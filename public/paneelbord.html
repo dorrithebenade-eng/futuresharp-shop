@@ -16,26 +16,32 @@
       <span class="merk-skeier">—</span>
       <span class="merk-shop">Future Shop</span>
     </a>
-    <div class="paneel-aanmeld-blok">
-      <span id="paneel-gebruiker-epos" class="paneel-gebruiker-epos"></span>
-      <button id="paneel-afmeld-knoppie" class="mini-kop-mandjie paneel-aanmeld-knoppie" type="button" style="display:none;">Meld af</button>
+    <div class="mini-kop-regs">
+      <div class="paneel-aanmeld-blok">
+        <span id="paneel-gebruiker-epos" class="paneel-gebruiker-epos"></span>
+        <button id="paneel-afmeld-knoppie" class="mini-kop-mandjie paneel-aanmeld-knoppie" type="button" style="display:none;" data-i18n="paneel_meld_af">Meld af</button>
+      </div>
+      <div class="taal-wisselaar" role="group" aria-label="Taal / Language">
+        <button type="button" class="taal-knoppie" data-taal="af">AF</button>
+        <button type="button" class="taal-knoppie" data-taal="en">EN</button>
+      </div>
     </div>
    </div>
   </header>
 
   <main class="paneel-wrap">
-    <h1 class="mandjie-titel">Personeel-paneelbord</h1>
+    <h1 class="mandjie-titel" data-i18n="paneel_titel">Personeel-paneelbord</h1>
 
     <!-- Aanmeld-vorm — verskyn wanneer niemand aangemeld is nie -->
     <section id="paneel-aanmeld-afdeling" class="paneel-auth-blok" style="display:none;">
-      <h2 class="paneel-afdeling-titel">Meld aan</h2>
-      <p class="paneel-hulp-teks">Net vir personeel — kontak die eienaar as jy nog nie 'n rekening het nie.</p>
+      <h2 class="paneel-afdeling-titel" data-i18n="paneel_meld_aan_titel">Meld aan</h2>
+      <p class="paneel-hulp-teks" data-i18n="paneel_aanmeld_hulp">Net vir personeel — kontak die eienaar as jy nog nie 'n rekening het nie.</p>
 
       <form id="paneel-aanmeld-vorm">
-        <label class="veld-etiket" for="aanmeld-epos">Epos</label>
+        <label class="veld-etiket" for="aanmeld-epos" data-i18n="paneel_epos">Epos</label>
         <input type="email" id="aanmeld-epos" class="veld-invoer" required autocomplete="username">
 
-        <label class="veld-etiket" for="aanmeld-wagwoord">Wagwoord</label>
+        <label class="veld-etiket" for="aanmeld-wagwoord" data-i18n="paneel_wagwoord">Wagwoord</label>
         <div class="paneel-wagwoord-wrap">
           <input type="password" id="aanmeld-wagwoord" class="veld-invoer" required autocomplete="current-password">
           <button type="button" class="paneel-wagwoord-ogie" data-teiken="aanmeld-wagwoord" aria-label="Wys/verberg wagwoord">👁</button>
@@ -43,34 +49,34 @@
 
         <div id="paneel-aanmeld-foute" class="vb-foute" style="display:none;"></div>
 
-        <button type="submit" class="kaart-aksie paneel-vorm-indien">Meld aan</button>
-        <button type="button" id="paneel-wagwoord-vergeet-skakel" class="paneel-skakel-knoppie">Wagwoord vergeet?</button>
+        <button type="submit" class="kaart-aksie paneel-vorm-indien" data-i18n="paneel_meld_aan_knoppie">Meld aan</button>
+        <button type="button" id="paneel-wagwoord-vergeet-skakel" class="paneel-skakel-knoppie" data-i18n="paneel_wagwoord_vergeet">Wagwoord vergeet?</button>
       </form>
     </section>
 
     <!-- Wagwoord-vergeet-vorm -->
     <section id="paneel-herstel-afdeling" class="paneel-auth-blok" style="display:none;">
-      <h2 class="paneel-afdeling-titel">Wagwoord herstel</h2>
+      <h2 class="paneel-afdeling-titel" data-i18n="paneel_herstel_titel">Wagwoord herstel</h2>
       <form id="paneel-herstel-vorm">
-        <label class="veld-etiket" for="herstel-epos">Epos</label>
+        <label class="veld-etiket" for="herstel-epos" data-i18n="paneel_epos">Epos</label>
         <input type="email" id="herstel-epos" class="veld-invoer" required autocomplete="username">
 
         <div id="paneel-herstel-foute" class="vb-foute" style="display:none;"></div>
-        <div id="paneel-herstel-sukses" class="stelsel-boodskap" style="display:none;">
+        <div id="paneel-herstel-sukses" class="stelsel-boodskap" style="display:none;" data-i18n="paneel_herstel_sukses">
           'n Herstel-skakel is gestuur — kyk jou e-pos.
         </div>
 
-        <button type="submit" class="kaart-aksie paneel-vorm-indien">Stuur herstel-skakel</button>
-        <button type="button" id="paneel-terug-na-aanmeld-skakel" class="paneel-skakel-knoppie">Terug na aanmeld</button>
+        <button type="submit" class="kaart-aksie paneel-vorm-indien" data-i18n="paneel_stuur_herstel">Stuur herstel-skakel</button>
+        <button type="button" id="paneel-terug-na-aanmeld-skakel" class="paneel-skakel-knoppie" data-i18n="paneel_terug_aanmeld">Terug na aanmeld</button>
       </form>
     </section>
 
     <!-- Stel-nuwe-wagwoord-vorm — verskyn outomaties wanneer 'n token
          (uitnodiging/bevestiging/herstel) in die URL gevind word -->
     <section id="paneel-nuwe-wagwoord-afdeling" class="paneel-auth-blok" style="display:none;">
-      <h2 class="paneel-afdeling-titel">Stel jou wagwoord</h2>
+      <h2 class="paneel-afdeling-titel" data-i18n="paneel_nuwe_wagwoord_titel">Stel jou wagwoord</h2>
       <form id="paneel-nuwe-wagwoord-vorm">
-        <label class="veld-etiket" for="nuwe-wagwoord">Nuwe wagwoord</label>
+        <label class="veld-etiket" for="nuwe-wagwoord" data-i18n="paneel_nuwe_wagwoord_etiket">Nuwe wagwoord</label>
         <div class="paneel-wagwoord-wrap">
           <input type="password" id="nuwe-wagwoord" class="veld-invoer" required minlength="8" autocomplete="new-password">
           <button type="button" class="paneel-wagwoord-ogie" data-teiken="nuwe-wagwoord" aria-label="Wys/verberg wagwoord">👁</button>
@@ -78,7 +84,7 @@
 
         <div id="paneel-nuwe-wagwoord-foute" class="vb-foute" style="display:none;"></div>
 
-        <button type="submit" class="kaart-aksie paneel-vorm-indien">Stel wagwoord</button>
+        <button type="submit" class="kaart-aksie paneel-vorm-indien" data-i18n="paneel_stel_wagwoord_knoppie">Stel wagwoord</button>
       </form>
     </section>
 
@@ -88,80 +94,80 @@
 
       <section class="paneel-afdeling">
         <div class="paneel-afdeling-kop">
-          <h2 class="paneel-afdeling-titel">Katalogus</h2>
-          <button id="paneel-voeg-by-knoppie" class="kaart-aksie paneel-voeg-by-knoppie" type="button">+ Voeg produk by</button>
+          <h2 class="paneel-afdeling-titel" data-i18n="paneel_katalogus_titel">Katalogus</h2>
+          <button id="paneel-voeg-by-knoppie" class="kaart-aksie paneel-voeg-by-knoppie" type="button" data-i18n="paneel_voeg_produk_by_knoppie">+ Voeg produk by</button>
         </div>
         <div id="paneel-produkte-lys">
-          <p class="stelsel-boodskap">Produkte word gelaai …</p>
+          <p class="stelsel-boodskap" data-i18n="paneel_produkte_laai">Produkte word gelaai …</p>
         </div>
       </section>
 
       <section id="paneel-vorm-afdeling" class="paneel-afdeling" style="display:none;">
         <div class="paneel-afdeling-kop">
-          <h2 id="paneel-vorm-titel" class="paneel-afdeling-titel">Voeg produk by</h2>
-          <button id="paneel-vorm-kanselleer" class="terug-skakel paneel-vorm-kanselleer" type="button">✕ Kanselleer</button>
+          <h2 id="paneel-vorm-titel" class="paneel-afdeling-titel" data-i18n="paneel_voeg_produk_by_titel">Voeg produk by</h2>
+          <button id="paneel-vorm-kanselleer" class="terug-skakel paneel-vorm-kanselleer" type="button" data-i18n="paneel_kanselleer">✕ Kanselleer</button>
         </div>
 
         <form id="paneel-produk-vorm">
           <input type="hidden" id="vorm-oorspronklike-slug" value="">
 
-          <label class="veld-etiket" for="vorm-slug">Slug (kort, unieke kode — bv. "my-boek-titel") <span class="veld-verplig">(verplig)</span></label>
+          <label class="veld-etiket" for="vorm-slug"><span data-i18n="vorm_slug_etiket">Slug (kort, unieke kode — bv. "my-boek-titel")</span> <span class="veld-verplig" data-i18n="verplig">(verplig)</span></label>
           <input type="text" id="vorm-slug" class="veld-invoer" required>
 
-          <label class="veld-etiket" for="vorm-titel">Titel <span class="veld-verplig">(verplig)</span></label>
+          <label class="veld-etiket" for="vorm-titel"><span data-i18n="vorm_titel_etiket">Titel</span> <span class="veld-verplig" data-i18n="verplig">(verplig)</span></label>
           <input type="text" id="vorm-titel" class="veld-invoer" required>
 
-          <label class="veld-etiket" for="vorm-outeur">Outeur <span class="veld-verplig">(verplig)</span></label>
+          <label class="veld-etiket" for="vorm-outeur"><span data-i18n="vorm_outeur_etiket">Outeur</span> <span class="veld-verplig" data-i18n="verplig">(verplig)</span></label>
           <input type="text" id="vorm-outeur" class="veld-invoer" required>
 
-          <label class="veld-etiket" for="vorm-oorsig">Oorsig (verskyn op die katalogus-kaart, ongeveer 100 woorde)</label>
+          <label class="veld-etiket" for="vorm-oorsig" data-i18n="vorm_oorsig_etiket">Oorsig (verskyn op die katalogus-kaart, ongeveer 100 woorde)</label>
           <textarea id="vorm-oorsig" class="veld-invoer paneel-teksarea" rows="5"></textarea>
 
-          <label class="veld-etiket" for="vorm-vol-beskrywing">Volledige beskrywing (verskyn op die produk-bladsy)</label>
+          <label class="veld-etiket" for="vorm-vol-beskrywing" data-i18n="vorm_vol_beskrywing_etiket">Volledige beskrywing (verskyn op die produk-bladsy)</label>
           <textarea id="vorm-vol-beskrywing" class="veld-invoer paneel-teksarea" rows="6"></textarea>
 
-          <label class="veld-etiket" for="vorm-omslag">Omslag — beeld-URL/-pad</label>
+          <label class="veld-etiket" for="vorm-omslag" data-i18n="vorm_omslag_etiket">Omslag — beeld-URL/-pad</label>
           <input type="text" id="vorm-omslag" class="veld-invoer" placeholder="/images/omslae/my-boek-titel.jpg">
-          <p class="paneel-hulp-teks">Lêer-oplaai is nog nie gebou nie — plaas die omslagbeeld self in <code>public/images/omslae/</code> en tik die pad hier in.</p>
+          <p class="paneel-hulp-teks" data-i18n="vorm_omslag_hulp">Lêer-oplaai is nog nie gebou nie — plaas die omslagbeeld self in <code>public/images/omslae/</code> en tik die pad hier in.</p>
 
           <fieldset class="paneel-formaat-blok">
-            <legend class="paneel-formaat-titel">E-boek</legend>
+            <legend class="paneel-formaat-titel" data-i18n="paneel_eboek">E-boek</legend>
 
             <label class="paneel-wisselaar">
               <input type="checkbox" id="vorm-eboek-beskikbaar" checked>
-              Beskikbaar
+              <span data-i18n="paneel_beskikbaar">Beskikbaar</span>
             </label>
 
             <div id="vorm-eboek-velde">
               <div class="veld-ry">
                 <div>
-                  <label class="veld-etiket" for="vorm-eboek-prys">Prys (R)</label>
+                  <label class="veld-etiket" for="vorm-eboek-prys" data-i18n="paneel_prys_r">Prys (R)</label>
                   <input type="number" id="vorm-eboek-prys" class="veld-invoer" min="0" step="0.01">
                 </div>
                 <div>
-                  <label class="veld-etiket" for="vorm-eboek-vrystelling">Vrystellingsdatum (leeg = dadelik beskikbaar)</label>
+                  <label class="veld-etiket" for="vorm-eboek-vrystelling" data-i18n="paneel_vrystellingsdatum">Vrystellingsdatum (leeg = dadelik beskikbaar)</label>
                   <input type="date" id="vorm-eboek-vrystelling" class="veld-invoer">
                 </div>
               </div>
 
               <label class="paneel-wisselaar">
                 <input type="checkbox" id="vorm-eboek-verdeling-aan">
-                Outeur-verdeling (Paystack-subrekening) op hierdie formaat
+                <span data-i18n="paneel_outeur_verdeling">Outeur-verdeling (Paystack-subrekening) op hierdie formaat</span>
               </label>
 
               <div id="vorm-eboek-verdeling-velde" style="display:none;">
-                <label class="veld-etiket" for="vorm-eboek-subrekening">Subrekening-kode (ACCT_...)</label>
+                <label class="veld-etiket" for="vorm-eboek-subrekening" data-i18n="paneel_subrekening_kode">Subrekening-kode (ACCT_...)</label>
                 <input type="text" id="vorm-eboek-subrekening" class="veld-invoer" placeholder="ACCT_xxxxxxxxxx">
                 <div class="veld-ry">
                   <div>
-                    <label class="veld-etiket" for="vorm-eboek-verdeling-tipe">Tipe</label>
+                    <label class="veld-etiket" for="vorm-eboek-verdeling-tipe" data-i18n="paneel_tipe">Tipe</label>
                     <select id="vorm-eboek-verdeling-tipe" class="veld-invoer">
-                      <option value="persentasie">Persentasie</option>
-                      <option value="vaste_bedrag">Vaste bedrag</option>
+                      <option value="persentasie" data-i18n="paneel_persentasie">Persentasie</option>
+                      <option value="vaste_bedrag" data-i18n="paneel_vaste_bedrag">Vaste bedrag</option>
                     </select>
                   </div>
                   <div>
-                    <label class="veld-etiket" for="vorm-eboek-verdeling-waarde">Waarde (% of R, na gelang van tipe)</label>
+                    <label class="veld-etiket" for="vorm-eboek-verdeling-waarde" data-i18n="paneel_waarde">Waarde (% of R, na gelang van tipe)</label>
                     <input type="number" id="vorm-eboek-verdeling-waarde" class="veld-invoer" min="0" step="0.01">
                   </div>
                 </div>
@@ -170,49 +176,49 @@
           </fieldset>
 
           <fieldset class="paneel-formaat-blok">
-            <legend class="paneel-formaat-titel">Harde kopie</legend>
+            <legend class="paneel-formaat-titel" data-i18n="paneel_hardekopie">Harde kopie</legend>
 
             <label class="paneel-wisselaar">
               <input type="checkbox" id="vorm-hardekopie-beskikbaar">
-              Beskikbaar
+              <span data-i18n="paneel_beskikbaar">Beskikbaar</span>
             </label>
 
             <div id="vorm-hardekopie-velde" style="display:none;">
               <div class="veld-ry">
                 <div>
-                  <label class="veld-etiket" for="vorm-hardekopie-prys">Prys (R)</label>
+                  <label class="veld-etiket" for="vorm-hardekopie-prys" data-i18n="paneel_prys_r">Prys (R)</label>
                   <input type="number" id="vorm-hardekopie-prys" class="veld-invoer" min="0" step="0.01">
                 </div>
                 <div>
-                  <label class="veld-etiket" for="vorm-hardekopie-vrystelling">Vrystellingsdatum (leeg = dadelik beskikbaar)</label>
+                  <label class="veld-etiket" for="vorm-hardekopie-vrystelling" data-i18n="paneel_vrystellingsdatum">Vrystellingsdatum (leeg = dadelik beskikbaar)</label>
                   <input type="date" id="vorm-hardekopie-vrystelling" class="veld-invoer">
                 </div>
               </div>
 
-              <label class="veld-etiket" for="vorm-hardekopie-voorraad">Voorraad-status</label>
+              <label class="veld-etiket" for="vorm-hardekopie-voorraad" data-i18n="paneel_voorraad_status">Voorraad-status</label>
               <select id="vorm-hardekopie-voorraad" class="veld-invoer">
-                <option value="beskikbaar">Beskikbaar</option>
-                <option value="uitverkoop">Uitverkoop</option>
+                <option value="beskikbaar" data-i18n="paneel_beskikbaar">Beskikbaar</option>
+                <option value="uitverkoop" data-i18n="paneel_uitverkoop">Uitverkoop</option>
               </select>
 
               <label class="paneel-wisselaar">
                 <input type="checkbox" id="vorm-hardekopie-verdeling-aan">
-                Outeur-verdeling (Paystack-subrekening) op hierdie formaat
+                <span data-i18n="paneel_outeur_verdeling">Outeur-verdeling (Paystack-subrekening) op hierdie formaat</span>
               </label>
 
               <div id="vorm-hardekopie-verdeling-velde" style="display:none;">
-                <label class="veld-etiket" for="vorm-hardekopie-subrekening">Subrekening-kode (ACCT_...)</label>
+                <label class="veld-etiket" for="vorm-hardekopie-subrekening" data-i18n="paneel_subrekening_kode">Subrekening-kode (ACCT_...)</label>
                 <input type="text" id="vorm-hardekopie-subrekening" class="veld-invoer" placeholder="ACCT_xxxxxxxxxx">
                 <div class="veld-ry">
                   <div>
-                    <label class="veld-etiket" for="vorm-hardekopie-verdeling-tipe">Tipe</label>
+                    <label class="veld-etiket" for="vorm-hardekopie-verdeling-tipe" data-i18n="paneel_tipe">Tipe</label>
                     <select id="vorm-hardekopie-verdeling-tipe" class="veld-invoer">
-                      <option value="persentasie">Persentasie</option>
-                      <option value="vaste_bedrag">Vaste bedrag</option>
+                      <option value="persentasie" data-i18n="paneel_persentasie">Persentasie</option>
+                      <option value="vaste_bedrag" data-i18n="paneel_vaste_bedrag">Vaste bedrag</option>
                     </select>
                   </div>
                   <div>
-                    <label class="veld-etiket" for="vorm-hardekopie-verdeling-waarde">Waarde (% of R, na gelang van tipe)</label>
+                    <label class="veld-etiket" for="vorm-hardekopie-verdeling-waarde" data-i18n="paneel_waarde">Waarde (% of R, na gelang van tipe)</label>
                     <input type="number" id="vorm-hardekopie-verdeling-waarde" class="veld-invoer" min="0" step="0.01">
                   </div>
                 </div>
@@ -222,13 +228,14 @@
 
           <div id="paneel-vorm-foute" class="vb-foute" style="display:none;"></div>
 
-          <button type="submit" id="paneel-vorm-indien" class="kaart-aksie paneel-vorm-indien">Skep produk</button>
+          <button type="submit" id="paneel-vorm-indien" class="kaart-aksie paneel-vorm-indien" data-i18n="paneel_skep_produk">Skep produk</button>
         </form>
       </section>
 
     </div>
   </main>
 
+  <script src="js/taal.js"></script>
   <script src="js/paneelbord.js"></script>
 </body>
 </html>

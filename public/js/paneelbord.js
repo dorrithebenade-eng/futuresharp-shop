@@ -35,7 +35,7 @@ function wys_aangemeld_toestand(gebruiker) {
 
   if (!het_personeel_rol(gebruiker)) {
     statusWrap.style.display = "block";
-    statusWrap.textContent = "Jou rekening het nie 'n personeel-rol nie — kontak die eienaar om toegang te kry.";
+    statusWrap.textContent = t("paneel_geen_personeel_rol");
     inhoudWrap.style.display = "none";
     return;
   }
@@ -61,7 +61,7 @@ function kry_outorisasie_kop() {
 
 async function laai_produkte() {
   const wrap = document.getElementById("paneel-produkte-lys");
-  wrap.innerHTML = `<p class="stelsel-boodskap">Produkte word gelaai …</p>`;
+  wrap.innerHTML = `<p class="stelsel-boodskap">${t("paneel_produkte_laai")}</p>`;
 
   try {
     const resp = await fetch(ALLE_PRODUKTE_ENDPOINT, { headers: kry_outorisasie_kop() });
@@ -70,7 +70,7 @@ async function laai_produkte() {
     wys_produkte_lys(data.produkte || []);
   } catch (fout) {
     console.error("Kon nie produkte laai nie:", fout);
-    wrap.innerHTML = `<p class="stelsel-boodskap">Kon nie produkte laai nie — probeer weer.</p>`;
+    wrap.innerHTML = `<p class="stelsel-boodskap">${t("paneel_kon_nie_produkte_laai")}</p>`;
   }
 }
 
@@ -78,7 +78,7 @@ function wys_produkte_lys(produkte) {
   const wrap = document.getElementById("paneel-produkte-lys");
 
   if (!produkte.length) {
-    wrap.innerHTML = `<p class="stelsel-boodskap">Nog geen produkte nie — voeg die eerste een by.</p>`;
+    wrap.innerHTML = `<p class="stelsel-boodskap">${t("paneel_nog_geen_produkte")}</p>`;
     return;
   }
 
@@ -88,21 +88,21 @@ function wys_produkte_lys(produkte) {
       const hardeKopie = produk.formate && produk.formate.harde_kopie;
 
       const pryse = [];
-      if (eboek && eboek.beskikbaar) pryse.push(`E-boek — ${formateer_prys_sent(eboek.prys_sent)}`);
-      if (hardeKopie && hardeKopie.beskikbaar) pryse.push(`Harde kopie — ${formateer_prys_sent(hardeKopie.prys_sent)}`);
+      if (eboek && eboek.beskikbaar) pryse.push(`${t("paneel_eboek")} — ${formateer_prys_sent(eboek.prys_sent)}`);
+      if (hardeKopie && hardeKopie.beskikbaar) pryse.push(`${t("paneel_hardekopie")} — ${formateer_prys_sent(hardeKopie.prys_sent)}`);
 
       return `
         <div class="paneel-produk-ry ${produk.aktief ? "" : "paneel-produk-ry-onaktief"}">
           <div class="paneel-produk-inligting">
             <strong>${produk.titel}</strong>
             <span class="paneel-produk-outeur">${produk.outeur}</span>
-            <span class="paneel-produk-pryse">${pryse.join(" · ") || "Geen formaat beskikbaar nie"}</span>
-            ${!produk.aktief ? `<span class="paneel-onaktief-etiket">Onaktief</span>` : ""}
+            <span class="paneel-produk-pryse">${pryse.join(" · ") || t("paneel_geen_formaat")}</span>
+            ${!produk.aktief ? `<span class="paneel-onaktief-etiket">${t("paneel_onaktief")}</span>` : ""}
           </div>
           <div class="paneel-produk-aksies">
-            <button class="terug-skakel paneel-wysig-knoppie" data-slug="${produk.slug}">Wysig</button>
+            <button class="terug-skakel paneel-wysig-knoppie" data-slug="${produk.slug}">${t("paneel_wysig")}</button>
             <button class="terug-skakel paneel-aktief-knoppie" data-slug="${produk.slug}" data-aktief="${produk.aktief}">
-              ${produk.aktief ? "Deaktiveer" : "Aktiveer"}
+              ${produk.aktief ? t("paneel_deaktiveer") : t("paneel_aktiveer")}
             </button>
           </div>
         </div>
@@ -131,7 +131,7 @@ function wys_produkte_lys(produkte) {
         laai_produkte();
       } catch (fout) {
         console.error("Kon nie aktief-status wysig nie:", fout);
-        alert("Kon nie die produk se status wysig nie — probeer weer.");
+        alert(t("paneel_kon_nie_status_wysig"));
         knoppie.disabled = false;
       }
     });
@@ -146,8 +146,8 @@ function reset_vorm() {
   document.getElementById("vorm-slug").disabled = false;
   document.getElementById("vorm-eboek-beskikbaar").checked = true;
   wys_verberg_formaat_velde();
-  document.getElementById("paneel-vorm-titel").textContent = "Voeg produk by";
-  document.getElementById("paneel-vorm-indien").textContent = "Skep produk";
+  document.getElementById("paneel-vorm-titel").textContent = t("paneel_voeg_produk_by_titel");
+  document.getElementById("paneel-vorm-indien").textContent = t("paneel_skep_produk");
   document.getElementById("paneel-vorm-foute").style.display = "none";
 }
 
@@ -170,8 +170,8 @@ function open_vorm_vir_toevoeging() {
 
 function open_vorm_vir_wysig(produk) {
   reset_vorm();
-  document.getElementById("paneel-vorm-titel").textContent = `Wysig — ${produk.titel}`;
-  document.getElementById("paneel-vorm-indien").textContent = "Stoor wysigings";
+  document.getElementById("paneel-vorm-titel").textContent = `${t("paneel_wysig_titel_voorvoegsel")}${produk.titel}`;
+  document.getElementById("paneel-vorm-indien").textContent = t("paneel_stoor_wysigings");
   document.getElementById("vorm-oorspronklike-slug").value = produk.slug;
 
   document.getElementById("vorm-slug").value = produk.slug;
@@ -279,17 +279,17 @@ async function hanteer_vorm_indiening(gebeurtenis) {
   const produk = bou_produk_liggaam();
 
   if (!produk.slug || !produk.titel || !produk.outeur) {
-    wys_vorm_foute("Slug, titel en outeur is verpligte velde.");
+    wys_vorm_foute(t("paneel_verpligte_velde_fout"));
     return;
   }
   if (!produk.formate.eboek.beskikbaar && !produk.formate.harde_kopie.beskikbaar) {
-    wys_vorm_foute("Ten minste een formaat (e-boek of harde kopie) moet beskikbaar wees.");
+    wys_vorm_foute(t("paneel_formaat_verplig_fout"));
     return;
   }
 
   const knoppie = document.getElementById("paneel-vorm-indien");
   knoppie.disabled = true;
-  knoppie.textContent = "Besig …";
+  knoppie.textContent = t("besig");
 
   try {
     const resp = is_wysiging
@@ -313,10 +313,10 @@ async function hanteer_vorm_indiening(gebeurtenis) {
     laai_produkte();
   } catch (fout) {
     console.error("Kon nie produk stoor nie:", fout);
-    wys_vorm_foute(`Kon nie stoor nie: ${fout.message}`);
+    wys_vorm_foute(`${t("paneel_kon_nie_stoor")}${fout.message}`);
   } finally {
     knoppie.disabled = false;
-    knoppie.textContent = is_wysiging ? "Stoor wysigings" : "Skep produk";
+    knoppie.textContent = is_wysiging ? t("paneel_stoor_wysigings") : t("paneel_skep_produk");
   }
 }
 
@@ -364,7 +364,7 @@ function wys_stel_nuwe_wagwoord_afdeling(token_inligting) {
       window.history.replaceState(null, "", window.location.pathname);
       wys_aangemeld_toestand(sessie.gebruiker);
     } catch (fout) {
-      foutWrap.textContent = `Kon nie wagwoord stel nie: ${fout.message}`;
+      foutWrap.textContent = `${t("paneel_kon_nie_wagwoord_stel")}${fout.message}`;
       foutWrap.style.display = "block";
     }
   };
@@ -396,7 +396,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const sessie = await identiteit_meld_aan(epos, wagwoord);
       wys_aangemeld_toestand(sessie.gebruiker);
     } catch (fout) {
-      foutWrap.textContent = `Kon nie aanmeld nie: ${fout.message}`;
+      foutWrap.textContent = `${t("paneel_kon_nie_aanmeld")}${fout.message}`;
       foutWrap.style.display = "block";
     }
   });
@@ -424,7 +424,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       await identiteit_stuur_herstel(epos);
       suksesWrap.style.display = "block";
     } catch (fout) {
-      foutWrap.textContent = `Kon nie herstel-epos stuur nie: ${fout.message}`;
+      foutWrap.textContent = `${t("paneel_kon_nie_herstel_stuur")}${fout.message}`;
       foutWrap.style.display = "block";
     }
   });
