@@ -28,26 +28,33 @@
       <span class="merk-skeier">—</span>
       <span class="merk-shop">Future Shop</span>
     </a>
-    <a href="mandjie.html" class="mini-kop-mandjie">
-      <svg class="mandjie-ikoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <circle cx="9" cy="21" r="1"></circle>
-        <circle cx="20" cy="21" r="1"></circle>
-        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-      </svg>
-      Mandjie
-      <span id="mandjie-teller" class="mandjie-teller"></span>
-    </a>
+    <div class="mini-kop-regs">
+      <a href="mandjie.html" class="mini-kop-mandjie">
+        <svg class="mandjie-ikoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="9" cy="21" r="1"></circle>
+          <circle cx="20" cy="21" r="1"></circle>
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+        </svg>
+        <span data-i18n="nav_mandjie">Mandjie</span>
+        <span id="mandjie-teller" class="mandjie-teller"></span>
+      </a>
+      <div class="taal-wisselaar" role="group" aria-label="Taal / Language">
+        <button type="button" class="taal-knoppie" data-taal="af">AF</button>
+        <button type="button" class="taal-knoppie" data-taal="en">EN</button>
+      </div>
+    </div>
    </div>
   </header>
 
   <main class="vb-wrap">
-    <a class="terug-skakel" href="mandjie.html">&larr; Terug na mandjie</a>
-    <h1 class="mandjie-titel">Voltooi betaling</h1>
+    <a class="terug-skakel" href="mandjie.html" data-i18n="terug_mandjie">&larr; Terug na mandjie</a>
+    <h1 class="mandjie-titel" data-i18n="voltooi_betaling_titel">Voltooi betaling</h1>
     <div id="vb-inhoud">
-      <p class="stelsel-boodskap">Word gelaai …</p>
+      <p class="stelsel-boodskap" data-i18n="word_gelaai">Word gelaai …</p>
     </div>
   </main>
 
+  <script src="js/taal.js"></script>
   <script src="js/mandjie.js"></script>
   <script src="js/voltooi-betaling.js"></script>
 </body>

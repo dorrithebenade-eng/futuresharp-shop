@@ -10,7 +10,7 @@ function formateer_prys_sent(sent) {
 }
 
 function etiket_vir_formaat(formaat) {
-  return formaat === "harde_kopie" ? "Harde kopie" : "E-boek";
+  return formaat === "harde_kopie" ? t("hardekopie_etiket") : t("eboek_etiket");
 }
 
 function kry_of_skep_bestelnommer() {
@@ -27,7 +27,7 @@ function kry_of_skep_bestelnommer() {
 function bou_opsomming(items, totaal) {
   return `
     <section class="vb-afdeling">
-      <h2 class="vb-afdeling-titel">Bestelling-opsomming</h2>
+      <h2 class="vb-afdeling-titel">${t("bestelling_opsomming")}</h2>
       <div class="vb-opsomming-lys">
         ${items
           .map(
@@ -40,7 +40,7 @@ function bou_opsomming(items, totaal) {
           .join("")}
       </div>
       <div class="vb-opsomming-totaal">
-        <span>Totaal</span>
+        <span>${t("totaal")}</span>
         <span>${formateer_prys_sent(totaal)}</span>
       </div>
     </section>
@@ -50,21 +50,21 @@ function bou_opsomming(items, totaal) {
 function bou_aflewer_afdeling() {
   return `
     <section class="vb-afdeling">
-      <h2 class="vb-afdeling-titel">Aflewering</h2>
-      <p class="vb-afdeling-nota">Jou mandjie bevat 'n harde-kopie-item — verskaf asseblief 'n afleweradres.</p>
+      <h2 class="vb-afdeling-titel">${t("aflewering_titel")}</h2>
+      <p class="vb-afdeling-nota">${t("aflewering_nota")}</p>
 
       <div id="aflewer-adres-blok" class="aflewer-blok">
-        <label class="veld-etiket" for="adres-straat">Straatadres</label>
+        <label class="veld-etiket" for="adres-straat">${t("straatadres")}</label>
         <input type="text" id="adres-straat" class="veld-invoer">
-        <label class="veld-etiket" for="adres-stad">Stad</label>
+        <label class="veld-etiket" for="adres-stad">${t("stad")}</label>
         <input type="text" id="adres-stad" class="veld-invoer">
         <div class="veld-ry">
           <div>
-            <label class="veld-etiket" for="adres-provinsie">Provinsie</label>
+            <label class="veld-etiket" for="adres-provinsie">${t("provinsie")}</label>
             <input type="text" id="adres-provinsie" class="veld-invoer">
           </div>
           <div>
-            <label class="veld-etiket" for="adres-poskode">Poskode</label>
+            <label class="veld-etiket" for="adres-poskode">${t("poskode")}</label>
             <input type="text" id="adres-poskode" class="veld-invoer">
           </div>
         </div>
@@ -76,10 +76,10 @@ function bou_aflewer_afdeling() {
 function bou_kontak_afdeling() {
   return `
     <section class="vb-afdeling">
-      <h2 class="vb-afdeling-titel">Kontakbesonderhede</h2>
-      <label class="veld-etiket" for="kontak-epos">E-pos</label>
+      <h2 class="vb-afdeling-titel">${t("kontakbesonderhede")}</h2>
+      <label class="veld-etiket" for="kontak-epos">${t("epos")}</label>
       <input type="email" id="kontak-epos" class="veld-invoer" required>
-      <label class="veld-etiket" for="kontak-selfoon">Selfoonnommer <span class="veld-verplig">(verplig)</span></label>
+      <label class="veld-etiket" for="kontak-selfoon">${t("selfoonnommer")} <span class="veld-verplig">${t("verplig")}</span></label>
       <input type="tel" id="kontak-selfoon" class="veld-invoer" placeholder="08x xxx xxxx" required>
     </section>
   `;
@@ -91,8 +91,8 @@ function valideer_en_bou_bestelling(items, totaal, bestelnommer, bevat_harde_kop
   const epos = document.getElementById("kontak-epos").value.trim();
   const selfoon = document.getElementById("kontak-selfoon").value.trim();
 
-  if (!epos) foute.push("E-pos is verplig.");
-  if (!selfoon) foute.push("Selfoonnommer is verplig.");
+  if (!epos) foute.push(t("epos_verplig"));
+  if (!selfoon) foute.push(t("selfoon_verplig"));
 
   let aflewering = null;
 
@@ -103,7 +103,7 @@ function valideer_en_bou_bestelling(items, totaal, bestelnommer, bevat_harde_kop
     const poskode = document.getElementById("adres-poskode").value.trim();
 
     if (!straat || !stad || !provinsie || !poskode) {
-      foute.push("Vul asseblief die volledige afleweradres in.");
+      foute.push(t("volledige_adres_verplig"));
     } else {
       aflewering = { straat, stad, provinsie, poskode };
     }
@@ -141,7 +141,7 @@ function wys_foute(foute) {
 async function stuur_na_betaling(bestelling) {
   const knoppie = document.getElementById("gaan-na-betaling");
   knoppie.disabled = true;
-  knoppie.textContent = "Besig …";
+  knoppie.textContent = t("besig");
 
   try {
     const resp = await fetch("/.netlify/functions/begin-betaling", {
@@ -158,11 +158,9 @@ async function stuur_na_betaling(bestelling) {
     window.location.href = data.authorization_url;
   } catch (fout) {
     console.error("Kon nie na betaling gaan nie:", fout);
-    wys_foute([
-      "Kon nie tans na betaling gaan nie — die betaalfunksie is dalk nog nie ontplooi/opgestel nie. Probeer weer, of kontak ons as dit voortduur.",
-    ]);
+    wys_foute([t("betaling_fout")]);
     knoppie.disabled = false;
-    knoppie.textContent = "Gaan na betaling";
+    knoppie.textContent = t("gaan_na_betaling");
   }
 }
 
@@ -173,7 +171,7 @@ function laai_vb() {
   if (!items.length) {
     wrap.innerHTML = `
       <p class="stelsel-boodskap">
-        Jou mandjie is leeg. <a href="index.html">Blaai deur die katalogus</a>.
+        ${t("mandjie_leeg")} <a href="index.html">${t("blaai_katalogus")}</a>.
       </p>
     `;
     return;
@@ -184,12 +182,12 @@ function laai_vb() {
   const bestelnommer = kry_of_skep_bestelnommer();
 
   wrap.innerHTML = `
-    <p class="vb-bestelnommer">Bestelnommer: <strong>${bestelnommer}</strong></p>
+    <p class="vb-bestelnommer">${t("bestelnommer_etiket")}: <strong>${bestelnommer}</strong></p>
     ${bou_opsomming(items, totaal)}
     ${bevatHardeKopie ? bou_aflewer_afdeling() : ""}
     ${bou_kontak_afdeling()}
     <div id="vb-foute" class="vb-foute" style="display:none;"></div>
-    <button class="kaart-aksie vb-betaal-knoppie" id="gaan-na-betaling">Gaan na betaling</button>
+    <button class="kaart-aksie vb-betaal-knoppie" id="gaan-na-betaling">${t("gaan_na_betaling")}</button>
   `;
 
   document.getElementById("gaan-na-betaling").addEventListener("click", () => {

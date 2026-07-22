@@ -47,14 +47,14 @@ function bou_aksie_ry(produk, formaat, formaat_data, etiket) {
         <span class="produk-formaat-etiket">${etiket}</span>
         <span class="produk-formaat-prys">${formateer_prys_sent(formaat_data.prys_sent)}</span>
         ${voorbestelling
-          ? `<span class="produk-voorbestel-nota">Voorbestelling — beskikbaar vanaf ${formateer_datum_af(formaat_data.vrystelling_datum)}</span>`
+          ? `<span class="produk-voorbestel-nota">${t("voorbestelling_beskikbaar_vanaf")} ${formateer_datum_af(formaat_data.vrystelling_datum)}</span>`
           : ""}
       </div>
       <button class="kaart-aksie produk-formaat-knoppie" id="${knoppie_id}"
         data-slug="${produk.slug}" data-formaat="${formaat}"
         data-titel="${produk.titel}" data-prys="${formaat_data.prys_sent}"
         data-voorbestelling="${voorbestelling}">
-        ${voorbestelling ? "Voorbestel nou" : "Voeg by mandjie"}
+        ${voorbestelling ? t("voorbestel_nou") : t("voeg_by_mandjie")}
       </button>
     </div>
   `;
@@ -74,14 +74,14 @@ function wys_produk(produk) {
 
   const aksies = [];
   if (eboek && eboek.beskikbaar) {
-    aksies.push(bou_aksie_ry(produk, "eboek", eboek, "E-boek"));
+    aksies.push(bou_aksie_ry(produk, "eboek", eboek, t("eboek_etiket")));
   }
   if (hardeKopie && hardeKopie.beskikbaar) {
-    aksies.push(bou_aksie_ry(produk, "harde_kopie", hardeKopie, "Harde kopie"));
+    aksies.push(bou_aksie_ry(produk, "harde_kopie", hardeKopie, t("hardekopie_etiket")));
   }
 
   wrap.innerHTML = `
-    <a class="terug-skakel" href="index.html">&larr; Terug na katalogus</a>
+    <a class="terug-skakel" href="index.html">${t("terug_katalogus")}</a>
     <div class="produk-uitleg">
       ${omslagHtml}
       <div class="produk-inligting">
@@ -106,14 +106,12 @@ function wys_produk(produk) {
 
       const terugvoer = document.getElementById("produk-terugvoer");
       if (resultaat.reeds_in_mandjie) {
-        terugvoer.textContent = "Reeds in jou mandjie.";
+        terugvoer.textContent = t("reeds_in_mandjie");
       } else {
-        knoppie.textContent = voorbestelling === "true" ? "Voorbestel ✓" : "In mandjie ✓";
+        knoppie.textContent = voorbestelling === "true" ? t("voorbestel_teken") : t("in_mandjie_teken");
         knoppie.disabled = true;
         terugvoer.textContent =
-          voorbestelling === "true"
-            ? "Voorbestelling bygevoeg — jy betaal nou, en kry toegang sodra dit vrygestel word."
-            : "Bygevoeg by mandjie.";
+          voorbestelling === "true" ? t("voorbestelling_bygevoeg") : t("bygevoeg_mandjie");
       }
     });
   });
@@ -143,13 +141,13 @@ async function laai_produk() {
       wys_produk(produkte[0]);
       return;
     }
-    wrap.innerHTML = `<p class="stelsel-boodskap">Geen produk gespesifiseer nie. <a href="index.html">Terug na katalogus</a></p>`;
+    wrap.innerHTML = `<p class="stelsel-boodskap">${t("geen_produk")} <a href="index.html">${t("terug_katalogus_skakel")}</a></p>`;
     return;
   }
 
   const produk = produkte.find((p) => p.slug === slug);
   if (!produk) {
-    wrap.innerHTML = `<p class="stelsel-boodskap">Hierdie produk kon nie gevind word nie. <a href="index.html">Terug na katalogus</a></p>`;
+    wrap.innerHTML = `<p class="stelsel-boodskap">${t("produk_nie_gevind")} <a href="index.html">${t("terug_katalogus_skakel")}</a></p>`;
     return;
   }
 

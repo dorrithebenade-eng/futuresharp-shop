@@ -39,14 +39,14 @@ function bou_kaart(produk) {
   const pryse = [];
   if (eboek && eboek.beskikbaar) {
     const etiket = is_voorbestelling(eboek)
-      ? `E-boek — ${formateer_prys_sent(eboek.prys_sent)} · Voorbestelling`
-      : `E-boek — ${formateer_prys_sent(eboek.prys_sent)}`;
+      ? `${t("eboek_etiket")} — ${formateer_prys_sent(eboek.prys_sent)} · ${t("voorbestelling_chip")}`
+      : `${t("eboek_etiket")} — ${formateer_prys_sent(eboek.prys_sent)}`;
     pryse.push(`<span class="prys-chip">${etiket}</span>`);
   }
   if (hardeKopie && hardeKopie.beskikbaar) {
     const etiket = is_voorbestelling(hardeKopie)
-      ? `Harde kopie — ${formateer_prys_sent(hardeKopie.prys_sent)} · Voorbestelling`
-      : `Harde kopie — ${formateer_prys_sent(hardeKopie.prys_sent)}`;
+      ? `${t("hardekopie_etiket")} — ${formateer_prys_sent(hardeKopie.prys_sent)} · ${t("voorbestelling_chip")}`
+      : `${t("hardekopie_etiket")} — ${formateer_prys_sent(hardeKopie.prys_sent)}`;
     pryse.push(`<span class="prys-chip">${etiket}</span>`);
   }
 
@@ -64,7 +64,7 @@ function bou_kaart(produk) {
         <p class="kaart-beskrywing">${produk.oorsig || ""}</p>
         <div class="kaart-onderkant">
           <div class="kaart-pryse">${pryse.join("")}</div>
-          <button class="kaart-aksie" data-slug="${produk.slug}">Koop nou</button>
+          <button class="kaart-aksie" data-slug="${produk.slug}">${t("koop_nou")}</button>
         </div>
       </div>
     </article>
@@ -78,13 +78,12 @@ function wys_produkte(produkte, { demo_modus } = {}) {
   if (demo_modus) {
     const kennisgewing = document.createElement("div");
     kennisgewing.className = "demo-kennisgewing";
-    kennisgewing.textContent =
-      "Voorskou-modus: die lewendige katalogus-Function is nie bereikbaar nie — demo-produkte word gewys.";
+    kennisgewing.textContent = t("katalogus_demo");
     rooster.appendChild(kennisgewing);
   }
 
   if (!produkte.length) {
-    rooster.innerHTML += `<p class="stelsel-boodskap">Nog geen produkte beskikbaar nie.</p>`;
+    rooster.innerHTML += `<p class="stelsel-boodskap">${t("katalogus_leeg")}</p>`;
     return;
   }
 
@@ -101,7 +100,7 @@ function wys_produkte(produkte, { demo_modus } = {}) {
 
 async function laai_katalogus() {
   const rooster = document.getElementById("katalogus-rooster");
-  rooster.innerHTML = `<p class="stelsel-boodskap">Katalogus word gelaai …</p>`;
+  rooster.innerHTML = `<p class="stelsel-boodskap">${t("katalogus_laai")}</p>`;
 
   try {
     const resp = await fetch(KATALOGUS_ENDPOINT);

@@ -3,7 +3,7 @@ function formateer_prys_sent(sent) {
 }
 
 function etiket_vir_formaat(formaat) {
-  return formaat === "harde_kopie" ? "Harde kopie" : "E-boek";
+  return formaat === "harde_kopie" ? t("hardekopie_etiket") : t("eboek_etiket");
 }
 
 function bou_mandjie_ry(item) {
@@ -15,8 +15,8 @@ function bou_mandjie_ry(item) {
       </div>
       <span class="mandjie-ry-prys">${formateer_prys_sent(item.prys_sent)}</span>
       <button class="mandjie-verwyder" data-slug="${item.produk_slug}" data-formaat="${item.formaat}"
-        aria-label="Verwyder ${item.titel} (${etiket_vir_formaat(item.formaat)}) uit mandjie">
-        Verwyder
+        aria-label="${t("verwyder")} ${item.titel} (${etiket_vir_formaat(item.formaat)})">
+        ${t("verwyder")}
       </button>
     </div>
   `;
@@ -29,7 +29,7 @@ function wys_mandjie() {
   if (!items.length) {
     wrap.innerHTML = `
       <p class="stelsel-boodskap">
-        Jou mandjie is leeg. <a href="index.html">Blaai deur die katalogus</a>.
+        ${t("mandjie_leeg")} <a href="index.html">${t("blaai_katalogus")}</a>.
       </p>
     `;
     return;
@@ -42,11 +42,11 @@ function wys_mandjie() {
       ${items.map(bou_mandjie_ry).join("")}
     </div>
     <div class="mandjie-totaal-ry">
-      <span>Totaal</span>
+      <span>${t("totaal")}</span>
       <span class="mandjie-totaal-bedrag">${formateer_prys_sent(totaal)}</span>
     </div>
     <button class="kaart-aksie mandjie-vb-knoppie" id="gaan-na-vb">
-      Voltooi betaling
+      ${t("voltooi_betaling_knoppie")}
     </button>
   `;
 

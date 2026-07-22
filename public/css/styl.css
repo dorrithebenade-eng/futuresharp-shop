@@ -343,6 +343,45 @@ body {
   font-weight: 700;
 }
 
+/* ---------- Taalwisselaar ---------- */
+
+.mini-kop-regs {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.taal-wisselaar {
+  display: flex;
+  border: 1px solid #3A3A3A;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.taal-knoppie {
+  background: none;
+  border: none;
+  color: #B8B6B1;
+  font-family: var(--font-liggaam);
+  font-weight: 600;
+  font-size: 12px;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.taal-knoppie:hover { color: var(--wit); }
+
+.taal-knoppie-aktief {
+  background: var(--teal);
+  color: var(--wit);
+}
+
+@media (max-width: 400px) {
+  .mini-kop-regs { gap: 12px; }
+  .taal-knoppie { padding: 6px 10px; }
+}
+
 /* ---------- Enkel-produk-bladsy ---------- */
 
 .produk-wrap {

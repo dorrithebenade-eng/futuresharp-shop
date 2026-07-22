@@ -28,15 +28,21 @@
       <span class="merk-skeier">—</span>
       <span class="merk-shop">Future Shop</span>
     </a>
-    <a href="mandjie.html" class="mini-kop-mandjie">
-      <svg class="mandjie-ikoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <circle cx="9" cy="21" r="1"></circle>
-        <circle cx="20" cy="21" r="1"></circle>
-        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-      </svg>
-      Mandjie
-      <span id="mandjie-teller" class="mandjie-teller"></span>
-    </a>
+    <div class="mini-kop-regs">
+      <a href="mandjie.html" class="mini-kop-mandjie">
+        <svg class="mandjie-ikoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="9" cy="21" r="1"></circle>
+          <circle cx="20" cy="21" r="1"></circle>
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+        </svg>
+        <span data-i18n="nav_mandjie">Mandjie</span>
+        <span id="mandjie-teller" class="mandjie-teller"></span>
+      </a>
+      <div class="taal-wisselaar" role="group" aria-label="Taal / Language">
+        <button type="button" class="taal-knoppie" data-taal="af">AF</button>
+        <button type="button" class="taal-knoppie" data-taal="en">EN</button>
+      </div>
+    </div>
    </div>
   </header>
 
@@ -47,19 +53,20 @@
     <div class="kop-inhoud">
       <p class="kop-eyebrow">Future Sharp</p>
       <h1 class="kop-titel">
-        <span class="kop-titel-normaal">Welkom by</span>
+        <span class="kop-titel-normaal" data-i18n="kop_titel_normaal">Welkom by</span>
         <span class="kop-titel-brand">Future Shop.</span>
       </h1>
-      <p class="kop-subtitel">Future Sharp se eie boekwinkel. Loer gerus na ons versameling e-boeke, of bestel selfs jou harde kopie van 'n boek indien dit in harde-kopie-formaat beskikbaar is.</p>
+      <p class="kop-subtitel" data-i18n="kop_subtitel">Future Sharp se eie boekwinkel. Loer gerus na ons versameling e-boeke, of bestel selfs jou harde kopie van 'n boek indien dit in harde-kopie-formaat beskikbaar is.</p>
     </div>
   </header>
 
   <main class="katalogus-wrap">
     <div class="rooster" id="katalogus-rooster">
-      <p class="stelsel-boodskap">Katalogus word gelaai …</p>
+      <p class="stelsel-boodskap" data-i18n="katalogus_laai">Katalogus word gelaai …</p>
     </div>
   </main>
 
+  <script src="js/taal.js"></script>
   <script src="js/mandjie.js"></script>
   <script src="js/katalogus.js"></script>
 </body>

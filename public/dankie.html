@@ -28,30 +28,37 @@
       <span class="merk-skeier">—</span>
       <span class="merk-shop">Future Shop</span>
     </a>
-    <a href="mandjie.html" class="mini-kop-mandjie">
-      <svg class="mandjie-ikoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <circle cx="9" cy="21" r="1"></circle>
-        <circle cx="20" cy="21" r="1"></circle>
-        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-      </svg>
-      Mandjie
-      <span id="mandjie-teller" class="mandjie-teller"></span>
-    </a>
+    <div class="mini-kop-regs">
+      <a href="mandjie.html" class="mini-kop-mandjie">
+        <svg class="mandjie-ikoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="9" cy="21" r="1"></circle>
+          <circle cx="20" cy="21" r="1"></circle>
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+        </svg>
+        <span data-i18n="nav_mandjie">Mandjie</span>
+        <span id="mandjie-teller" class="mandjie-teller"></span>
+      </a>
+      <div class="taal-wisselaar" role="group" aria-label="Taal / Language">
+        <button type="button" class="taal-knoppie" data-taal="af">AF</button>
+        <button type="button" class="taal-knoppie" data-taal="en">EN</button>
+      </div>
+    </div>
    </div>
   </header>
 
   <main class="dankie-wrap">
-    <h1 class="mandjie-titel">Dankie vir jou bestelling!</h1>
+    <h1 class="mandjie-titel" data-i18n="dankie_titel">Dankie vir jou bestelling!</h1>
     <p class="dankie-teks" id="dankie-bestelnommer"></p>
-    <p class="dankie-teks">
+    <p class="dankie-teks" data-i18n="dankie_teks">
       Ons bevestig jou betaling tans bediener-kant. Sodra dit voltooi is,
       sal jou e-boeke onmiddellik in
       <strong>"My Boeke"</strong> beskikbaar wees, en jy sal die status van
       enige harde-kopie-items daar kan volg.
     </p>
-    <a class="kaart-aksie dankie-knoppie" href="index.html">Terug na die winkel</a>
+    <a class="kaart-aksie dankie-knoppie" href="index.html" data-i18n="terug_winkel">Terug na die winkel</a>
   </main>
 
+  <script src="js/taal.js"></script>
   <script src="js/mandjie.js"></script>
   <script>
     // Maak seker die mandjie leeg is ná suksesvolle betaling — die
@@ -64,7 +71,7 @@
     const bestelnommer = params.get("bestelnommer") || params.get("reference");
     const wrap = document.getElementById("dankie-bestelnommer");
     wrap.textContent = bestelnommer
-      ? `Bestelnommer: ${bestelnommer}`
+      ? `${t("bestelnommer_etiket")}: ${bestelnommer}`
       : "";
   </script>
 </body>
