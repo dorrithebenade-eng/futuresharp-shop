@@ -60,8 +60,19 @@ body {
 }
 
 @media (max-width: 640px) {
-  .kop-blokke { display: none; }
-  .kop-inhoud { padding-right: 0; }
+  .kop-blokke {
+    position: static;
+    width: 220px;
+    max-width: 70%;
+    margin: 0 auto 28px;
+    transform: none;
+  }
+  .kop-inhoud {
+    padding-right: 0;
+    text-align: center;
+  }
+  .kop-titel { align-items: center; }
+  .kop-subtitel { margin-left: auto; margin-right: auto; }
 }
 
 .kop-eyebrow {
