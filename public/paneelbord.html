@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="af">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Personeel-paneelbord — Future Shop</title>
+  <link rel="stylesheet" href="css/styl.css">
+  <script src="js/identiteit.js"></script>
+</head>
+<body>
+
+  <header class="mini-kop">
+   <div class="mini-kop-inner">
+    <a href="index.html" class="mini-kop-merk">
+      <span class="merk-sharp">Future Sharp</span>
+      <span class="merk-skeier">—</span>
+      <span class="merk-shop">Future Shop</span>
+    </a>
+    <div class="paneel-aanmeld-blok">
+      <span id="paneel-gebruiker-epos" class="paneel-gebruiker-epos"></span>
+      <button id="paneel-afmeld-knoppie" class="mini-kop-mandjie paneel-aanmeld-knoppie" type="button" style="display:none;">Meld af</button>
+    </div>
+   </div>
+  </header>
+
+  <main class="paneel-wrap">
+    <h1 class="mandjie-titel">Personeel-paneelbord</h1>
+
+    <!-- Aanmeld-vorm — verskyn wanneer niemand aangemeld is nie -->
+    <section id="paneel-aanmeld-afdeling" class="paneel-auth-blok" style="display:none;">
+      <h2 class="paneel-afdeling-titel">Meld aan</h2>
+      <p class="paneel-hulp-teks">Net vir personeel — kontak die eienaar as jy nog nie 'n rekening het nie.</p>
+
+      <form id="paneel-aanmeld-vorm">
+        <label class="veld-etiket" for="aanmeld-epos">Epos</label>
+        <input type="email" id="aanmeld-epos" class="veld-invoer" required autocomplete="username">
+
+        <label class="veld-etiket" for="aanmeld-wagwoord">Wagwoord</label>
+        <div class="paneel-wagwoord-wrap">
+          <input type="password" id="aanmeld-wagwoord" class="veld-invoer" required autocomplete="current-password">
+          <button type="button" class="paneel-wagwoord-ogie" data-teiken="aanmeld-wagwoord" aria-label="Wys/verberg wagwoord">👁</button>
+        </div>
+
+        <div id="paneel-aanmeld-foute" class="vb-foute" style="display:none;"></div>
+
+        <button type="submit" class="kaart-aksie paneel-vorm-indien">Meld aan</button>
+        <button type="button" id="paneel-wagwoord-vergeet-skakel" class="paneel-skakel-knoppie">Wagwoord vergeet?</button>
+      </form>
+    </section>
+
+    <!-- Wagwoord-vergeet-vorm -->
+    <section id="paneel-herstel-afdeling" class="paneel-auth-blok" style="display:none;">
+      <h2 class="paneel-afdeling-titel">Wagwoord herstel</h2>
+      <form id="paneel-herstel-vorm">
+        <label class="veld-etiket" for="herstel-epos">Epos</label>
+        <input type="email" id="herstel-epos" class="veld-invoer" required autocomplete="username">
+
+        <div id="paneel-herstel-foute" class="vb-foute" style="display:none;"></div>
+        <div id="paneel-herstel-sukses" class="stelsel-boodskap" style="display:none;">
+          'n Herstel-skakel is gestuur — kyk jou e-pos.
+        </div>
+
+        <button type="submit" class="kaart-aksie paneel-vorm-indien">Stuur herstel-skakel</button>
+        <button type="button" id="paneel-terug-na-aanmeld-skakel" class="paneel-skakel-knoppie">Terug na aanmeld</button>
+      </form>
+    </section>
+
+    <!-- Stel-nuwe-wagwoord-vorm — verskyn outomaties wanneer 'n token
+         (uitnodiging/bevestiging/herstel) in die URL gevind word -->
+    <section id="paneel-nuwe-wagwoord-afdeling" class="paneel-auth-blok" style="display:none;">
+      <h2 class="paneel-afdeling-titel">Stel jou wagwoord</h2>
+      <form id="paneel-nuwe-wagwoord-vorm">
+        <label class="veld-etiket" for="nuwe-wagwoord">Nuwe wagwoord</label>
+        <div class="paneel-wagwoord-wrap">
+          <input type="password" id="nuwe-wagwoord" class="veld-invoer" required minlength="8" autocomplete="new-password">
+          <button type="button" class="paneel-wagwoord-ogie" data-teiken="nuwe-wagwoord" aria-label="Wys/verberg wagwoord">👁</button>
+        </div>
+
+        <div id="paneel-nuwe-wagwoord-foute" class="vb-foute" style="display:none;"></div>
+
+        <button type="submit" class="kaart-aksie paneel-vorm-indien">Stel wagwoord</button>
+      </form>
+    </section>
+
+    <div id="paneel-status" class="stelsel-boodskap" style="display:none;"></div>
+
+    <div id="paneel-inhoud" style="display:none;">
+
+      <section class="paneel-afdeling">
+        <div class="paneel-afdeling-kop">
+          <h2 class="paneel-afdeling-titel">Katalogus</h2>
+          <button id="paneel-voeg-by-knoppie" class="kaart-aksie paneel-voeg-by-knoppie" type="button">+ Voeg produk by</button>
+        </div>
+        <div id="paneel-produkte-lys">
+          <p class="stelsel-boodskap">Produkte word gelaai …</p>
+        </div>
+      </section>
+
+      <section id="paneel-vorm-afdeling" class="paneel-afdeling" style="display:none;">
+        <div class="paneel-afdeling-kop">
+          <h2 id="paneel-vorm-titel" class="paneel-afdeling-titel">Voeg produk by</h2>
+          <button id="paneel-vorm-kanselleer" class="terug-skakel paneel-vorm-kanselleer" type="button">✕ Kanselleer</button>
+        </div>
+
+        <form id="paneel-produk-vorm">
+          <input type="hidden" id="vorm-oorspronklike-slug" value="">
+
+          <label class="veld-etiket" for="vorm-slug">Slug (kort, unieke kode — bv. "my-boek-titel") <span class="veld-verplig">(verplig)</span></label>
+          <input type="text" id="vorm-slug" class="veld-invoer" required>
+
+          <label class="veld-etiket" for="vorm-titel">Titel <span class="veld-verplig">(verplig)</span></label>
+          <input type="text" id="vorm-titel" class="veld-invoer" required>
+
+          <label class="veld-etiket" for="vorm-outeur">Outeur <span class="veld-verplig">(verplig)</span></label>
+          <input type="text" id="vorm-outeur" class="veld-invoer" required>
+
+          <label class="veld-etiket" for="vorm-oorsig">Oorsig (verskyn op die katalogus-kaart, ongeveer 100 woorde)</label>
+          <textarea id="vorm-oorsig" class="veld-invoer paneel-teksarea" rows="5"></textarea>
+
+          <label class="veld-etiket" for="vorm-vol-beskrywing">Volledige beskrywing (verskyn op die produk-bladsy)</label>
+          <textarea id="vorm-vol-beskrywing" class="veld-invoer paneel-teksarea" rows="6"></textarea>
+
+          <label class="veld-etiket" for="vorm-omslag">Omslag — beeld-URL/-pad</label>
+          <input type="text" id="vorm-omslag" class="veld-invoer" placeholder="/images/omslae/my-boek-titel.jpg">
+          <p class="paneel-hulp-teks">Lêer-oplaai is nog nie gebou nie — plaas die omslagbeeld self in <code>public/images/omslae/</code> en tik die pad hier in.</p>
+
+          <fieldset class="paneel-formaat-blok">
+            <legend class="paneel-formaat-titel">E-boek</legend>
+
+            <label class="paneel-wisselaar">
+              <input type="checkbox" id="vorm-eboek-beskikbaar" checked>
+              Beskikbaar
+            </label>
+
+            <div id="vorm-eboek-velde">
+              <div class="veld-ry">
+                <div>
+                  <label class="veld-etiket" for="vorm-eboek-prys">Prys (R)</label>
+                  <input type="number" id="vorm-eboek-prys" class="veld-invoer" min="0" step="0.01">
+                </div>
+                <div>
+                  <label class="veld-etiket" for="vorm-eboek-vrystelling">Vrystellingsdatum (leeg = dadelik beskikbaar)</label>
+                  <input type="date" id="vorm-eboek-vrystelling" class="veld-invoer">
+                </div>
+              </div>
+
+              <label class="paneel-wisselaar">
+                <input type="checkbox" id="vorm-eboek-verdeling-aan">
+                Outeur-verdeling (Paystack-subrekening) op hierdie formaat
+              </label>
+
+              <div id="vorm-eboek-verdeling-velde" style="display:none;">
+                <label class="veld-etiket" for="vorm-eboek-subrekening">Subrekening-kode (ACCT_...)</label>
+                <input type="text" id="vorm-eboek-subrekening" class="veld-invoer" placeholder="ACCT_xxxxxxxxxx">
+                <div class="veld-ry">
+                  <div>
+                    <label class="veld-etiket" for="vorm-eboek-verdeling-tipe">Tipe</label>
+                    <select id="vorm-eboek-verdeling-tipe" class="veld-invoer">
+                      <option value="persentasie">Persentasie</option>
+                      <option value="vaste_bedrag">Vaste bedrag</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="veld-etiket" for="vorm-eboek-verdeling-waarde">Waarde (% of R, na gelang van tipe)</label>
+                    <input type="number" id="vorm-eboek-verdeling-waarde" class="veld-invoer" min="0" step="0.01">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset class="paneel-formaat-blok">
+            <legend class="paneel-formaat-titel">Harde kopie</legend>
+
+            <label class="paneel-wisselaar">
+              <input type="checkbox" id="vorm-hardekopie-beskikbaar">
+              Beskikbaar
+            </label>
+
+            <div id="vorm-hardekopie-velde" style="display:none;">
+              <div class="veld-ry">
+                <div>
+                  <label class="veld-etiket" for="vorm-hardekopie-prys">Prys (R)</label>
+                  <input type="number" id="vorm-hardekopie-prys" class="veld-invoer" min="0" step="0.01">
+                </div>
+                <div>
+                  <label class="veld-etiket" for="vorm-hardekopie-vrystelling">Vrystellingsdatum (leeg = dadelik beskikbaar)</label>
+                  <input type="date" id="vorm-hardekopie-vrystelling" class="veld-invoer">
+                </div>
+              </div>
+
+              <label class="veld-etiket" for="vorm-hardekopie-voorraad">Voorraad-status</label>
+              <select id="vorm-hardekopie-voorraad" class="veld-invoer">
+                <option value="beskikbaar">Beskikbaar</option>
+                <option value="uitverkoop">Uitverkoop</option>
+              </select>
+
+              <label class="paneel-wisselaar">
+                <input type="checkbox" id="vorm-hardekopie-verdeling-aan">
+                Outeur-verdeling (Paystack-subrekening) op hierdie formaat
+              </label>
+
+              <div id="vorm-hardekopie-verdeling-velde" style="display:none;">
+                <label class="veld-etiket" for="vorm-hardekopie-subrekening">Subrekening-kode (ACCT_...)</label>
+                <input type="text" id="vorm-hardekopie-subrekening" class="veld-invoer" placeholder="ACCT_xxxxxxxxxx">
+                <div class="veld-ry">
+                  <div>
+                    <label class="veld-etiket" for="vorm-hardekopie-verdeling-tipe">Tipe</label>
+                    <select id="vorm-hardekopie-verdeling-tipe" class="veld-invoer">
+                      <option value="persentasie">Persentasie</option>
+                      <option value="vaste_bedrag">Vaste bedrag</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="veld-etiket" for="vorm-hardekopie-verdeling-waarde">Waarde (% of R, na gelang van tipe)</label>
+                    <input type="number" id="vorm-hardekopie-verdeling-waarde" class="veld-invoer" min="0" step="0.01">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </fieldset>
+
+          <div id="paneel-vorm-foute" class="vb-foute" style="display:none;"></div>
+
+          <button type="submit" id="paneel-vorm-indien" class="kaart-aksie paneel-vorm-indien">Skep produk</button>
+        </form>
+      </section>
+
+    </div>
+  </main>
+
+  <script src="js/paneelbord.js"></script>
+</body>
+</html>

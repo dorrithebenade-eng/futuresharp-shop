@@ -1,0 +1,30 @@
+{
+  "slug": "voorbeeld-produk-slegs-eboek",
+  "titel": "Nog 'n Voorbeeld Titel",
+  "outeur": "Outeur Naam",
+  "oorsig": "'n Kort oorsig van hierdie boek (ongeveer 100 woorde) — hierdie voorbeeld-produk is slegs as e-boek beskikbaar, geen harde-kopie-opsie nie.",
+  "vol_beskrywing": "Langer beskrywing hier.",
+  "omslag": "/images/omslae/voorbeeld-produk-slegs-eboek.jpg",
+
+  "formate": {
+    "eboek": {
+      "beskikbaar": true,
+      "prys_sent": 12000,
+      "geleidelik_ontsluit": true,
+      "verdeling": null
+    },
+    "harde_kopie": {
+      "beskikbaar": false
+    }
+  },
+
+  "eboek_konfig_pad": "config/boek-dele/voorbeeld-produk-slegs-eboek.json",
+
+  "reeks": {
+    "reeks_slug": null,
+    "volgorde_in_reeks": null
+  },
+
+  "aktief": true,
+  "geskep_op": "2026-07-21T00:00:00Z"
+}

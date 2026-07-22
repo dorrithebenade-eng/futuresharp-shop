@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="af">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>
+    // MOET voor die Identity-widget se eie skrip loop — sien nota in
+    // mandjie.js vir hoekom. Netlify se e-pos-skakels (bevestiging,
+    // uitnodiging, wagwoord-herstel) land altyd hier met 'n token in
+    // die URL; op die oomblik het net personeel rekeninge, so ons stuur
+    // dit dadelik na die paneelbord toe voor die widget dit self "opeet".
+    (function () {
+      var identiteitsTokenPatroon = /(confirmation_token|invite_token|recovery_token|email_change_token)=/;
+      if (identiteitsTokenPatroon.test(window.location.hash)) {
+        window.location.replace("paneelbord.html" + window.location.hash);
+      }
+    })();
+  </script>
+  <title>Jou Mandjie — Future Shop</title>
+  <link rel="stylesheet" href="css/styl.css">
+</head>
+<body>
+
+  <header class="mini-kop">
+   <div class="mini-kop-inner">
+    <a href="index.html" class="mini-kop-merk">
+      <span class="merk-sharp">Future Sharp</span>
+      <span class="merk-skeier">—</span>
+      <span class="merk-shop">Future Shop</span>
+    </a>
+    <a href="mandjie.html" class="mini-kop-mandjie">
+      <svg class="mandjie-ikoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="9" cy="21" r="1"></circle>
+        <circle cx="20" cy="21" r="1"></circle>
+        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+      </svg>
+      Mandjie
+      <span id="mandjie-teller" class="mandjie-teller"></span>
+    </a>
+   </div>
+  </header>
+
+  <main class="mandjie-wrap">
+    <a class="terug-skakel" href="index.html">&larr; Bly aan koop</a>
+    <h1 class="mandjie-titel">Jou mandjie</h1>
+    <div id="mandjie-inhoud">
+      <p class="stelsel-boodskap">Mandjie word gelaai …</p>
+    </div>
+  </main>
+
+  <script src="js/mandjie.js"></script>
+  <script src="js/mandjie-bladsy.js"></script>
+</body>
+</html>

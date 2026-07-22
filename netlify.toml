@@ -1,0 +1,11 @@
+[build]
+  publish = "public"
+  functions = "netlify/functions"
+
+[dev]
+  publish = "public"
+
+# Netlify Identity registrasie-instellings word via die Netlify-kontrolepaneel
+# gestel (nie hierdie lêer nie): "Oop registrasie" aan, standaard-rol by
+# registrasie = "koper" (via 'n Identity-triggerfunksie, sien
+# netlify/functions/identity-registrasie.js hieronder).

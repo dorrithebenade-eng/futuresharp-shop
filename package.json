@@ -1,0 +1,9 @@
+{
+  "name": "future-shop",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Future Shop \u2014 algemene e-boek + harde-kopie-verkoopstelsel onder die Future Sharp-handelsmerk",
+  "dependencies": {
+    "@netlify/blobs": "^8.1.0"
+  }
+}

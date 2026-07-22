@@ -1,0 +1,64 @@
+{
+  "_opmerking": "Voorbeeld van 'n bestelling-rekord in Netlify Blobs. Sleutel = bestelnommer. Store: 'bestellings'.",
+
+  "bestelnommer": "FS-2026-000123",
+  "geskep_op": "2026-07-21T09:15:00Z",
+  "bygewerk_op": "2026-07-21T09:16:40Z",
+
+  "koper": {
+    "netlify_identity_id": "abc123-identity-uuid",
+    "epos": "koper@voorbeeld.co.za",
+    "selfoonnommer": "+27821234567"
+  },
+
+  "items": [
+    {
+      "produk_slug": "voorbeeld-produk",
+      "titel": "Voorbeeld Titel",
+      "formaat": "eboek",
+      "prys_sent": 15000
+    },
+    {
+      "produk_slug": "voorbeeld-produk",
+      "titel": "Voorbeeld Titel",
+      "formaat": "harde_kopie",
+      "prys_sent": 28000
+    }
+  ],
+
+  "totaal_sent": 43000,
+
+  "bevat_harde_kopie": true,
+
+  "verdeling": {
+    "_opmerking": "sent-bedrag per subrekening wat vir hierdie bestelling bereken is (deur begin-betaling.js), nie 'n Paystack-veld self nie — vir personeel se rekords/rekonsiliasie.",
+    "ACCT_voorbeeldoutuer": 15500
+  },
+  "split_code": "SPL_voorbeeldkode",
+
+  "aflewering": {
+    "straat": "12 Voorbeeldstraat",
+    "stad": "Johannesburg",
+    "provinsie": "Gauteng",
+    "poskode": "2196"
+  },
+
+  "drukker": {
+    "bestelling_geplaas": false,
+    "geplaas_op": null,
+    "nota": "Personeel plaas hierdie bestelling self by die print-on-demand-verskaffer en verskaf die koper se adres direk aan hulle — die verskaffer hanteer koerierswerk."
+  },
+
+  "paystack": {
+    "referensie": "FS-2026-000123",
+    "geverifieer": true,
+    "geverifieer_op": "2026-07-21T09:16:40Z",
+    "bedrag_bevestig_sent": 43000,
+    "split_toegepas": null
+  },
+
+  "status": "Nuut",
+  "status_geskiedenis": [
+    { "status": "Nuut", "op": "2026-07-21T09:16:40Z" }
+  ]
+}

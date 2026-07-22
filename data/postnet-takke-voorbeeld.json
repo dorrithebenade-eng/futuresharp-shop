@@ -1,0 +1,14 @@
+{
+  "_opmerking": "PLEKHOUER-DATA. Hierdie is 'n klein voorbeeldlys sodat die soekfunksie getoets kan word. Voor die werf regtig lewendig gaan, moet dit vervang word met 'n werklike PostNet-tak-databron of -API (PostNet SA publiseer nie 'n publieke API nie sover bekend nie — dit sal dalk 'n handmatig-onderhoude lys, of 'n derdeparty-lokaliseerder, moet wees).",
+
+  "takke": [
+    { "naam": "PostNet Rosebank", "adres": "The Firs, Rosebank, Johannesburg", "tak_kode": "JHB-ROSEBANK-04" },
+    { "naam": "PostNet Sandton City", "adres": "Sandton City Shopping Centre, Sandton", "tak_kode": "JHB-SANDTON-11" },
+    { "naam": "PostNet Menlyn", "adres": "Menlyn Park Shopping Centre, Pretoria", "tak_kode": "PTA-MENLYN-02" },
+    { "naam": "PostNet Brooklyn", "adres": "Brooklyn Mall, Pretoria", "tak_kode": "PTA-BROOKLYN-07" },
+    { "naam": "PostNet Claremont", "adres": "Cavendish Square, Claremont, Kaapstad", "tak_kode": "CPT-CLAREMONT-03" },
+    { "naam": "PostNet V&A Waterfront", "adres": "Victoria Wharf, V&A Waterfront, Kaapstad", "tak_kode": "CPT-VAWATERFRONT-01" },
+    { "naam": "PostNet Umhlanga", "adres": "Gateway Theatre of Shopping, Umhlanga", "tak_kode": "DBN-UMHLANGA-05" },
+    { "naam": "PostNet Centurion", "adres": "Centurion Mall, Centurion", "tak_kode": "PTA-CENTURION-09" }
+  ]
+}

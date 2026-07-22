@@ -1,0 +1,43 @@
+{
+  "_opmerking_verdeling": "verdeling is opsioneel per formaat (weglaat of null = alles gaan na Future Sharp se hoofrekening). 'waarde' beteken 'n persentasie (0-100) as tipe='persentasie', of 'n bedrag in sent as tipe='vaste_bedrag'. subrekening_kode moet 'n reeds-geskepte Paystack-subrekening wees (ACCT_...).",
+
+  "slug": "voorbeeld-produk",
+  "titel": "Voorbeeld Titel",
+  "outeur": "Outeur Naam",
+  "oorsig": "'n Kort oorsig van die boek (ongeveer 100 woorde) wat op die katalogus-kaart verskyn, onder die omslag.",
+  "vol_beskrywing": "Langer beskrywing vir die enkel-produk-bladsy. Kan meerdere paragrawe bevat.",
+  "omslag": "/images/omslae/voorbeeld-produk.jpg",
+
+  "formate": {
+    "eboek": {
+      "beskikbaar": true,
+      "prys_sent": 15000,
+      "geleidelik_ontsluit": true,
+      "verdeling": {
+        "subrekening_kode": "ACCT_voorbeeldoutuer",
+        "tipe": "persentasie",
+        "waarde": 70
+      }
+    },
+    "harde_kopie": {
+      "beskikbaar": true,
+      "prys_sent": 28000,
+      "voorraad_status": "beskikbaar",
+      "verdeling": {
+        "subrekening_kode": "ACCT_voorbeeldoutuer",
+        "tipe": "vaste_bedrag",
+        "waarde": 5000
+      }
+    }
+  },
+
+  "eboek_konfig_pad": "config/boek-dele/voorbeeld-produk.json",
+
+  "reeks": {
+    "reeks_slug": null,
+    "volgorde_in_reeks": null
+  },
+
+  "aktief": true,
+  "geskep_op": "2026-07-21T00:00:00Z"
+}
