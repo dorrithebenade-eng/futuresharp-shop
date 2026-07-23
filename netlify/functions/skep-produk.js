@@ -38,6 +38,11 @@ exports.handler = async (event, context) => {
     return { statusCode: 405, body: "Metode nie toegelaat nie" };
   }
 
+  // TYDELIKE ONTFOUTING — verwyder sodra die rol-probleem opgelos is.
+  console.log("ONTFOUT: Authorization-kop teenwoordig?", !!(event.headers.authorization || event.headers.Authorization));
+  console.log("ONTFOUT: clientContext teenwoordig?", !!context.clientContext);
+  console.log("ONTFOUT: clientContext.user:", JSON.stringify(context.clientContext && context.clientContext.user));
+
   const gebruiker = kry_gebruiker_en_kontroleer_rol(event, context, "personeel");
   if (!gebruiker) {
     return { statusCode: 403, body: "Geen toegang nie — personeel-rol vereis" };
