@@ -154,6 +154,18 @@ const WOORDEBOEK = {
     af: 'Lêer-oplaai is nog nie gebou nie — plaas die omslagbeeld self in public/images/omslae/ en tik die pad hier in.',
     en: "File upload hasn't been built yet — place the cover image yourself in public/images/omslae/ and type the path here.",
   },
+  vorm_omslag_hulp_nuut: {
+    af: "Kies 'n beeld (JPEG, PNG, WEBP of GIF, maks. 4MB) — dit word outomaties opgelaai en gestoor.",
+    en: "Choose an image (JPEG, PNG, WEBP or GIF, max 4MB) — it will be uploaded and stored automatically.",
+  },
+  paneel_oplaai_besig: { af: "Word opgelaai …", en: "Uploading …" },
+  paneel_oplaai_sukses: { af: "Omslag opgelaai ✓", en: "Cover uploaded ✓" },
+  paneel_oplaai_fout: { af: "Kon nie beeld oplaai nie: ", en: "Could not upload image: " },
+  paneel_oplaai_te_groot: { af: "Beeld is te groot — maksimum 4MB.", en: "Image is too large — maximum 4MB." },
+  paneel_oplaai_verkeerde_tipe: {
+    af: "Slegs JPEG, PNG, WEBP of GIF-beelde word toegelaat.",
+    en: "Only JPEG, PNG, WEBP or GIF images are allowed.",
+  },
   paneel_beskikbaar: { af: "Beskikbaar", en: "Available" },
   paneel_prys_r: { af: "Prys (R)", en: "Price (R)" },
   paneel_vrystellingsdatum: {

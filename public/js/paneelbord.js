@@ -145,10 +145,87 @@ function reset_vorm() {
   document.getElementById("vorm-oorspronklike-slug").value = "";
   document.getElementById("vorm-slug").disabled = false;
   document.getElementById("vorm-eboek-beskikbaar").checked = true;
+  document.getElementById("vorm-omslag").value = "";
+  wys_omslag_voorskou("");
+  document.getElementById("vorm-omslag-status").textContent = "";
   wys_verberg_formaat_velde();
   document.getElementById("paneel-vorm-titel").textContent = t("paneel_voeg_produk_by_titel");
   document.getElementById("paneel-vorm-indien").textContent = t("paneel_skep_produk");
   document.getElementById("paneel-vorm-foute").style.display = "none";
+}
+
+function wys_omslag_voorskou(pad) {
+  const beeld = document.getElementById("vorm-omslag-voorskou");
+  if (pad) {
+    beeld.src = pad;
+    beeld.style.display = "block";
+  } else {
+    beeld.removeAttribute("src");
+    beeld.style.display = "none";
+  }
+}
+
+// --- Omslag-oplaai ---
+
+function lees_lêer_as_base64(lêer) {
+  return new Promise((resolve, reject) => {
+    const leser = new FileReader();
+    leser.onload = () => {
+      // readAsDataURL gee "data:image/png;base64,iVBORw0..." — ons het
+      // net die gedeelte ná die komma nodig.
+      const volledig = leser.result;
+      const kommaIndeks = volledig.indexOf(",");
+      resolve(volledig.slice(kommaIndeks + 1));
+    };
+    leser.onerror = () => reject(leser.error);
+    leser.readAsDataURL(lêer);
+  });
+}
+
+async function hanteer_omslag_lêer_gekies(gebeurtenis) {
+  const lêer = gebeurtenis.target.files && gebeurtenis.target.files[0];
+  const statusWrap = document.getElementById("vorm-omslag-status");
+  if (!lêer) return;
+
+  const MAKS_GROOTTE = 4 * 1024 * 1024;
+  const TOEGELATE_TIPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+
+  if (!TOEGELATE_TIPES.includes(lêer.type)) {
+    statusWrap.textContent = t("paneel_oplaai_verkeerde_tipe");
+    gebeurtenis.target.value = "";
+    return;
+  }
+  if (lêer.size > MAKS_GROOTTE) {
+    statusWrap.textContent = t("paneel_oplaai_te_groot");
+    gebeurtenis.target.value = "";
+    return;
+  }
+
+  statusWrap.textContent = t("paneel_oplaai_besig");
+
+  try {
+    const data_base64 = await lees_lêer_as_base64(lêer);
+    const slug = document.getElementById("vorm-slug").value.trim();
+
+    const resp = await fetch("/.netlify/functions/laai-omslag-op", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...kry_outorisasie_kop() },
+      body: JSON.stringify({ slug, inhoud_tipe: lêer.type, data_base64 }),
+    });
+
+    if (!resp.ok) {
+      const teks = await resp.text();
+      throw new Error(teks || `Status ${resp.status}`);
+    }
+
+    const data = await resp.json();
+    document.getElementById("vorm-omslag").value = data.pad;
+    wys_omslag_voorskou(data.pad);
+    statusWrap.textContent = t("paneel_oplaai_sukses");
+  } catch (fout) {
+    console.error("Kon nie omslag oplaai nie:", fout);
+    statusWrap.textContent = `${t("paneel_oplaai_fout")}${fout.message}`;
+  }
 }
 
 function wys_verberg_formaat_velde() {
@@ -181,6 +258,7 @@ function open_vorm_vir_wysig(produk) {
   document.getElementById("vorm-oorsig").value = produk.oorsig || "";
   document.getElementById("vorm-vol-beskrywing").value = produk.vol_beskrywing || "";
   document.getElementById("vorm-omslag").value = produk.omslag || "";
+  wys_omslag_voorskou(produk.omslag || "");
 
   const eboek = (produk.formate && produk.formate.eboek) || {};
   document.getElementById("vorm-eboek-beskikbaar").checked = !!eboek.beskikbaar;
@@ -444,4 +522,5 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("vorm-hardekopie-beskikbaar").addEventListener("change", wys_verberg_formaat_velde);
   document.getElementById("vorm-eboek-verdeling-aan").addEventListener("change", wys_verberg_formaat_velde);
   document.getElementById("vorm-hardekopie-verdeling-aan").addEventListener("change", wys_verberg_formaat_velde);
+  document.getElementById("vorm-omslag-lêer").addEventListener("change", hanteer_omslag_lêer_gekies);
 });

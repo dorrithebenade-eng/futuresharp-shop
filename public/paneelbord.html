@@ -126,9 +126,14 @@
           <label class="veld-etiket" for="vorm-vol-beskrywing" data-i18n="vorm_vol_beskrywing_etiket">Volledige beskrywing (verskyn op die produk-bladsy)</label>
           <textarea id="vorm-vol-beskrywing" class="veld-invoer paneel-teksarea" rows="6"></textarea>
 
-          <label class="veld-etiket" for="vorm-omslag" data-i18n="vorm_omslag_etiket">Omslag — beeld-URL/-pad</label>
-          <input type="text" id="vorm-omslag" class="veld-invoer" placeholder="/images/omslae/my-boek-titel.jpg">
-          <p class="paneel-hulp-teks" data-i18n="vorm_omslag_hulp">Lêer-oplaai is nog nie gebou nie — plaas die omslagbeeld self in <code>public/images/omslae/</code> en tik die pad hier in.</p>
+          <label class="veld-etiket" for="vorm-omslag-lêer" data-i18n="vorm_omslag_etiket">Omslag — beeld-URL/-pad</label>
+          <div class="paneel-omslag-blok">
+            <img id="vorm-omslag-voorskou" class="paneel-omslag-voorskou" style="display:none;" alt="">
+            <input type="file" id="vorm-omslag-lêer" class="veld-invoer" accept="image/png,image/jpeg,image/webp,image/gif">
+            <p id="vorm-omslag-status" class="paneel-hulp-teks"></p>
+          </div>
+          <input type="hidden" id="vorm-omslag" value="">
+          <p class="paneel-hulp-teks" data-i18n="vorm_omslag_hulp_nuut">Kies 'n beeld (JPEG, PNG, WEBP of GIF, maks. 4MB) — dit word outomaties opgelaai en gestoor.</p>
 
           <fieldset class="paneel-formaat-blok">
             <legend class="paneel-formaat-titel" data-i18n="paneel_eboek">E-boek</legend>

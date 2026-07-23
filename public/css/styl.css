@@ -393,6 +393,22 @@ body {
   .taal-knoppie { padding: 6px 10px; }
 }
 
+/* ---------- Paneelbord: omslag-oplaai ---------- */
+
+.paneel-omslag-blok {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.paneel-omslag-voorskou {
+  width: 120px;
+  height: 168px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #3A3A3A;
+}
+
 /* ---------- Enkel-produk-bladsy ---------- */
 
 .produk-wrap {
