@@ -166,7 +166,7 @@ body {
 .kaart-omslag {
   width: 160px;
   flex-shrink: 0;
-  aspect-ratio: 3 / 4;
+  aspect-ratio: 1530 / 2322;
   background: var(--grys-lig);
   object-fit: cover;
   display: block;
