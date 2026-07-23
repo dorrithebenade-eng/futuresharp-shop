@@ -5,6 +5,21 @@
 const { kry_store } = require("./_blob-store");
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 
+// Future Sharp se hoofrekening moet ALTYD ten minste 3% van 'n formaat se
+// prys behou — dit dek Paystack se eie transaksiekoste. Paystack self
+// weier ook enige verdeling waar die handelaar se aandeel nul of minder
+// is ("Merchant share cannot be lower than zero"), so ons keer dit hier
+// reeds af by stoor-tyd, met 'n duidelike boodskap, i.p.v. dat personeel
+// dit eers by 'n mislukte betaling agterkom.
+function oorskry_hoofrekening_minimum(verdelings, prys_sent) {
+  if (!verdelings.length || !prys_sent) return false;
+  const totaal_persentasie = verdelings.reduce((som, v) => {
+    const persentasie = v.tipe === "vaste_bedrag" ? (v.waarde / prys_sent) * 100 : v.waarde;
+    return som + persentasie;
+  }, 0);
+  return totaal_persentasie > 97;
+}
+
 // Valideer 'n opsionele lys outeur-verdelings — gee 'n LEË lys terug (geen
 // verdeling nie, alles gaan na Future Sharp se hoofrekening) as die invoer
 // nie 'n lys is nie. Elke individuele verdeling wat nie korrek gevorm is
@@ -67,6 +82,25 @@ exports.handler = async (event, context) => {
     };
   }
 
+  const eboek_verdelings = kry_geldige_verdelings(formate.eboek.verdelings);
+  if (oorskry_hoofrekening_minimum(eboek_verdelings, formate.eboek.prys_sent || 0)) {
+    return {
+      statusCode: 400,
+      body: "Die e-boek se verdeling(s) los minder as 3% oor vir Future Sharp se hoofrekening — verminder die persentasie/bedrag sodat ten minste 3% oorbly.",
+    };
+  }
+  const hardekopie_verdelings = kry_geldige_verdelings(formate.harde_kopie && formate.harde_kopie.verdelings);
+  if (
+    formate.harde_kopie &&
+    formate.harde_kopie.beskikbaar &&
+    oorskry_hoofrekening_minimum(hardekopie_verdelings, formate.harde_kopie.prys_sent || 0)
+  ) {
+    return {
+      statusCode: 400,
+      body: "Die harde-kopie se verdeling(s) los minder as 3% oor vir Future Sharp se hoofrekening — verminder die persentasie/bedrag sodat ten minste 3% oorbly.",
+    };
+  }
+
   const store = kry_store("katalogus");
 
   // Verhoed oorskryf van 'n bestaande slug per ongeluk
@@ -90,7 +124,7 @@ exports.handler = async (event, context) => {
         beskikbaar: !!formate.eboek.beskikbaar,
         prys_sent: formate.eboek.prys_sent || 0,
         geleidelik_ontsluit: true,
-        verdelings: kry_geldige_verdelings(formate.eboek.verdelings),
+        verdelings: eboek_verdelings,
         vrystelling_datum: kry_geldige_datum(formate.eboek.vrystelling_datum),
       },
       harde_kopie: formate.harde_kopie && formate.harde_kopie.beskikbaar
@@ -98,7 +132,7 @@ exports.handler = async (event, context) => {
             beskikbaar: true,
             prys_sent: formate.harde_kopie.prys_sent || 0,
             voorraad_status: formate.harde_kopie.voorraad_status || "beskikbaar",
-            verdelings: kry_geldige_verdelings(formate.harde_kopie.verdelings),
+            verdelings: hardekopie_verdelings,
             vrystelling_datum: kry_geldige_datum(formate.harde_kopie.vrystelling_datum),
           }
         : { beskikbaar: false },

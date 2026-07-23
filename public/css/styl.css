@@ -718,30 +718,6 @@ body {
   gap: 16px;
 }
 
-/* ---------- Paneelbord: meervoudige outeur-verdelings per formaat ---------- */
-.paneel-verdelings-lys {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-
-.paneel-verdeling-ry {
-  display: grid;
-  grid-template-columns: 1.4fr 1fr 1fr auto;
-  gap: 8px;
-  align-items: center;
-}
-
-.paneel-verdeling-verwyder {
-  padding: 6px 10px;
-}
-
-@media (max-width: 640px) {
-  .paneel-verdeling-ry { grid-template-columns: 1fr 1fr; }
-  .paneel-verdeling-verwyder { grid-column: span 2; }
-}
-
 /* PostNet is heeltemal geskrap — Future Sharp gebruik 'n print-on-demand-
    verskaffer wat self koerierswerk hanteer, so daar is net een aflewer-
    metode (woonadres) nodig. */

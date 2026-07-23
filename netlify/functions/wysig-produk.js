@@ -30,6 +30,18 @@ function kry_geldige_datum(waarde) {
   return waarde;
 }
 
+// Selfde reël as skep-produk.js: Future Sharp se hoofrekening moet ALTYD
+// ten minste 3% behou (dek Paystack se transaksiekoste, en Paystack self
+// weier sonder dit uitdruklik).
+function oorskry_hoofrekening_minimum(verdelings, prys_sent) {
+  if (!verdelings.length || !prys_sent) return false;
+  const totaal_persentasie = verdelings.reduce((som, v) => {
+    const persentasie = v.tipe === "vaste_bedrag" ? (v.waarde / prys_sent) * 100 : v.waarde;
+    return som + persentasie;
+  }, 0);
+  return totaal_persentasie > 97;
+}
+
 exports.handler = async (event, context) => {
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: "Metode nie toegelaat nie" };
@@ -70,6 +82,19 @@ exports.handler = async (event, context) => {
           vrystelling_datum: kry_geldige_datum(wysigings.formate[formaat_naam].vrystelling_datum),
         };
       }
+    }
+  }
+
+  for (const [formaat_naam, etiket] of [
+    ["eboek", "e-boek"],
+    ["harde_kopie", "harde-kopie"],
+  ]) {
+    const f = nuwe_formate[formaat_naam];
+    if (f && f.beskikbaar && oorskry_hoofrekening_minimum(f.verdelings || [], f.prys_sent || 0)) {
+      return {
+        statusCode: 400,
+        body: `Die ${etiket} se verdeling(s) los minder as 3% oor vir Future Sharp se hoofrekening — verminder die persentasie/bedrag sodat ten minste 3% oorbly.`,
+      };
     }
   }
 

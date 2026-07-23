@@ -120,6 +120,22 @@ exports.handler = async (event) => {
     return { statusCode: 400, body: "Bestelling se totaal is ongeldig" };
   }
 
+  // Veiligheidsnet: Future Sharp se hoofrekening moet ALTYD ten minste 3%
+  // van die bestelling se totaal behou (dek Paystack se transaksiekoste,
+  // en Paystack self weier 'n verdeling waar die handelaar se aandeel nul
+  // of minder is). skep-produk.js/wysig-produk.js keer dit reeds af by
+  // stoor-tyd, maar ons verklein hier ook proporsioneel as 'n laaste
+  // vangnet — bv. vir data wat van vóór hierdie reël bestaan het — sodat
+  // 'n koper se betaling nooit hierom kan misluk nie.
+  const totale_verdeling_sent = Object.values(verdeling_per_subrekening).reduce((a, b) => a + b, 0);
+  const maks_verdeling_sent = Math.floor(totaal_sent * 0.97);
+  if (totale_verdeling_sent > maks_verdeling_sent && totale_verdeling_sent > 0) {
+    const skaal_faktor = maks_verdeling_sent / totale_verdeling_sent;
+    for (const kode of Object.keys(verdeling_per_subrekening)) {
+      verdeling_per_subrekening[kode] = Math.floor(verdeling_per_subrekening[kode] * skaal_faktor);
+    }
+  }
+
   // --- Stap 2: dinamiese split-groep skep indien nodig ---
   const subrekening_kodes = Object.keys(verdeling_per_subrekening);
   let split_code = null;
