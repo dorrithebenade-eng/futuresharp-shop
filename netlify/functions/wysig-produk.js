@@ -7,18 +7,20 @@ const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 
 // Selfde validasie as skep-produk.js — hou dit in lyn sodat 'n wysiging
 // nie 'n ongeldige verdeling kan invoer wat skep-produk sou verwerp nie.
-function kry_geldige_verdeling(verdeling) {
-  if (!verdeling || !verdeling.subrekening_kode) return null;
-  if (!["persentasie", "vaste_bedrag"].includes(verdeling.tipe)) return null;
-  const waarde = Number(verdeling.waarde);
-  if (!Number.isFinite(waarde) || waarde <= 0) return null;
-  if (verdeling.tipe === "persentasie" && waarde > 100) return null;
+function kry_geldige_verdelings(verdelings) {
+  if (!Array.isArray(verdelings)) return [];
 
-  return {
-    subrekening_kode: verdeling.subrekening_kode,
-    tipe: verdeling.tipe,
-    waarde,
-  };
+  return verdelings
+    .map((v) => {
+      if (!v || !v.outeur_id) return null;
+      if (!["persentasie", "vaste_bedrag"].includes(v.tipe)) return null;
+      const waarde = Number(v.waarde);
+      if (!Number.isFinite(waarde) || waarde <= 0) return null;
+      if (v.tipe === "persentasie" && waarde > 100) return null;
+
+      return { outeur_id: v.outeur_id, tipe: v.tipe, waarde };
+    })
+    .filter(Boolean);
 }
 
 function kry_geldige_datum(waarde) {
@@ -33,7 +35,7 @@ exports.handler = async (event, context) => {
     return { statusCode: 405, body: "Metode nie toegelaat nie" };
   }
 
-  const gebruiker = await kry_gebruiker_en_kontroleer_rol(event, context, "personeel");
+  const gebruiker = kry_gebruiker_en_kontroleer_rol(event, context, "personeel");
   if (!gebruiker) {
     return { statusCode: 403, body: "Geen toegang nie — personeel-rol vereis" };
   }
@@ -64,7 +66,7 @@ exports.handler = async (event, context) => {
       if (wysigings.formate[formaat_naam]) {
         nuwe_formate[formaat_naam] = {
           ...wysigings.formate[formaat_naam],
-          verdeling: kry_geldige_verdeling(wysigings.formate[formaat_naam].verdeling),
+          verdelings: kry_geldige_verdelings(wysigings.formate[formaat_naam].verdelings),
           vrystelling_datum: kry_geldige_datum(wysigings.formate[formaat_naam].vrystelling_datum),
         };
       }

@@ -5,22 +5,30 @@
 const { kry_store } = require("./_blob-store");
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 
-// Valideer 'n opsionele outeur-verdeling — gee null terug (geen verdeling
-// nie, alles gaan na Future Sharp se hoofrekening) tensy dit korrek
-// gevorm is. Dit voorkom dat 'n missvormde vorm-invoer stilweg 'n
-// halwe/ongeldige verdeling stoor wat later betaling-verwarring veroorsaak.
-function kry_geldige_verdeling(verdeling) {
-  if (!verdeling || !verdeling.subrekening_kode) return null;
-  if (!["persentasie", "vaste_bedrag"].includes(verdeling.tipe)) return null;
-  const waarde = Number(verdeling.waarde);
-  if (!Number.isFinite(waarde) || waarde <= 0) return null;
-  if (verdeling.tipe === "persentasie" && waarde > 100) return null;
+// Valideer 'n opsionele lys outeur-verdelings — gee 'n LEË lys terug (geen
+// verdeling nie, alles gaan na Future Sharp se hoofrekening) as die invoer
+// nie 'n lys is nie. Elke individuele verdeling wat nie korrek gevorm is
+// nie (ontbrekende outeur_id, ongeldige tipe/waarde) word stilweg
+// uitgesif — dit voorkom dat 'n missvormde vorm-invoer 'n
+// halwe/ongeldige verdeling stoor wat later betaling-verwarring
+// veroorsaak. Ons verwys hier na 'n outeur_id (na die "outeurs"-store),
+// nie na die rou ACCT_-subrekening-kode nie — dié word eers by
+// betaal-tyd opgesoek, sodat 'n boek se verdeling-instelling outomaties
+// bly werk selfs al verander 'n outeur later hul subrekening-kode.
+function kry_geldige_verdelings(verdelings) {
+  if (!Array.isArray(verdelings)) return [];
 
-  return {
-    subrekening_kode: verdeling.subrekening_kode,
-    tipe: verdeling.tipe,
-    waarde,
-  };
+  return verdelings
+    .map((v) => {
+      if (!v || !v.outeur_id) return null;
+      if (!["persentasie", "vaste_bedrag"].includes(v.tipe)) return null;
+      const waarde = Number(v.waarde);
+      if (!Number.isFinite(waarde) || waarde <= 0) return null;
+      if (v.tipe === "persentasie" && waarde > 100) return null;
+
+      return { outeur_id: v.outeur_id, tipe: v.tipe, waarde };
+    })
+    .filter(Boolean);
 }
 
 // Valideer 'n opsionele vrystellingsdatum vir voorbestellings — 'n geldige
@@ -38,7 +46,7 @@ exports.handler = async (event, context) => {
     return { statusCode: 405, body: "Metode nie toegelaat nie" };
   }
 
-  const gebruiker = await kry_gebruiker_en_kontroleer_rol(event, context, "personeel");
+  const gebruiker = kry_gebruiker_en_kontroleer_rol(event, context, "personeel");
   if (!gebruiker) {
     return { statusCode: 403, body: "Geen toegang nie — personeel-rol vereis" };
   }
@@ -82,7 +90,7 @@ exports.handler = async (event, context) => {
         beskikbaar: !!formate.eboek.beskikbaar,
         prys_sent: formate.eboek.prys_sent || 0,
         geleidelik_ontsluit: true,
-        verdeling: kry_geldige_verdeling(formate.eboek.verdeling),
+        verdelings: kry_geldige_verdelings(formate.eboek.verdelings),
         vrystelling_datum: kry_geldige_datum(formate.eboek.vrystelling_datum),
       },
       harde_kopie: formate.harde_kopie && formate.harde_kopie.beskikbaar
@@ -90,7 +98,7 @@ exports.handler = async (event, context) => {
             beskikbaar: true,
             prys_sent: formate.harde_kopie.prys_sent || 0,
             voorraad_status: formate.harde_kopie.voorraad_status || "beskikbaar",
-            verdeling: kry_geldige_verdeling(formate.harde_kopie.verdeling),
+            verdelings: kry_geldige_verdelings(formate.harde_kopie.verdelings),
             vrystelling_datum: kry_geldige_datum(formate.harde_kopie.vrystelling_datum),
           }
         : { beskikbaar: false },

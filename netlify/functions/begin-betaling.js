@@ -47,6 +47,17 @@ exports.handler = async (event) => {
 
   const katalogusStore = kry_store("katalogus");
   const bestellingsStore = kry_store("bestellings");
+  const outeursStore = kry_store("outeurs");
+  // Onthou reeds-opgesoekte outeurs binne hierdie versoek — voorkom
+  // herhaalde Blobs-opsoeke as dieselfde outeur op meer as een item/formaat
+  // se verdeling verskyn.
+  const outeur_kas = {};
+  async function kry_outeur(outeur_id) {
+    if (!(outeur_id in outeur_kas)) {
+      outeur_kas[outeur_id] = await outeursStore.get(outeur_id, { type: "json" });
+    }
+    return outeur_kas[outeur_id];
+  }
 
   // Verhoed dat 'n reeds-betaalde bestelnommer oorskryf word
   const bestaande = await bestellingsStore.get(bestelnommer, { type: "json" });
@@ -82,15 +93,26 @@ exports.handler = async (event) => {
       prys_sent: item_prys_sent,
     });
 
-    const verdeling = formaat_data.verdeling;
-    if (verdeling && verdeling.subrekening_kode) {
+    const verdelings = formaat_data.verdelings || [];
+    for (const verdeling of verdelings) {
+      if (!verdeling || !verdeling.outeur_id) continue;
+
+      const outeur = await kry_outeur(verdeling.outeur_id);
+      if (!outeur || !outeur.subrekening_kode) {
+        // Outeur bestaan nie (meer) nie, of het geen subrekening-kode nie —
+        // spring hierdie verdeling oor. Die bedrag bly eenvoudig by Future
+        // Sharp se hoofrekening, i.p.v. die hele betaling te laat faal.
+        console.warn(`Outeur "${verdeling.outeur_id}" nie gevind nie — verdeling oorgeslaan`);
+        continue;
+      }
+
       const item_aandeel_sent =
         verdeling.tipe === "vaste_bedrag"
           ? Math.min(verdeling.waarde, item_prys_sent)
           : Math.round((item_prys_sent * verdeling.waarde) / 100);
 
-      verdeling_per_subrekening[verdeling.subrekening_kode] =
-        (verdeling_per_subrekening[verdeling.subrekening_kode] || 0) + item_aandeel_sent;
+      verdeling_per_subrekening[outeur.subrekening_kode] =
+        (verdeling_per_subrekening[outeur.subrekening_kode] || 0) + item_aandeel_sent;
     }
   }
 

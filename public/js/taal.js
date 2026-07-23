@@ -173,8 +173,8 @@ const WOORDEBOEK = {
     en: "Release date (leave empty = available immediately)",
   },
   paneel_outeur_verdeling: {
-    af: "Outeur-verdeling (Paystack-subrekening) op hierdie formaat",
-    en: "Author split (Paystack subaccount) on this format",
+    af: "Outeur-verdeling(s) (Paystack-subrekening) op hierdie formaat",
+    en: "Author split(s) (Paystack subaccount) on this format",
   },
   paneel_subrekening_kode: { af: "Subrekening-kode (ACCT_...)", en: "Subaccount code (ACCT_...)" },
   paneel_tipe: { af: "Tipe", en: "Type" },
@@ -186,6 +186,24 @@ const WOORDEBOEK = {
   paneel_skep_produk: { af: "Skep produk", en: "Create product" },
   paneel_eboek: { af: "E-boek", en: "E-book" },
   paneel_hardekopie: { af: "Harde kopie", en: "Hard copy" },
+
+  // Outeurs-register
+  paneel_outeurs_titel: { af: "Outeurs", en: "Authors" },
+  paneel_voeg_outeur_by_knoppie: { af: "+ Voeg outeur by", en: "+ Add author" },
+  paneel_outeurs_hulp: {
+    af: "Voeg elke outeur hier EEN KEER by (naam + Paystack-subrekening-kode) — kies hulle daarna eenvoudig uit 'n lys wanneer jy 'n boek se outeur-verdeling opstel, sonder om die rou kode elke keer te moet intik.",
+    en: "Add each author here ONCE (name + Paystack subaccount code) — from then on, simply pick them from a list when setting up a book's author split, without needing to type the raw code every time.",
+  },
+  paneel_outeurs_laai: { af: "Outeurs word gelaai …", en: "Loading authors …" },
+  paneel_kon_nie_outeurs_laai: {
+    af: "Kon nie outeurs laai nie — probeer weer.",
+    en: "Could not load authors — try again.",
+  },
+  paneel_nog_geen_outeurs: { af: "Nog geen outeurs nie — voeg die eerste een by.", en: "No authors yet — add the first one." },
+  paneel_outeur_naam_etiket: { af: "Naam", en: "Name" },
+  paneel_kies_outeur: { af: "— kies outeur —", en: "— select author —" },
+  paneel_voeg_verdeling_by: { af: "+ Voeg verdeling by", en: "+ Add split" },
+  paneel_verwyder_verdeling: { af: "Verwyder verdeling", en: "Remove split" },
 
   paneel_kon_nie_produkte_laai: { af: "Kon nie produkte laai nie — probeer weer.", en: "Could not load products — try again." },
   paneel_nog_geen_produkte: { af: "Nog geen produkte nie — voeg die eerste een by.", en: "No products yet — add the first one." },

@@ -102,6 +102,32 @@
         </div>
       </section>
 
+      <section class="paneel-afdeling">
+        <div class="paneel-afdeling-kop">
+          <h2 class="paneel-afdeling-titel" data-i18n="paneel_outeurs_titel">Outeurs</h2>
+          <button id="paneel-voeg-outeur-by-knoppie" class="kaart-aksie paneel-voeg-by-knoppie" type="button" data-i18n="paneel_voeg_outeur_by_knoppie">+ Voeg outeur by</button>
+        </div>
+        <p class="paneel-hulp-teks" data-i18n="paneel_outeurs_hulp">Voeg elke outeur hier EEN KEER by (naam + Paystack-subrekening-kode) — kies hulle daarna eenvoudig uit 'n lys wanneer jy 'n boek se outeur-verdeling opstel, sonder om die rou kode elke keer te moet intik.</p>
+        <div id="paneel-outeurs-lys">
+          <p class="stelsel-boodskap" data-i18n="paneel_outeurs_laai">Outeurs word gelaai …</p>
+        </div>
+
+        <div id="paneel-outeur-vorm-afdeling" style="display:none;">
+          <form id="paneel-outeur-vorm">
+            <label class="veld-etiket" for="outeur-vorm-naam"><span data-i18n="paneel_outeur_naam_etiket">Naam</span> <span class="veld-verplig" data-i18n="verplig">(verplig)</span></label>
+            <input type="text" id="outeur-vorm-naam" class="veld-invoer" required>
+
+            <label class="veld-etiket" for="outeur-vorm-subrekening"><span data-i18n="paneel_subrekening_kode">Subrekening-kode (ACCT_...)</span> <span class="veld-verplig" data-i18n="verplig">(verplig)</span></label>
+            <input type="text" id="outeur-vorm-subrekening" class="veld-invoer" placeholder="ACCT_xxxxxxxxxx" required>
+
+            <div id="paneel-outeur-vorm-foute" class="vb-foute" style="display:none;"></div>
+
+            <button type="submit" id="paneel-outeur-vorm-indien" class="kaart-aksie paneel-vorm-indien" data-i18n="paneel_voeg_outeur_by_knoppie">+ Voeg outeur by</button>
+            <button type="button" id="paneel-outeur-vorm-kanselleer" class="terug-skakel paneel-vorm-kanselleer" type="button" data-i18n="paneel_kanselleer">✕ Kanselleer</button>
+          </form>
+        </div>
+      </section>
+
       <section id="paneel-vorm-afdeling" class="paneel-afdeling" style="display:none;">
         <div class="paneel-afdeling-kop">
           <h2 id="paneel-vorm-titel" class="paneel-afdeling-titel" data-i18n="paneel_voeg_produk_by_titel">Voeg produk by</h2>
@@ -157,25 +183,12 @@
 
               <label class="paneel-wisselaar">
                 <input type="checkbox" id="vorm-eboek-verdeling-aan">
-                <span data-i18n="paneel_outeur_verdeling">Outeur-verdeling (Paystack-subrekening) op hierdie formaat</span>
+                <span data-i18n="paneel_outeur_verdeling">Outeur-verdeling(s) (Paystack-subrekening) op hierdie formaat</span>
               </label>
 
               <div id="vorm-eboek-verdeling-velde" style="display:none;">
-                <label class="veld-etiket" for="vorm-eboek-subrekening" data-i18n="paneel_subrekening_kode">Subrekening-kode (ACCT_...)</label>
-                <input type="text" id="vorm-eboek-subrekening" class="veld-invoer" placeholder="ACCT_xxxxxxxxxx">
-                <div class="veld-ry">
-                  <div>
-                    <label class="veld-etiket" for="vorm-eboek-verdeling-tipe" data-i18n="paneel_tipe">Tipe</label>
-                    <select id="vorm-eboek-verdeling-tipe" class="veld-invoer">
-                      <option value="persentasie" data-i18n="paneel_persentasie">Persentasie</option>
-                      <option value="vaste_bedrag" data-i18n="paneel_vaste_bedrag">Vaste bedrag</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label class="veld-etiket" for="vorm-eboek-verdeling-waarde" data-i18n="paneel_waarde">Waarde (% of R, na gelang van tipe)</label>
-                    <input type="number" id="vorm-eboek-verdeling-waarde" class="veld-invoer" min="0" step="0.01">
-                  </div>
-                </div>
+                <div id="vorm-eboek-verdelings-lys" class="paneel-verdelings-lys"></div>
+                <button type="button" id="vorm-eboek-voeg-verdeling-by" class="terug-skakel" data-i18n="paneel_voeg_verdeling_by">+ Voeg verdeling by</button>
               </div>
             </div>
           </fieldset>
@@ -208,25 +221,12 @@
 
               <label class="paneel-wisselaar">
                 <input type="checkbox" id="vorm-hardekopie-verdeling-aan">
-                <span data-i18n="paneel_outeur_verdeling">Outeur-verdeling (Paystack-subrekening) op hierdie formaat</span>
+                <span data-i18n="paneel_outeur_verdeling">Outeur-verdeling(s) (Paystack-subrekening) op hierdie formaat</span>
               </label>
 
               <div id="vorm-hardekopie-verdeling-velde" style="display:none;">
-                <label class="veld-etiket" for="vorm-hardekopie-subrekening" data-i18n="paneel_subrekening_kode">Subrekening-kode (ACCT_...)</label>
-                <input type="text" id="vorm-hardekopie-subrekening" class="veld-invoer" placeholder="ACCT_xxxxxxxxxx">
-                <div class="veld-ry">
-                  <div>
-                    <label class="veld-etiket" for="vorm-hardekopie-verdeling-tipe" data-i18n="paneel_tipe">Tipe</label>
-                    <select id="vorm-hardekopie-verdeling-tipe" class="veld-invoer">
-                      <option value="persentasie" data-i18n="paneel_persentasie">Persentasie</option>
-                      <option value="vaste_bedrag" data-i18n="paneel_vaste_bedrag">Vaste bedrag</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label class="veld-etiket" for="vorm-hardekopie-verdeling-waarde" data-i18n="paneel_waarde">Waarde (% of R, na gelang van tipe)</label>
-                    <input type="number" id="vorm-hardekopie-verdeling-waarde" class="veld-invoer" min="0" step="0.01">
-                  </div>
-                </div>
+                <div id="vorm-hardekopie-verdelings-lys" class="paneel-verdelings-lys"></div>
+                <button type="button" id="vorm-hardekopie-voeg-verdeling-by" class="terug-skakel" data-i18n="paneel_voeg_verdeling_by">+ Voeg verdeling by</button>
               </div>
             </div>
           </fieldset>
