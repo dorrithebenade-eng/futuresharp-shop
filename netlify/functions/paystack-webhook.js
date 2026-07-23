@@ -8,7 +8,7 @@
 // af omdat dit direk van Paystack se bediener af kom.
 
 const crypto = require("crypto");
-const { getStore } = require("@netlify/blobs");
+const { kry_store } = require("./_blob-store");
 
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
@@ -39,7 +39,7 @@ exports.handler = async (event) => {
   const data = gebeurtenis.data;
   const bestelnommer = data.reference;
 
-  const store = getStore("bestellings");
+  const store = kry_store("bestellings");
   const bestelling = await store.get(bestelnommer, { type: "json" });
 
   if (!bestelling) {

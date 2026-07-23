@@ -2,7 +2,7 @@
 // Word deur die "Voeg produk by"-vorm op die interne paneelbord aangeroep
 // (Fase 4).
 
-const { getStore } = require("@netlify/blobs");
+const { kry_store } = require("./_blob-store");
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 
 // Valideer 'n opsionele outeur-verdeling — gee null terug (geen verdeling
@@ -59,7 +59,7 @@ exports.handler = async (event, context) => {
     };
   }
 
-  const store = getStore("katalogus");
+  const store = kry_store("katalogus");
 
   // Verhoed oorskryf van 'n bestaande slug per ongeluk
   const bestaande = await store.get(slug, { type: "json" });

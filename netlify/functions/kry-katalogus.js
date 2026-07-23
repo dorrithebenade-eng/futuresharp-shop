@@ -2,7 +2,7 @@
 // katalogus deurblaai. Lys alle produkte met aktief = true uit die
 // "katalogus"-Blobs-store.
 
-const { getStore } = require("@netlify/blobs");
+const { kry_store } = require("./_blob-store");
 
 exports.handler = async (event) => {
   if (event.httpMethod !== "GET") {
@@ -10,7 +10,7 @@ exports.handler = async (event) => {
   }
 
   try {
-    const store = getStore("katalogus");
+    const store = kry_store("katalogus");
     const { blobs } = await store.list();
 
     const produkte = [];

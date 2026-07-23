@@ -2,7 +2,7 @@
 // dit (aktief = false laat dit uit die katalogus verdwyn sonder om die
 // rekord te verwyder — bestellingsgeskiedenis bly intak).
 
-const { getStore } = require("@netlify/blobs");
+const { kry_store } = require("./_blob-store");
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 
 // Selfde validasie as skep-produk.js — hou dit in lyn sodat 'n wysiging
@@ -50,7 +50,7 @@ exports.handler = async (event, context) => {
     return { statusCode: 400, body: "Verpligte velde: slug, wysigings" };
   }
 
-  const store = getStore("katalogus");
+  const store = kry_store("katalogus");
   const bestaande = await store.get(slug, { type: "json" });
   if (!bestaande) {
     return { statusCode: 404, body: `Geen produk met slug "${slug}" nie` };

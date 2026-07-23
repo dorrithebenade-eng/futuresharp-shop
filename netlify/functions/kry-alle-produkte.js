@@ -4,7 +4,7 @@
 // omdat personeel ook onaktiewe produkte moet kan sien om te wysig/
 // heraktiveer.
 
-const { getStore } = require("@netlify/blobs");
+const { kry_store } = require("./_blob-store");
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 
 exports.handler = async (event, context) => {
@@ -18,7 +18,7 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    const store = getStore("katalogus");
+    const store = kry_store("katalogus");
     const { blobs } = await store.list();
 
     const produkte = [];

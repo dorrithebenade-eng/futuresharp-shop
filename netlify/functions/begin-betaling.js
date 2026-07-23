@@ -25,7 +25,7 @@
 // vaste-bedrag-items is dit wiskundig presies (die bedrag wat Paystack
 // uitbetaal, is binne 'n sent van die gestelde vaste bedrag).
 
-const { getStore } = require("@netlify/blobs");
+const { kry_store } = require("./_blob-store");
 
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
@@ -45,8 +45,8 @@ exports.handler = async (event) => {
     return { statusCode: 400, body: "Onvolledige bestelling-data" };
   }
 
-  const katalogusStore = getStore("katalogus");
-  const bestellingsStore = getStore("bestellings");
+  const katalogusStore = kry_store("katalogus");
+  const bestellingsStore = kry_store("bestellings");
 
   // Verhoed dat 'n reeds-betaalde bestelnommer oorskryf word
   const bestaande = await bestellingsStore.get(bestelnommer, { type: "json" });
