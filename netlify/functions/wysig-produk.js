@@ -33,7 +33,7 @@ exports.handler = async (event, context) => {
     return { statusCode: 405, body: "Metode nie toegelaat nie" };
   }
 
-  const gebruiker = kry_gebruiker_en_kontroleer_rol(event, context, "personeel");
+  const gebruiker = await kry_gebruiker_en_kontroleer_rol(event, context, "personeel");
   if (!gebruiker) {
     return { statusCode: 403, body: "Geen toegang nie — personeel-rol vereis" };
   }
