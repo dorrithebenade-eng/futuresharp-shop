@@ -60,16 +60,22 @@ body {
 }
 
 @media (max-width: 640px) {
+  .kop {
+    display: flex;
+    flex-direction: column;
+  }
   .kop-blokke {
     position: static;
     width: 220px;
     max-width: 70%;
-    margin: 0 auto 28px;
+    margin: 28px auto 0;
     transform: none;
+    order: 2;
   }
   .kop-inhoud {
     padding-right: 0;
     text-align: center;
+    order: 1;
   }
   .kop-titel { align-items: center; }
   .kop-subtitel { margin-left: auto; margin-right: auto; }
@@ -77,10 +83,11 @@ body {
 
 .kop-eyebrow {
   font-family: var(--font-liggaam);
-  font-size: 13px;
+  font-weight: 700;
+  font-size: 15px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--amber);
+  color: #FFC94D;
   margin: 0 0 12px;
 }
 
@@ -122,8 +129,8 @@ body {
 
 .katalogus-wrap {
   max-width: 1100px;
-  margin: -40px auto 0;
-  padding: 0 24px 80px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
   position: relative;
 }
 
