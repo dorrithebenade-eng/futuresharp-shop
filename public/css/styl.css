@@ -156,12 +156,7 @@ body {
 }
 
 .kaart-hoek {
-  position: absolute;
-  top: -1px;
-  left: -1px;
-  width: 18px;
-  height: 18px;
-  background: var(--swart);
+  display: none;
 }
 
 .kaart-omslag {
