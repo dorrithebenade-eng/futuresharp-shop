@@ -234,6 +234,42 @@ const WOORDEBOEK = {
   paneel_kon_nie_aanmeld: { af: "Kon nie aanmeld nie: ", en: "Could not log in: " },
   paneel_kon_nie_wagwoord_stel: { af: "Kon nie wagwoord stel nie: ", en: "Could not set password: " },
   paneel_kon_nie_herstel_stuur: { af: "Kon nie herstel-epos stuur nie: ", en: "Could not send reset email: " },
+
+  // My Boeke
+  my_boeke_titel: { af: "My Boeke", en: "My Books" },
+  my_boeke_subtitel: { af: "Al jou gekoopte e-boeke, gereed om te lees.", en: "All your purchased e-books, ready to read." },
+  lees_aanlyn: { af: "Lees aanlyn", en: "Read online" },
+  beskikbaar_vanaf: { af: "Beskikbaar vanaf", en: "Available from" },
+  nog_nie_beskikbaar: { af: "Nog nie beskikbaar nie", en: "Not yet available" },
+  meld_aan_vir_my_boeke: { af: "Meld eers aan om jou boeke te sien.", en: "Please log in to see your books." },
+  laai_tans: { af: "Laai tans...", en: "Loading..." },
+  sessie_verval: { af: "Jou sessie het verval — meld gerus weer aan.", en: "Your session has expired — please log in again." },
+  geen_boeke_nog: { af: "Jy het nog geen e-boeke gekoop nie.", en: "You haven't purchased any e-books yet." },
+  fout_boeke_laai: { af: "Kon nie jou boeke laai nie — probeer later weer.", en: "Couldn't load your books — please try again later." },
+
+  // Aanmeld / Registreer / Herstel (kopers)
+  aanmeld_titel: { af: "Meld aan", en: "Log in" },
+  epos_etiket: { af: "E-pos", en: "Email" },
+  wagwoord_etiket: { af: "Wagwoord", en: "Password" },
+  meld_aan_knoppie: { af: "Meld aan", en: "Log in" },
+  geen_rekening_nog: { af: "Het jy nog geen rekening nie?", en: "Don't have an account yet?" },
+  registreer_hier: { af: "Registreer hier", en: "Register here" },
+  wagwoord_vergeet: { af: "Wagwoord vergeet?", en: "Forgot your password?" },
+  registreer_titel: { af: "Skep 'n rekening", en: "Create an account" },
+  registreer_knoppie: { af: "Registreer", en: "Register" },
+  het_reeds_rekening: { af: "Het jy reeds 'n rekening?", en: "Already have an account?" },
+  meld_aan_hier: { af: "Meld hier aan", en: "Log in here" },
+  herstel_titel: { af: "Herstel wagwoord", en: "Reset password" },
+  stuur_herstel_knoppie: { af: "Stuur herstel-skakel", en: "Send reset link" },
+  terug_na_aanmeld: { af: "Terug na aanmeld", en: "Back to login" },
+  meld_tans_aan: { af: "Meld tans aan...", en: "Logging in..." },
+  aanmeld_fout: { af: "Kon nie aanmeld nie — kyk jou besonderhede.", en: "Couldn't log in — check your details." },
+  registreer_tans: { af: "Skep tans rekening...", en: "Creating account..." },
+  registreer_sukses_bevestig_epos: { af: "Rekening geskep! Kyk jou e-pos vir 'n bevestigingskakel voor jy kan aanmeld.", en: "Account created! Check your email for a confirmation link before logging in." },
+  registreer_fout: { af: "Kon nie rekening skep nie.", en: "Couldn't create account." },
+  stuur_tans_herstel: { af: "Stuur tans...", en: "Sending..." },
+  herstel_epos_gestuur: { af: "Herstel-skakel gestuur — kyk jou e-pos.", en: "Reset link sent — check your email." },
+  herstel_fout: { af: "Kon nie herstel-epos stuur nie.", en: "Couldn't send reset email." },
 };
 
 function kry_huidige_taal() {
