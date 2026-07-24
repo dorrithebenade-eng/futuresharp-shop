@@ -412,16 +412,18 @@ body {
 
 .rekening-paneel {
   position: absolute;
-  top: calc(100% + 10px);
+  top: 100%;
   right: 0;
-  min-width: 180px;
+  margin-top: 6px;
+  min-width: 200px;
   background: var(--swart);
   border: 1px solid #3A3A3A;
   border-radius: 8px;
   padding: 6px;
   display: flex;
   flex-direction: column;
-  z-index: 20;
+  z-index: 30;
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.45);
 }
 
 .rekening-paneel-skakel {
@@ -456,7 +458,7 @@ body {
 .mini-kop-regs {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 28px;
 }
 
 .taal-wisselaar {
@@ -488,6 +490,118 @@ body {
 @media (max-width: 400px) {
   .mini-kop-regs { gap: 12px; }
   .taal-knoppie { padding: 6px 10px; }
+}
+
+/* ---------- Mobiele hamburger-kieslys ---------- */
+
+.mini-kop-hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 4px;
+  background: none;
+  border: none;
+  padding: 6px;
+  cursor: pointer;
+}
+
+.mini-kop-hamburger span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: var(--wit);
+}
+
+.mini-kop-regs-toemaak {
+  display: none;
+  align-self: flex-end;
+  background: none;
+  border: none;
+  color: var(--wit);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 6px;
+  margin-bottom: 12px;
+}
+
+.mini-kop-regs-agtergrond {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .mini-kop-hamburger {
+    display: flex;
+  }
+
+  .mini-kop-regs {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 78%;
+    max-width: 320px;
+    background: var(--swart);
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 22px;
+    padding: 20px 24px 32px;
+    transform: translateX(100%);
+    transition: transform 0.25s ease;
+    z-index: 50;
+    overflow-y: auto;
+  }
+
+  .mini-kop-regs.mini-kop-regs-oop {
+    transform: translateX(0);
+  }
+
+  .mini-kop-regs-toemaak {
+    display: block;
+  }
+
+  .mini-kop-regs-agtergrond {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 40;
+  }
+
+  .mini-kop-regs-agtergrond.mini-kop-regs-agtergrond-oop {
+    display: block;
+  }
+
+  .mini-kop-mandjie {
+    justify-content: flex-start;
+  }
+
+  .rekening-menu {
+    width: 100%;
+  }
+
+  .rekening-skakelaar {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .rekening-epos {
+    max-width: none;
+  }
+
+  .rekening-paneel {
+    position: static;
+    box-shadow: none;
+    border: none;
+    margin-top: 10px;
+    padding: 0;
+  }
+
+  .rekening-paneel-skakel {
+    padding: 12px 4px;
+  }
+
+  .taal-wisselaar {
+    align-self: flex-start;
+  }
 }
 
 /* ---------- Paneelbord: omslag-oplaai ---------- */
