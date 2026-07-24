@@ -360,7 +360,6 @@ body {
 .mini-kop-rekening-plek {
   display: flex;
   align-items: center;
-  gap: 16px;
 }
 
 .mini-kop-rekening {
@@ -369,14 +368,87 @@ body {
   font-size: 14px;
   color: var(--wit);
   text-decoration: none;
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
 }
 
 .mini-kop-rekening:hover {
   color: var(--teal);
+}
+
+/* ---------- Rekening-menu (aftrekkieslys, koper/personeel) ---------- */
+
+.rekening-menu {
+  position: relative;
+}
+
+.rekening-skakelaar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  padding: 4px 0;
+  cursor: pointer;
+  font-family: var(--font-liggaam);
+}
+
+.rekening-epos {
+  color: var(--wit);
+  font-size: 14px;
+  font-weight: 600;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rekening-pyltjie {
+  color: #B8B6B1;
+  font-size: 11px;
+}
+
+.rekening-skakelaar:hover .rekening-epos {
+  color: var(--teal);
+}
+
+.rekening-paneel {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  min-width: 180px;
+  background: var(--swart);
+  border: 1px solid #3A3A3A;
+  border-radius: 8px;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  z-index: 20;
+}
+
+.rekening-paneel-skakel {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  color: var(--wit);
+  font-family: var(--font-liggaam);
+  font-size: 14px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.rekening-paneel-skakel:hover {
+  background: #262626;
+  color: var(--teal);
+}
+
+.rekening-paneel-knoppie {
+  border-top: 1px solid #3A3A3A;
+  margin-top: 4px;
+  padding-top: 10px;
+  border-radius: 0 0 6px 6px;
 }
 
 /* ---------- Taalwisselaar ---------- */
