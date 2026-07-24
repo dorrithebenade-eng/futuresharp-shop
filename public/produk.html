@@ -7,8 +7,7 @@
     // MOET voor die Identity-widget se eie skrip loop — sien nota in
     // mandjie.js vir hoekom. Netlify se e-pos-skakels (bevestiging,
     // uitnodiging, wagwoord-herstel) land altyd hier met 'n token in
-    // die URL; op die oomblik het net personeel rekeninge, so ons stuur
-    // dit dadelik na die paneelbord toe voor die widget dit self "opeet".
+    // die URL; bevestig.html hanteer dit nou universeel.
     (function () {
       var identiteitsTokenPatroon = /(confirmation_token|invite_token|recovery_token|email_change_token)=/;
       if (identiteitsTokenPatroon.test(window.location.hash)) {
@@ -20,7 +19,6 @@
   <link rel="stylesheet" href="css/styl.css">
 </head>
 <body>
-
   <header class="mini-kop">
    <div class="mini-kop-inner">
     <a href="index.html" class="mini-kop-merk">
@@ -38,6 +36,7 @@
         <span data-i18n="nav_mandjie">Mandjie</span>
         <span id="mandjie-teller" class="mandjie-teller"></span>
       </a>
+      <span id="nav-rekening-plek" class="mini-kop-rekening-plek"></span>
       <div class="taal-wisselaar" role="group" aria-label="Taal / Language">
         <button type="button" class="taal-knoppie" data-taal="af">AF</button>
         <button type="button" class="taal-knoppie" data-taal="en">EN</button>
@@ -45,13 +44,13 @@
     </div>
    </div>
   </header>
-
   <main class="produk-wrap" id="produk-wrap">
     <p class="stelsel-boodskap" data-i18n="produk_laai">Produk word gelaai …</p>
   </main>
-
   <script src="js/taal.js"></script>
+  <script src="js/identiteit.js"></script>
   <script src="js/mandjie.js"></script>
+  <script src="js/nav-rekening.js"></script>
   <script src="js/produk.js"></script>
 </body>
 </html>
