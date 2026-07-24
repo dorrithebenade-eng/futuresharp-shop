@@ -34,21 +34,20 @@ function verberg_alle_auth_afdelings() {
 }
 
 function wys_aangemeld_toestand(gebruiker) {
+  if (!het_personeel_rol(gebruiker)) {
+    // Nie personeel nie — moet NOOIT enigiets van die paneelbord se
+    // binnekant sien nie, nie eens 'n foutboodskap wat na "personeel-rol"
+    // verwys nie. Stuur stilweg terug na die winkel.
+    window.location.href = "index.html";
+    return;
+  }
+
   verberg_alle_auth_afdelings();
   document.getElementById("paneel-afmeld-knoppie").style.display = "inline-flex";
   document.getElementById("paneel-gebruiker-epos").textContent = gebruiker.email;
 
-  const statusWrap = document.getElementById("paneel-status");
-  const inhoudWrap = document.getElementById("paneel-inhoud");
-
-  if (!het_personeel_rol(gebruiker)) {
-    statusWrap.style.display = "block";
-    statusWrap.textContent = t("paneel_geen_personeel_rol");
-    inhoudWrap.style.display = "none";
-    return;
-  }
-
-  inhoudWrap.style.display = "block";
+  document.getElementById("paneel-inhoud").style.display = "block";
+  document.getElementById("paneel-hoof").style.visibility = "visible";
   laai_produkte();
   laai_outeurs();
 }
@@ -59,6 +58,7 @@ function wys_afgemeld_toestand() {
   document.getElementById("paneel-afmeld-knoppie").style.display = "none";
   document.getElementById("paneel-gebruiker-epos").textContent = "";
   document.getElementById("paneel-inhoud").style.display = "none";
+  document.getElementById("paneel-hoof").style.visibility = "visible";
 }
 
 function kry_outorisasie_kop() {
@@ -663,6 +663,7 @@ function kry_token_uit_hash() {
 function wys_stel_nuwe_wagwoord_afdeling(token_inligting) {
   verberg_alle_auth_afdelings();
   document.getElementById("paneel-nuwe-wagwoord-afdeling").style.display = "block";
+  document.getElementById("paneel-hoof").style.visibility = "visible";
 
   document.getElementById("paneel-nuwe-wagwoord-vorm").onsubmit = async (gebeurtenis) => {
     gebeurtenis.preventDefault();
