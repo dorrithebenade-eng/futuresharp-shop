@@ -12,14 +12,21 @@
 function kry_token_uit_url() {
   const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""));
 
+  // confirmation_token: koper/personeel het self geregistreer en het
+  // klaar 'n wagwoord by die registrasie-vorm gekies — hier hoef ons
+  // net die e-pos te bevestig, nie weer vir 'n wagwoord te vra nie.
   const bevestig_token = hash.get("confirmation_token");
-  if (bevestig_token) return { tipe: "signup", token: bevestig_token };
+  if (bevestig_token) return { tipe: "signup", token: bevestig_token, benodig_wagwoord: false };
 
+  // recovery_token: wagwoord-vergeet-vloei — wagwoord moet gestel word.
   const herstel_token = hash.get("recovery_token");
-  if (herstel_token) return { tipe: "recovery", token: herstel_token };
+  if (herstel_token) return { tipe: "recovery", token: herstel_token, benodig_wagwoord: true };
 
+  // invite_token: admin het die rekening geskep (bv. personeel) — die
+  // gebruiker het nog nooit 'n wagwoord gehad nie, dus moet dit hier
+  // gestel word.
   const uitnodig_token = hash.get("invite_token");
-  if (uitnodig_token) return { tipe: "signup", token: uitnodig_token };
+  if (uitnodig_token) return { tipe: "signup", token: uitnodig_token, benodig_wagwoord: true };
 
   return null;
 }
@@ -42,10 +49,33 @@ function wys_ongeldige_skakel() {
   document.getElementById("bevestig-fout-blok").hidden = false;
 }
 
+async function verifieer_en_herlei(tipe, token, wagwoord) {
+  const sessie = await identiteit_verwerk_token(tipe, token, wagwoord);
+  // Universele bestemming vir ALLE Identity-e-poslinke (koper én
+  // personeel) — ná verwerking weet ons eers wie dit is, dus besluit
+  // ons EERS NOU waarheen om te gaan, i.p.v. vooraf te probeer raai.
+  const is_personeel = identiteit_het_rol(sessie.gebruiker, "personeel");
+  window.location.href = is_personeel ? "/paneelbord.html" : kry_terug_pad();
+}
+
 const token_inligting = kry_token_uit_url();
 
 if (!token_inligting) {
   wys_ongeldige_skakel();
+} else if (!token_inligting.benodig_wagwoord) {
+  // Self-registrasie: wagwoord is klaar by registrasie gekies — moenie
+  // weer daarvoor vra nie, verifieer outomaties.
+  document.getElementById("bevestig-blok").hidden = true;
+  wys_boodskap(window.t ? window.t("bevestig_tans") : "Bevestig tans...");
+
+  verifieer_en_herlei(token_inligting.tipe, token_inligting.token, undefined).catch((fout) => {
+    document.getElementById("bevestig-blok").hidden = false;
+    document.getElementById("bevestig-vorm").hidden = true;
+    wys_boodskap(
+      fout.message || (window.t ? window.t("bevestig_fout") : "Kon nie bevestig nie."),
+      true
+    );
+  });
 } else {
   document.getElementById("bevestig-vorm").addEventListener("submit", async (ev) => {
     ev.preventDefault();
@@ -56,12 +86,7 @@ if (!token_inligting) {
     wys_boodskap(window.t ? window.t("bevestig_tans") : "Bevestig...");
 
     try {
-      const sessie = await identiteit_verwerk_token(token_inligting.tipe, token_inligting.token, wagwoord);
-      // Universele bestemming vir ALLE Identity-e-poslinke (koper én
-      // personeel) — ná verwerking weet ons eers wie dit is, dus besluit
-      // ons EERS NOU waarheen om te gaan, i.p.v. vooraf te probeer raai.
-      const is_personeel = identiteit_het_rol(sessie.gebruiker, "personeel");
-      window.location.href = is_personeel ? "/paneelbord.html" : kry_terug_pad();
+      await verifieer_en_herlei(token_inligting.tipe, token_inligting.token, wagwoord);
     } catch (fout) {
       knoppie.disabled = false;
       wys_boodskap(
