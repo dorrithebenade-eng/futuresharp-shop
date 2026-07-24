@@ -8,6 +8,7 @@ const SKEP_PRODUK_ENDPOINT = "/.netlify/functions/skep-produk";
 const WYSIG_PRODUK_ENDPOINT = "/.netlify/functions/wysig-produk";
 const KRY_OUTEURS_ENDPOINT = "/.netlify/functions/kry-outeurs";
 const SKEP_OUTEUR_ENDPOINT = "/.netlify/functions/skep-outeur";
+const LAAI_EBOEK_OP_ENDPOINT = "/.netlify/functions/laai-eboek-op";
 
 // In-geheue kas van outeurs — gevul deur laai_outeurs(), gebruik om die
 // verdeling-aftrekkieslyste op elke boek-vorm te bou sonder om elke keer
@@ -305,6 +306,8 @@ function reset_vorm() {
   document.getElementById("vorm-omslag").value = "";
   wys_omslag_voorskou("");
   document.getElementById("vorm-omslag-status").textContent = "";
+  document.getElementById("vorm-eboek-sleutel").value = "";
+  document.getElementById("vorm-eboek-lêer-status").textContent = "";
   document.getElementById("vorm-eboek-verdelings-lys").innerHTML = "";
   document.getElementById("vorm-hardekopie-verdelings-lys").innerHTML = "";
   wys_verberg_formaat_velde();
@@ -387,6 +390,84 @@ async function hanteer_omslag_lêer_gekies(gebeurtenis) {
   }
 }
 
+// --- E-boek-PDF-oplaai (stuksgewys — sien laai-eboek-op.js vir hoekom) ---
+
+// Lees 'n Blob/File-fragment as base64, sonder om die HELE lêer eers in
+// geheue as een groot data-URL te probeer omskep (belangrik vir groot
+// PDF's — ons lees en stuur een stuk op 'n slag).
+function lees_stuk_as_base64(stuk) {
+  return new Promise((resolve, reject) => {
+    const leser = new FileReader();
+    leser.onload = () => {
+      const volledig = leser.result;
+      const kommaIndeks = volledig.indexOf(",");
+      resolve(volledig.slice(kommaIndeks + 1));
+    };
+    leser.onerror = () => reject(leser.error);
+    leser.readAsDataURL(stuk);
+  });
+}
+
+async function hanteer_eboek_lêer_gekies(gebeurtenis) {
+  const lêer = gebeurtenis.target.files && gebeurtenis.target.files[0];
+  const statusWrap = document.getElementById("vorm-eboek-lêer-status");
+  if (!lêer) return;
+
+  if (lêer.type !== "application/pdf") {
+    statusWrap.textContent = t("paneel_eboek_oplaai_verkeerde_tipe");
+    gebeurtenis.target.value = "";
+    return;
+  }
+
+  const slug = document.getElementById("vorm-slug").value.trim();
+  if (!slug) {
+    statusWrap.textContent = t("paneel_eboek_oplaai_geen_slug");
+    gebeurtenis.target.value = "";
+    return;
+  }
+
+  const STUK_GROOTTE = 3 * 1024 * 1024; // 3MB per stuk (ruim onder die 6MB-limiet ná base64)
+  const opload_id = crypto.randomUUID();
+  const totale_stukke = Math.ceil(lêer.size / STUK_GROOTTE);
+
+  try {
+    for (let indeks = 0; indeks < totale_stukke; indeks++) {
+      const begin = indeks * STUK_GROOTTE;
+      const stuk = lêer.slice(begin, begin + STUK_GROOTTE);
+      const data_base64 = await lees_stuk_as_base64(stuk);
+      const is_laaste = indeks === totale_stukke - 1;
+
+      statusWrap.textContent = `${t("paneel_eboek_oplaai_besig")} (${indeks + 1}/${totale_stukke})`;
+
+      const resp = await fetch(LAAI_EBOEK_OP_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...kry_outorisasie_kop() },
+        body: JSON.stringify({
+          slug,
+          opload_id,
+          stuk_indeks: indeks,
+          is_laaste,
+          data_base64,
+        }),
+      });
+
+      if (!resp.ok) {
+        const teks = await resp.text();
+        throw new Error(teks || `Status ${resp.status}`);
+      }
+
+      if (is_laaste) {
+        const data = await resp.json();
+        document.getElementById("vorm-eboek-sleutel").value = data.eboek_sleutel;
+        statusWrap.textContent = t("paneel_eboek_oplaai_sukses");
+      }
+    }
+  } catch (fout) {
+    console.error("Kon nie e-boek-PDF oplaai nie:", fout);
+    statusWrap.textContent = `${t("paneel_oplaai_fout")}${fout.message}`;
+  }
+}
+
 function wys_verberg_formaat_velde() {
   document.getElementById("vorm-eboek-velde").style.display =
     document.getElementById("vorm-eboek-beskikbaar").checked ? "block" : "none";
@@ -423,6 +504,10 @@ function open_vorm_vir_wysig(produk) {
   document.getElementById("vorm-eboek-beskikbaar").checked = !!eboek.beskikbaar;
   document.getElementById("vorm-eboek-prys").value = eboek.prys_sent ? (eboek.prys_sent / 100).toFixed(2) : "";
   document.getElementById("vorm-eboek-vrystelling").value = eboek.vrystelling_datum || "";
+  document.getElementById("vorm-eboek-sleutel").value = eboek.eboek_sleutel || "";
+  document.getElementById("vorm-eboek-lêer-status").textContent = eboek.eboek_sleutel
+    ? t("paneel_eboek_reeds_opgelaai")
+    : "";
   if (eboek.verdelings && eboek.verdelings.length) {
     document.getElementById("vorm-eboek-verdeling-aan").checked = true;
     eboek.verdelings.forEach((v) => voeg_verdeling_ry_by("eboek", v));
@@ -478,6 +563,7 @@ function bou_produk_liggaam() {
         prys_sent: kry_rand_as_sent("vorm-eboek-prys"),
         vrystelling_datum: document.getElementById("vorm-eboek-vrystelling").value || null,
         verdelings: bou_verdelings_vanuit_vorm("eboek"),
+        eboek_sleutel: document.getElementById("vorm-eboek-sleutel").value.trim() || null,
       },
       harde_kopie: {
         beskikbaar: hardeKopieBeskikbaar,
@@ -671,6 +757,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("vorm-eboek-verdeling-aan").addEventListener("change", wys_verberg_formaat_velde);
   document.getElementById("vorm-hardekopie-verdeling-aan").addEventListener("change", wys_verberg_formaat_velde);
   document.getElementById("vorm-omslag-lêer").addEventListener("change", hanteer_omslag_lêer_gekies);
+  document.getElementById("vorm-eboek-lêer").addEventListener("change", hanteer_eboek_lêer_gekies);
 
   // Outeurs
   document.getElementById("paneel-voeg-outeur-by-knoppie").addEventListener("click", open_outeur_vorm);
