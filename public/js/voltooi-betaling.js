@@ -2,6 +2,11 @@
 // verskaffer wat self koerierswerk hanteer. Personeel plaas die drukwerk-
 // bestelling self by die verskaffer en verskaf die koper se adres direk
 // (sien "drukker"-blok in data/bestelling-skema-voorbeeld.json).
+//
+// Fase 5: begin-betaling.js vereis nou 'n aangemelde "koper" — hierdie
+// bladsy moet dus eers 'n geldige sessie bevestig (identiteit.js) voor die
+// bestel-vorm gewys word, en die sessie se access_token saam met die
+// betaal-versoek stuur.
 
 const BESTELNOMMER_SLEUTEL = "future_shop_bestelnommer_konsep";
 
@@ -138,7 +143,7 @@ function wys_foute(foute) {
   foutWrap.innerHTML = foute.map((f) => `<p>${f}</p>`).join("");
 }
 
-async function stuur_na_betaling(bestelling) {
+async function stuur_na_betaling(bestelling, toegangs_token) {
   const knoppie = document.getElementById("gaan-na-betaling");
   knoppie.disabled = true;
   knoppie.textContent = t("besig");
@@ -146,9 +151,18 @@ async function stuur_na_betaling(bestelling) {
   try {
     const resp = await fetch("/.netlify/functions/begin-betaling", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${toegangs_token}`,
+      },
       body: JSON.stringify(bestelling),
     });
+
+    if (resp.status === 401) {
+      // Sessie het intussen verval — stuur koper terug na aanmeld
+      window.location.href = "/aanmeld.html?terug=/voltooi-betaling.html";
+      return;
+    }
 
     if (!resp.ok) throw new Error(`Status ${resp.status}`);
 
@@ -164,8 +178,29 @@ async function stuur_na_betaling(bestelling) {
   }
 }
 
-function laai_vb() {
+function wys_meld_aan_boodskap() {
   const wrap = document.getElementById("vb-inhoud");
+  wrap.innerHTML = `
+    <p class="stelsel-boodskap">
+      ${t("meld_aan_vir_my_boeke")}
+      <a href="/aanmeld.html?terug=/voltooi-betaling.html">${t("meld_aan_knoppie")}</a>
+    </p>
+  `;
+}
+
+async function laai_vb() {
+  const wrap = document.getElementById("vb-inhoud");
+
+  // --- Vereis 'n aangemelde koper voordat enigiets anders gewys word ---
+  // identiteit_kry_huidige_sessie() verfris outomaties 'n verlope
+  // access_token via die refresh_token — sien identiteit.js. Hierdie
+  // bladsy moet dus identiteit.js LAAI (script-tag) voor voltooi-betaling.js.
+  const sessie = await identiteit_kry_huidige_sessie();
+  if (!sessie || !sessie.access_token) {
+    wys_meld_aan_boodskap();
+    return;
+  }
+
   const items = kry_mandjie();
 
   if (!items.length) {
@@ -190,14 +225,28 @@ function laai_vb() {
     <button class="kaart-aksie vb-betaal-knoppie" id="gaan-na-betaling">${t("gaan_na_betaling")}</button>
   `;
 
-  document.getElementById("gaan-na-betaling").addEventListener("click", () => {
+  // Voorvul die kontak-epos met die aangemelde koper se e-pos, as gerief
+  const epos_invoer = document.getElementById("kontak-epos");
+  if (epos_invoer && sessie.gebruiker && sessie.gebruiker.email) {
+    epos_invoer.value = sessie.gebruiker.email;
+  }
+
+  document.getElementById("gaan-na-betaling").addEventListener("click", async () => {
+    // Voordat ons betaling begin, verseker die sessie is nog geldig —
+    // 'n verlope access_token sal 'n 401 by begin-betaling.js veroorsaak.
+    const vars_sessie = await identiteit_kry_huidige_sessie();
+    if (!vars_sessie || !vars_sessie.access_token) {
+      window.location.href = "/aanmeld.html?terug=/voltooi-betaling.html";
+      return;
+    }
+
     const resultaat = valideer_en_bou_bestelling(items, totaal, bestelnommer, bevatHardeKopie);
     if (!resultaat.geldig) {
       wys_foute(resultaat.foute);
       return;
     }
     wys_foute([]);
-    stuur_na_betaling(resultaat.bestelling);
+    stuur_na_betaling(resultaat.bestelling, vars_sessie.access_token);
   });
 }
 

@@ -9,6 +9,15 @@
     // uitnodiging, wagwoord-herstel) land altyd hier met 'n token in
     // die URL; op die oomblik het net personeel rekeninge, so ons stuur
     // dit dadelik na die paneelbord toe voor die widget dit self "opeet".
+    //
+    // ⚠️ FASE 5-GAPING (nog nie opgelos nie): nou dat kopers ook
+    // bevestigings-/herstel-skakels via identiteit.js/aanmeld.html kry,
+    // sal HULLE s'n ook per ongeluk hierheen na paneelbord.html herlei
+    // word — verkeerd vir 'n koper. Sodra bevestig.html gebou is, moet
+    // hierdie logika koper- vs. personeel-tokens kan onderskei (bv. deur
+    // eers die gebruiker se rol na te gaan, of deur 'n aparte
+    // e-pos-sjabloon/redirect_to vir koper- vs. personeel-registrasie in
+    // die Netlify Identity-instellings te gebruik).
     (function () {
       var identiteitsTokenPatroon = /(confirmation_token|invite_token|recovery_token|email_change_token)=/;
       if (identiteitsTokenPatroon.test(window.location.hash)) {
@@ -20,7 +29,6 @@
   <link rel="stylesheet" href="css/styl.css">
 </head>
 <body>
-
   <header class="mini-kop">
    <div class="mini-kop-inner">
     <a href="index.html" class="mini-kop-merk">
@@ -45,7 +53,6 @@
     </div>
    </div>
   </header>
-
   <main class="vb-wrap">
     <a class="terug-skakel" href="mandjie.html" data-i18n="terug_mandjie">&larr; Terug na mandjie</a>
     <h1 class="mandjie-titel" data-i18n="voltooi_betaling_titel">Voltooi betaling</h1>
@@ -53,8 +60,8 @@
       <p class="stelsel-boodskap" data-i18n="word_gelaai">Word gelaai …</p>
     </div>
   </main>
-
   <script src="js/taal.js"></script>
+  <script src="js/identiteit.js"></script>
   <script src="js/mandjie.js"></script>
   <script src="js/voltooi-betaling.js"></script>
 </body>
