@@ -527,9 +527,23 @@ body {
   display: none;
 }
 
+.mini-kop-mobiel-balk {
+  display: none;
+  align-items: center;
+  gap: 14px;
+}
+
 @media (max-width: 640px) {
   .mini-kop-hamburger {
     display: flex;
+  }
+
+  .mini-kop-mobiel-balk {
+    display: flex;
+  }
+
+  .mini-kop-regs .taal-wisselaar {
+    display: none;
   }
 
   .mini-kop-regs {

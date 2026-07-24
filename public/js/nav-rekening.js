@@ -36,7 +36,24 @@
   const agtergrond = document.createElement("div");
   agtergrond.className = "mini-kop-regs-agtergrond";
 
-  inner.insertBefore(hamburger, regs);
+  // Die taal-wisselaar bly ALTYD sigbaar in die kopbalk, ook op mobiel
+  // — ons kloon dit in 'n aparte, altyd-sigbare balkie langs die
+  // hamburger, en verskuil die oorspronklike een (binne die skyfie-
+  // paneel) net op mobiel via CSS, om duplisering te vermy. taal.js se
+  // eie DOMContentLoaded-luisteraar (wat .taal-knoppie-elemente aan
+  // kliek-hanteerders koppel) loop eers NÁ hierdie sinkrone kode, so
+  // die kloon se knoppies word ook korrek gekoppel.
+  const mobiel_balk = document.createElement("div");
+  mobiel_balk.className = "mini-kop-mobiel-balk";
+
+  const taal_oorspronklik = regs.querySelector(".taal-wisselaar");
+  if (taal_oorspronklik) {
+    const taal_kloon = taal_oorspronklik.cloneNode(true);
+    mobiel_balk.appendChild(taal_kloon);
+  }
+  mobiel_balk.appendChild(hamburger);
+
+  inner.insertBefore(mobiel_balk, regs.nextSibling);
   regs.insertBefore(toemaak_knoppie, regs.firstChild);
   inner.parentElement.insertBefore(agtergrond, inner.nextSibling);
 
@@ -80,10 +97,12 @@
     return;
   }
 
-  const is_personeel = identiteit_het_rol(sessie.gebruiker, "personeel");
-  const bestemming_href = is_personeel ? "paneelbord.html" : "my-boeke.html";
-  const bestemming_teks = is_personeel ? "Paneelbord" : "My Boeke";
-
+  // LET WEL: hierdie is die WINKEL-kant se rekening-menu — dit wys
+  // ALTYD "My Boeke", nooit "Paneelbord" nie, ongeag of die
+  // onderliggende rekening toevallig ook 'n personeel-rol het. Winkel-
+  // en paneel-aanmelding is doelbewus volledig geskeide sessies (sien
+  // identiteit.js) — 'n personeel-rekening wat hier aanmeld, word in
+  // hierdie konteks bloot as 'n gewone koper behandel.
   plek.innerHTML = `
     <div class="rekening-menu">
       <button type="button" id="rekening-skakelaar" class="rekening-skakelaar"
@@ -92,7 +111,7 @@
         <span class="rekening-pyltjie" aria-hidden="true">▾</span>
       </button>
       <div id="rekening-paneel" class="rekening-paneel" hidden>
-        <a href="${bestemming_href}" class="rekening-paneel-skakel">${bestemming_teks}</a>
+        <a href="my-boeke.html" class="rekening-paneel-skakel">My Boeke</a>
         <button type="button" id="rekening-meld-af-knoppie" class="rekening-paneel-skakel rekening-paneel-knoppie">Meld af</button>
       </div>
     </div>
