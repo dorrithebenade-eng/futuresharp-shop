@@ -66,8 +66,8 @@ body {
   }
   .kop-blokke {
     position: static;
-    width: 220px;
-    max-width: 70%;
+    width: 300px;
+    max-width: 85%;
     margin: 28px auto 0;
     transform: none;
     order: 2;

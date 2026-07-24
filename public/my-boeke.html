@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="af">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Boeke — Future Shop</title>
+  <link rel="stylesheet" href="/styl.css" />
+
+  <!--
+    LET WEL — PAS AAN VOOR GEBRUIK
+    ================================
+    Ek het nie toegang tot die res van die winkel se HTML in hierdie
+    sessie nie, so hierdie bladsy se <head>/nav/kop/voetskrif is 'n
+    minimale plekhouer. Kopieer die werklike <nav>/kop-blokke/voetskrif-
+    opmaak vanaf bv. mandjie.html hierheen sodat "My Boeke" dieselfde
+    voorkoms as die res van die winkel het (dieselfde CSS-klasse word
+    hieronder reeds gebruik: .kop, .kop-inhoud, ens. is NIE hier herhaal
+    nie — voeg self by).
+  -->
+</head>
+<body>
+
+  <main class="inhoud-area">
+    <h1 data-i18n="my_boeke_titel">My Boeke</h1>
+    <p data-i18n="my_boeke_subtitel">
+      Al jou gekoopte e-boeke, gereed om te lees.
+    </p>
+
+    <div id="my-boeke-status" aria-live="polite"></div>
+    <ul id="my-boeke-lys" class="boeke-lys"></ul>
+  </main>
+
+  <!-- Bestaande gedeelde modules — paaie soos elders in die winkel -->
+  <script src="/js/taal.js"></script>
+  <script src="/js/identiteit.js"></script>
+  <script src="/js/my-boeke.js"></script>
+</body>
+</html>

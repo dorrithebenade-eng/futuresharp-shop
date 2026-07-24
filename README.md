@@ -273,10 +273,10 @@ dieselfde paneelbord se "Wysig"-/"Deaktiveer"-knoppies → roep `wysig-produk.js
 aan. 'n Gedeaktiveerde produk verdwyn uit die publieke katalogus maar bly in
 Blobs (bestellingsgeskiedenis bly intak) en kan enige tyd weer geaktiveer word.
 
-**Bekende beperking:** omslag-beeld-oplaai is nie gebou nie — personeel plaas
-die beeldlêer self in `public/images/omslae/` (via Git/herontplooi) en tik
-net die pad in die vorm in. 'n Regte oplaai-vloei (via 'n Blobs-store +
-diensfunksie) kan later bygevoeg word as dit nodig word.
+**Opgedateer:** omslag-beeld-oplaai is intussen gebou en bevestig werkend —
+personeel kies 'n beeld direk in die vorm ("Choose file", JPEG/PNG/WEBP/GIF,
+maks. 4MB), wat outomaties via `laai-omslag-op.js`/`kry-omslag.js` opgelaai
+en gestoor word. Geen handmatige lêerplasing of pad-intik meer nodig nie.
 
 Die enigste stap wat nog buite die vorm gebeur, is die werklike PDF vir die e-boek
 se leesbare inhoud oplaai — dít los ons in Fase 5 (leser) op.
@@ -341,6 +341,33 @@ Wat dit in Fase 5 gaan verg:
    aflaai is vars, so daar's geen probleem om dieselfde boek op 'n
    rekenaar, foon of tablet af te laai nie; die koper meld net op elke
    toestel by hul rekening aan.
+
+### Leesmodel — besluit: albei opsies (hibried)
+
+"My Boeke" bied vir elke gekoopte e-boek **twee opsies**, nie net een nie:
+
+- **"Lees aanlyn"** — maak die boek oop in 'n ingeboude, in-blaaier-leser
+  (PDF.js-gebaseer). Die PDF verlaat nooit die platform as 'n aflaaibare
+  lêer nie — dit stroom net. Dit is die verkose opsie vir wie net gou wil
+  lees.
+- **"Laai af"** — kry die volledige, watermerkte PDF om self te stoor of
+  na 'n eie toestel/e-leser oor te dra (bv. Amazon se "Send to Kindle",
+  wat 'n gewone PDF sonder verdere iets van ons kant af aanvaar).
+
+Albei paaie gebruik dieselfde onderliggende Fase-5-watermerk-Function
+(punt 4 hierbo) — "Lees aanlyn" stroom die watermerkte PDF direk na die
+in-blaaier-leser, "Laai af" gee dieselfde watermerkte PDF as 'n lêer.
+Geen aparte watermerk-logika vir die twee paaie nie.
+
+**Belangrik — tweetalige leser-koppelvlak:** die "Lees aanlyn"-leser se
+eie koppelvlak (knoppies soos "Vorige"/"Volgende", "Bladsy X van Y",
+"Aflaai", foutboodskappe, ens.) moet deur die bestaande `taal.js`/`t()`-
+stelsel loop, net soos die res van die platform — AF/EN, koppelbaar met
+die bestaande taal-wisselaar.
+
+**Dit raak nooit die boek se inhoud self nie** — die PDF-teks (die
+skryfwerk) word nooit verander of vertaal nie, ongeag watter platformtaal
+gekies is. Slegs die leser se buite-om-koppelvlak is tweetalig.
 
 **Skaal-nota:** vir 'n klein katalogus is 'n volle deurloop van die
 "bestellings"-store (via `store.list()`) heeltemal aanvaarbaar. Sou die
