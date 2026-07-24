@@ -1,12 +1,31 @@
 // public/js/aanmeld.js
 //
 // Gebruik identiteit.js se globale identiteit_*-funksies (moet voor
-// hierdie skrip gelaai word). Geen eie fetch/localStorage-logika hier nie.
+// hierdie skrip gelaai word). Geen eie fetch/localStorage-logika hier nie,
+// buiten die "terug"-bestemming (sien TERUG_SLEUTEL hieronder).
+
+// Waarom localStorage en nie net die "?terug="-URL-parameter nie: 'n nuwe
+// koper wat by kassa registreer, verlaat die bladsy heeltemal om hul
+// e-pos te gaan bevestig. Die bevestigings-skakel word deur GoTrue self
+// gegenereer (nie deur ons kode nie) en bevat GEEN "?terug="-parameter
+// nie — dit sou dus verlore raak teen die tyd bevestig.html laai. Deur
+// dit hier in localStorage te stoor, oorleef dit daardie omweg.
+const TERUG_SLEUTEL = "future_shop_terug_na";
 
 function kry_terug_pad() {
   const parms = new URLSearchParams(window.location.search);
-  return parms.get("terug") || "/my-boeke.html";
+  const uit_url = parms.get("terug");
+  if (uit_url) {
+    localStorage.setItem(TERUG_SLEUTEL, uit_url);
+    return uit_url;
+  }
+  return localStorage.getItem(TERUG_SLEUTEL) || "/my-boeke.html";
 }
+
+// Stoor dadelik by bladsy-laai — ongeag of die persoon uiteindelik
+// aanmeld óf registreer, sodat dit ook oorleef as hulle na registreer
+// wissel voor hulle indien.
+kry_terug_pad();
 
 function wys_boodskap(teks, is_fout) {
   const el = document.getElementById("aanmeld-boodskap");
@@ -44,7 +63,9 @@ document.getElementById("aanmeld-vorm")?.addEventListener("submit", async (ev) =
 
   try {
     await identiteit_meld_aan(epos, wagwoord);
-    window.location.href = kry_terug_pad();
+    const pad = kry_terug_pad();
+    localStorage.removeItem(TERUG_SLEUTEL);
+    window.location.href = pad;
   } catch (fout) {
     wys_boodskap(
       fout.message || (window.t ? window.t("aanmeld_fout") : "Kon nie aanmeld nie — kyk jou besonderhede."),
@@ -63,12 +84,9 @@ document.getElementById("registreer-vorm")?.addEventListener("submit", async (ev
 
   try {
     await identiteit_registreer(epos, wagwoord);
-    if (typeof maak_mandjie_leeg === "function") {
-      maak_mandjie_leeg();
-    }
     // GoTrue vereis gewoonlik e-pos-bevestiging voor die eerste aanmeld
-    // kan slaag — daar is nog geen "bevestig.html" wat die
-    // bevestigings-skakel se token verwerk nie (sien AANPASSINGS-NODIG.md).
+    // kan slaag — bevestig.html verwerk die skakel se token en gebruik
+    // die "terug"-pad wat hierbo in localStorage gestoor is.
     wys_boodskap(
       window.t
         ? window.t("registreer_sukses_bevestig_epos")
@@ -108,6 +126,8 @@ document.getElementById("herstel-vorm")?.addEventListener("submit", async (ev) =
 (async function kontroleer_reeds_aangemeld() {
   const sessie = await identiteit_kry_huidige_sessie();
   if (sessie) {
-    window.location.href = kry_terug_pad();
+    const pad = kry_terug_pad();
+    localStorage.removeItem(TERUG_SLEUTEL);
+    window.location.href = pad;
   }
 })();

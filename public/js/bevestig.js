@@ -31,9 +31,15 @@ function kry_token_uit_url() {
   return null;
 }
 
+// Sien aanmeld.js vir waarom dit in localStorage gestoor word (nie net
+// 'n "?terug="-URL-parameter nie): GoTrue se e-poslinke bevat geen
+// "?terug="-parameter nie, so dit sou anders verlore raak.
+const TERUG_SLEUTEL = "future_shop_terug_na";
+
 function kry_terug_pad() {
-  const parms = new URLSearchParams(window.location.search);
-  return parms.get("terug") || "/my-boeke.html";
+  const pad = localStorage.getItem(TERUG_SLEUTEL);
+  localStorage.removeItem(TERUG_SLEUTEL);
+  return pad || "/my-boeke.html";
 }
 
 function wys_boodskap(teks, is_fout) {
