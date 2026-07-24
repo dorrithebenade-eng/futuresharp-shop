@@ -4,46 +4,60 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Aanmeld — Future Shop</title>
-  <link rel="stylesheet" href="/styl.css" />
-
-  <!--
-    LET WEL — SOOS MET my-boeke.html: kopieer die werklike
-    <nav>/kop-blokke/voetskrif-opmaak vanaf 'n bestaande bladsy (bv.
-    mandjie.html) hierheen sodat "Aanmeld" dieselfde voorkoms as die res
-    van die winkel het. Die klasse hieronder (.aanmeld-area, ens.) is nuut
-    en het nog geen CSS-reëls in styl.css nie — voeg self by, of hernoem
-    na bestaande vorm-klasse elders in die winkel indien daar reeds een is.
-  -->
+  <link rel="stylesheet" href="css/styl.css" />
 </head>
 <body>
+  <header class="mini-kop">
+   <div class="mini-kop-inner">
+    <a href="index.html" class="mini-kop-merk">
+      <span class="merk-sharp">Future Sharp</span>
+      <span class="merk-skeier">—</span>
+      <span class="merk-shop">Future Shop</span>
+    </a>
+    <div class="mini-kop-regs">
+      <a href="mandjie.html" class="mini-kop-mandjie">
+        <svg class="mandjie-ikoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="9" cy="21" r="1"></circle>
+          <circle cx="20" cy="21" r="1"></circle>
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+        </svg>
+        <span data-i18n="nav_mandjie">Mandjie</span>
+        <span id="mandjie-teller" class="mandjie-teller"></span>
+      </a>
+      <div class="taal-wisselaar" role="group" aria-label="Taal / Language">
+        <button type="button" class="taal-knoppie" data-taal="af">AF</button>
+        <button type="button" class="taal-knoppie" data-taal="en">EN</button>
+      </div>
+    </div>
+   </div>
+  </header>
 
-  <main class="inhoud-area aanmeld-area">
+  <main class="vb-wrap">
+    <h1 class="mandjie-titel" data-i18n="aanmeld_titel">Meld aan</h1>
 
     <!-- ====== AANMELD-VORM ====== -->
     <section id="aanmeld-blok">
-      <h1 data-i18n="aanmeld_titel">Meld aan</h1>
-
       <form id="aanmeld-vorm" novalidate>
-        <label for="aanmeld-epos" data-i18n="epos_etiket">E-pos</label>
-        <input type="email" id="aanmeld-epos" name="epos" required autocomplete="email" />
+        <label class="veld-etiket" for="aanmeld-epos" data-i18n="epos_etiket">E-pos</label>
+        <input type="email" id="aanmeld-epos" name="epos" class="veld-invoer" required autocomplete="email" />
 
-        <label for="aanmeld-wagwoord" data-i18n="wagwoord_etiket">Wagwoord</label>
-        <input type="password" id="aanmeld-wagwoord" name="wagwoord" required autocomplete="current-password" />
+        <label class="veld-etiket" for="aanmeld-wagwoord" data-i18n="wagwoord_etiket">Wagwoord</label>
+        <input type="password" id="aanmeld-wagwoord" name="wagwoord" class="veld-invoer" required autocomplete="current-password" />
 
-        <button type="submit" class="knoppie knoppie--primer" data-i18n="meld_aan_knoppie">
+        <button type="submit" class="kaart-aksie vb-betaal-knoppie" data-i18n="meld_aan_knoppie">
           Meld aan
         </button>
       </form>
 
       <p class="aanmeld-wissel">
         <span data-i18n="geen_rekening_nog">Het jy nog geen rekening nie?</span>
-        <button type="button" id="wys-registreer-knoppie" class="knoppie-skakel" data-i18n="registreer_hier">
+        <button type="button" id="wys-registreer-knoppie" class="terug-skakel" data-i18n="registreer_hier">
           Registreer hier
         </button>
       </p>
 
       <p class="aanmeld-wissel">
-        <button type="button" id="wys-herstel-knoppie" class="knoppie-skakel" data-i18n="wagwoord_vergeet">
+        <button type="button" id="wys-herstel-knoppie" class="terug-skakel" data-i18n="wagwoord_vergeet">
           Wagwoord vergeet?
         </button>
       </p>
@@ -51,24 +65,22 @@
 
     <!-- ====== REGISTREER-VORM ====== -->
     <section id="registreer-blok" hidden>
-      <h1 data-i18n="registreer_titel">Skep 'n rekening</h1>
-
       <form id="registreer-vorm" novalidate>
-        <label for="registreer-epos" data-i18n="epos_etiket">E-pos</label>
-        <input type="email" id="registreer-epos" name="epos" required autocomplete="email" />
+        <label class="veld-etiket" for="registreer-epos" data-i18n="epos_etiket">E-pos</label>
+        <input type="email" id="registreer-epos" name="epos" class="veld-invoer" required autocomplete="email" />
 
-        <label for="registreer-wagwoord" data-i18n="wagwoord_etiket">Wagwoord</label>
-        <input type="password" id="registreer-wagwoord" name="wagwoord" required
+        <label class="veld-etiket" for="registreer-wagwoord" data-i18n="wagwoord_etiket">Wagwoord</label>
+        <input type="password" id="registreer-wagwoord" name="wagwoord" class="veld-invoer" required
                autocomplete="new-password" minlength="8" />
 
-        <button type="submit" class="knoppie knoppie--primer" data-i18n="registreer_knoppie">
+        <button type="submit" class="kaart-aksie vb-betaal-knoppie" data-i18n="registreer_knoppie">
           Registreer
         </button>
       </form>
 
       <p class="aanmeld-wissel">
         <span data-i18n="het_reeds_rekening">Het jy reeds 'n rekening?</span>
-        <button type="button" id="wys-aanmeld-knoppie" class="knoppie-skakel" data-i18n="meld_aan_hier">
+        <button type="button" id="wys-aanmeld-knoppie" class="terug-skakel" data-i18n="meld_aan_hier">
           Meld hier aan
         </button>
       </p>
@@ -76,30 +88,28 @@
 
     <!-- ====== WAGWOORD-HERSTEL-VORM ====== -->
     <section id="herstel-blok" hidden>
-      <h1 data-i18n="herstel_titel">Herstel wagwoord</h1>
-
       <form id="herstel-vorm" novalidate>
-        <label for="herstel-epos" data-i18n="epos_etiket">E-pos</label>
-        <input type="email" id="herstel-epos" name="epos" required autocomplete="email" />
+        <label class="veld-etiket" for="herstel-epos" data-i18n="epos_etiket">E-pos</label>
+        <input type="email" id="herstel-epos" name="epos" class="veld-invoer" required autocomplete="email" />
 
-        <button type="submit" class="knoppie knoppie--primer" data-i18n="stuur_herstel_knoppie">
+        <button type="submit" class="kaart-aksie vb-betaal-knoppie" data-i18n="stuur_herstel_knoppie">
           Stuur herstel-skakel
         </button>
       </form>
 
       <p class="aanmeld-wissel">
-        <button type="button" id="herstel-terug-knoppie" class="knoppie-skakel" data-i18n="terug_na_aanmeld">
+        <button type="button" id="herstel-terug-knoppie" class="terug-skakel" data-i18n="terug_na_aanmeld">
           Terug na aanmeld
         </button>
       </p>
     </section>
 
-    <div id="aanmeld-boodskap" aria-live="polite"></div>
-
+    <div id="aanmeld-boodskap" class="vb-foute" aria-live="polite"></div>
   </main>
 
-  <script src="/js/taal.js"></script>
-  <script src="/js/identiteit.js"></script>
-  <script src="/js/aanmeld.js"></script>
+  <script src="js/taal.js"></script>
+  <script src="js/identiteit.js"></script>
+  <script src="js/mandjie.js"></script>
+  <script src="js/aanmeld.js"></script>
 </body>
 </html>

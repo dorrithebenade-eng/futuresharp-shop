@@ -4,47 +4,66 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Bevestig — Future Shop</title>
-  <link rel="stylesheet" href="/css/styl.css" />
-
-  <!--
-    LET WEL — soos met aanmeld.html/my-boeke.html: kopieer die werklike
-    <nav>/kop-blokke/voetskrif-opmaak vanaf 'n bestaande bladsy hierheen
-    sodat dit dieselfde voorkoms as die res van die winkel het.
-  -->
+  <link rel="stylesheet" href="css/styl.css" />
 </head>
 <body>
+  <header class="mini-kop">
+   <div class="mini-kop-inner">
+    <a href="index.html" class="mini-kop-merk">
+      <span class="merk-sharp">Future Sharp</span>
+      <span class="merk-skeier">—</span>
+      <span class="merk-shop">Future Shop</span>
+    </a>
+    <div class="mini-kop-regs">
+      <a href="mandjie.html" class="mini-kop-mandjie">
+        <svg class="mandjie-ikoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="9" cy="21" r="1"></circle>
+          <circle cx="20" cy="21" r="1"></circle>
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+        </svg>
+        <span data-i18n="nav_mandjie">Mandjie</span>
+        <span id="mandjie-teller" class="mandjie-teller"></span>
+      </a>
+      <div class="taal-wisselaar" role="group" aria-label="Taal / Language">
+        <button type="button" class="taal-knoppie" data-taal="af">AF</button>
+        <button type="button" class="taal-knoppie" data-taal="en">EN</button>
+      </div>
+    </div>
+   </div>
+  </header>
 
-  <main class="inhoud-area aanmeld-area">
+  <main class="vb-wrap">
     <section id="bevestig-blok">
-      <h1 data-i18n="bevestig_titel">Stel jou wagwoord</h1>
-      <p id="bevestig-hulp" data-i18n="bevestig_hulp">
+      <h1 class="mandjie-titel" data-i18n="bevestig_titel">Stel jou wagwoord</h1>
+      <p class="vb-afdeling-nota" id="bevestig-hulp" data-i18n="bevestig_hulp">
         Stel 'n wagwoord om jou rekening klaar te maak.
       </p>
 
       <form id="bevestig-vorm" novalidate>
-        <label for="bevestig-wagwoord" data-i18n="wagwoord_etiket">Wagwoord</label>
-        <input type="password" id="bevestig-wagwoord" name="wagwoord" required
+        <label class="veld-etiket" for="bevestig-wagwoord" data-i18n="wagwoord_etiket">Wagwoord</label>
+        <input type="password" id="bevestig-wagwoord" name="wagwoord" class="veld-invoer" required
                autocomplete="new-password" minlength="8" />
 
-        <button type="submit" class="knoppie knoppie--primer" data-i18n="bevestig_knoppie">
+        <button type="submit" class="kaart-aksie vb-betaal-knoppie" data-i18n="bevestig_knoppie">
           Bevestig
         </button>
       </form>
     </section>
 
     <section id="bevestig-fout-blok" hidden>
-      <h1 data-i18n="bevestig_fout_titel">Hierdie skakel werk nie meer nie</h1>
-      <p data-i18n="bevestig_fout_hulp">
+      <h1 class="mandjie-titel" data-i18n="bevestig_fout_titel">Hierdie skakel werk nie meer nie</h1>
+      <p class="vb-afdeling-nota" data-i18n="bevestig_fout_hulp">
         Die skakel is dalk reeds gebruik, of het verval. Probeer weer registreer of aanmeld.
       </p>
-      <a href="/aanmeld.html" data-i18n="terug_na_aanmeld">Terug na aanmeld</a>
+      <a class="terug-skakel" href="aanmeld.html" data-i18n="terug_na_aanmeld">Terug na aanmeld</a>
     </section>
 
-    <div id="bevestig-boodskap" aria-live="polite"></div>
+    <div id="bevestig-boodskap" class="vb-foute" aria-live="polite"></div>
   </main>
 
-  <script src="/js/taal.js"></script>
-  <script src="/js/identiteit.js"></script>
-  <script src="/js/bevestig.js"></script>
+  <script src="js/taal.js"></script>
+  <script src="js/identiteit.js"></script>
+  <script src="js/mandjie.js"></script>
+  <script src="js/bevestig.js"></script>
 </body>
 </html>
