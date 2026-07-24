@@ -21,7 +21,7 @@
     (function () {
       var identiteitsTokenPatroon = /(confirmation_token|invite_token|recovery_token|email_change_token)=/;
       if (identiteitsTokenPatroon.test(window.location.hash)) {
-        window.location.replace("paneelbord.html" + window.location.hash);
+        window.location.replace("bevestig.html" + window.location.hash);
       }
     })();
   </script>

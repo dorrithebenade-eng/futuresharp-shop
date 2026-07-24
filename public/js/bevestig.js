@@ -56,8 +56,12 @@ if (!token_inligting) {
     wys_boodskap(window.t ? window.t("bevestig_tans") : "Bevestig...");
 
     try {
-      await identiteit_verwerk_token(token_inligting.tipe, token_inligting.token, wagwoord);
-      window.location.href = kry_terug_pad();
+      const sessie = await identiteit_verwerk_token(token_inligting.tipe, token_inligting.token, wagwoord);
+      // Universele bestemming vir ALLE Identity-e-poslinke (koper én
+      // personeel) — ná verwerking weet ons eers wie dit is, dus besluit
+      // ons EERS NOU waarheen om te gaan, i.p.v. vooraf te probeer raai.
+      const is_personeel = identiteit_het_rol(sessie.gebruiker, "personeel");
+      window.location.href = is_personeel ? "/paneelbord.html" : kry_terug_pad();
     } catch (fout) {
       knoppie.disabled = false;
       wys_boodskap(
