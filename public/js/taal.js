@@ -106,6 +106,16 @@ const WOORDEBOEK = {
     af: 'Ons bevestig jou betaling tans bediener-kant. Sodra dit voltooi is, sal jou e-boeke onmiddellik in "My Boeke" beskikbaar wees, en jy sal die status van enige harde-kopie-items daar kan volg.',
     en: 'We\'re confirming your payment server-side. Once that\'s done, your e-books will immediately be available in "My Books", and you\'ll be able to track the status of any hard-copy items there.',
   },
+  dankie_titel_aankoop: { af: "Dankie vir jou aankoop!", en: "Thank you for your purchase!" },
+  dankie_teks_eboek_alleen: {
+    af: 'Jou e-boek is nou beskikbaar in "My Boeke", gereed om te lees.',
+    en: 'Your e-book is now available in "My Books", ready to read.',
+  },
+  dankie_teks_bevat_harde_kopie: {
+    af: 'Ons bevestig jou betaling tans bediener-kant. Sodra dit voltooi is, sal enige e-boeke onmiddellik in "My Boeke" beskikbaar wees, en jy sal die status van jou harde-kopie-item(s) daar kan volg.',
+    en: 'We\'re confirming your payment server-side. Once that\'s done, any e-books will immediately be available in "My Books", and you\'ll be able to track the status of your hard-copy item(s) there.',
+  },
+  gaan_na_my_boeke: { af: "Gaan na My Boeke", en: "Go to My Books" },
   terug_winkel: { af: "Terug na die winkel", en: "Back to the shop" },
 
   // Personeel-paneelbord
@@ -166,6 +176,19 @@ const WOORDEBOEK = {
     af: "Slegs JPEG, PNG, WEBP of GIF-beelde word toegelaat.",
     en: "Only JPEG, PNG, WEBP or GIF images are allowed.",
   },
+  paneel_eboek_pdf_etiket: { af: "E-boek-PDF", en: "E-book PDF" },
+  paneel_eboek_pdf_hulp: {
+    af: "Kies die volledige boek-PDF — dit word stuksgewys opgelaai (werk ook vir groter lêers) en is nooit publiek toeganklik nie, net vir kopers wat dit gekoop het.",
+    en: "Choose the full book PDF — it's uploaded in pieces (works for larger files too) and is never publicly accessible, only to buyers who purchased it.",
+  },
+  paneel_eboek_oplaai_verkeerde_tipe: { af: "Slegs PDF-lêers word toegelaat.", en: "Only PDF files are allowed." },
+  paneel_eboek_oplaai_geen_slug: {
+    af: "Vul eers die slug in voordat jy die PDF oplaai.",
+    en: "Fill in the slug first before uploading the PDF.",
+  },
+  paneel_eboek_oplaai_besig: { af: "Word opgelaai", en: "Uploading" },
+  paneel_eboek_oplaai_sukses: { af: "E-boek-PDF opgelaai ✓", en: "E-book PDF uploaded ✓" },
+  paneel_eboek_reeds_opgelaai: { af: "PDF reeds opgelaai ✓", en: "PDF already uploaded ✓" },
   paneel_beskikbaar: { af: "Beskikbaar", en: "Available" },
   paneel_prys_r: { af: "Prys (R)", en: "Price (R)" },
   paneel_vrystellingsdatum: {
@@ -246,6 +269,14 @@ const WOORDEBOEK = {
   sessie_verval: { af: "Sessie verval — meld weer aan.", en: "Session expired — log in again." },
   geen_boeke_nog: { af: "Nog geen boeke gekoop nie.", en: "No books purchased yet." },
   fout_boeke_laai: { af: "Kon nie boeke laai nie. Probeer weer.", en: "Couldn't load books. Try again." },
+
+  // Leser-bladsy
+  terug_na_my_boeke: { af: "← My Boeke", en: "← My Books" },
+  leser_geen_boek: { af: "Geen boek gespesifiseer nie.", en: "No book specified." },
+  leser_laai_tans: { af: "Jou boek word gelaai …", en: "Your book is loading …" },
+  leser_nie_gekoop: { af: "Jy het nie hierdie e-boek gekoop nie.", en: "You haven't purchased this e-book." },
+  leser_nog_nie_beskikbaar: { af: "Hierdie e-boek is nog nie beskikbaar nie.", en: "This e-book isn't available yet." },
+  leser_fout: { af: "Kon nie jou boek laai nie — probeer later weer.", en: "Couldn't load your book — try again later." },
 
   // Aanmeld / Registreer / Herstel (kopers)
   aanmeld_titel: { af: "Meld aan", en: "Log in" },
