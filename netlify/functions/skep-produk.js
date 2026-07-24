@@ -126,6 +126,10 @@ exports.handler = async (event, context) => {
         geleidelik_ontsluit: true,
         verdelings: eboek_verdelings,
         vrystelling_datum: kry_geldige_datum(formate.eboek.vrystelling_datum),
+        // Blobs-sleutel na die werklike PDF (gestoor via laai-eboek-op.js,
+        // in die private "eboeke"-store — NOOIT publiek bedien nie, in
+        // teenstelling met omslae). null totdat personeel die PDF oplaai.
+        eboek_sleutel: invoer.eboek_sleutel || null,
       },
       harde_kopie: formate.harde_kopie && formate.harde_kopie.beskikbaar
         ? {
