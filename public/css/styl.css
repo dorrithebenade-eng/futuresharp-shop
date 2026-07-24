@@ -357,6 +357,18 @@ body {
   font-weight: 700;
 }
 
+.mini-kop-rekening {
+  font-family: var(--font-liggaam);
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--wit);
+  text-decoration: none;
+}
+
+.mini-kop-rekening:hover {
+  color: var(--teal);
+}
+
 /* ---------- Taalwisselaar ---------- */
 
 .mini-kop-regs {
