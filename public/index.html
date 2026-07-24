@@ -20,7 +20,6 @@
   <link rel="stylesheet" href="css/styl.css">
 </head>
 <body>
-
   <header class="mini-kop">
    <div class="mini-kop-inner">
     <a href="index.html" class="mini-kop-merk">
@@ -38,6 +37,7 @@
         <span data-i18n="nav_mandjie">Mandjie</span>
         <span id="mandjie-teller" class="mandjie-teller"></span>
       </a>
+      <span id="nav-rekening-plek" class="mini-kop-rekening-plek"></span>
       <div class="taal-wisselaar" role="group" aria-label="Taal / Language">
         <button type="button" class="taal-knoppie" data-taal="af">AF</button>
         <button type="button" class="taal-knoppie" data-taal="en">EN</button>
@@ -45,7 +45,6 @@
     </div>
    </div>
   </header>
-
   <header class="kop">
     <div class="kop-blokke" aria-hidden="true">
       <img src="images/future-shop-woordmerk.png" alt="" class="kop-woordmerk">
@@ -59,15 +58,15 @@
       <p class="kop-subtitel" data-i18n="kop_subtitel">Future Sharp se eie boekwinkel. Loer gerus na ons versameling e-boeke, of bestel selfs jou harde kopie van 'n boek indien dit in harde-kopie-formaat beskikbaar is.</p>
     </div>
   </header>
-
   <main class="katalogus-wrap">
     <div class="rooster" id="katalogus-rooster">
       <p class="stelsel-boodskap" data-i18n="katalogus_laai">Katalogus word gelaai …</p>
     </div>
   </main>
-
   <script src="js/taal.js"></script>
+  <script src="js/identiteit.js"></script>
   <script src="js/mandjie.js"></script>
+  <script src="js/nav-rekening.js"></script>
   <script src="js/katalogus.js"></script>
 </body>
 </html>
