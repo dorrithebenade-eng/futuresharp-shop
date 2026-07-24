@@ -270,6 +270,15 @@ const WOORDEBOEK = {
   stuur_tans_herstel: { af: "Stuur …", en: "Sending …" },
   herstel_epos_gestuur: { af: "Herstel-skakel gestuur — kyk jou epos.", en: "Reset link sent — check your email." },
   herstel_fout: { af: "Kon nie die epos stuur nie. Probeer weer.", en: "Couldn't send the email. Try again." },
+
+  // Bevestig (e-pos-skakel-verwerking)
+  bevestig_titel: { af: "Stel jou wagwoord", en: "Set your password" },
+  bevestig_hulp: { af: "Stel 'n wagwoord om jou rekening klaar te maak.", en: "Set a password to finish setting up your account." },
+  bevestig_knoppie: { af: "Bevestig", en: "Confirm" },
+  bevestig_tans: { af: "Bevestig …", en: "Confirming …" },
+  bevestig_fout: { af: "Kon nie bevestig nie.", en: "Couldn't confirm." },
+  bevestig_fout_titel: { af: "Hierdie skakel werk nie meer nie", en: "This link no longer works" },
+  bevestig_fout_hulp: { af: "Die skakel is dalk reeds gebruik, of het verval. Probeer weer registreer of aanmeld.", en: "The link may have already been used, or has expired. Try registering or logging in again." },
 };
 
 function kry_huidige_taal() {
