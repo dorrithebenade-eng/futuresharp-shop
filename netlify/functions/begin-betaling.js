@@ -1,6 +1,10 @@
 // Word deur voltooi-betaling.js aangeroep wanneer die koper op "Gaan na betaling" klik.
 //
-// Doen vier dinge:
+// Doen vyf dinge:
+// 0. Verifieer die koper se Identity-JWT bediener-kant (_rol-kontrole.js)
+//    en koppel hul netlify_identity_id aan die bestelling — dit is wat
+//    Fase 5 se "My Boeke" (kry-my-boeke.js) later gebruik om te bepaal
+//    watter bestellings aan watter koper behoort.
 // 1. Herbou items + totaal SERVER-KANT vanuit die "katalogus"-store — die
 //    kliënt se pryse word nooit vertrou nie. Dit voorkom prys-manipulasie
 //    (iemand wat die mandjie se prys in die blaaier se dev-tools verander),
@@ -26,10 +30,21 @@
 // uitbetaal, is binne 'n sent van die gestelde vaste bedrag).
 
 const { kry_store } = require("./_blob-store");
+const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 
-exports.handler = async (event) => {
+exports.handler = async (event, context) => {
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: "Metode nie toegelaat nie" };
+  }
+
+  // --- Stap 0: verifieer die koper se identiteit bediener-kant ---
+  // Sonder 'n geldige "koper"-rol-token kan niemand 'n bestelling begin nie
+  // — dit voorkom ook dat 'n bestelling aan die verkeerde koper gekoppel
+  // word, aangesien ons NOOIT die kliënt se eie voorstel van wie hulle is
+  // vertrou nie.
+  const gebruiker = await kry_gebruiker_en_kontroleer_rol(event, context, "koper");
+  if (!gebruiker) {
+    return { statusCode: 401, body: "Meld eers aan om te koop" };
   }
 
   let invoer;
@@ -179,7 +194,13 @@ exports.handler = async (event) => {
     bestelnommer,
     geskep_op: bestaande ? bestaande.geskep_op : new Date().toISOString(),
     bygewerk_op: new Date().toISOString(),
-    koper,
+    koper: {
+      ...koper,
+      // Bediener-kant geverifieer (Stap 0) — NOOIT die kliënt se eie
+      // voorstel van hul identiteit vertrou nie. Dit is wat kry-my-boeke.js
+      // gebruik om 'n bestelling aan 'n aangemelde koper te koppel.
+      netlify_identity_id: gebruiker.id,
+    },
     items: geverifieerde_items,
     totaal_sent,
     bevat_harde_kopie,
