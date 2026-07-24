@@ -51,6 +51,11 @@ function verwyder_uit_mandjie(produk_slug, formaat) {
   stoor_mandjie(items);
 }
 
+function maak_mandjie_leeg() {
+  localStorage.removeItem(MANDJIE_SLEUTEL);
+  wys_mandjie_teller();
+}
+
 function kry_mandjie_totaal_sent() {
   return kry_mandjie().reduce((som, item) => som + item.prys_sent, 0);
 }

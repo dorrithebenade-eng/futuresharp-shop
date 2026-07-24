@@ -156,6 +156,13 @@ async function identiteit_kry_huidige_sessie() {
 
 function identiteit_meld_af() {
   identiteit_verwyder_sessie();
+  // Maak ook die mandjie leeg — dit is 'n gedeelde localStorage-toestand
+  // sonder gebruiker-koppeling, so dit moenie oorleef na 'n ander persoon
+  // op dieselfde toestel aanmeld nie. mandjie.js is nie altyd op elke
+  // bladsy gelaai waar afmeld kan gebeur nie, dus 'n bestaan-toets eers.
+  if (typeof maak_mandjie_leeg === "function") {
+    maak_mandjie_leeg();
+  }
 }
 
 function identiteit_het_rol(gebruiker, rol) {

@@ -63,6 +63,9 @@ document.getElementById("registreer-vorm")?.addEventListener("submit", async (ev
 
   try {
     await identiteit_registreer(epos, wagwoord);
+    if (typeof maak_mandjie_leeg === "function") {
+      maak_mandjie_leeg();
+    }
     // GoTrue vereis gewoonlik e-pos-bevestiging voor die eerste aanmeld
     // kan slaag — daar is nog geen "bevestig.html" wat die
     // bevestigings-skakel se token verwerk nie (sien AANPASSINGS-NODIG.md).
