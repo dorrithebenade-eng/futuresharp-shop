@@ -283,6 +283,7 @@ const WOORDEBOEK = {
   epos_etiket: { af: "E-pos", en: "Email" },
   wagwoord_etiket: { af: "Wagwoord", en: "Password" },
   meld_aan_knoppie: { af: "Meld aan", en: "Log in" },
+  bly_aangemeld_etiket: { af: "Bly aangemeld op hierdie toestel", en: "Stay signed in on this device" },
   geen_rekening_nog: { af: "Het jy nog geen rekening nie?", en: "Don't have an account yet?" },
   registreer_hier: { af: "Registreer hier", en: "Register here" },
   wagwoord_vergeet: { af: "Wagwoord vergeet?", en: "Forgot your password?" },

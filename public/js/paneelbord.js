@@ -705,8 +705,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const epos = document.getElementById("aanmeld-epos").value.trim();
     const wagwoord = document.getElementById("aanmeld-wagwoord").value;
+    const bly_aangemeld = document.getElementById("aanmeld-bly-aangemeld").checked;
     try {
-      const sessie = await identiteit_meld_aan(epos, wagwoord);
+      const sessie = await identiteit_meld_aan(epos, wagwoord, bly_aangemeld);
       wys_aangemeld_toestand(sessie.gebruiker);
     } catch (fout) {
       foutWrap.textContent = `${t("paneel_kon_nie_aanmeld")}${fout.message}`;

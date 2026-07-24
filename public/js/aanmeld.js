@@ -58,11 +58,12 @@ document.getElementById("aanmeld-vorm")?.addEventListener("submit", async (ev) =
   ev.preventDefault();
   const epos = document.getElementById("aanmeld-epos").value.trim();
   const wagwoord = document.getElementById("aanmeld-wagwoord").value;
+  const bly_aangemeld = document.getElementById("aanmeld-bly-aangemeld").checked;
 
   wys_boodskap(window.t ? window.t("meld_tans_aan") : "Meld tans aan...");
 
   try {
-    await identiteit_meld_aan(epos, wagwoord);
+    await identiteit_meld_aan(epos, wagwoord, bly_aangemeld);
     const pad = kry_terug_pad();
     localStorage.removeItem(TERUG_SLEUTEL);
     window.location.href = pad;

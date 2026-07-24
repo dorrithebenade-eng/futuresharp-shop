@@ -21,24 +21,43 @@
 
 const IDENTITEIT_SESSIE_SLEUTEL = "future_shop_identiteit_sessie";
 
+// Verstek: sessionStorage — 'n sessie verval sodra die oortjie/venster
+// toegemaak word. 'n Gebruiker kan egter "Bly aangemeld" merk by
+// aanmeld — dan gebruik ons eerder localStorage, wat oorleef. Ons weet
+// nie vooraf in watter een 'n bestaande sessie sit nie, dus soek
+// identiteit_kry_sessie() in albei; identiteit_verwyder_sessie() maak
+// altyd albei skoon, om nooit 'n weeskopie agter te laat nie.
+
 function kry_identiteit_api_url() {
   return `${window.location.origin}/.netlify/identity`;
 }
 
 function identiteit_kry_sessie() {
   try {
-    const ruwe = localStorage.getItem(IDENTITEIT_SESSIE_SLEUTEL);
+    const ruwe = sessionStorage.getItem(IDENTITEIT_SESSIE_SLEUTEL) || localStorage.getItem(IDENTITEIT_SESSIE_SLEUTEL);
     return ruwe ? JSON.parse(ruwe) : null;
   } catch {
     return null;
   }
 }
 
-function identiteit_stoor_sessie(sessie) {
-  localStorage.setItem(IDENTITEIT_SESSIE_SLEUTEL, JSON.stringify(sessie));
+// Vind uit watter bewaarplek 'n bestaande sessie reeds gebruik (indien
+// enige) — sodat 'n verfris-aksie dit weer daar terugskryf, i.p.v. per
+// ongeluk 'n "Bly aangemeld"-sessie na 'n oortjie-alleen-sessie te
+// verander of andersom.
+function kry_aktiewe_sessie_bewaarplek() {
+  if (sessionStorage.getItem(IDENTITEIT_SESSIE_SLEUTEL)) return sessionStorage;
+  if (localStorage.getItem(IDENTITEIT_SESSIE_SLEUTEL)) return localStorage;
+  return sessionStorage;
+}
+
+function identiteit_stoor_sessie(sessie, bly_aangemeld) {
+  const bewaarplek = bly_aangemeld ? localStorage : kry_aktiewe_sessie_bewaarplek();
+  bewaarplek.setItem(IDENTITEIT_SESSIE_SLEUTEL, JSON.stringify(sessie));
 }
 
 function identiteit_verwyder_sessie() {
+  sessionStorage.removeItem(IDENTITEIT_SESSIE_SLEUTEL);
   localStorage.removeItem(IDENTITEIT_SESSIE_SLEUTEL);
 }
 
@@ -52,7 +71,7 @@ async function identiteit_verwerk_antwoord(resp) {
 }
 
 // --- Aanmeld ---
-async function identiteit_meld_aan(epos, wagwoord) {
+async function identiteit_meld_aan(epos, wagwoord, bly_aangemeld) {
   const liggaam = new URLSearchParams();
   liggaam.set("grant_type", "password");
   liggaam.set("username", epos);
@@ -67,7 +86,7 @@ async function identiteit_meld_aan(epos, wagwoord) {
   const gebruiker = await identiteit_kry_gebruiker(token_data.access_token);
 
   const sessie = { ...token_data, gebruiker, geskep_op: Date.now() };
-  identiteit_stoor_sessie(sessie);
+  identiteit_stoor_sessie(sessie, bly_aangemeld);
   return sessie;
 }
 
@@ -138,7 +157,7 @@ async function identiteit_ververs_sessie() {
   const token_data = await resp.json();
   const gebruiker = await identiteit_kry_gebruiker(token_data.access_token);
   const sessie = { ...token_data, gebruiker, geskep_op: Date.now() };
-  identiteit_stoor_sessie(sessie);
+  kry_aktiewe_sessie_bewaarplek().setItem(IDENTITEIT_SESSIE_SLEUTEL, JSON.stringify(sessie));
   return sessie;
 }
 
