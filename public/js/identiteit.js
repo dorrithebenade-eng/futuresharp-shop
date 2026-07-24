@@ -19,14 +19,25 @@
 //   POST /verify   { type: "signup"|"recovery", token, password }  → bevestig/herstel + sessie
 //   GET  /user     (met Authorization: Bearer <access_token>)      → gebruiker-inligting
 
-const IDENTITEIT_SESSIE_SLEUTEL = "future_shop_identiteit_sessie";
+// BELANGRIK — WINKEL- EN PANEEL-AANMELDING IS VOLLEDIG GESKEI:
+// 'n Aanmelding op die winkel se aanmeld.html (of enige ander kliënt-
+// bladsy) word onder 'n ANDER stoor-sleutel gehou as 'n aanmelding op
+// paneelbord.html. Dit beteken 'n personeel-rekening wat via die winkel
+// se aanmeld-vorm aanmeld, WORD NOOIT as personeel behandel in daardie
+// konteks nie — dit is doelbewus 'n heeltemal aparte sessie. Om by die
+// paneelbord te kom, moet 'n mens spesifiek via paneelbord.html se eie
+// aanmeld-vorm aanmeld, al is dit dieselfde rekening.
+function kry_sessie_sleutel() {
+  const is_paneel = window.location.pathname.endsWith("/paneelbord.html") ||
+    window.location.pathname.endsWith("paneelbord.html");
+  return is_paneel ? "future_shop_identiteit_sessie_paneel" : "future_shop_identiteit_sessie_winkel";
+}
 
 // Verstek: sessionStorage — 'n sessie verval sodra die oortjie/venster
 // toegemaak word. 'n Gebruiker kan egter "Bly aangemeld" merk by
 // aanmeld — dan gebruik ons eerder localStorage, wat oorleef. Ons weet
 // nie vooraf in watter een 'n bestaande sessie sit nie, dus soek
-// identiteit_kry_sessie() in albei; identiteit_verwyder_sessie() maak
-// altyd albei skoon, om nooit 'n weeskopie agter te laat nie.
+// identiteit_kry_sessie() in albei.
 
 function kry_identiteit_api_url() {
   return `${window.location.origin}/.netlify/identity`;
@@ -34,31 +45,34 @@ function kry_identiteit_api_url() {
 
 function identiteit_kry_sessie() {
   try {
-    const ruwe = sessionStorage.getItem(IDENTITEIT_SESSIE_SLEUTEL) || localStorage.getItem(IDENTITEIT_SESSIE_SLEUTEL);
+    const sleutel = kry_sessie_sleutel();
+    const ruwe = sessionStorage.getItem(sleutel) || localStorage.getItem(sleutel);
     return ruwe ? JSON.parse(ruwe) : null;
   } catch {
     return null;
   }
 }
 
-// Vind uit watter bewaarplek 'n bestaande sessie reeds gebruik (indien
-// enige) — sodat 'n verfris-aksie dit weer daar terugskryf, i.p.v. per
-// ongeluk 'n "Bly aangemeld"-sessie na 'n oortjie-alleen-sessie te
-// verander of andersom.
+// Vind uit watter bewaarplek 'n bestaande sessie (in HIERDIE area — sien
+// kry_sessie_sleutel()) reeds gebruik, sodat 'n verfris-aksie dit weer
+// daar terugskryf, i.p.v. per ongeluk 'n "Bly aangemeld"-sessie na 'n
+// oortjie-alleen-sessie te verander of andersom.
 function kry_aktiewe_sessie_bewaarplek() {
-  if (sessionStorage.getItem(IDENTITEIT_SESSIE_SLEUTEL)) return sessionStorage;
-  if (localStorage.getItem(IDENTITEIT_SESSIE_SLEUTEL)) return localStorage;
+  const sleutel = kry_sessie_sleutel();
+  if (sessionStorage.getItem(sleutel)) return sessionStorage;
+  if (localStorage.getItem(sleutel)) return localStorage;
   return sessionStorage;
 }
 
 function identiteit_stoor_sessie(sessie, bly_aangemeld) {
   const bewaarplek = bly_aangemeld ? localStorage : kry_aktiewe_sessie_bewaarplek();
-  bewaarplek.setItem(IDENTITEIT_SESSIE_SLEUTEL, JSON.stringify(sessie));
+  bewaarplek.setItem(kry_sessie_sleutel(), JSON.stringify(sessie));
 }
 
 function identiteit_verwyder_sessie() {
-  sessionStorage.removeItem(IDENTITEIT_SESSIE_SLEUTEL);
-  localStorage.removeItem(IDENTITEIT_SESSIE_SLEUTEL);
+  const sleutel = kry_sessie_sleutel();
+  sessionStorage.removeItem(sleutel);
+  localStorage.removeItem(sleutel);
 }
 
 async function identiteit_verwerk_antwoord(resp) {
@@ -113,7 +127,9 @@ async function identiteit_stuur_herstel(epos) {
 // --- Verwerk 'n token uit 'n e-pos-skakel (uitnodiging/bevestiging/herstel) ---
 // tipe: "signup" (vir invite_token OF confirmation_token) of "recovery"
 // (vir recovery_token). Stel dadelik 'n nuwe wagwoord as deel van dieselfde
-// stap — dis hoe GoTrue se /verify-eindpunt werk.
+// stap — dis hoe GoTrue se /verify-eindpunt werk. Die sessie word gestoor
+// onder die sleutel van die bladsy waarop DIT verwerk word (bevestig.html
+// is 'n winkel-bladsy, dus altyd die winkel-sleutel — sien nota bo).
 async function identiteit_verwerk_token(tipe, token, nuwe_wagwoord) {
   const resp = await fetch(`${kry_identiteit_api_url()}/verify`, {
     method: "POST",
@@ -157,7 +173,7 @@ async function identiteit_ververs_sessie() {
   const token_data = await resp.json();
   const gebruiker = await identiteit_kry_gebruiker(token_data.access_token);
   const sessie = { ...token_data, gebruiker, geskep_op: Date.now() };
-  kry_aktiewe_sessie_bewaarplek().setItem(IDENTITEIT_SESSIE_SLEUTEL, JSON.stringify(sessie));
+  kry_aktiewe_sessie_bewaarplek().setItem(kry_sessie_sleutel(), JSON.stringify(sessie));
   return sessie;
 }
 
