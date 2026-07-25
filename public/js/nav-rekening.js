@@ -112,12 +112,22 @@
   // mobiel-hantering hier nodig nie.
   const my_boeke_teks = window.t ? window.t("my_boeke_titel") : "My Boeke";
   const meld_af_teks = window.t ? window.t("paneel_meld_af") : "Meld af";
+  const inisiale = sessie.gebruiker.email
+    .split("@")[0]
+    .split(/[._-]/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((deel) => deel[0].toUpperCase())
+    .join("") || sessie.gebruiker.email.slice(0, 2).toUpperCase();
 
   plek.innerHTML = `
     <div class="nav-rekening-groep">
-      <span class="nav-rekening-epos">${sessie.gebruiker.email}</span>
+      <div class="nav-rekening-identiteit">
+        <span class="nav-rekening-avatar" title="${sessie.gebruiker.email}" aria-hidden="true">${inisiale}</span>
+        <span class="nav-rekening-epos-mobiel">${sessie.gebruiker.email}</span>
+      </div>
       <a href="my-boeke.html" class="nav-rekening-skakel">${my_boeke_teks}</a>
-      <button type="button" id="rekening-meld-af-knoppie" class="nav-rekening-skakel">${meld_af_teks}</button>
+      <button type="button" id="rekening-meld-af-knoppie" class="nav-rekening-skakel nav-rekening-skakel--gedemp">${meld_af_teks}</button>
     </div>
   `;
 

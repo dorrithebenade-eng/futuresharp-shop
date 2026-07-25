@@ -24,11 +24,13 @@ const WOORDEBOEK = {
   nav_mandjie: { af: "Mandjie", en: "Cart" },
 
   // Kop (tuisblad)
+  kop_eyebrow: { af: "E-boeke · Harde kopieë", en: "E-books · Hard copies" },
   kop_titel_normaal: { af: "Welkom by", en: "Welcome to" },
   kop_subtitel: {
     af: "Future Sharp se eie boekwinkel. Loer gerus na ons versameling e-boeke, of bestel selfs jou harde kopie van 'n boek indien dit in harde-kopie-formaat beskikbaar is.",
     en: "Future Sharp's own bookshop. Browse our collection of e-books, or order a hard copy of a book where a hard-copy format is available.",
   },
+  kop_cta: { af: "Blaai deur boeke", en: "Browse books" },
   katalogus_laai: { af: "Katalogus word gelaai …", en: "Loading catalogue …" },
   katalogus_leeg: { af: "Nog geen produkte beskikbaar nie.", en: "No products available yet." },
   katalogus_demo: {
