@@ -1171,8 +1171,9 @@ body {
 
 .leser-lisensie-nota {
   font-family: var(--font-liggaam);
-  font-size: 11px;
-  color: var(--grys-teks);
+  font-size: 13px;
+  color: var(--koraal);
+  text-align: center;
   margin: -4px 0 0;
 }
 
