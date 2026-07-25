@@ -9,32 +9,61 @@ function wys_status(teks) {
   if (status_el) status_el.textContent = teks;
 }
 
-function bou_boek_ry(boek) {
-  const li = document.createElement("li");
-  li.className = "boek-ry";
-
-  const titel_el = document.createElement("span");
-  titel_el.className = "boek-titel";
-  titel_el.textContent = boek.titel;
-  li.appendChild(titel_el);
-
+function bou_boek_kaart(boek) {
+  // Beskikbare boeke is 'n regte skakel na die leser — nie-beskikbare
+  // boeke (voorbestellings wat nog wag vir vrystelling) is 'n statiese
+  // kaart wat nie klikbaar is nie, met 'n datum-merker oor die omslag.
+  const el = document.createElement(boek.beskikbaar_nou ? "a" : "div");
+  el.className = "my-boek-kaart";
   if (boek.beskikbaar_nou) {
-    const skakel = document.createElement("a");
-    skakel.className = "knoppie knoppie--primer";
-    skakel.href = `/leser.html?boek=${encodeURIComponent(boek.produk_slug)}`;
-    skakel.textContent = window.t ? window.t("lees_aanlyn") : "Lees aanlyn";
-    li.appendChild(skakel);
+    el.href = `/leser.html?boek=${encodeURIComponent(boek.produk_slug)}`;
   } else {
-    const wag_boodskap = document.createElement("span");
-    wag_boodskap.className = "boek-nog-nie-beskikbaar";
-    const datum_teks = boek.vrystelling_datum
-      ? (window.t ? window.t("beskikbaar_vanaf") : "Beskikbaar vanaf") + " " + boek.vrystelling_datum
-      : (window.t ? window.t("nog_nie_beskikbaar") : "Nog nie beskikbaar nie");
-    wag_boodskap.textContent = datum_teks;
-    li.appendChild(wag_boodskap);
+    el.setAttribute("aria-disabled", "true");
   }
 
-  return li;
+  const omslag_wrap = document.createElement("div");
+  omslag_wrap.className = "my-boek-omslag-wrap";
+
+  if (boek.omslag) {
+    const omslag_img = document.createElement("img");
+    omslag_img.className = "my-boek-omslag";
+    omslag_img.src = boek.omslag;
+    omslag_img.alt = `Omslag van ${boek.titel}`;
+    omslag_img.loading = "lazy";
+    omslag_wrap.appendChild(omslag_img);
+  } else {
+    const plek_el = document.createElement("div");
+    plek_el.className = "my-boek-omslag my-boek-omslag--plek";
+    plek_el.setAttribute("role", "img");
+    plek_el.setAttribute("aria-label", `Geen omslag beskikbaar vir ${boek.titel}`);
+    plek_el.textContent = boek.titel;
+    omslag_wrap.appendChild(plek_el);
+  }
+
+  if (!boek.beskikbaar_nou) {
+    const merker = document.createElement("span");
+    merker.className = "my-boek-merker";
+    merker.textContent = boek.vrystelling_datum
+      ? (window.t ? window.t("beskikbaar_vanaf") : "Beskikbaar vanaf") + " " + boek.vrystelling_datum
+      : (window.t ? window.t("nog_nie_beskikbaar") : "Nog nie beskikbaar nie");
+    omslag_wrap.appendChild(merker);
+  }
+
+  el.appendChild(omslag_wrap);
+
+  const titel_el = document.createElement("p");
+  titel_el.className = "my-boek-titel";
+  titel_el.textContent = boek.titel;
+  el.appendChild(titel_el);
+
+  if (boek.outeur) {
+    const outeur_el = document.createElement("p");
+    outeur_el.className = "my-boek-outeur";
+    outeur_el.textContent = boek.outeur;
+    el.appendChild(outeur_el);
+  }
+
+  return el;
 }
 
 async function laai_my_boeke() {
@@ -83,7 +112,7 @@ async function laai_my_boeke() {
     }
 
     wys_status("");
-    data.boeke.forEach((boek) => lys_el.appendChild(bou_boek_ry(boek)));
+    data.boeke.forEach((boek) => lys_el.appendChild(bou_boek_kaart(boek)));
   } catch (fout) {
     console.error("Kon nie My Boeke laai nie:", fout);
     wys_status(

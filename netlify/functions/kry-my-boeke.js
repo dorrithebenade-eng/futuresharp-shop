@@ -31,7 +31,19 @@ exports.handler = async (event, context) => {
 
   try {
     const bestellings_store = kry_store("bestellings");
+    const katalogus_store = kry_store("katalogus");
     const { blobs } = await bestellings_store.list();
+
+    // Kas produk-opsoeke binne hierdie versoek — 'n koper kan dieselfde
+    // boek oor verskeie bestellings besit, geen rede om dit twee keer
+    // uit Blobs te lees nie.
+    const produk_kas = new Map();
+    async function kry_produk(slug) {
+      if (produk_kas.has(slug)) return produk_kas.get(slug);
+      const produk = await katalogus_store.get(slug, { type: "json" });
+      produk_kas.set(slug, produk);
+      return produk;
+    }
 
     const vandag = new Date().toISOString().slice(0, 10);
     const my_boeke = [];
@@ -66,10 +78,18 @@ exports.handler = async (event, context) => {
         const vrystelling_datum = boek_item.vrystelling_datum || null;
         const beskikbaar_nou = !vrystelling_datum || vrystelling_datum <= vandag;
 
+        // Omslag en outeur kom van die katalogus-rekord, nie van die
+        // bestelling nie — bestellings stoor net wat op koop-tydstip
+        // nodig was. Val gragvol terug indien die produk intussen
+        // gedeaktiveer/verwyder is.
+        const produk = await kry_produk(boek_item.produk_slug);
+
         my_boeke.push({
           bestelnommer: bestelling.bestelnommer,
           produk_slug: boek_item.produk_slug,
           titel: boek_item.titel,
+          outeur: (produk && produk.outeur) || "",
+          omslag: (produk && produk.omslag) || "",
           vrystelling_datum,
           beskikbaar_nou,
         });

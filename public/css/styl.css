@@ -1356,3 +1356,106 @@ body {
   text-decoration: underline;
   cursor: pointer;
 }
+
+/* ---------- My Boeke-rooster ---------- */
+
+.my-boeke-rooster {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 28px 20px;
+}
+
+@media (max-width: 480px) {
+  .my-boeke-rooster {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 22px 14px;
+  }
+}
+
+.my-boek-kaart {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+a.my-boek-kaart:hover .my-boek-omslag,
+a.my-boek-kaart:focus-visible .my-boek-omslag {
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
+  transform: translateY(-3px);
+}
+
+a.my-boek-kaart:focus-visible {
+  outline: 3px solid var(--teal);
+  outline-offset: 4px;
+}
+
+.my-boek-kaart[aria-disabled="true"] {
+  cursor: default;
+}
+
+.my-boek-omslag-wrap {
+  position: relative;
+}
+
+.my-boek-omslag {
+  width: 100%;
+  aspect-ratio: 1530 / 2322;
+  object-fit: cover;
+  display: block;
+  background: var(--grys-lig);
+  border-radius: 3px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.my-boek-omslag--plek {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 14px;
+  font-family: var(--font-opskrif);
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--grys-teks);
+  line-height: 1.3;
+}
+
+.my-boek-merker {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 12px;
+  background: rgba(23, 23, 23, 0.72);
+  color: var(--wit);
+  font-family: var(--font-liggaam);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+  border-radius: 3px;
+}
+
+.my-boek-titel {
+  font-family: var(--font-opskrif);
+  font-weight: 700;
+  font-size: 13px;
+  margin: 0;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.my-boek-outeur {
+  font-family: var(--font-liggaam);
+  font-size: 12px;
+  color: var(--grys-teks);
+  margin: -4px 0 0;
+}
