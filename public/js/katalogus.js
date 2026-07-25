@@ -32,9 +32,10 @@ function formateer_prys_sent(sent) {
   return `R${(sent / 100).toFixed(2)}`;
 }
 
-function bou_kaart(produk) {
+function bou_kaart(produk, besit_stel) {
   const eboek = produk.formate && produk.formate.eboek;
   const hardeKopie = produk.formate && produk.formate.harde_kopie;
+  const besit = besit_stel instanceof Set && besit_stel.has(produk.slug);
 
   const pryse = [];
   if (eboek && eboek.beskikbaar) {
@@ -54,10 +55,17 @@ function bou_kaart(produk) {
     ? `<img class="kaart-omslag" src="${produk.omslag}" alt="Omslag van ${produk.titel}" loading="lazy">`
     : `<div class="kaart-omslag" role="img" aria-label="Geen omslag beskikbaar vir ${produk.titel}"></div>`;
 
+  const besitMerkerHtml = besit
+    ? `<span class="kaart-besit-merker">${t("reeds_gekoop")}</span>`
+    : "";
+
   return `
     <article class="kaart">
       <span class="kaart-hoek" aria-hidden="true"></span>
-      ${omslagHtml}
+      <div class="kaart-omslag-wrap">
+        ${omslagHtml}
+        ${besitMerkerHtml}
+      </div>
       <div class="kaart-liggaam">
         <h3 class="kaart-titel">${produk.titel}</h3>
         <p class="kaart-outeur">${produk.outeur}</p>
@@ -71,7 +79,7 @@ function bou_kaart(produk) {
   `;
 }
 
-function wys_produkte(produkte, { demo_modus } = {}) {
+function wys_produkte(produkte, { demo_modus, besit_stel = new Set() } = {}) {
   const rooster = document.getElementById("katalogus-rooster");
   rooster.innerHTML = "";
 
@@ -87,7 +95,7 @@ function wys_produkte(produkte, { demo_modus } = {}) {
     return;
   }
 
-  rooster.innerHTML += produkte.map(bou_kaart).join("");
+  rooster.innerHTML += produkte.map((produk) => bou_kaart(produk, besit_stel)).join("");
 
   rooster.querySelectorAll(".kaart-aksie").forEach((knoppie) => {
     knoppie.addEventListener("click", () => {
@@ -98,15 +106,41 @@ function wys_produkte(produkte, { demo_modus } = {}) {
   });
 }
 
+// Lees die aangemelde koper se reeds-gekoopte e-boeke — gebruik dieselfde
+// endpoint as "My Boeke". Gee 'n leë Set terug (nooit 'n fout nie) as
+// niemand aangemeld is nie, of as die versoek om enige rede misluk — die
+// katalogus moet steeds normaal werk vir 'n besoeker sonder rekening.
+async function kry_besit_stel() {
+  try {
+    if (typeof identiteit_kry_huidige_sessie !== "function") return new Set();
+    const sessie = await identiteit_kry_huidige_sessie();
+    if (!sessie || !sessie.access_token) return new Set();
+
+    const resp = await fetch("/.netlify/functions/kry-my-boeke", {
+      headers: { Authorization: `Bearer ${sessie.access_token}` },
+    });
+    if (!resp.ok) return new Set();
+
+    const data = await resp.json();
+    return new Set((data.boeke || []).map((boek) => boek.produk_slug));
+  } catch (fout) {
+    console.warn("Kon nie besit-status laai nie:", fout);
+    return new Set();
+  }
+}
+
 async function laai_katalogus() {
   const rooster = document.getElementById("katalogus-rooster");
   rooster.innerHTML = `<p class="stelsel-boodskap">${t("katalogus_laai")}</p>`;
 
   try {
-    const resp = await fetch(KATALOGUS_ENDPOINT);
+    const [resp, besit_stel] = await Promise.all([
+      fetch(KATALOGUS_ENDPOINT),
+      kry_besit_stel(),
+    ]);
     if (!resp.ok) throw new Error(`Status ${resp.status}`);
     const data = await resp.json();
-    wys_produkte(data.produkte || []);
+    wys_produkte(data.produkte || [], { besit_stel });
   } catch (fout) {
     console.warn("Kon nie lewendige katalogus laai nie, wys demo-data:", fout);
     wys_produkte(DEMO_PRODUKTE, { demo_modus: true });

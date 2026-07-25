@@ -161,13 +161,32 @@ body {
   display: none;
 }
 
-.kaart-omslag {
+.kaart-omslag-wrap {
   width: 160px;
   flex-shrink: 0;
+  position: relative;
+}
+
+.kaart-omslag {
+  width: 100%;
   aspect-ratio: 1530 / 2322;
   background: var(--grys-lig);
   object-fit: cover;
   display: block;
+}
+
+.kaart-besit-merker {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: var(--teal);
+  color: var(--wit);
+  font-family: var(--font-liggaam);
+  font-weight: 600;
+  font-size: 11px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
 }
 
 .kaart-liggaam {
@@ -181,7 +200,7 @@ body {
 
 @media (max-width: 560px) {
   .kaart { flex-direction: column; }
-  .kaart-omslag { width: 100%; }
+  .kaart-omslag-wrap { width: 100%; }
 }
 
 .kaart-titel {
@@ -1149,11 +1168,16 @@ body {
 .leser-nutsbalk {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   flex-wrap: wrap;
   gap: 12px;
   background: var(--grys-lig);
   padding: 10px 14px;
+}
+
+.leser-nutsbalk-onder {
+  justify-content: center;
+  padding: 14px;
 }
 
 .leser-nutsbalk-groep {
@@ -1172,6 +1196,12 @@ body {
   cursor: pointer;
 }
 .leser-nutsknoppie:hover { border-color: var(--teal); }
+
+.leser-nutsbalk-onder .leser-nutsknoppie {
+  width: 44px;
+  height: 44px;
+  font-size: 20px;
+}
 
 .leser-bladsy-teller {
   display: flex;
@@ -1230,6 +1260,7 @@ body {
   padding: 16px;
   background: var(--grys-lig);
   overflow-x: auto;
+  touch-action: pan-y;
 }
 
 .leser-bladsy-omhulsel canvas {

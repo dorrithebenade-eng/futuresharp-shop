@@ -217,4 +217,49 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener("resize", () => {
     if (pdf_dokument) wys_bladsy(huidige_bladsy);
   });
+
+  // --- Swipe-gebare (foon/tablet) — links blaai vorentoe, regs blaai terug.
+  // Net op die bladsy-omhulsel self, sodat 'n normale vertikale
+  // bladsy-rol (bv. as die skerm laer as die bladsy is) nie per ongeluk
+  // as 'n blaai-gebaar gelees word nie.
+  const MIN_SWIPE_AFSTAND = 50;
+  const MAKS_VERTIKALE_AFWYKING = 60;
+  let swipe_begin_x = null;
+  let swipe_begin_y = null;
+
+  const omhulsel = document.querySelector(".leser-bladsy-omhulsel");
+  if (omhulsel) {
+    omhulsel.addEventListener(
+      "touchstart",
+      (ev) => {
+        if (!pdf_dokument || ev.touches.length !== 1) return;
+        swipe_begin_x = ev.touches[0].clientX;
+        swipe_begin_y = ev.touches[0].clientY;
+      },
+      { passive: true }
+    );
+
+    omhulsel.addEventListener(
+      "touchend",
+      (ev) => {
+        if (!pdf_dokument || swipe_begin_x === null) return;
+        const eind_x = ev.changedTouches[0].clientX;
+        const eind_y = ev.changedTouches[0].clientY;
+        const delta_x = eind_x - swipe_begin_x;
+        const delta_y = eind_y - swipe_begin_y;
+
+        swipe_begin_x = null;
+        swipe_begin_y = null;
+
+        if (Math.abs(delta_x) < MIN_SWIPE_AFSTAND || Math.abs(delta_y) > MAKS_VERTIKALE_AFWYKING) return;
+
+        if (delta_x < 0) {
+          wys_bladsy(huidige_bladsy + 1);
+        } else {
+          wys_bladsy(huidige_bladsy - 1);
+        }
+      },
+      { passive: true }
+    );
+  }
 });

@@ -39,6 +39,7 @@ const WOORDEBOEK = {
   eboek_etiket: { af: "E-boek", en: "E-book" },
   hardekopie_etiket: { af: "Harde kopie", en: "Hard copy" },
   voorbestelling_chip: { af: "Voorbestelling", en: "Pre-order" },
+  reeds_gekoop: { af: "Alreeds joune", en: "Already yours" },
 
   // Produk-bladsy
   produk_laai: { af: "Produk word gelaai …", en: "Loading product …" },

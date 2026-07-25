@@ -27,15 +27,6 @@
 
     <div id="leser-bekyker" class="leser-bekyker" hidden>
       <div class="leser-nutsbalk">
-        <div class="leser-nutsbalk-groep">
-          <button type="button" id="leser-vorige" class="leser-nutsknoppie" aria-label="Vorige bladsy">‹</button>
-          <span class="leser-bladsy-teller">
-            <input type="number" id="leser-bladsy-invoer" class="leser-bladsy-invoer" min="1" value="1">
-            <span data-i18n="leser_van">van</span>
-            <span id="leser-totaal-bladsye">—</span>
-          </span>
-          <button type="button" id="leser-volgende" class="leser-nutsknoppie" aria-label="Volgende bladsy">›</button>
-        </div>
         <form id="leser-soek-vorm" class="leser-soek-vorm">
           <input type="search" id="leser-soek-invoer" class="leser-soek-invoer" placeholder="Soek in boek…">
           <button type="submit" class="leser-nutsknoppie" aria-label="Soek">🔍</button>
@@ -47,6 +38,17 @@
       <div id="leser-soek-status" class="leser-soek-status"></div>
       <div class="leser-bladsy-omhulsel">
         <canvas id="leser-canvas"></canvas>
+      </div>
+      <div class="leser-nutsbalk leser-nutsbalk-onder">
+        <div class="leser-nutsbalk-groep">
+          <button type="button" id="leser-vorige" class="leser-nutsknoppie" aria-label="Vorige bladsy">‹</button>
+          <span class="leser-bladsy-teller">
+            <input type="number" id="leser-bladsy-invoer" class="leser-bladsy-invoer" min="1" value="1">
+            <span data-i18n="leser_van">van</span>
+            <span id="leser-totaal-bladsye">—</span>
+          </span>
+          <button type="button" id="leser-volgende" class="leser-nutsknoppie" aria-label="Volgende bladsy">›</button>
+        </div>
       </div>
     </div>
   </main>
