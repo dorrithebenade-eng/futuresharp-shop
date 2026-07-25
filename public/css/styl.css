@@ -1269,6 +1269,20 @@ body {
   gap: 10px;
 }
 
+.leser-zoom-groep {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.leser-zoem-persentasie {
+  font-family: var(--font-liggaam);
+  font-size: 13px;
+  color: var(--grys-teks);
+  min-width: 40px;
+  text-align: center;
+}
+
 .leser-nutsknoppie {
   background: var(--wit);
   border: 1px solid #D8D6D1;

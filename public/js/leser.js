@@ -22,6 +22,10 @@ let totale_bladsye = 0;
 let produk_slug_globaal = null;
 let sessie_globaal = null;
 let vordering_stoor_tydsaanwyser = null;
+let huidige_zoem = 1;
+
+const MIN_ZOEM = 0.6;
+const MAKS_ZOEM = 3;
 
 function wys_status(teks) {
   const el = document.getElementById("leser-status");
@@ -90,8 +94,9 @@ async function wys_bladsy(nommer) {
 
   const bladsy = await pdf_dokument.getPage(veilige_nommer);
   const omhulsel = document.querySelector(".leser-bladsy-omhulsel");
-  const skaal = (omhulsel.clientWidth - 32) / bladsy.getViewport({ scale: 1 }).width;
-  const viewport = bladsy.getViewport({ scale: Math.max(skaal, 0.3) });
+  const pas_skaal = (omhulsel.clientWidth - 32) / bladsy.getViewport({ scale: 1 }).width;
+  const skaal = Math.max(pas_skaal, 0.3) * huidige_zoem;
+  const viewport = bladsy.getViewport({ scale: skaal });
 
   const canvas = document.getElementById("leser-canvas");
   const konteks = canvas.getContext("2d");
@@ -102,6 +107,17 @@ async function wys_bladsy(nommer) {
 
   wys_voortgang();
   stoor_vordering_debounced();
+}
+
+function wys_zoem_persentasie() {
+  const el = document.getElementById("leser-zoem-persentasie");
+  if (el) el.textContent = `${Math.round(huidige_zoem * 100)}%`;
+}
+
+function stel_zoem(nuwe_zoem) {
+  huidige_zoem = Math.min(Math.max(nuwe_zoem, MIN_ZOEM), MAKS_ZOEM);
+  wys_zoem_persentasie();
+  wys_bladsy(huidige_bladsy);
 }
 
 async function soek_in_boek(soekterm) {
@@ -214,6 +230,9 @@ document.addEventListener("DOMContentLoaded", () => {
     soek_in_boek(document.getElementById("leser-soek-invoer").value);
   });
 
+  document.getElementById("leser-zoom-in").addEventListener("click", () => stel_zoem(huidige_zoem + 0.2));
+  document.getElementById("leser-zoom-uit").addEventListener("click", () => stel_zoem(huidige_zoem - 0.2));
+
   document.addEventListener("keydown", (ev) => {
     if (!pdf_dokument) return;
     if (ev.key === "ArrowRight") wys_bladsy(huidige_bladsy + 1);
@@ -233,14 +252,61 @@ document.addEventListener("DOMContentLoaded", () => {
   let swipe_begin_x = null;
   let swipe_begin_y = null;
 
+  // --- Knyp-om-te-zoem (twee vingers) — op dieselfde omhulsel as die
+  // swipe-gebare. 'n Knyp begin sodra 'n TWEEDE vinger raak; ons kanselleer
+  // dan enige lopende swipe-opsporing sodat die vinger wat afgelig word ná
+  // die knyp nie per ongeluk as 'n eenvinger-swipe gelees word nie.
+  let knyp_begin_afstand = null;
+  let knyp_begin_zoem = 1;
+  let knyp_render_hangende = false;
+
+  function kry_knyp_afstand(ev) {
+    const [a, b] = ev.touches;
+    return Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY);
+  }
+
   const omhulsel = document.querySelector(".leser-bladsy-omhulsel");
   if (omhulsel) {
     omhulsel.addEventListener(
       "touchstart",
       (ev) => {
-        if (!pdf_dokument || ev.touches.length !== 1) return;
-        swipe_begin_x = ev.touches[0].clientX;
-        swipe_begin_y = ev.touches[0].clientY;
+        if (!pdf_dokument) return;
+
+        if (ev.touches.length === 2) {
+          swipe_begin_x = null;
+          swipe_begin_y = null;
+          knyp_begin_afstand = kry_knyp_afstand(ev);
+          knyp_begin_zoem = huidige_zoem;
+          return;
+        }
+
+        if (ev.touches.length === 1) {
+          swipe_begin_x = ev.touches[0].clientX;
+          swipe_begin_y = ev.touches[0].clientY;
+        }
+      },
+      { passive: true }
+    );
+
+    omhulsel.addEventListener(
+      "touchmove",
+      (ev) => {
+        if (!pdf_dokument || ev.touches.length !== 2 || knyp_begin_afstand === null) return;
+
+        const huidige_afstand = kry_knyp_afstand(ev);
+        const nuwe_zoem = knyp_begin_zoem * (huidige_afstand / knyp_begin_afstand);
+        huidige_zoem = Math.min(Math.max(nuwe_zoem, MIN_ZOEM), MAKS_ZOEM);
+        wys_zoem_persentasie();
+
+        // Herteken die bladsy hoogstens een keer per animasie-raam — 'n
+        // knyp-gebeurtenis skiet baie vinniger as wat PDF.js kan herteken.
+        if (!knyp_render_hangende) {
+          knyp_render_hangende = true;
+          requestAnimationFrame(() => {
+            wys_bladsy(huidige_bladsy);
+            knyp_render_hangende = false;
+          });
+        }
       },
       { passive: true }
     );
@@ -248,6 +314,10 @@ document.addEventListener("DOMContentLoaded", () => {
     omhulsel.addEventListener(
       "touchend",
       (ev) => {
+        if (ev.touches.length < 2) {
+          knyp_begin_afstand = null;
+        }
+
         if (!pdf_dokument || swipe_begin_x === null) return;
         const eind_x = ev.changedTouches[0].clientX;
         const eind_y = ev.changedTouches[0].clientY;
