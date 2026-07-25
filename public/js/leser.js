@@ -147,6 +147,12 @@ async function laai_leser() {
   }
   sessie_globaal = sessie;
 
+  const lisensie_nota_el = document.getElementById("leser-lisensie-nota");
+  if (lisensie_nota_el && sessie.gebruiker && sessie.gebruiker.email) {
+    const patroon = window.t ? window.t("leser_lisensie_nota") : "Hierdie eksemplaar is aan %epos% gekoppel — nie vir herverspreiding nie.";
+    lisensie_nota_el.textContent = patroon.replace("%epos%", sessie.gebruiker.email);
+  }
+
   wys_status(window.t ? window.t("leser_laai_tans") : "Jou boek word gelaai...");
 
   kry_boek_titel(sessie, produk_slug).then((titel) => {

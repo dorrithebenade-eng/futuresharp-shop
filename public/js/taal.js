@@ -236,6 +236,15 @@ const WOORDEBOEK = {
   paneel_deaktiveer: { af: "Deaktiveer", en: "Deactivate" },
   paneel_aktiveer: { af: "Aktiveer", en: "Activate" },
   paneel_onaktief: { af: "Onaktief", en: "Inactive" },
+  paneel_skrap: { af: "Skrap", en: "Delete" },
+  paneel_skrap_bevestig: {
+    af: 'Wis "%titel%" permanent uit? Dit verwyder ook die PDF en omslagbeeld, en kan nie ontdoen word nie.',
+    en: 'Permanently delete "%titel%"? This also removes the PDF and cover image, and cannot be undone.',
+  },
+  paneel_kon_nie_skrap_nie: {
+    af: "Kon nie produk skrap nie — probeer weer.",
+    en: "Could not delete product — try again.",
+  },
   paneel_wysig_titel_voorvoegsel: { af: "Wysig — ", en: "Edit — " },
   paneel_stoor_wysigings: { af: "Stoor wysigings", en: "Save changes" },
   paneel_verpligte_velde_fout: {
@@ -263,6 +272,10 @@ const WOORDEBOEK = {
   my_boeke_titel: { af: "My Boeke", en: "My Books" },
   my_boeke_subtitel: { af: "Al jou gekoopte e-boeke, gereed om te lees.", en: "All your purchased e-books, ready to read." },
   lees_aanlyn: { af: "Lees aanlyn", en: "Read online" },
+  leser_lisensie_nota: {
+    af: "Hierdie eksemplaar is aan %epos% gekoppel — nie vir herverspreiding nie.",
+    en: "This copy is linked to %epos% — not for redistribution.",
+  },
   beskikbaar_vanaf: { af: "Beskikbaar vanaf", en: "Available from" },
   nog_nie_beskikbaar: { af: "Nog nie beskikbaar nie", en: "Not yet available" },
   meld_aan_vir_my_boeke: { af: "Meld eers aan om jou boeke te sien.", en: "Log in to see your books." },

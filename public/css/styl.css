@@ -1101,7 +1101,12 @@ body {
   gap: 16px;
 }
 
-.paneel-produk-aksies button { background: none; border: none; padding: 0; }
+.paneel-produk-aksies button { background: none; border: none; padding: 0; cursor: pointer; }
+
+.paneel-skrap-knoppie {
+  color: var(--koraal);
+}
+.paneel-skrap-knoppie:hover { color: #B33E1E; }
 
 .paneel-vorm-kanselleer {
   background: none;
@@ -1162,6 +1167,13 @@ body {
   font-weight: 800;
   font-size: 22px;
   margin: 0;
+}
+
+.leser-lisensie-nota {
+  font-family: var(--font-liggaam);
+  font-size: 11px;
+  color: var(--grys-teks);
+  margin: -4px 0 0;
 }
 
 .leser-bekyker {

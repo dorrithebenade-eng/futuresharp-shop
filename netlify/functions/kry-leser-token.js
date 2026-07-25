@@ -37,6 +37,7 @@ exports.handler = async (event, context) => {
     const store = kry_store("leestokens");
     await store.setJSON(token, {
       gebruiker_id: gebruiker.id,
+      gebruiker_epos: gebruiker.email,
       produk_slug,
       verval_op,
     });

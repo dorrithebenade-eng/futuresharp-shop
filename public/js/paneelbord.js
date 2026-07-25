@@ -6,6 +6,7 @@
 const ALLE_PRODUKTE_ENDPOINT = "/.netlify/functions/kry-alle-produkte";
 const SKEP_PRODUK_ENDPOINT = "/.netlify/functions/skep-produk";
 const WYSIG_PRODUK_ENDPOINT = "/.netlify/functions/wysig-produk";
+const VERWYDER_PRODUK_ENDPOINT = "/.netlify/functions/verwyder-produk";
 const KRY_OUTEURS_ENDPOINT = "/.netlify/functions/kry-outeurs";
 const SKEP_OUTEUR_ENDPOINT = "/.netlify/functions/skep-outeur";
 const LAAI_EBOEK_OP_ENDPOINT = "/.netlify/functions/laai-eboek-op";
@@ -113,6 +114,7 @@ function wys_produkte_lys(produkte) {
             <button class="terug-skakel paneel-aktief-knoppie" data-slug="${produk.slug}" data-aktief="${produk.aktief}">
               ${produk.aktief ? t("paneel_deaktiveer") : t("paneel_aktiveer")}
             </button>
+            <button class="terug-skakel paneel-skrap-knoppie" data-slug="${produk.slug}" data-titel="${produk.titel}">${t("paneel_skrap")}</button>
           </div>
         </div>
       `;
@@ -141,6 +143,36 @@ function wys_produkte_lys(produkte) {
       } catch (fout) {
         console.error("Kon nie aktief-status wysig nie:", fout);
         alert(t("paneel_kon_nie_status_wysig"));
+        knoppie.disabled = false;
+      }
+    });
+  });
+
+  wrap.querySelectorAll(".paneel-skrap-knoppie").forEach((knoppie) => {
+    knoppie.addEventListener("click", async () => {
+      const bevestig_teks = t("paneel_skrap_bevestig").replace("%titel%", knoppie.dataset.titel);
+      if (!window.confirm(bevestig_teks)) return;
+
+      knoppie.disabled = true;
+      try {
+        const resp = await fetch(VERWYDER_PRODUK_ENDPOINT, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", ...kry_outorisasie_kop() },
+          body: JSON.stringify({ slug: knoppie.dataset.slug }),
+        });
+
+        if (resp.status === 409) {
+          const data = await resp.json().catch(() => null);
+          alert((data && data.fout) || t("paneel_kon_nie_skrap_nie"));
+          knoppie.disabled = false;
+          return;
+        }
+        if (!resp.ok) throw new Error(`Status ${resp.status}`);
+
+        laai_produkte();
+      } catch (fout) {
+        console.error("Kon nie produk skrap nie:", fout);
+        alert(t("paneel_kon_nie_skrap_nie"));
         knoppie.disabled = false;
       }
     });

@@ -24,7 +24,7 @@
 
 const { kry_store } = require("./_blob-store");
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
-const { PDFDocument, rgb, StandardFonts } = require("pdf-lib");
+const { PDFDocument } = require("pdf-lib");
 
 const MAKS_ANTWOORD_GREPE = 5 * 1024 * 1024; // 5MB per stuk, ruim onder die 6MB-limiet
 
@@ -35,7 +35,7 @@ async function verifieer_via_token(token, produk_slug) {
   if (!rekord) return null;
   if (rekord.produk_slug !== produk_slug) return null;
   if (Date.now() > rekord.verval_op) return null;
-  return { id: rekord.gebruiker_id };
+  return { id: rekord.gebruiker_id, email: rekord.gebruiker_epos };
 }
 
 async function besit_boek(gebruiker_id, produk_slug) {
@@ -68,7 +68,10 @@ async function besit_boek(gebruiker_id, produk_slug) {
 
 async function kry_of_genereer_gemerkte_kopie(produk_slug, gebruiker) {
   const gemerk_store = kry_store("eboeke-gemerk");
-  const gemerk_sleutel = `${produk_slug}--${gebruiker.id}.pdf`;
+  // "-v3" forseer 'n vars-generasie ná die skuif van 'n sigbare
+  // watermerk-bladsy na onsigbare dokument-metadata — ou "-v1"/"-v2"-
+  // kopieë bly onskadelik ongebruik in Blobs staan.
+  const gemerk_sleutel = `${produk_slug}--${gebruiker.id}-v3.pdf`;
 
   const bestaande = await gemerk_store.get(gemerk_sleutel, { type: "arrayBuffer" });
   if (bestaande) return Buffer.from(bestaande);
@@ -84,21 +87,16 @@ async function kry_of_genereer_gemerkte_kopie(produk_slug, gebruiker) {
   if (!rou_pdf) return null;
 
   const pdf = await PDFDocument.load(rou_pdf);
-  pdf.setSubject(`Future Shop — gekoop deur ${gebruiker.email}`);
-  pdf.setKeywords([`future-shop-koper:${gebruiker.email}`]);
-
-  const bladsy = pdf.addPage();
-  const { width, height } = bladsy.getSize();
-  const font = await pdf.embedFont(StandardFonts.Helvetica);
-  const teks = `Hierdie eksemplaar is aan ${gebruiker.email} gekoppel — nie vir herverspreiding nie.`;
-  bladsy.drawText(teks, {
-    x: 40,
-    y: height / 2,
-    size: 10,
-    font,
-    color: rgb(0.55, 0.55, 0.55),
-    maxWidth: width - 80,
-  });
+  const koper_epos = gebruiker.email || "onbekende koper";
+  // Onsigbare lisensie-/opsporing-merker — geen ekstra bladsy of sigbare
+  // teks in die dokument self nie (dit lyk professioneler en steur nie
+  // die leeservaring nie). Die koper-koppeling is steeds vasgelê in die
+  // dokument se eie metadata, wat behoue bly selfs al word die PDF
+  // gekopieer/herverspei — 'n mens hoef net die lêer se "Eienskappe" oop
+  // te maak om te sien aan wie dit gekoppel is.
+  pdf.setSubject(`Future Shop — gekoop deur ${koper_epos}`);
+  pdf.setKeywords([`future-shop-koper:${koper_epos}`]);
+  pdf.setProducer(`Future Shop — eksemplaar gekoppel aan ${koper_epos}`);
 
   const gemerkte_bytes = Buffer.from(await pdf.save());
   await gemerk_store.set(gemerk_sleutel, gemerkte_bytes, { metadata: { inhoud_tipe: "application/pdf" } });
