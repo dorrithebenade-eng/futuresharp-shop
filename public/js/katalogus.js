@@ -91,7 +91,14 @@ function wys_produkte(produkte, { demo_modus, besit_stel = new Set() } = {}) {
   }
 
   if (!produkte.length) {
-    rooster.innerHTML += `<p class="stelsel-boodskap">${t("katalogus_leeg")}</p>`;
+    rooster.innerHTML += `
+      <div class="katalogus-leeg-plekhouer">
+        <svg class="katalogus-leeg-ster" viewBox="0 0 260 260" aria-hidden="true">
+          <polygon points="130.0,0.0 149.5,31.9 179.7,9.9 185.6,46.9 221.9,38.1 213.1,74.4 250.1,80.3 228.1,110.5 260.0,130.0 228.1,149.5 250.1,179.7 213.1,185.6 221.9,221.9 185.6,213.1 179.7,250.1 149.5,228.1 130.0,260.0 110.5,228.1 80.3,250.1 74.4,213.1 38.1,221.9 46.9,185.6 9.9,179.7 31.9,149.5 0.0,130.0 31.9,110.5 9.9,80.3 46.9,74.4 38.1,38.1 74.4,46.9 80.3,9.9 110.5,31.9" />
+        </svg>
+        <span class="katalogus-leeg-ster-teks">${t("katalogus_leeg_titel")}</span>
+      </div>
+    `;
     return;
   }
 

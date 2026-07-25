@@ -33,6 +33,12 @@ const WOORDEBOEK = {
   kop_cta: { af: "Kyk gerus deur ons katalogus", en: "Browse our catalogue" },
   katalogus_laai: { af: "Katalogus word gelaai …", en: "Loading catalogue …" },
   katalogus_leeg: { af: "Nog geen produkte beskikbaar nie.", en: "No products available yet." },
+  katalogus_leeg_titel: { af: "Binnekort in aksie", en: "Coming soon" },
+  katalogus_leeg_beskrywing: {
+    af: "Ons is besig om die winkel gereed te maak — kom kyk binnekort weer.",
+    en: "We're getting the shop ready — check back soon.",
+  },
+  binnekort_ster_teks: { af: "Binnekort\nin aksie", en: "Coming\nsoon" },
   katalogus_demo: {
     af: "Voorskou-modus: die lewendige katalogus-Function is nie bereikbaar nie — demo-produkte word gewys.",
     en: "Preview mode: the live catalogue function is unreachable — demo products are shown.",

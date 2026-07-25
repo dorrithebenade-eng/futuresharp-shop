@@ -318,6 +318,92 @@ body {
   font-size: 15px;
 }
 
+/* ---------- TYDELIKE "Binnekort in aksie"-stikker ---------- */
+
+.binnekort-wapper {
+  position: relative;
+  height: 0;
+  display: flex;
+  justify-content: center;
+  z-index: 10;
+}
+
+.binnekort-ster {
+  position: relative;
+  top: -90px;
+  width: 190px;
+  height: 190px;
+  background: var(--koraal);
+  border: 4px solid var(--swart);
+  clip-path: polygon(50.0% 0.0%, 58.2% 13.9%, 71.7% 5.0%, 73.1% 21.1%, 89.1% 18.8%, 83.3% 33.9%, 98.7% 38.9%, 87.0% 50.0%, 98.7% 61.1%, 83.3% 66.1%, 89.1% 81.2%, 73.1% 78.9%, 71.7% 95.0%, 58.2% 86.1%, 50.0% 100.0%, 41.8% 86.1%, 28.3% 95.0%, 26.9% 78.9%, 10.9% 81.2%, 16.7% 66.1%, 1.3% 61.1%, 13.0% 50.0%, 1.3% 38.9%, 16.7% 33.9%, 10.9% 18.8%, 26.9% 21.1%, 28.3% 5.0%, 41.8% 13.9%);
+  transform: rotate(-8deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--swart);
+  font-family: var(--font-opskrif);
+  font-weight: 800;
+  font-size: 20px;
+  line-height: 1.25;
+  white-space: pre-line;
+}
+
+@media (max-width: 480px) {
+  .binnekort-ster {
+    width: 140px;
+    height: 140px;
+    font-size: 15px;
+    top: -66px;
+  }
+}
+
+.katalogus-leeg-plekhouer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 260px;
+  height: 260px;
+  margin: -130px auto 40px;
+}
+
+.katalogus-leeg-ster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  fill: var(--koraal);
+  stroke: var(--swart);
+  stroke-width: 3;
+  transform: rotate(-6deg);
+  filter: drop-shadow(4px 6px 0 rgba(23, 23, 23, 0.25));
+}
+
+.katalogus-leeg-ster-teks {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-opskrif);
+  font-weight: 800;
+  font-size: 26px;
+  line-height: 1.15;
+  color: var(--swart);
+  text-align: center;
+  max-width: 160px;
+}
+
+@media (max-width: 480px) {
+  .katalogus-leeg-plekhouer {
+    width: 200px;
+    height: 200px;
+    margin: -100px auto 32px;
+  }
+  .katalogus-leeg-ster-teks {
+    font-size: 20px;
+    max-width: 130px;
+  }
+}
+
 .demo-kennisgewing {
   grid-column: 1 / -1;
   background: #FFF7E6;
