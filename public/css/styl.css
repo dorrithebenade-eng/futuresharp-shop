@@ -1369,6 +1369,29 @@ body {
   touch-action: pan-x pan-y;
 }
 
+.leser-bladsy-posisie {
+  position: relative;
+  display: inline-block;
+}
+
+.leser-skakel-laag {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+.leser-skakel-area {
+  position: absolute;
+  pointer-events: auto;
+  cursor: pointer;
+  border-radius: 2px;
+}
+.leser-skakel-area:hover {
+  background: rgba(71, 159, 145, 0.18);
+  outline: 1px solid rgba(71, 159, 145, 0.4);
+}
+
 .leser-bladsy-omhulsel canvas {
   display: block;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);

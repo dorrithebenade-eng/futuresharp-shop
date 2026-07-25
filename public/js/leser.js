@@ -104,9 +104,79 @@ async function wys_bladsy(nommer) {
   canvas.height = viewport.height;
 
   await bladsy.render({ canvasContext: konteks, viewport }).promise;
+  await bou_skakel_laag(bladsy, viewport);
 
   wys_voortgang();
   stoor_vordering_debounced();
+}
+
+// --- Klikbare inhoudsopgawe/verwysings — lees die PDF se EIE ingeboude
+// skakel-annotasies (soos 'n outeur dit self in Word/hul PDF-sagteware
+// as hiperskakels na 'n opskrif of bladsy opgestel het) en teken
+// onsigbare, klikbare gebiede oor die canvas op presies daardie plekke.
+// Ons bou hierdie skakels self nie — ons lees net wat reeds in die
+// dokument ingebed is.
+async function kry_bladsy_indeks_vir_bestemming(bestemming) {
+  let eksplisiete_bestemming = bestemming;
+  if (typeof bestemming === "string") {
+    eksplisiete_bestemming = await pdf_dokument.getDestination(bestemming);
+  }
+  if (!Array.isArray(eksplisiete_bestemming) || !eksplisiete_bestemming[0]) return null;
+
+  try {
+    return await pdf_dokument.getPageIndex(eksplisiete_bestemming[0]);
+  } catch {
+    return null;
+  }
+}
+
+async function bou_skakel_laag(bladsy, viewport) {
+  const laag = document.getElementById("leser-skakel-laag");
+  if (!laag) return;
+  laag.innerHTML = "";
+  laag.style.width = `${viewport.width}px`;
+  laag.style.height = `${viewport.height}px`;
+
+  let anotasies;
+  try {
+    anotasies = await bladsy.getAnnotations();
+  } catch {
+    return;
+  }
+
+  anotasies.forEach((anotasie) => {
+    if (anotasie.subtype !== "Link" || (!anotasie.dest && !anotasie.url)) return;
+
+    const reghoek = viewport.convertToViewportRectangle(anotasie.rect);
+    const links = Math.min(reghoek[0], reghoek[2]);
+    const bo = Math.min(reghoek[1], reghoek[3]);
+    const breedte = Math.abs(reghoek[2] - reghoek[0]);
+    const hoogte = Math.abs(reghoek[3] - reghoek[1]);
+
+    const skakel_el = document.createElement("a");
+    skakel_el.className = "leser-skakel-area";
+    skakel_el.href = "#";
+    skakel_el.style.left = `${links}px`;
+    skakel_el.style.top = `${bo}px`;
+    skakel_el.style.width = `${breedte}px`;
+    skakel_el.style.height = `${hoogte}px`;
+
+    if (anotasie.url) {
+      // Eksterne skakel (bv. 'n outeur se webwerf) — maak in 'n nuwe
+      // oortjie oop, hou die leser self oop.
+      skakel_el.href = anotasie.url;
+      skakel_el.target = "_blank";
+      skakel_el.rel = "noopener noreferrer";
+    } else {
+      skakel_el.addEventListener("click", async (ev) => {
+        ev.preventDefault();
+        const bladsy_indeks = await kry_bladsy_indeks_vir_bestemming(anotasie.dest);
+        if (bladsy_indeks !== null) wys_bladsy(bladsy_indeks + 1);
+      });
+    }
+
+    laag.appendChild(skakel_el);
+  });
 }
 
 function is_ingezoem() {
