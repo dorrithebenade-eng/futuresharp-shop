@@ -30,25 +30,22 @@ body {
   position: relative;
   background: var(--teal-helder);
   color: var(--wit);
-  padding: 48px 24px;
+  padding: 56px 24px 72px;
   overflow: hidden;
+  --kop-blokke-breedte: clamp(220px, 44vw, 760px);
+  --kop-blokke-marge: clamp(20px, 4vw, 64px);
 }
 
 @media (max-width: 640px) {
-  .kop { padding: 36px 20px; }
-}
-
-.kop-kolom {
-  display: grid;
-  grid-template-columns: 1.15fr 1fr;
-  gap: clamp(24px, 4vw, 56px);
-  align-items: center;
-  max-width: 1200px;
-  margin: 0 auto;
+  .kop { padding: 40px 20px 52px; }
 }
 
 .kop-blokke {
-  width: 100%;
+  position: absolute;
+  top: 50%;
+  right: var(--kop-blokke-marge);
+  width: var(--kop-blokke-breedte);
+  transform: translateY(-50%);
 }
 
 .kop-woordmerk {
@@ -59,20 +56,26 @@ body {
 
 .kop-inhoud {
   position: relative;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding-right: calc(var(--kop-blokke-breedte) + var(--kop-blokke-marge) + 24px);
 }
 
 @media (max-width: 640px) {
-  .kop-kolom {
+  .kop {
     display: flex;
     flex-direction: column;
   }
   .kop-blokke {
-    width: 100%;
-    max-width: 340px;
+    position: static;
+    width: 300px;
+    max-width: 85%;
     margin: 28px auto 0;
+    transform: none;
     order: 2;
   }
   .kop-inhoud {
+    padding-right: 0;
     text-align: center;
     order: 1;
   }
@@ -326,7 +329,7 @@ body {
 /* ---------- Mini-nav (produk- en ander binneblaaie) ---------- */
 
 .mini-kop {
-  padding: clamp(16px, 1.6vw, 22px) 24px;
+  padding: 20px 24px;
   background: var(--swart);
   color: var(--wit);
   position: relative;
@@ -337,14 +340,14 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  max-width: 1200px;
+  max-width: 1100px;
   margin: 0 auto;
 }
 
 .mini-kop-merk {
   font-family: var(--font-opskrif);
   text-decoration: none;
-  font-size: clamp(16px, 1.4vw, 19px);
+  font-size: 16px;
   display: inline-flex;
   align-items: baseline;
   gap: 8px;
@@ -358,7 +361,7 @@ body {
 .merk-skeier {
   font-weight: 400;
   color: #8A8983;
-  font-size: 0.9em;
+  font-size: 14px;
 }
 
 .merk-shop {
@@ -374,7 +377,7 @@ body {
 .mini-kop-mandjie {
   font-family: var(--font-liggaam);
   font-weight: 600;
-  font-size: clamp(14px, 1.2vw, 16px);
+  font-size: 14px;
   color: var(--wit);
   text-decoration: none;
   display: inline-flex;
@@ -383,8 +386,8 @@ body {
 }
 
 .mandjie-ikoon {
-  width: 1.3em;
-  height: 1.3em;
+  width: 18px;
+  height: 18px;
   flex-shrink: 0;
 }
 
@@ -434,15 +437,15 @@ body {
 }
 
 .nav-rekening-avatar {
-  width: clamp(26px, 2.2vw, 30px);
-  height: clamp(26px, 2.2vw, 30px);
+  width: 26px;
+  height: 26px;
   flex-shrink: 0;
   border-radius: 50%;
   background: #3A3A3A;
   border: 1px solid #4A4A4A;
   color: #E8E6E1;
   font-family: var(--font-liggaam);
-  font-size: clamp(10px, 0.9vw, 11px);
+  font-size: 10px;
   font-weight: 700;
   display: flex;
   align-items: center;
@@ -461,7 +464,7 @@ body {
   color: var(--wit);
   font-family: var(--font-liggaam);
   font-weight: 600;
-  font-size: clamp(14px, 1.2vw, 16px);
+  font-size: 14px;
   text-decoration: none;
   cursor: pointer;
   white-space: nowrap;
@@ -474,7 +477,7 @@ body {
 .nav-rekening-skakel--gedemp {
   color: #ADABA5;
   font-weight: 500;
-  font-size: 0.9em;
+  font-size: 13px;
 }
 .nav-rekening-skakel--gedemp:hover { color: var(--wit); }
 
@@ -501,8 +504,8 @@ body {
   color: #B8B6B1;
   font-family: var(--font-liggaam);
   font-weight: 600;
-  font-size: clamp(12px, 1vw, 13px);
-  padding: clamp(6px, 0.6vw, 7px) clamp(12px, 1.1vw, 14px);
+  font-size: 12px;
+  padding: 6px 12px;
   cursor: pointer;
   transition: background 0.15s ease, color 0.15s ease;
 }
