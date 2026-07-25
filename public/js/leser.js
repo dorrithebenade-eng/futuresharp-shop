@@ -1,15 +1,27 @@
 // public/js/leser.js
 //
-// Kry 'n kort-leeftyd leestoken (kry-leser-token.js, met 'n regte
-// Bearer-versoek), en wys dan die <iframe> direk na
-// kry-eboek-inhoud.js met daardie token in die URL. Die iframe self
-// (nie hierdie skrip nie) laai die PDF — die blaaier se ingeboude
-// PDF-bekyker vra self die inhoud stuk-vir-stuk aan via HTTP
-// Range-versoeke, wat nodig is vir groter e-boeke (sien nota in
-// kry-eboek-inhoud.js).
+// Gebruik PDF.js (Mozilla se eie PDF-enjin, dieselfde een in Firefox)
+// om die e-boek binne ons eie koppelvlak te vertoon — nie die blaaier
+// se ingeboude PDF-bekyker (<iframe>) nie. Dit gee ons volle beheer:
+// regte bladsy-teller, voortgang wat onthou word, en soek binne die
+// boek.
+//
+// PDF.js laai die PDF via HTTP Range-versoeke (nodig vir groot lêers)
+// — kry-eboek-inhoud.js ondersteun dit reeds, dus is geen
+// bediener-kant-verandering vir die PDF self nodig nie.
 //
 // Vereis identiteit.js reeds gelaai. Lees die produk-slug uit die
-// "?boek="-URL-parameter (sien my-boeke.js se skakel-konstruksie).
+// "?boek="-URL-parameter.
+
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.worker.min.js";
+
+let pdf_dokument = null;
+let huidige_bladsy = 1;
+let totale_bladsye = 0;
+let produk_slug_globaal = null;
+let sessie_globaal = null;
+let vordering_stoor_tydsaanwyser = null;
 
 function wys_status(teks) {
   const el = document.getElementById("leser-status");
@@ -30,9 +42,96 @@ async function kry_boek_titel(sessie, produk_slug) {
   }
 }
 
+async function kry_gestoorde_bladsy(sessie, produk_slug) {
+  try {
+    const resp = await fetch(
+      `/.netlify/functions/kry-lees-vordering?produk_slug=${encodeURIComponent(produk_slug)}`,
+      { headers: { Authorization: `Bearer ${sessie.access_token}` } }
+    );
+    if (!resp.ok) return null;
+    const data = await resp.json();
+    return data.bladsy || null;
+  } catch {
+    return null;
+  }
+}
+
+function stoor_vordering_debounced() {
+  // Wag 'n oomblik ná die laaste bladsy-verandering voordat ons stoor —
+  // vermy 'n stortvloed versoeke as iemand vinnig deur bladsye blaai.
+  clearTimeout(vordering_stoor_tydsaanwyser);
+  vordering_stoor_tydsaanwyser = setTimeout(async () => {
+    try {
+      await fetch("/.netlify/functions/stoor-lees-vordering", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessie_globaal.access_token}`,
+        },
+        body: JSON.stringify({ produk_slug: produk_slug_globaal, bladsy: huidige_bladsy }),
+      });
+    } catch (fout) {
+      console.warn("Kon nie leesvordering stoor nie:", fout);
+    }
+  }, 600);
+}
+
+function wys_voortgang() {
+  document.getElementById("leser-bladsy-invoer").value = huidige_bladsy;
+  document.getElementById("leser-totaal-bladsye").textContent = totale_bladsye;
+  const persentasie = totale_bladsye ? Math.round((huidige_bladsy / totale_bladsye) * 100) : 0;
+  document.getElementById("leser-voortgang-balk").style.width = `${persentasie}%`;
+}
+
+async function wys_bladsy(nommer) {
+  if (!pdf_dokument) return;
+  const veilige_nommer = Math.min(Math.max(1, nommer), totale_bladsye);
+  huidige_bladsy = veilige_nommer;
+
+  const bladsy = await pdf_dokument.getPage(veilige_nommer);
+  const omhulsel = document.querySelector(".leser-bladsy-omhulsel");
+  const skaal = (omhulsel.clientWidth - 32) / bladsy.getViewport({ scale: 1 }).width;
+  const viewport = bladsy.getViewport({ scale: Math.max(skaal, 0.3) });
+
+  const canvas = document.getElementById("leser-canvas");
+  const konteks = canvas.getContext("2d");
+  canvas.width = viewport.width;
+  canvas.height = viewport.height;
+
+  await bladsy.render({ canvasContext: konteks, viewport }).promise;
+
+  wys_voortgang();
+  stoor_vordering_debounced();
+}
+
+async function soek_in_boek(soekterm) {
+  const statusWrap = document.getElementById("leser-soek-status");
+  if (!soekterm.trim()) {
+    statusWrap.textContent = "";
+    return;
+  }
+  statusWrap.textContent = window.t ? window.t("leser_soek_besig") : "Soek …";
+
+  const soekterm_klein = soekterm.trim().toLowerCase();
+  for (let n = 1; n <= totale_bladsye; n++) {
+    const bladsy = await pdf_dokument.getPage(n);
+    const teksinhoud = await bladsy.getTextContent();
+    const teks = teksinhoud.items.map((item) => item.str).join(" ").toLowerCase();
+    if (teks.includes(soekterm_klein)) {
+      statusWrap.textContent = window.t
+        ? `${window.t("leser_soek_gevind")} ${n}`
+        : `Gevind op bladsy ${n}`;
+      wys_bladsy(n);
+      return;
+    }
+  }
+  statusWrap.textContent = window.t ? window.t("leser_soek_niks") : "Geen resultate gevind nie.";
+}
+
 async function laai_leser() {
   const parms = new URLSearchParams(window.location.search);
   const produk_slug = parms.get("boek");
+  produk_slug_globaal = produk_slug;
 
   if (!produk_slug) {
     wys_status(window.t ? window.t("leser_geen_boek") : "Geen boek gespesifiseer nie.");
@@ -46,6 +145,7 @@ async function laai_leser() {
     )}`;
     return;
   }
+  sessie_globaal = sessie;
 
   wys_status(window.t ? window.t("leser_laai_tans") : "Jou boek word gelaai...");
 
@@ -68,20 +168,53 @@ async function laai_leser() {
     }
 
     const { token } = await token_resp.json();
-
-    // Die iframe se src word DIREK na die Function gewys (nie via 'n
-    // fetch()+blob-URL nie) — sodat die blaaier se eie PDF-bekyker die
-    // groot-lêer-Range-versoeke self hanteer.
-    const raam = document.getElementById("leser-raam");
-    raam.src = `/.netlify/functions/kry-eboek-inhoud?produk_slug=${encodeURIComponent(
+    const pdf_url = `/.netlify/functions/kry-eboek-inhoud?produk_slug=${encodeURIComponent(
       produk_slug
     )}&token=${encodeURIComponent(token)}`;
-    raam.hidden = false;
+
+    pdf_dokument = await pdfjsLib.getDocument(pdf_url).promise;
+    totale_bladsye = pdf_dokument.numPages;
+
+    const gestoorde_bladsy = await kry_gestoorde_bladsy(sessie, produk_slug);
+
     wys_status("");
+    document.getElementById("leser-bekyker").hidden = false;
+    await wys_bladsy(gestoorde_bladsy || 1);
   } catch (fout) {
     console.error("Kon nie e-boek laai nie:", fout);
-    wys_status(window.t ? window.t("leser_fout") : "Kon nie jou boek laai nie — probeer later weer.");
+    if (fout && fout.message === "Onverwagte status: 403") {
+      wys_status(window.t ? window.t("leser_nie_gekoop") : "Jy het nie hierdie e-boek gekoop nie.");
+    } else if (fout && fout.message === "Onverwagte status: 404") {
+      wys_status(window.t ? window.t("leser_nog_nie_beskikbaar") : "Hierdie e-boek is nog nie beskikbaar nie.");
+    } else {
+      wys_status(window.t ? window.t("leser_fout") : "Kon nie jou boek laai nie — probeer later weer.");
+    }
   }
 }
 
-document.addEventListener("DOMContentLoaded", laai_leser);
+document.addEventListener("DOMContentLoaded", () => {
+  laai_leser();
+
+  document.getElementById("leser-vorige").addEventListener("click", () => wys_bladsy(huidige_bladsy - 1));
+  document.getElementById("leser-volgende").addEventListener("click", () => wys_bladsy(huidige_bladsy + 1));
+
+  document.getElementById("leser-bladsy-invoer").addEventListener("change", (ev) => {
+    const nommer = parseInt(ev.target.value, 10);
+    if (Number.isFinite(nommer)) wys_bladsy(nommer);
+  });
+
+  document.getElementById("leser-soek-vorm").addEventListener("submit", (ev) => {
+    ev.preventDefault();
+    soek_in_boek(document.getElementById("leser-soek-invoer").value);
+  });
+
+  document.addEventListener("keydown", (ev) => {
+    if (!pdf_dokument) return;
+    if (ev.key === "ArrowRight") wys_bladsy(huidige_bladsy + 1);
+    if (ev.key === "ArrowLeft") wys_bladsy(huidige_bladsy - 1);
+  });
+
+  window.addEventListener("resize", () => {
+    if (pdf_dokument) wys_bladsy(huidige_bladsy);
+  });
+});

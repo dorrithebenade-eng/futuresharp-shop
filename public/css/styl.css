@@ -286,6 +286,8 @@ body {
   padding: 20px 24px;
   background: var(--swart);
   color: var(--wit);
+  position: relative;
+  z-index: 35;
 }
 
 .mini-kop-inner {
@@ -408,6 +410,18 @@ body {
 
 .rekening-skakelaar:hover .rekening-epos {
   color: var(--teal);
+}
+
+.rekening-agtergrond {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 25;
+}
+
+.rekening-agtergrond.rekening-agtergrond-oop {
+  display: block;
 }
 
 .rekening-paneel {
@@ -1169,7 +1183,7 @@ body {
   margin-top: 24px;
 }
 
-/* ---------- Leser-bladsy (e-boek) ---------- */
+/* ---------- Leser-bladsy (e-boek, PDF.js) ---------- */
 
 .leser-wrap {
   max-width: 900px;
@@ -1187,10 +1201,103 @@ body {
   margin: 0;
 }
 
-.leser-raam {
+.leser-bekyker {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.leser-nutsbalk {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  background: var(--grys-lig);
+  padding: 10px 14px;
+}
+
+.leser-nutsbalk-groep {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.leser-nutsknoppie {
+  background: var(--wit);
+  border: 1px solid #D8D6D1;
+  font-size: 16px;
+  width: 34px;
+  height: 34px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.leser-nutsknoppie:hover { border-color: var(--teal); }
+
+.leser-bladsy-teller {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-liggaam);
+  font-size: 14px;
+  color: var(--grys-teks);
+}
+
+.leser-bladsy-invoer {
+  width: 56px;
+  padding: 6px 8px;
+  border: 1px solid #D8D6D1;
+  text-align: center;
+  font-family: var(--font-liggaam);
+  font-size: 14px;
+}
+
+.leser-soek-vorm {
+  display: flex;
+  gap: 8px;
+}
+
+.leser-soek-invoer {
+  padding: 8px 12px;
+  border: 1px solid #D8D6D1;
+  font-family: var(--font-liggaam);
+  font-size: 14px;
+  min-width: 160px;
+}
+
+.leser-voortgang-wrap {
   width: 100%;
-  height: 80vh;
-  border: 1px solid #E8E6E1;
+  height: 4px;
+  background: var(--grys-lig);
+}
+
+.leser-voortgang-balk {
+  height: 100%;
+  background: var(--teal);
+  width: 0%;
+  transition: width 0.2s ease;
+}
+
+.leser-soek-status {
+  font-family: var(--font-liggaam);
+  font-size: 13px;
+  color: var(--grys-teks);
+  min-height: 16px;
+}
+
+.leser-bladsy-omhulsel {
+  display: flex;
+  justify-content: center;
+  padding: 16px;
+  background: var(--grys-lig);
+  overflow-x: auto;
+}
+
+.leser-bladsy-omhulsel canvas {
+  max-width: 100%;
+  height: auto;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  background: var(--wit);
 }
 
 .terug-skakel-lig {

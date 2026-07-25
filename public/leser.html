@@ -24,12 +24,37 @@
   <main class="leser-wrap">
     <h1 class="leser-titel" id="leser-titel"></h1>
     <div id="leser-status" class="stelsel-boodskap" aria-live="polite"></div>
-    <iframe id="leser-raam" class="leser-raam" title="E-boek" hidden></iframe>
+
+    <div id="leser-bekyker" class="leser-bekyker" hidden>
+      <div class="leser-nutsbalk">
+        <div class="leser-nutsbalk-groep">
+          <button type="button" id="leser-vorige" class="leser-nutsknoppie" aria-label="Vorige bladsy">‹</button>
+          <span class="leser-bladsy-teller">
+            <input type="number" id="leser-bladsy-invoer" class="leser-bladsy-invoer" min="1" value="1">
+            <span data-i18n="leser_van">van</span>
+            <span id="leser-totaal-bladsye">—</span>
+          </span>
+          <button type="button" id="leser-volgende" class="leser-nutsknoppie" aria-label="Volgende bladsy">›</button>
+        </div>
+        <form id="leser-soek-vorm" class="leser-soek-vorm">
+          <input type="search" id="leser-soek-invoer" class="leser-soek-invoer" placeholder="Soek in boek…">
+          <button type="submit" class="leser-nutsknoppie" aria-label="Soek">🔍</button>
+        </form>
+      </div>
+      <div class="leser-voortgang-wrap">
+        <div id="leser-voortgang-balk" class="leser-voortgang-balk"></div>
+      </div>
+      <div id="leser-soek-status" class="leser-soek-status"></div>
+      <div class="leser-bladsy-omhulsel">
+        <canvas id="leser-canvas"></canvas>
+      </div>
+    </div>
   </main>
 
   <script src="js/taal.js"></script>
   <script src="js/identiteit.js"></script>
   <script src="js/nav-rekening.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.min.js"></script>
   <script src="js/leser.js"></script>
 </body>
 </html>

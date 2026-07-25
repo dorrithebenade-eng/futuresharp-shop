@@ -277,6 +277,10 @@ const WOORDEBOEK = {
   leser_nie_gekoop: { af: "Jy het nie hierdie e-boek gekoop nie.", en: "You haven't purchased this e-book." },
   leser_nog_nie_beskikbaar: { af: "Hierdie e-boek is nog nie beskikbaar nie.", en: "This e-book isn't available yet." },
   leser_fout: { af: "Kon nie jou boek laai nie — probeer later weer.", en: "Couldn't load your book — try again later." },
+  leser_van: { af: "van", en: "of" },
+  leser_soek_besig: { af: "Soek …", en: "Searching …" },
+  leser_soek_gevind: { af: "Gevind op bladsy", en: "Found on page" },
+  leser_soek_niks: { af: "Geen resultate gevind nie.", en: "No results found." },
 
   // Aanmeld / Registreer / Herstel (kopers)
   aanmeld_titel: { af: "Meld aan", en: "Log in" },
