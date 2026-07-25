@@ -1357,7 +1357,12 @@ body {
   padding: 16px;
   background: var(--grys-lig);
   overflow-x: auto;
-  touch-action: pan-y;
+  touch-action: pan-x pan-y;
+}
+
+.leser-bladsy-omhulsel--gezoem {
+  justify-content: flex-start;
+  touch-action: pan-x pan-y;
 }
 
 .leser-bladsy-omhulsel canvas {

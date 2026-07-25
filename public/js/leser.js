@@ -109,9 +109,21 @@ async function wys_bladsy(nommer) {
   stoor_vordering_debounced();
 }
 
+function is_ingezoem() {
+  return huidige_zoem > 1.02;
+}
+
+function opdateer_gebaar_modus() {
+  const omhulsel = document.querySelector(".leser-bladsy-omhulsel");
+  if (omhulsel) {
+    omhulsel.classList.toggle("leser-bladsy-omhulsel--gezoem", is_ingezoem());
+  }
+}
+
 function wys_zoem_persentasie() {
   const el = document.getElementById("leser-zoem-persentasie");
   if (el) el.textContent = `${Math.round(huidige_zoem * 100)}%`;
+  opdateer_gebaar_modus();
 }
 
 function stel_zoem(nuwe_zoem) {
@@ -280,7 +292,7 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
 
-        if (ev.touches.length === 1) {
+        if (ev.touches.length === 1 && !is_ingezoem()) {
           swipe_begin_x = ev.touches[0].clientX;
           swipe_begin_y = ev.touches[0].clientY;
         }
