@@ -435,15 +435,15 @@ body {
 }
 
 .nav-rekening-avatar {
-  width: clamp(26px, 2.2vw, 30px);
-  height: clamp(26px, 2.2vw, 30px);
+  width: clamp(30px, 2.6vw, 36px);
+  height: clamp(30px, 2.6vw, 36px);
   flex-shrink: 0;
   border-radius: 50%;
-  background: #3A3A3A;
-  border: 1px solid #4A4A4A;
-  color: #E8E6E1;
+  background: var(--teal);
+  border: none;
+  color: var(--wit);
   font-family: var(--font-liggaam);
-  font-size: clamp(10px, 0.9vw, 11px);
+  font-size: clamp(12px, 1.1vw, 14px);
   font-weight: 700;
   display: flex;
   align-items: center;
