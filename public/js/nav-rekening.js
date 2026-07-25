@@ -93,7 +93,8 @@
   }
 
   if (!sessie) {
-    plek.innerHTML = `<a href="aanmeld.html" class="mini-kop-rekening">Meld aan</a>`;
+    const meld_aan_teks = window.t ? window.t("meld_aan_knoppie") : "Meld aan";
+    plek.innerHTML = `<a href="aanmeld.html" class="mini-kop-rekening">${meld_aan_teks}</a>`;
     return;
   }
 
@@ -103,6 +104,9 @@
   // en paneel-aanmelding is doelbewus volledig geskeide sessies (sien
   // identiteit.js) — 'n personeel-rekening wat hier aanmeld, word in
   // hierdie konteks bloot as 'n gewone koper behandel.
+  const my_boeke_teks = window.t ? window.t("my_boeke_titel") : "My Boeke";
+  const meld_af_teks = window.t ? window.t("paneel_meld_af") : "Meld af";
+
   plek.innerHTML = `
     <div class="rekening-menu">
       <button type="button" id="rekening-skakelaar" class="rekening-skakelaar"
@@ -111,17 +115,25 @@
         <span class="rekening-pyltjie" aria-hidden="true">▾</span>
       </button>
       <div id="rekening-paneel" class="rekening-paneel" hidden>
-        <a href="my-boeke.html" class="rekening-paneel-skakel">My Boeke</a>
-        <button type="button" id="rekening-meld-af-knoppie" class="rekening-paneel-skakel rekening-paneel-knoppie">Meld af</button>
+        <a href="my-boeke.html" class="rekening-paneel-skakel">${my_boeke_teks}</a>
+        <button type="button" id="rekening-meld-af-knoppie" class="rekening-paneel-skakel rekening-paneel-knoppie">${meld_af_teks}</button>
       </div>
     </div>
   `;
+
+  // Skemer-agtergrond wanneer die paneel oop is — verhoed dat dit soos
+  // 'n los blokkie oor die res van die bladsy (bv. 'n helder hero-
+  // agtergrond) "hang"; dit lyk nou eerder soos 'n doelbewuste laag.
+  const rekening_agtergrond = document.createElement("div");
+  rekening_agtergrond.className = "rekening-agtergrond";
+  document.body.appendChild(rekening_agtergrond);
 
   const skakelaar = document.getElementById("rekening-skakelaar");
   const paneel = document.getElementById("rekening-paneel");
 
   function maak_paneel_toe() {
     paneel.hidden = true;
+    rekening_agtergrond.classList.remove("rekening-agtergrond-oop");
     skakelaar.setAttribute("aria-expanded", "false");
   }
   function wissel_paneel() {
@@ -129,6 +141,7 @@
       maak_paneel_toe();
     } else {
       paneel.hidden = false;
+      rekening_agtergrond.classList.add("rekening-agtergrond-oop");
       skakelaar.setAttribute("aria-expanded", "true");
     }
   }
@@ -137,6 +150,7 @@
     ev.stopPropagation();
     wissel_paneel();
   });
+  rekening_agtergrond.addEventListener("click", maak_paneel_toe);
   document.addEventListener("click", (ev) => {
     if (!paneel.hidden && !paneel.contains(ev.target) && ev.target !== skakelaar) {
       maak_paneel_toe();
