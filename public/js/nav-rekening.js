@@ -98,70 +98,28 @@
     return;
   }
 
-  // LET WEL: hierdie is die WINKEL-kant se rekening-menu — dit wys
+  // LET WEL: hierdie is die WINKEL-kant se rekening-nav — dit wys
   // ALTYD "My Boeke", nooit "Paneelbord" nie, ongeag of die
   // onderliggende rekening toevallig ook 'n personeel-rol het. Winkel-
   // en paneel-aanmelding is doelbewus volledig geskeide sessies (sien
   // identiteit.js) — 'n personeel-rekening wat hier aanmeld, word in
   // hierdie konteks bloot as 'n gewone koper behandel.
+  //
+  // Geen aftrekkieslys nie — e-pos, "My Boeke" en "Meld af" staan
+  // reguit langs mekaar in die kopbalk. Op smal skerms val hulle
+  // vanself in die bestaande mobiele skyfie-paneel (.mini-kop-regs)
+  // in, saam met Mandjie en die taal-wisselaar — geen aparte
+  // mobiel-hantering hier nodig nie.
   const my_boeke_teks = window.t ? window.t("my_boeke_titel") : "My Boeke";
   const meld_af_teks = window.t ? window.t("paneel_meld_af") : "Meld af";
 
   plek.innerHTML = `
-    <div class="rekening-menu">
-      <button type="button" id="rekening-skakelaar" class="rekening-skakelaar"
-              aria-haspopup="true" aria-expanded="false">
-        <span class="rekening-epos">${sessie.gebruiker.email}</span>
-        <span class="rekening-pyltjie" aria-hidden="true">▾</span>
-      </button>
-      <div id="rekening-paneel" class="rekening-paneel" hidden>
-        <a href="my-boeke.html" class="rekening-paneel-skakel">${my_boeke_teks}</a>
-        <button type="button" id="rekening-meld-af-knoppie" class="rekening-paneel-skakel rekening-paneel-knoppie">${meld_af_teks}</button>
-      </div>
+    <div class="nav-rekening-groep">
+      <span class="nav-rekening-epos">${sessie.gebruiker.email}</span>
+      <a href="my-boeke.html" class="nav-rekening-skakel">${my_boeke_teks}</a>
+      <button type="button" id="rekening-meld-af-knoppie" class="nav-rekening-skakel">${meld_af_teks}</button>
     </div>
   `;
-
-  // Skemer-agtergrond wanneer die paneel oop is — verhoed dat dit soos
-  // 'n los blokkie oor die res van die bladsy (bv. 'n helder hero-
-  // agtergrond) "hang"; dit lyk nou eerder soos 'n doelbewuste laag.
-  const rekening_agtergrond = document.createElement("div");
-  rekening_agtergrond.className = "rekening-agtergrond";
-  document.body.appendChild(rekening_agtergrond);
-
-  const skakelaar = document.getElementById("rekening-skakelaar");
-  const paneel = document.getElementById("rekening-paneel");
-
-  function maak_paneel_toe() {
-    paneel.hidden = true;
-    rekening_agtergrond.classList.remove("rekening-agtergrond-oop");
-    skakelaar.setAttribute("aria-expanded", "false");
-  }
-  function wissel_paneel() {
-    if (!paneel.hidden) {
-      maak_paneel_toe();
-    } else {
-      paneel.hidden = false;
-      rekening_agtergrond.classList.add("rekening-agtergrond-oop");
-      skakelaar.setAttribute("aria-expanded", "true");
-    }
-  }
-
-  skakelaar.addEventListener("click", (ev) => {
-    ev.stopPropagation();
-    wissel_paneel();
-  });
-  rekening_agtergrond.addEventListener("click", maak_paneel_toe);
-  document.addEventListener("click", (ev) => {
-    if (!paneel.hidden && !paneel.contains(ev.target) && ev.target !== skakelaar) {
-      maak_paneel_toe();
-    }
-  });
-  document.addEventListener("keydown", (ev) => {
-    if (ev.key === "Escape" && !paneel.hidden) {
-      maak_paneel_toe();
-      skakelaar.focus();
-    }
-  });
 
   document.getElementById("rekening-meld-af-knoppie").addEventListener("click", () => {
     identiteit_meld_af();
