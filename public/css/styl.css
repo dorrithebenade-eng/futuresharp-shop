@@ -328,14 +328,15 @@ body {
 
 .winkel-bannier {
   position: relative;
-  top: -22px;
+  top: -10px;
+  transform: translateX(72px) rotate(-3deg);
   max-width: 88%;
   padding: 12px 28px;
-  background: var(--koraal);
+  background: var(--amber);
   border: 2px solid var(--swart);
   border-radius: 999px;
   box-shadow: 4px 5px 0 rgba(23, 23, 23, 0.25);
-  color: var(--wit);
+  color: var(--swart);
   font-family: var(--font-liggaam);
   font-weight: 600;
   font-size: 14px;
@@ -347,11 +348,12 @@ body {
 
 @media (max-width: 640px) {
   .winkel-bannier {
-    top: -18px;
+    top: -8px;
+    transform: translateX(30px) rotate(-3deg);
     font-size: 13px;
     padding: 10px 18px;
     white-space: normal;
-    max-width: 92%;
+    max-width: 80%;
   }
 }
 
