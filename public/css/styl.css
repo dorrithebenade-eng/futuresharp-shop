@@ -331,7 +331,7 @@ body {
   width: 190px;
   height: 190px;
   top: 95px;
-  transform: translateX(115px) rotate(8deg);
+  transform: translateX(260px) rotate(8deg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -416,7 +416,7 @@ body {
     width: 145px;
     height: 145px;
     top: 60px;
-    transform: translateX(60px) rotate(8deg);
+    transform: translateX(150px) rotate(8deg);
   }
   .winkel-bannier-ster-teks--kort { font-size: 14px; }
   .winkel-bannier-ster-teks--medium { font-size: 11px; }
