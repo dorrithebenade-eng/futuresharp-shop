@@ -377,7 +377,7 @@ async function kry_outeur_gebruik_in_produkte(outeur_id) {
         ...((produk.formate && produk.formate.eboek && produk.formate.eboek.verdelings) || []),
         ...((produk.formate && produk.formate.harde_kopie && produk.formate.harde_kopie.verdelings) || []),
       ];
-      const in_gebruik = alle_verdelings.some((v) => v.outeur_id === outeur_id);
+      const in_gebruik = alle_verdelings.some((v) => v.rol_tipe === "outeur" && v.entiteit_id === outeur_id);
       if (in_gebruik) titels.push(produk.titel);
     });
 
@@ -598,29 +598,52 @@ async function hanteer_koepon_vorm_indiening(gebeurtenis) {
   }
 }
 
-// --- Verdeling-rye (herhaalbaar, meervoudige outeur-verdelings per formaat) ---
+// --- Verdeling-rye (herhaalbaar, meervoudige verdelings per formaat,
+// oor 5 moontlike rolle: Outeur, Vennoot, Ontwerp/Admin, Printing,
+// Aflewering) ---
 
-function bou_outeur_opsies_html(gekose_outeur_id) {
-  const geen_opsie = `<option value="">${t("paneel_kies_outeur")}</option>`;
-  const outeur_opsies = outeurs_kas
+const ROL_TIPE_KONFIG = {
+  outeur: { kas: () => outeurs_kas, idveld: "outeur_id", etiket: "Outeur" },
+  vennoot: { kas: () => (window.paneel_register_kas && window.paneel_register_kas["vennote"]) || [], idveld: "vennoot_id", etiket: "Vennoot" },
+  ontwerp_admin: { kas: () => (window.paneel_register_kas && window.paneel_register_kas["ontwerp-admin"]) || [], idveld: "ontwerp_admin_id", etiket: "Ontwerp/Admin" },
+  printing: { kas: () => (window.paneel_register_kas && window.paneel_register_kas["printing"]) || [], idveld: "printing_id", etiket: "Printing" },
+  aflewering: { kas: () => (window.paneel_register_kas && window.paneel_register_kas["aflewering"]) || [], idveld: "aflewering_id", etiket: "Aflewering" },
+};
+
+function bou_rol_tipe_opsies_html(gekose_rol_tipe) {
+  return Object.entries(ROL_TIPE_KONFIG)
     .map(
-      (outeur) =>
-        `<option value="${outeur.outeur_id}" ${outeur.outeur_id === gekose_outeur_id ? "selected" : ""}>${outeur.naam}</option>`
+      ([sleutel, kfg]) =>
+        `<option value="${sleutel}" ${sleutel === gekose_rol_tipe ? "selected" : ""}>${kfg.etiket}</option>`
     )
     .join("");
-  return geen_opsie + outeur_opsies;
+}
+
+function bou_entiteit_opsies_html(rol_tipe, gekose_entiteit_id) {
+  const konfig = ROL_TIPE_KONFIG[rol_tipe] || ROL_TIPE_KONFIG.outeur;
+  const geen_opsie = `<option value="">Kies ${konfig.etiket.toLowerCase()}</option>`;
+  const opsies = konfig
+    .kas()
+    .map(
+      (item) =>
+        `<option value="${item[konfig.idveld]}" ${item[konfig.idveld] === gekose_entiteit_id ? "selected" : ""}>${item.naam}</option>`
+    )
+    .join("");
+  return geen_opsie + opsies;
 }
 
 function skep_verdeling_ry_element(voorvoegsel, bestaande) {
   const ry = document.createElement("div");
   ry.className = "paneel-verdeling-ry veld-ry";
 
+  const gekose_rol_tipe = (bestaande && bestaande.rol_tipe) || "outeur";
   const gekose_tipe = (bestaande && bestaande.tipe) || "persentasie";
   const gekose_waarde = bestaande && Number.isFinite(bestaande.waarde) ? bestaande.waarde : "";
-  const gekose_outeur_id = (bestaande && bestaande.outeur_id) || "";
+  const gekose_entiteit_id = (bestaande && bestaande.entiteit_id) || "";
 
   ry.innerHTML = `
-    <select class="veld-invoer paneel-verdeling-outeur">${bou_outeur_opsies_html(gekose_outeur_id)}</select>
+    <select class="veld-invoer paneel-verdeling-rol-tipe">${bou_rol_tipe_opsies_html(gekose_rol_tipe)}</select>
+    <select class="veld-invoer paneel-verdeling-entiteit">${bou_entiteit_opsies_html(gekose_rol_tipe, gekose_entiteit_id)}</select>
     <select class="veld-invoer paneel-verdeling-tipe">
       <option value="persentasie" ${gekose_tipe === "persentasie" ? "selected" : ""}>${t("paneel_persentasie")}</option>
       <option value="vaste_bedrag" ${gekose_tipe === "vaste_bedrag" ? "selected" : ""}>${t("paneel_vaste_bedrag")}</option>
@@ -630,6 +653,14 @@ function skep_verdeling_ry_element(voorvoegsel, bestaande) {
   `;
 
   ry.querySelector(".paneel-verdeling-verwyder").addEventListener("click", () => ry.remove());
+
+  // Wanneer die rol verander, moet die entiteit-keuselys heeltemal
+  // herbou word (dit verwys nou na 'n ander register) — en die vorige
+  // keuse val outomaties weg, want dit hoort nie meer by die nuwe rol nie.
+  ry.querySelector(".paneel-verdeling-rol-tipe").addEventListener("change", (gebeurtenis) => {
+    const entiteitSelect = ry.querySelector(".paneel-verdeling-entiteit");
+    entiteitSelect.innerHTML = bou_entiteit_opsies_html(gebeurtenis.target.value, "");
+  });
 
   return ry;
 }
@@ -642,16 +673,22 @@ function voeg_verdeling_ry_by(voorvoegsel, bestaande) {
 function kry_verdelings_uit_vorm(voorvoegsel) {
   const lys = document.getElementById(`vorm-${voorvoegsel}-verdelings-lys`);
   return Array.from(lys.querySelectorAll(".paneel-verdeling-ry")).map((ry) => ({
-    outeur_id: ry.querySelector(".paneel-verdeling-outeur").value,
+    rol_tipe: ry.querySelector(".paneel-verdeling-rol-tipe").value,
+    entiteit_id: ry.querySelector(".paneel-verdeling-entiteit").value,
     tipe: ry.querySelector(".paneel-verdeling-tipe").value,
     waarde: parseFloat(ry.querySelector(".paneel-verdeling-waarde").value),
   }));
 }
 
+// Ververs elke reeds-oop verdeling-ry se entiteit-keuselys met die
+// nuutste register-data (bv. ná 'n nuwe vennoot bygevoeg is terwyl 'n
+// boek se vorm reeds oop was) — behou die huidige keuse waar moontlik.
 function ververs_alle_verdeling_aftrekkieslyste() {
-  document.querySelectorAll(".paneel-verdeling-outeur").forEach((keuselys) => {
-    const huidige_waarde = keuselys.value;
-    keuselys.innerHTML = bou_outeur_opsies_html(huidige_waarde);
+  document.querySelectorAll(".paneel-verdeling-ry").forEach((ry) => {
+    const rolSelect = ry.querySelector(".paneel-verdeling-rol-tipe");
+    const entiteitSelect = ry.querySelector(".paneel-verdeling-entiteit");
+    const huidige_waarde = entiteitSelect.value;
+    entiteitSelect.innerHTML = bou_entiteit_opsies_html(rolSelect.value, huidige_waarde);
   });
 }
 
@@ -836,6 +873,10 @@ function wys_verberg_formaat_velde() {
     document.getElementById("vorm-eboek-verdeling-aan").checked ? "block" : "none";
   document.getElementById("vorm-hardekopie-verdeling-velde").style.display =
     document.getElementById("vorm-hardekopie-verdeling-aan").checked ? "block" : "none";
+  document.getElementById("vorm-eboek-hosting-velde").style.display =
+    document.getElementById("vorm-eboek-hosting-aan").checked ? "block" : "none";
+  document.getElementById("vorm-hardekopie-hosting-velde").style.display =
+    document.getElementById("vorm-hardekopie-hosting-aan").checked ? "block" : "none";
 }
 
 function open_vorm_vir_toevoeging() {
@@ -871,6 +912,11 @@ function open_vorm_vir_wysig(produk) {
     document.getElementById("vorm-eboek-verdeling-aan").checked = true;
     eboek.verdelings.forEach((v) => voeg_verdeling_ry_by("eboek", v));
   }
+  if (eboek.hosting) {
+    document.getElementById("vorm-eboek-hosting-aan").checked = true;
+    document.getElementById("vorm-eboek-hosting-tipe").value = eboek.hosting.tipe || "persentasie";
+    document.getElementById("vorm-eboek-hosting-waarde").value = eboek.hosting.waarde || "";
+  }
 
   const hardeKopie = (produk.formate && produk.formate.harde_kopie) || {};
   document.getElementById("vorm-hardekopie-beskikbaar").checked = !!hardeKopie.beskikbaar;
@@ -880,6 +926,11 @@ function open_vorm_vir_wysig(produk) {
   if (hardeKopie.verdelings && hardeKopie.verdelings.length) {
     document.getElementById("vorm-hardekopie-verdeling-aan").checked = true;
     hardeKopie.verdelings.forEach((v) => voeg_verdeling_ry_by("hardekopie", v));
+  }
+  if (hardeKopie.hosting) {
+    document.getElementById("vorm-hardekopie-hosting-aan").checked = true;
+    document.getElementById("vorm-hardekopie-hosting-tipe").value = hardeKopie.hosting.tipe || "persentasie";
+    document.getElementById("vorm-hardekopie-hosting-waarde").value = hardeKopie.hosting.waarde || "";
   }
 
   wys_verberg_formaat_velde();
@@ -905,6 +956,17 @@ function bou_verdelings_vanuit_vorm(voorvoegsel) {
   return kry_verdelings_uit_vorm(voorvoegsel);
 }
 
+function kry_hosting_vanuit_vorm(voorvoegsel) {
+  const aan = document.getElementById(`vorm-${voorvoegsel}-hosting-aan`).checked;
+  if (!aan) return null;
+  const waarde = parseFloat(document.getElementById(`vorm-${voorvoegsel}-hosting-waarde`).value);
+  if (!Number.isFinite(waarde) || waarde <= 0) return null;
+  return {
+    tipe: document.getElementById(`vorm-${voorvoegsel}-hosting-tipe`).value,
+    waarde,
+  };
+}
+
 function bou_produk_liggaam() {
   const eboekBeskikbaar = document.getElementById("vorm-eboek-beskikbaar").checked;
   const hardeKopieBeskikbaar = document.getElementById("vorm-hardekopie-beskikbaar").checked;
@@ -922,6 +984,7 @@ function bou_produk_liggaam() {
         prys_sent: kry_rand_as_sent("vorm-eboek-prys"),
         vrystelling_datum: document.getElementById("vorm-eboek-vrystelling").value || null,
         verdelings: bou_verdelings_vanuit_vorm("eboek"),
+        hosting: kry_hosting_vanuit_vorm("eboek"),
         eboek_sleutel: document.getElementById("vorm-eboek-sleutel").value.trim() || null,
       },
       harde_kopie: {
@@ -930,6 +993,7 @@ function bou_produk_liggaam() {
         voorraad_status: document.getElementById("vorm-hardekopie-voorraad").value,
         vrystelling_datum: document.getElementById("vorm-hardekopie-vrystelling").value || null,
         verdelings: bou_verdelings_vanuit_vorm("hardekopie"),
+        hosting: kry_hosting_vanuit_vorm("hardekopie"),
       },
     },
   };
@@ -1117,6 +1181,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("vorm-hardekopie-beskikbaar").addEventListener("change", wys_verberg_formaat_velde);
   document.getElementById("vorm-eboek-verdeling-aan").addEventListener("change", wys_verberg_formaat_velde);
   document.getElementById("vorm-hardekopie-verdeling-aan").addEventListener("change", wys_verberg_formaat_velde);
+  document.getElementById("vorm-eboek-hosting-aan").addEventListener("change", wys_verberg_formaat_velde);
+  document.getElementById("vorm-hardekopie-hosting-aan").addEventListener("change", wys_verberg_formaat_velde);
   document.getElementById("vorm-omslag-lêer").addEventListener("change", hanteer_omslag_lêer_gekies);
   document.getElementById("vorm-eboek-lêer").addEventListener("change", hanteer_eboek_lêer_gekies);
 

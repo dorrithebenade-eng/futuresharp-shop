@@ -405,12 +405,27 @@
 
               <label class="paneel-wisselaar">
                 <input type="checkbox" id="vorm-eboek-verdeling-aan">
-                <span data-i18n="paneel_outeur_verdeling">Outeur-verdeling(s) (Paystack-subrekening) op hierdie formaat</span>
+                <span>Verdeling(s) (Outeur / Vennoot / Ontwerp-Admin / Printing / Aflewering)</span>
               </label>
 
               <div id="vorm-eboek-verdeling-velde" style="display:none;">
                 <div id="vorm-eboek-verdelings-lys" class="paneel-verdelings-lys"></div>
                 <button type="button" id="vorm-eboek-voeg-verdeling-by" class="terug-skakel" data-i18n="paneel_voeg_verdeling_by">+ Voeg verdeling by</button>
+              </div>
+
+              <label class="paneel-wisselaar">
+                <input type="checkbox" id="vorm-eboek-hosting-aan">
+                <span>Hosting (dokumentasie — bedrag bly heeltemal by die hoofrekening)</span>
+              </label>
+
+              <div id="vorm-eboek-hosting-velde" style="display:none;">
+                <div class="veld-ry">
+                  <select class="veld-invoer" id="vorm-eboek-hosting-tipe">
+                    <option value="persentasie">Persentasie (%)</option>
+                    <option value="vaste_bedrag">Vaste bedrag (R)</option>
+                  </select>
+                  <input type="number" class="veld-invoer" id="vorm-eboek-hosting-waarde" min="0" step="0.01" placeholder="Waarde">
+                </div>
               </div>
             </div>
           </fieldset>
@@ -443,12 +458,27 @@
 
               <label class="paneel-wisselaar">
                 <input type="checkbox" id="vorm-hardekopie-verdeling-aan">
-                <span data-i18n="paneel_outeur_verdeling">Outeur-verdeling(s) (Paystack-subrekening) op hierdie formaat</span>
+                <span>Verdeling(s) (Outeur / Vennoot / Ontwerp-Admin / Printing / Aflewering)</span>
               </label>
 
               <div id="vorm-hardekopie-verdeling-velde" style="display:none;">
                 <div id="vorm-hardekopie-verdelings-lys" class="paneel-verdelings-lys"></div>
                 <button type="button" id="vorm-hardekopie-voeg-verdeling-by" class="terug-skakel" data-i18n="paneel_voeg_verdeling_by">+ Voeg verdeling by</button>
+              </div>
+
+              <label class="paneel-wisselaar">
+                <input type="checkbox" id="vorm-hardekopie-hosting-aan">
+                <span>Hosting (dokumentasie — bedrag bly heeltemal by die hoofrekening)</span>
+              </label>
+
+              <div id="vorm-hardekopie-hosting-velde" style="display:none;">
+                <div class="veld-ry">
+                  <select class="veld-invoer" id="vorm-hardekopie-hosting-tipe">
+                    <option value="persentasie">Persentasie (%)</option>
+                    <option value="vaste_bedrag">Vaste bedrag (R)</option>
+                  </select>
+                  <input type="number" class="veld-invoer" id="vorm-hardekopie-hosting-waarde" min="0" step="0.01" placeholder="Waarde">
+                </div>
               </div>
             </div>
           </fieldset>

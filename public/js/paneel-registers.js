@@ -10,6 +10,7 @@
 const PANEEL_REGISTERS = [
   {
     sleutel: "vennote",
+    rol_tipe: "vennoot",
     idveld: "vennoot_id",
     kry_endpoint: "/.netlify/functions/kry-vennote",
     skep_endpoint: "/.netlify/functions/skep-vennoot",
@@ -23,6 +24,7 @@ const PANEEL_REGISTERS = [
   },
   {
     sleutel: "ontwerp-admin",
+    rol_tipe: "ontwerp_admin",
     idveld: "ontwerp_admin_id",
     kry_endpoint: "/.netlify/functions/kry-ontwerp-admin",
     skep_endpoint: "/.netlify/functions/skep-ontwerp-admin",
@@ -36,6 +38,7 @@ const PANEEL_REGISTERS = [
   },
   {
     sleutel: "printing",
+    rol_tipe: "printing",
     idveld: "printing_id",
     kry_endpoint: "/.netlify/functions/kry-printing",
     skep_endpoint: "/.netlify/functions/skep-printing",
@@ -49,6 +52,7 @@ const PANEEL_REGISTERS = [
   },
   {
     sleutel: "aflewering",
+    rol_tipe: "aflewering",
     idveld: "aflewering_id",
     kry_endpoint: "/.netlify/functions/kry-aflewering",
     skep_endpoint: "/.netlify/functions/skep-aflewering",
@@ -81,6 +85,11 @@ async function paneel_register_laai(reg) {
     const lys = data[reg.respons_veld] || [];
     window.paneel_register_kas[reg.sleutel] = lys;
     paneel_register_wys_lys(reg, lys);
+    // Ververs enige reeds-oop boek-verdeling-rye met die nuutste
+    // register-data (kom van paneelbord.js).
+    if (typeof ververs_alle_verdeling_aftrekkieslyste === "function") {
+      ververs_alle_verdeling_aftrekkieslyste();
+    }
   } catch (fout) {
     console.error(`Kon nie ${reg.sleutel} laai nie:`, fout);
     wrap.innerHTML = `<p class="stelsel-boodskap">${reg.fout_teks}</p>`;
@@ -206,7 +215,7 @@ async function paneel_register_kry_gebruik_in_produkte(reg, id) {
         ...((produk.formate && produk.formate.eboek && produk.formate.eboek.verdelings) || []),
         ...((produk.formate && produk.formate.harde_kopie && produk.formate.harde_kopie.verdelings) || []),
       ];
-      const in_gebruik = alle_verdelings.some((v) => String(v[reg.idveld]) === String(id));
+      const in_gebruik = alle_verdelings.some((v) => v.rol_tipe === reg.rol_tipe && v.entiteit_id === String(id));
       if (in_gebruik) titels.push(produk.titel);
     });
 
