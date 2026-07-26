@@ -158,14 +158,25 @@ body {
   position: relative;
 }
 
+body.winkel-bannier-aktief .katalogus-wrap {
+  padding-top: 260px;
+}
+
 .rooster {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
+@media (max-width: 640px) {
+  body.winkel-bannier-aktief .katalogus-wrap {
+    padding-top: 215px;
+  }
+}
+
 @media (max-width: 400px) {
   .katalogus-wrap { padding: 24px 16px 60px; }
+  body.winkel-bannier-aktief .katalogus-wrap { padding-top: 215px; }
 }
 
 /* ---------- Produk-kaart ---------- */
@@ -224,6 +235,54 @@ body {
   flex: 1;
   min-width: 0;
 }
+
+.kaart-etiket-ster-wrap {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 62px;
+  height: 62px;
+  transform: rotate(10deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.kaart-etiket-ster-wrap .ster-skaduwee-laag {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 100%;
+  height: 100%;
+}
+
+.kaart-etiket-ster-wrap .winkel-bannier-ster {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  stroke: var(--swart);
+  stroke-width: 4;
+}
+
+.kaart-etiket-ster-teks {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-opskrif);
+  font-weight: 800;
+  font-size: 9px;
+  line-height: 1.1;
+  color: var(--swart);
+  text-align: center;
+  max-width: 42px;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
+}
+
+.kaart-etiket-ster-teks--swart { color: var(--wit); }
 
 @media (max-width: 560px) {
   .kaart { flex-direction: column; }
@@ -330,7 +389,7 @@ body {
   position: relative;
   width: 190px;
   height: 190px;
-  top: 140px;
+  top: 60px;
   transform: translateX(185px) rotate(8deg);
   display: flex;
   align-items: center;

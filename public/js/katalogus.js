@@ -32,6 +32,42 @@ function formateer_prys_sent(sent) {
   return `R${(sent / 100).toFixed(2)}`;
 }
 
+// Gedeelde kleur-palet (dieselfde 4 opsies as die personeel-paneelbord se
+// kleur-swatches) — gebruik deur die winkel-bannier-ster ÉN die
+// boek-etiket-ster, sodat albei presies dieselfde tinte gebruik.
+const ETIKET_KLEUR_GRADIENTE = {
+  amber: ["#F5D484", "#F1BD43", "#BB9334"],
+  koraal: ["#F29279", "#EC5832", "#B84427"],
+  teal: ["#87C0B7", "#479F91", "#377C71"],
+  swart: ["#686868", "#171717", "#111111"],
+};
+
+const STER_POLIGOON_PUNTE =
+  "130.0,0.0 149.5,31.9 179.7,9.9 185.6,46.9 221.9,38.1 213.1,74.4 250.1,80.3 228.1,110.5 260.0,130.0 228.1,149.5 250.1,179.7 213.1,185.6 221.9,221.9 185.6,213.1 179.7,250.1 149.5,228.1 130.0,260.0 110.5,228.1 80.3,250.1 74.4,213.1 38.1,221.9 46.9,185.6 9.9,179.7 31.9,149.5 0.0,130.0 31.9,110.5 9.9,80.3 46.9,74.4 38.1,38.1 74.4,46.9 80.3,9.9 110.5,31.9";
+
+// Bou 'n gradiënt-gevulde ster-SVG (skaduwee + voorlaag) as HTML-string.
+// `gradient_id` moet uniek wees per instansie op die bladsy (verskeie
+// boek-kaarte kan gelyktydig 'n ster wys).
+function bou_gradient_ster_svg_html(kleur_klas, gradient_id) {
+  const kleur = ETIKET_KLEUR_GRADIENTE[kleur_klas] ? kleur_klas : "amber";
+  const [stop1, stop2, stop3] = ETIKET_KLEUR_GRADIENTE[kleur];
+  return `
+    <svg class="ster-skaduwee-laag" viewBox="0 0 260 260" aria-hidden="true">
+      <polygon points="${STER_POLIGOON_PUNTE}" />
+    </svg>
+    <svg class="winkel-bannier-ster" viewBox="0 0 260 260" aria-hidden="true">
+      <defs>
+        <linearGradient id="${gradient_id}" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="${stop1}" />
+          <stop offset="55%" stop-color="${stop2}" />
+          <stop offset="100%" stop-color="${stop3}" />
+        </linearGradient>
+      </defs>
+      <polygon fill="url(#${gradient_id})" points="${STER_POLIGOON_PUNTE}" />
+    </svg>
+  `;
+}
+
 function bou_kaart(produk, besit_stel) {
   const eboek = produk.formate && produk.formate.eboek;
   const hardeKopie = produk.formate && produk.formate.harde_kopie;
@@ -59,12 +95,22 @@ function bou_kaart(produk, besit_stel) {
     ? `<span class="kaart-besit-merker">${t("reeds_gekoop")}</span>`
     : "";
 
+  const etiketHtml = produk.etiket
+    ? `
+      <div class="kaart-etiket-ster-wrap" aria-hidden="true">
+        ${bou_gradient_ster_svg_html(produk.etiket.kleur, `gradient-etiket-${produk.slug}`)}
+        <span class="kaart-etiket-ster-teks${produk.etiket.kleur === "swart" ? " kaart-etiket-ster-teks--swart" : ""}">${produk.etiket.teks}</span>
+      </div>
+    `
+    : "";
+
   return `
     <article class="kaart">
       <span class="kaart-hoek" aria-hidden="true"></span>
       <div class="kaart-omslag-wrap">
         ${omslagHtml}
         ${besitMerkerHtml}
+        ${etiketHtml}
       </div>
       <div class="kaart-liggaam">
         <h3 class="kaart-titel">${produk.titel}</h3>
@@ -173,6 +219,7 @@ async function laai_winkel_bannier() {
     if (!resp.ok) return;
     const data = await resp.json();
     if (!data.aktief || !data.teks) return;
+    document.body.classList.add("winkel-bannier-aktief");
 
     const teks_lengte = data.teks.length;
     const grootte_klas = teks_lengte <= 18 ? "kort" : teks_lengte <= 28 ? "medium" : "lank";
