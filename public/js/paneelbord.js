@@ -9,6 +9,8 @@ const WYSIG_PRODUK_ENDPOINT = "/.netlify/functions/wysig-produk";
 const VERWYDER_PRODUK_ENDPOINT = "/.netlify/functions/verwyder-produk";
 const KRY_OUTEURS_ENDPOINT = "/.netlify/functions/kry-outeurs";
 const SKEP_OUTEUR_ENDPOINT = "/.netlify/functions/skep-outeur";
+const WYSIG_OUTEUR_ENDPOINT = "/.netlify/functions/wysig-outeur";
+const SKRAP_OUTEUR_ENDPOINT = "/.netlify/functions/skrap-outeur";
 const LAAI_EBOEK_OP_ENDPOINT = "/.netlify/functions/laai-eboek-op";
 const KRY_KENNISGEWING_ENDPOINT = "/.netlify/functions/kry-kennisgewing";
 const STOOR_KENNISGEWING_ENDPOINT = "/.netlify/functions/stoor-kennisgewing";
@@ -259,6 +261,10 @@ async function laai_outeurs() {
   }
 }
 
+// null = nuwe outeur word bygevoeg; andersins die outeur_id wat tans
+// gewysig word.
+let outeur_wysig_toestand = null;
+
 function wys_outeurs_lys(outeurs) {
   const wrap = document.getElementById("paneel-outeurs-lys");
 
@@ -275,21 +281,44 @@ function wys_outeurs_lys(outeurs) {
             <strong>${outeur.naam}</strong>
             <span class="paneel-produk-outeur">${outeur.subrekening_kode}</span>
           </div>
+          <div class="paneel-produk-aksies">
+            <button class="terug-skakel paneel-outeur-wysig-knoppie" data-id="${outeur.outeur_id}">${t("paneel_wysig")}</button>
+            <button class="terug-skakel paneel-skrap-knoppie paneel-outeur-skrap-knoppie" data-id="${outeur.outeur_id}">${t("paneel_skrap")}</button>
+          </div>
         </div>
       `
     )
     .join("");
+
+  wrap.querySelectorAll(".paneel-outeur-wysig-knoppie").forEach((knoppie) => {
+    knoppie.addEventListener("click", () => {
+      const outeur = outeurs.find((o) => o.outeur_id === knoppie.dataset.id);
+      if (outeur) open_outeur_vorm(outeur);
+    });
+  });
+
+  wrap.querySelectorAll(".paneel-outeur-skrap-knoppie").forEach((knoppie) => {
+    knoppie.addEventListener("click", () => {
+      const outeur = outeurs.find((o) => o.outeur_id === knoppie.dataset.id);
+      if (outeur) skrap_outeur(outeur, knoppie);
+    });
+  });
 }
 
-function open_outeur_vorm() {
-  document.getElementById("outeur-vorm-naam").value = "";
-  document.getElementById("outeur-vorm-subrekening").value = "";
+function open_outeur_vorm(outeur) {
+  outeur_wysig_toestand = outeur ? outeur.outeur_id : null;
+  document.getElementById("outeur-vorm-naam").value = outeur ? outeur.naam : "";
+  document.getElementById("outeur-vorm-subrekening").value = outeur ? outeur.subrekening_kode : "";
   document.getElementById("paneel-outeur-vorm-foute").style.display = "none";
+  document.getElementById("paneel-outeur-vorm-indien").textContent = outeur
+    ? "Stoor wysigings"
+    : t("paneel_voeg_outeur_by_knoppie");
   document.getElementById("paneel-outeur-vorm-afdeling").style.display = "block";
   document.getElementById("paneel-outeur-vorm-afdeling").scrollIntoView({ behavior: "smooth" });
 }
 
 function sluit_outeur_vorm() {
+  outeur_wysig_toestand = null;
   document.getElementById("paneel-outeur-vorm-afdeling").style.display = "none";
 }
 
@@ -300,16 +329,20 @@ async function hanteer_outeur_vorm_indiening(gebeurtenis) {
 
   const naam = document.getElementById("outeur-vorm-naam").value.trim();
   const subrekening_kode = document.getElementById("outeur-vorm-subrekening").value.trim();
+  const wysig_id = outeur_wysig_toestand;
 
   const knoppie = document.getElementById("paneel-outeur-vorm-indien");
   knoppie.disabled = true;
   knoppie.textContent = t("besig");
 
   try {
-    const resp = await fetch(SKEP_OUTEUR_ENDPOINT, {
+    const endpoint = wysig_id ? WYSIG_OUTEUR_ENDPOINT : SKEP_OUTEUR_ENDPOINT;
+    const liggaam = wysig_id ? { outeur_id: wysig_id, naam, subrekening_kode } : { naam, subrekening_kode };
+
+    const resp = await fetch(endpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...kry_outorisasie_kop() },
-      body: JSON.stringify({ naam, subrekening_kode }),
+      body: JSON.stringify(liggaam),
     });
 
     if (!resp.ok) {
@@ -325,7 +358,71 @@ async function hanteer_outeur_vorm_indiening(gebeurtenis) {
     foutWrap.style.display = "block";
   } finally {
     knoppie.disabled = false;
-    knoppie.textContent = t("paneel_voeg_outeur_by_knoppie");
+    knoppie.textContent = wysig_id ? "Stoor wysigings" : t("paneel_voeg_outeur_by_knoppie");
+  }
+}
+
+// Kyk of hierdie outeur reeds op enige boek se verdeling gebruik word —
+// waarsku net, blokkeer nie (soos deur Dorrithé bevestig).
+async function kry_outeur_gebruik_in_produkte(outeur_id) {
+  try {
+    const resp = await fetch(ALLE_PRODUKTE_ENDPOINT, { headers: kry_outorisasie_kop() });
+    if (!resp.ok) return [];
+    const data = await resp.json();
+    const produkte = data.produkte || [];
+
+    const titels = [];
+    produkte.forEach((produk) => {
+      const alle_verdelings = [
+        ...((produk.formate && produk.formate.eboek && produk.formate.eboek.verdelings) || []),
+        ...((produk.formate && produk.formate.harde_kopie && produk.formate.harde_kopie.verdelings) || []),
+      ];
+      const in_gebruik = alle_verdelings.some((v) => v.outeur_id === outeur_id);
+      if (in_gebruik) titels.push(produk.titel);
+    });
+
+    return titels;
+  } catch (fout) {
+    console.error("Kon nie outeur-gebruik nagaan nie:", fout);
+    return [];
+  }
+}
+
+async function skrap_outeur(outeur, knoppie) {
+  knoppie.disabled = true;
+
+  const titels = await kry_outeur_gebruik_in_produkte(outeur.outeur_id);
+
+  let bevestig_teks = `Skrap "${outeur.naam}"?`;
+  if (titels.length) {
+    bevestig_teks =
+      `Let op: "${outeur.naam}" word tans gebruik in: ${titels.join(", ")}.\n\n` +
+      `Skrapping sal NIE daardie boek se verdeling outomaties verwyder nie — gaan dit self na.\n\n` +
+      `Wil jy steeds "${outeur.naam}" skrap?`;
+  }
+
+  if (!window.confirm(bevestig_teks)) {
+    knoppie.disabled = false;
+    return;
+  }
+
+  try {
+    const resp = await fetch(SKRAP_OUTEUR_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...kry_outorisasie_kop() },
+      body: JSON.stringify({ outeur_id: outeur.outeur_id }),
+    });
+
+    if (!resp.ok) {
+      const teks = await resp.text();
+      throw new Error(teks || `Status ${resp.status}`);
+    }
+
+    laai_outeurs();
+  } catch (fout) {
+    console.error("Kon nie outeur skrap nie:", fout);
+    alert(`Kon nie skrap nie: ${fout.message}`);
+    knoppie.disabled = false;
   }
 }
 
@@ -1024,7 +1121,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("vorm-eboek-lêer").addEventListener("change", hanteer_eboek_lêer_gekies);
 
   // Outeurs
-  document.getElementById("paneel-voeg-outeur-by-knoppie").addEventListener("click", open_outeur_vorm);
+  document.getElementById("paneel-voeg-outeur-by-knoppie").addEventListener("click", () => open_outeur_vorm(null));
   document.getElementById("paneel-outeur-vorm-kanselleer").addEventListener("click", sluit_outeur_vorm);
   document.getElementById("paneel-outeur-vorm").addEventListener("submit", hanteer_outeur_vorm_indiening);
 
