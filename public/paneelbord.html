@@ -107,6 +107,10 @@
           <button type="button" class="paneel-kieslys-item aktief" data-afdeling="katalogus" data-i18n="paneel_katalogus_titel">Katalogus</button>
           <button type="button" class="paneel-kieslys-item" data-afdeling="winkel-bannier" data-i18n="paneel_kennisgewing_titel">Winkel-bannier</button>
           <button type="button" class="paneel-kieslys-item" data-afdeling="outeurs" data-i18n="paneel_outeurs_titel">Outeurs</button>
+          <button type="button" class="paneel-kieslys-item" data-afdeling="vennote">Vennote</button>
+          <button type="button" class="paneel-kieslys-item" data-afdeling="ontwerp-admin">Ontwerp/Admin</button>
+          <button type="button" class="paneel-kieslys-item" data-afdeling="printing">Printing</button>
+          <button type="button" class="paneel-kieslys-item" data-afdeling="aflewering">Aflewering</button>
           <button type="button" class="paneel-kieslys-item" data-afdeling="koepons" data-i18n="paneel_koepons_titel">Koepons</button>
         </nav>
 
@@ -164,6 +168,110 @@
 
             <button type="submit" id="paneel-outeur-vorm-indien" class="kaart-aksie paneel-vorm-indien" data-i18n="paneel_voeg_outeur_by_knoppie">+ Voeg outeur by</button>
             <button type="button" id="paneel-outeur-vorm-kanselleer" class="terug-skakel paneel-vorm-kanselleer" type="button" data-i18n="paneel_kanselleer">✕ Kanselleer</button>
+          </form>
+        </div>
+      </section>
+
+      <section class="paneel-afdeling" data-afdeling-inhoud="vennote">
+        <div class="paneel-afdeling-kop">
+          <h2 class="paneel-afdeling-titel">Vennote</h2>
+          <button id="paneel-voeg-vennoot-by-knoppie" class="kaart-aksie paneel-voeg-by-knoppie" type="button">+ Voeg vennoot by</button>
+        </div>
+        <p class="paneel-hulp-teks">Voeg elke vennoot hier EEN KEER by (naam + Paystack-subrekening-kode) — kies hulle daarna uit 'n lys wanneer jy 'n boek se verdeling opstel.</p>
+        <div id="paneel-vennote-lys">
+          <p class="stelsel-boodskap">Vennote word gelaai …</p>
+        </div>
+
+        <div id="paneel-vennoot-vorm-afdeling" style="display:none;">
+          <form id="paneel-vennoot-vorm">
+            <label class="veld-etiket" for="vennoot-vorm-naam"><span>Naam</span> <span class="veld-verplig">(verplig)</span></label>
+            <input type="text" id="vennoot-vorm-naam" class="veld-invoer" required>
+
+            <label class="veld-etiket" for="vennoot-vorm-subrekening"><span>Subrekening-kode (ACCT_...)</span> <span class="veld-verplig">(verplig)</span></label>
+            <input type="text" id="vennoot-vorm-subrekening" class="veld-invoer" placeholder="ACCT_xxxxxxxxxx" required>
+
+            <div id="paneel-vennoot-vorm-foute" class="vb-foute" style="display:none;"></div>
+
+            <button type="submit" id="paneel-vennoot-vorm-indien" class="kaart-aksie paneel-vorm-indien">+ Voeg vennoot by</button>
+            <button type="button" id="paneel-vennoot-vorm-kanselleer" class="terug-skakel paneel-vorm-kanselleer">✕ Kanselleer</button>
+          </form>
+        </div>
+      </section>
+
+      <section class="paneel-afdeling" data-afdeling-inhoud="ontwerp-admin">
+        <div class="paneel-afdeling-kop">
+          <h2 class="paneel-afdeling-titel">Ontwerp/Admin</h2>
+          <button id="paneel-voeg-ontwerp-admin-by-knoppie" class="kaart-aksie paneel-voeg-by-knoppie" type="button">+ Voeg by</button>
+        </div>
+        <p class="paneel-hulp-teks">Voeg elke Ontwerp/Admin-inskrywing hier EEN KEER by (naam + Paystack-subrekening-kode).</p>
+        <div id="paneel-ontwerp-admin-lys">
+          <p class="stelsel-boodskap">Word gelaai …</p>
+        </div>
+
+        <div id="paneel-ontwerp-admin-vorm-afdeling" style="display:none;">
+          <form id="paneel-ontwerp-admin-vorm">
+            <label class="veld-etiket" for="ontwerp-admin-vorm-naam"><span>Naam</span> <span class="veld-verplig">(verplig)</span></label>
+            <input type="text" id="ontwerp-admin-vorm-naam" class="veld-invoer" required>
+
+            <label class="veld-etiket" for="ontwerp-admin-vorm-subrekening"><span>Subrekening-kode (ACCT_...)</span> <span class="veld-verplig">(verplig)</span></label>
+            <input type="text" id="ontwerp-admin-vorm-subrekening" class="veld-invoer" placeholder="ACCT_xxxxxxxxxx" required>
+
+            <div id="paneel-ontwerp-admin-vorm-foute" class="vb-foute" style="display:none;"></div>
+
+            <button type="submit" id="paneel-ontwerp-admin-vorm-indien" class="kaart-aksie paneel-vorm-indien">+ Voeg by</button>
+            <button type="button" id="paneel-ontwerp-admin-vorm-kanselleer" class="terug-skakel paneel-vorm-kanselleer">✕ Kanselleer</button>
+          </form>
+        </div>
+      </section>
+
+      <section class="paneel-afdeling" data-afdeling-inhoud="printing">
+        <div class="paneel-afdeling-kop">
+          <h2 class="paneel-afdeling-titel">Printing</h2>
+          <button id="paneel-voeg-printing-by-knoppie" class="kaart-aksie paneel-voeg-by-knoppie" type="button">+ Voeg by</button>
+        </div>
+        <p class="paneel-hulp-teks">Voeg elke Printing-inskrywing hier EEN KEER by (naam + Paystack-subrekening-kode).</p>
+        <div id="paneel-printing-lys">
+          <p class="stelsel-boodskap">Word gelaai …</p>
+        </div>
+
+        <div id="paneel-printing-vorm-afdeling" style="display:none;">
+          <form id="paneel-printing-vorm">
+            <label class="veld-etiket" for="printing-vorm-naam"><span>Naam</span> <span class="veld-verplig">(verplig)</span></label>
+            <input type="text" id="printing-vorm-naam" class="veld-invoer" required>
+
+            <label class="veld-etiket" for="printing-vorm-subrekening"><span>Subrekening-kode (ACCT_...)</span> <span class="veld-verplig">(verplig)</span></label>
+            <input type="text" id="printing-vorm-subrekening" class="veld-invoer" placeholder="ACCT_xxxxxxxxxx" required>
+
+            <div id="paneel-printing-vorm-foute" class="vb-foute" style="display:none;"></div>
+
+            <button type="submit" id="paneel-printing-vorm-indien" class="kaart-aksie paneel-vorm-indien">+ Voeg by</button>
+            <button type="button" id="paneel-printing-vorm-kanselleer" class="terug-skakel paneel-vorm-kanselleer">✕ Kanselleer</button>
+          </form>
+        </div>
+      </section>
+
+      <section class="paneel-afdeling" data-afdeling-inhoud="aflewering">
+        <div class="paneel-afdeling-kop">
+          <h2 class="paneel-afdeling-titel">Aflewering</h2>
+          <button id="paneel-voeg-aflewering-by-knoppie" class="kaart-aksie paneel-voeg-by-knoppie" type="button">+ Voeg by</button>
+        </div>
+        <p class="paneel-hulp-teks">Voeg elke Aflewering-inskrywing hier EEN KEER by (naam + Paystack-subrekening-kode).</p>
+        <div id="paneel-aflewering-lys">
+          <p class="stelsel-boodskap">Word gelaai …</p>
+        </div>
+
+        <div id="paneel-aflewering-vorm-afdeling" style="display:none;">
+          <form id="paneel-aflewering-vorm">
+            <label class="veld-etiket" for="aflewering-vorm-naam"><span>Naam</span> <span class="veld-verplig">(verplig)</span></label>
+            <input type="text" id="aflewering-vorm-naam" class="veld-invoer" required>
+
+            <label class="veld-etiket" for="aflewering-vorm-subrekening"><span>Subrekening-kode (ACCT_...)</span> <span class="veld-verplig">(verplig)</span></label>
+            <input type="text" id="aflewering-vorm-subrekening" class="veld-invoer" placeholder="ACCT_xxxxxxxxxx" required>
+
+            <div id="paneel-aflewering-vorm-foute" class="vb-foute" style="display:none;"></div>
+
+            <button type="submit" id="paneel-aflewering-vorm-indien" class="kaart-aksie paneel-vorm-indien">+ Voeg by</button>
+            <button type="button" id="paneel-aflewering-vorm-kanselleer" class="terug-skakel paneel-vorm-kanselleer">✕ Kanselleer</button>
           </form>
         </div>
       </section>
@@ -359,6 +467,7 @@
 
   <script src="js/taal.js"></script>
   <script src="js/paneelbord.js"></script>
+  <script src="js/paneel-registers.js"></script>
   <script src="js/paneel-kieslys.js"></script>
 </body>
 </html>
