@@ -99,6 +99,26 @@
 
       <section class="paneel-afdeling">
         <div class="paneel-afdeling-kop">
+          <h2 class="paneel-afdeling-titel" data-i18n="paneel_kennisgewing_titel">Winkel-bannier</h2>
+        </div>
+        <p class="paneel-hulp-teks" data-i18n="paneel_kennisgewing_hulp">'n Kort kennisgewing wat oor die onderkant van die tuisblad se hero wys — vir enigiets algemeens (nie aan 'n spesifieke boek gekoppel nie). Net EEN bannier op 'n slag.</p>
+        <form id="paneel-kennisgewing-vorm">
+          <label class="veld-etiket" for="kennisgewing-teks"><span data-i18n="paneel_kennisgewing_teks_etiket">Bannier-teks</span></label>
+          <input type="text" id="kennisgewing-teks" class="veld-invoer" maxlength="140" placeholder="Bv. Nuwe outeur sluit binnekort by ons aan!">
+
+          <label class="paneel-wisselaar-ry">
+            <input type="checkbox" id="kennisgewing-aktief">
+            <span data-i18n="paneel_kennisgewing_aktief_etiket">Wys op die tuisblad</span>
+          </label>
+
+          <div id="paneel-kennisgewing-foute" class="vb-foute" style="display:none;"></div>
+
+          <button type="submit" id="paneel-kennisgewing-stoor" class="kaart-aksie paneel-vorm-indien" data-i18n="paneel_kennisgewing_stoor_knoppie">Stoor bannier</button>
+        </form>
+      </section>
+
+      <section class="paneel-afdeling">
+        <div class="paneel-afdeling-kop">
           <h2 class="paneel-afdeling-titel" data-i18n="paneel_katalogus_titel">Katalogus</h2>
           <button id="paneel-voeg-by-knoppie" class="kaart-aksie paneel-voeg-by-knoppie" type="button" data-i18n="paneel_voeg_produk_by_knoppie">+ Voeg produk by</button>
         </div>
@@ -129,6 +149,74 @@
 
             <button type="submit" id="paneel-outeur-vorm-indien" class="kaart-aksie paneel-vorm-indien" data-i18n="paneel_voeg_outeur_by_knoppie">+ Voeg outeur by</button>
             <button type="button" id="paneel-outeur-vorm-kanselleer" class="terug-skakel paneel-vorm-kanselleer" type="button" data-i18n="paneel_kanselleer">✕ Kanselleer</button>
+          </form>
+        </div>
+      </section>
+
+      <section class="paneel-afdeling">
+        <div class="paneel-afdeling-kop">
+          <h2 class="paneel-afdeling-titel" data-i18n="paneel_koepons_titel">Koepons</h2>
+          <button id="paneel-voeg-koepon-by-knoppie" class="kaart-aksie paneel-voeg-by-knoppie" type="button" data-i18n="paneel_voeg_koepon_by_knoppie">+ Voeg koepon by</button>
+        </div>
+        <div id="paneel-koepons-lys">
+          <p class="stelsel-boodskap" data-i18n="paneel_koepons_laai">Koepons word gelaai …</p>
+        </div>
+
+        <div id="paneel-koepon-vorm-afdeling" style="display:none;">
+          <form id="paneel-koepon-vorm">
+            <label class="veld-etiket" for="koepon-vorm-kode"><span data-i18n="paneel_koepon_kode_etiket">Kode</span></label>
+            <div class="paneel-kode-ry">
+              <input type="text" id="koepon-vorm-kode" class="veld-invoer" placeholder="Leeg = outomaties gegenereer" style="text-transform:uppercase;">
+              <button type="button" id="koepon-vorm-genereer" class="terug-skakel" data-i18n="paneel_koepon_genereer_knoppie">Genereer</button>
+            </div>
+
+            <label class="veld-etiket" for="koepon-vorm-tipe"><span data-i18n="paneel_koepon_tipe_etiket">Tipe</span></label>
+            <select id="koepon-vorm-tipe" class="veld-invoer">
+              <option value="gratis" data-i18n="paneel_koepon_tipe_gratis">Gratis-ontsluiting (geen betaling)</option>
+              <option value="afslag" data-i18n="paneel_koepon_tipe_afslag">Afslag (verminderde betaling)</option>
+            </select>
+
+            <div id="koepon-vorm-afslag-velde" style="display:none;">
+              <label class="veld-etiket" for="koepon-vorm-afslag-tipe"><span data-i18n="paneel_koepon_afslag_tipe_etiket">Afslag-tipe</span></label>
+              <select id="koepon-vorm-afslag-tipe" class="veld-invoer">
+                <option value="persentasie" data-i18n="paneel_koepon_persentasie">Persentasie (%)</option>
+                <option value="vaste_bedrag" data-i18n="paneel_koepon_vaste_bedrag">Vaste bedrag (R)</option>
+              </select>
+
+              <label class="veld-etiket" for="koepon-vorm-afslag-waarde"><span data-i18n="paneel_koepon_afslag_waarde_etiket">Afslag-waarde</span></label>
+              <input type="number" id="koepon-vorm-afslag-waarde" class="veld-invoer" min="0" step="0.01">
+            </div>
+
+            <label class="veld-etiket" for="koepon-vorm-produk"><span data-i18n="paneel_koepon_produk_etiket">Boek</span></label>
+            <select id="koepon-vorm-produk" class="veld-invoer">
+              <option value="" data-i18n="paneel_koepon_enige_boek">Enige boek</option>
+            </select>
+
+            <label class="veld-etiket" for="koepon-vorm-formaat"><span data-i18n="paneel_koepon_formaat_etiket">Formaat</span></label>
+            <select id="koepon-vorm-formaat" class="veld-invoer">
+              <option value="albei" data-i18n="paneel_koepon_formaat_albei">Albei</option>
+              <option value="eboek" data-i18n="paneel_koepon_formaat_eboek">E-boek</option>
+              <option value="harde_kopie" data-i18n="paneel_koepon_formaat_hardekopie">Harde kopie</option>
+            </select>
+
+            <label class="veld-etiket" for="koepon-vorm-maks-gebruike"><span data-i18n="paneel_koepon_maks_gebruike_etiket">Maksimum aantal gebruike</span></label>
+            <input type="number" id="koepon-vorm-maks-gebruike" class="veld-invoer" min="1" step="1" value="1">
+
+            <label class="veld-etiket" for="koepon-vorm-verval"><span data-i18n="paneel_koepon_verval_etiket">Vervaldatum (opsioneel)</span></label>
+            <input type="date" id="koepon-vorm-verval" class="veld-invoer">
+
+            <label class="veld-etiket" for="koepon-vorm-outeur"><span data-i18n="paneel_koepon_outeur_etiket">Outeur (opsioneel)</span></label>
+            <select id="koepon-vorm-outeur" class="veld-invoer">
+              <option value="" data-i18n="paneel_koepon_geen_outeur">Geen (winkel self)</option>
+            </select>
+
+            <label class="veld-etiket" for="koepon-vorm-nota"><span data-i18n="paneel_koepon_nota_etiket">Interne nota (opsioneel)</span></label>
+            <input type="text" id="koepon-vorm-nota" class="veld-invoer" maxlength="300" placeholder="Bv. resensie-eksemplaar vir ...">
+
+            <div id="paneel-koepon-vorm-foute" class="vb-foute" style="display:none;"></div>
+
+            <button type="submit" id="paneel-koepon-vorm-indien" class="kaart-aksie paneel-vorm-indien" data-i18n="paneel_voeg_koepon_by_knoppie">+ Voeg koepon by</button>
+            <button type="button" id="paneel-koepon-vorm-kanselleer" class="terug-skakel paneel-vorm-kanselleer" data-i18n="paneel_kanselleer">✕ Kanselleer</button>
           </form>
         </div>
       </section>

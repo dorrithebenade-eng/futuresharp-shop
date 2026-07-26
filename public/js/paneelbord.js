@@ -10,11 +10,17 @@ const VERWYDER_PRODUK_ENDPOINT = "/.netlify/functions/verwyder-produk";
 const KRY_OUTEURS_ENDPOINT = "/.netlify/functions/kry-outeurs";
 const SKEP_OUTEUR_ENDPOINT = "/.netlify/functions/skep-outeur";
 const LAAI_EBOEK_OP_ENDPOINT = "/.netlify/functions/laai-eboek-op";
+const KRY_KENNISGEWING_ENDPOINT = "/.netlify/functions/kry-kennisgewing";
+const STOOR_KENNISGEWING_ENDPOINT = "/.netlify/functions/stoor-kennisgewing";
+const SKEP_KOEPON_ENDPOINT = "/.netlify/functions/skep-koepon";
+const KRY_KOEPONS_ENDPOINT = "/.netlify/functions/kry-koepons";
+const WYSIG_KOEPON_ENDPOINT = "/.netlify/functions/wysig-koepon";
 
 // In-geheue kas van outeurs — gevul deur laai_outeurs(), gebruik om die
 // verdeling-aftrekkieslyste op elke boek-vorm te bou sonder om elke keer
 // weer te moet gaan haal.
 let outeurs_kas = [];
+let produkte_kas = [];
 
 function formateer_prys_sent(sent) {
   return `R${(sent / 100).toFixed(2)}`;
@@ -51,6 +57,8 @@ function wys_aangemeld_toestand(gebruiker) {
   document.getElementById("paneel-hoof").style.visibility = "visible";
   laai_produkte();
   laai_outeurs();
+  laai_kennisgewing();
+  laai_koepons();
 }
 
 function wys_afgemeld_toestand() {
@@ -67,6 +75,55 @@ function kry_outorisasie_kop() {
   return sessie ? { Authorization: `Bearer ${sessie.access_token}` } : {};
 }
 
+// --- Winkel-bannier ---
+
+async function laai_kennisgewing() {
+  try {
+    const resp = await fetch(KRY_KENNISGEWING_ENDPOINT);
+    if (!resp.ok) throw new Error(`Status ${resp.status}`);
+    const data = await resp.json();
+    document.getElementById("kennisgewing-teks").value = data.teks || "";
+    document.getElementById("kennisgewing-aktief").checked = Boolean(data.aktief);
+  } catch (fout) {
+    console.warn("Kon nie winkel-bannier laai nie:", fout);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const kennisgewing_vorm = document.getElementById("paneel-kennisgewing-vorm");
+  if (!kennisgewing_vorm) return;
+
+  kennisgewing_vorm.addEventListener("submit", async (gebeurtenis) => {
+    gebeurtenis.preventDefault();
+    const foutWrap = document.getElementById("paneel-kennisgewing-foute");
+    foutWrap.style.display = "none";
+
+    const stoor_knoppie = document.getElementById("paneel-kennisgewing-stoor");
+    stoor_knoppie.disabled = true;
+
+    try {
+      const resp = await fetch(STOOR_KENNISGEWING_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...kry_outorisasie_kop() },
+        body: JSON.stringify({
+          teks: document.getElementById("kennisgewing-teks").value,
+          aktief: document.getElementById("kennisgewing-aktief").checked,
+        }),
+      });
+
+      if (!resp.ok) {
+        const data = await resp.json().catch(() => null);
+        throw new Error((data && data.fout) || `Status ${resp.status}`);
+      }
+    } catch (fout) {
+      foutWrap.textContent = fout.message || "Kon nie bannier stoor nie";
+      foutWrap.style.display = "block";
+    } finally {
+      stoor_knoppie.disabled = false;
+    }
+  });
+});
+
 // --- Produkte-lys ---
 
 async function laai_produkte() {
@@ -77,6 +134,7 @@ async function laai_produkte() {
     const resp = await fetch(ALLE_PRODUKTE_ENDPOINT, { headers: kry_outorisasie_kop() });
     if (!resp.ok) throw new Error(`Status ${resp.status}`);
     const data = await resp.json();
+    produkte_kas = data.produkte || [];
     wys_produkte_lys(data.produkte || []);
   } catch (fout) {
     console.error("Kon nie produkte laai nie:", fout);
@@ -268,6 +326,178 @@ async function hanteer_outeur_vorm_indiening(gebeurtenis) {
   } finally {
     knoppie.disabled = false;
     knoppie.textContent = t("paneel_voeg_outeur_by_knoppie");
+  }
+}
+
+// --- Koepons ---
+
+function formateer_koepon_status(koepon) {
+  if (!koepon.aktief) return t("paneel_koepon_status_onaktief");
+  if (koepon.verval_op && new Date(koepon.verval_op) < new Date()) return t("paneel_koepon_status_verval");
+  if (koepon.gebruike_tot_dusver >= koepon.maks_gebruike) return t("paneel_koepon_status_op");
+  return t("paneel_koepon_status_aktief");
+}
+
+async function laai_koepons() {
+  const wrap = document.getElementById("paneel-koepons-lys");
+  if (!wrap) return;
+  wrap.innerHTML = `<p class="stelsel-boodskap">${t("paneel_koepons_laai")}</p>`;
+
+  try {
+    const resp = await fetch(KRY_KOEPONS_ENDPOINT, { headers: kry_outorisasie_kop() });
+    if (!resp.ok) throw new Error(`Status ${resp.status}`);
+    const data = await resp.json();
+    wys_koepons_lys(data.koepons || []);
+  } catch (fout) {
+    console.error("Kon nie koepons laai nie:", fout);
+    wrap.innerHTML = `<p class="stelsel-boodskap">${t("paneel_kon_nie_koepons_laai")}</p>`;
+  }
+}
+
+function wys_koepons_lys(koepons) {
+  const wrap = document.getElementById("paneel-koepons-lys");
+
+  if (!koepons.length) {
+    wrap.innerHTML = `<p class="stelsel-boodskap">${t("paneel_nog_geen_koepons")}</p>`;
+    return;
+  }
+
+  wrap.innerHTML = koepons
+    .map((koepon) => {
+      const produk = produkte_kas.find((p) => p.slug === koepon.produk_slug);
+      const boek_teks = koepon.produk_slug
+        ? (produk ? produk.titel : koepon.produk_slug)
+        : t("paneel_koepon_enige_boek");
+      const tipe_teks =
+        koepon.tipe === "afslag"
+          ? koepon.afslag_tipe === "vaste_bedrag"
+            ? `${t("paneel_koepon_tipe_afslag")} — R${(koepon.afslag_waarde / 1).toFixed(2)}`
+            : `${t("paneel_koepon_tipe_afslag")} — ${koepon.afslag_waarde}%`
+          : t("paneel_koepon_tipe_gratis");
+
+      return `
+        <div class="paneel-produk-ry">
+          <div class="paneel-produk-inligting">
+            <strong>${koepon.kode}</strong>
+            <span class="paneel-produk-outeur">${tipe_teks} · ${boek_teks} · ${koepon.gebruike_tot_dusver}/${koepon.maks_gebruike} · ${formateer_koepon_status(koepon)}</span>
+            ${koepon.nota ? `<span class="paneel-produk-outeur">${koepon.nota}</span>` : ""}
+          </div>
+          <div class="paneel-produk-aksies">
+            <button class="terug-skakel paneel-koepon-aktief-knoppie" data-kode="${koepon.kode}" data-aktief="${koepon.aktief}">
+              ${koepon.aktief ? t("paneel_deaktiveer") : t("paneel_aktiveer")}
+            </button>
+          </div>
+        </div>
+      `;
+    })
+    .join("");
+
+  wrap.querySelectorAll(".paneel-koepon-aktief-knoppie").forEach((knoppie) => {
+    knoppie.addEventListener("click", async () => {
+      const nuwe_aktief_status = knoppie.dataset.aktief !== "true";
+      knoppie.disabled = true;
+      try {
+        const resp = await fetch(WYSIG_KOEPON_ENDPOINT, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", ...kry_outorisasie_kop() },
+          body: JSON.stringify({ kode: knoppie.dataset.kode, aktief: nuwe_aktief_status }),
+        });
+        if (!resp.ok) throw new Error(`Status ${resp.status}`);
+        laai_koepons();
+      } catch (fout) {
+        console.error("Kon nie koepon-status wysig nie:", fout);
+        alert(t("paneel_kon_nie_status_wysig"));
+        knoppie.disabled = false;
+      }
+    });
+  });
+}
+
+function vul_koepon_dropdowns() {
+  const produk_select = document.getElementById("koepon-vorm-produk");
+  const geen_produk_opsie = `<option value="">${t("paneel_koepon_enige_boek")}</option>`;
+  produk_select.innerHTML =
+    geen_produk_opsie + produkte_kas.map((p) => `<option value="${p.slug}">${p.titel}</option>`).join("");
+
+  const outeur_select = document.getElementById("koepon-vorm-outeur");
+  const geen_outeur_opsie = `<option value="">${t("paneel_koepon_geen_outeur")}</option>`;
+  outeur_select.innerHTML =
+    geen_outeur_opsie + outeurs_kas.map((o) => `<option value="${o.outeur_id}">${o.naam}</option>`).join("");
+}
+
+function wys_verberg_afslag_velde() {
+  const tipe = document.getElementById("koepon-vorm-tipe").value;
+  document.getElementById("koepon-vorm-afslag-velde").style.display = tipe === "afslag" ? "block" : "none";
+}
+
+function open_koepon_vorm() {
+  document.getElementById("paneel-koepon-vorm").reset();
+  vul_koepon_dropdowns();
+  wys_verberg_afslag_velde();
+  document.getElementById("paneel-koepon-vorm-foute").style.display = "none";
+  document.getElementById("paneel-koepon-vorm-afdeling").style.display = "block";
+  document.getElementById("paneel-koepon-vorm-afdeling").scrollIntoView({ behavior: "smooth" });
+}
+
+function sluit_koepon_vorm() {
+  document.getElementById("paneel-koepon-vorm-afdeling").style.display = "none";
+}
+
+function genereer_koepon_kode_voorskou() {
+  // Net 'n plaaslike voorskou-kode vir personeel se gerief — die Function
+  // self genereer (en bevestig uniekheid van) die WERKLIKE kode as die
+  // veld leeg gelaat word. Hierdie voorskou verhoed net dat die veld leeg
+  // lyk voor indiening.
+  const karakters = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+  let kode = "";
+  for (let i = 0; i < 8; i++) kode += karakters[Math.floor(Math.random() * karakters.length)];
+  document.getElementById("koepon-vorm-kode").value = kode;
+}
+
+async function hanteer_koepon_vorm_indiening(gebeurtenis) {
+  gebeurtenis.preventDefault();
+  const foutWrap = document.getElementById("paneel-koepon-vorm-foute");
+  foutWrap.style.display = "none";
+
+  const tipe = document.getElementById("koepon-vorm-tipe").value;
+  const liggaam = {
+    kode: document.getElementById("koepon-vorm-kode").value.trim(),
+    tipe,
+    afslag_tipe: document.getElementById("koepon-vorm-afslag-tipe").value,
+    afslag_waarde: Number(document.getElementById("koepon-vorm-afslag-waarde").value),
+    produk_slug: document.getElementById("koepon-vorm-produk").value || null,
+    formaat_beperking: document.getElementById("koepon-vorm-formaat").value,
+    maks_gebruike: Number(document.getElementById("koepon-vorm-maks-gebruike").value) || 1,
+    verval_op: document.getElementById("koepon-vorm-verval").value || null,
+    outeur_id: document.getElementById("koepon-vorm-outeur").value || null,
+    nota: document.getElementById("koepon-vorm-nota").value.trim(),
+  };
+
+  const knoppie = document.getElementById("paneel-koepon-vorm-indien");
+  knoppie.disabled = true;
+  knoppie.textContent = t("besig");
+
+  try {
+    const resp = await fetch(SKEP_KOEPON_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...kry_outorisasie_kop() },
+      body: JSON.stringify(liggaam),
+    });
+
+    if (!resp.ok) {
+      const data = await resp.json().catch(() => null);
+      throw new Error((data && data.fout) || `Status ${resp.status}`);
+    }
+
+    sluit_koepon_vorm();
+    laai_koepons();
+  } catch (fout) {
+    console.error("Kon nie koepon stoor nie:", fout);
+    foutWrap.textContent = fout.message;
+    foutWrap.style.display = "block";
+  } finally {
+    knoppie.disabled = false;
+    knoppie.textContent = t("paneel_voeg_koepon_by_knoppie");
   }
 }
 
@@ -797,6 +1027,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("paneel-voeg-outeur-by-knoppie").addEventListener("click", open_outeur_vorm);
   document.getElementById("paneel-outeur-vorm-kanselleer").addEventListener("click", sluit_outeur_vorm);
   document.getElementById("paneel-outeur-vorm").addEventListener("submit", hanteer_outeur_vorm_indiening);
+
+  // Koepons
+  document.getElementById("paneel-voeg-koepon-by-knoppie").addEventListener("click", open_koepon_vorm);
+  document.getElementById("paneel-koepon-vorm-kanselleer").addEventListener("click", sluit_koepon_vorm);
+  document.getElementById("paneel-koepon-vorm").addEventListener("submit", hanteer_koepon_vorm_indiening);
+  document.getElementById("koepon-vorm-tipe").addEventListener("change", wys_verberg_afslag_velde);
+  document.getElementById("koepon-vorm-genereer").addEventListener("click", genereer_koepon_kode_voorskou);
 
   // Verdeling-rye (meervoudige outeur-verdelings per formaat)
   document.getElementById("vorm-eboek-voeg-verdeling-by").addEventListener("click", () => voeg_verdeling_ry_by("eboek"));

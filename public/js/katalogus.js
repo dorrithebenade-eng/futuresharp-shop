@@ -154,4 +154,21 @@ async function laai_katalogus() {
   }
 }
 
+async function laai_winkel_bannier() {
+  const plek = document.getElementById("winkel-bannier-plek");
+  if (!plek) return;
+
+  try {
+    const resp = await fetch("/.netlify/functions/kry-kennisgewing");
+    if (!resp.ok) return;
+    const data = await resp.json();
+    if (!data.aktief || !data.teks) return;
+
+    plek.innerHTML = `<div class="winkel-bannier">${data.teks}</div>`;
+  } catch (fout) {
+    console.warn("Kon nie winkel-bannier laai nie:", fout);
+  }
+}
+
 document.addEventListener("DOMContentLoaded", laai_katalogus);
+document.addEventListener("DOMContentLoaded", laai_winkel_bannier);
