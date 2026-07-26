@@ -105,7 +105,6 @@
       <div class="paneel-uitleg">
         <nav id="paneel-sy-kieslys" class="paneel-sy-kieslys" aria-label="Paneelbord-afdelings">
           <button type="button" class="paneel-kieslys-item aktief" data-afdeling="katalogus" data-i18n="paneel_katalogus_titel">Katalogus</button>
-          <button type="button" class="paneel-kieslys-item" data-afdeling="winkel-bannier" data-i18n="paneel_kennisgewing_titel">Winkel-bannier</button>
           <button type="button" class="paneel-kieslys-item" data-afdeling="outeurs" data-i18n="paneel_outeurs_titel">Outeurs</button>
           <button type="button" class="paneel-kieslys-item" data-afdeling="vennote">Vennote</button>
           <button type="button" class="paneel-kieslys-item" data-afdeling="ontwerp-admin">Ontwerp/Admin</button>
@@ -115,26 +114,6 @@
         </nav>
 
         <div class="paneel-inhoud-kolom">
-
-      <section class="paneel-afdeling" data-afdeling-inhoud="winkel-bannier">
-        <div class="paneel-afdeling-kop">
-          <h2 class="paneel-afdeling-titel" data-i18n="paneel_kennisgewing_titel">Winkel-bannier</h2>
-        </div>
-        <p class="paneel-hulp-teks" data-i18n="paneel_kennisgewing_hulp">'n Kort kennisgewing wat oor die onderkant van die tuisblad se hero wys — vir enigiets algemeens (nie aan 'n spesifieke boek gekoppel nie). Net EEN bannier op 'n slag.</p>
-        <form id="paneel-kennisgewing-vorm">
-          <label class="veld-etiket" for="kennisgewing-teks"><span data-i18n="paneel_kennisgewing_teks_etiket">Bannier-teks</span></label>
-          <input type="text" id="kennisgewing-teks" class="veld-invoer" maxlength="140" placeholder="Bv. Nuwe outeur sluit binnekort by ons aan!">
-
-          <label class="paneel-wisselaar-ry">
-            <input type="checkbox" id="kennisgewing-aktief">
-            <span data-i18n="paneel_kennisgewing_aktief_etiket">Wys op die tuisblad</span>
-          </label>
-
-          <div id="paneel-kennisgewing-foute" class="vb-foute" style="display:none;"></div>
-
-          <button type="submit" id="paneel-kennisgewing-stoor" class="kaart-aksie paneel-vorm-indien" data-i18n="paneel_kennisgewing_stoor_knoppie">Stoor bannier</button>
-        </form>
-      </section>
 
       <section class="paneel-afdeling" data-afdeling-inhoud="katalogus">
         <div class="paneel-afdeling-kop">
@@ -376,6 +355,36 @@
           </div>
           <input type="hidden" id="vorm-omslag" value="">
           <p class="paneel-hulp-teks" data-i18n="vorm_omslag_hulp_nuut">Kies 'n beeld (JPEG, PNG, WEBP of GIF, maks. 4MB) — dit word outomaties opgelaai en gestoor.</p>
+
+          <label class="paneel-wisselaar">
+            <input type="checkbox" id="vorm-etiket-aan">
+            <span>Etiket op hierdie boek se omslag (katalogus-oorsig)</span>
+          </label>
+
+          <div id="vorm-etiket-velde" style="display:none;">
+            <label class="veld-etiket" for="vorm-etiket-teks">Etiket-teks (kort, bv. "Nuut!" of "Topverkoper")</label>
+            <input type="text" id="vorm-etiket-teks" class="veld-invoer" maxlength="30">
+
+            <label class="veld-etiket">Etiket-kleur</label>
+            <div class="paneel-kleur-swatches">
+              <label class="paneel-kleur-swatch paneel-kleur-swatch--amber">
+                <input type="radio" name="vorm-etiket-kleur" value="amber" checked>
+                <span class="paneel-kleur-merker"></span>
+              </label>
+              <label class="paneel-kleur-swatch paneel-kleur-swatch--koraal">
+                <input type="radio" name="vorm-etiket-kleur" value="koraal">
+                <span class="paneel-kleur-merker"></span>
+              </label>
+              <label class="paneel-kleur-swatch paneel-kleur-swatch--teal">
+                <input type="radio" name="vorm-etiket-kleur" value="teal">
+                <span class="paneel-kleur-merker"></span>
+              </label>
+              <label class="paneel-kleur-swatch paneel-kleur-swatch--swart">
+                <input type="radio" name="vorm-etiket-kleur" value="swart">
+                <span class="paneel-kleur-merker"></span>
+              </label>
+            </div>
+          </div>
 
           <fieldset class="paneel-formaat-blok">
             <legend class="paneel-formaat-titel" data-i18n="paneel_eboek">E-boek</legend>

@@ -158,25 +158,14 @@ body {
   position: relative;
 }
 
-body.winkel-bannier-aktief .katalogus-wrap {
-  padding-top: 260px;
-}
-
 .rooster {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-@media (max-width: 640px) {
-  body.winkel-bannier-aktief .katalogus-wrap {
-    padding-top: 215px;
-  }
-}
-
 @media (max-width: 400px) {
   .katalogus-wrap { padding: 24px 16px 60px; }
-  body.winkel-bannier-aktief .katalogus-wrap { padding-top: 215px; }
 }
 
 /* ---------- Produk-kaart ---------- */
@@ -377,62 +366,6 @@ body.winkel-bannier-aktief .katalogus-wrap {
   font-size: 15px;
 }
 
-#winkel-bannier-plek {
-  position: relative;
-  height: 0;
-  display: flex;
-  justify-content: center;
-  z-index: 10;
-}
-
-.winkel-bannier-ster-wrap {
-  position: relative;
-  width: 190px;
-  height: 190px;
-  top: 60px;
-  transform: translateX(185px) rotate(8deg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.winkel-bannier-ster {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  stroke: var(--swart);
-  stroke-width: 3;
-}
-
-.winkel-bannier-ster-skaduwee {
-  position: absolute;
-  top: 7px;
-  left: 6px;
-  width: 100%;
-  height: 100%;
-}
-
-.winkel-bannier-ster-teks {
-  position: relative;
-  z-index: 1;
-  font-family: var(--font-opskrif);
-  font-weight: 800;
-  line-height: 1.2;
-  color: var(--swart);
-  text-align: center;
-  max-width: 108px;
-  overflow-wrap: break-word;
-  word-break: break-word;
-  hyphens: auto;
-}
-
-.winkel-bannier-ster-teks--kort { font-size: 17px; }
-.winkel-bannier-ster-teks--medium { font-size: 13px; }
-.winkel-bannier-ster-teks--lank { font-size: 11px; max-width: 96px; }
-.winkel-bannier-ster-teks--swart { color: var(--wit); }
-
 .paneel-kleur-swatches {
   display: flex;
   gap: 10px;
@@ -468,18 +401,6 @@ body.winkel-bannier-aktief .katalogus-wrap {
 .paneel-kleur-swatch input:focus-visible + .paneel-kleur-merker {
   outline: 2px solid var(--teal);
   outline-offset: 2px;
-}
-
-@media (max-width: 640px) {
-  .winkel-bannier-ster-wrap {
-    width: 145px;
-    height: 145px;
-    top: 60px;
-    transform: translateX(150px) rotate(8deg);
-  }
-  .winkel-bannier-ster-teks--kort { font-size: 14px; }
-  .winkel-bannier-ster-teks--medium { font-size: 11px; }
-  .winkel-bannier-ster-teks--lank { font-size: 9.5px; max-width: 78px; }
 }
 
 .katalogus-leeg-plekhouer {

@@ -210,11 +210,4 @@ async function laai_katalogus() {
   }
 }
 
-async function laai_winkel_bannier() {
-  // Winkel-bannier-sticker is heeltemal verwyder (het herhaaldelik
-  // oorvleuelingsprobleme veroorsaak). Niks word meer hier gewys nie.
-  return;
-}
-
 document.addEventListener("DOMContentLoaded", laai_katalogus);
-document.addEventListener("DOMContentLoaded", laai_winkel_bannier);

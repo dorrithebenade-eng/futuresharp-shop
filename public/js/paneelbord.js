@@ -12,8 +12,6 @@ const SKEP_OUTEUR_ENDPOINT = "/.netlify/functions/skep-outeur";
 const WYSIG_OUTEUR_ENDPOINT = "/.netlify/functions/wysig-outeur";
 const SKRAP_OUTEUR_ENDPOINT = "/.netlify/functions/skrap-outeur";
 const LAAI_EBOEK_OP_ENDPOINT = "/.netlify/functions/laai-eboek-op";
-const KRY_KENNISGEWING_ENDPOINT = "/.netlify/functions/kry-kennisgewing";
-const STOOR_KENNISGEWING_ENDPOINT = "/.netlify/functions/stoor-kennisgewing";
 const SKEP_KOEPON_ENDPOINT = "/.netlify/functions/skep-koepon";
 const KRY_KOEPONS_ENDPOINT = "/.netlify/functions/kry-koepons";
 const WYSIG_KOEPON_ENDPOINT = "/.netlify/functions/wysig-koepon";
@@ -59,7 +57,6 @@ function wys_aangemeld_toestand(gebruiker) {
   document.getElementById("paneel-hoof").style.visibility = "visible";
   laai_produkte();
   laai_outeurs();
-  laai_kennisgewing();
   laai_koepons();
 }
 
@@ -76,55 +73,6 @@ function kry_outorisasie_kop() {
   const sessie = identiteit_kry_sessie();
   return sessie ? { Authorization: `Bearer ${sessie.access_token}` } : {};
 }
-
-// --- Winkel-bannier ---
-
-async function laai_kennisgewing() {
-  try {
-    const resp = await fetch(KRY_KENNISGEWING_ENDPOINT);
-    if (!resp.ok) throw new Error(`Status ${resp.status}`);
-    const data = await resp.json();
-    document.getElementById("kennisgewing-teks").value = data.teks || "";
-    document.getElementById("kennisgewing-aktief").checked = Boolean(data.aktief);
-  } catch (fout) {
-    console.warn("Kon nie winkel-bannier laai nie:", fout);
-  }
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  const kennisgewing_vorm = document.getElementById("paneel-kennisgewing-vorm");
-  if (!kennisgewing_vorm) return;
-
-  kennisgewing_vorm.addEventListener("submit", async (gebeurtenis) => {
-    gebeurtenis.preventDefault();
-    const foutWrap = document.getElementById("paneel-kennisgewing-foute");
-    foutWrap.style.display = "none";
-
-    const stoor_knoppie = document.getElementById("paneel-kennisgewing-stoor");
-    stoor_knoppie.disabled = true;
-
-    try {
-      const resp = await fetch(STOOR_KENNISGEWING_ENDPOINT, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", ...kry_outorisasie_kop() },
-        body: JSON.stringify({
-          teks: document.getElementById("kennisgewing-teks").value,
-          aktief: document.getElementById("kennisgewing-aktief").checked,
-        }),
-      });
-
-      if (!resp.ok) {
-        const data = await resp.json().catch(() => null);
-        throw new Error((data && data.fout) || `Status ${resp.status}`);
-      }
-    } catch (fout) {
-      foutWrap.textContent = fout.message || "Kon nie bannier stoor nie";
-      foutWrap.style.display = "block";
-    } finally {
-      stoor_knoppie.disabled = false;
-    }
-  });
-});
 
 // --- Produkte-lys ---
 
@@ -877,6 +825,8 @@ function wys_verberg_formaat_velde() {
     document.getElementById("vorm-eboek-hosting-aan").checked ? "block" : "none";
   document.getElementById("vorm-hardekopie-hosting-velde").style.display =
     document.getElementById("vorm-hardekopie-hosting-aan").checked ? "block" : "none";
+  document.getElementById("vorm-etiket-velde").style.display =
+    document.getElementById("vorm-etiket-aan").checked ? "block" : "none";
 }
 
 function open_vorm_vir_toevoeging() {
@@ -899,6 +849,15 @@ function open_vorm_vir_wysig(produk) {
   document.getElementById("vorm-vol-beskrywing").value = produk.vol_beskrywing || "";
   document.getElementById("vorm-omslag").value = produk.omslag || "";
   wys_omslag_voorskou(produk.omslag || "");
+
+  if (produk.etiket) {
+    document.getElementById("vorm-etiket-aan").checked = true;
+    document.getElementById("vorm-etiket-teks").value = produk.etiket.teks || "";
+    const gekose_kleur_radio = document.querySelector(
+      `input[name="vorm-etiket-kleur"][value="${produk.etiket.kleur || "amber"}"]`
+    );
+    if (gekose_kleur_radio) gekose_kleur_radio.checked = true;
+  }
 
   const eboek = (produk.formate && produk.formate.eboek) || {};
   document.getElementById("vorm-eboek-beskikbaar").checked = !!eboek.beskikbaar;
@@ -967,6 +926,15 @@ function kry_hosting_vanuit_vorm(voorvoegsel) {
   };
 }
 
+function kry_etiket_vanuit_vorm() {
+  const aan = document.getElementById("vorm-etiket-aan").checked;
+  if (!aan) return null;
+  const teks = document.getElementById("vorm-etiket-teks").value.trim();
+  if (!teks) return null;
+  const gekose_kleur = document.querySelector('input[name="vorm-etiket-kleur"]:checked');
+  return { teks, kleur: gekose_kleur ? gekose_kleur.value : "amber" };
+}
+
 function bou_produk_liggaam() {
   const eboekBeskikbaar = document.getElementById("vorm-eboek-beskikbaar").checked;
   const hardeKopieBeskikbaar = document.getElementById("vorm-hardekopie-beskikbaar").checked;
@@ -978,6 +946,7 @@ function bou_produk_liggaam() {
     oorsig: document.getElementById("vorm-oorsig").value.trim(),
     vol_beskrywing: document.getElementById("vorm-vol-beskrywing").value.trim(),
     omslag: document.getElementById("vorm-omslag").value.trim(),
+    etiket: kry_etiket_vanuit_vorm(),
     formate: {
       eboek: {
         beskikbaar: eboekBeskikbaar,
@@ -1183,6 +1152,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("vorm-hardekopie-verdeling-aan").addEventListener("change", wys_verberg_formaat_velde);
   document.getElementById("vorm-eboek-hosting-aan").addEventListener("change", wys_verberg_formaat_velde);
   document.getElementById("vorm-hardekopie-hosting-aan").addEventListener("change", wys_verberg_formaat_velde);
+  document.getElementById("vorm-etiket-aan").addEventListener("change", wys_verberg_formaat_velde);
   document.getElementById("vorm-omslag-lêer").addEventListener("change", hanteer_omslag_lêer_gekies);
   document.getElementById("vorm-eboek-lêer").addEventListener("change", hanteer_eboek_lêer_gekies);
 
