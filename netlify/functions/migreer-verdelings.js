@@ -2,15 +2,16 @@
 // verdeling-skema { outeur_id, tipe, waarde } om na die NUWE skema
 // { rol_tipe: "outeur", entiteit_id, tipe, waarde }.
 //
-// GEBRUIK: gaan een keer (terwyl aangemeld as personeel) na
+// GEBRUIK: gaan een keer na
 //   https://<jou-werf>/.netlify/functions/migreer-verdelings
-// in jou blaaiser. Dit gee 'n opsomming terug van watter boeke
-// bygewerk is. Skrap hierdie lêer daarna — dit word nêrens anders
-// aangeroep nie en is nie deel van die normale werking van die
-// webwerf nie.
+// direk in jou blaaiser (GEEN aanmelding nodig nie — tydelik, net vir
+// hierdie eenmalige oorskakeling). Dit gee 'n opsomming terug van watter
+// boeke bygewerk is.
+//
+// BELANGRIK: skrap hierdie lêer heeltemal ná gebruik — dit het geen
+// rol-kontrole nie en moet nooit permanent op die werf bly nie.
 
 const { kry_store } = require("./_blob-store");
-const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 
 function is_ou_skema(v) {
   return v && v.outeur_id && !v.rol_tipe && !v.entiteit_id;
@@ -27,11 +28,6 @@ function skakel_om(verdelings) {
 }
 
 exports.handler = async (event, context) => {
-  const gebruiker = await kry_gebruiker_en_kontroleer_rol(event, context, "personeel");
-  if (!gebruiker) {
-    return { statusCode: 403, body: "Geen toegang nie — personeel-rol vereis" };
-  }
-
   const store = kry_store("katalogus");
   const { blobs } = await store.list();
 
