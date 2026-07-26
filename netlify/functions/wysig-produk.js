@@ -1,9 +1,16 @@
 // Personeel-beskermd — wysig velde van 'n bestaande produk, of deaktiveer
 // dit (aktief = false laat dit uit die katalogus verdwyn sonder om die
 // rekord te verwyder — bestellingsgeskiedenis bly intak).
+//
+// VERDELING-ARGITEKTUUR (uitgebrei) — sien skep-produk.js vir volledige
+// opmerkings. Elke verdeling-ry: { rol_tipe, entiteit_id, tipe, waarde }.
+// Hosting is 'n aparte dokumentasie-veld ({ tipe, waarde }, geen
+// entiteit_id nie) — die bedrag bly by die hoofrekening.
 
 const { kry_store } = require("./_blob-store");
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
+
+const GELDIGE_ROL_TIPES = ["outeur", "vennoot", "ontwerp_admin", "printing", "aflewering"];
 
 // Selfde validasie as skep-produk.js — hou dit in lyn sodat 'n wysiging
 // nie 'n ongeldige verdeling kan invoer wat skep-produk sou verwerp nie.
@@ -12,15 +19,25 @@ function kry_geldige_verdelings(verdelings) {
 
   return verdelings
     .map((v) => {
-      if (!v || !v.outeur_id) return null;
+      if (!v || !v.entiteit_id) return null;
+      if (!GELDIGE_ROL_TIPES.includes(v.rol_tipe)) return null;
       if (!["persentasie", "vaste_bedrag"].includes(v.tipe)) return null;
       const waarde = Number(v.waarde);
       if (!Number.isFinite(waarde) || waarde <= 0) return null;
       if (v.tipe === "persentasie" && waarde > 100) return null;
 
-      return { outeur_id: v.outeur_id, tipe: v.tipe, waarde };
+      return { rol_tipe: v.rol_tipe, entiteit_id: v.entiteit_id, tipe: v.tipe, waarde };
     })
     .filter(Boolean);
+}
+
+function kry_geldige_hosting(hosting) {
+  if (!hosting) return null;
+  if (!["persentasie", "vaste_bedrag"].includes(hosting.tipe)) return null;
+  const waarde = Number(hosting.waarde);
+  if (!Number.isFinite(waarde) || waarde <= 0) return null;
+  if (hosting.tipe === "persentasie" && waarde > 100) return null;
+  return { tipe: hosting.tipe, waarde };
 }
 
 function kry_geldige_datum(waarde) {
@@ -31,15 +48,23 @@ function kry_geldige_datum(waarde) {
 }
 
 // Selfde reël as skep-produk.js: Future Sharp se hoofrekening moet ALTYD
-// ten minste 3% behou (dek Paystack se transaksiekoste, en Paystack self
-// weier sonder dit uitdruklik).
-function oorskry_hoofrekening_minimum(verdelings, prys_sent) {
-  if (!verdelings.length || !prys_sent) return false;
-  const totaal_persentasie = verdelings.reduce((som, v) => {
+// ten minste 3% + Hosting% behou (dek Paystack se transaksiekoste plus
+// die ooreengekome hosting-aandeel).
+function oorskry_hoofrekening_minimum(verdelings, hosting, prys_sent) {
+  if (!prys_sent) return false;
+
+  const verdelings_persentasie = verdelings.reduce((som, v) => {
     const persentasie = v.tipe === "vaste_bedrag" ? (v.waarde / prys_sent) * 100 : v.waarde;
     return som + persentasie;
   }, 0);
-  return totaal_persentasie > 97;
+
+  const hosting_persentasie = hosting
+    ? hosting.tipe === "vaste_bedrag"
+      ? (hosting.waarde / prys_sent) * 100
+      : hosting.waarde
+    : 0;
+
+  return verdelings_persentasie + hosting_persentasie > 97;
 }
 
 exports.handler = async (event, context) => {
@@ -79,6 +104,7 @@ exports.handler = async (event, context) => {
         nuwe_formate[formaat_naam] = {
           ...wysigings.formate[formaat_naam],
           verdelings: kry_geldige_verdelings(wysigings.formate[formaat_naam].verdelings),
+          hosting: kry_geldige_hosting(wysigings.formate[formaat_naam].hosting),
           vrystelling_datum: kry_geldige_datum(wysigings.formate[formaat_naam].vrystelling_datum),
         };
       }
@@ -90,10 +116,10 @@ exports.handler = async (event, context) => {
     ["harde_kopie", "harde-kopie"],
   ]) {
     const f = nuwe_formate[formaat_naam];
-    if (f && f.beskikbaar && oorskry_hoofrekening_minimum(f.verdelings || [], f.prys_sent || 0)) {
+    if (f && f.beskikbaar && oorskry_hoofrekening_minimum(f.verdelings || [], f.hosting, f.prys_sent || 0)) {
       return {
         statusCode: 400,
-        body: `Die ${etiket} se verdeling(s) los minder as 3% oor vir Future Sharp se hoofrekening — verminder die persentasie/bedrag sodat ten minste 3% oorbly.`,
+        body: `Die ${etiket} se verdeling(s) plus Hosting los minder as 3% oor vir Future Sharp se hoofrekening — verminder die persentasie/bedrae sodat ten minste 3% oorbly.`,
       };
     }
   }
