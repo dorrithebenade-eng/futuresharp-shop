@@ -93,8 +93,18 @@ function wys_produkte(produkte, { demo_modus, besit_stel = new Set() } = {}) {
   if (!produkte.length) {
     rooster.innerHTML += `
       <div class="katalogus-leeg-plekhouer">
-        <svg class="katalogus-leeg-ster" viewBox="0 0 260 260" aria-hidden="true">
+        <svg class="ster-skaduwee-laag" viewBox="0 0 260 260" aria-hidden="true">
           <polygon points="130.0,0.0 149.5,31.9 179.7,9.9 185.6,46.9 221.9,38.1 213.1,74.4 250.1,80.3 228.1,110.5 260.0,130.0 228.1,149.5 250.1,179.7 213.1,185.6 221.9,221.9 185.6,213.1 179.7,250.1 149.5,228.1 130.0,260.0 110.5,228.1 80.3,250.1 74.4,213.1 38.1,221.9 46.9,185.6 9.9,179.7 31.9,149.5 0.0,130.0 31.9,110.5 9.9,80.3 46.9,74.4 38.1,38.1 74.4,46.9 80.3,9.9 110.5,31.9" />
+        </svg>
+        <svg class="katalogus-leeg-ster" viewBox="0 0 260 260" aria-hidden="true">
+          <defs>
+            <linearGradient id="gradient-koraal" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#F29279" />
+              <stop offset="55%" stop-color="#EC5832" />
+              <stop offset="100%" stop-color="#B84427" />
+            </linearGradient>
+          </defs>
+          <polygon fill="url(#gradient-koraal)" points="130.0,0.0 149.5,31.9 179.7,9.9 185.6,46.9 221.9,38.1 213.1,74.4 250.1,80.3 228.1,110.5 260.0,130.0 228.1,149.5 250.1,179.7 213.1,185.6 221.9,221.9 185.6,213.1 179.7,250.1 149.5,228.1 130.0,260.0 110.5,228.1 80.3,250.1 74.4,213.1 38.1,221.9 46.9,185.6 9.9,179.7 31.9,149.5 0.0,130.0 31.9,110.5 9.9,80.3 46.9,74.4 38.1,38.1 74.4,46.9 80.3,9.9 110.5,31.9" />
         </svg>
         <span class="katalogus-leeg-ster-teks">${t("katalogus_leeg_titel")}</span>
       </div>
@@ -164,7 +174,34 @@ async function laai_winkel_bannier() {
     const data = await resp.json();
     if (!data.aktief || !data.teks) return;
 
-    plek.innerHTML = `<div class="winkel-bannier">${data.teks}</div>`;
+    const teks_lengte = data.teks.length;
+    const grootte_klas = teks_lengte <= 18 ? "kort" : teks_lengte <= 28 ? "medium" : "lank";
+    const kleur_klas = ["amber", "koraal", "teal", "swart"].includes(data.kleur) ? data.kleur : "amber";
+    const gradient_stoppe = {
+      amber: ["#F5D484", "#F1BD43", "#BB9334"],
+      koraal: ["#F29279", "#EC5832", "#B84427"],
+      teal: ["#87C0B7", "#479F91", "#377C71"],
+      swart: ["#686868", "#171717", "#111111"],
+    }[kleur_klas];
+
+    plek.innerHTML = `
+      <div class="winkel-bannier-ster-wrap">
+        <svg class="ster-skaduwee-laag winkel-bannier-ster-skaduwee" viewBox="0 0 260 260" aria-hidden="true">
+          <polygon points="130.0,0.0 149.5,31.9 179.7,9.9 185.6,46.9 221.9,38.1 213.1,74.4 250.1,80.3 228.1,110.5 260.0,130.0 228.1,149.5 250.1,179.7 213.1,185.6 221.9,221.9 185.6,213.1 179.7,250.1 149.5,228.1 130.0,260.0 110.5,228.1 80.3,250.1 74.4,213.1 38.1,221.9 46.9,185.6 9.9,179.7 31.9,149.5 0.0,130.0 31.9,110.5 9.9,80.3 46.9,74.4 38.1,38.1 74.4,46.9 80.3,9.9 110.5,31.9" />
+        </svg>
+        <svg class="winkel-bannier-ster" viewBox="0 0 260 260" aria-hidden="true">
+          <defs>
+            <linearGradient id="gradient-bannier" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="${gradient_stoppe[0]}" />
+              <stop offset="55%" stop-color="${gradient_stoppe[1]}" />
+              <stop offset="100%" stop-color="${gradient_stoppe[2]}" />
+            </linearGradient>
+          </defs>
+          <polygon fill="url(#gradient-bannier)" points="130.0,0.0 149.5,31.9 179.7,9.9 185.6,46.9 221.9,38.1 213.1,74.4 250.1,80.3 228.1,110.5 260.0,130.0 228.1,149.5 250.1,179.7 213.1,185.6 221.9,221.9 185.6,213.1 179.7,250.1 149.5,228.1 130.0,260.0 110.5,228.1 80.3,250.1 74.4,213.1 38.1,221.9 46.9,185.6 9.9,179.7 31.9,149.5 0.0,130.0 31.9,110.5 9.9,80.3 46.9,74.4 38.1,38.1 74.4,46.9 80.3,9.9 110.5,31.9" />
+        </svg>
+        <span class="winkel-bannier-ster-teks winkel-bannier-ster-teks--${grootte_klas} winkel-bannier-ster-teks--${kleur_klas}">${data.teks}</span>
+      </div>
+    `;
   } catch (fout) {
     console.warn("Kon nie winkel-bannier laai nie:", fout);
   }

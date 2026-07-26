@@ -326,35 +326,101 @@ body {
   z-index: 10;
 }
 
-.winkel-bannier {
+.winkel-bannier-ster-wrap {
   position: relative;
-  top: -10px;
-  transform: translateX(72px) rotate(-3deg);
-  max-width: 88%;
-  padding: 12px 28px;
-  background: var(--amber);
-  border: 2px solid var(--swart);
-  border-radius: 999px;
-  box-shadow: 4px 5px 0 rgba(23, 23, 23, 0.25);
+  width: 190px;
+  height: 190px;
+  top: 95px;
+  transform: translateX(115px) rotate(8deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.winkel-bannier-ster {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  stroke: var(--swart);
+  stroke-width: 3;
+}
+
+.winkel-bannier-ster-skaduwee {
+  position: absolute;
+  top: 7px;
+  left: 6px;
+  width: 100%;
+  height: 100%;
+}
+
+.winkel-bannier-ster-teks {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-opskrif);
+  font-weight: 800;
+  line-height: 1.2;
   color: var(--swart);
-  font-family: var(--font-liggaam);
-  font-weight: 600;
-  font-size: 14px;
   text-align: center;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  max-width: 108px;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
+}
+
+.winkel-bannier-ster-teks--kort { font-size: 17px; }
+.winkel-bannier-ster-teks--medium { font-size: 13px; }
+.winkel-bannier-ster-teks--lank { font-size: 11px; max-width: 96px; }
+.winkel-bannier-ster-teks--swart { color: var(--wit); }
+
+.paneel-kleur-swatches {
+  display: flex;
+  gap: 10px;
+  margin: 6px 0 4px;
+}
+
+.paneel-kleur-swatch {
+  cursor: pointer;
+}
+.paneel-kleur-swatch input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+.paneel-kleur-merker {
+  display: block;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  box-shadow: inset 0 0 0 2px rgba(23, 23, 23, 0.15);
+}
+.paneel-kleur-swatch--amber .paneel-kleur-merker { background: var(--amber); }
+.paneel-kleur-swatch--koraal .paneel-kleur-merker { background: var(--koraal); }
+.paneel-kleur-swatch--teal .paneel-kleur-merker { background: var(--teal); }
+.paneel-kleur-swatch--swart .paneel-kleur-merker { background: var(--swart); }
+
+.paneel-kleur-swatch input:checked + .paneel-kleur-merker {
+  border-color: var(--swart);
+  box-shadow: 0 0 0 2px var(--wit), 0 0 0 4px var(--swart);
+}
+.paneel-kleur-swatch input:focus-visible + .paneel-kleur-merker {
+  outline: 2px solid var(--teal);
+  outline-offset: 2px;
 }
 
 @media (max-width: 640px) {
-  .winkel-bannier {
-    top: -8px;
-    transform: translateX(30px) rotate(-3deg);
-    font-size: 13px;
-    padding: 10px 18px;
-    white-space: normal;
-    max-width: 80%;
+  .winkel-bannier-ster-wrap {
+    width: 145px;
+    height: 145px;
+    top: 60px;
+    transform: translateX(60px) rotate(8deg);
   }
+  .winkel-bannier-ster-teks--kort { font-size: 14px; }
+  .winkel-bannier-ster-teks--medium { font-size: 11px; }
+  .winkel-bannier-ster-teks--lank { font-size: 9.5px; max-width: 78px; }
 }
 
 .katalogus-leeg-plekhouer {
@@ -367,16 +433,28 @@ body {
   margin: -50px auto 40px;
 }
 
+.ster-skaduwee-laag {
+  position: absolute;
+  fill: var(--swart);
+  opacity: 0.85;
+}
+
+.katalogus-leeg-plekhouer > .ster-skaduwee-laag {
+  top: 9px;
+  left: 7px;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-6deg);
+}
+
 .katalogus-leeg-ster {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  fill: var(--koraal);
   stroke: var(--swart);
   stroke-width: 3;
   transform: rotate(-6deg);
-  filter: drop-shadow(4px 6px 0 rgba(23, 23, 23, 0.25));
 }
 
 .katalogus-leeg-ster-teks {
