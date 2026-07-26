@@ -8,10 +8,10 @@
 // 1. Herbou items + totaal SERVER-KANT vanuit die "katalogus"-store — die
 //    kliënt se pryse word nooit vertrou nie. Dit voorkom prys-manipulasie
 //    (iemand wat die mandjie se prys in die blaaier se dev-tools verander),
-//    en is ook nodig om die korrekte outeur-verdeling per boek te bepaal.
-// 2. Indien enige item(s) 'n outeur-verdeling het, skep dinamies 'n
-//    Paystack Transaction Split ("op die vlug", soos Paystack self
-//    aanbeveel wanneer die samestelling eers by kassa bekend is) en kry 'n
+//    en is ook nodig om die korrekte verdeling per boek te bepaal.
+// 2. Indien enige item(s) 'n verdeling het, skep dinamies 'n Paystack
+//    Transaction Split ("op die vlug", soos Paystack self aanbeveel
+//    wanneer die samestelling eers by kassa bekend is) en kry 'n
 //    split_code terug.
 // 3. Stoor 'n konsep-bestelling in Netlify Blobs (status = "Wag vir betaling").
 // 4. Roep Paystack se "Initialize Transaction"-eindpunt aan (met split_code
@@ -19,6 +19,16 @@
 //
 // PAYSTACK_SECRET_KEY moet as 'n omgewingveranderlike in die Netlify-
 // werf-instellings gestel word (nooit in kode nie).
+//
+// VERDELING-ARGITEKTUUR (uitgebrei): elke verdeling-inskrywing verwys nou
+// na 'n rol_tipe (outeur / vennoot / ontwerp_admin / printing /
+// aflewering) plus 'n entiteit_id (na die relevante register). Hosting is
+// GEEN split-inskrywing nie — dit is 'n suiwer dokumentasie-veld; die
+// bedrag bly heeltemal by Future Sharp se hoofrekening (dis presies wat
+// gebeur as ons dit eenvoudig NIE by verdeling_per_subrekening voeg nie).
+// Ons trek dit wel af by die 3%-veiligheidsnet-berekening hieronder, sodat
+// die hoofrekening se ANDER rolle nooit die 3%+Hosting-minimum kan
+// oorskry nie.
 //
 // Oor die verdeling-berekening: 'n Paystack Split Group het EEN tipe
 // (persentasie OF vaste bedrag) vir die hele groep, maar 'n boek se
@@ -31,6 +41,15 @@
 
 const { kry_store } = require("./_blob-store");
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
+
+// Rol_tipe → watter Blobs-store die entiteit se subrekening-kode in is.
+const ROL_TIPE_STORES = {
+  outeur: "outeurs",
+  vennoot: "vennote",
+  ontwerp_admin: "ontwerp-admin",
+  printing: "printing",
+  aflewering: "aflewering",
+};
 
 exports.handler = async (event, context) => {
   if (event.httpMethod !== "POST") {
@@ -62,16 +81,21 @@ exports.handler = async (event, context) => {
 
   const katalogusStore = kry_store("katalogus");
   const bestellingsStore = kry_store("bestellings");
-  const outeursStore = kry_store("outeurs");
-  // Onthou reeds-opgesoekte outeurs binne hierdie versoek — voorkom
-  // herhaalde Blobs-opsoeke as dieselfde outeur op meer as een item/formaat
-  // se verdeling verskyn.
-  const outeur_kas = {};
-  async function kry_outeur(outeur_id) {
-    if (!(outeur_id in outeur_kas)) {
-      outeur_kas[outeur_id] = await outeursStore.get(outeur_id, { type: "json" });
+
+  // Onthou reeds-opgesoekte entiteite binne hierdie versoek (oor al 5
+  // registers heen) — voorkom herhaalde Blobs-opsoeke as dieselfde
+  // entiteit op meer as een item/formaat se verdeling verskyn.
+  const entiteit_kas = {};
+  async function kry_entiteit(rol_tipe, entiteit_id) {
+    const store_naam = ROL_TIPE_STORES[rol_tipe];
+    if (!store_naam || !entiteit_id) return null;
+
+    const kas_sleutel = `${rol_tipe}:${entiteit_id}`;
+    if (!(kas_sleutel in entiteit_kas)) {
+      const store = kry_store(store_naam);
+      entiteit_kas[kas_sleutel] = await store.get(entiteit_id, { type: "json" });
     }
-    return outeur_kas[outeur_id];
+    return entiteit_kas[kas_sleutel];
   }
 
   // Verhoed dat 'n reeds-betaalde bestelnommer oorskryf word
@@ -82,6 +106,7 @@ exports.handler = async (event, context) => {
 
   // --- Stap 1: herbou items + totaal server-kant vanuit die katalogus ---
   let totaal_sent = 0;
+  let hosting_totaal_sent = 0;
   let bevat_harde_kopie = false;
   const geverifieerde_items = [];
   const verdeling_per_subrekening = {}; // { "ACCT_xxx": sent_bedrag }
@@ -108,16 +133,33 @@ exports.handler = async (event, context) => {
       prys_sent: item_prys_sent,
     });
 
+    // Hosting — suiwer dokumentasie, geen subrekening nie. Ons tel dit net
+    // op sodat die 3%-veiligheidsnet hieronder ruimte daarvoor hou.
+    if (formaat_data.hosting) {
+      const hosting_sent =
+        formaat_data.hosting.tipe === "vaste_bedrag"
+          ? Math.min(formaat_data.hosting.waarde, item_prys_sent)
+          : Math.round((item_prys_sent * formaat_data.hosting.waarde) / 100);
+      hosting_totaal_sent += hosting_sent;
+    }
+
     const verdelings = formaat_data.verdelings || [];
     for (const verdeling of verdelings) {
-      if (!verdeling || !verdeling.outeur_id) continue;
+      if (!verdeling) continue;
 
-      const outeur = await kry_outeur(verdeling.outeur_id);
-      if (!outeur || !outeur.subrekening_kode) {
-        // Outeur bestaan nie (meer) nie, of het geen subrekening-kode nie —
-        // spring hierdie verdeling oor. Die bedrag bly eenvoudig by Future
-        // Sharp se hoofrekening, i.p.v. die hele betaling te laat faal.
-        console.warn(`Outeur "${verdeling.outeur_id}" nie gevind nie — verdeling oorgeslaan`);
+      // Ondersteun steeds die OU skema ({ outeur_id }) as 'n vangnet vir
+      // enige rekord wat om een of ander rede nie gemigreer is nie.
+      const rol_tipe = verdeling.rol_tipe || (verdeling.outeur_id ? "outeur" : null);
+      const entiteit_id = verdeling.entiteit_id || verdeling.outeur_id;
+      if (!rol_tipe || !entiteit_id) continue;
+
+      const entiteit = await kry_entiteit(rol_tipe, entiteit_id);
+      if (!entiteit || !entiteit.subrekening_kode) {
+        // Entiteit bestaan nie (meer) nie, of het geen subrekening-kode
+        // nie — spring hierdie verdeling oor. Die bedrag bly eenvoudig by
+        // Future Sharp se hoofrekening, i.p.v. die hele betaling te laat
+        // faal.
+        console.warn(`${rol_tipe} "${entiteit_id}" nie gevind nie — verdeling oorgeslaan`);
         continue;
       }
 
@@ -126,8 +168,8 @@ exports.handler = async (event, context) => {
           ? Math.min(verdeling.waarde, item_prys_sent)
           : Math.round((item_prys_sent * verdeling.waarde) / 100);
 
-      verdeling_per_subrekening[outeur.subrekening_kode] =
-        (verdeling_per_subrekening[outeur.subrekening_kode] || 0) + item_aandeel_sent;
+      verdeling_per_subrekening[entiteit.subrekening_kode] =
+        (verdeling_per_subrekening[entiteit.subrekening_kode] || 0) + item_aandeel_sent;
     }
   }
 
@@ -135,17 +177,18 @@ exports.handler = async (event, context) => {
     return { statusCode: 400, body: "Bestelling se totaal is ongeldig" };
   }
 
-  // Veiligheidsnet: Future Sharp se hoofrekening moet ALTYD ten minste 3%
-  // van die bestelling se totaal behou (dek Paystack se transaksiekoste,
-  // en Paystack self weier 'n verdeling waar die handelaar se aandeel nul
-  // of minder is). skep-produk.js/wysig-produk.js keer dit reeds af by
-  // stoor-tyd, maar ons verklein hier ook proporsioneel as 'n laaste
-  // vangnet — bv. vir data wat van vóór hierdie reël bestaan het — sodat
-  // 'n koper se betaling nooit hierom kan misluk nie.
+  // Veiligheidsnet: Future Sharp se hoofrekening moet ALTYD ten minste
+  // 3% + Hosting van die bestelling se totaal behou (dek Paystack se
+  // transaksiekoste plus die ooreengekome hosting-aandeel, en Paystack
+  // self weier 'n verdeling waar die handelaar se aandeel nul of minder
+  // is). skep-produk.js/wysig-produk.js keer dit reeds af by stoor-tyd,
+  // maar ons verklein hier ook proporsioneel as 'n laaste vangnet — bv.
+  // vir data wat van vóór hierdie reël bestaan het — sodat 'n koper se
+  // betaling nooit hierom kan misluk nie.
   const totale_verdeling_sent = Object.values(verdeling_per_subrekening).reduce((a, b) => a + b, 0);
-  const maks_verdeling_sent = Math.floor(totaal_sent * 0.97);
+  const maks_verdeling_sent = Math.floor(totaal_sent * 0.97) - hosting_totaal_sent;
   if (totale_verdeling_sent > maks_verdeling_sent && totale_verdeling_sent > 0) {
-    const skaal_faktor = maks_verdeling_sent / totale_verdeling_sent;
+    const skaal_faktor = Math.max(maks_verdeling_sent, 0) / totale_verdeling_sent;
     for (const kode of Object.keys(verdeling_per_subrekening)) {
       verdeling_per_subrekening[kode] = Math.floor(verdeling_per_subrekening[kode] * skaal_faktor);
     }
@@ -203,6 +246,8 @@ exports.handler = async (event, context) => {
     },
     items: geverifieerde_items,
     totaal_sent,
+    // Suiwer dokumentasie — geen subrekening nie, bly by die hoofrekening.
+    hosting_totaal_sent,
     bevat_harde_kopie,
     aflewering: aflewering || null,
     verdeling: subrekening_kodes.length ? verdeling_per_subrekening : null,
