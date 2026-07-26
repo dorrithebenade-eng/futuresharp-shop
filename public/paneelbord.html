@@ -97,7 +97,22 @@
 
     <div id="paneel-inhoud" style="display:none;">
 
-      <section class="paneel-afdeling">
+      <button id="paneel-kieslys-hamburger" class="paneel-kieslys-hamburger" type="button" aria-label="Wys afdelings">
+        <span>☰</span> <span data-i18n="paneel_afdelings_knoppie">Afdelings</span>
+      </button>
+      <div id="paneel-kieslys-agtergrond" class="paneel-kieslys-agtergrond"></div>
+
+      <div class="paneel-uitleg">
+        <nav id="paneel-sy-kieslys" class="paneel-sy-kieslys" aria-label="Paneelbord-afdelings">
+          <button type="button" class="paneel-kieslys-item aktief" data-afdeling="katalogus" data-i18n="paneel_katalogus_titel">Katalogus</button>
+          <button type="button" class="paneel-kieslys-item" data-afdeling="winkel-bannier" data-i18n="paneel_kennisgewing_titel">Winkel-bannier</button>
+          <button type="button" class="paneel-kieslys-item" data-afdeling="outeurs" data-i18n="paneel_outeurs_titel">Outeurs</button>
+          <button type="button" class="paneel-kieslys-item" data-afdeling="koepons" data-i18n="paneel_koepons_titel">Koepons</button>
+        </nav>
+
+        <div class="paneel-inhoud-kolom">
+
+      <section class="paneel-afdeling" data-afdeling-inhoud="winkel-bannier">
         <div class="paneel-afdeling-kop">
           <h2 class="paneel-afdeling-titel" data-i18n="paneel_kennisgewing_titel">Winkel-bannier</h2>
         </div>
@@ -117,7 +132,7 @@
         </form>
       </section>
 
-      <section class="paneel-afdeling">
+      <section class="paneel-afdeling" data-afdeling-inhoud="katalogus">
         <div class="paneel-afdeling-kop">
           <h2 class="paneel-afdeling-titel" data-i18n="paneel_katalogus_titel">Katalogus</h2>
           <button id="paneel-voeg-by-knoppie" class="kaart-aksie paneel-voeg-by-knoppie" type="button" data-i18n="paneel_voeg_produk_by_knoppie">+ Voeg produk by</button>
@@ -127,7 +142,7 @@
         </div>
       </section>
 
-      <section class="paneel-afdeling">
+      <section class="paneel-afdeling" data-afdeling-inhoud="outeurs">
         <div class="paneel-afdeling-kop">
           <h2 class="paneel-afdeling-titel" data-i18n="paneel_outeurs_titel">Outeurs</h2>
           <button id="paneel-voeg-outeur-by-knoppie" class="kaart-aksie paneel-voeg-by-knoppie" type="button" data-i18n="paneel_voeg_outeur_by_knoppie">+ Voeg outeur by</button>
@@ -153,7 +168,7 @@
         </div>
       </section>
 
-      <section class="paneel-afdeling">
+      <section class="paneel-afdeling" data-afdeling-inhoud="koepons">
         <div class="paneel-afdeling-kop">
           <h2 class="paneel-afdeling-titel" data-i18n="paneel_koepons_titel">Koepons</h2>
           <button id="paneel-voeg-koepon-by-knoppie" class="kaart-aksie paneel-voeg-by-knoppie" type="button" data-i18n="paneel_voeg_koepon_by_knoppie">+ Voeg koepon by</button>
@@ -221,7 +236,7 @@
         </div>
       </section>
 
-      <section id="paneel-vorm-afdeling" class="paneel-afdeling" style="display:none;">
+      <section id="paneel-vorm-afdeling" class="paneel-afdeling" data-afdeling-inhoud="katalogus" style="display:none;">
         <div class="paneel-afdeling-kop">
           <h2 id="paneel-vorm-titel" class="paneel-afdeling-titel" data-i18n="paneel_voeg_produk_by_titel">Voeg produk by</h2>
           <button id="paneel-vorm-kanselleer" class="terug-skakel paneel-vorm-kanselleer" type="button" data-i18n="paneel_kanselleer">✕ Kanselleer</button>
@@ -336,10 +351,14 @@
         </form>
       </section>
 
+        </div>
+      </div>
+
     </div>
   </main>
 
   <script src="js/taal.js"></script>
   <script src="js/paneelbord.js"></script>
+  <script src="js/paneel-kieslys.js"></script>
 </body>
 </html>
