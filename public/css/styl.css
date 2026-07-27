@@ -1221,6 +1221,12 @@ body {
   color: var(--koraal);
 }
 
+.veld-opsioneel {
+  font-weight: 400;
+  color: var(--grys-teks);
+  font-style: italic;
+}
+
 .veld-invoer {
   width: 100%;
   padding: 12px 14px;
