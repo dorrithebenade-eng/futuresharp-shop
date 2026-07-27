@@ -113,8 +113,10 @@ function bou_kaart(produk, besit_stel) {
     <article class="kaart">
       <span class="kaart-hoek" aria-hidden="true"></span>
       <div class="kaart-omslag-wrap">
-        ${omslagHtml}
-        ${besitMerkerHtml}
+        <div class="kaart-omslag-knip">
+          ${omslagHtml}
+          ${besitMerkerHtml}
+        </div>
         ${etiketHtml}
       </div>
       <div class="kaart-liggaam">
