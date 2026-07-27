@@ -21,7 +21,6 @@ const KRY_KOEPONS_ENDPOINT = "/.netlify/functions/kry-koepons";
 const VOORAFGESTELDE_ETIKETTE = {
   nuut: { af: "Nuut!", en: "New!" },
   topverkoper: { af: "Topverkoper", en: "Bestseller" },
-  aanbeveel: { af: "Aanbeveel", en: "Recommended" },
   beperkte_voorraad: { af: "Beperkte voorraad", en: "Limited stock" },
   uitverkoop_binnekort: { af: "Uitverkoop binnekort", en: "Selling out soon" },
   spesiale_aanbod: { af: "Spesiale aanbod", en: "Special offer" },
