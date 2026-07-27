@@ -25,6 +25,18 @@ const VELD_IKONE = {
   dekkingsarea: "📍",
 };
 
+// Voorkom dat blaaiers hierdie velde per ongeluk met 'n aanmeld-vorm
+// verwar (en bv. 'n gestoorde e-posadres in die verkeerde veld invul,
+// net omdat 'n teksveld toevallig bo die wagwoord-velde sit). "off" vir
+// alles wat nie 'n bekende, veilige autocomplete-betekenis het nie.
+const VELD_AUTOCOMPLETE = {
+  epos: "email",
+  selfoon: "tel",
+};
+function kry_autocomplete(veld_id) {
+  return VELD_AUTOCOMPLETE[veld_id] || "off";
+}
+
 const ROL_VELDE = {
   outeur: [
     { id: "epos", etiket: "E-pos", tipe: "email", verplig: true },
@@ -95,7 +107,7 @@ function bou_velde(rol_tipe) {
             <span class="uitn-ikoon-etiket">${VELD_IKONE[veld.id] || "✏️"}</span>${veld.etiket}
             ${veld.verplig ? '<span class="veld-verplig">(verplig)</span>' : '<span class="veld-opsioneel">(opsioneel)</span>'}
           </label>
-          <input type="${veld.tipe}" id="uitn-${veld.id}" class="uitn-invoer-groot" ${veld.verplig ? "required" : ""}>
+          <input type="${veld.tipe}" id="uitn-${veld.id}" class="uitn-invoer-groot" autocomplete="${kry_autocomplete(veld.id)}" ${veld.verplig ? "required" : ""}>
         </div>
       `
     )
@@ -113,14 +125,14 @@ function bou_velde(rol_tipe) {
               <span class="uitn-ikoon-etiket">🔒</span>Kies 'n wagwoord
               <span class="veld-verplig">(verplig)</span>
             </label>
-            <input type="password" id="uitn-wagwoord" class="uitn-invoer-groot" minlength="6" required>
+            <input type="password" id="uitn-wagwoord" class="uitn-invoer-groot" autocomplete="new-password" minlength="6" required>
           </div>
           <div class="uitn-veld-groep">
             <label class="uitn-etiket-groot" for="uitn-wagwoord-bevestig">
               <span class="uitn-ikoon-etiket">🔒</span>Bevestig wagwoord
               <span class="veld-verplig">(verplig)</span>
             </label>
-            <input type="password" id="uitn-wagwoord-bevestig" class="uitn-invoer-groot" minlength="6" required>
+            <input type="password" id="uitn-wagwoord-bevestig" class="uitn-invoer-groot" autocomplete="new-password" minlength="6" required>
           </div>
         </div>
       `
