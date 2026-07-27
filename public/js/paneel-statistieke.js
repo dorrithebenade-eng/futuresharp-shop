@@ -1,6 +1,35 @@
 // paneel-statistieke.js — laai die 4 besoek-tellers en wys dit bo-aan
 // die paneelbord. kry_outorisasie_kop() kom van paneelbord.js.
 
+function formateer_maand_etiket(maand_sleutel) {
+  const [jaar, maand_nommer] = maand_sleutel.split("-");
+  const maande_af = [
+    "Januarie", "Februarie", "Maart", "April", "Mei", "Junie",
+    "Julie", "Augustus", "September", "Oktober", "November", "Desember",
+  ];
+  return `${maande_af[Number(maand_nommer) - 1]} ${jaar}`;
+}
+
+function wys_maandelikse_geskiedenis(geskiedenis) {
+  const plek = document.getElementById("paneel-statistieke-geskiedenis-plek");
+
+  if (!geskiedenis || !geskiedenis.length) {
+    plek.innerHTML = "";
+    return;
+  }
+
+  plek.innerHTML = `
+    <details class="paneel-statistieke-geskiedenis">
+      <summary>Maandelikse geskiedenis (${geskiedenis.length})</summary>
+      <ul class="paneel-statistieke-geskiedenis-lys">
+        ${geskiedenis
+          .map((m) => `<li><span>${formateer_maand_etiket(m.maand)}</span><strong>${m.telling}</strong></li>`)
+          .join("")}
+      </ul>
+    </details>
+  `;
+}
+
 async function paneel_statistieke_laai() {
   try {
     const resp = await fetch("/.netlify/functions/kry-statistieke", {
@@ -13,6 +42,7 @@ async function paneel_statistieke_laai() {
     document.getElementById("statistiek-vandag").textContent = data.vandag;
     document.getElementById("statistiek-week").textContent = data.hierdie_week;
     document.getElementById("statistiek-maand").textContent = data.hierdie_maand;
+    wys_maandelikse_geskiedenis(data.maandelikse_geskiedenis);
   } catch (fout) {
     console.error("Kon nie statistieke laai nie:", fout);
   }

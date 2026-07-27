@@ -2097,6 +2097,30 @@ a.my-boek-kaart:focus-visible {
 }
 .paneel-statistiek-herstel:hover { color: var(--koraal); }
 
+.paneel-statistieke-geskiedenis {
+  margin: -14px 0 28px;
+  font-size: 13px;
+}
+.paneel-statistieke-geskiedenis summary {
+  cursor: pointer;
+  color: var(--teal);
+  font-weight: 700;
+}
+.paneel-statistieke-geskiedenis-lys {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 0;
+  max-width: 260px;
+}
+.paneel-statistieke-geskiedenis-lys li {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid #EDEBE6;
+  color: var(--swart);
+}
+.paneel-statistieke-geskiedenis-lys li:last-child { border-bottom: none; }
+
 .paneel-uitnodiging-genereer-blok {
   display: flex;
   align-items: flex-end;

@@ -2,7 +2,9 @@
 // identifiseerbare inligting gestoor nie — net vier lopende syfers:
 // totaal (herstel net met 'n knoppie), plus vandag/week/maand wat
 // OUTOMATIES herstel sodra 'n nuwe dag/week/maand begin (die "sleutel"
-// per periode verander eenvoudig, geen skedule-taak nodig nie).
+// per periode verander eenvoudig, geen skedule-taak nodig nie). Elke
+// maand se finale syfer word geargiveer in "maandelikse-geskiedenis"
+// voordat dit herstel, sodat 'n geskiedenis oor tyd bewaar bly.
 
 const { kry_store } = require("./_blob-store");
 
@@ -40,12 +42,23 @@ exports.handler = async (event) => {
   const nuwe_week = week_rec && week_rec.sleutel === week_sleutel ? week_rec.telling + 1 : 1;
   const nuwe_maand = maand_rec && maand_rec.sleutel === maand_sleutel ? maand_rec.telling + 1 : 1;
 
-  await Promise.all([
+  const skryf_take = [
     store.setJSON("totaal", { telling: nuwe_totaal }),
     store.setJSON("daagliks", { sleutel: vandag_sleutel, telling: nuwe_dag }),
     store.setJSON("weekliks", { sleutel: week_sleutel, telling: nuwe_week }),
     store.setJSON("maandeliks", { sleutel: maand_sleutel, telling: nuwe_maand }),
-  ]);
+  ];
+
+  // 'n Nuwe maand het aangebreek — argiveer die vorige maand se finale
+  // syfer voordat dit oorskryf word, sodat 'n geskiedenis oor tyd bly.
+  if (maand_rec && maand_rec.sleutel && maand_rec.sleutel !== maand_sleutel) {
+    const geskiedenis_rec = await store.get("maandelikse-geskiedenis", { type: "json" });
+    const geskiedenis_lys = Array.isArray(geskiedenis_rec?.maande) ? geskiedenis_rec.maande : [];
+    geskiedenis_lys.push({ maand: maand_rec.sleutel, telling: maand_rec.telling });
+    skryf_take.push(store.setJSON("maandelikse-geskiedenis", { maande: geskiedenis_lys }));
+  }
+
+  await Promise.all(skryf_take);
 
   return { statusCode: 204, body: "" };
 };

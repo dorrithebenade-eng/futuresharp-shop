@@ -17,12 +17,17 @@ exports.handler = async (event, context) => {
   }
 
   const store = kry_store("statistieke");
-  const [totaal, dag, week, maand] = await Promise.all([
+  const [totaal, dag, week, maand, geskiedenis] = await Promise.all([
     store.get("totaal", { type: "json" }),
     store.get("daagliks", { type: "json" }),
     store.get("weekliks", { type: "json" }),
     store.get("maandeliks", { type: "json" }),
+    store.get("maandelikse-geskiedenis", { type: "json" }),
   ]);
+
+  const maande_geskiedenis = Array.isArray(geskiedenis?.maande) ? geskiedenis.maande : [];
+  // Nuutste eerste vir vertoning
+  maande_geskiedenis.sort((a, b) => (a.maand < b.maand ? 1 : -1));
 
   return {
     statusCode: 200,
@@ -32,6 +37,7 @@ exports.handler = async (event, context) => {
       vandag: dag?.telling || 0,
       hierdie_week: week?.telling || 0,
       hierdie_maand: maand?.telling || 0,
+      maandelikse_geskiedenis: maande_geskiedenis,
     }),
   };
 };
