@@ -227,15 +227,15 @@ body {
 
 .kaart-etiket-ster-wrap {
   position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 62px;
-  height: 62px;
-  transform: rotate(10deg);
+  top: -14px;
+  right: -14px;
+  width: 68px;
+  height: 68px;
+  transform: rotate(12deg);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 2;
+  z-index: 3;
 }
 
 .kaart-etiket-ster-wrap .ster-skaduwee-laag {
@@ -261,11 +261,11 @@ body {
   z-index: 1;
   font-family: var(--font-opskrif);
   font-weight: 800;
-  font-size: 9px;
+  font-size: 10px;
   line-height: 1.1;
   color: var(--swart);
   text-align: center;
-  max-width: 42px;
+  max-width: 46px;
   overflow-wrap: break-word;
   word-break: break-word;
   hyphens: auto;

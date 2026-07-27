@@ -110,7 +110,6 @@ function bou_kaart(produk, besit_stel) {
       <div class="kaart-omslag-wrap">
         ${omslagHtml}
         ${besitMerkerHtml}
-        ${etiketHtml}
       </div>
       <div class="kaart-liggaam">
         <h3 class="kaart-titel">${produk.titel}</h3>
@@ -121,6 +120,7 @@ function bou_kaart(produk, besit_stel) {
           <button class="kaart-aksie" data-slug="${produk.slug}">${t("koop_nou")}</button>
         </div>
       </div>
+      ${etiketHtml}
     </article>
   `;
 }
