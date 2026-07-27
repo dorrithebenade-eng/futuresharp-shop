@@ -14,6 +14,25 @@ const SKRAP_OUTEUR_ENDPOINT = "/.netlify/functions/skrap-outeur";
 const LAAI_EBOEK_OP_ENDPOINT = "/.netlify/functions/laai-eboek-op";
 const SKEP_KOEPON_ENDPOINT = "/.netlify/functions/skep-koepon";
 const KRY_KOEPONS_ENDPOINT = "/.netlify/functions/kry-koepons";
+
+// Voorafgestelde etikette — elk met vaste AF/EN-teks, sodat personeel nie
+// self vertalings hoef te tik/onthou nie. "aangepas" laat steeds vrye teks
+// toe vir uitsonderings.
+const VOORAFGESTELDE_ETIKETTE = {
+  nuut: { af: "Nuut!", en: "New!" },
+  topverkoper: { af: "Topverkoper", en: "Bestseller" },
+  aanbeveel: { af: "Aanbeveel", en: "Recommended" },
+  beperkte_voorraad: { af: "Beperkte voorraad", en: "Limited stock" },
+  uitverkoop_binnekort: { af: "Uitverkoop binnekort", en: "Selling out soon" },
+  spesiale_aanbod: { af: "Spesiale aanbod", en: "Special offer" },
+};
+
+function kry_etiket_voorafgestelde_sleutel(teks_af, teks_en) {
+  for (const [sleutel, waarde] of Object.entries(VOORAFGESTELDE_ETIKETTE)) {
+    if (waarde.af === teks_af && waarde.en === teks_en) return sleutel;
+  }
+  return "aangepas";
+}
 const WYSIG_KOEPON_ENDPOINT = "/.netlify/functions/wysig-koepon";
 
 // In-geheue kas van outeurs — gevul deur laai_outeurs(), gebruik om die
@@ -654,6 +673,7 @@ function reset_vorm() {
   document.getElementById("vorm-eboek-lêer-status").textContent = "";
   document.getElementById("vorm-eboek-verdelings-lys").innerHTML = "";
   document.getElementById("vorm-hardekopie-verdelings-lys").innerHTML = "";
+  document.getElementById("vorm-etiket-pasgemaak-velde").style.display = "none";
   wys_verberg_formaat_velde();
   document.getElementById("paneel-vorm-titel").textContent = t("paneel_voeg_produk_by_titel");
   document.getElementById("paneel-vorm-indien").textContent = t("paneel_skep_produk");
@@ -852,8 +872,16 @@ function open_vorm_vir_wysig(produk) {
 
   if (produk.etiket) {
     document.getElementById("vorm-etiket-aan").checked = true;
-    document.getElementById("vorm-etiket-teks-af").value = produk.etiket.teks_af || produk.etiket.teks || "";
-    document.getElementById("vorm-etiket-teks-en").value = produk.etiket.teks_en || "";
+    const teks_af = produk.etiket.teks_af || produk.etiket.teks || "";
+    const teks_en = produk.etiket.teks_en || "";
+    document.getElementById("vorm-etiket-teks-af").value = teks_af;
+    document.getElementById("vorm-etiket-teks-en").value = teks_en;
+
+    const voorafgestelde_sleutel = kry_etiket_voorafgestelde_sleutel(teks_af, teks_en);
+    document.getElementById("vorm-etiket-voorafgestel").value = voorafgestelde_sleutel;
+    document.getElementById("vorm-etiket-pasgemaak-velde").style.display =
+      voorafgestelde_sleutel === "aangepas" ? "block" : "none";
+
     const gekose_kleur_radio = document.querySelector(
       `input[name="vorm-etiket-kleur"][value="${produk.etiket.kleur || "amber"}"]`
     );
@@ -930,9 +958,24 @@ function kry_hosting_vanuit_vorm(voorvoegsel) {
 function kry_etiket_vanuit_vorm() {
   const aan = document.getElementById("vorm-etiket-aan").checked;
   if (!aan) return null;
-  const teks_af = document.getElementById("vorm-etiket-teks-af").value.trim();
-  const teks_en = document.getElementById("vorm-etiket-teks-en").value.trim();
+
+  const voorafgestelde_sleutel = document.getElementById("vorm-etiket-voorafgestel").value;
+  if (!voorafgestelde_sleutel) return null;
+
+  let teks_af;
+  let teks_en;
+
+  if (voorafgestelde_sleutel === "aangepas") {
+    teks_af = document.getElementById("vorm-etiket-teks-af").value.trim();
+    teks_en = document.getElementById("vorm-etiket-teks-en").value.trim();
+  } else {
+    const voorafgestelde = VOORAFGESTELDE_ETIKETTE[voorafgestelde_sleutel];
+    teks_af = voorafgestelde ? voorafgestelde.af : "";
+    teks_en = voorafgestelde ? voorafgestelde.en : "";
+  }
+
   if (!teks_af && !teks_en) return null;
+
   const gekose_kleur = document.querySelector('input[name="vorm-etiket-kleur"]:checked');
   return {
     teks_af: teks_af || teks_en,
@@ -1159,6 +1202,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("vorm-eboek-hosting-aan").addEventListener("change", wys_verberg_formaat_velde);
   document.getElementById("vorm-hardekopie-hosting-aan").addEventListener("change", wys_verberg_formaat_velde);
   document.getElementById("vorm-etiket-aan").addEventListener("change", wys_verberg_formaat_velde);
+  document.getElementById("vorm-etiket-voorafgestel").addEventListener("change", (gebeurtenis) => {
+    document.getElementById("vorm-etiket-pasgemaak-velde").style.display =
+      gebeurtenis.target.value === "aangepas" ? "block" : "none";
+  });
   document.getElementById("vorm-omslag-lêer").addEventListener("change", hanteer_omslag_lêer_gekies);
   document.getElementById("vorm-eboek-lêer").addEventListener("change", hanteer_eboek_lêer_gekies);
 

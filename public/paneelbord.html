@@ -362,12 +362,26 @@
           </label>
 
           <div id="vorm-etiket-velde" style="display:none;">
-            <label class="veld-etiket" for="vorm-etiket-teks-af">Etiket-teks — Afrikaans (kort, bv. "Nuut!")</label>
-            <input type="text" id="vorm-etiket-teks-af" class="veld-invoer" maxlength="30">
+            <label class="veld-etiket" for="vorm-etiket-voorafgestel">Kies 'n etiket</label>
+            <select id="vorm-etiket-voorafgestel" class="veld-invoer">
+              <option value="">— Kies —</option>
+              <option value="nuut">Nuut! / New!</option>
+              <option value="topverkoper">Topverkoper / Bestseller</option>
+              <option value="aanbeveel">Aanbeveel / Recommended</option>
+              <option value="beperkte_voorraad">Beperkte voorraad / Limited stock</option>
+              <option value="uitverkoop_binnekort">Uitverkoop binnekort / Selling out soon</option>
+              <option value="spesiale_aanbod">Spesiale aanbod / Special offer</option>
+              <option value="aangepas">Pasgemaak …</option>
+            </select>
 
-            <label class="veld-etiket" for="vorm-etiket-teks-en">Etiket-teks — Engels (kort, bv. "New!")</label>
-            <input type="text" id="vorm-etiket-teks-en" class="veld-invoer" maxlength="30">
-            <p class="paneel-hulp-teks">As jy net een taal invul, word dieselfde teks vir albei tale gebruik.</p>
+            <div id="vorm-etiket-pasgemaak-velde" style="display:none;">
+              <label class="veld-etiket" for="vorm-etiket-teks-af">Etiket-teks — Afrikaans</label>
+              <input type="text" id="vorm-etiket-teks-af" class="veld-invoer" maxlength="30">
+
+              <label class="veld-etiket" for="vorm-etiket-teks-en">Etiket-teks — Engels</label>
+              <input type="text" id="vorm-etiket-teks-en" class="veld-invoer" maxlength="30">
+              <p class="paneel-hulp-teks">As jy net een taal invul, word dieselfde teks vir albei tale gebruik.</p>
+            </div>
 
             <label class="veld-etiket">Etiket-kleur</label>
             <div class="paneel-kleur-swatches">
