@@ -22,6 +22,7 @@ const TAAL_SLEUTEL = "future_shop_taal";
 const WOORDEBOEK = {
   // Nav
   nav_mandjie: { af: "Mandjie", en: "Cart" },
+  nav_kursusse: { af: "Kursusse", en: "Courses" },
 
   // Kop (tuisblad)
   kop_eyebrow: { af: "E-boeke · Harde kopieë", en: "E-books · Hard copies" },

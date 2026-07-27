@@ -14,6 +14,25 @@
 // Vereis identiteit.js reeds gelaai. Vereis die bestaande mini-kop-
 // merk-op (mini-kop-inner > mini-kop-regs > #nav-rekening-plek).
 
+// --- 3. Skakel na Future Sharp se aanlyn kursusse (futuresharp.co) ---
+// Voeg op elke bladsy in — soos die res van hierdie lêer, een plek om te
+// onderhou i.p.v. 9 aparte HTML-lêers. Eksterne skakel, maak in 'n nuwe
+// oortjie oop (target="_blank") sodat 'n koper nie die winkel verloor nie.
+(function () {
+  const regs = document.querySelector(".mini-kop-regs");
+  if (!regs) return;
+
+  const kursusse_skakel = document.createElement("a");
+  kursusse_skakel.href = "https://www.futuresharp.co/courses";
+  kursusse_skakel.target = "_blank";
+  kursusse_skakel.rel = "noopener";
+  kursusse_skakel.className = "mini-kop-kursusse-skakel";
+  kursusse_skakel.title = "Besigtig gerus ook ons aanlyn kursusse";
+  kursusse_skakel.textContent = window.t ? window.t("nav_kursusse") : "Kursusse";
+
+  regs.insertBefore(kursusse_skakel, regs.firstChild);
+})();
+
 // --- 1. Mobiele hamburger-kieslys (loop ongeag aanmeld-status) ---
 (function () {
   const inner = document.querySelector(".mini-kop-inner");

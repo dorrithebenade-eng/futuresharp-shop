@@ -537,6 +537,16 @@ body {
   gap: 8px;
 }
 
+.mini-kop-kursusse-skakel {
+  font-family: var(--font-liggaam);
+  font-weight: 600;
+  font-size: clamp(14px, 1.2vw, 16px);
+  color: var(--wit);
+  text-decoration: none;
+  opacity: 0.85;
+}
+.mini-kop-kursusse-skakel:hover { opacity: 1; text-decoration: underline; }
+
 .mandjie-ikoon {
   width: 1.3em;
   height: 1.3em;
