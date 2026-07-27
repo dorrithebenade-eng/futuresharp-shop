@@ -6,6 +6,26 @@
   <title>Personeel-paneelbord — Future Shop</title>
   <link rel="stylesheet" href="css/styl.css">
   <script src="js/identiteit.js"></script>
+
+  <!-- PWA: Future Shop Paneelbord-app (aparte omvang, net hierdie bladsy) -->
+  <link rel="manifest" href="/paneel-manifest.json">
+  <meta name="theme-color" content="#171717">
+
+  <!-- Apple-spesifieke tags (iOS ondersteun nie standaard manifest-installasie ten volle nie) -->
+  <link rel="apple-touch-icon" href="/icons/paneel-apple-touch-ikoon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Paneelbord">
+
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("/paneel-sw.js", { scope: "/paneelbord.html" }).catch((fout) => {
+          console.error("Service worker-registrasie het misluk:", fout);
+        });
+      });
+    }
+  </script>
 </head>
 <body>
 
@@ -31,6 +51,7 @@
 
   <main class="paneel-wrap" id="paneel-hoof" style="visibility:hidden;">
     <h1 class="mandjie-titel" data-i18n="paneel_titel">Personeel-paneelbord</h1>
+    <div id="pwa-installeer-plek"></div>
 
     <!-- Aanmeld-vorm — verskyn wanneer niemand aangemeld is nie -->
     <section id="paneel-aanmeld-afdeling" class="paneel-auth-blok" style="display:none;">
@@ -523,5 +544,6 @@
   <script src="js/paneelbord.js"></script>
   <script src="js/paneel-registers.js"></script>
   <script src="js/paneel-kieslys.js"></script>
+  <script src="js/paneelbord-installeer-app.js"></script>
 </body>
 </html>

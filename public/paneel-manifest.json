@@ -1,0 +1,33 @@
+{
+  "id": "/paneelbord.html",
+  "name": "Future Shop Paneelbord",
+  "short_name": "Paneelbord",
+  "description": "Bestuur produkte, bestellings en verdelings vir Future Shop.",
+  "start_url": "/paneelbord.html",
+  "scope": "/paneelbord.html",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#FFFFFF",
+  "theme_color": "#171717",
+  "lang": "af",
+  "icons": [
+    {
+      "src": "/icons/paneel-ikoon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/paneel-ikoon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/paneel-ikoon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
