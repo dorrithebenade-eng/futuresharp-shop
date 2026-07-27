@@ -5,6 +5,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lees — Future Shop</title>
   <link rel="stylesheet" href="css/styl.css">
+
+  <!-- PWA: Future Shop Leser-app -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#3FB6A4">
+
+  <!-- Apple-spesifieke tags (iOS ondersteun nie standaard manifest-installasie ten volle nie) -->
+  <link rel="apple-touch-icon" href="/icons/apple-touch-ikoon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Future Shop">
+
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("/sw.js").catch((fout) => {
+          console.error("Service worker-registrasie het misluk:", fout);
+        });
+      });
+    }
+  </script>
 </head>
 <body>
   <header class="mini-kop">

@@ -1,0 +1,32 @@
+{
+  "name": "Future Shop",
+  "short_name": "Future Shop",
+  "description": "Lees jou aangekoopte e-boeke direk vanaf jou tuisskerm.",
+  "start_url": "/my-boeke.html",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#FFFFFF",
+  "theme_color": "#3FB6A4",
+  "lang": "af",
+  "icons": [
+    {
+      "src": "/icons/ikoon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/ikoon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/ikoon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
