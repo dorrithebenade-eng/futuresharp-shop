@@ -49,9 +49,18 @@ exports.handler = async (event) => {
     if (!produk) continue;
     const eboek_verdelings = (produk.formate?.eboek?.verdelings) || [];
     const hk_verdelings = (produk.formate?.harde_kopie?.verdelings) || [];
-    const kom_voor = [...eboek_verdelings, ...hk_verdelings].some(
+    const in_verdeling = [...eboek_verdelings, ...hk_verdelings].some(
       (v) => v && v.rol_tipe === skakel.rol_tipe && v.entiteit_id === skakel.entiteit_id
     );
+    // Outeurs kan ook net as skrywer gekrediteer wees (outeur_ids op die
+    // produk self) sonder om (nog) 'n inkomste-verdeling opgestel te hê —
+    // die verslag moet hulle steeds hul eie besigtigings kan wys.
+    const as_outeur_gekrediteer =
+      skakel.rol_tipe === "outeur" &&
+      Array.isArray(produk.outeur_ids) &&
+      produk.outeur_ids.includes(skakel.entiteit_id);
+    const kom_voor = in_verdeling || as_outeur_gekrediteer;
+
     if (!kom_voor) continue;
 
     boeke.push({
