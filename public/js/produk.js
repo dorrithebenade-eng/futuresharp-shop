@@ -37,6 +37,17 @@ function kry_produk_slug_uit_url() {
   return params.get("produk");
 }
 
+function bou_beskikbaar_merkers(eboek, hardeKopie) {
+  const merkers = [];
+  if (eboek && eboek.beskikbaar) {
+    merkers.push(`<span class="beskikbaar-merker beskikbaar-merker--eboek">📖 ${t("eboek_etiket")}</span>`);
+  }
+  if (hardeKopie && hardeKopie.beskikbaar) {
+    merkers.push(`<span class="beskikbaar-merker beskikbaar-merker--hardekopie">📦 ${t("hardekopie_etiket")}</span>`);
+  }
+  return `<div class="beskikbaar-merkers">${merkers.join("")}</div>`;
+}
+
 function bou_aksie_ry(produk, formaat, formaat_data, etiket) {
   const knoppie_id = `voeg-by-mandjie-${formaat}`;
   const voorbestelling = is_voorbestelling(formaat_data);
@@ -87,10 +98,19 @@ function wys_produk(produk) {
       <div class="produk-inligting">
         <h1 class="produk-titel">${produk.titel}</h1>
         <p class="produk-outeur">${produk.outeur}</p>
-        <p class="produk-beskrywing">${produk.vol_beskrywing || produk.oorsig || ""}</p>
-        <div class="produk-aksies">${aksies.join("")}</div>
-        <p class="produk-nota" id="produk-terugvoer" role="status"></p>
+        ${bou_beskikbaar_merkers(eboek, hardeKopie)}
       </div>
+    </div>
+
+    <div class="produk-beskrywing-afdeling">
+      <div class="afdeling-etiket">${t("oor_hierdie_boek")}</div>
+      <p class="produk-beskrywing">${produk.vol_beskrywing || produk.oorsig || ""}</p>
+    </div>
+
+    <div class="koop-afdeling">
+      <div class="afdeling-etiket">${t("kies_formaat")}</div>
+      <div class="produk-aksies">${aksies.join("")}</div>
+      <p class="produk-nota" id="produk-terugvoer" role="status"></p>
     </div>
   `;
 
@@ -152,6 +172,16 @@ async function laai_produk() {
   }
 
   wys_produk(produk);
+
+  if (!demo_modus) {
+    // Agtergrond-belangstelling-telling — "fire and forget", nooit die
+    // bladsy se werking laat wag of breek as dit misluk nie.
+    fetch("/.netlify/functions/tel-produk-besigtiging", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ slug: produk.slug }),
+    }).catch(() => {});
+  }
 }
 
 document.addEventListener("DOMContentLoaded", laai_produk);

@@ -68,24 +68,26 @@ function bou_gradient_ster_svg_html(kleur_klas, gradient_id) {
   `;
 }
 
+function bou_beskikbaar_merkers(eboek, hardeKopie) {
+  const merkers = [];
+  if (eboek && eboek.beskikbaar) {
+    merkers.push(`<span class="beskikbaar-merker beskikbaar-merker--eboek">📖 ${t("eboek_etiket")}</span>`);
+  }
+  if (hardeKopie && hardeKopie.beskikbaar) {
+    merkers.push(`<span class="beskikbaar-merker beskikbaar-merker--hardekopie">📦 ${t("hardekopie_etiket")}</span>`);
+  }
+  return `<div class="beskikbaar-merkers">${merkers.join("")}</div>`;
+}
+
 function bou_kaart(produk, besit_stel) {
   const eboek = produk.formate && produk.formate.eboek;
   const hardeKopie = produk.formate && produk.formate.harde_kopie;
   const besit = besit_stel instanceof Set && besit_stel.has(produk.slug);
 
-  const pryse = [];
-  if (eboek && eboek.beskikbaar) {
-    const etiket = is_voorbestelling(eboek)
-      ? `${t("eboek_etiket")} — ${formateer_prys_sent(eboek.prys_sent)} · ${t("voorbestelling_chip")}`
-      : `${t("eboek_etiket")} — ${formateer_prys_sent(eboek.prys_sent)}`;
-    pryse.push(`<span class="prys-chip">${etiket}</span>`);
-  }
-  if (hardeKopie && hardeKopie.beskikbaar) {
-    const etiket = is_voorbestelling(hardeKopie)
-      ? `${t("hardekopie_etiket")} — ${formateer_prys_sent(hardeKopie.prys_sent)} · ${t("voorbestelling_chip")}`
-      : `${t("hardekopie_etiket")} — ${formateer_prys_sent(hardeKopie.prys_sent)}`;
-    pryse.push(`<span class="prys-chip">${etiket}</span>`);
-  }
+  const beskikbare_pryse = [eboek, hardeKopie]
+    .filter((f) => f && f.beskikbaar)
+    .map((f) => f.prys_sent);
+  const vanaf_prys_sent = beskikbare_pryse.length ? Math.min(...beskikbare_pryse) : null;
 
   const omslagHtml = produk.omslag
     ? `<img class="kaart-omslag" src="${produk.omslag}" alt="Omslag van ${produk.titel}" loading="lazy">`
@@ -125,10 +127,13 @@ function bou_kaart(produk, besit_stel) {
       <div class="kaart-liggaam">
         <h3 class="kaart-titel">${produk.titel}</h3>
         <p class="kaart-outeur">${produk.outeur}</p>
-        <p class="kaart-beskrywing">${produk.oorsig || ""}</p>
+        <p class="kaart-teaser">${produk.oorsig || ""}</p>
+        <a class="lees-meer-skakel" href="produk.html?produk=${produk.slug}" data-slug="${produk.slug}">
+          ${t("lees_meer")} →
+        </a>
         <div class="kaart-onderkant">
-          <div class="kaart-pryse">${pryse.join("")}</div>
-          <button class="kaart-aksie" data-slug="${produk.slug}">${t("koop_nou")}</button>
+          ${vanaf_prys_sent !== null ? `<p class="kaart-prys">${t("vanaf_prys")} ${formateer_prys_sent(vanaf_prys_sent)}</p>` : ""}
+          ${bou_beskikbaar_merkers(eboek, hardeKopie)}
         </div>
       </div>
     </article>
@@ -169,14 +174,6 @@ function wys_produkte(produkte, { demo_modus, besit_stel = new Set() } = {}) {
   }
 
   rooster.innerHTML += produkte.map((produk) => bou_kaart(produk, besit_stel)).join("");
-
-  rooster.querySelectorAll(".kaart-aksie").forEach((knoppie) => {
-    knoppie.addEventListener("click", () => {
-      // Fase 2 se mandjie-integrasie volg in die volgende stap —
-      // vir nou stuur ons na 'n produk-bladsy per slug.
-      window.location.href = `produk.html?produk=${knoppie.dataset.slug}`;
-    });
-  });
 }
 
 // Lees die aangemelde koper se reeds-gekoopte e-boeke — gebruik dieselfde

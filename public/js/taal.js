@@ -47,12 +47,16 @@ const WOORDEBOEK = {
   hardekopie_etiket: { af: "Harde kopie", en: "Hard copy" },
   voorbestelling_chip: { af: "Voorbestelling", en: "Pre-order" },
   reeds_gekoop: { af: "Alreeds joune", en: "Already yours" },
+  lees_meer: { af: "Lees meer", en: "Read more" },
+  vanaf_prys: { af: "Vanaf", en: "From" },
 
   // Produk-bladsy
   produk_laai: { af: "Produk word gelaai …", en: "Loading product …" },
   terug_katalogus: { af: "← Terug na katalogus", en: "← Back to catalogue" },
   terug_katalogus_skakel: { af: "Terug na katalogus", en: "Back to catalogue" },
   voeg_by_mandjie: { af: "Voeg by mandjie", en: "Add to cart" },
+  oor_hierdie_boek: { af: "Oor hierdie boek", en: "About this book" },
+  kies_formaat: { af: "Kies jou formaat", en: "Choose your format" },
   voorbestel_nou: { af: "Voorbestel nou", en: "Pre-order now" },
   voorbestelling_beskikbaar_vanaf: { af: "Voorbestelling — beskikbaar vanaf", en: "Pre-order — available from" },
   reeds_in_mandjie: { af: "Reeds in jou mandjie.", en: "Already in your cart." },
