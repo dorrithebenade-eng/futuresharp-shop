@@ -132,6 +132,10 @@ function wys_produkte_lys(produkte) {
             <span class="paneel-produk-outeur">${produk.outeur}</span>
             <span class="paneel-produk-pryse">${pryse.join(" · ") || t("paneel_geen_formaat")}</span>
             <span class="paneel-produk-besigtigings">👁 ${produk.besigtigings || 0}</span>
+            <span class="paneel-produk-aankope">
+              🛒 ${t("paneel_eboek")}: ${produk.aankope_eboek || 0} (${formateer_prys_sent(produk.opbrengs_eboek_sent || 0)})
+              · ${t("paneel_hardekopie")}: ${produk.aankope_harde_kopie || 0} (${formateer_prys_sent(produk.opbrengs_harde_kopie_sent || 0)})
+            </span>
             ${!produk.aktief ? `<span class="paneel-onaktief-etiket">${t("paneel_onaktief")}</span>` : ""}
           </div>
           <div class="paneel-produk-aksies">

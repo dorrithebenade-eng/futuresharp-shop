@@ -79,6 +79,30 @@ exports.handler = async (event) => {
 
   await store.setJSON(bestelnommer, bygewerkte_bestelling);
 
+  // Werk per-produk aankope- en opbrengs-tellers by (soortgelyk aan die
+  // bestaande "besigtigings"-teller op elke produk se eie rekord) — nooit
+  // die betaling-bevestiging self laat faal as hierdie stap om enige rede
+  // struikel nie, dis 'n bykomstige rekord-doel, nie krities nie.
+  try {
+    const katalogusStore = kry_store("katalogus");
+    for (const item of bestelling.items) {
+      const produk = await katalogusStore.get(item.produk_slug, { type: "json" });
+      if (!produk) continue;
+
+      const is_harde_kopie = item.formaat === "harde_kopie";
+      const aankope_veld = is_harde_kopie ? "aankope_harde_kopie" : "aankope_eboek";
+      const opbrengs_veld = is_harde_kopie ? "opbrengs_harde_kopie_sent" : "opbrengs_eboek_sent";
+
+      await katalogusStore.setJSON(item.produk_slug, {
+        ...produk,
+        [aankope_veld]: (produk[aankope_veld] || 0) + 1,
+        [opbrengs_veld]: (produk[opbrengs_veld] || 0) + item.prys_sent,
+      });
+    }
+  } catch (fout) {
+    console.error(`Webhook: kon nie per-produk aankope-tellers bywerk vir ${bestelnommer} nie:`, fout);
+  }
+
   // E-boek-ontsluiting (Fase 4) sal hierdie status = "Nuut" +
   // paystack.geverifieer = true as sein gebruik om outomaties te ontsluit.
 

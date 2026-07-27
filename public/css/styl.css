@@ -2051,6 +2051,14 @@ a.my-boek-kaart:focus-visible {
   margin-top: 2px;
 }
 
+.paneel-produk-aankope {
+  font-size: 12px;
+  color: var(--teal);
+  font-weight: 600;
+  display: block;
+  margin-top: 2px;
+}
+
 /* ---------- Besoekers-statistiek-blokkie (paneelbord bo-aan) ---------- */
 
 .paneel-statistieke-blok {
