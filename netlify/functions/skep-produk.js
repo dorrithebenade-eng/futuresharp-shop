@@ -74,6 +74,26 @@ function kry_geldige_hosting(hosting) {
   return { tipe: hosting.tipe, waarde };
 }
 
+// Valideer die opsionele boek-etiket (enkele ster op die katalogus-kaart,
+// bv. "Nuut!" of "Topverkoper") — 'n vrye teks + een van 4 vaste kleure.
+// null as niks (of ongeldige) teks ingevoer is nie.
+const GELDIGE_ETIKET_KLEURE = ["amber", "koraal", "teal", "swart"];
+
+function kry_geldige_etiket(etiket) {
+  if (!etiket) return null;
+  const teks_af = String(etiket.teks_af || "").trim().slice(0, 30);
+  const teks_en = String(etiket.teks_en || "").trim().slice(0, 30);
+  if (!teks_af && !teks_en) return null;
+  const kleur = GELDIGE_ETIKET_KLEURE.includes(etiket.kleur) ? etiket.kleur : "amber";
+  // As net een taal ingevul is, val die ander een op dieselfde teks terug —
+  // beter as 'n leë sticker in daardie taal.
+  return {
+    teks_af: teks_af || teks_en,
+    teks_en: teks_en || teks_af,
+    kleur,
+  };
+}
+
 // Valideer 'n opsionele vrystellingsdatum vir voorbestellings — 'n geldige
 // ISO-datumstring, of null (geen voorbestelling nie, produk is dadelik
 // beskikbaar).
@@ -149,6 +169,7 @@ exports.handler = async (event, context) => {
     oorsig: invoer.oorsig || "",
     vol_beskrywing: invoer.vol_beskrywing || "",
     omslag: invoer.omslag || "",
+    etiket: kry_geldige_etiket(invoer.etiket),
     formate: {
       eboek: {
         beskikbaar: !!formate.eboek.beskikbaar,

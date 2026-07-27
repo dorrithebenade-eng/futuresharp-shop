@@ -40,6 +40,21 @@ function kry_geldige_hosting(hosting) {
   return { tipe: hosting.tipe, waarde };
 }
 
+const GELDIGE_ETIKET_KLEURE = ["amber", "koraal", "teal", "swart"];
+
+function kry_geldige_etiket(etiket) {
+  if (!etiket) return null;
+  const teks_af = String(etiket.teks_af || "").trim().slice(0, 30);
+  const teks_en = String(etiket.teks_en || "").trim().slice(0, 30);
+  if (!teks_af && !teks_en) return null;
+  const kleur = GELDIGE_ETIKET_KLEURE.includes(etiket.kleur) ? etiket.kleur : "amber";
+  return {
+    teks_af: teks_af || teks_en,
+    teks_en: teks_en || teks_af,
+    kleur,
+  };
+}
+
 function kry_geldige_datum(waarde) {
   if (!waarde) return null;
   const datum = new Date(waarde);
@@ -128,6 +143,7 @@ exports.handler = async (event, context) => {
     ...bestaande,
     ...wysigings,
     formate: nuwe_formate,
+    etiket: "etiket" in wysigings ? kry_geldige_etiket(wysigings.etiket) : bestaande.etiket,
     bygewerk_op: new Date().toISOString(),
     bygewerk_deur: gebruiker.email,
   };

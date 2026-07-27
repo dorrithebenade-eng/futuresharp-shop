@@ -852,7 +852,8 @@ function open_vorm_vir_wysig(produk) {
 
   if (produk.etiket) {
     document.getElementById("vorm-etiket-aan").checked = true;
-    document.getElementById("vorm-etiket-teks").value = produk.etiket.teks || "";
+    document.getElementById("vorm-etiket-teks-af").value = produk.etiket.teks_af || produk.etiket.teks || "";
+    document.getElementById("vorm-etiket-teks-en").value = produk.etiket.teks_en || "";
     const gekose_kleur_radio = document.querySelector(
       `input[name="vorm-etiket-kleur"][value="${produk.etiket.kleur || "amber"}"]`
     );
@@ -929,10 +930,15 @@ function kry_hosting_vanuit_vorm(voorvoegsel) {
 function kry_etiket_vanuit_vorm() {
   const aan = document.getElementById("vorm-etiket-aan").checked;
   if (!aan) return null;
-  const teks = document.getElementById("vorm-etiket-teks").value.trim();
-  if (!teks) return null;
+  const teks_af = document.getElementById("vorm-etiket-teks-af").value.trim();
+  const teks_en = document.getElementById("vorm-etiket-teks-en").value.trim();
+  if (!teks_af && !teks_en) return null;
   const gekose_kleur = document.querySelector('input[name="vorm-etiket-kleur"]:checked');
-  return { teks, kleur: gekose_kleur ? gekose_kleur.value : "amber" };
+  return {
+    teks_af: teks_af || teks_en,
+    teks_en: teks_en || teks_af,
+    kleur: gekose_kleur ? gekose_kleur.value : "amber",
+  };
 }
 
 function bou_produk_liggaam() {

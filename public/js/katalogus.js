@@ -97,13 +97,16 @@ function bou_kaart(produk, besit_stel) {
 
   const etiketHtml = produk.etiket
     ? (() => {
-        const teks_lengte = produk.etiket.teks.length;
+        const etiket_teks = kry_huidige_taal() === "en"
+          ? (produk.etiket.teks_en || produk.etiket.teks_af || produk.etiket.teks || "")
+          : (produk.etiket.teks_af || produk.etiket.teks_en || produk.etiket.teks || "");
+        const teks_lengte = etiket_teks.length;
         const grootte_klas = teks_lengte <= 6 ? "kort" : teks_lengte <= 12 ? "medium" : "lank";
         const kleur_klas_teks = produk.etiket.kleur === "swart" ? " kaart-etiket-ster-teks--swart" : "";
         return `
           <div class="kaart-etiket-ster-wrap" aria-hidden="true">
             ${bou_gradient_ster_svg_html(produk.etiket.kleur, `gradient-etiket-${produk.slug}`)}
-            <span class="kaart-etiket-ster-teks kaart-etiket-ster-teks--${grootte_klas}${kleur_klas_teks}">${produk.etiket.teks}</span>
+            <span class="kaart-etiket-ster-teks kaart-etiket-ster-teks--${grootte_klas}${kleur_klas_teks}">${etiket_teks}</span>
           </div>
         `;
       })()
