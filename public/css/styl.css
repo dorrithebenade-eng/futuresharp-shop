@@ -1846,3 +1846,81 @@ a.my-boek-kaart:focus-visible {
   color: var(--grys-teks);
   margin: -4px 0 0;
 }
+
+/* ---------- PWA installeer-balk ---------- */
+
+.pwa-installeer-balk {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--grys-lig);
+  border: 1px solid var(--teal-helder);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 24px;
+}
+
+.pwa-installeer-ikoon {
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
+  flex-shrink: 0;
+  background: var(--teal-helder);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-opskrif);
+  font-weight: 800;
+  color: var(--wit);
+  font-size: 15px;
+}
+
+.pwa-installeer-teks {
+  flex: 1;
+  font-family: var(--font-liggaam);
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--swart);
+}
+
+.pwa-installeer-teks strong {
+  display: block;
+  font-family: var(--font-opskrif);
+  font-size: 13.5px;
+  margin-bottom: 2px;
+}
+
+.pwa-installeer-knoppie {
+  background: var(--teal-helder);
+  color: var(--wit);
+  border: none;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-family: var(--font-liggaam);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.pwa-installeer-sluit {
+  background: none;
+  border: none;
+  color: var(--grys-teks);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px;
+  flex-shrink: 0;
+  align-self: flex-start;
+}
+
+@media (max-width: 640px) {
+  .pwa-installeer-balk {
+    flex-wrap: wrap;
+  }
+  .pwa-installeer-knoppie {
+    margin-left: 50px;
+  }
+}
