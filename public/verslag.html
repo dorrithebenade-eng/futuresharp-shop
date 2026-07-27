@@ -6,21 +6,122 @@
   <title>Jou boek-verslag — Future Sharp</title>
   <link rel="stylesheet" href="css/styl.css">
   <style>
-    .verslag-raam { max-width: 640px; margin: 32px auto 60px; padding: 0 20px; }
-    .verslag-kop { text-align: center; margin-bottom: 32px; }
-    .verslag-kop h1 { font-family: var(--font-opskrif); font-size: 26px; margin: 0 0 6px; }
-    .verslag-kop p { color: var(--grys-teks); margin: 0; }
-    .verslag-boek-ry {
+    body { background: #EDEDED; }
+
+    .verslag-raam {
+      max-width: 680px;
+      margin: 24px auto 60px;
+      background: var(--wit);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    }
+
+    .verslag-kop {
+      background: var(--teal-helder);
+      padding: 36px 28px 30px;
+      text-align: center;
+    }
+    .verslag-kop img { width: 72px; height: 72px; margin-bottom: 12px; }
+    .verslag-kop h1 {
+      color: var(--wit);
+      font-family: var(--font-opskrif);
+      font-size: 24px;
+      font-weight: 800;
+      margin: 0 0 6px;
+    }
+    .verslag-kop p {
+      color: var(--wit);
+      opacity: 0.95;
+      margin: 0;
+      font-size: 15px;
+    }
+
+    .verslag-inhoud { padding: 28px 26px; }
+
+    .verslag-totale {
+      display: flex;
+      gap: 14px;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+    }
+    .verslag-totaal-blok {
+      flex: 1;
+      min-width: 140px;
       background: var(--grys-lig);
       border-radius: 12px;
-      padding: 18px 22px;
+      padding: 16px;
+      text-align: center;
+    }
+    .verslag-totaal-syfer {
+      display: block;
+      font-family: var(--font-opskrif);
+      font-weight: 800;
+      font-size: 28px;
+      color: var(--koraal);
+    }
+    .verslag-totaal-etiket {
+      font-size: 12px;
+      color: var(--grys-teks);
+      margin-top: 2px;
+    }
+
+    .verslag-onderskrif {
+      font-family: var(--font-opskrif);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--teal);
+      font-weight: 800;
+      margin: 0 0 14px;
+    }
+
+    .verslag-boek-ry {
+      border: 1px solid #EDEBE6;
+      border-radius: 12px;
+      padding: 18px 20px;
       margin-bottom: 14px;
     }
-    .verslag-boek-titel { font-family: var(--font-opskrif); font-weight: 800; font-size: 16px; margin: 0 0 10px; }
-    .verslag-syfers { display: flex; gap: 24px; flex-wrap: wrap; }
-    .verslag-syfer-blok { text-align: center; }
-    .verslag-syfer { display: block; font-family: var(--font-opskrif); font-weight: 800; font-size: 22px; color: var(--teal); }
-    .verslag-syfer-etiket { font-size: 12px; color: var(--grys-teks); }
+    .verslag-boek-titel {
+      font-family: var(--font-opskrif);
+      font-weight: 800;
+      font-size: 17px;
+      margin: 0 0 16px;
+    }
+    .verslag-syfers { display: flex; gap: 10px; flex-wrap: wrap; }
+    .verslag-syfer-blok {
+      flex: 1;
+      min-width: 100px;
+      text-align: center;
+      background: var(--grys-lig);
+      border-radius: 10px;
+      padding: 12px 8px;
+    }
+    .verslag-syfer-ikoon {
+      width: 30px; height: 30px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 6px;
+      font-size: 14px;
+    }
+    .verslag-syfer-ikoon--besigtig { background: #E3F5F1; }
+    .verslag-syfer-ikoon--eboek { background: #FCEFE9; }
+    .verslag-syfer-ikoon--hardekopie { background: #FCF3DA; }
+    .verslag-syfer {
+      display: block;
+      font-family: var(--font-opskrif);
+      font-weight: 800;
+      font-size: 20px;
+      color: var(--swart);
+    }
+    .verslag-syfer-etiket { font-size: 11px; color: var(--grys-teks); }
+
+    .verslag-voetnota {
+      text-align: center;
+      font-size: 13px;
+      color: var(--grys-teks);
+      margin-top: 24px;
+    }
   </style>
 </head>
 <body>
@@ -35,14 +136,20 @@
   </header>
 
   <main class="verslag-raam">
-    <div id="verslag-status" class="stelsel-boodskap" aria-live="polite"></div>
+    <div class="verslag-kop">
+      <img src="/icons/ikoon-512.png" alt="Future Sharp" onerror="this.style.display='none'">
+      <h1 id="verslag-naam">Welkom</h1>
+      <p>Hier's hoe jou boek(e) tans presteer — bygewerk regstreeks.</p>
+    </div>
 
-    <div id="verslag-inhoud" style="display:none;">
-      <div class="verslag-kop">
-        <h1 id="verslag-naam"></h1>
-        <p>Hier's hoe jou boek(e) tans presteer — bygewerk regstreeks.</p>
+    <div class="verslag-inhoud">
+      <div id="verslag-status" class="stelsel-boodskap" aria-live="polite"></div>
+
+      <div id="verslag-body" style="display:none;">
+        <div class="verslag-totale" id="verslag-totale"></div>
+        <p class="verslag-onderskrif">Per boek</p>
+        <div id="verslag-boeke-lys"></div>
       </div>
-      <div id="verslag-boeke-lys"></div>
     </div>
   </main>
 

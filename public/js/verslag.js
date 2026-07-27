@@ -18,18 +18,47 @@ function bou_boek_ry(boek) {
       <p class="verslag-boek-titel">${boek.titel}</p>
       <div class="verslag-syfers">
         <div class="verslag-syfer-blok">
+          <div class="verslag-syfer-ikoon verslag-syfer-ikoon--besigtig">👁</div>
           <span class="verslag-syfer">${boek.besigtigings}</span>
-          <span class="verslag-syfer-etiket">👁 Besigtigings</span>
+          <span class="verslag-syfer-etiket">Besigtigings</span>
         </div>
         <div class="verslag-syfer-blok">
+          <div class="verslag-syfer-ikoon verslag-syfer-ikoon--eboek">📖</div>
           <span class="verslag-syfer">${boek.aankope_eboek}</span>
-          <span class="verslag-syfer-etiket">📖 E-boeke verkoop</span>
+          <span class="verslag-syfer-etiket">E-boeke verkoop</span>
         </div>
         <div class="verslag-syfer-blok">
+          <div class="verslag-syfer-ikoon verslag-syfer-ikoon--hardekopie">📦</div>
           <span class="verslag-syfer">${boek.aankope_harde_kopie}</span>
-          <span class="verslag-syfer-etiket">📦 Harde kopieë verkoop</span>
+          <span class="verslag-syfer-etiket">Harde kopieë verkoop</span>
         </div>
       </div>
+    </div>
+  `;
+}
+
+function bou_totale(boeke) {
+  const totale = boeke.reduce(
+    (som, boek) => ({
+      besigtigings: som.besigtigings + boek.besigtigings,
+      aankope_eboek: som.aankope_eboek + boek.aankope_eboek,
+      aankope_harde_kopie: som.aankope_harde_kopie + boek.aankope_harde_kopie,
+    }),
+    { besigtigings: 0, aankope_eboek: 0, aankope_harde_kopie: 0 }
+  );
+
+  return `
+    <div class="verslag-totaal-blok">
+      <span class="verslag-totaal-syfer">${totale.besigtigings}</span>
+      <span class="verslag-totaal-etiket">Totale besigtigings</span>
+    </div>
+    <div class="verslag-totaal-blok">
+      <span class="verslag-totaal-syfer">${totale.aankope_eboek}</span>
+      <span class="verslag-totaal-etiket">E-boeke verkoop</span>
+    </div>
+    <div class="verslag-totaal-blok">
+      <span class="verslag-totaal-syfer">${totale.aankope_harde_kopie}</span>
+      <span class="verslag-totaal-etiket">Harde kopieë verkoop</span>
     </div>
   `;
 }
@@ -57,13 +86,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const lys = document.getElementById("verslag-boeke-lys");
     if (!data.boeke.length) {
+      document.getElementById("verslag-totale").innerHTML = "";
       lys.innerHTML = `<p class="stelsel-boodskap">Nog geen boeke aan jou gekoppel nie.</p>`;
     } else {
+      document.getElementById("verslag-totale").innerHTML = bou_totale(data.boeke);
       lys.innerHTML = data.boeke.map(bou_boek_ry).join("");
     }
 
     document.getElementById("verslag-status").style.display = "none";
-    document.getElementById("verslag-inhoud").style.display = "block";
+    document.getElementById("verslag-body").style.display = "block";
   } catch (fout) {
     console.error("Kon nie verslag laai nie:", fout);
     wys_status("Kon nie hierdie verslag laai nie. Probeer weer, of kontak Future Sharp.");
