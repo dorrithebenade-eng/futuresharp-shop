@@ -84,11 +84,6 @@ function bou_kaart(produk, besit_stel) {
   const hardeKopie = produk.formate && produk.formate.harde_kopie;
   const besit = besit_stel instanceof Set && besit_stel.has(produk.slug);
 
-  const beskikbare_pryse = [eboek, hardeKopie]
-    .filter((f) => f && f.beskikbaar)
-    .map((f) => f.prys_sent);
-  const vanaf_prys_sent = beskikbare_pryse.length ? Math.min(...beskikbare_pryse) : null;
-
   const omslagHtml = produk.omslag
     ? `<img class="kaart-omslag" src="${produk.omslag}" alt="Omslag van ${produk.titel}" loading="lazy">`
     : `<div class="kaart-omslag" role="img" aria-label="Geen omslag beskikbaar vir ${produk.titel}"></div>`;
@@ -132,7 +127,6 @@ function bou_kaart(produk, besit_stel) {
           ${t("lees_meer")} →
         </a>
         <div class="kaart-onderkant">
-          ${vanaf_prys_sent !== null ? `<p class="kaart-prys">${t("vanaf_prys")} ${formateer_prys_sent(vanaf_prys_sent)}</p>` : ""}
           ${bou_beskikbaar_merkers(eboek, hardeKopie)}
         </div>
       </div>
