@@ -32,6 +32,23 @@ function wys_status(teks) {
   if (el) el.textContent = teks;
 }
 
+// Wys 'n klein, nie-opdringerige aanduiding of die boek van 'n plaaslike
+// (aflyn) kopie af gelees word, of pas nou-nou vir aflyn-gebruik gestoor
+// is. Die element is opsioneel — as dit nie op die bladsy is nie, val
+// hierdie funksie eenvoudig stil terug (raak niks anders nie).
+function wys_aflyn_aanduiding(status) {
+  const el = document.getElementById("leser-aflyn-aanduiding");
+  if (!el) return;
+
+  if (status === "reeds_plaaslik") {
+    el.textContent = window.t ? window.t("leser_aflyn_reeds") : "📥 Aflyn beskikbaar";
+  } else if (status === "nuut_afgelaai") {
+    el.textContent = window.t ? window.t("leser_aflyn_nuut") : "📥 Nou vir aflyn-lees gestoor";
+  } else {
+    el.textContent = "";
+  }
+}
+
 async function kry_boek_titel(sessie, produk_slug) {
   try {
     const resp = await fetch("/.netlify/functions/kry-my-boeke", {
@@ -258,30 +275,49 @@ async function laai_leser() {
   });
 
   try {
-    const token_resp = await fetch(
-      `/.netlify/functions/kry-leser-token?produk_slug=${encodeURIComponent(produk_slug)}`,
-      { method: "POST", headers: { Authorization: `Bearer ${sessie.access_token}` } }
-    );
+    // Kyk EERS plaaslik (IndexedDB) — as die boek reeds afgelaai is, laai
+    // dit direk daarvandaan, GEEN netwerk-versoek of data-gebruik nie.
+    let pdf_grepe = await aflyn_kry_boek(produk_slug);
+    let aflyn_status = "reeds_plaaslik";
 
-    if (token_resp.status === 401) {
-      wys_status(window.t ? window.t("sessie_verval") : "Jou sessie het verval — meld gerus weer aan.");
-      return;
+    if (!pdf_grepe) {
+      const token_resp = await fetch(
+        `/.netlify/functions/kry-leser-token?produk_slug=${encodeURIComponent(produk_slug)}`,
+        { method: "POST", headers: { Authorization: `Bearer ${sessie.access_token}` } }
+      );
+
+      if (token_resp.status === 401) {
+        wys_status(window.t ? window.t("sessie_verval") : "Jou sessie het verval — meld gerus weer aan.");
+        return;
+      }
+      if (!token_resp.ok) {
+        throw new Error(`Onverwagte status: ${token_resp.status}`);
+      }
+
+      const { token } = await token_resp.json();
+      const pdf_url = `/.netlify/functions/kry-eboek-inhoud?produk_slug=${encodeURIComponent(
+        produk_slug
+      )}&token=${encodeURIComponent(token)}`;
+
+      const pdf_resp = await fetch(pdf_url);
+      if (!pdf_resp.ok) {
+        throw new Error(`Onverwagte status: ${pdf_resp.status}`);
+      }
+      pdf_grepe = await pdf_resp.arrayBuffer();
+      aflyn_status = "nuut_afgelaai";
+
+      // Stoor plaaslik vir volgende keer — "beste-poging", loop nie die
+      // huidige lees-sessie in gedrang as dit misluk nie.
+      aflyn_stoor_boek(produk_slug, pdf_grepe);
     }
-    if (!token_resp.ok) {
-      throw new Error(`Onverwagte status: ${token_resp.status}`);
-    }
 
-    const { token } = await token_resp.json();
-    const pdf_url = `/.netlify/functions/kry-eboek-inhoud?produk_slug=${encodeURIComponent(
-      produk_slug
-    )}&token=${encodeURIComponent(token)}`;
-
-    pdf_dokument = await pdfjsLib.getDocument(pdf_url).promise;
+    pdf_dokument = await pdfjsLib.getDocument({ data: pdf_grepe }).promise;
     totale_bladsye = pdf_dokument.numPages;
 
     const gestoorde_bladsy = await kry_gestoorde_bladsy(sessie, produk_slug);
 
     wys_status("");
+    wys_aflyn_aanduiding(aflyn_status);
     document.getElementById("leser-bekyker").hidden = false;
     await wys_bladsy(gestoorde_bladsy || 1);
   } catch (fout) {
@@ -290,6 +326,12 @@ async function laai_leser() {
       wys_status(window.t ? window.t("leser_nie_gekoop") : "Jy het nie hierdie e-boek gekoop nie.");
     } else if (fout && fout.message === "Onverwagte status: 404") {
       wys_status(window.t ? window.t("leser_nog_nie_beskikbaar") : "Hierdie e-boek is nog nie beskikbaar nie.");
+    } else if (!navigator.onLine) {
+      wys_status(
+        window.t
+          ? window.t("leser_vanlyn_nie_beskikbaar")
+          : "Jy is vanlyn, en hierdie boek is nog nie plaaslik gestoor nie — koppel eers een keer aan die internet om dit oop te maak."
+      );
     } else {
       wys_status(window.t ? window.t("leser_fout") : "Kon nie jou boek laai nie — probeer later weer.");
     }
