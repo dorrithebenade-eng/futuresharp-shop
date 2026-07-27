@@ -77,27 +77,38 @@
       <span class="merk-skeier">—</span>
       <span class="merk-shop">Future Shop</span>
     </a>
+    <div class="mini-kop-regs">
+      <span id="nav-rekening-plek" class="mini-kop-rekening-plek"></span>
+      <div class="taal-wisselaar" role="group" aria-label="Taal / Language">
+        <button type="button" class="taal-knoppie" data-taal="af">AF</button>
+        <button type="button" class="taal-knoppie" data-taal="en">EN</button>
+      </div>
+    </div>
    </div>
   </header>
 
   <main class="kontak-raam">
     <img class="kontak-ikoon" src="/icons/ikoon-192.png" alt="" onerror="this.style.display='none'">
-    <h1>Is jy 'n skrywer?</h1>
-    <p>
+    <h1 data-i18n="kontak_titel">Is jy 'n skrywer?</h1>
+    <p data-i18n="kontak_intro">
       Kontak ons gerus as jy 'n skrywer is wat graag jou boek(e) in ons winkel
       wil verkoop. Verskeie opsies is beskikbaar — ons gesels graag met jou
       oor wat die beste vir jou werk sal werk.
     </p>
 
     <div class="kontak-kaart">
-      <p class="kontak-epos-etiket">Stuur vir ons 'n e-pos</p>
+      <p class="kontak-epos-etiket" data-i18n="kontak_epos_etiket">Stuur vir ons 'n e-pos</p>
       <p class="kontak-epos-adres">futureshop@futuresharp.co.za</p>
       <a class="kontak-stuur-knoppie" href="mailto:futureshop@futuresharp.co.za?subject=Ek%20wil%20graag%20my%20boek%20verkoop">
-        ✉️ Stuur e-pos
+        ✉️ <span data-i18n="kontak_stuur_knoppie">Stuur e-pos</span>
       </a>
     </div>
 
-    <p class="kontak-opsies">Ons kontak jou binnekort terug.</p>
+    <p class="kontak-opsies" data-i18n="kontak_terugvoer">Ons kontak jou binnekort terug.</p>
   </main>
+
+  <script src="js/taal.js"></script>
+  <script src="js/identiteit.js"></script>
+  <script src="js/nav-rekening.js"></script>
 </body>
 </html>

@@ -24,6 +24,14 @@ const WOORDEBOEK = {
   nav_mandjie: { af: "Mandjie", en: "Cart" },
   nav_kursusse: { af: "Kursusse", en: "Courses" },
   nav_kontak: { af: "Kontak", en: "Contact" },
+  kontak_titel: { af: "Is jy 'n skrywer?", en: "Are you a writer?" },
+  kontak_intro: {
+    af: "Kontak ons gerus as jy 'n skrywer is wat graag jou boek(e) in ons winkel wil verkoop. Verskeie opsies is beskikbaar — ons gesels graag met jou oor wat die beste vir jou werk sal werk.",
+    en: "Feel free to contact us if you're a writer who would like to sell your book(s) in our shop. Several options are available — we'd love to chat about what would work best for your work.",
+  },
+  kontak_epos_etiket: { af: "Stuur vir ons 'n e-pos", en: "Send us an email" },
+  kontak_stuur_knoppie: { af: "Stuur e-pos", en: "Send email" },
+  kontak_terugvoer: { af: "Ons kontak jou binnekort terug.", en: "We'll get back to you soon." },
 
   // Kop (tuisblad)
   kop_eyebrow: { af: "E-boeke · Harde kopieë", en: "E-books · Hard copies" },
