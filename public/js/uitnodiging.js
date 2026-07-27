@@ -67,6 +67,10 @@ const ROL_VELDE = {
   ],
 };
 
+// Net hierdie twee rolle kry outomaties 'n koper-tipe rekening — moet
+// dus 'n wagwoord kies. Ander rolle sien geen wagwoord-velde nie.
+const ROLLE_MET_REKENING = ["outeur", "vennoot"];
+
 function kry_token_uit_url() {
   const params = new URLSearchParams(window.location.search);
   return (params.get("token") || "").trim();
@@ -83,7 +87,7 @@ function bou_velde(rol_tipe) {
   const wrap = document.getElementById("uitnodiging-velde");
   const velde = ROL_VELDE[rol_tipe] || [];
 
-  wrap.innerHTML = velde
+  const veldeHtml = velde
     .map(
       (veld) => `
         <div class="uitn-veld-groep">
@@ -96,6 +100,33 @@ function bou_velde(rol_tipe) {
       `
     )
     .join("");
+
+  const rekeningHtml = ROLLE_MET_REKENING.includes(rol_tipe)
+    ? `
+        <div class="uitn-rekening-afdeling">
+          <p class="uitn-rekening-nota">
+            🔑 Met hierdie e-pos en wagwoord kan jy voortaan direk by die Future
+            Shop-winkel en -leser aanmeld.
+          </p>
+          <div class="uitn-veld-groep">
+            <label class="uitn-etiket-groot" for="uitn-wagwoord">
+              <span class="uitn-ikoon-etiket">🔒</span>Kies 'n wagwoord
+              <span class="veld-verplig">(verplig)</span>
+            </label>
+            <input type="password" id="uitn-wagwoord" class="uitn-invoer-groot" minlength="6" required>
+          </div>
+          <div class="uitn-veld-groep">
+            <label class="uitn-etiket-groot" for="uitn-wagwoord-bevestig">
+              <span class="uitn-ikoon-etiket">🔒</span>Bevestig wagwoord
+              <span class="veld-verplig">(verplig)</span>
+            </label>
+            <input type="password" id="uitn-wagwoord-bevestig" class="uitn-invoer-groot" minlength="6" required>
+          </div>
+        </div>
+      `
+    : "";
+
+  wrap.innerHTML = veldeHtml + rekeningHtml;
 }
 
 function kry_kontak_inligting_uit_vorm(rol_tipe) {
@@ -115,6 +146,24 @@ async function hanteer_indiening(gebeurtenis, token, rol_tipe) {
 
   const naam = document.getElementById("uitn-naam").value.trim();
   const knoppie = document.getElementById("uitnodiging-indien-knoppie");
+
+  let wagwoord = "";
+  if (ROLLE_MET_REKENING.includes(rol_tipe)) {
+    wagwoord = document.getElementById("uitn-wagwoord").value;
+    const wagwoord_bevestig = document.getElementById("uitn-wagwoord-bevestig").value;
+
+    if (wagwoord.length < 6) {
+      foutWrap.textContent = "Wagwoord moet ten minste 6 karakters wees.";
+      foutWrap.style.display = "block";
+      return;
+    }
+    if (wagwoord !== wagwoord_bevestig) {
+      foutWrap.textContent = "Die twee wagwoorde stem nie ooreen nie.";
+      foutWrap.style.display = "block";
+      return;
+    }
+  }
+
   knoppie.disabled = true;
   knoppie.textContent = "Besig …";
 
@@ -125,6 +174,7 @@ async function hanteer_indiening(gebeurtenis, token, rol_tipe) {
       body: JSON.stringify({
         token,
         naam,
+        wagwoord,
         kontak_inligting: kry_kontak_inligting_uit_vorm(rol_tipe),
       }),
     });
@@ -134,8 +184,23 @@ async function hanteer_indiening(gebeurtenis, token, rol_tipe) {
       throw new Error(teks || `Status ${resp.status}`);
     }
 
+    const resultaat = await resp.json();
+
     document.getElementById("uitnodiging-vorm").style.display = "none";
-    wys_status("Dankie! Jou inligting is ontvang. Future Sharp sal binnekort met jou skakel.", false);
+
+    if (ROLLE_MET_REKENING.includes(rol_tipe) && resultaat.rekening_geskep) {
+      wys_status(
+        "Dankie! Jou inligting is ontvang, en jou rekening is geskep — jy kan nou by die Future Shop-winkel aanmeld met jou e-pos en hierdie wagwoord.",
+        false
+      );
+    } else if (ROLLE_MET_REKENING.includes(rol_tipe) && !resultaat.rekening_geskep) {
+      wys_status(
+        "Dankie! Jou inligting is ontvang. Die winkel-rekening kon egter nie outomaties geskep word nie (moontlik bestaan daardie e-posadres reeds) — kontak Future Sharp as jy nie kan aanmeld nie.",
+        false
+      );
+    } else {
+      wys_status("Dankie! Jou inligting is ontvang. Future Sharp sal binnekort met jou skakel.", false);
+    }
   } catch (fout) {
     console.error("Kon nie uitnodiging voltooi nie:", fout);
     foutWrap.textContent = `Kon nie indien nie: ${fout.message}`;
