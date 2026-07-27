@@ -21,6 +21,7 @@ const PANEEL_REGISTERS = [
     leeg_teks: "Nog geen vennote bygevoeg nie.",
     fout_teks: "Kon nie vennote laai nie.",
     knoppie_teks: "+ Voeg vennoot by",
+    het_verslag: true,
   },
   {
     sleutel: "ontwerp-admin",
@@ -116,12 +117,22 @@ function paneel_register_wys_lys(reg, lys) {
           </div>
           <div class="paneel-produk-aksies">
             <button class="terug-skakel paneel-register-wysig-knoppie" data-id="${item[reg.idveld]}">Wysig</button>
+            ${reg.het_verslag ? `<button class="terug-skakel paneel-register-verslag-knoppie" data-id="${item[reg.idveld]}">Verslag-skakel</button>` : ""}
             <button class="terug-skakel paneel-skrap-knoppie paneel-register-skrap-knoppie" data-id="${item[reg.idveld]}">Skrap</button>
           </div>
         </div>
       `
     )
     .join("");
+
+  if (reg.het_verslag) {
+    wrap.querySelectorAll(".paneel-register-verslag-knoppie").forEach((knoppie) => {
+      knoppie.addEventListener("click", () => {
+        const item = lys.find((i) => String(i[reg.idveld]) === knoppie.dataset.id);
+        if (item) genereer_verslag_skakel(reg.rol_tipe, item[reg.idveld], knoppie);
+      });
+    });
+  }
 
   wrap.querySelectorAll(".paneel-register-wysig-knoppie").forEach((knoppie) => {
     knoppie.addEventListener("click", () => {

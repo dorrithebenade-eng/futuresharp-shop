@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="af">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jou boek-verslag — Future Sharp</title>
+  <link rel="stylesheet" href="css/styl.css">
+  <style>
+    .verslag-raam { max-width: 640px; margin: 32px auto 60px; padding: 0 20px; }
+    .verslag-kop { text-align: center; margin-bottom: 32px; }
+    .verslag-kop h1 { font-family: var(--font-opskrif); font-size: 26px; margin: 0 0 6px; }
+    .verslag-kop p { color: var(--grys-teks); margin: 0; }
+    .verslag-boek-ry {
+      background: var(--grys-lig);
+      border-radius: 12px;
+      padding: 18px 22px;
+      margin-bottom: 14px;
+    }
+    .verslag-boek-titel { font-family: var(--font-opskrif); font-weight: 800; font-size: 16px; margin: 0 0 10px; }
+    .verslag-syfers { display: flex; gap: 24px; flex-wrap: wrap; }
+    .verslag-syfer-blok { text-align: center; }
+    .verslag-syfer { display: block; font-family: var(--font-opskrif); font-weight: 800; font-size: 22px; color: var(--teal); }
+    .verslag-syfer-etiket { font-size: 12px; color: var(--grys-teks); }
+  </style>
+</head>
+<body>
+  <header class="mini-kop">
+   <div class="mini-kop-inner">
+    <a href="index.html" class="mini-kop-merk">
+      <span class="merk-sharp">Future Sharp</span>
+      <span class="merk-skeier">—</span>
+      <span class="merk-shop">Future Shop</span>
+    </a>
+   </div>
+  </header>
+
+  <main class="verslag-raam">
+    <div id="verslag-status" class="stelsel-boodskap" aria-live="polite"></div>
+
+    <div id="verslag-inhoud" style="display:none;">
+      <div class="verslag-kop">
+        <h1 id="verslag-naam"></h1>
+        <p>Hier's hoe jou boek(e) tans presteer — bygewerk regstreeks.</p>
+      </div>
+      <div id="verslag-boeke-lys"></div>
+    </div>
+  </main>
+
+  <script src="js/verslag.js"></script>
+</body>
+</html>

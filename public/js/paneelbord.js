@@ -42,6 +42,34 @@ function formateer_prys_sent(sent) {
   return `R${(sent / 100).toFixed(2)}`;
 }
 
+// Gedeelde funksie — ook deur paneel-registers.js gebruik (vir Vennote).
+// Genereer (of hergebruik) 'n aanhoudende verslag-skakel en wys dit vir
+// personeel om te kopieer.
+async function genereer_verslag_skakel(rol_tipe, entiteit_id, knoppie) {
+  const oorspronklike_teks = knoppie.textContent;
+  knoppie.disabled = true;
+  knoppie.textContent = "Besig …";
+
+  try {
+    const resp = await fetch("/.netlify/functions/skep-verslag-skakel", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...kry_outorisasie_kop() },
+      body: JSON.stringify({ rol_tipe, entiteit_id }),
+    });
+    if (!resp.ok) throw new Error(`Status ${resp.status}`);
+    const data = await resp.json();
+
+    const skakel = `${window.location.origin}/verslag.html?token=${data.token}`;
+    window.prompt("Verslag-skakel (Ctrl+C om te kopieer) — werk vir altyd, stuur dit aan die persoon:", skakel);
+  } catch (fout) {
+    console.error("Kon nie verslag-skakel genereer nie:", fout);
+    alert("Kon nie verslag-skakel genereer nie — probeer weer.");
+  } finally {
+    knoppie.disabled = false;
+    knoppie.textContent = oorspronklike_teks;
+  }
+}
+
 function het_personeel_rol(gebruiker) {
   const rolle = (gebruiker && gebruiker.app_metadata && gebruiker.app_metadata.roles) || [];
   return rolle.includes("personeel");
@@ -252,6 +280,7 @@ function wys_outeurs_lys(outeurs) {
           </div>
           <div class="paneel-produk-aksies">
             <button class="terug-skakel paneel-outeur-wysig-knoppie" data-id="${outeur.outeur_id}">${t("paneel_wysig")}</button>
+            <button class="terug-skakel paneel-outeur-verslag-knoppie" data-id="${outeur.outeur_id}">Verslag-skakel</button>
             <button class="terug-skakel paneel-skrap-knoppie paneel-outeur-skrap-knoppie" data-id="${outeur.outeur_id}">${t("paneel_skrap")}</button>
           </div>
         </div>
@@ -263,6 +292,13 @@ function wys_outeurs_lys(outeurs) {
     knoppie.addEventListener("click", () => {
       const outeur = outeurs.find((o) => o.outeur_id === knoppie.dataset.id);
       if (outeur) open_outeur_vorm(outeur);
+    });
+  });
+
+  wrap.querySelectorAll(".paneel-outeur-verslag-knoppie").forEach((knoppie) => {
+    knoppie.addEventListener("click", () => {
+      const outeur = outeurs.find((o) => o.outeur_id === knoppie.dataset.id);
+      if (outeur) genereer_verslag_skakel("outeur", outeur.outeur_id, knoppie);
     });
   });
 
