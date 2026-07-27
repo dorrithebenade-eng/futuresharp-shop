@@ -14,6 +14,23 @@ const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 
 const GELDIGE_ROL_TIPES = ["outeur", "vennoot", "ontwerp_admin", "printing", "aflewering"];
 
+// Skep 'n leesbare "Outeur A, Outeur B en Outeur C"-string vanuit 'n lys
+// outeur_id's — gestoor as 'n aparte `outeur`-veld sodat bestaande
+// vertoon-kode (katalogus-kaart, produk-bladsy) heeltemal ongeraak bly;
+// `outeur_ids` bly die "bron van waarheid" vir toekomstige wysigings.
+async function kry_outeur_naam_string(outeur_ids) {
+  if (!Array.isArray(outeur_ids) || !outeur_ids.length) return "";
+
+  const store = kry_store("outeurs");
+  const outeure = await Promise.all(outeur_ids.map((id) => store.get(id, { type: "json" })));
+  const name_lys = outeure.filter(Boolean).map((o) => o.naam);
+
+  if (!name_lys.length) return "";
+  if (name_lys.length === 1) return name_lys[0];
+  if (name_lys.length === 2) return `${name_lys[0]} en ${name_lys[1]}`;
+  return `${name_lys.slice(0, -1).join(", ")} en ${name_lys[name_lys.length - 1]}`;
+}
+
 // Future Sharp se hoofrekening moet ALTYD ten minste 3% + Hosting% van 'n
 // formaat se prys behou — dit dek Paystack se eie transaksiekoste plus
 // die ooreengekome hosting-aandeel. Paystack self weier ook enige
@@ -122,11 +139,12 @@ exports.handler = async (event, context) => {
   }
 
   // Basiese validering — verplig velde volgens die katalogus-skema
-  const { slug, titel, outeur, formate } = invoer;
-  if (!slug || !titel || !outeur || !formate || !formate.eboek) {
+  const { slug, titel, outeur_ids, formate } = invoer;
+  const geldige_outeur_ids = Array.isArray(outeur_ids) ? outeur_ids.filter(Boolean) : [];
+  if (!slug || !titel || !geldige_outeur_ids.length || !formate || !formate.eboek) {
     return {
       statusCode: 400,
-      body: "Verpligte velde ontbreek: slug, titel, outeur, formate.eboek",
+      body: "Verpligte velde ontbreek: slug, titel, ten minste een outeur, formate.eboek",
     };
   }
 
@@ -165,7 +183,8 @@ exports.handler = async (event, context) => {
   const produk = {
     slug,
     titel,
-    outeur,
+    outeur: await kry_outeur_naam_string(geldige_outeur_ids),
+    outeur_ids: geldige_outeur_ids,
     oorsig: invoer.oorsig || "",
     vol_beskrywing: invoer.vol_beskrywing || "",
     omslag: invoer.omslag || "",

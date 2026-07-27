@@ -12,6 +12,20 @@ const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 
 const GELDIGE_ROL_TIPES = ["outeur", "vennoot", "ontwerp_admin", "printing", "aflewering"];
 
+// Selfde helper as skep-produk.js — sien dié lêer vir volledige opmerking.
+async function kry_outeur_naam_string(outeur_ids) {
+  if (!Array.isArray(outeur_ids) || !outeur_ids.length) return "";
+
+  const store = kry_store("outeurs");
+  const outeure = await Promise.all(outeur_ids.map((id) => store.get(id, { type: "json" })));
+  const name_lys = outeure.filter(Boolean).map((o) => o.naam);
+
+  if (!name_lys.length) return "";
+  if (name_lys.length === 1) return name_lys[0];
+  if (name_lys.length === 2) return `${name_lys[0]} en ${name_lys[1]}`;
+  return `${name_lys.slice(0, -1).join(", ")} en ${name_lys[name_lys.length - 1]}`;
+}
+
 // Selfde validasie as skep-produk.js — hou dit in lyn sodat 'n wysiging
 // nie 'n ongeldige verdeling kan invoer wat skep-produk sou verwerp nie.
 function kry_geldige_verdelings(verdelings) {
@@ -139,9 +153,18 @@ exports.handler = async (event, context) => {
     }
   }
 
+  const nuwe_outeur_ids = Array.isArray(wysigings.outeur_ids)
+    ? wysigings.outeur_ids.filter(Boolean)
+    : bestaande.outeur_ids;
+  const nuwe_outeur_naam = Array.isArray(wysigings.outeur_ids)
+    ? await kry_outeur_naam_string(nuwe_outeur_ids)
+    : bestaande.outeur;
+
   const bygewerk = {
     ...bestaande,
     ...wysigings,
+    outeur_ids: nuwe_outeur_ids,
+    outeur: nuwe_outeur_naam,
     formate: nuwe_formate,
     etiket: "etiket" in wysigings ? kry_geldige_etiket(wysigings.etiket) : bestaande.etiket,
     bygewerk_op: new Date().toISOString(),

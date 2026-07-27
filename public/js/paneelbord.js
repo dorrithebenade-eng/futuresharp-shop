@@ -252,6 +252,7 @@ async function laai_outeurs() {
     // outeurs-lys (bv. ná 'n nuwe outeur bygevoeg is terwyl 'n boek se
     // vorm reeds oop was).
     ververs_alle_verdeling_aftrekkieslyste();
+    ververs_alle_outeur_aftrekkieslyste();
   } catch (fout) {
     console.error("Kon nie outeurs laai nie:", fout);
     wrap.innerHTML = `<p class="stelsel-boodskap">${t("paneel_kon_nie_outeurs_laai")}</p>`;
@@ -697,6 +698,49 @@ function ververs_alle_verdeling_aftrekkieslyste() {
   });
 }
 
+// --- Outeur-kieser-rye (herhaalbaar — 'n boek kan meer as een outeur hê) ---
+
+function bou_outeur_opsies_html(gekose_outeur_id) {
+  const geen_opsie = `<option value="">Kies outeur</option>`;
+  const opsies = outeurs_kas
+    .map(
+      (o) =>
+        `<option value="${o.outeur_id}" ${o.outeur_id === gekose_outeur_id ? "selected" : ""}>${o.naam}</option>`
+    )
+    .join("");
+  return geen_opsie + opsies;
+}
+
+function skep_outeur_ry_element(gekose_outeur_id) {
+  const ry = document.createElement("div");
+  ry.className = "paneel-outeur-ry veld-ry";
+  ry.innerHTML = `
+    <select class="veld-invoer paneel-outeur-ry-kies">${bou_outeur_opsies_html(gekose_outeur_id || "")}</select>
+    <button type="button" class="terug-skakel paneel-outeur-ry-verwyder" aria-label="Verwyder outeur">✕</button>
+  `;
+  ry.querySelector(".paneel-outeur-ry-verwyder").addEventListener("click", () => ry.remove());
+  return ry;
+}
+
+function voeg_outeur_ry_by(gekose_outeur_id) {
+  document.getElementById("vorm-outeurs-lys").appendChild(skep_outeur_ry_element(gekose_outeur_id || null));
+}
+
+function kry_outeur_ids_uit_vorm() {
+  return Array.from(document.querySelectorAll(".paneel-outeur-ry-kies"))
+    .map((select) => select.value)
+    .filter(Boolean);
+}
+
+// Ververs enige reeds-oop outeur-rye se keuselys (bv. ná 'n nuwe outeur
+// via die Uitnodigings-oortjie bygevoeg is) — behou huidige keuse.
+function ververs_alle_outeur_aftrekkieslyste() {
+  document.querySelectorAll(".paneel-outeur-ry-kies").forEach((select) => {
+    const huidige_waarde = select.value;
+    select.innerHTML = bou_outeur_opsies_html(huidige_waarde);
+  });
+}
+
 // --- Vorm: oopmaak/toemaak ---
 
 function reset_vorm() {
@@ -711,6 +755,7 @@ function reset_vorm() {
   document.getElementById("vorm-eboek-lêer-status").textContent = "";
   document.getElementById("vorm-eboek-verdelings-lys").innerHTML = "";
   document.getElementById("vorm-hardekopie-verdelings-lys").innerHTML = "";
+  document.getElementById("vorm-outeurs-lys").innerHTML = "";
   document.getElementById("vorm-etiket-pasgemaak-velde").style.display = "none";
   wys_verberg_formaat_velde();
   document.getElementById("paneel-vorm-titel").textContent = t("paneel_voeg_produk_by_titel");
@@ -889,6 +934,7 @@ function wys_verberg_formaat_velde() {
 
 function open_vorm_vir_toevoeging() {
   reset_vorm();
+  voeg_outeur_ry_by(null);
   document.getElementById("paneel-vorm-afdeling").style.display = "block";
   document.getElementById("paneel-vorm-afdeling").scrollIntoView({ behavior: "smooth" });
 }
@@ -902,7 +948,13 @@ function open_vorm_vir_wysig(produk) {
   document.getElementById("vorm-slug").value = produk.slug;
   document.getElementById("vorm-slug").disabled = true; // slug is die sleutel — nie wysigbaar nie
   document.getElementById("vorm-titel").value = produk.titel || "";
-  document.getElementById("vorm-outeur").value = produk.outeur || "";
+  if (Array.isArray(produk.outeur_ids) && produk.outeur_ids.length) {
+    produk.outeur_ids.forEach((outeur_id) => voeg_outeur_ry_by(outeur_id));
+  } else {
+    // Ou produkte van vóór hierdie wysiging het net 'n vry-teks outeur-veld
+    // — geen outeur_ids nie. Wys een leë ry sodat personeel dit kan opstel.
+    voeg_outeur_ry_by(null);
+  }
   document.getElementById("vorm-oorsig").value = produk.oorsig || "";
   document.getElementById("vorm-vol-beskrywing").value = produk.vol_beskrywing || "";
   document.getElementById("vorm-omslag").value = produk.omslag || "";
@@ -1029,7 +1081,7 @@ function bou_produk_liggaam() {
   return {
     slug: document.getElementById("vorm-slug").value.trim(),
     titel: document.getElementById("vorm-titel").value.trim(),
-    outeur: document.getElementById("vorm-outeur").value.trim(),
+    outeur_ids: kry_outeur_ids_uit_vorm(),
     oorsig: document.getElementById("vorm-oorsig").value.trim(),
     vol_beskrywing: document.getElementById("vorm-vol-beskrywing").value.trim(),
     omslag: document.getElementById("vorm-omslag").value.trim(),
@@ -1069,7 +1121,7 @@ async function hanteer_vorm_indiening(gebeurtenis) {
   const is_wysiging = !!oorspronklike_slug;
   const produk = bou_produk_liggaam();
 
-  if (!produk.slug || !produk.titel || !produk.outeur) {
+  if (!produk.slug || !produk.titel || !produk.outeur_ids.length) {
     wys_vorm_foute(t("paneel_verpligte_velde_fout"));
     return;
   }
@@ -1261,5 +1313,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Verdeling-rye (meervoudige outeur-verdelings per formaat)
   document.getElementById("vorm-eboek-voeg-verdeling-by").addEventListener("click", () => voeg_verdeling_ry_by("eboek"));
+  document.getElementById("vorm-voeg-outeur-by").addEventListener("click", () => voeg_outeur_ry_by(null));
   document.getElementById("vorm-hardekopie-voeg-verdeling-by").addEventListener("click", () => voeg_verdeling_ry_by("hardekopie"));
 });
