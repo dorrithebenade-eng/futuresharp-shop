@@ -1,5 +1,14 @@
-// Personeel-beskermd — voeg 'n nuwe Aflewering-inskrywing by die
-// "aflewering"-store: naam + Paystack-subrekening-kode.
+// Personeel-beskermd — voeg 'n nuwe Aflewering-inskrywing by die "aflewering"-store.
+//
+// subrekening_kode is nou OPSIONEEL by skepping — 'n nuwe persoon wat via
+// 'n uitnodigings-skakel self aansluit het nog geen Paystack-subrekening
+// nie; personeel voeg dit later by (sien wysig-aflewering.js) sodra hulle
+// dit self by Paystack opgestel het. Status word outomaties afgelei:
+// "wag_vir_subrekening" (geen kode nie) of "aktief" (kode teenwoordig).
+//
+// kontak_inligting dra die rol-spesifieke inligting wat via die
+// uitnodigings-vorm ingesamel word (e-pos, selfoon, bankbesonderhede,
+// ens.) — sien KONTAK_VELDE hieronder vir die volledige wit-lys.
 
 const { kry_store } = require("./_blob-store");
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
@@ -11,6 +20,27 @@ function maak_slug(teks) {
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
+}
+
+// Wit-lys van kontak-/bankvelde wat ons vaslê — voorkom dat willekeurige
+// ekstra velde ongesanitiseerd gestoor word. Nie elke rol gebruik elke
+// veld nie (bv. net Outeurs gebruik id_nommer) — onbetrokke velde bly
+// eenvoudig leeg/afwesig.
+const KONTAK_VELDE = [
+  "epos", "selfoon", "adres",
+  "bank_naam", "bank_rekeningnommer", "bank_tak_kode",
+  "id_nommer", "btw_nommer", "dekkingsarea",
+];
+
+function skoon_kontak_inligting(kontak_inligting) {
+  if (!kontak_inligting || typeof kontak_inligting !== "object") return {};
+  const skoon = {};
+  for (const veld of KONTAK_VELDE) {
+    if (kontak_inligting[veld]) {
+      skoon[veld] = String(kontak_inligting[veld]).trim().slice(0, 200);
+    }
+  }
+  return skoon;
 }
 
 exports.handler = async (event, context) => {
@@ -33,10 +63,10 @@ exports.handler = async (event, context) => {
   const naam = (invoer.naam || "").trim();
   const subrekening_kode = (invoer.subrekening_kode || "").trim();
 
-  if (!naam || !subrekening_kode) {
-    return { statusCode: 400, body: "Verpligte velde: naam, subrekening_kode" };
+  if (!naam) {
+    return { statusCode: 400, body: "Verpligte veld: naam" };
   }
-  if (!subrekening_kode.startsWith("ACCT_")) {
+  if (subrekening_kode && !subrekening_kode.startsWith("ACCT_")) {
     return { statusCode: 400, body: "Subrekening-kode moet met ACCT_ begin" };
   }
 
@@ -56,6 +86,8 @@ exports.handler = async (event, context) => {
     aflewering_id,
     naam,
     subrekening_kode,
+    status: subrekening_kode ? "aktief" : "wag_vir_subrekening",
+    kontak_inligting: skoon_kontak_inligting(invoer.kontak_inligting),
     geskep_op: new Date().toISOString(),
     geskep_deur: gebruiker.email,
   };

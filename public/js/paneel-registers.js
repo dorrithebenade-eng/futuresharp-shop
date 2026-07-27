@@ -110,7 +110,9 @@ function paneel_register_wys_lys(reg, lys) {
         <div class="paneel-produk-ry">
           <div class="paneel-produk-inligting">
             <strong>${item.naam}</strong>
-            <span class="paneel-produk-outeur">${item.subrekening_kode}</span>
+            <span class="paneel-produk-outeur">
+              ${item.subrekening_kode ? item.subrekening_kode : '<span class="paneel-status-merker paneel-status-merker--wag">Wag vir subrekening</span>'}
+            </span>
           </div>
           <div class="paneel-produk-aksies">
             <button class="terug-skakel paneel-register-wysig-knoppie" data-id="${item[reg.idveld]}">Wysig</button>

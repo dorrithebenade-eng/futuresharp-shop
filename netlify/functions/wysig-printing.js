@@ -1,8 +1,27 @@
-// Personeel-beskermd — wysig een bestaande inskrywing se naam en/of
-// Paystack-subrekening-kode in die "printing"-store.
+// Personeel-beskermd — wysig 'n bestaande inskrywing se naam,
+// Paystack-subrekening-kode (opsioneel — kan later bygevoeg word sodra
+// personeel dit self by Paystack opstel), en/of kontak-inligting in die
+// "printing"-store.
 
 const { kry_store } = require("./_blob-store");
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
+
+const KONTAK_VELDE = [
+  "epos", "selfoon", "adres",
+  "bank_naam", "bank_rekeningnommer", "bank_tak_kode",
+  "id_nommer", "btw_nommer", "dekkingsarea",
+];
+
+function skoon_kontak_inligting(kontak_inligting) {
+  if (!kontak_inligting || typeof kontak_inligting !== "object") return {};
+  const skoon = {};
+  for (const veld of KONTAK_VELDE) {
+    if (kontak_inligting[veld]) {
+      skoon[veld] = String(kontak_inligting[veld]).trim().slice(0, 200);
+    }
+  }
+  return skoon;
+}
 
 exports.handler = async (event, context) => {
   if (event.httpMethod !== "POST") {
@@ -28,10 +47,10 @@ exports.handler = async (event, context) => {
   if (!printing_id) {
     return { statusCode: 400, body: "Verpligte veld: printing_id" };
   }
-  if (!naam || !subrekening_kode) {
-    return { statusCode: 400, body: "Verpligte velde: naam, subrekening_kode" };
+  if (!naam) {
+    return { statusCode: 400, body: "Verpligte veld: naam" };
   }
-  if (!subrekening_kode.startsWith("ACCT_")) {
+  if (subrekening_kode && !subrekening_kode.startsWith("ACCT_")) {
     return { statusCode: 400, body: "Subrekening-kode moet met ACCT_ begin" };
   }
 
@@ -46,6 +65,11 @@ exports.handler = async (event, context) => {
     ...bestaande,
     naam,
     subrekening_kode,
+    status: subrekening_kode ? "aktief" : "wag_vir_subrekening",
+    kontak_inligting: {
+      ...bestaande.kontak_inligting,
+      ...skoon_kontak_inligting(invoer.kontak_inligting),
+    },
     gewysig_op: new Date().toISOString(),
     gewysig_deur: gebruiker.email,
   };
