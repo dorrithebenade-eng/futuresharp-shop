@@ -32,23 +32,6 @@ function wys_status(teks) {
   if (el) el.textContent = teks;
 }
 
-// Wys 'n klein, nie-opdringerige aanduiding of die boek van 'n plaaslike
-// (aflyn) kopie af gelees word, of pas nou-nou vir aflyn-gebruik gestoor
-// is. Die element is opsioneel — as dit nie op die bladsy is nie, val
-// hierdie funksie eenvoudig stil terug (raak niks anders nie).
-function wys_aflyn_aanduiding(status) {
-  const el = document.getElementById("leser-aflyn-aanduiding");
-  if (!el) return;
-
-  if (status === "reeds_plaaslik") {
-    el.textContent = window.t ? window.t("leser_aflyn_reeds") : "📥 Aflyn beskikbaar";
-  } else if (status === "nuut_afgelaai") {
-    el.textContent = window.t ? window.t("leser_aflyn_nuut") : "📥 Nou vir aflyn-lees gestoor";
-  } else {
-    el.textContent = "";
-  }
-}
-
 async function kry_boek_titel(sessie, produk_slug) {
   try {
     const resp = await fetch("/.netlify/functions/kry-my-boeke", {
@@ -317,7 +300,6 @@ async function laai_leser() {
     const gestoorde_bladsy = await kry_gestoorde_bladsy(sessie, produk_slug);
 
     wys_status("");
-    wys_aflyn_aanduiding(aflyn_status);
     document.getElementById("leser-bekyker").hidden = false;
     await wys_bladsy(gestoorde_bladsy || 1);
   } catch (fout) {

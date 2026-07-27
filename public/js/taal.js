@@ -340,8 +340,6 @@ const WOORDEBOEK = {
     af: "Jy is vanlyn, en hierdie boek is nog nie plaaslik gestoor nie — koppel eers een keer aan die internet om dit oop te maak.",
     en: "You're offline, and this book hasn't been stored locally yet — connect to the internet once to open it.",
   },
-  leser_aflyn_reeds: { af: "📥 Aflyn beskikbaar", en: "📥 Available offline" },
-  leser_aflyn_nuut: { af: "📥 Nou vir aflyn-lees gestoor", en: "📥 Now stored for offline reading" },
   leser_van: { af: "van", en: "of" },
   leser_soek_besig: { af: "Soek …", en: "Searching …" },
   leser_soek_gevind: { af: "Gevind op bladsy", en: "Found on page" },
