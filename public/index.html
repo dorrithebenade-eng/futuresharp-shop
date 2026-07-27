@@ -75,5 +75,11 @@
   <script src="js/mandjie.js"></script>
   <script src="js/nav-rekening.js"></script>
   <script src="js/katalogus.js"></script>
+  <script>
+    // Agtergrond-besoekteller — "fire and forget", nooit die bladsy se
+    // werking laat wag of breek as dit misluk nie. Geen persoonlike
+    // inligting gestuur nie, net 'n eenvoudige tel-versoek.
+    fetch("/.netlify/functions/tel-besoek", { method: "POST" }).catch(() => {});
+  </script>
 </body>
 </html>

@@ -2051,6 +2051,52 @@ a.my-boek-kaart:focus-visible {
   margin-top: 2px;
 }
 
+/* ---------- Besoekers-statistiek-blokkie (paneelbord bo-aan) ---------- */
+
+.paneel-statistieke-blok {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin: 4px 0 28px;
+}
+
+.paneel-statistiek {
+  background: var(--grys-lig);
+  border-radius: 12px;
+  padding: 14px 20px;
+  min-width: 110px;
+  text-align: center;
+}
+
+.paneel-statistiek-syfer {
+  display: block;
+  font-family: var(--font-opskrif);
+  font-weight: 800;
+  font-size: 26px;
+  color: var(--teal);
+}
+
+.paneel-statistiek-etiket {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--grys-teks);
+  margin-top: 2px;
+}
+
+.paneel-statistiek-herstel {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--grys-teks);
+  font-size: 13px;
+  padding: 0;
+  line-height: 1;
+}
+.paneel-statistiek-herstel:hover { color: var(--koraal); }
+
 .paneel-uitnodiging-genereer-blok {
   display: flex;
   align-items: flex-end;

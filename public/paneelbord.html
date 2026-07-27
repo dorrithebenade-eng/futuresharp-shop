@@ -117,6 +117,27 @@
     <div id="paneel-status" class="stelsel-boodskap" style="display:none;"></div>
 
     <div id="paneel-inhoud" style="display:none;">
+      <div class="paneel-statistieke-blok">
+        <div class="paneel-statistiek">
+          <span class="paneel-statistiek-syfer" id="statistiek-totaal">—</span>
+          <span class="paneel-statistiek-etiket">Totaal
+            <button type="button" id="statistiek-herstel-totaal" class="paneel-statistiek-herstel" title="Herstel totaal na 0">↺</button>
+          </span>
+        </div>
+        <div class="paneel-statistiek">
+          <span class="paneel-statistiek-syfer" id="statistiek-vandag">—</span>
+          <span class="paneel-statistiek-etiket">Vandag</span>
+        </div>
+        <div class="paneel-statistiek">
+          <span class="paneel-statistiek-syfer" id="statistiek-week">—</span>
+          <span class="paneel-statistiek-etiket">Hierdie week</span>
+        </div>
+        <div class="paneel-statistiek">
+          <span class="paneel-statistiek-syfer" id="statistiek-maand">—</span>
+          <span class="paneel-statistiek-etiket">Hierdie maand</span>
+        </div>
+      </div>
+
 
       <button id="paneel-kieslys-hamburger" class="paneel-kieslys-hamburger" type="button" aria-label="Wys afdelings">
         <span>☰</span> <span>Afdelings</span>
@@ -581,6 +602,7 @@
   <script src="js/paneelbord.js"></script>
   <script src="js/paneel-registers.js"></script>
   <script src="js/paneel-uitnodigings.js"></script>
+  <script src="js/paneel-statistieke.js"></script>
   <script src="js/paneel-kieslys.js"></script>
   <script src="js/paneelbord-installeer-app.js"></script>
 </body>
