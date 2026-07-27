@@ -1946,3 +1946,29 @@ a.my-boek-kaart:focus-visible {
   background: #FCF3DA;
   color: #B8860B;
 }
+
+.paneel-status-merker--voltooi {
+  background: #E3F5F1;
+  color: var(--teal);
+}
+
+.paneel-uitnodiging-genereer-blok {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  max-width: 420px;
+  margin-bottom: 20px;
+}
+
+.paneel-uitnodiging-genereer-blok .veld-etiket {
+  margin: 0 0 6px;
+}
+
+.paneel-uitnodiging-genereer-blok select {
+  margin: 0;
+}
+
+#uitnodiging-nuwe-skakel-blok {
+  margin-bottom: 24px;
+  max-width: 560px;
+}

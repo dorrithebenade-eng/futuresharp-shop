@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="af">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sluit aan — Future Sharp</title>
+  <link rel="stylesheet" href="css/styl.css">
+</head>
+<body>
+  <header class="mini-kop">
+   <div class="mini-kop-inner">
+    <a href="index.html" class="mini-kop-merk">
+      <span class="merk-sharp">Future Sharp</span>
+      <span class="merk-skeier">—</span>
+      <span class="merk-shop">Future Shop</span>
+    </a>
+   </div>
+  </header>
+
+  <main class="paneel-wrap" style="max-width:560px;">
+    <h1 class="mandjie-titel" id="uitnodiging-titel">Sluit aan by Future Sharp</h1>
+    <p class="vb-afdeling-nota" id="uitnodiging-subtitel"></p>
+
+    <div id="uitnodiging-status" class="stelsel-boodskap" aria-live="polite"></div>
+
+    <form id="uitnodiging-vorm" style="display:none;">
+
+      <label class="veld-etiket" for="uitn-naam"><span>Volle naam</span> <span class="veld-verplig">(verplig)</span></label>
+      <input type="text" id="uitn-naam" class="veld-invoer" required>
+
+      <div id="uitnodiging-velde"></div>
+
+      <div id="uitnodiging-vorm-foute" class="vb-foute" style="display:none;"></div>
+
+      <button type="submit" id="uitnodiging-indien-knoppie" class="kaart-aksie" style="margin-top:20px;">Dien in</button>
+    </form>
+  </main>
+
+  <script src="js/uitnodiging.js"></script>
+</body>
+</html>

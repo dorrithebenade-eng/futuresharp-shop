@@ -132,6 +132,7 @@
           <button type="button" class="paneel-kieslys-item" data-afdeling="printing">Printing</button>
           <button type="button" class="paneel-kieslys-item" data-afdeling="aflewering">Aflewering</button>
           <button type="button" class="paneel-kieslys-item" data-afdeling="koepons" data-i18n="paneel_koepons_titel">Koepons</button>
+          <button type="button" class="paneel-kieslys-item" data-afdeling="uitnodigings">Uitnodigings</button>
         </nav>
 
         <div class="paneel-inhoud-kolom">
@@ -344,6 +345,42 @@
         </div>
       </section>
 
+      <section class="paneel-afdeling" data-afdeling-inhoud="uitnodigings">
+        <div class="paneel-afdeling-kop">
+          <h2 class="paneel-afdeling-titel">Uitnodigings</h2>
+        </div>
+        <p class="paneel-hulp-teks">
+          Genereer 'n skakel vir 'n nuwe rolspeler om self hul inligting in te vul.
+          Hulle word outomaties by die betrokke register gevoeg (sonder Paystack-subrekening —
+          voeg dit self later by sodra jy dit opgestel het).
+        </p>
+
+        <div class="paneel-uitnodiging-genereer-blok">
+          <label class="veld-etiket" for="uitnodiging-rol-kieser"><span>Rol</span></label>
+          <select id="uitnodiging-rol-kieser" class="veld-invoer">
+            <option value="outeur">Outeur</option>
+            <option value="vennoot">Vennoot</option>
+            <option value="ontwerp_admin">Ontwerp/Admin</option>
+            <option value="printing">Printing</option>
+            <option value="aflewering">Aflewering</option>
+          </select>
+          <button id="uitnodiging-genereer-knoppie" class="kaart-aksie" type="button">+ Genereer skakel</button>
+        </div>
+
+        <div id="uitnodiging-nuwe-skakel-blok" style="display:none;">
+          <label class="veld-etiket">Nuwe skakel — kopieer en stuur aan die persoon</label>
+          <div class="paneel-kode-ry">
+            <input type="text" id="uitnodiging-nuwe-skakel-veld" class="veld-invoer" readonly>
+            <button type="button" id="uitnodiging-kopieer-knoppie" class="terug-skakel">Kopieer</button>
+          </div>
+        </div>
+
+        <h3 class="paneel-afdeling-titel" style="font-size:16px;margin-top:28px;">Rekord van uitnodigings</h3>
+        <div id="paneel-uitnodigings-lys">
+          <p class="stelsel-boodskap">Uitnodigings word gelaai …</p>
+        </div>
+      </section>
+
       <section id="paneel-vorm-afdeling" class="paneel-afdeling" data-afdeling-inhoud="katalogus" style="display:none;">
         <div class="paneel-afdeling-kop">
           <h2 id="paneel-vorm-titel" class="paneel-afdeling-titel" data-i18n="paneel_voeg_produk_by_titel">Voeg produk by</h2>
@@ -543,6 +580,7 @@
   <script src="js/taal.js"></script>
   <script src="js/paneelbord.js"></script>
   <script src="js/paneel-registers.js"></script>
+  <script src="js/paneel-uitnodigings.js"></script>
   <script src="js/paneel-kieslys.js"></script>
   <script src="js/paneelbord-installeer-app.js"></script>
 </body>
