@@ -5,6 +5,126 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sluit aan — Future Sharp</title>
   <link rel="stylesheet" href="css/styl.css">
+  <style>
+    /* ---------- Uitnodiging-bladsy: groter teks, ryker grafika ----------
+       Doelbewus 'n eie stylblok, net vir hierdie bladsy — raak nie die
+       res van die webwerf se styl.css-reëls aan nie. */
+
+    body { background: #EDEDED; }
+
+    .uitn-raam {
+      max-width: 480px;
+      margin: 24px auto 60px;
+      background: var(--wit);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    }
+
+    .uitn-kop {
+      background: var(--teal-helder);
+      padding: 32px 24px 28px;
+      text-align: center;
+    }
+    .uitn-kop img { width: 84px; height: 84px; margin-bottom: 14px; }
+    .uitn-kop h1 {
+      color: var(--wit);
+      font-size: 26px;
+      font-weight: 800;
+      margin: 0 0 8px;
+      line-height: 1.25;
+      font-family: var(--font-opskrif);
+    }
+    .uitn-kop p {
+      color: var(--wit);
+      font-size: 17px;
+      opacity: 0.95;
+      margin: 0;
+      line-height: 1.4;
+      font-family: var(--font-liggaam);
+    }
+
+    .uitn-inhoud { padding: 26px 22px; }
+
+    .uitn-stap-merker {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--grys-lig);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 24px;
+      font-size: 15px;
+      color: var(--grys-teks);
+    }
+    .uitn-stap-merker .syfer {
+      width: 26px; height: 26px; border-radius: 50%;
+      background: var(--koraal); color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 14px; flex-shrink: 0;
+    }
+
+    .uitn-veld-groep { margin-bottom: 22px; }
+    .uitn-etiket-groot {
+      display: block;
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--swart);
+      font-family: var(--font-opskrif);
+    }
+    .uitn-etiket-groot .veld-verplig,
+    .uitn-etiket-groot .veld-opsioneel {
+      font-size: 14px;
+      font-weight: 500;
+      margin-left: 4px;
+    }
+    .uitn-invoer-groot {
+      width: 100%;
+      padding: 16px;
+      font-size: 18px;
+      border: 2px solid #D8D6D1;
+      border-radius: 10px;
+      font-family: var(--font-liggaam);
+    }
+    .uitn-invoer-groot:focus {
+      border-color: var(--teal-helder);
+      outline: none;
+    }
+
+    .uitn-ikoon-etiket {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px; height: 32px;
+      background: var(--teal-helder);
+      border-radius: 8px;
+      margin-right: 8px;
+      font-size: 15px;
+      vertical-align: middle;
+    }
+
+    .uitn-knoppie-groot {
+      width: 100%;
+      background: var(--koraal);
+      color: var(--wit);
+      border: none;
+      border-radius: 12px;
+      padding: 18px;
+      font-size: 19px;
+      font-weight: 800;
+      cursor: pointer;
+      margin-top: 8px;
+      font-family: var(--font-opskrif);
+    }
+    .uitn-knoppie-groot:disabled { opacity: 0.6; }
+
+    #uitnodiging-status.stelsel-boodskap {
+      font-size: 17px;
+      padding: 20px;
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
   <header class="mini-kop">
@@ -17,23 +137,37 @@
    </div>
   </header>
 
-  <main class="paneel-wrap" style="max-width:560px;">
-    <h1 class="mandjie-titel" id="uitnodiging-titel">Sluit aan by Future Sharp</h1>
-    <p class="vb-afdeling-nota" id="uitnodiging-subtitel"></p>
+  <main class="uitn-raam">
+    <div class="uitn-kop">
+      <img src="/icons/ikoon-512.png" alt="Future Sharp" onerror="this.style.display='none'">
+      <h1 id="uitnodiging-titel">Welkom by Future Sharp!</h1>
+      <p id="uitnodiging-subtitel"></p>
+    </div>
 
-    <div id="uitnodiging-status" class="stelsel-boodskap" aria-live="polite"></div>
+    <div class="uitn-inhoud">
+      <div id="uitnodiging-status" class="stelsel-boodskap" aria-live="polite"></div>
 
-    <form id="uitnodiging-vorm" style="display:none;">
+      <form id="uitnodiging-vorm" style="display:none;">
+        <div class="uitn-stap-merker">
+          <span class="syfer">1</span>
+          Vul jou besonderhede hieronder in — dit neem net 'n paar minute
+        </div>
 
-      <label class="veld-etiket" for="uitn-naam"><span>Volle naam</span> <span class="veld-verplig">(verplig)</span></label>
-      <input type="text" id="uitn-naam" class="veld-invoer" required>
+        <div class="uitn-veld-groep">
+          <label class="uitn-etiket-groot" for="uitn-naam">
+            <span class="uitn-ikoon-etiket">👤</span>Volle naam
+            <span class="veld-verplig">(verplig)</span>
+          </label>
+          <input type="text" id="uitn-naam" class="uitn-invoer-groot" required>
+        </div>
 
-      <div id="uitnodiging-velde"></div>
+        <div id="uitnodiging-velde"></div>
 
-      <div id="uitnodiging-vorm-foute" class="vb-foute" style="display:none;"></div>
+        <div id="uitnodiging-vorm-foute" class="vb-foute" style="display:none;"></div>
 
-      <button type="submit" id="uitnodiging-indien-knoppie" class="kaart-aksie" style="margin-top:20px;">Dien in</button>
-    </form>
+        <button type="submit" id="uitnodiging-indien-knoppie" class="uitn-knoppie-groot">Dien in →</button>
+      </form>
+    </div>
   </main>
 
   <script src="js/uitnodiging.js"></script>

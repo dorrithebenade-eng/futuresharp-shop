@@ -12,6 +12,19 @@ const ROL_ETIKETTE = {
 
 // Rol-spesifieke kontak-/bankvelde — id moet 'n sleutel in KONTAK_VELDE
 // (bediener-kant wit-lys) wees.
+// Ikoon per veld-tipe — vir die groter, grafies-ryker uitleg.
+const VELD_IKONE = {
+  epos: "📧",
+  selfoon: "📱",
+  id_nommer: "🪪",
+  adres: "🏠",
+  bank_naam: "🏦",
+  bank_rekeningnommer: "🏦",
+  bank_tak_kode: "🏦",
+  btw_nommer: "🧾",
+  dekkingsarea: "📍",
+};
+
 const ROL_VELDE = {
   outeur: [
     { id: "epos", etiket: "E-pos", tipe: "email", verplig: true },
@@ -73,11 +86,13 @@ function bou_velde(rol_tipe) {
   wrap.innerHTML = velde
     .map(
       (veld) => `
-        <label class="veld-etiket" for="uitn-${veld.id}">
-          <span>${veld.etiket}</span>
-          ${veld.verplig ? '<span class="veld-verplig">(verplig)</span>' : '<span class="veld-opsioneel">(opsioneel)</span>'}
-        </label>
-        <input type="${veld.tipe}" id="uitn-${veld.id}" class="veld-invoer" ${veld.verplig ? "required" : ""}>
+        <div class="uitn-veld-groep">
+          <label class="uitn-etiket-groot" for="uitn-${veld.id}">
+            <span class="uitn-ikoon-etiket">${VELD_IKONE[veld.id] || "✏️"}</span>${veld.etiket}
+            ${veld.verplig ? '<span class="veld-verplig">(verplig)</span>' : '<span class="veld-opsioneel">(opsioneel)</span>'}
+          </label>
+          <input type="${veld.tipe}" id="uitn-${veld.id}" class="uitn-invoer-groot" ${veld.verplig ? "required" : ""}>
+        </div>
       `
     )
     .join("");
@@ -155,9 +170,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     const rol_etiket = ROL_ETIKETTE[data.rol_tipe] || data.rol_tipe;
-    document.getElementById("uitnodiging-titel").textContent = `Sluit aan as ${rol_etiket}`;
+    document.getElementById("uitnodiging-titel").textContent = "Welkom by Future Sharp!";
     document.getElementById("uitnodiging-subtitel").textContent =
-      "Voltooi jou besonderhede hieronder. Future Sharp sal jou inligting gebruik om jou by die stelsel te registreer.";
+      `Sluit aan as ${rol_etiket} — dit neem net 'n paar minute`;
 
     bou_velde(data.rol_tipe);
     document.getElementById("uitnodiging-status").style.display = "none";
