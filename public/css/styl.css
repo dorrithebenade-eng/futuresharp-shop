@@ -2044,6 +2044,13 @@ a.my-boek-kaart:focus-visible {
   color: var(--teal);
 }
 
+.paneel-produk-besigtigings {
+  font-size: 12px;
+  color: var(--grys-teks);
+  display: inline-block;
+  margin-top: 2px;
+}
+
 .paneel-uitnodiging-genereer-blok {
   display: flex;
   align-items: flex-end;

@@ -131,6 +131,7 @@ function wys_produkte_lys(produkte) {
             <strong>${produk.titel}</strong>
             <span class="paneel-produk-outeur">${produk.outeur}</span>
             <span class="paneel-produk-pryse">${pryse.join(" · ") || t("paneel_geen_formaat")}</span>
+            <span class="paneel-produk-besigtigings">👁 ${produk.besigtigings || 0}</span>
             ${!produk.aktief ? `<span class="paneel-onaktief-etiket">${t("paneel_onaktief")}</span>` : ""}
           </div>
           <div class="paneel-produk-aksies">
