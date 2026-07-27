@@ -101,7 +101,7 @@ function bou_kaart(produk, besit_stel) {
           ? (produk.etiket.teks_en || produk.etiket.teks_af || produk.etiket.teks || "")
           : (produk.etiket.teks_af || produk.etiket.teks_en || produk.etiket.teks || "");
         const teks_lengte = etiket_teks.length;
-        const grootte_klas = teks_lengte <= 6 ? "kort" : teks_lengte <= 12 ? "medium" : "lank";
+        const grootte_klas = teks_lengte <= 5 ? "kort" : teks_lengte <= 10 ? "medium" : "lank";
         const kleur_klas_teks = produk.etiket.kleur === "swart" ? " kaart-etiket-ster-teks--swart" : "";
         return `
           <div class="kaart-etiket-ster-wrap" aria-hidden="true">

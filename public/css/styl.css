@@ -275,8 +275,8 @@ body {
 }
 
 .kaart-etiket-ster-teks--kort { font-size: 19px; }
-.kaart-etiket-ster-teks--medium { font-size: 15px; }
-.kaart-etiket-ster-teks--lank { font-size: 12px; }
+.kaart-etiket-ster-teks--medium { font-size: 14px; }
+.kaart-etiket-ster-teks--lank { font-size: 10.5px; }
 
 .kaart-etiket-ster-teks--swart { color: var(--wit); }
 
