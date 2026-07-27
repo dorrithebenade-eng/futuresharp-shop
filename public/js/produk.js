@@ -99,12 +99,10 @@ function wys_produk(produk) {
         <h1 class="produk-titel">${produk.titel}</h1>
         <p class="produk-outeur">${produk.outeur}</p>
         ${bou_beskikbaar_merkers(eboek, hardeKopie)}
-      </div>
-    </div>
 
-    <div class="produk-beskrywing-afdeling">
-      <div class="afdeling-etiket">${t("oor_hierdie_boek")}</div>
-      <p class="produk-beskrywing">${produk.vol_beskrywing || produk.oorsig || ""}</p>
+        <div class="afdeling-etiket produk-beskrywing-etiket">${t("oor_hierdie_boek")}</div>
+        <p class="produk-beskrywing">${produk.vol_beskrywing || produk.oorsig || ""}</p>
+      </div>
     </div>
 
     <div class="koop-afdeling">

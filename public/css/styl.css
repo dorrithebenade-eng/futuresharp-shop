@@ -1293,9 +1293,8 @@ body {
 
 /* ---------- Produk-bladsy: beskrywing- en koop-afdelings ---------- */
 
-.produk-beskrywing-afdeling {
-  max-width: 1000px;
-  margin: 36px 0 8px;
+.produk-beskrywing-etiket {
+  margin-top: 20px;
 }
 
 .koop-afdeling {
