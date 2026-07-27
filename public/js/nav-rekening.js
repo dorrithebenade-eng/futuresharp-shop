@@ -31,6 +31,14 @@
   kursusse_skakel.textContent = window.t ? window.t("nav_kursusse") : "Kursusse";
 
   regs.insertBefore(kursusse_skakel, regs.firstChild);
+
+  const kontak_skakel = document.createElement("a");
+  kontak_skakel.href = "kontak.html";
+  kontak_skakel.className = "mini-kop-kursusse-skakel";
+  kontak_skakel.title = "Is jy 'n skrywer? Kontak ons oor jou boek";
+  kontak_skakel.textContent = window.t ? window.t("nav_kontak") : "Kontak";
+
+  regs.insertBefore(kontak_skakel, kursusse_skakel.nextSibling);
 })();
 
 // --- 1. Mobiele hamburger-kieslys (loop ongeag aanmeld-status) ---

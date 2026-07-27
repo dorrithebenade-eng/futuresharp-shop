@@ -23,6 +23,7 @@ const WOORDEBOEK = {
   // Nav
   nav_mandjie: { af: "Mandjie", en: "Cart" },
   nav_kursusse: { af: "Kursusse", en: "Courses" },
+  nav_kontak: { af: "Kontak", en: "Contact" },
 
   // Kop (tuisblad)
   kop_eyebrow: { af: "E-boeke · Harde kopieë", en: "E-books · Hard copies" },
