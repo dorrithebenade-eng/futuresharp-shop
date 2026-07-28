@@ -7,7 +7,12 @@ function formateer_maand_etiket(maand_sleutel) {
     "Januarie", "Februarie", "Maart", "April", "Mei", "Junie",
     "Julie", "Augustus", "September", "Oktober", "November", "Desember",
   ];
-  return `${maande_af[Number(maand_nommer) - 1]} ${jaar}`;
+  const maande_en = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December",
+  ];
+  const maand_lys = (typeof kry_huidige_taal === "function" && kry_huidige_taal() === "en") ? maande_en : maande_af;
+  return `${maand_lys[Number(maand_nommer) - 1]} ${jaar}`;
 }
 
 function wys_maandelikse_geskiedenis(geskiedenis) {
@@ -20,7 +25,7 @@ function wys_maandelikse_geskiedenis(geskiedenis) {
 
   plek.innerHTML = `
     <details class="paneel-statistieke-geskiedenis">
-      <summary>Maandelikse geskiedenis (${geskiedenis.length})</summary>
+      <summary>${t("statistiek_maandelikse_geskiedenis")} (${geskiedenis.length})</summary>
       <ul class="paneel-statistieke-geskiedenis-lys">
         ${geskiedenis
           .map((m) => `<li><span>${formateer_maand_etiket(m.maand)}</span><strong>${m.telling}</strong></li>`)
@@ -49,7 +54,7 @@ async function paneel_statistieke_laai() {
 }
 
 async function paneel_statistiek_herstel_totaal() {
-  if (!window.confirm("Herstel die totale besoekerstal na 0? Dit kan nie ongedaan gemaak word nie.")) {
+  if (!window.confirm(t("statistiek_herstel_bevestig"))) {
     return;
   }
 
@@ -66,7 +71,7 @@ async function paneel_statistiek_herstel_totaal() {
     paneel_statistieke_laai();
   } catch (fout) {
     console.error("Kon nie totaal herstel nie:", fout);
-    alert("Kon nie herstel nie — probeer weer.");
+    alert(t("statistiek_kon_nie_herstel"));
   } finally {
     knoppie.disabled = false;
   }

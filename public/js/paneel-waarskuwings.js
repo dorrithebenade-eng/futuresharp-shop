@@ -25,14 +25,14 @@ async function paneel_waarskuwings_laai() {
     const lys = data.waarskuwings || [];
 
     if (!lys.length) {
-      wrap.innerHTML = `<p class="stelsel-boodskap">Geen betaling-waarskuwings nie — alles werk soos verwag. ✅</p>`;
+      wrap.innerHTML = `<p class="stelsel-boodskap">${t("waarskuwing_geen")}</p>`;
       return;
     }
 
     wrap.innerHTML = lys
       .map((b) => {
         const items_teks = (b.items || [])
-          .map((i) => `${i.titel} (${i.formaat === "harde_kopie" ? "Harde kopie" : "E-boek"})`)
+          .map((i) => `${i.titel} (${i.formaat === "harde_kopie" ? t("hardekopie_etiket") : t("eboek_etiket")})`)
           .join(", ");
         return `
           <div class="paneel-waarskuwing-ry">
@@ -48,7 +48,7 @@ async function paneel_waarskuwings_laai() {
       .join("");
   } catch (fout) {
     console.error("Kon nie betaling-waarskuwings laai nie:", fout);
-    wrap.innerHTML = `<p class="stelsel-boodskap">Kon nie waarskuwings laai nie.</p>`;
+    wrap.innerHTML = `<p class="stelsel-boodskap">${t("waarskuwing_kon_nie_laai")}</p>`;
   }
 }
 

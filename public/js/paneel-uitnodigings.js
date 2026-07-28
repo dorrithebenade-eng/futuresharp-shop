@@ -3,19 +3,22 @@
 // van alle hangende/voltooide uitnodigings.
 // kry_outorisasie_kop() kom van paneelbord.js, wat eerste laai.
 
-const ROL_ETIKETTE_PANEEL = {
-  outeur: "Outeur",
-  vennoot: "Vennoot",
-  ontwerp_admin: "Ontwerp/Admin",
-  printing: "Printing",
-  aflewering: "Aflewering",
-};
+function kry_rol_etiket_paneel(rol_tipe) {
+  const sleutels = {
+    outeur: "rol_outeur",
+    vennoot: "rol_vennoot",
+    ontwerp_admin: "rol_ontwerp_admin",
+    printing: "rol_printing",
+    aflewering: "rol_aflewering",
+  };
+  return sleutels[rol_tipe] ? t(sleutels[rol_tipe]) : rol_tipe;
+}
 
 async function paneel_uitnodiging_genereer() {
   const rol_tipe = document.getElementById("uitnodiging-rol-kieser").value;
   const knoppie = document.getElementById("uitnodiging-genereer-knoppie");
   knoppie.disabled = true;
-  knoppie.textContent = "Besig …";
+  knoppie.textContent = t("besig");
 
   try {
     const resp = await fetch("/.netlify/functions/skep-uitnodiging", {
@@ -53,7 +56,7 @@ function paneel_uitnodiging_kopieer() {
   navigator.clipboard.writeText(skakelveld.value).then(() => {
     const knoppie = document.getElementById("uitnodiging-kopieer-knoppie");
     const oorspronklike = knoppie.textContent;
-    knoppie.textContent = "Gekopieer!";
+    knoppie.textContent = t("uitnodiging_gekopieer");
     setTimeout(() => (knoppie.textContent = oorspronklike), 1500);
   });
 }
@@ -76,7 +79,7 @@ async function paneel_uitnodigings_laai() {
     const lys = data.uitnodigings || [];
 
     if (!lys.length) {
-      wrap.innerHTML = `<p class="stelsel-boodskap">Nog geen uitnodigings gestuur nie.</p>`;
+      wrap.innerHTML = `<p class="stelsel-boodskap">${t("uitnodiging_geen_gestuur")}</p>`;
       return;
     }
 
@@ -86,11 +89,11 @@ async function paneel_uitnodigings_laai() {
         return `
           <div class="paneel-produk-ry">
             <div class="paneel-produk-inligting">
-              <strong>${ROL_ETIKETTE_PANEEL[u.rol_tipe] || u.rol_tipe}</strong>
+              <strong>${kry_rol_etiket_paneel(u.rol_tipe)}</strong>
               <span class="paneel-produk-outeur">
                 ${is_voltooi
-                  ? `<span class="paneel-status-merker paneel-status-merker--voltooi">Voltooi — ${formateer_datum_kort(u.voltooi_op)}</span>`
-                  : `<span class="paneel-status-merker paneel-status-merker--wag">Hangend sedert ${formateer_datum_kort(u.geskep_op)}</span>`
+                  ? `<span class="paneel-status-merker paneel-status-merker--voltooi">${t("uitnodiging_status_voltooi")} — ${formateer_datum_kort(u.voltooi_op)}</span>`
+                  : `<span class="paneel-status-merker paneel-status-merker--wag">${t("uitnodiging_status_hangend")} ${formateer_datum_kort(u.geskep_op)}</span>`
                 }
               </span>
             </div>
@@ -100,7 +103,7 @@ async function paneel_uitnodigings_laai() {
       .join("");
   } catch (fout) {
     console.error("Kon nie uitnodigings laai nie:", fout);
-    wrap.innerHTML = `<p class="stelsel-boodskap">Kon nie uitnodigings laai nie.</p>`;
+    wrap.innerHTML = `<p class="stelsel-boodskap">${t("uitnodiging_kon_nie_laai")}</p>`;
   }
 }
 

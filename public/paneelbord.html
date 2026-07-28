@@ -120,21 +120,21 @@
       <div class="paneel-statistieke-blok">
         <div class="paneel-statistiek">
           <span class="paneel-statistiek-syfer" id="statistiek-totaal">—</span>
-          <span class="paneel-statistiek-etiket">Totaal
+          <span class="paneel-statistiek-etiket"><span data-i18n="statistiek_totaal">Totaal</span>
             <button type="button" id="statistiek-herstel-totaal" class="paneel-statistiek-herstel" title="Herstel totaal na 0">↺</button>
           </span>
         </div>
         <div class="paneel-statistiek">
           <span class="paneel-statistiek-syfer" id="statistiek-vandag">—</span>
-          <span class="paneel-statistiek-etiket">Vandag</span>
+          <span class="paneel-statistiek-etiket" data-i18n="statistiek_vandag">Vandag</span>
         </div>
         <div class="paneel-statistiek">
           <span class="paneel-statistiek-syfer" id="statistiek-week">—</span>
-          <span class="paneel-statistiek-etiket">Hierdie week</span>
+          <span class="paneel-statistiek-etiket" data-i18n="statistiek_week">Hierdie week</span>
         </div>
         <div class="paneel-statistiek">
           <span class="paneel-statistiek-syfer" id="statistiek-maand">—</span>
-          <span class="paneel-statistiek-etiket">Hierdie maand</span>
+          <span class="paneel-statistiek-etiket" data-i18n="statistiek_maand">Hierdie maand</span>
         </div>
       </div>
       <div id="paneel-statistieke-geskiedenis-plek"></div>
@@ -154,9 +154,9 @@
           <button type="button" class="paneel-kieslys-item" data-afdeling="printing">Printing</button>
           <button type="button" class="paneel-kieslys-item" data-afdeling="aflewering">Aflewering</button>
           <button type="button" class="paneel-kieslys-item" data-afdeling="koepons" data-i18n="paneel_koepons_titel">Koepons</button>
-          <button type="button" class="paneel-kieslys-item" data-afdeling="uitnodigings">Uitnodigings</button>
-          <button type="button" class="paneel-kieslys-item" data-afdeling="waarskuwings">⚠️ Waarskuwings</button>
-          <button type="button" class="paneel-kieslys-item" data-afdeling="kategoriee">Kategorieë</button>
+          <button type="button" class="paneel-kieslys-item" data-afdeling="uitnodigings" data-i18n="paneel_nav_uitnodigings">Uitnodigings</button>
+          <button type="button" class="paneel-kieslys-item" data-afdeling="waarskuwings"><span data-i18n="paneel_nav_waarskuwings">⚠️ Waarskuwings</span></button>
+          <button type="button" class="paneel-kieslys-item" data-afdeling="kategoriee" data-i18n="paneel_nav_kategoriee">Kategorieë</button>
         </nav>
 
         <div class="paneel-inhoud-kolom">
@@ -371,45 +371,45 @@
 
       <section class="paneel-afdeling" data-afdeling-inhoud="uitnodigings">
         <div class="paneel-afdeling-kop">
-          <h2 class="paneel-afdeling-titel">Uitnodigings</h2>
+          <h2 class="paneel-afdeling-titel" data-i18n="paneel_nav_uitnodigings">Uitnodigings</h2>
         </div>
-        <p class="paneel-hulp-teks">
+        <p class="paneel-hulp-teks" data-i18n="uitnodiging_hulp_teks">
           Genereer 'n skakel vir 'n nuwe rolspeler om self hul inligting in te vul.
           Hulle word outomaties by die betrokke register gevoeg (sonder Paystack-subrekening —
           voeg dit self later by sodra jy dit opgestel het).
         </p>
 
         <div class="paneel-uitnodiging-genereer-blok">
-          <label class="veld-etiket" for="uitnodiging-rol-kieser"><span>Rol</span></label>
+          <label class="veld-etiket" for="uitnodiging-rol-kieser"><span data-i18n="uitnodiging_rol_etiket">Rol</span></label>
           <select id="uitnodiging-rol-kieser" class="veld-invoer">
-            <option value="outeur">Outeur</option>
-            <option value="vennoot">Vennoot</option>
-            <option value="ontwerp_admin">Ontwerp/Admin</option>
-            <option value="printing">Printing</option>
-            <option value="aflewering">Aflewering</option>
+            <option value="outeur" data-i18n="rol_outeur">Outeur</option>
+            <option value="vennoot" data-i18n="rol_vennoot">Vennoot</option>
+            <option value="ontwerp_admin" data-i18n="rol_ontwerp_admin">Ontwerp/Admin</option>
+            <option value="printing" data-i18n="rol_printing">Printing</option>
+            <option value="aflewering" data-i18n="rol_aflewering">Aflewering</option>
           </select>
-          <button id="uitnodiging-genereer-knoppie" class="kaart-aksie" type="button">+ Genereer skakel</button>
+          <button id="uitnodiging-genereer-knoppie" class="kaart-aksie" type="button" data-i18n="uitnodiging_genereer_knoppie">+ Genereer skakel</button>
         </div>
 
         <div id="uitnodiging-nuwe-skakel-blok" style="display:none;">
-          <label class="veld-etiket">Nuwe skakel — kopieer en stuur aan die persoon</label>
+          <label class="veld-etiket" data-i18n="uitnodiging_nuwe_skakel_etiket">Nuwe skakel — kopieer en stuur aan die persoon</label>
           <div class="paneel-kode-ry">
             <input type="text" id="uitnodiging-nuwe-skakel-veld" class="veld-invoer" readonly>
-            <button type="button" id="uitnodiging-kopieer-knoppie" class="terug-skakel">Kopieer</button>
+            <button type="button" id="uitnodiging-kopieer-knoppie" class="terug-skakel" data-i18n="paneel_kopieer">Kopieer</button>
           </div>
         </div>
 
-        <h3 class="paneel-afdeling-titel" style="font-size:16px;margin-top:28px;">Rekord van uitnodigings</h3>
+        <h3 class="paneel-afdeling-titel" style="font-size:16px;margin-top:28px;" data-i18n="uitnodiging_rekord_titel">Rekord van uitnodigings</h3>
         <div id="paneel-uitnodigings-lys">
-          <p class="stelsel-boodskap">Uitnodigings word gelaai …</p>
+          <p class="stelsel-boodskap" data-i18n="uitnodiging_lys_laai">Uitnodigings word gelaai …</p>
         </div>
       </section>
 
       <section class="paneel-afdeling" data-afdeling-inhoud="waarskuwings">
         <div class="paneel-afdeling-kop">
-          <h2 class="paneel-afdeling-titel">⚠️ Betaling-waarskuwings</h2>
+          <h2 class="paneel-afdeling-titel" data-i18n="waarskuwing_titel">⚠️ Betaling-waarskuwings</h2>
         </div>
-        <p class="paneel-hulp-teks">
+        <p class="paneel-hulp-teks" data-i18n="waarskuwing_hulp_teks">
           Bestellings waar 'n outeur/vennoot se subrekening-kode nie kon werk nie
           (bv. foutief of nog nie by Paystack opgestel nie) — die betaling het steeds
           deurgegaan, met die volle bedrag na die hoofrekening. Gaan die betrokke
@@ -417,30 +417,30 @@
           bestellings vir dieselfde boek sal dan weer korrek verdeel word.
         </p>
         <div id="paneel-waarskuwings-lys">
-          <p class="stelsel-boodskap">Word gelaai …</p>
+          <p class="stelsel-boodskap" data-i18n="paneel_word_gelaai">Word gelaai …</p>
         </div>
       </section>
 
       <section class="paneel-afdeling" data-afdeling-inhoud="kategoriee">
         <div class="paneel-afdeling-kop">
-          <h2 class="paneel-afdeling-titel">Kategorieë</h2>
-          <button id="paneel-voeg-kategorie-by-knoppie" class="kaart-aksie" type="button">+ Voeg kategorie by</button>
+          <h2 class="paneel-afdeling-titel" data-i18n="paneel_nav_kategoriee">Kategorieë</h2>
+          <button id="paneel-voeg-kategorie-by-knoppie" class="kaart-aksie" type="button" data-i18n="kategorie_voeg_by_knoppie">+ Voeg kategorie by</button>
         </div>
-        <p class="paneel-hulp-teks">
+        <p class="paneel-hulp-teks" data-i18n="kategorie_hulp_teks">
           Kategorieë wat kopers op die katalogus kan gebruik om te filter (bv. Fiksie, Selfhelp).
           'n Boek kan in meer as een kategorie wees.
         </p>
         <div id="paneel-kategoriee-lys">
-          <p class="stelsel-boodskap">Word gelaai …</p>
+          <p class="stelsel-boodskap" data-i18n="paneel_word_gelaai">Word gelaai …</p>
         </div>
 
         <div id="paneel-kategorie-vorm-afdeling" style="display:none; margin-top:20px;">
           <form id="paneel-kategorie-vorm">
-            <label class="veld-etiket" for="kategorie-vorm-naam"><span>Naam</span> <span class="veld-verplig">(verplig)</span></label>
+            <label class="veld-etiket" for="kategorie-vorm-naam"><span data-i18n="kategorie_naam_etiket">Naam</span> <span class="veld-verplig" data-i18n="verplig">(verplig)</span></label>
             <input type="text" id="kategorie-vorm-naam" class="veld-invoer" required>
             <div id="paneel-kategorie-vorm-foute" class="vb-foute" style="display:none;"></div>
-            <button type="submit" id="paneel-kategorie-vorm-indien" class="kaart-aksie" style="margin-top:14px;">+ Voeg kategorie by</button>
-            <button type="button" id="paneel-kategorie-vorm-kanselleer" class="terug-skakel" style="margin-left:10px;">Kanselleer</button>
+            <button type="submit" id="paneel-kategorie-vorm-indien" class="kaart-aksie" style="margin-top:14px;" data-i18n="kategorie_voeg_by_knoppie">+ Voeg kategorie by</button>
+            <button type="button" id="paneel-kategorie-vorm-kanselleer" class="terug-skakel" style="margin-left:10px;" data-i18n="paneel_kanselleer_kort">Kanselleer</button>
           </form>
         </div>
       </section>
@@ -464,7 +464,7 @@
           <div id="vorm-outeurs-lys" class="paneel-outeurs-lys"></div>
           <button type="button" id="vorm-voeg-outeur-by" class="terug-skakel" style="margin-bottom:16px;">+ Voeg outeur by</button>
 
-          <label class="veld-etiket">Kategorieë <span class="veld-opsioneel">(opsioneel)</span></label>
+          <label class="veld-etiket"><span data-i18n="paneel_nav_kategoriee">Kategorieë</span> <span class="veld-opsioneel" data-i18n="opsioneel">(opsioneel)</span></label>
           <div id="vorm-kategoriee-lys" class="paneel-kategoriee-merkblokkies"></div>
 
           <label class="veld-etiket" for="vorm-oorsig" data-i18n="vorm_oorsig_etiket">Oorsig (verskyn op die katalogus-kaart, ongeveer 100 woorde)</label>

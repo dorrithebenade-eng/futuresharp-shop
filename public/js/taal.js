@@ -25,6 +25,74 @@ const WOORDEBOEK = {
   nav_kursusse: { af: "Kursusse", en: "Courses" },
   nav_kontak: { af: "Kontak", en: "Contact" },
   filter_alle: { af: "Alle", en: "All" },
+  opsioneel: { af: "(opsioneel)", en: "(optional)" },
+
+  // Statistieke-blokkie
+  statistiek_totaal: { af: "Totaal", en: "Total" },
+  statistiek_vandag: { af: "Vandag", en: "Today" },
+  statistiek_week: { af: "Hierdie week", en: "This week" },
+  statistiek_maand: { af: "Hierdie maand", en: "This month" },
+  statistiek_maandelikse_geskiedenis: { af: "Maandelikse geskiedenis", en: "Monthly history" },
+  statistiek_herstel_bevestig: {
+    af: "Herstel die totale besoekerstal na 0? Dit kan nie ongedaan gemaak word nie.",
+    en: "Reset the total visitor count to 0? This cannot be undone.",
+  },
+  statistiek_kon_nie_herstel: { af: "Kon nie herstel nie — probeer weer.", en: "Could not reset — try again." },
+
+  // Sy-kieslys-oortjies
+  paneel_nav_uitnodigings: { af: "Uitnodigings", en: "Invitations" },
+  paneel_nav_waarskuwings: { af: "⚠️ Waarskuwings", en: "⚠️ Warnings" },
+  paneel_nav_kategoriee: { af: "Kategorieë", en: "Categories" },
+  paneel_word_gelaai: { af: "Word gelaai …", en: "Loading …" },
+  paneel_kopieer: { af: "Kopieer", en: "Copy" },
+  paneel_kanselleer_kort: { af: "Kanselleer", en: "Cancel" },
+
+  // Uitnodigings-afdeling
+  uitnodiging_hulp_teks: {
+    af: "Genereer 'n skakel vir 'n nuwe rolspeler om self hul inligting in te vul. Hulle word outomaties by die betrokke register gevoeg (sonder Paystack-subrekening — voeg dit self later by sodra jy dit opgestel het).",
+    en: "Generate a link for a new role-player to fill in their own information. They're automatically added to the relevant register (without a Paystack subaccount — add that yourself later once you've set it up).",
+  },
+  uitnodiging_rol_etiket: { af: "Rol", en: "Role" },
+  rol_outeur: { af: "Outeur", en: "Author" },
+  rol_vennoot: { af: "Vennoot", en: "Partner" },
+  rol_ontwerp_admin: { af: "Ontwerp/Admin", en: "Design/Admin" },
+  rol_printing: { af: "Printing", en: "Printing" },
+  rol_aflewering: { af: "Aflewering", en: "Delivery" },
+  uitnodiging_genereer_knoppie: { af: "+ Genereer skakel", en: "+ Generate link" },
+  uitnodiging_nuwe_skakel_etiket: { af: "Nuwe skakel — kopieer en stuur aan die persoon", en: "New link — copy and send to the person" },
+  uitnodiging_rekord_titel: { af: "Rekord van uitnodigings", en: "Record of invitations" },
+  uitnodiging_lys_laai: { af: "Uitnodigings word gelaai …", en: "Loading invitations …" },
+  uitnodiging_gekopieer: { af: "Gekopieer!", en: "Copied!" },
+  uitnodiging_geen_gestuur: { af: "Nog geen uitnodigings gestuur nie.", en: "No invitations sent yet." },
+  uitnodiging_status_voltooi: { af: "Voltooi", en: "Completed" },
+  uitnodiging_status_hangend: { af: "Hangend sedert", en: "Pending since" },
+  uitnodiging_kon_nie_laai: { af: "Kon nie uitnodigings laai nie.", en: "Could not load invitations." },
+
+  // Waarskuwings-afdeling
+  waarskuwing_titel: { af: "⚠️ Betaling-waarskuwings", en: "⚠️ Payment warnings" },
+  waarskuwing_hulp_teks: {
+    af: "Bestellings waar 'n outeur/vennoot se subrekening-kode nie kon werk nie (bv. foutief of nog nie by Paystack opgestel nie) — die betaling het steeds deurgegaan, met die volle bedrag na die hoofrekening. Gaan die betrokke subrekening-kode(s) na en werk dit reg in die register; toekomstige bestellings vir dieselfde boek sal dan weer korrek verdeel word.",
+    en: "Orders where an author/partner's subaccount code didn't work (e.g. incorrect, or not yet set up on Paystack) — the payment still went through, with the full amount going to the main account. Check the relevant subaccount code(s) and fix it in the register; future orders for the same book will then split correctly again.",
+  },
+  waarskuwing_geen: { af: "Geen betaling-waarskuwings nie — alles werk soos verwag. ✅", en: "No payment warnings — everything is working as expected. ✅" },
+  waarskuwing_kon_nie_laai: { af: "Kon nie waarskuwings laai nie.", en: "Could not load warnings." },
+
+  // Kategorieë-afdeling
+  kategorie_voeg_by_knoppie: { af: "+ Voeg kategorie by", en: "+ Add category" },
+  kategorie_hulp_teks: {
+    af: "Kategorieë wat kopers op die katalogus kan gebruik om te filter (bv. Fiksie, Selfhelp). 'n Boek kan in meer as een kategorie wees.",
+    en: "Categories buyers can use to filter the catalogue (e.g. Fiction, Self-help). A book can be in more than one category.",
+  },
+  kategorie_naam_etiket: { af: "Naam", en: "Name" },
+  kategorie_kon_nie_laai: { af: "Kon nie kategorieë laai nie.", en: "Could not load categories." },
+  kategorie_leeg: { af: "Nog geen kategorieë bygevoeg nie.", en: "No categories added yet." },
+  kategorie_kon_nie_stoor: { af: "Kon nie stoor nie", en: "Could not save" },
+  kategorie_skrap_vraag_voorvoegsel: { af: "Skrap", en: "Delete" },
+  kategorie_kon_nie_skrap: { af: "Kon nie skrap nie", en: "Could not delete" },
+  kategorie_geen_vir_produk: {
+    af: "Nog geen kategorieë geskep nie — voeg eers een by via die Kategorieë-oortjie.",
+    en: "No categories created yet — add one via the Categories tab first.",
+  },
   kontak_titel: { af: "Is jy 'n skrywer?", en: "Are you a writer?" },
   kontak_intro: {
     af: "Kontak ons gerus as jy 'n skrywer is wat graag jou boek(e) in ons winkel wil verkoop. Verskeie opsies is beskikbaar — ons gesels graag met jou oor wat die beste vir jou werk sal werk.",

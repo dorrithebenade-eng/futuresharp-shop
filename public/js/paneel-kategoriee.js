@@ -13,7 +13,7 @@ let kategorie_wysig_toestand = null; // null = nuwe kategorie, andersins die kat
 
 async function paneel_kategoriee_laai() {
   const wrap = document.getElementById("paneel-kategoriee-lys");
-  wrap.innerHTML = `<p class="stelsel-boodskap">Word gelaai …</p>`;
+  wrap.innerHTML = `<p class="stelsel-boodskap">${t("paneel_word_gelaai")}</p>`;
 
   try {
     const resp = await fetch("/.netlify/functions/kry-kategoriee");
@@ -29,7 +29,7 @@ async function paneel_kategoriee_laai() {
     }
   } catch (fout) {
     console.error("Kon nie kategorieë laai nie:", fout);
-    wrap.innerHTML = `<p class="stelsel-boodskap">Kon nie kategorieë laai nie.</p>`;
+    wrap.innerHTML = `<p class="stelsel-boodskap">${t("kategorie_kon_nie_laai")}</p>`;
   }
 }
 
@@ -37,7 +37,7 @@ function paneel_kategoriee_wys_lys(lys) {
   const wrap = document.getElementById("paneel-kategoriee-lys");
 
   if (!lys.length) {
-    wrap.innerHTML = `<p class="stelsel-boodskap">Nog geen kategorieë bygevoeg nie.</p>`;
+    wrap.innerHTML = `<p class="stelsel-boodskap">${t("kategorie_leeg")}</p>`;
     return;
   }
 
@@ -49,8 +49,8 @@ function paneel_kategoriee_wys_lys(lys) {
             <strong>${kat.naam}</strong>
           </div>
           <div class="paneel-produk-aksies">
-            <button class="terug-skakel paneel-kategorie-wysig-knoppie" data-id="${kat.kategorie_id}">Wysig</button>
-            <button class="terug-skakel paneel-skrap-knoppie paneel-kategorie-skrap-knoppie" data-id="${kat.kategorie_id}">Skrap</button>
+            <button class="terug-skakel paneel-kategorie-wysig-knoppie" data-id="${kat.kategorie_id}">${t("paneel_wysig")}</button>
+            <button class="terug-skakel paneel-skrap-knoppie paneel-kategorie-skrap-knoppie" data-id="${kat.kategorie_id}">${t("paneel_skrap")}</button>
           </div>
         </div>
       `
@@ -76,7 +76,7 @@ function paneel_kategorie_open_vorm(kat) {
   kategorie_wysig_toestand = kat ? kat.kategorie_id : null;
   document.getElementById("kategorie-vorm-naam").value = kat ? kat.naam : "";
   document.getElementById("paneel-kategorie-vorm-foute").style.display = "none";
-  document.getElementById("paneel-kategorie-vorm-indien").textContent = kat ? "Stoor wysigings" : "+ Voeg kategorie by";
+  document.getElementById("paneel-kategorie-vorm-indien").textContent = kat ? t("paneel_stoor_wysigings") : t("kategorie_voeg_by_knoppie");
   document.getElementById("paneel-kategorie-vorm-afdeling").style.display = "block";
 }
 
@@ -93,7 +93,7 @@ async function paneel_kategorie_hanteer_indiening(gebeurtenis) {
   const naam = document.getElementById("kategorie-vorm-naam").value.trim();
   const knoppie = document.getElementById("paneel-kategorie-vorm-indien");
   knoppie.disabled = true;
-  knoppie.textContent = "Besig …";
+  knoppie.textContent = t("besig");
 
   try {
     const endpoint = kategorie_wysig_toestand
@@ -118,11 +118,11 @@ async function paneel_kategorie_hanteer_indiening(gebeurtenis) {
     paneel_kategoriee_laai();
   } catch (fout) {
     console.error("Kon nie kategorie stoor nie:", fout);
-    foutWrap.textContent = `Kon nie stoor nie: ${fout.message}`;
+    foutWrap.textContent = `${t("kategorie_kon_nie_stoor")}: ${fout.message}`;
     foutWrap.style.display = "block";
   } finally {
     knoppie.disabled = false;
-    knoppie.textContent = kategorie_wysig_toestand ? "Stoor wysigings" : "+ Voeg kategorie by";
+    knoppie.textContent = kategorie_wysig_toestand ? t("paneel_stoor_wysigings") : t("kategorie_voeg_by_knoppie");
   }
 }
 
@@ -144,7 +144,7 @@ async function paneel_kategorie_skrap(kat, knoppie) {
   knoppie.disabled = true;
 
   const titels = await paneel_kategorie_kry_gebruik_in_produkte(kat.kategorie_id);
-  let bevestig_teks = `Skrap "${kat.naam}"?`;
+  let bevestig_teks = `${t("kategorie_skrap_vraag_voorvoegsel")} "${kat.naam}"?`;
   if (titels.length) {
     bevestig_teks =
       `Let op: "${kat.naam}" word tans gebruik in: ${titels.join(", ")}.\n\n` +
@@ -170,7 +170,7 @@ async function paneel_kategorie_skrap(kat, knoppie) {
     paneel_kategoriee_laai();
   } catch (fout) {
     console.error("Kon nie kategorie skrap nie:", fout);
-    alert(`Kon nie skrap nie: ${fout.message}`);
+    alert(`${t("kategorie_kon_nie_skrap")}: ${fout.message}`);
     knoppie.disabled = false;
   }
 }
@@ -180,7 +180,7 @@ async function paneel_kategorie_skrap(kat, knoppie) {
 function bou_kategorie_merkblokkies_html(gekose_ids) {
   const gekose = new Set(gekose_ids || []);
   if (!window.kategoriee_kas.length) {
-    return `<p class="stelsel-boodskap">Nog geen kategorieë geskep nie — voeg eers een by via die Kategorieë-oortjie.</p>`;
+    return `<p class="stelsel-boodskap">${t("kategorie_geen_vir_produk")}</p>`;
   }
   return window.kategoriee_kas
     .map(
