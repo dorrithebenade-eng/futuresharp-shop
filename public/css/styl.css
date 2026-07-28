@@ -2219,6 +2219,34 @@ a.my-boek-kaart:focus-visible {
   border-color: var(--teal-helder);
 }
 
+/* ---------- Koepon-blok (voltooi-betaling) ---------- */
+
+.vb-koepon-blok {
+  margin: 18px 0;
+  padding-top: 16px;
+  border-top: 1px dashed #E3E0D9;
+}
+
+.vb-koepon-ry {
+  display: flex;
+  gap: 10px;
+}
+.vb-koepon-ry .veld-invoer {
+  flex: 1;
+  margin: 0;
+}
+.vb-koepon-ry button {
+  flex-shrink: 0;
+}
+
+.vb-koepon-nota {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 10px 0 0;
+}
+.vb-koepon-nota--sukses { color: var(--teal); }
+.vb-koepon-nota--fout { color: var(--koraal); }
+
 .paneel-uitnodiging-genereer-blok {
   display: flex;
   align-items: flex-end;

@@ -10,6 +10,11 @@
 
 const BESTELNOMMER_SLEUTEL = "future_shop_bestelnommer_konsep";
 
+// Koepon-toestand — module-vlak, aangesien dit tussen die "Toepas"-klik en
+// die uiteindelike "Gaan na betaling"-indiening moet oorleef.
+let TOEGEPASTE_KOEPON_KODE = null;
+let VERTOONDE_TOTAAL_SENT = 0;
+
 function formateer_prys_sent(sent) {
   return `R${(sent / 100).toFixed(2)}`;
 }
@@ -44,9 +49,19 @@ function bou_opsomming(items, totaal) {
           )
           .join("")}
       </div>
+
+      <div class="vb-koepon-blok">
+        <label class="veld-etiket" for="vb-koepon-invoer">${t("koepon_etiket")}</label>
+        <div class="vb-koepon-ry">
+          <input type="text" id="vb-koepon-invoer" class="veld-invoer" placeholder="${t("koepon_plekhouer")}">
+          <button type="button" id="vb-koepon-toepas" class="terug-skakel">${t("koepon_toepas_knoppie")}</button>
+        </div>
+        <p id="vb-koepon-nota" class="vb-koepon-nota" style="display:none;"></p>
+      </div>
+
       <div class="vb-opsomming-totaal">
         <span>${t("totaal")}</span>
-        <span>${formateer_prys_sent(totaal)}</span>
+        <span id="vb-totaal-bedrag">${formateer_prys_sent(totaal)}</span>
       </div>
     </section>
   `;
@@ -90,7 +105,7 @@ function bou_kontak_afdeling() {
   `;
 }
 
-function valideer_en_bou_bestelling(items, totaal, bestelnommer, bevat_harde_kopie) {
+function valideer_en_bou_bestelling(items, totaal, bestelnommer, bevat_harde_kopie, koepon_kode) {
   const foute = [];
 
   const epos = document.getElementById("kontak-epos").value.trim();
@@ -126,6 +141,7 @@ function valideer_en_bou_bestelling(items, totaal, bestelnommer, bevat_harde_kop
     totaal_sent: totaal,
     bevat_harde_kopie,
     aflewering,
+    koepon_kode: koepon_kode || null,
     status: "Konsep — wag vir betaling",
   };
 
@@ -167,6 +183,14 @@ async function stuur_na_betaling(bestelling, toegangs_token) {
     if (!resp.ok) throw new Error(`Status ${resp.status}`);
 
     const data = await resp.json();
+
+    if (data.gratis) {
+      // 100%-koepon — geen Paystack-transaksie was nodig nie, die
+      // bestelling is reeds as betaal gemerk deur begin-betaling.js.
+      window.location.href = `dankie.html?bestelnommer=${encodeURIComponent(data.bestelnommer)}`;
+      return;
+    }
+
     if (!data.authorization_url) throw new Error("Geen authorization_url ontvang nie");
 
     window.location.href = data.authorization_url;
@@ -175,6 +199,76 @@ async function stuur_na_betaling(bestelling, toegangs_token) {
     wys_foute([t("betaling_fout")]);
     knoppie.disabled = false;
     knoppie.textContent = t("gaan_na_betaling");
+  }
+}
+
+function wys_koepon_nota(teks, is_fout) {
+  const nota = document.getElementById("vb-koepon-nota");
+  nota.textContent = teks;
+  nota.style.display = "block";
+  nota.classList.toggle("vb-koepon-nota--fout", !!is_fout);
+  nota.classList.toggle("vb-koepon-nota--sukses", !is_fout);
+}
+
+async function hanteer_koepon_toepas(items, oorspronklike_totaal, toegangs_token) {
+  const invoer = document.getElementById("vb-koepon-invoer");
+  const knoppie = document.getElementById("vb-koepon-toepas");
+  const kode = invoer.value.trim();
+
+  if (!kode) return;
+
+  knoppie.disabled = true;
+  const oorspronklike_knoppie_teks = knoppie.textContent;
+  knoppie.textContent = t("besig");
+
+  try {
+    const resp = await fetch("/.netlify/functions/verifieer-koepon", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${toegangs_token}`,
+      },
+      body: JSON.stringify({
+        koepon_kode: kode,
+        items: items.map((i) => ({ produk_slug: i.produk_slug, formaat: i.formaat })),
+      }),
+    });
+
+    if (!resp.ok) {
+      const teks = await resp.text();
+      throw new Error(teks || `Status ${resp.status}`);
+    }
+
+    const data = await resp.json();
+
+    TOEGEPASTE_KOEPON_KODE = kode.toUpperCase();
+    VERTOONDE_TOTAAL_SENT = data.nuwe_totaal_sent;
+    document.getElementById("vb-totaal-bedrag").textContent = formateer_prys_sent(data.nuwe_totaal_sent);
+
+    if (data.nuwe_totaal_sent === 0) {
+      wys_koepon_nota(t("koepon_toegepas_gratis"), false);
+    } else {
+      wys_koepon_nota(`${t("koepon_toegepas_afslag")} ${formateer_prys_sent(data.afslag_sent)}`, false);
+    }
+
+    invoer.disabled = true;
+    knoppie.textContent = t("koepon_verwyder_knoppie");
+    knoppie.disabled = false;
+    knoppie.onclick = () => {
+      TOEGEPASTE_KOEPON_KODE = null;
+      VERTOONDE_TOTAAL_SENT = oorspronklike_totaal;
+      document.getElementById("vb-totaal-bedrag").textContent = formateer_prys_sent(oorspronklike_totaal);
+      document.getElementById("vb-koepon-nota").style.display = "none";
+      invoer.disabled = false;
+      invoer.value = "";
+      knoppie.textContent = oorspronklike_knoppie_teks;
+      knoppie.onclick = () => hanteer_koepon_toepas(items, oorspronklike_totaal, toegangs_token);
+    };
+  } catch (fout) {
+    console.error("Kon nie koepon toepas nie:", fout);
+    wys_koepon_nota(fout.message || t("koepon_ongeldig"), true);
+    knoppie.disabled = false;
+    knoppie.textContent = oorspronklike_knoppie_teks;
   }
 }
 
@@ -213,6 +307,8 @@ async function laai_vb() {
   }
 
   const totaal = kry_mandjie_totaal_sent();
+  VERTOONDE_TOTAAL_SENT = totaal;
+  TOEGEPASTE_KOEPON_KODE = null;
   const bevatHardeKopie = mandjie_bevat_harde_kopie();
   const bestelnommer = kry_of_skep_bestelnommer();
 
@@ -231,6 +327,10 @@ async function laai_vb() {
     epos_invoer.value = sessie.gebruiker.email;
   }
 
+  document.getElementById("vb-koepon-toepas").addEventListener("click", () => {
+    hanteer_koepon_toepas(items, totaal, sessie.access_token);
+  });
+
   document.getElementById("gaan-na-betaling").addEventListener("click", async () => {
     // Voordat ons betaling begin, verseker die sessie is nog geldig —
     // 'n verlope access_token sal 'n 401 by begin-betaling.js veroorsaak.
@@ -240,7 +340,13 @@ async function laai_vb() {
       return;
     }
 
-    const resultaat = valideer_en_bou_bestelling(items, totaal, bestelnommer, bevatHardeKopie);
+    const resultaat = valideer_en_bou_bestelling(
+      items,
+      VERTOONDE_TOTAAL_SENT,
+      bestelnommer,
+      bevatHardeKopie,
+      TOEGEPASTE_KOEPON_KODE
+    );
     if (!resultaat.geldig) {
       wys_foute(resultaat.foute);
       return;

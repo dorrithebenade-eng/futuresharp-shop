@@ -73,7 +73,7 @@ exports.handler = async (event, context) => {
     return { statusCode: 400, body: "Ongeldige JSON" };
   }
 
-  const { bestelnommer, items, aflewering, koper } = invoer;
+  const { bestelnommer, items, aflewering, koper, koepon_kode } = invoer;
 
   if (!bestelnommer || !items || !items.length || !koper || !koper.epos || !koper.selfoonnommer) {
     return { statusCode: 400, body: "Onvolledige bestelling-data" };
@@ -104,12 +104,52 @@ exports.handler = async (event, context) => {
     return { statusCode: 409, body: "Hierdie bestelnommer is reeds verwerk" };
   }
 
+  // --- Stap 0.5: koepon opsoek + basiese validasie (NOOIT die kliënt se
+  // eie voorstel van die afslag-bedrag vertrou nie — ons haal die regte
+  // koepon-rekord op en bereken self) ---
+  let koepon = null;
+  const koepon_kode_skoon = koepon_kode ? String(koepon_kode).trim().toUpperCase() : "";
+
+  if (koepon_kode_skoon) {
+    const koeponStore = kry_store("koepons");
+    const gevonde_koepon = await koeponStore.get(koepon_kode_skoon, { type: "json" });
+
+    if (!gevonde_koepon) {
+      return { statusCode: 400, body: "Koepon-kode is nie geldig nie" };
+    }
+    if (!gevonde_koepon.aktief) {
+      return { statusCode: 400, body: "Hierdie koepon is nie meer aktief nie" };
+    }
+    if (gevonde_koepon.verval_op && new Date(gevonde_koepon.verval_op) < new Date()) {
+      return { statusCode: 400, body: "Hierdie koepon het verval" };
+    }
+    if (gevonde_koepon.gebruike_tot_dusver >= gevonde_koepon.maks_gebruike) {
+      return { statusCode: 400, body: "Hierdie koepon is klaar ten volle gebruik" };
+    }
+    koepon = gevonde_koepon;
+  }
+
+  // Gee terug of 'n koepon op 'n spesifieke item van toepassing is —
+  // hou ook "een keer per boek per koper" reg, selfs by 'n
+  // veelvuldig-herbruikbare koepon-kode.
+  function koepon_geld_vir_item(produk_slug, formaat) {
+    if (!koepon) return false;
+    if (koepon.produk_slug && koepon.produk_slug !== produk_slug) return false;
+    if (koepon.formaat_beperking !== "albei" && koepon.formaat_beperking !== formaat) return false;
+    const reeds_gebruik_deur_koper = (koepon.gebruike_geskiedenis || []).some(
+      (g) => g.koper_id === gebruiker.id && g.produk_slug === produk_slug
+    );
+    if (reeds_gebruik_deur_koper) return false;
+    return true;
+  }
+
   // --- Stap 1: herbou items + totaal server-kant vanuit die katalogus ---
   let totaal_sent = 0;
   let hosting_totaal_sent = 0;
   let bevat_harde_kopie = false;
   const geverifieerde_items = [];
   const verdeling_per_subrekening = {}; // { "ACCT_xxx": sent_bedrag }
+  const koepon_gebruikte_items = []; // items waarop die koepon toegepas is
 
   for (const kliënt_item of items) {
     const produk = await katalogusStore.get(kliënt_item.produk_slug, { type: "json" });
@@ -122,24 +162,45 @@ exports.handler = async (event, context) => {
       return { statusCode: 400, body: `"${produk.titel}" (${kliënt_item.formaat}) is nie meer beskikbaar nie` };
     }
 
-    const item_prys_sent = formaat_data.prys_sent;
-    totaal_sent += item_prys_sent;
+    const item_prys_sent = formaat_data.prys_sent; // oorspronklike prys, voor enige koepon
+    let verkoop_prys_sent = item_prys_sent;
+    let item_koepon_toegepas = false;
+
+    if (koepon_geld_vir_item(produk.slug, kliënt_item.formaat)) {
+      item_koepon_toegepas = true;
+      if (koepon.tipe === "gratis") {
+        verkoop_prys_sent = 0;
+      } else if (koepon.afslag_tipe === "vaste_bedrag") {
+        verkoop_prys_sent = Math.max(0, item_prys_sent - koepon.afslag_waarde);
+      } else {
+        verkoop_prys_sent = Math.max(
+          0,
+          item_prys_sent - Math.round((item_prys_sent * koepon.afslag_waarde) / 100)
+        );
+      }
+      koepon_gebruikte_items.push({ produk_slug: produk.slug, formaat: kliënt_item.formaat });
+    }
+
+    totaal_sent += verkoop_prys_sent;
     if (kliënt_item.formaat === "harde_kopie") bevat_harde_kopie = true;
 
     geverifieerde_items.push({
       produk_slug: produk.slug,
       titel: produk.titel,
       formaat: kliënt_item.formaat,
-      prys_sent: item_prys_sent,
+      prys_sent: verkoop_prys_sent,
+      ...(item_koepon_toegepas ? { oorspronklike_prys_sent: item_prys_sent, koepon_kode: koepon.kode } : {}),
     });
 
     // Hosting — suiwer dokumentasie, geen subrekening nie. Ons tel dit net
     // op sodat die 3%-veiligheidsnet hieronder ruimte daarvoor hou.
+    // LET WEL: gebaseer op die VERKOOP-prys (ná koepon), nie die
+    // oorspronklike prys nie — 'n afslag word eweredig deur almal gedra.
     if (formaat_data.hosting) {
       const hosting_sent =
         formaat_data.hosting.tipe === "vaste_bedrag"
-          ? Math.min(formaat_data.hosting.waarde, item_prys_sent)
-          : Math.round((item_prys_sent * formaat_data.hosting.waarde) / 100);
+          ? Math.min(formaat_data.hosting.waarde, verkoop_prys_sent)
+          : Math.round((verkoop_prys_sent * formaat_data.hosting.waarde) / 100);
       hosting_totaal_sent += hosting_sent;
     }
 
@@ -165,16 +226,97 @@ exports.handler = async (event, context) => {
 
       const item_aandeel_sent =
         verdeling.tipe === "vaste_bedrag"
-          ? Math.min(verdeling.waarde, item_prys_sent)
-          : Math.round((item_prys_sent * verdeling.waarde) / 100);
+          ? Math.min(verdeling.waarde, verkoop_prys_sent)
+          : Math.round((verkoop_prys_sent * verdeling.waarde) / 100);
 
       verdeling_per_subrekening[entiteit.subrekening_kode] =
         (verdeling_per_subrekening[entiteit.subrekening_kode] || 0) + item_aandeel_sent;
     }
   }
 
-  if (totaal_sent <= 0) {
+  if (totaal_sent < 0 || !geverifieerde_items.length) {
     return { statusCode: 400, body: "Bestelling se totaal is ongeldig" };
+  }
+
+  // --- 100%-koepon-kortpad: R0, geen Paystack-transaksie moontlik of
+  // nodig nie. Merk die bestelling dadelik as betaal (soos die webhook
+  // normaalweg sou doen), werk koepon-gebruik + per-produk aankope-tellers
+  // op dieselfde plek by (geen webhook gaan ooit hiervoor vuur nie, want
+  // daar's nooit 'n regte Paystack-transaksie nie), en stuur die koper
+  // reguit na dankie.html i.p.v. Paystack se betaalvenster.
+  if (totaal_sent === 0) {
+    const nou = new Date().toISOString();
+    const gratis_bestelling = {
+      bestelnommer,
+      geskep_op: bestaande ? bestaande.geskep_op : nou,
+      bygewerk_op: nou,
+      koper: { ...koper, netlify_identity_id: gebruiker.id },
+      items: geverifieerde_items,
+      totaal_sent: 0,
+      hosting_totaal_sent: 0,
+      bevat_harde_kopie,
+      aflewering: aflewering || null,
+      verdeling: null,
+      split_code: null,
+      split_fout: null,
+      koepon_toegepas: koepon ? { kode: koepon.kode, items: koepon_gebruikte_items } : null,
+      drukker: bevat_harde_kopie ? { bestelling_geplaas: false, geplaas_op: null, nota: "" } : null,
+      paystack: {
+        referensie: bestelnommer,
+        geverifieer: true,
+        geverifieer_op: nou,
+        bedrag_bevestig_sent: 0,
+        gratis_via_koepon: true,
+      },
+      status: "Nuut",
+      status_geskiedenis: [{ status: "Nuut", op: nou }],
+    };
+
+    await bestellingsStore.setJSON(bestelnommer, gratis_bestelling);
+
+    // Werk koepon-gebruik-rekord dadelik by — geen latere webhook-stap
+    // gaan dit doen nie, aangesien daar geen betaling was nie.
+    if (koepon && koepon_gebruikte_items.length) {
+      const koeponStore = kry_store("koepons");
+      const nuwe_geskiedenis = [
+        ...(koepon.gebruike_geskiedenis || []),
+        ...koepon_gebruikte_items.map((i) => ({
+          koper_id: gebruiker.id,
+          produk_slug: i.produk_slug,
+          formaat: i.formaat,
+          op: nou,
+        })),
+      ];
+      await koeponStore.setJSON(koepon.kode, {
+        ...koepon,
+        gebruike_tot_dusver: koepon.gebruike_tot_dusver + 1,
+        gebruike_geskiedenis: nuwe_geskiedenis,
+      });
+    }
+
+    // Per-produk aankope-tellers — soortgelyk aan paystack-webhook.js,
+    // maar hier direk aangeroep aangesien geen webhook gaan vuur nie.
+    try {
+      const katalogusStore = kry_store("katalogus");
+      for (const item of geverifieerde_items) {
+        const produk = await katalogusStore.get(item.produk_slug, { type: "json" });
+        if (!produk) continue;
+        const is_harde_kopie = item.formaat === "harde_kopie";
+        const aankope_veld = is_harde_kopie ? "aankope_harde_kopie" : "aankope_eboek";
+        await katalogusStore.setJSON(item.produk_slug, {
+          ...produk,
+          [aankope_veld]: (produk[aankope_veld] || 0) + 1,
+        });
+      }
+    } catch (fout) {
+      console.error(`Kon nie per-produk aankope-tellers bywerk nie vir gratis-bestelling ${bestelnommer}:`, fout);
+    }
+
+    return {
+      statusCode: 200,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ gratis: true, bestelnommer }),
+    };
   }
 
   // Veiligheidsnet: Future Sharp se hoofrekening moet ALTYD ten minste
@@ -262,6 +404,7 @@ exports.handler = async (event, context) => {
     verdeling: subrekening_kodes.length ? verdeling_per_subrekening : null,
     split_code,
     split_fout,
+    koepon_toegepas: koepon ? { kode: koepon.kode, items: koepon_gebruikte_items } : null,
     drukker: bevat_harde_kopie
       ? { bestelling_geplaas: false, geplaas_op: null, nota: "" }
       : null,

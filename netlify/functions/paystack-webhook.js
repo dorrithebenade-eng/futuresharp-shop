@@ -79,6 +79,37 @@ exports.handler = async (event) => {
 
   await store.setJSON(bestelnommer, bygewerkte_bestelling);
 
+  // Registreer koepon-gebruik NOU (nie by begin-betaling.js nie) — vir 'n
+  // gedeeltelike afslag is die betaling eers ECHT "gebruik" sodra dit
+  // werklik bevestig is; as die koper nooit deur Paystack voltooi het nie,
+  // moes die koepon nie as gebruik tel nie. (Die 100%-koepon-kortpad in
+  // begin-betaling.js registreer sy eie gebruik dadelik, aangesien daar
+  // in daardie geval nooit 'n Paystack-transaksie of hierdie webhook is nie.)
+  if (bestelling.koepon_toegepas && bestelling.koepon_toegepas.kode) {
+    try {
+      const koeponStore = kry_store("koepons");
+      const koepon = await koeponStore.get(bestelling.koepon_toegepas.kode, { type: "json" });
+      if (koepon) {
+        const nuwe_geskiedenis = [
+          ...(koepon.gebruike_geskiedenis || []),
+          ...bestelling.koepon_toegepas.items.map((i) => ({
+            koper_id: bestelling.koper.netlify_identity_id,
+            produk_slug: i.produk_slug,
+            formaat: i.formaat,
+            op: nou,
+          })),
+        ];
+        await koeponStore.setJSON(bestelling.koepon_toegepas.kode, {
+          ...koepon,
+          gebruike_tot_dusver: koepon.gebruike_tot_dusver + 1,
+          gebruike_geskiedenis: nuwe_geskiedenis,
+        });
+      }
+    } catch (fout) {
+      console.error(`Webhook: kon nie koepon-gebruik registreer nie vir ${bestelnommer}:`, fout);
+    }
+  }
+
   // Werk per-produk aankope- en opbrengs-tellers by (soortgelyk aan die
   // bestaande "besigtigings"-teller op elke produk se eie rekord) — nooit
   // die betaling-bevestiging self laat faal as hierdie stap om enige rede
