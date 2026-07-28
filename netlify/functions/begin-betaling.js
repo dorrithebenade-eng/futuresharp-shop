@@ -197,6 +197,7 @@ exports.handler = async (event, context) => {
   // --- Stap 2: dinamiese split-groep skep indien nodig ---
   const subrekening_kodes = Object.keys(verdeling_per_subrekening);
   let split_code = null;
+  let split_fout = null; // vangnet-rekord — sien onder
 
   if (subrekening_kodes.length) {
     const subaccounts = subrekening_kodes.map((kode) => ({
@@ -222,13 +223,21 @@ exports.handler = async (event, context) => {
 
       const splitData = await splitResp.json();
       if (!splitResp.ok || !splitData.status) {
-        console.error("Kon nie split-groep skep nie:", splitData);
-        return { statusCode: 502, body: "Kon nie betaling-verdeling opstel nie" };
+        // VANGNET: 'n foutiewe/ongeldige subrekening-kode (bv. verkeerd
+        // ingetik, of nooit werklik by Paystack geskep nie) moes voorheen
+        // die HELE aankoop geblokkeer het — een verkeerde kode kon 'n
+        // boek se verkope heeltemal stop. Ons laat die betaling nou eerder
+        // DEURGAAN sonder verdeling (volle bedrag na die hoofrekening,
+        // soos vir enige produk sonder 'n verdeling), en teken die fout
+        // aan vir personeel om later reg te stel.
+        console.error(`Kon nie split-groep skep nie vir ${bestelnommer} — val terug op hoofrekening:`, splitData);
+        split_fout = (splitData && splitData.message) || "Onbekende Paystack-fout";
+      } else {
+        split_code = splitData.data.split_code;
       }
-      split_code = splitData.data.split_code;
     } catch (fout) {
-      console.error("Fout tydens split-groep-skepping:", fout);
-      return { statusCode: 500, body: "Kon nie betaling-verdeling opstel nie" };
+      console.error(`Fout tydens split-groep-skepping vir ${bestelnommer} — val terug op hoofrekening:`, fout);
+      split_fout = fout.message;
     }
   }
 
@@ -252,6 +261,7 @@ exports.handler = async (event, context) => {
     aflewering: aflewering || null,
     verdeling: subrekening_kodes.length ? verdeling_per_subrekening : null,
     split_code,
+    split_fout,
     drukker: bevat_harde_kopie
       ? { bestelling_geplaas: false, geplaas_op: null, nota: "" }
       : null,
