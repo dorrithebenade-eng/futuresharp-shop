@@ -311,10 +311,27 @@ function wys_outeurs_lys(outeurs) {
   });
 }
 
+const OUTEUR_KONTAK_VELDE = ["epos", "selfoon", "id-nommer", "adres", "bank-naam", "bank-rekeningnommer", "bank-tak-kode"];
+// Bediener-kant KONTAK_VELDE gebruik onderstrepe (id_nommer, bank_naam, ens.);
+// HTML-veld-ID's hierbo gebruik koppeltekens (foutbestande CSS-konvensie in
+// hierdie kodebasis) — hierdie kaart versoen die twee.
+const OUTEUR_KONTAK_VELD_SLEUTELS = {
+  "epos": "epos", "selfoon": "selfoon", "id-nommer": "id_nommer",
+  "adres": "adres", "bank-naam": "bank_naam",
+  "bank-rekeningnommer": "bank_rekeningnommer", "bank-tak-kode": "bank_tak_kode",
+};
+
 function open_outeur_vorm(outeur) {
   outeur_wysig_toestand = outeur ? outeur.outeur_id : null;
   document.getElementById("outeur-vorm-naam").value = outeur ? outeur.naam : "";
   document.getElementById("outeur-vorm-subrekening").value = outeur ? outeur.subrekening_kode : "";
+
+  const kontak = (outeur && outeur.kontak_inligting) || {};
+  OUTEUR_KONTAK_VELDE.forEach((html_veld) => {
+    const el = document.getElementById(`outeur-vorm-${html_veld}`);
+    if (el) el.value = kontak[OUTEUR_KONTAK_VELD_SLEUTELS[html_veld]] || "";
+  });
+
   document.getElementById("paneel-outeur-vorm-foute").style.display = "none";
   document.getElementById("paneel-outeur-vorm-indien").textContent = outeur
     ? "Stoor wysigings"
@@ -337,13 +354,21 @@ async function hanteer_outeur_vorm_indiening(gebeurtenis) {
   const subrekening_kode = document.getElementById("outeur-vorm-subrekening").value.trim();
   const wysig_id = outeur_wysig_toestand;
 
+  const kontak_inligting = {};
+  OUTEUR_KONTAK_VELDE.forEach((html_veld) => {
+    const el = document.getElementById(`outeur-vorm-${html_veld}`);
+    if (el && el.value.trim()) kontak_inligting[OUTEUR_KONTAK_VELD_SLEUTELS[html_veld]] = el.value.trim();
+  });
+
   const knoppie = document.getElementById("paneel-outeur-vorm-indien");
   knoppie.disabled = true;
   knoppie.textContent = t("besig");
 
   try {
     const endpoint = wysig_id ? WYSIG_OUTEUR_ENDPOINT : SKEP_OUTEUR_ENDPOINT;
-    const liggaam = wysig_id ? { outeur_id: wysig_id, naam, subrekening_kode } : { naam, subrekening_kode };
+    const liggaam = wysig_id
+      ? { outeur_id: wysig_id, naam, subrekening_kode, kontak_inligting }
+      : { naam, subrekening_kode, kontak_inligting };
 
     const resp = await fetch(endpoint, {
       method: "POST",

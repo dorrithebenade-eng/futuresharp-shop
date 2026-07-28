@@ -22,6 +22,7 @@ const PANEEL_REGISTERS = [
     fout_teks: "Kon nie vennote laai nie.",
     knoppie_teks: "+ Voeg vennoot by",
     het_verslag: true,
+    kontak_velde: ["epos", "selfoon", "bank_naam", "bank_rekeningnommer", "bank_tak_kode", "btw_nommer"],
   },
   {
     sleutel: "ontwerp-admin",
@@ -36,6 +37,7 @@ const PANEEL_REGISTERS = [
     leeg_teks: "Nog geen inskrywings bygevoeg nie.",
     fout_teks: "Kon nie laai nie.",
     knoppie_teks: "+ Voeg by",
+    kontak_velde: ["epos", "selfoon", "bank_naam", "bank_rekeningnommer", "bank_tak_kode"],
   },
   {
     sleutel: "printing",
@@ -50,6 +52,7 @@ const PANEEL_REGISTERS = [
     leeg_teks: "Nog geen inskrywings bygevoeg nie.",
     fout_teks: "Kon nie laai nie.",
     knoppie_teks: "+ Voeg by",
+    kontak_velde: ["epos", "selfoon", "bank_naam", "bank_rekeningnommer", "bank_tak_kode"],
   },
   {
     sleutel: "aflewering",
@@ -64,6 +67,7 @@ const PANEEL_REGISTERS = [
     leeg_teks: "Nog geen inskrywings bygevoeg nie.",
     fout_teks: "Kon nie laai nie.",
     knoppie_teks: "+ Voeg by",
+    kontak_velde: ["epos", "selfoon", "dekkingsarea", "bank_naam", "bank_rekeningnommer", "bank_tak_kode"],
   },
 ];
 
@@ -154,6 +158,13 @@ function paneel_register_open_vorm(reg, item) {
 
   document.getElementById(`${reg.sleutel}-vorm-naam`).value = item ? item.naam : "";
   document.getElementById(`${reg.sleutel}-vorm-subrekening`).value = item ? item.subrekening_kode : "";
+
+  const kontak = (item && item.kontak_inligting) || {};
+  (reg.kontak_velde || []).forEach((veld_naam) => {
+    const el = document.getElementById(`${reg.sleutel}-vorm-${veld_naam}`);
+    if (el) el.value = kontak[veld_naam] || "";
+  });
+
   document.getElementById(`paneel-${reg.sleutel}-vorm-foute`).style.display = "none";
 
   const indien_knoppie = document.getElementById(`paneel-${reg.sleutel}-vorm-indien`);
@@ -177,6 +188,12 @@ async function paneel_register_hanteer_indiening(reg, gebeurtenis) {
   const subrekening_kode = document.getElementById(`${reg.sleutel}-vorm-subrekening`).value.trim();
   const wysig_id = paneel_register_wysig_toestand[reg.sleutel];
 
+  const kontak_inligting = {};
+  (reg.kontak_velde || []).forEach((veld_naam) => {
+    const el = document.getElementById(`${reg.sleutel}-vorm-${veld_naam}`);
+    if (el && el.value.trim()) kontak_inligting[veld_naam] = el.value.trim();
+  });
+
   const knoppie = document.getElementById(`paneel-${reg.sleutel}-vorm-indien`);
   knoppie.disabled = true;
   knoppie.textContent = "Besig …";
@@ -184,8 +201,8 @@ async function paneel_register_hanteer_indiening(reg, gebeurtenis) {
   try {
     const endpoint = wysig_id ? reg.wysig_endpoint : reg.skep_endpoint;
     const liggaam = wysig_id
-      ? { [reg.idveld]: wysig_id, naam, subrekening_kode }
-      : { naam, subrekening_kode };
+      ? { [reg.idveld]: wysig_id, naam, subrekening_kode, kontak_inligting }
+      : { naam, subrekening_kode, kontak_inligting };
 
     const resp = await fetch(endpoint, {
       method: "POST",
