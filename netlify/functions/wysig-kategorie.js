@@ -21,13 +21,14 @@ exports.handler = async (event, context) => {
   }
 
   const kategorie_id = (invoer.kategorie_id || "").trim();
-  const naam = (invoer.naam || "").trim();
+  const naam_af = (invoer.naam_af || invoer.naam || "").trim();
+  const naam_en = (invoer.naam_en || "").trim();
 
   if (!kategorie_id) {
     return { statusCode: 400, body: "Verpligte veld: kategorie_id" };
   }
-  if (!naam) {
-    return { statusCode: 400, body: "Verpligte veld: naam" };
+  if (!naam_af && !naam_en) {
+    return { statusCode: 400, body: "Verpligte veld: naam_af of naam_en" };
   }
 
   const store = kry_store("kategoriee");
@@ -38,7 +39,8 @@ exports.handler = async (event, context) => {
 
   const bygewerk = {
     ...bestaande,
-    naam,
+    naam_af: naam_af || naam_en,
+    naam_en: naam_en || naam_af,
     gewysig_op: new Date().toISOString(),
     gewysig_deur: gebruiker.email,
   };

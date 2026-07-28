@@ -2185,6 +2185,12 @@ a.my-boek-kaart:focus-visible {
   cursor: pointer;
 }
 
+.paneel-kategorie-naam-en {
+  font-size: 12px;
+  color: var(--grys-teks);
+  font-weight: 400;
+}
+
 /* ---------- Katalogus-kategorie-filter ---------- */
 
 .katalogus-filter {

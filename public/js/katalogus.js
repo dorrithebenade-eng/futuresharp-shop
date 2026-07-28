@@ -211,7 +211,7 @@ function bou_filter_chips(kategoriee) {
   const chips = kategoriee
     .map(
       (k) =>
-        `<button type="button" class="filter-chip${AKTIEWE_KATEGORIEE.has(k.kategorie_id) ? " filter-chip--aktief" : ""}" data-kategorie="${k.kategorie_id}">${k.naam}</button>`
+        `<button type="button" class="filter-chip${AKTIEWE_KATEGORIEE.has(k.kategorie_id) ? " filter-chip--aktief" : ""}" data-kategorie="${k.kategorie_id}">${kry_huidige_taal() === "en" ? (k.naam_en || k.naam_af) : (k.naam_af || k.naam_en)}</button>`
     )
     .join("");
 

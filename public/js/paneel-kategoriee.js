@@ -46,7 +46,7 @@ function paneel_kategoriee_wys_lys(lys) {
       (kat) => `
         <div class="paneel-produk-ry">
           <div class="paneel-produk-inligting">
-            <strong>${kat.naam}</strong>
+            <strong>${kat.naam_af}</strong> <span class="paneel-kategorie-naam-en">(EN: ${kat.naam_en})</span>
           </div>
           <div class="paneel-produk-aksies">
             <button class="terug-skakel paneel-kategorie-wysig-knoppie" data-id="${kat.kategorie_id}">${t("paneel_wysig")}</button>
@@ -74,7 +74,8 @@ function paneel_kategoriee_wys_lys(lys) {
 
 function paneel_kategorie_open_vorm(kat) {
   kategorie_wysig_toestand = kat ? kat.kategorie_id : null;
-  document.getElementById("kategorie-vorm-naam").value = kat ? kat.naam : "";
+  document.getElementById("kategorie-vorm-naam-af").value = kat ? kat.naam_af : "";
+  document.getElementById("kategorie-vorm-naam-en").value = kat ? kat.naam_en : "";
   document.getElementById("paneel-kategorie-vorm-foute").style.display = "none";
   document.getElementById("paneel-kategorie-vorm-indien").textContent = kat ? t("paneel_stoor_wysigings") : t("kategorie_voeg_by_knoppie");
   document.getElementById("paneel-kategorie-vorm-afdeling").style.display = "block";
@@ -90,7 +91,8 @@ async function paneel_kategorie_hanteer_indiening(gebeurtenis) {
   const foutWrap = document.getElementById("paneel-kategorie-vorm-foute");
   foutWrap.style.display = "none";
 
-  const naam = document.getElementById("kategorie-vorm-naam").value.trim();
+  const naam_af = document.getElementById("kategorie-vorm-naam-af").value.trim();
+  const naam_en = document.getElementById("kategorie-vorm-naam-en").value.trim();
   const knoppie = document.getElementById("paneel-kategorie-vorm-indien");
   knoppie.disabled = true;
   knoppie.textContent = t("besig");
@@ -100,8 +102,8 @@ async function paneel_kategorie_hanteer_indiening(gebeurtenis) {
       ? "/.netlify/functions/wysig-kategorie"
       : "/.netlify/functions/skep-kategorie";
     const liggaam = kategorie_wysig_toestand
-      ? { kategorie_id: kategorie_wysig_toestand, naam }
-      : { naam };
+      ? { kategorie_id: kategorie_wysig_toestand, naam_af, naam_en }
+      : { naam_af, naam_en };
 
     const resp = await fetch(endpoint, {
       method: "POST",
@@ -144,12 +146,12 @@ async function paneel_kategorie_skrap(kat, knoppie) {
   knoppie.disabled = true;
 
   const titels = await paneel_kategorie_kry_gebruik_in_produkte(kat.kategorie_id);
-  let bevestig_teks = `${t("kategorie_skrap_vraag_voorvoegsel")} "${kat.naam}"?`;
+  let bevestig_teks = `${t("kategorie_skrap_vraag_voorvoegsel")} "${kat.naam_af}"?`;
   if (titels.length) {
     bevestig_teks =
-      `Let op: "${kat.naam}" word tans gebruik in: ${titels.join(", ")}.\n\n` +
+      `Let op: "${kat.naam_af}" word tans gebruik in: ${titels.join(", ")}.\n\n` +
       `Skrapping sal NIE daardie boeke se kategorie outomaties verwyder nie — gaan dit self na.\n\n` +
-      `Wil jy steeds "${kat.naam}" skrap?`;
+      `Wil jy steeds "${kat.naam_af}" skrap?`;
   }
 
   if (!window.confirm(bevestig_teks)) {
@@ -187,7 +189,7 @@ function bou_kategorie_merkblokkies_html(gekose_ids) {
       (kat) => `
         <label class="paneel-kategorie-merkblokkie">
           <input type="checkbox" value="${kat.kategorie_id}" ${gekose.has(kat.kategorie_id) ? "checked" : ""}>
-          ${kat.naam}
+          ${kat.naam_af}
         </label>
       `
     )

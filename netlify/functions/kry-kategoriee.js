@@ -15,7 +15,7 @@ exports.handler = async (event) => {
   const { blobs } = await store.list();
 
   const kategoriee = await Promise.all(blobs.map((b) => store.get(b.key, { type: "json" })));
-  kategoriee.sort((a, b) => a.naam.localeCompare(b.naam, "af"));
+  kategoriee.sort((a, b) => a.naam_af.localeCompare(b.naam_af, "af"));
 
   return {
     statusCode: 200,

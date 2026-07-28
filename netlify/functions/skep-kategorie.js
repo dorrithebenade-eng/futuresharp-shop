@@ -32,12 +32,19 @@ exports.handler = async (event, context) => {
     return { statusCode: 400, body: "Ongeldige JSON" };
   }
 
-  const naam = (invoer.naam || "").trim();
-  if (!naam) {
-    return { statusCode: 400, body: "Verpligte veld: naam" };
+  const naam_af = (invoer.naam_af || invoer.naam || "").trim();
+  const naam_en = (invoer.naam_en || "").trim();
+
+  if (!naam_af && !naam_en) {
+    return { statusCode: 400, body: "Verpligte veld: naam_af of naam_en" };
   }
 
-  const kategorie_id = maak_slug(naam);
+  // As net een taal ingevul is, val die ander een op dieselfde teks terug —
+  // beter as 'n leë kategorie-naam in daardie taal.
+  const finale_naam_af = naam_af || naam_en;
+  const finale_naam_en = naam_en || naam_af;
+
+  const kategorie_id = maak_slug(finale_naam_af);
   if (!kategorie_id) {
     return { statusCode: 400, body: "Kon nie 'n geldige ID van die naam aflei nie" };
   }
@@ -46,12 +53,13 @@ exports.handler = async (event, context) => {
 
   const bestaande = await store.get(kategorie_id, { type: "json" });
   if (bestaande) {
-    return { statusCode: 409, body: `'n Kategorie met naam "${naam}" bestaan reeds` };
+    return { statusCode: 409, body: `'n Kategorie met naam "${finale_naam_af}" bestaan reeds` };
   }
 
   const kategorie = {
     kategorie_id,
-    naam,
+    naam_af: finale_naam_af,
+    naam_en: finale_naam_en,
     geskep_op: new Date().toISOString(),
     geskep_deur: gebruiker.email,
   };
