@@ -2228,6 +2228,16 @@ a.my-boek-kaart:focus-visible {
   margin-top: 4px;
 }
 
+.paneel-hosting-herinnering {
+  font-family: var(--font-liggaam);
+  font-size: 13px;
+  color: #B8860B;
+  background: #FCF3DA;
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin: 6px 0 14px;
+}
+
 /* ---------- Koepon-blok (voltooi-betaling) ---------- */
 
 .vb-koepon-blok {
