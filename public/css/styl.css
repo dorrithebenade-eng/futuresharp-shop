@@ -2139,6 +2139,37 @@ a.my-boek-kaart:focus-visible {
 }
 .paneel-statistieke-geskiedenis-lys li:last-child { border-bottom: none; }
 
+/* ---------- Betaling-waarskuwings ---------- */
+
+.paneel-waarskuwing-ry {
+  background: #FDF0EC;
+  border: 1px solid #F4C6B4;
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin-bottom: 12px;
+}
+.paneel-waarskuwing-kop {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 6px;
+}
+.paneel-waarskuwing-datum {
+  font-size: 12px;
+  color: var(--grys-teks);
+}
+.paneel-waarskuwing-items {
+  font-size: 13px;
+  color: var(--swart);
+  margin: 0 0 6px;
+}
+.paneel-waarskuwing-boodskap {
+  font-size: 13px;
+  color: var(--koraal);
+  font-weight: 600;
+  margin: 0;
+}
+
 .paneel-uitnodiging-genereer-blok {
   display: flex;
   align-items: flex-end;

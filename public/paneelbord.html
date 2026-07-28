@@ -155,6 +155,7 @@
           <button type="button" class="paneel-kieslys-item" data-afdeling="aflewering">Aflewering</button>
           <button type="button" class="paneel-kieslys-item" data-afdeling="koepons" data-i18n="paneel_koepons_titel">Koepons</button>
           <button type="button" class="paneel-kieslys-item" data-afdeling="uitnodigings">Uitnodigings</button>
+          <button type="button" class="paneel-kieslys-item" data-afdeling="waarskuwings">⚠️ Waarskuwings</button>
         </nav>
 
         <div class="paneel-inhoud-kolom">
@@ -403,6 +404,22 @@
         </div>
       </section>
 
+      <section class="paneel-afdeling" data-afdeling-inhoud="waarskuwings">
+        <div class="paneel-afdeling-kop">
+          <h2 class="paneel-afdeling-titel">⚠️ Betaling-waarskuwings</h2>
+        </div>
+        <p class="paneel-hulp-teks">
+          Bestellings waar 'n outeur/vennoot se subrekening-kode nie kon werk nie
+          (bv. foutief of nog nie by Paystack opgestel nie) — die betaling het steeds
+          deurgegaan, met die volle bedrag na die hoofrekening. Gaan die betrokke
+          subrekening-kode(s) na en werk dit reg in die register; toekomstige
+          bestellings vir dieselfde boek sal dan weer korrek verdeel word.
+        </p>
+        <div id="paneel-waarskuwings-lys">
+          <p class="stelsel-boodskap">Word gelaai …</p>
+        </div>
+      </section>
+
       <section id="paneel-vorm-afdeling" class="paneel-afdeling" data-afdeling-inhoud="katalogus" style="display:none;">
         <div class="paneel-afdeling-kop">
           <h2 id="paneel-vorm-titel" class="paneel-afdeling-titel" data-i18n="paneel_voeg_produk_by_titel">Voeg produk by</h2>
@@ -605,6 +622,7 @@
   <script src="js/paneel-registers.js"></script>
   <script src="js/paneel-uitnodigings.js"></script>
   <script src="js/paneel-statistieke.js"></script>
+  <script src="js/paneel-waarskuwings.js"></script>
   <script src="js/paneel-kieslys.js"></script>
   <script src="js/paneelbord-installeer-app.js"></script>
 </body>
