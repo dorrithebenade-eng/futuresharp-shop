@@ -167,7 +167,7 @@ const WOORDEBOEK = {
   bestelling_opsomming: { af: "Bestelling-opsomming", en: "Order summary" },
   koepon_etiket: { af: "Het jy 'n koepon-kode?", en: "Do you have a coupon code?" },
   koepon_plekhouer: { af: "Voer koepon-kode in", en: "Enter coupon code" },
-  koepon_toepas_knoppie: { af: "Toepas", en: "Apply" },
+  koepon_toepas_knoppie: { af: "Wissel koepon", en: "Redeem" },
   koepon_verwyder_knoppie: { af: "Verwyder", en: "Remove" },
   koepon_toegepas_gratis: { af: "✅ Koepon toegepas — hierdie bestelling is nou gratis!", en: "✅ Coupon applied — this order is now free!" },
   koepon_toegepas_afslag: { af: "✅ Koepon toegepas — jy bespaar", en: "✅ Coupon applied — you save" },
