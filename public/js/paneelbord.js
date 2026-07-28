@@ -669,7 +669,16 @@ function skep_verdeling_ry_element(voorvoegsel, bestaande) {
 
   const gekose_rol_tipe = (bestaande && bestaande.rol_tipe) || "outeur";
   const gekose_tipe = (bestaande && bestaande.tipe) || "persentasie";
-  const gekose_waarde = bestaande && Number.isFinite(bestaande.waarde) ? bestaande.waarde : "";
+  // BELANGRIK: "Vaste bedrag"-verdelings word ALTYD in sent gestoor
+  // (dieselfde eenheid as prys_sent), maar personeel tik/sien dit altyd
+  // in rand — hier skakel ons sent terug na rand vir vertoning.
+  // "Persentasie"-tipes het geen eenheid-omskakeling nodig nie.
+  const gekose_waarde =
+    bestaande && Number.isFinite(bestaande.waarde)
+      ? gekose_tipe === "vaste_bedrag"
+        ? (bestaande.waarde / 100).toFixed(2)
+        : bestaande.waarde
+      : "";
   const gekose_entiteit_id = (bestaande && bestaande.entiteit_id) || "";
 
   ry.innerHTML = `
@@ -703,12 +712,20 @@ function voeg_verdeling_ry_by(voorvoegsel, bestaande) {
 
 function kry_verdelings_uit_vorm(voorvoegsel) {
   const lys = document.getElementById(`vorm-${voorvoegsel}-verdelings-lys`);
-  return Array.from(lys.querySelectorAll(".paneel-verdeling-ry")).map((ry) => ({
-    rol_tipe: ry.querySelector(".paneel-verdeling-rol-tipe").value,
-    entiteit_id: ry.querySelector(".paneel-verdeling-entiteit").value,
-    tipe: ry.querySelector(".paneel-verdeling-tipe").value,
-    waarde: parseFloat(ry.querySelector(".paneel-verdeling-waarde").value),
-  }));
+  return Array.from(lys.querySelectorAll(".paneel-verdeling-ry")).map((ry) => {
+    const tipe = ry.querySelector(".paneel-verdeling-tipe").value;
+    const rou_waarde = parseFloat(ry.querySelector(".paneel-verdeling-waarde").value);
+    // "Vaste bedrag" word deur personeel in RAND ingetik, maar moet in
+    // SENT gestoor word (dieselfde eenheid as prys_sent) — sonder hierdie
+    // omskakeling word 'n R60-verdeling as 60 sent (R0.60) uitbetaal.
+    const waarde = tipe === "vaste_bedrag" ? Math.round(rou_waarde * 100) : rou_waarde;
+    return {
+      rol_tipe: ry.querySelector(".paneel-verdeling-rol-tipe").value,
+      entiteit_id: ry.querySelector(".paneel-verdeling-entiteit").value,
+      tipe,
+      waarde,
+    };
+  });
 }
 
 // Ververs elke reeds-oop verdeling-ry se entiteit-keuselys met die
@@ -1020,7 +1037,11 @@ function open_vorm_vir_wysig(produk) {
   if (eboek.hosting) {
     document.getElementById("vorm-eboek-hosting-aan").checked = true;
     document.getElementById("vorm-eboek-hosting-tipe").value = eboek.hosting.tipe || "persentasie";
-    document.getElementById("vorm-eboek-hosting-waarde").value = eboek.hosting.waarde || "";
+    document.getElementById("vorm-eboek-hosting-waarde").value = eboek.hosting.waarde
+      ? eboek.hosting.tipe === "vaste_bedrag"
+        ? (eboek.hosting.waarde / 100).toFixed(2)
+        : eboek.hosting.waarde
+      : "";
   }
 
   const hardeKopie = (produk.formate && produk.formate.harde_kopie) || {};
@@ -1035,7 +1056,11 @@ function open_vorm_vir_wysig(produk) {
   if (hardeKopie.hosting) {
     document.getElementById("vorm-hardekopie-hosting-aan").checked = true;
     document.getElementById("vorm-hardekopie-hosting-tipe").value = hardeKopie.hosting.tipe || "persentasie";
-    document.getElementById("vorm-hardekopie-hosting-waarde").value = hardeKopie.hosting.waarde || "";
+    document.getElementById("vorm-hardekopie-hosting-waarde").value = hardeKopie.hosting.waarde
+      ? hardeKopie.hosting.tipe === "vaste_bedrag"
+        ? (hardeKopie.hosting.waarde / 100).toFixed(2)
+        : hardeKopie.hosting.waarde
+      : "";
   }
 
   wys_verberg_formaat_velde();
@@ -1064,12 +1089,13 @@ function bou_verdelings_vanuit_vorm(voorvoegsel) {
 function kry_hosting_vanuit_vorm(voorvoegsel) {
   const aan = document.getElementById(`vorm-${voorvoegsel}-hosting-aan`).checked;
   if (!aan) return null;
-  const waarde = parseFloat(document.getElementById(`vorm-${voorvoegsel}-hosting-waarde`).value);
-  if (!Number.isFinite(waarde) || waarde <= 0) return null;
-  return {
-    tipe: document.getElementById(`vorm-${voorvoegsel}-hosting-tipe`).value,
-    waarde,
-  };
+  const tipe = document.getElementById(`vorm-${voorvoegsel}-hosting-tipe`).value;
+  const rou_waarde = parseFloat(document.getElementById(`vorm-${voorvoegsel}-hosting-waarde`).value);
+  if (!Number.isFinite(rou_waarde) || rou_waarde <= 0) return null;
+  // Selfde rand-na-sent-omskakeling as die verdelings hierbo — Hosting se
+  // "Vaste bedrag (R)" word ook deur personeel in rand ingetik.
+  const waarde = tipe === "vaste_bedrag" ? Math.round(rou_waarde * 100) : rou_waarde;
+  return { tipe, waarde };
 }
 
 function kry_etiket_vanuit_vorm() {
