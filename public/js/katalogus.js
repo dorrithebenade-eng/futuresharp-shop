@@ -1,4 +1,5 @@
 const KATALOGUS_ENDPOINT = "/.netlify/functions/kry-katalogus";
+const KATEGORIEE_ENDPOINT = "/.netlify/functions/kry-kategoriee";
 
 // Demo-terugvalprodukte — word slegs gebruik wanneer die lewendige Function
 // nie bereikbaar is nie (bv. tydens plaaslike voorskou sonder Netlify Dev).
@@ -193,20 +194,84 @@ async function kry_besit_stel() {
   }
 }
 
+// --- Kategorie-filter ---
+
+let ALLE_PRODUKTE = [];
+let HUIDIGE_BESIT_STEL = new Set();
+const AKTIEWE_KATEGORIEE = new Set();
+
+function bou_filter_chips(kategoriee) {
+  const wrap = document.getElementById("katalogus-filter");
+  if (!kategoriee || !kategoriee.length) {
+    wrap.innerHTML = "";
+    return;
+  }
+
+  const alle_chip = `<button type="button" class="filter-chip${AKTIEWE_KATEGORIEE.size === 0 ? " filter-chip--aktief" : ""}" data-kategorie="">${t("filter_alle")}</button>`;
+  const chips = kategoriee
+    .map(
+      (k) =>
+        `<button type="button" class="filter-chip${AKTIEWE_KATEGORIEE.has(k.kategorie_id) ? " filter-chip--aktief" : ""}" data-kategorie="${k.kategorie_id}">${k.naam}</button>`
+    )
+    .join("");
+
+  wrap.innerHTML = alle_chip + chips;
+
+  wrap.querySelectorAll(".filter-chip").forEach((chip) => {
+    chip.addEventListener("click", () => {
+      const kat_id = chip.dataset.kategorie;
+      if (!kat_id) {
+        AKTIEWE_KATEGORIEE.clear();
+      } else if (AKTIEWE_KATEGORIEE.has(kat_id)) {
+        AKTIEWE_KATEGORIEE.delete(kat_id);
+      } else {
+        AKTIEWE_KATEGORIEE.add(kat_id);
+      }
+      bou_filter_chips(kategoriee);
+      pas_filter_toe();
+    });
+  });
+}
+
+function pas_filter_toe() {
+  const gefiltreer =
+    AKTIEWE_KATEGORIEE.size === 0
+      ? ALLE_PRODUKTE
+      : ALLE_PRODUKTE.filter(
+          (p) => Array.isArray(p.kategorie_ids) && p.kategorie_ids.some((id) => AKTIEWE_KATEGORIEE.has(id))
+        );
+  wys_produkte(gefiltreer, { besit_stel: HUIDIGE_BESIT_STEL });
+}
+
 async function laai_katalogus() {
   const rooster = document.getElementById("katalogus-rooster");
   rooster.innerHTML = `<p class="stelsel-boodskap">${t("katalogus_laai")}</p>`;
 
   try {
-    const [resp, besit_stel] = await Promise.all([
+    const [resp, kat_resp, besit_stel] = await Promise.all([
       fetch(KATALOGUS_ENDPOINT),
+      fetch(KATEGORIEE_ENDPOINT).catch(() => null),
       kry_besit_stel(),
     ]);
     if (!resp.ok) throw new Error(`Status ${resp.status}`);
     const data = await resp.json();
-    wys_produkte(data.produkte || [], { besit_stel });
+
+    ALLE_PRODUKTE = data.produkte || [];
+    HUIDIGE_BESIT_STEL = besit_stel;
+
+    let kategoriee = [];
+    if (kat_resp && kat_resp.ok) {
+      const kat_data = await kat_resp.json();
+      kategoriee = kat_data.kategoriee || [];
+    }
+
+    bou_filter_chips(kategoriee);
+    pas_filter_toe();
   } catch (fout) {
     console.warn("Kon nie lewendige katalogus laai nie, wys demo-data:", fout);
+    ALLE_PRODUKTE = DEMO_PRODUKTE;
+    HUIDIGE_BESIT_STEL = new Set();
+    document.getElementById("katalogus-filter").innerHTML = "";
     wys_produkte(DEMO_PRODUKTE, { demo_modus: true });
   }
 }

@@ -24,6 +24,7 @@ const WOORDEBOEK = {
   nav_mandjie: { af: "Mandjie", en: "Cart" },
   nav_kursusse: { af: "Kursusse", en: "Courses" },
   nav_kontak: { af: "Kontak", en: "Contact" },
+  filter_alle: { af: "Alle", en: "All" },
   kontak_titel: { af: "Is jy 'n skrywer?", en: "Are you a writer?" },
   kontak_intro: {
     af: "Kontak ons gerus as jy 'n skrywer is wat graag jou boek(e) in ons winkel wil verkoop. Verskeie opsies is beskikbaar — ons gesels graag met jou oor wat die beste vir jou werk sal werk.",

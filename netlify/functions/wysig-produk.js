@@ -164,6 +164,9 @@ exports.handler = async (event, context) => {
     ...bestaande,
     ...wysigings,
     outeur_ids: nuwe_outeur_ids,
+    kategorie_ids: Array.isArray(wysigings.kategorie_ids)
+      ? wysigings.kategorie_ids.filter(Boolean)
+      : bestaande.kategorie_ids || [],
     outeur: nuwe_outeur_naam,
     formate: nuwe_formate,
     etiket: "etiket" in wysigings ? kry_geldige_etiket(wysigings.etiket) : bestaande.etiket,

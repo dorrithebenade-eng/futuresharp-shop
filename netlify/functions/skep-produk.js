@@ -185,6 +185,7 @@ exports.handler = async (event, context) => {
     titel,
     outeur: await kry_outeur_naam_string(geldige_outeur_ids),
     outeur_ids: geldige_outeur_ids,
+    kategorie_ids: Array.isArray(invoer.kategorie_ids) ? invoer.kategorie_ids.filter(Boolean) : [],
     oorsig: invoer.oorsig || "",
     vol_beskrywing: invoer.vol_beskrywing || "",
     omslag: invoer.omslag || "",
