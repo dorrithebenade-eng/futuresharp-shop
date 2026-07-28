@@ -14,7 +14,18 @@ exports.handler = async (event) => {
   const store = kry_store("kategoriee");
   const { blobs } = await store.list();
 
-  const kategoriee = await Promise.all(blobs.map((b) => store.get(b.key, { type: "json" })));
+  const rou_kategoriee = await Promise.all(blobs.map((b) => store.get(b.key, { type: "json" })));
+
+  // Terugwaartse-vertoonbaarheid — kategorieë wat geskep is voor die
+  // naam_af/naam_en-uitbreiding het net 'n ou `naam`-veld. Normaliseer
+  // hulle hier sodat die lys nooit omval nie, en sodat hulle steeds
+  // wysigbaar is om 'n regte Engelse naam by te voeg.
+  const kategoriee = rou_kategoriee.filter(Boolean).map((k) => ({
+    ...k,
+    naam_af: k.naam_af || k.naam || "",
+    naam_en: k.naam_en || k.naam_af || k.naam || "",
+  }));
+
   kategoriee.sort((a, b) => a.naam_af.localeCompare(b.naam_af, "af"));
 
   return {
