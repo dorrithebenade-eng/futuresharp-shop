@@ -349,6 +349,17 @@ document.addEventListener("DOMContentLoaded", () => {
     if (pdf_dokument) wys_bladsy(huidige_bladsy);
   });
 
+  // Eksplisiete skerm-draai-luisteraar — bo-op die gewone "resize" hierbo.
+  // Sommige foon-blaaiers (veral iOS Safari) vuur "resize" soms te vroeg
+  // tydens die draai-oorgang, voor die skerm se nuwe afmetings finaal is
+  // — 'n klein vertraging hier verseker ons herteken NADAT die draai
+  // werklik voltooi is, sodat die bladsy altyd korrek geskaal bly.
+  window.addEventListener("orientationchange", () => {
+    setTimeout(() => {
+      if (pdf_dokument) wys_bladsy(huidige_bladsy);
+    }, 200);
+  });
+
   // --- Swipe-gebare (foon/tablet) — links blaai vorentoe, regs blaai terug.
   // Net op die bladsy-omhulsel self, sodat 'n normale vertikale
   // bladsy-rol (bv. as die skerm laer as die bladsy is) nie per ongeluk
