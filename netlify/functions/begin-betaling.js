@@ -143,6 +143,27 @@ exports.handler = async (event, context) => {
     return true;
   }
 
+  // --- Voorkom dubbele e-boek-aankope ---
+  // Slaan al hierdie koper se reeds-betaalde bestellings na om te sien
+  // watter e-boeke hulle reeds besit. Net e-boeke word so beperk — 'n
+  // harde kopie kan doelbewus weer gekoop word (bv. as geskenk, of 'n
+  // vervangingskopie), so dié beperking geld nie daarvoor nie.
+  const reeds_besitte_eboeke = new Set();
+  {
+    const { blobs: alle_bestelling_sleutels } = await bestellingsStore.list();
+    for (const sleutel_item of alle_bestelling_sleutels) {
+      const bestaande_bestelling = await bestellingsStore.get(sleutel_item.key, { type: "json" });
+      if (!bestaande_bestelling) continue;
+      const behoort_aan_koper =
+        bestaande_bestelling.koper &&
+        bestaande_bestelling.koper.netlify_identity_id === gebruiker.id;
+      if (!behoort_aan_koper || bestaande_bestelling.status !== "Nuut") continue;
+      for (const besitte_item of bestaande_bestelling.items || []) {
+        if (besitte_item.formaat === "eboek") reeds_besitte_eboeke.add(besitte_item.produk_slug);
+      }
+    }
+  }
+
   // --- Stap 1: herbou items + totaal server-kant vanuit die katalogus ---
   let totaal_sent = 0;
   let hosting_totaal_sent = 0;
@@ -155,6 +176,13 @@ exports.handler = async (event, context) => {
     const produk = await katalogusStore.get(kliënt_item.produk_slug, { type: "json" });
     if (!produk || !produk.aktief) {
       return { statusCode: 400, body: `"${kliënt_item.produk_slug}" is nie meer beskikbaar nie` };
+    }
+
+    if (kliënt_item.formaat === "eboek" && reeds_besitte_eboeke.has(produk.slug)) {
+      return {
+        statusCode: 400,
+        body: `Jy besit reeds die e-boek "${produk.titel}" — kyk gerus in "My Boeke". Kontak Future Sharp as jy dink dit is 'n fout.`,
+      };
     }
 
     const formaat_data = produk.formate && produk.formate[kliënt_item.formaat];

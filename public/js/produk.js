@@ -37,6 +37,29 @@ function kry_produk_slug_uit_url() {
   return params.get("produk");
 }
 
+// Lees die aangemelde koper se reeds-gekoopte e-boeke — dieselfde patroon
+// as katalogus.js. Gee 'n leë Set terug (nooit 'n fout nie) as niemand
+// aangemeld is nie, of as die versoek misluk — die produk-bladsy moet
+// steeds normaal werk vir 'n besoeker sonder rekening.
+async function kry_besit_stel() {
+  try {
+    if (typeof identiteit_kry_huidige_sessie !== "function") return new Set();
+    const sessie = await identiteit_kry_huidige_sessie();
+    if (!sessie || !sessie.access_token) return new Set();
+
+    const resp = await fetch("/.netlify/functions/kry-my-boeke", {
+      headers: { Authorization: `Bearer ${sessie.access_token}` },
+    });
+    if (!resp.ok) return new Set();
+
+    const data = await resp.json();
+    return new Set((data.boeke || []).map((boek) => boek.produk_slug));
+  } catch (fout) {
+    console.warn("Kon nie besit-status laai nie:", fout);
+    return new Set();
+  }
+}
+
 function bou_beskikbaar_merkers(eboek, hardeKopie) {
   const merkers = [];
   if (eboek && eboek.beskikbaar) {
@@ -48,7 +71,25 @@ function bou_beskikbaar_merkers(eboek, hardeKopie) {
   return `<div class="beskikbaar-merkers">${merkers.join("")}</div>`;
 }
 
-function bou_aksie_ry(produk, formaat, formaat_data, etiket) {
+function bou_aksie_ry(produk, formaat, formaat_data, etiket, besit) {
+  // E-boeke wat die koper reeds besit — geen koop-knoppie nie, net 'n
+  // duidelike "Alreeds joune"-merker met 'n skakel na die leser. Harde
+  // kopieë word doelbewus NIE so beperk nie (geskenke/vervangingskopieë
+  // is 'n geldige rede om weer te koop).
+  if (formaat === "eboek" && besit) {
+    return `
+      <div class="produk-formaat-ry">
+        <div class="produk-formaat-info">
+          <span class="produk-formaat-etiket">${etiket}</span>
+          <span class="produk-besit-merker">✅ ${t("reeds_gekoop")}</span>
+        </div>
+        <a class="kaart-aksie produk-alreeds-eie-knoppie" href="leser.html?boek=${produk.slug}">
+          ${t("gaan_lees")}
+        </a>
+      </div>
+    `;
+  }
+
   const knoppie_id = `voeg-by-mandjie-${formaat}`;
   const voorbestelling = is_voorbestelling(formaat_data);
 
@@ -71,7 +112,7 @@ function bou_aksie_ry(produk, formaat, formaat_data, etiket) {
   `;
 }
 
-function wys_produk(produk) {
+function wys_produk(produk, besit_stel) {
   document.title = `${produk.titel} — Future Shop`;
 
   const wrap = document.getElementById("produk-wrap");
@@ -82,13 +123,14 @@ function wys_produk(produk) {
 
   const eboek = produk.formate && produk.formate.eboek;
   const hardeKopie = produk.formate && produk.formate.harde_kopie;
+  const besit_eboek = besit_stel instanceof Set && besit_stel.has(produk.slug);
 
   const aksies = [];
   if (eboek && eboek.beskikbaar) {
-    aksies.push(bou_aksie_ry(produk, "eboek", eboek, t("eboek_etiket")));
+    aksies.push(bou_aksie_ry(produk, "eboek", eboek, t("eboek_etiket"), besit_eboek));
   }
   if (hardeKopie && hardeKopie.beskikbaar) {
-    aksies.push(bou_aksie_ry(produk, "harde_kopie", hardeKopie, t("hardekopie_etiket")));
+    aksies.push(bou_aksie_ry(produk, "harde_kopie", hardeKopie, t("hardekopie_etiket"), false));
   }
 
   wrap.innerHTML = `
@@ -141,11 +183,16 @@ async function laai_produk() {
 
   let produkte;
   let demo_modus = false;
+  let besit_stel = new Set();
   try {
-    const resp = await fetch(KATALOGUS_ENDPOINT);
+    const [resp, opgehaalde_besit_stel] = await Promise.all([
+      fetch(KATALOGUS_ENDPOINT),
+      kry_besit_stel(),
+    ]);
     if (!resp.ok) throw new Error(`Status ${resp.status}`);
     const data = await resp.json();
     produkte = data.produkte || [];
+    besit_stel = opgehaalde_besit_stel;
   } catch (fout) {
     console.warn("Kon nie lewendige katalogus laai nie, wys demo-data:", fout);
     produkte = DEMO_PRODUKTE;
@@ -156,7 +203,7 @@ async function laai_produk() {
     if (demo_modus) {
       // Voorskou-gerief: sonder 'n spesifieke slug in die URL, wys net
       // die eerste demo-produk sodat die bladsy steeds bekyk kan word.
-      wys_produk(produkte[0]);
+      wys_produk(produkte[0], besit_stel);
       return;
     }
     wrap.innerHTML = `<p class="stelsel-boodskap">${t("geen_produk")} <a href="index.html">${t("terug_katalogus_skakel")}</a></p>`;
@@ -169,7 +216,7 @@ async function laai_produk() {
     return;
   }
 
-  wys_produk(produk);
+  wys_produk(produk, besit_stel);
 
   if (!demo_modus) {
     // Agtergrond-belangstelling-telling — "fire and forget", nooit die

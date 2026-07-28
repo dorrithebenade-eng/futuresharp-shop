@@ -126,6 +126,7 @@ const WOORDEBOEK = {
   hardekopie_etiket: { af: "Harde kopie", en: "Hard copy" },
   voorbestelling_chip: { af: "Voorbestelling", en: "Pre-order" },
   reeds_gekoop: { af: "Alreeds joune", en: "Already yours" },
+  gaan_lees: { af: "Gaan lees →", en: "Go read →" },
   lees_meer: { af: "Lees meer", en: "Read more" },
   vanaf_prys: { af: "Vanaf", en: "From" },
 

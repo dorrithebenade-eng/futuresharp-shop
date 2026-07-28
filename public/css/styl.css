@@ -2219,6 +2219,15 @@ a.my-boek-kaart:focus-visible {
   border-color: var(--teal-helder);
 }
 
+.produk-besit-merker {
+  display: inline-block;
+  font-family: var(--font-liggaam);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--teal);
+  margin-top: 4px;
+}
+
 /* ---------- Koepon-blok (voltooi-betaling) ---------- */
 
 .vb-koepon-blok {
