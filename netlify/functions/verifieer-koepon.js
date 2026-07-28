@@ -28,23 +28,43 @@ exports.handler = async (event, context) => {
   const items = Array.isArray(invoer.items) ? invoer.items : [];
 
   if (!kode) {
-    return { statusCode: 400, body: "Verpligte veld: koepon_kode" };
+    return {
+      statusCode: 400,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ fout_kode: "VERPLIGTE_KODE" }),
+    };
   }
 
   const koeponStore = kry_store("koepons");
   const koepon = await koeponStore.get(kode, { type: "json" });
 
   if (!koepon) {
-    return { statusCode: 400, body: "Koepon-kode is nie geldig nie" };
+    return {
+      statusCode: 400,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ fout_kode: "ONGELDIG" }),
+    };
   }
   if (!koepon.aktief) {
-    return { statusCode: 400, body: "Hierdie koepon is nie meer aktief nie" };
+    return {
+      statusCode: 400,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ fout_kode: "ONAKTIEF" }),
+    };
   }
   if (koepon.verval_op && new Date(koepon.verval_op) < new Date()) {
-    return { statusCode: 400, body: "Hierdie koepon het verval" };
+    return {
+      statusCode: 400,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ fout_kode: "VERVAL" }),
+    };
   }
   if (koepon.gebruike_tot_dusver >= koepon.maks_gebruike) {
-    return { statusCode: 400, body: "Hierdie koepon is klaar ten volle gebruik" };
+    return {
+      statusCode: 400,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ fout_kode: "VOLGEBRUIK" }),
+    };
   }
 
   const katalogusStore = kry_store("katalogus");
@@ -89,7 +109,11 @@ exports.handler = async (event, context) => {
   }
 
   if (!enige_item_pas) {
-    return { statusCode: 400, body: "Hierdie koepon is nie van toepassing op enigiets in jou mandjie nie" };
+    return {
+      statusCode: 400,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ fout_kode: "GEEN_TOEPASSING" }),
+    };
   }
 
   return {

@@ -172,6 +172,13 @@ const WOORDEBOEK = {
   koepon_toegepas_gratis: { af: "✅ Koepon toegepas — hierdie bestelling is nou gratis!", en: "✅ Coupon applied — this order is now free!" },
   koepon_toegepas_afslag: { af: "✅ Koepon toegepas — jy bespaar", en: "✅ Coupon applied — you save" },
   koepon_ongeldig: { af: "Koepon-kode is nie geldig nie", en: "Coupon code is not valid" },
+  koepon_fout_onaktief: { af: "Hierdie koepon is nie meer aktief nie", en: "This coupon is no longer active" },
+  koepon_fout_verval: { af: "Hierdie koepon het verval", en: "This coupon has expired" },
+  koepon_fout_volgebruik: { af: "Hierdie koepon is klaar ten volle gebruik", en: "This coupon has already been fully used" },
+  koepon_fout_geen_toepassing: {
+    af: "Hierdie koepon is nie van toepassing op enigiets in jou mandjie nie",
+    en: "This coupon does not apply to anything in your cart",
+  },
   aflewering_titel: { af: "Aflewering", en: "Delivery" },
   aflewering_nota: {
     af: "Jou mandjie bevat 'n harde-kopie-item — verskaf asseblief 'n afleweradres.",

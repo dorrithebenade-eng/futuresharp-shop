@@ -15,6 +15,18 @@ const BESTELNOMMER_SLEUTEL = "future_shop_bestelnommer_konsep";
 let TOEGEPASTE_KOEPON_KODE = null;
 let VERTOONDE_TOTAAL_SENT = 0;
 
+// Koppel elke taal-onafhanklike foutkode (van verifieer-koepon.js) aan die
+// regte taal.js-sleutel — sodat 'n Engelse koper 'n regte Engelse
+// boodskap kry, nie die bediener se interne Afrikaanse teks nie.
+const KOEPON_FOUT_SLEUTELS = {
+  VERPLIGTE_KODE: "koepon_ongeldig",
+  ONGELDIG: "koepon_ongeldig",
+  ONAKTIEF: "koepon_fout_onaktief",
+  VERVAL: "koepon_fout_verval",
+  VOLGEBRUIK: "koepon_fout_volgebruik",
+  GEEN_TOEPASSING: "koepon_fout_geen_toepassing",
+};
+
 function formateer_prys_sent(sent) {
   return `R${(sent / 100).toFixed(2)}`;
 }
@@ -235,8 +247,15 @@ async function hanteer_koepon_toepas(items, oorspronklike_totaal, toegangs_token
     });
 
     if (!resp.ok) {
-      const teks = await resp.text();
-      throw new Error(teks || `Status ${resp.status}`);
+      let fout_kode = "ONGELDIG";
+      try {
+        const fout_data = await resp.json();
+        if (fout_data && fout_data.fout_kode) fout_kode = fout_data.fout_kode;
+      } catch {
+        // Onverwagte, nie-JSON-antwoord (bv. 'n 500 sonder liggaam) — val
+        // terug op die generiese "ongeldig"-boodskap.
+      }
+      throw new Error(t(KOEPON_FOUT_SLEUTELS[fout_kode] || "koepon_ongeldig"));
     }
 
     const data = await resp.json();
