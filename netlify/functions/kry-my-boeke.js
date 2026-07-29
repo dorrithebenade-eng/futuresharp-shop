@@ -115,11 +115,17 @@ exports.handler = async (event, context) => {
         }
 
         // Leen-na-koop-opgradering: net gewys as (a) hierdie 'n leen is,
-        // (b) die koper NIE reeds die eboek self ook besit nie, en (c) die
-        // outomaties-geskepte koepon nog werklik geldig is (nie verval,
-        // nie gedeaktiveer, nie reeds gebruik nie).
+        // (b) die koper NIE reeds die eboek self ook besit nie, (c) die
+        // outomaties-geskepte koepon nog werklik geldig is, EN (d) óf die
+        // leen reeds verval het, óf daar nog net 5 dae of minder oor is —
+        // vroeër as dit voel dit soos 'n te-vroeë upsell, nie 'n tydige
+        // herinnering nie.
+        const OPGRADERING_WYS_DAE_VOOR_VERVAL = 5;
+        const binne_wys_venster =
+          leen_aktief === false || (leen_aktief === true && dae_oor !== null && dae_oor <= OPGRADERING_WYS_DAE_VOOR_VERVAL);
+
         let opgradering = null;
-        if (is_leen && boek_item.opgradering_koepon_kode) {
+        if (is_leen && boek_item.opgradering_koepon_kode && binne_wys_venster) {
           const koepon = await koepon_store.get(boek_item.opgradering_koepon_kode, { type: "json" });
           const nog_geldig =
             koepon &&

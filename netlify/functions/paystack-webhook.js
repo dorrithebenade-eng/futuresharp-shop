@@ -24,9 +24,11 @@ function maak_koepon_kode() {
 // Leen-na-koop-opgradering: sodra 'n leen suksesvol bevestig is, skep 'n
 // koper-spesifieke koepon wat presies die betaalde leen-bedrag as
 // vaste-bedrag-afslag gee op 'n LATERE eboek-koop van dieselfde boek.
-// 14 dae geldig vanaf die leen-aankoop-datum. Nooit vir harde kopie —
-// leen is uitsluitlik 'n eboek-konsep.
-const LEEN_OPGRADERING_GELDIGHEID_DAE = 14;
+// Bly geldig regdeur die hele leen-tydperk, plus 14 dae ná die leen self
+// verval — nie net 14 dae ná die aankoop nie (die leen-tydperk self is
+// dikwels langer as dit). Nooit vir harde kopie — leen is uitsluitlik 'n
+// eboek-konsep.
+const LEEN_OPGRADERING_GELDIGHEID_DAE_NA_VERVAL = 14;
 
 async function skep_leen_opgradering_koepon(item, koper_id, geskep_op) {
   const koeponStore = kry_store("koepons");
@@ -38,8 +40,12 @@ async function skep_leen_opgradering_koepon(item, koper_id, geskep_op) {
     pogings++;
   } while ((await koeponStore.get(kode, { type: "json" })) && pogings < 5);
 
+  // item.verval_op is die leen se eie vervaldatum (server-kant bereken in
+  // begin-betaling.js) — val dit om enige rede terug op geskep_op, sodat
+  // die koepon nooit sonder 'n verval-datum bly nie.
+  const leen_verval_op = item.verval_op ? Date.parse(item.verval_op) : Date.parse(geskep_op);
   const verval_op = new Date(
-    Date.parse(geskep_op) + LEEN_OPGRADERING_GELDIGHEID_DAE * 24 * 60 * 60 * 1000
+    leen_verval_op + LEEN_OPGRADERING_GELDIGHEID_DAE_NA_VERVAL * 24 * 60 * 60 * 1000
   ).toISOString();
 
   const koepon = {

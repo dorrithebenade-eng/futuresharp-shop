@@ -81,10 +81,11 @@ function bou_boek_kaart(boek) {
     el.appendChild(leen_el);
   }
 
-  // Leen-na-koop-opgradering: 'n eie knoppie, geldig ongeag of die leen
-  // self reeds verval het — dis juis dán wanneer 'n koper waarskynlik wil
-  // koop. Voorkom dat die klik na die leser deurloop deur die kaart se
-  // eie skakel-gedrag (indien dit 'n <a> is).
+  // Leen-na-koop-opgradering: die bediener (kry-my-boeke.js) besluit reeds
+  // OF hierdie aanbod nou relevant is (laaste 5 dae van 'n aktiewe leen, of
+  // ná verval) — hier wys ons dit bloot as dit teenwoordig is. Voorkom dat
+  // die klik na die leser deurloop deur die kaart se eie skakel-gedrag
+  // (indien dit 'n <a> is).
   if (boek.opgradering) {
     const opgradering_knoppie = document.createElement("button");
     opgradering_knoppie.type = "button";
