@@ -191,6 +191,20 @@ function bestelling_binne_datumreeks(b, van_datum, tot_datum) {
   return true;
 }
 
+// Skakel 'n ArrayBuffer na 'n base64-string om — ExcelJS se blaaier-
+// weergawe verwerk 'n beeld as base64-data-URI betroubaarder as 'n rou
+// ArrayBuffer (wat intern 'n Node.js Buffer verwag, nie altyd korrek
+// herken word in 'n blaaier-omgewing nie).
+function array_buffer_na_base64(buffer) {
+  let binêr = "";
+  const grepe = new Uint8Array(buffer);
+  const brok_grootte = 0x8000;
+  for (let i = 0; i < grepe.length; i += brok_grootte) {
+    binêr += String.fromCharCode.apply(null, grepe.subarray(i, i + brok_grootte));
+  }
+  return btoa(binêr);
+}
+
 async function laai_bestellings_as_excel() {
   const knoppie = document.getElementById("bestellings-laai-af-knoppie");
   const oorspronklike_teks = knoppie.textContent;
@@ -234,7 +248,11 @@ async function laai_bestellings_as_excel() {
       const logo_resp = await fetch("/icons/paneel-ikoon-512.png");
       if (!logo_resp.ok) throw new Error(`Status ${logo_resp.status} vir /icons/paneel-ikoon-512.png`);
       const logo_buffer = await logo_resp.arrayBuffer();
-      logo_id = werkboek.addImage({ buffer: logo_buffer, extension: "png" });
+      const logo_base64 = array_buffer_na_base64(logo_buffer);
+      logo_id = werkboek.addImage({
+        base64: `data:image/png;base64,${logo_base64}`,
+        extension: "png",
+      });
     } catch (logo_fout) {
       console.warn("Kon nie logo vir Excel-uitvoer laai nie (uitvoer gaan sonder logo voort):", logo_fout);
       logo_id = null;
