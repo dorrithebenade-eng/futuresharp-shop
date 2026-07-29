@@ -227,13 +227,16 @@ async function laai_bestellings_as_excel() {
     werkboek.created = new Date();
 
     // Logo ophaal — nie-krities, as dit om enige rede misluk, gaan ons
-    // eenvoudig sonder voort in plaas daarvan om die hele uitvoer te faal.
+    // sonder voort in plaas daarvan om die hele uitvoer te faal, maar ons
+    // TEKEN die fout wel in die Console aan sodat dit nagegaan kan word.
     let logo_id = null;
     try {
-      const logo_resp = await fetch("/icons/ikoon-512.png");
+      const logo_resp = await fetch("/icons/paneel-ikoon-512.png");
+      if (!logo_resp.ok) throw new Error(`Status ${logo_resp.status} vir /icons/paneel-ikoon-512.png`);
       const logo_buffer = await logo_resp.arrayBuffer();
       logo_id = werkboek.addImage({ buffer: logo_buffer, extension: "png" });
-    } catch {
+    } catch (logo_fout) {
+      console.warn("Kon nie logo vir Excel-uitvoer laai nie (uitvoer gaan sonder logo voort):", logo_fout);
       logo_id = null;
     }
 
