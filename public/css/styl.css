@@ -2280,9 +2280,12 @@ a.my-boek-kaart:focus-visible {
 }
 .paneel-bestelling-kop {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 10px;
   margin-bottom: 6px;
+}
+.paneel-bestelling-kop .paneel-bestelling-skrap-knoppie {
+  margin-left: auto;
 }
 .paneel-bestelling-kop strong {
   font-family: var(--font-opskrif);

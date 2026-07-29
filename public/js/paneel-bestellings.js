@@ -65,6 +65,7 @@ function bou_bestelling_kaart(b) {
       <div class="paneel-bestelling-kop">
         <strong>${b.bestelnommer}</strong>
         <span class="paneel-status-merker ${status_klas}">${b.status}</span>
+        <button type="button" class="terug-skakel paneel-skrap-knoppie paneel-bestelling-skrap-knoppie" data-bestelnommer="${b.bestelnommer}" data-status="${b.status}">Skrap</button>
       </div>
       <p class="paneel-bestelling-meta">
         ${formateer_datum_vol_bestelling(b.geskep_op)} · ${(b.koper && b.koper.epos) || "—"} · <strong>${formateer_prys_sent_bestelling(b.totaal_sent)}</strong>
@@ -106,6 +107,46 @@ function pas_bestellings_filter_toe() {
   wrap.querySelectorAll(".paneel-bestelling-drukker-knoppie").forEach((knoppie) => {
     knoppie.addEventListener("click", () => hanteer_drukker_merk(knoppie));
   });
+
+  wrap.querySelectorAll(".paneel-bestelling-skrap-knoppie").forEach((knoppie) => {
+    knoppie.addEventListener("click", () => hanteer_bestelling_skrap(knoppie));
+  });
+}
+
+async function hanteer_bestelling_skrap(knoppie) {
+  const bestelnommer = knoppie.dataset.bestelnommer;
+  const status = knoppie.dataset.status;
+
+  let bevestig_teks = `Skrap bestelling "${bestelnommer}" permanent? Dit kan nie ongedaan gemaak word nie.`;
+  if (status === "Nuut") {
+    bevestig_teks =
+      `⚠️ LET WEL: hierdie bestelling is reeds BETAAL ("Nuut").\n\n` +
+      `Skrap dit net as dit werklik 'n toets/toets-transaksie was — nie 'n regte koper-aankoop nie.\n\n` +
+      `Dit sal ook uit toekomstige Excel-uitvoere en verslae verdwyn.\n\n` +
+      `Skrap "${bestelnommer}" permanent?`;
+  }
+
+  if (!window.confirm(bevestig_teks)) return;
+
+  knoppie.disabled = true;
+  knoppie.textContent = "Besig …";
+
+  try {
+    const resp = await fetch("/.netlify/functions/skrap-bestelling", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...kry_outorisasie_kop() },
+      body: JSON.stringify({ bestelnommer }),
+    });
+    if (!resp.ok) throw new Error(`Status ${resp.status}`);
+
+    ALLE_BESTELLINGS = ALLE_BESTELLINGS.filter((b) => b.bestelnommer !== bestelnommer);
+    pas_bestellings_filter_toe();
+  } catch (fout) {
+    console.error("Kon nie bestelling skrap nie:", fout);
+    alert("Kon nie bestelling skrap nie — probeer weer.");
+    knoppie.disabled = false;
+    knoppie.textContent = "Skrap";
+  }
 }
 
 async function hanteer_drukker_merk(knoppie) {
