@@ -1298,10 +1298,21 @@ body {
 
 /* ---------- Formaat-verduideliking-opspring-venster ---------- */
 
+@keyframes formaat-info-inskuif {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 .formaat-info-oorlegsel {
   position: fixed;
   inset: 0;
-  background: rgba(23, 23, 23, 0.6);
+  background: rgba(23, 23, 23, 0.55);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1312,45 +1323,102 @@ body {
 .formaat-info-venster {
   position: relative;
   background: var(--wit);
-  border-radius: 8px;
+  border-radius: 14px;
   max-width: 420px;
   width: 100%;
-  padding: 28px 24px 24px;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+  animation: formaat-info-inskuif 0.2s ease-out;
+}
+
+.formaat-info-kop {
+  position: relative;
+  padding: 30px 24px 22px;
+  text-align: center;
+}
+
+.formaat-info-venster--eboek .formaat-info-kop {
+  background: var(--teal-helder);
+}
+
+.formaat-info-venster--hardekopie .formaat-info-kop {
+  background: var(--koraal);
+}
+
+.formaat-info-venster--leen .formaat-info-kop {
+  background: var(--amber);
+}
+
+.formaat-info-ikoon {
+  display: block;
+  font-size: 38px;
+  line-height: 1;
+  margin-bottom: 10px;
 }
 
 .formaat-info-toe-knoppie {
   position: absolute;
   top: 12px;
   right: 12px;
+  width: 28px;
+  height: 28px;
   border: none;
-  background: transparent;
-  font-size: 18px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  font-size: 15px;
   line-height: 1;
   cursor: pointer;
-  color: var(--grys-teks);
-  padding: 6px;
+  color: var(--wit);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease;
+}
+
+.formaat-info-venster--leen .formaat-info-toe-knoppie {
+  background: rgba(0, 0, 0, 0.12);
+  color: var(--swart);
 }
 
 .formaat-info-toe-knoppie:hover,
 .formaat-info-toe-knoppie:focus-visible {
-  color: var(--swart);
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.formaat-info-venster--leen .formaat-info-toe-knoppie:hover,
+.formaat-info-venster--leen .formaat-info-toe-knoppie:focus-visible {
+  background: rgba(0, 0, 0, 0.22);
 }
 
 .formaat-info-opskrif {
   font-family: var(--font-opskrif);
-  font-size: 19px;
+  font-size: 20px;
   font-weight: 700;
-  margin: 0 0 12px;
-  padding-right: 20px;
+  margin: 0;
+  color: var(--wit);
+}
+
+.formaat-info-venster--leen .formaat-info-opskrif {
+  color: var(--swart);
+}
+
+.formaat-info-liggaam {
+  padding: 22px 24px 26px;
 }
 
 .formaat-info-teks {
   font-family: var(--font-liggaam);
   font-size: 15px;
-  line-height: 1.5;
+  line-height: 1.55;
   color: var(--swart);
   margin: 0;
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .formaat-info-venster {
+    animation: none;
+  }
 }
 
 .produk-leen-aktief-merker {

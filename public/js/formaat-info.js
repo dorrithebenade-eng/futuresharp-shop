@@ -16,6 +16,8 @@ function bou_formaat_info_inhoud(formaat, tydperk_dae) {
     return {
       opskrif: t("formaat_info_hardekopie_opskrif"),
       teks: t("formaat_info_hardekopie_teks"),
+      ikoon: "📦",
+      klas: "formaat-info-venster--hardekopie",
     };
   }
 
@@ -24,6 +26,8 @@ function bou_formaat_info_inhoud(formaat, tydperk_dae) {
     return {
       opskrif: t("formaat_info_leen_opskrif"),
       teks: `${t("formaat_lees_teks")} ${tydperk_teks}`,
+      ikoon: "⏳",
+      klas: "formaat-info-venster--leen",
     };
   }
 
@@ -31,6 +35,8 @@ function bou_formaat_info_inhoud(formaat, tydperk_dae) {
   return {
     opskrif: t("formaat_info_eboek_opskrif"),
     teks: t("formaat_lees_teks"),
+    ikoon: "📖",
+    klas: "formaat-info-venster--eboek",
   };
 }
 
@@ -47,16 +53,21 @@ function hanteer_formaat_info_esc(e) {
 function wys_formaat_info(formaat, tydperk_dae) {
   verberg_formaat_info(); // verwyder enige reeds-oop venster eers
 
-  const { opskrif, teks } = bou_formaat_info_inhoud(formaat, tydperk_dae);
+  const { opskrif, teks, ikoon, klas } = bou_formaat_info_inhoud(formaat, tydperk_dae);
 
   const oorlegsel = document.createElement("div");
   oorlegsel.id = "formaat-info-oorlegsel";
   oorlegsel.className = "formaat-info-oorlegsel";
   oorlegsel.innerHTML = `
-    <div class="formaat-info-venster" role="dialog" aria-modal="true" aria-labelledby="formaat-info-opskrif">
-      <button type="button" class="formaat-info-toe-knoppie" aria-label="${t("formaat_info_maak_toe")}">✕</button>
-      <h3 id="formaat-info-opskrif" class="formaat-info-opskrif">${opskrif}</h3>
-      <p class="formaat-info-teks">${teks}</p>
+    <div class="formaat-info-venster ${klas}" role="dialog" aria-modal="true" aria-labelledby="formaat-info-opskrif">
+      <div class="formaat-info-kop">
+        <button type="button" class="formaat-info-toe-knoppie" aria-label="${t("formaat_info_maak_toe")}">✕</button>
+        <span class="formaat-info-ikoon" aria-hidden="true">${ikoon}</span>
+        <h3 id="formaat-info-opskrif" class="formaat-info-opskrif">${opskrif}</h3>
+      </div>
+      <div class="formaat-info-liggaam">
+        <p class="formaat-info-teks">${teks}</p>
+      </div>
     </div>
   `;
 
