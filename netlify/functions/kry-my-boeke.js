@@ -71,10 +71,11 @@ exports.handler = async (event, context) => {
       const items = Array.isArray(bestelling.items) ? bestelling.items : [];
 
       for (const boek_item of items) {
-        // Net e-boeke is relevant vir "My Boeke" — harde kopieë loop deur
-        // die drukker/POD-vloei, nie hier nie.
-        if (boek_item.formaat !== "eboek") continue;
+        // "My Boeke" wys e-boeke wat gekoop OF geleen is — harde kopieë
+        // loop deur die drukker/POD-vloei, nie hier nie.
+        if (boek_item.formaat !== "eboek" && boek_item.formaat !== "leen") continue;
 
+        const is_leen = boek_item.formaat === "leen";
         const vrystelling_datum = boek_item.vrystelling_datum || null;
         const beskikbaar_nou = !vrystelling_datum || vrystelling_datum <= vandag;
 
@@ -84,6 +85,14 @@ exports.handler = async (event, context) => {
         // gedeaktiveer/verwyder is.
         const produk = await kry_produk(boek_item.produk_slug);
 
+        let leen_aktief = null;
+        let dae_oor = null;
+        if (is_leen && boek_item.verval_op) {
+          const verval_datum = new Date(boek_item.verval_op);
+          leen_aktief = verval_datum > new Date();
+          dae_oor = Math.max(0, Math.ceil((verval_datum - new Date()) / (1000 * 60 * 60 * 24)));
+        }
+
         my_boeke.push({
           bestelnommer: bestelling.bestelnommer,
           produk_slug: boek_item.produk_slug,
@@ -92,6 +101,10 @@ exports.handler = async (event, context) => {
           omslag: (produk && produk.omslag) || "",
           vrystelling_datum,
           beskikbaar_nou,
+          is_leen,
+          verval_op: is_leen ? boek_item.verval_op || null : null,
+          leen_aktief,
+          dae_oor,
         });
       }
     }

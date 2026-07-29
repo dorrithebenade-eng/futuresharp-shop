@@ -121,8 +121,9 @@ exports.handler = async (event) => {
       if (!produk) continue;
 
       const is_harde_kopie = item.formaat === "harde_kopie";
-      const aankope_veld = is_harde_kopie ? "aankope_harde_kopie" : "aankope_eboek";
-      const opbrengs_veld = is_harde_kopie ? "opbrengs_harde_kopie_sent" : "opbrengs_eboek_sent";
+      const is_leen = item.formaat === "leen";
+      const aankope_veld = is_harde_kopie ? "aankope_harde_kopie" : is_leen ? "aankope_leen" : "aankope_eboek";
+      const opbrengs_veld = is_harde_kopie ? "opbrengs_harde_kopie_sent" : is_leen ? "opbrengs_leen_sent" : "opbrengs_eboek_sent";
 
       await katalogusStore.setJSON(item.produk_slug, {
         ...produk,

@@ -38,9 +38,15 @@ async function verifieer_via_token(token, produk_slug) {
   return { id: rekord.gebruiker_id, email: rekord.gebruiker_epos };
 }
 
+// Gee 'n objek terug: { besit: boolean, rede: "koop" | "leen" | "leen_verval" | null }
+// "leen_verval" beteken hulle HET geleen, maar dit het reeds verstryk —
+// dié onderskeid laat die aanroeper 'n vriendelike, spesifieke
+// foutboodskap wys i.p.v. 'n generiese "nooit gekoop nie".
 async function besit_boek(gebruiker_id, produk_slug) {
   const bestellings_store = kry_store("bestellings");
   const { blobs } = await bestellings_store.list();
+
+  let leen_gevind_maar_verval = false;
 
   for (const item of blobs) {
     const ruwe = await bestellings_store.get(item.key);
@@ -59,11 +65,20 @@ async function besit_boek(gebruiker_id, produk_slug) {
     if (!behoort_aan_koper || !is_betaal) continue;
 
     const items = Array.isArray(bestelling.items) ? bestelling.items : [];
+
     if (items.some((i) => i.produk_slug === produk_slug && i.formaat === "eboek")) {
-      return true;
+      return { besit: true, rede: "koop" };
+    }
+
+    const leen_item = items.find((i) => i.produk_slug === produk_slug && i.formaat === "leen");
+    if (leen_item) {
+      if (leen_item.verval_op && new Date(leen_item.verval_op) > new Date()) {
+        return { besit: true, rede: "leen", verval_op: leen_item.verval_op };
+      }
+      leen_gevind_maar_verval = true;
     }
   }
-  return false;
+  return { besit: false, rede: leen_gevind_maar_verval ? "leen_verval" : null };
 }
 
 async function kry_of_genereer_gemerkte_kopie(produk_slug, gebruiker) {
@@ -136,8 +151,13 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    if (!(await besit_boek(gebruiker.id, produk_slug))) {
-      return { statusCode: 403, body: JSON.stringify({ fout: "Jy het nie hierdie e-boek gekoop nie" }) };
+    const besit_status = await besit_boek(gebruiker.id, produk_slug);
+    if (!besit_status.besit) {
+      const boodskap =
+        besit_status.rede === "leen_verval"
+          ? "Jou leen-tydperk vir hierdie e-boek het verval. Koop dit, of leen dit weer, om verder te lees."
+          : "Jy het nie hierdie e-boek gekoop of geleen nie";
+      return { statusCode: 403, body: JSON.stringify({ fout: boodskap, leen_verval: besit_status.rede === "leen_verval" }) };
     }
 
     const volledige_pdf = await kry_of_genereer_gemerkte_kopie(produk_slug, gebruiker);

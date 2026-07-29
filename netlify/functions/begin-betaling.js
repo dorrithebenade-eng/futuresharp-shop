@@ -143,12 +143,13 @@ exports.handler = async (event, context) => {
     return true;
   }
 
-  // --- Voorkom dubbele e-boek-aankope ---
+  // --- Voorkom dubbele e-boek-aankope + dubbele/onnodige leen ---
   // Slaan al hierdie koper se reeds-betaalde bestellings na om te sien
-  // watter e-boeke hulle reeds besit. Net e-boeke word so beperk — 'n
-  // harde kopie kan doelbewus weer gekoop word (bv. as geskenk, of 'n
-  // vervangingskopie), so dié beperking geld nie daarvoor nie.
+  // watter e-boeke hulle reeds BESIT (koop), en watter boeke hulle tans
+  // 'n AKTIEWE leen-tydperk voor het. 'n Harde kopie kan doelbewus weer
+  // gekoop word (bv. geskenk), so dié beperking geld nie daarvoor nie.
   const reeds_besitte_eboeke = new Set();
+  const aktiewe_leen_verval = new Map(); // produk_slug -> jongste verval_op (ISO)
   {
     const { blobs: alle_bestelling_sleutels } = await bestellingsStore.list();
     for (const sleutel_item of alle_bestelling_sleutels) {
@@ -160,6 +161,12 @@ exports.handler = async (event, context) => {
       if (!behoort_aan_koper || bestaande_bestelling.status !== "Nuut") continue;
       for (const besitte_item of bestaande_bestelling.items || []) {
         if (besitte_item.formaat === "eboek") reeds_besitte_eboeke.add(besitte_item.produk_slug);
+        if (besitte_item.formaat === "leen" && besitte_item.verval_op) {
+          const huidige = aktiewe_leen_verval.get(besitte_item.produk_slug);
+          if (!huidige || new Date(besitte_item.verval_op) > new Date(huidige)) {
+            aktiewe_leen_verval.set(besitte_item.produk_slug, besitte_item.verval_op);
+          }
+        }
       }
     }
   }
@@ -183,6 +190,22 @@ exports.handler = async (event, context) => {
         statusCode: 400,
         body: `Jy besit reeds die e-boek "${produk.titel}" — kyk gerus in "My Boeke". Kontak Future Sharp as jy dink dit is 'n fout.`,
       };
+    }
+
+    if (kliënt_item.formaat === "leen") {
+      if (reeds_besitte_eboeke.has(produk.slug)) {
+        return {
+          statusCode: 400,
+          body: `Jy besit reeds die e-boek "${produk.titel}" — geen rede om dit ook te leen nie.`,
+        };
+      }
+      const huidige_verval = aktiewe_leen_verval.get(produk.slug);
+      if (huidige_verval && new Date(huidige_verval) > new Date()) {
+        return {
+          statusCode: 400,
+          body: `Jy het reeds 'n aktiewe leen vir "${produk.titel}" (verval ${new Date(huidige_verval).toLocaleDateString("af-ZA")}) — wag tot dit verval, of koop dit eerder.`,
+        };
+      }
     }
 
     const formaat_data = produk.formate && produk.formate[kliënt_item.formaat];
@@ -212,12 +235,22 @@ exports.handler = async (event, context) => {
     totaal_sent += verkoop_prys_sent;
     if (kliënt_item.formaat === "harde_kopie") bevat_harde_kopie = true;
 
+    // Leen-items kry 'n verval-datum — bereken NOU, server-kant, sodat 'n
+    // koper dit nooit self kan verleng deur die kliënt te manipuleer nie.
+    const leen_ekstra = {};
+    if (kliënt_item.formaat === "leen") {
+      const tydperk_dae = formaat_data.tydperk_dae > 0 ? formaat_data.tydperk_dae : 30;
+      leen_ekstra.verval_op = new Date(Date.now() + tydperk_dae * 24 * 60 * 60 * 1000).toISOString();
+      leen_ekstra.tydperk_dae = tydperk_dae;
+    }
+
     geverifieerde_items.push({
       produk_slug: produk.slug,
       titel: produk.titel,
       formaat: kliënt_item.formaat,
       prys_sent: verkoop_prys_sent,
       ...(item_koepon_toegepas ? { oorspronklike_prys_sent: item_prys_sent, koepon_kode: koepon.kode } : {}),
+      ...leen_ekstra,
     });
 
     // Hosting — suiwer dokumentasie, geen subrekening nie. Ons tel dit net
@@ -329,8 +362,10 @@ exports.handler = async (event, context) => {
       for (const item of geverifieerde_items) {
         const produk = await katalogusStore.get(item.produk_slug, { type: "json" });
         if (!produk) continue;
-        const is_harde_kopie = item.formaat === "harde_kopie";
-        const aankope_veld = is_harde_kopie ? "aankope_harde_kopie" : "aankope_eboek";
+        const aankope_veld =
+          item.formaat === "harde_kopie" ? "aankope_harde_kopie" :
+          item.formaat === "leen" ? "aankope_leen" :
+          "aankope_eboek";
         await katalogusStore.setJSON(item.produk_slug, {
           ...produk,
           [aankope_veld]: (produk[aankope_veld] || 0) + 1,

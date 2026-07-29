@@ -138,11 +138,31 @@ exports.handler = async (event, context) => {
         };
       }
     }
+    // "Leen" is soortgelyk, maar het 'n tydperk_dae i.p.v. 'n
+    // vrystelling_datum, en vereis dat die e-boek se PDF reeds bestaan
+    // (dieselfde onderliggende lêer word gebruik, geen aparte oplaai nie).
+    if (wysigings.formate.leen) {
+      const leen_wysiging = wysigings.formate.leen;
+      if (leen_wysiging.beskikbaar && !(nuwe_formate.eboek && nuwe_formate.eboek.eboek_sleutel)) {
+        return {
+          statusCode: 400,
+          body: "'n Leen-opsie vereis 'n opgelaaide e-boek-PDF (dieselfde lêer word gebruik) — laai eers die e-boek-PDF op.",
+        };
+      }
+      nuwe_formate.leen = {
+        beskikbaar: !!leen_wysiging.beskikbaar,
+        prys_sent: leen_wysiging.prys_sent || 0,
+        tydperk_dae: Number(leen_wysiging.tydperk_dae) > 0 ? Math.round(Number(leen_wysiging.tydperk_dae)) : 30,
+        verdelings: kry_geldige_verdelings(leen_wysiging.verdelings),
+        hosting: kry_geldige_hosting(leen_wysiging.hosting),
+      };
+    }
   }
 
   for (const [formaat_naam, etiket] of [
     ["eboek", "e-boek"],
     ["harde_kopie", "harde-kopie"],
+    ["leen", "leen"],
   ]) {
     const f = nuwe_formate[formaat_naam];
     if (f && f.beskikbaar && oorskry_hoofrekening_minimum(f.verdelings || [], f.hosting, f.prys_sent || 0)) {

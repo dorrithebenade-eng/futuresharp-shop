@@ -169,6 +169,29 @@ exports.handler = async (event, context) => {
     };
   }
 
+  // "Leen" gebruik DIESELFDE onderliggende PDF as die e-boek (geen aparte
+  // oplaai nie) — dit kan dus net aangeskakel word as die e-boek self 'n
+  // opgelaaide PDF het.
+  const leen_verdelings = kry_geldige_verdelings(formate.leen && formate.leen.verdelings);
+  const leen_hosting = kry_geldige_hosting(formate.leen && formate.leen.hosting);
+  if (formate.leen && formate.leen.beskikbaar) {
+    if (!formate.eboek.eboek_sleutel && !invoer.eboek_sleutel) {
+      return {
+        statusCode: 400,
+        body: "'n Leen-opsie vereis 'n opgelaaide e-boek-PDF (dieselfde lêer word gebruik) — laai eers die e-boek-PDF op.",
+      };
+    }
+    if (oorskry_hoofrekening_minimum(leen_verdelings, leen_hosting, formate.leen.prys_sent || 0)) {
+      return {
+        statusCode: 400,
+        body: "Die leen-verdeling(s) plus Hosting los minder as 3% oor vir Future Sharp se hoofrekening — verminder die persentasie/bedrae sodat ten minste 3% oorbly.",
+      };
+    }
+  }
+  const leen_tydperk_dae = Number(formate.leen && formate.leen.tydperk_dae) > 0
+    ? Math.round(Number(formate.leen.tydperk_dae))
+    : 30; // verstek — 1 maand
+
   const store = kry_store("katalogus");
 
   // Verhoed oorskryf van 'n bestaande slug per ongeluk
@@ -211,6 +234,15 @@ exports.handler = async (event, context) => {
             verdelings: hardekopie_verdelings,
             hosting: hardekopie_hosting,
             vrystelling_datum: kry_geldige_datum(formate.harde_kopie.vrystelling_datum),
+          }
+        : { beskikbaar: false },
+      leen: formate.leen && formate.leen.beskikbaar
+        ? {
+            beskikbaar: true,
+            prys_sent: formate.leen.prys_sent || 0,
+            tydperk_dae: leen_tydperk_dae,
+            verdelings: leen_verdelings,
+            hosting: leen_hosting,
           }
         : { beskikbaar: false },
     },
