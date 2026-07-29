@@ -2257,6 +2257,21 @@ a.my-boek-kaart:focus-visible {
   margin: 0;
 }
 
+.paneel-bestellings-uitvoer {
+  display: flex;
+  gap: 14px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  background: var(--grys-lig);
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin-bottom: 8px;
+}
+.paneel-bestellings-uitvoer input[type="date"] {
+  margin: 0;
+  width: auto;
+}
+
 .paneel-bestelling-kaart {
   border: 1px solid #EDEBE6;
   border-radius: 12px;

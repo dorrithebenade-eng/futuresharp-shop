@@ -536,6 +536,21 @@
           </label>
         </div>
 
+        <div class="paneel-bestellings-uitvoer">
+          <div>
+            <label class="veld-etiket" for="bestellings-uitvoer-van" style="margin:0 0 4px;">Van</label>
+            <input type="date" id="bestellings-uitvoer-van" class="veld-invoer">
+          </div>
+          <div>
+            <label class="veld-etiket" for="bestellings-uitvoer-tot" style="margin:0 0 4px;">Tot</label>
+            <input type="date" id="bestellings-uitvoer-tot" class="veld-invoer">
+          </div>
+          <button type="button" id="bestellings-laai-af-knoppie" class="kaart-aksie" style="align-self:flex-end;">
+            📥 Laai af as Excel
+          </button>
+        </div>
+        <p class="paneel-hulp-teks" style="margin-top:-14px;">Los "Van"/"Tot" leeg om alles af te laai.</p>
+
         <div id="paneel-bestellings-lys">
           <p class="stelsel-boodskap">Word gelaai …</p>
         </div>
@@ -754,6 +769,7 @@
   <script src="js/paneel-statistieke.js"></script>
   <script src="js/paneel-waarskuwings.js"></script>
   <script src="js/paneel-kategoriee.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="js/paneel-bestellings.js"></script>
   <script src="js/paneel-kieslys.js"></script>
   <script src="js/paneelbord-installeer-app.js"></script>

@@ -154,10 +154,128 @@ async function paneel_bestellings_laai() {
   }
 }
 
+// --- Excel-uitvoer ---
+
+const REGISTER_ENDPOINTS_VIR_UITVOER = [
+  { endpoint: "/.netlify/functions/kry-outeurs", respons_veld: "outeurs" },
+  { endpoint: "/.netlify/functions/kry-vennote", respons_veld: "vennote" },
+  { endpoint: "/.netlify/functions/kry-ontwerp-admin", respons_veld: "ontwerp_admin" },
+  { endpoint: "/.netlify/functions/kry-printing", respons_veld: "printing" },
+  { endpoint: "/.netlify/functions/kry-aflewering", respons_veld: "aflewering" },
+];
+
+// Bou 'n opsoektabel: subrekening-kode → leesbare naam — sodat die
+// verdeling-blad regte name wys, nie net kriptiese ACCT_-kodes nie.
+async function bou_subrekening_naam_opsoek() {
+  const opsoek = {};
+  const antwoorde = await Promise.all(
+    REGISTER_ENDPOINTS_VIR_UITVOER.map((r) =>
+      fetch(r.endpoint, { headers: kry_outorisasie_kop() })
+        .then((resp) => (resp.ok ? resp.json() : null))
+        .then((data) => (data ? { lys: data[r.respons_veld] || [] } : { lys: [] }))
+        .catch(() => ({ lys: [] }))
+    )
+  );
+  antwoorde.forEach(({ lys }) => {
+    lys.forEach((item) => {
+      if (item.subrekening_kode) opsoek[item.subrekening_kode] = item.naam;
+    });
+  });
+  return opsoek;
+}
+
+function bestelling_binne_datumreeks(b, van_datum, tot_datum) {
+  const b_datum = new Date(b.geskep_op);
+  if (van_datum && b_datum < van_datum) return false;
+  if (tot_datum && b_datum > tot_datum) return false;
+  return true;
+}
+
+async function laai_bestellings_as_excel() {
+  const knoppie = document.getElementById("bestellings-laai-af-knoppie");
+  const oorspronklike_teks = knoppie.textContent;
+  knoppie.disabled = true;
+  knoppie.textContent = "Word saamgestel …";
+
+  try {
+    const van_waarde = document.getElementById("bestellings-uitvoer-van").value;
+    const tot_waarde = document.getElementById("bestellings-uitvoer-tot").value;
+    const van_datum = van_waarde ? new Date(van_waarde + "T00:00:00") : null;
+    const tot_datum = tot_waarde ? new Date(tot_waarde + "T23:59:59") : null;
+
+    const gekose_bestellings = ALLE_BESTELLINGS.filter((b) =>
+      bestelling_binne_datumreeks(b, van_datum, tot_datum)
+    );
+
+    if (!gekose_bestellings.length) {
+      alert("Geen bestellings in hierdie datumreeks nie.");
+      return;
+    }
+
+    const naam_opsoek = await bou_subrekening_naam_opsoek();
+
+    // --- Blad 1: Bestellings-oorsig ---
+    const bestellings_rye = gekose_bestellings.map((b) => ({
+      Bestelnommer: b.bestelnommer,
+      Datum: formateer_datum_vol_bestelling(b.geskep_op),
+      "Koper e-pos": (b.koper && b.koper.epos) || "",
+      Items: (b.items || [])
+        .map((i) => `${i.titel} (${etiket_vir_formaat_bestelling(i.formaat)})`)
+        .join("; "),
+      "Totaal (R)": (b.totaal_sent / 100).toFixed(2),
+      Status: b.status,
+      "Bevat harde kopie": b.bevat_harde_kopie ? "Ja" : "Nee",
+      "Drukwerk geplaas": b.bevat_harde_kopie
+        ? b.drukker && b.drukker.bestelling_geplaas
+          ? "Ja"
+          : "Nee"
+        : "n.v.t.",
+      "Koepon-kode": (b.koepon_toegepas && b.koepon_toegepas.kode) || "",
+      "100%-koepon (geen Paystack)": b.paystack && b.paystack.gratis_via_koepon ? "Ja" : "Nee",
+      "Split-vangnet geaktiveer": b.split_fout ? "Ja" : "Nee",
+    }));
+
+    // --- Blad 2: Verdeling-opsplitsing (een ry per party per bestelling) ---
+    const verdeling_rye = [];
+    gekose_bestellings.forEach((b) => {
+      if (!b.verdeling) return;
+      Object.entries(b.verdeling).forEach(([subrekening_kode, sent_bedrag]) => {
+        verdeling_rye.push({
+          Bestelnommer: b.bestelnommer,
+          Datum: formateer_datum_vol_bestelling(b.geskep_op),
+          Party: naam_opsoek[subrekening_kode] || "(onbekend)",
+          "Subrekening-kode": subrekening_kode,
+          "Bedrag (R)": (sent_bedrag / 100).toFixed(2),
+        });
+      });
+    });
+
+    const werkboek = XLSX.utils.book_new();
+    const blad_bestellings = XLSX.utils.json_to_sheet(bestellings_rye);
+    XLSX.utils.book_append_sheet(werkboek, blad_bestellings, "Bestellings");
+
+    if (verdeling_rye.length) {
+      const blad_verdeling = XLSX.utils.json_to_sheet(verdeling_rye);
+      XLSX.utils.book_append_sheet(werkboek, blad_verdeling, "Verdeling");
+    }
+
+    const vandag_kort = new Date().toISOString().slice(0, 10);
+    const lêernaam = `Future-Shop-Bestellings-${van_waarde || "alles"}-tot-${tot_waarde || vandag_kort}.xlsx`;
+    XLSX.writeFile(werkboek, lêernaam);
+  } catch (fout) {
+    console.error("Kon nie Excel-lêer saamstel nie:", fout);
+    alert("Kon nie die Excel-lêer saamstel nie — probeer weer.");
+  } finally {
+    knoppie.disabled = false;
+    knoppie.textContent = oorspronklike_teks;
+  }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("bestellings-soek").addEventListener("input", pas_bestellings_filter_toe);
   document.getElementById("bestellings-status-filter").addEventListener("change", pas_bestellings_filter_toe);
   document.getElementById("bestellings-net-onafgehandelde-druk").addEventListener("change", pas_bestellings_filter_toe);
+  document.getElementById("bestellings-laai-af-knoppie").addEventListener("click", laai_bestellings_as_excel);
 });
 
 // Selfde "wag totdat paneel-inhoud sigbaar raak"-patroon as elders
