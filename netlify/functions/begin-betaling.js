@@ -126,6 +126,9 @@ exports.handler = async (event, context) => {
     if (gevonde_koepon.gebruike_tot_dusver >= gevonde_koepon.maks_gebruike) {
       return { statusCode: 400, body: "Hierdie koepon is klaar ten volle gebruik" };
     }
+    if (gevonde_koepon.koper_id_beperking && gevonde_koepon.koper_id_beperking !== gebruiker.id) {
+      return { statusCode: 400, body: "Hierdie koepon is nie vir jou rekening geldig nie" };
+    }
     koepon = gevonde_koepon;
   }
 
@@ -134,6 +137,7 @@ exports.handler = async (event, context) => {
   // veelvuldig-herbruikbare koepon-kode.
   function koepon_geld_vir_item(produk_slug, formaat) {
     if (!koepon) return false;
+    if (koepon.koper_id_beperking && koepon.koper_id_beperking !== gebruiker.id) return false;
     if (koepon.produk_slug && koepon.produk_slug !== produk_slug) return false;
     if (koepon.formaat_beperking !== "albei" && koepon.formaat_beperking !== formaat) return false;
     const reeds_gebruik_deur_koper = (koepon.gebruike_geskiedenis || []).some(

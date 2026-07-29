@@ -81,6 +81,32 @@ function bou_boek_kaart(boek) {
     el.appendChild(leen_el);
   }
 
+  // Leen-na-koop-opgradering: 'n eie knoppie, geldig ongeag of die leen
+  // self reeds verval het — dis juis dán wanneer 'n koper waarskynlik wil
+  // koop. Voorkom dat die klik na die leser deurloop deur die kaart se
+  // eie skakel-gedrag (indien dit 'n <a> is).
+  if (boek.opgradering) {
+    const opgradering_knoppie = document.createElement("button");
+    opgradering_knoppie.type = "button";
+    opgradering_knoppie.className = "my-boek-opgradering-knoppie";
+    const bedrag = `R${(boek.opgradering.afslag_sent / 100).toFixed(2)}`;
+    opgradering_knoppie.textContent = window.t
+      ? `${window.t("leen_opgradering_knoppie")} ${bedrag} ${window.t("leen_opgradering_afslag_suffix")}`
+      : `Koop nou — ${bedrag} afslag`;
+    opgradering_knoppie.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      voeg_by_mandjie({
+        produk_slug: boek.produk_slug,
+        titel: boek.titel,
+        formaat: "eboek",
+        prys_sent: boek.opgradering.eboek_prys_sent,
+      });
+      window.location.href = `/voltooi-betaling.html?koepon=${encodeURIComponent(boek.opgradering.koepon_kode)}`;
+    });
+    el.appendChild(opgradering_knoppie);
+  }
+
   return el;
 }
 

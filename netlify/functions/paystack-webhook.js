@@ -10,6 +10,61 @@
 const crypto = require("crypto");
 const { kry_store } = require("./_blob-store");
 
+// Dieselfde patroon as skep-koepon.js — leesbaar-genoeg om oor die
+// telefoon deur te gee, sonder dubbelsinnige karakters (0/O, 1/I/L).
+function maak_koepon_kode() {
+  const karakters = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+  let kode = "";
+  for (let i = 0; i < 8; i++) {
+    kode += karakters[Math.floor(Math.random() * karakters.length)];
+  }
+  return kode;
+}
+
+// Leen-na-koop-opgradering: sodra 'n leen suksesvol bevestig is, skep 'n
+// koper-spesifieke koepon wat presies die betaalde leen-bedrag as
+// vaste-bedrag-afslag gee op 'n LATERE eboek-koop van dieselfde boek.
+// 14 dae geldig vanaf die leen-aankoop-datum. Nooit vir harde kopie —
+// leen is uitsluitlik 'n eboek-konsep.
+const LEEN_OPGRADERING_GELDIGHEID_DAE = 14;
+
+async function skep_leen_opgradering_koepon(item, koper_id, geskep_op) {
+  const koeponStore = kry_store("koepons");
+
+  let kode = "";
+  let pogings = 0;
+  do {
+    kode = maak_koepon_kode();
+    pogings++;
+  } while ((await koeponStore.get(kode, { type: "json" })) && pogings < 5);
+
+  const verval_op = new Date(
+    Date.parse(geskep_op) + LEEN_OPGRADERING_GELDIGHEID_DAE * 24 * 60 * 60 * 1000
+  ).toISOString();
+
+  const koepon = {
+    kode,
+    tipe: "afslag",
+    afslag_tipe: "vaste_bedrag",
+    afslag_waarde: item.prys_sent, // presies wat vir die leen betaal is
+    produk_slug: item.produk_slug,
+    formaat_beperking: "eboek", // Leen is net op eboeke van toepassing
+    koper_id_beperking: koper_id,
+    maks_gebruike: 1,
+    gebruike_tot_dusver: 0,
+    gebruike_geskiedenis: [],
+    verval_op,
+    aktief: true,
+    outeur_id: null,
+    nota: "Outomaties geskep: leen-na-koop-opgradering",
+    geskep_deur: "stelsel:leen-opgradering",
+    geskep_op,
+  };
+
+  await koeponStore.setJSON(kode, koepon);
+  return kode;
+}
+
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: "Metode nie toegelaat nie" };
@@ -63,8 +118,29 @@ exports.handler = async (event) => {
 
   const nou = new Date().toISOString();
 
+  // Skep vir elke leen-item in hierdie bestelling 'n koper-spesifieke
+  // opgradering-koepon — nooit die bevestiging self laat faal as hierdie
+  // stap struikel nie, dis 'n bykomstige voordeel, nie krities nie.
+  let bygewerkte_items = bestelling.items;
+  try {
+    bygewerkte_items = await Promise.all(
+      bestelling.items.map(async (item) => {
+        if (item.formaat !== "leen") return item;
+        const opgradering_koepon_kode = await skep_leen_opgradering_koepon(
+          item,
+          bestelling.koper.netlify_identity_id,
+          nou
+        );
+        return { ...item, opgradering_koepon_kode };
+      })
+    );
+  } catch (fout) {
+    console.error(`Webhook: kon nie leen-opgradering-koepon(s) skep nie vir ${bestelnommer}:`, fout);
+  }
+
   const bygewerkte_bestelling = {
     ...bestelling,
+    items: bygewerkte_items,
     paystack: {
       referensie: bestelnommer,
       geverifieer: true,

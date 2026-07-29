@@ -66,6 +66,13 @@ exports.handler = async (event, context) => {
       body: JSON.stringify({ fout_kode: "VOLGEBRUIK" }),
     };
   }
+  if (koepon.koper_id_beperking && koepon.koper_id_beperking !== gebruiker.id) {
+    return {
+      statusCode: 400,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ fout_kode: "NIE_JOUNE" }),
+    };
+  }
 
   const katalogusStore = kry_store("katalogus");
   let oorspronklike_totaal_sent = 0;

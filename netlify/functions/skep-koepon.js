@@ -43,11 +43,17 @@ exports.handler = async (event, context) => {
   }
 
   const tipe = invoer.tipe === "afslag" ? "afslag" : "gratis";
-  const formaat_beperking = ["eboek", "harde_kopie", "albei"].includes(invoer.formaat_beperking)
+  const formaat_beperking = ["eboek", "harde_kopie", "leen", "albei"].includes(invoer.formaat_beperking)
     ? invoer.formaat_beperking
     : "albei";
   const produk_slug = invoer.produk_slug ? String(invoer.produk_slug).trim() : null; // null = enige boek
   const outeur_id = invoer.outeur_id ? String(invoer.outeur_id).trim() : null;
+  // Bind hierdie kode aan net EEN spesifieke koper (gebruik vir outomaties-
+  // gegenereerde leen-na-koop-opgradering-koepons). Leeg/null = enigeen mag
+  // dit verlos (die normale geval vir personeel-geskepte koepons).
+  const koper_id_beperking = invoer.koper_id_beperking
+    ? String(invoer.koper_id_beperking).trim()
+    : null;
   const nota = invoer.nota ? String(invoer.nota).trim().slice(0, 300) : "";
 
   const maks_gebruike = Number.isInteger(invoer.maks_gebruike) && invoer.maks_gebruike > 0
@@ -110,6 +116,7 @@ exports.handler = async (event, context) => {
     afslag_waarde,
     produk_slug,
     formaat_beperking,
+    koper_id_beperking,
     maks_gebruike,
     gebruike_tot_dusver: 0,
     // Onthou WIE reeds hierdie kode teen WATTER boek gebruik het, sodat ons

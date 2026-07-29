@@ -125,7 +125,7 @@ const WOORDEBOEK = {
   eboek_etiket: { af: "E-boek", en: "E-book" },
   hardekopie_etiket: { af: "Harde kopie", en: "Hard copy" },
   voorbestelling_chip: { af: "Voorbestelling", en: "Pre-order" },
-  reeds_gekoop: { af: "Alreeds joune", en: "Already yours" },
+  reeds_gekoop: { af: "Gekoop", en: "Purchased" },
   gaan_lees: { af: "Gaan lees →", en: "Go read →" },
   leen_etiket: { af: "Leen", en: "Borrow" },
   leen_nou_knoppie: { af: "Leen nou", en: "Borrow now" },
@@ -134,7 +134,7 @@ const WOORDEBOEK = {
   dag_enkelvoud: { af: "dag oor", en: "day left" },
   dae_meervoud: { af: "dae", en: "days" },
   dae_oor_meervoud: { af: "dae oor", en: "days left" },
-  leen_verval_etiket: { af: "Leen verval", en: "Loan expired" },
+  leen_verval_etiket: { af: "Reeds gelees", en: "Already read" },
   leen_kennisgewing_voorvoegsel: { af: "Geleen —", en: "Borrowed —" },
   leen_verval_boodskap: {
     af: "Jou leen-tydperk vir hierdie e-boek het verval. Koop dit, of leen dit weer, om verder te lees.",
@@ -192,6 +192,10 @@ const WOORDEBOEK = {
   koepon_fout_geen_toepassing: {
     af: "Hierdie koepon is nie van toepassing op enigiets in jou mandjie nie",
     en: "This coupon does not apply to anything in your cart",
+  },
+  koepon_fout_nie_joune: {
+    af: "Hierdie koepon is nie vir jou rekening geldig nie",
+    en: "This coupon is not valid for your account",
   },
   aflewering_titel: { af: "Aflewering", en: "Delivery" },
   aflewering_nota: {
@@ -439,6 +443,8 @@ const WOORDEBOEK = {
   sessie_verval: { af: "Sessie verval — meld weer aan.", en: "Session expired — log in again." },
   geen_boeke_nog: { af: "Nog geen boeke gekoop nie.", en: "No books purchased yet." },
   fout_boeke_laai: { af: "Kon nie boeke laai nie. Probeer weer.", en: "Couldn't load books. Try again." },
+  leen_opgradering_knoppie: { af: "Koop nou —", en: "Buy now —" },
+  leen_opgradering_afslag_suffix: { af: "afslag", en: "off" },
 
   // Leser-bladsy
   terug_na_my_boeke: { af: "← My Boeke", en: "← My Books" },

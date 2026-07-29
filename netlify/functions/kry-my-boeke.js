@@ -47,7 +47,13 @@ exports.handler = async (event, context) => {
 
     const vandag = new Date().toISOString().slice(0, 10);
     const my_boeke = [];
+    const koepon_store = kry_store("koepons");
 
+    // Versamel eers al hierdie koper se BETAALDE bestellings — ons het dit
+    // twee keer nodig: (1) om te weet watter boeke reeds as volle eboek
+    // besit word (sodat ons nooit 'n opgradering-aanbod op iets wys wat
+    // klaar besit word nie), en (2) die gewone lys-bou-lus hieronder.
+    const koper_bestellings = [];
     for (const item of blobs) {
       const ruwe = await bestellings_store.get(item.key);
       if (!ruwe) continue;
@@ -66,8 +72,17 @@ exports.handler = async (event, context) => {
       // "Nuut" = status ná suksesvolle betaling (sien paystack-webhook.js)
       const is_betaal = bestelling.status === "Nuut";
 
-      if (!behoort_aan_koper || !is_betaal) continue;
+      if (behoort_aan_koper && is_betaal) koper_bestellings.push(bestelling);
+    }
 
+    const reeds_besit_as_eboek = new Set();
+    for (const bestelling of koper_bestellings) {
+      for (const boek_item of bestelling.items || []) {
+        if (boek_item.formaat === "eboek") reeds_besit_as_eboek.add(boek_item.produk_slug);
+      }
+    }
+
+    for (const bestelling of koper_bestellings) {
       const items = Array.isArray(bestelling.items) ? bestelling.items : [];
 
       for (const boek_item of items) {
@@ -76,6 +91,12 @@ exports.handler = async (event, context) => {
         if (boek_item.formaat !== "eboek" && boek_item.formaat !== "leen") continue;
 
         const is_leen = boek_item.formaat === "leen";
+
+        // As die koper hierdie boek intussen ook as volle eboek gekoop
+        // het (bv. via die leen-na-koop-opgradering), moet die ou
+        // leen-kaart nie ook nog apart wys nie — net die "Gekoop"-kaart.
+        if (is_leen && reeds_besit_as_eboek.has(boek_item.produk_slug)) continue;
+
         const vrystelling_datum = boek_item.vrystelling_datum || null;
         const beskikbaar_nou = !vrystelling_datum || vrystelling_datum <= vandag;
 
@@ -93,6 +114,31 @@ exports.handler = async (event, context) => {
           dae_oor = Math.max(0, Math.ceil((verval_datum - new Date()) / (1000 * 60 * 60 * 24)));
         }
 
+        // Leen-na-koop-opgradering: net gewys as (a) hierdie 'n leen is,
+        // (b) die koper NIE reeds die eboek self ook besit nie, en (c) die
+        // outomaties-geskepte koepon nog werklik geldig is (nie verval,
+        // nie gedeaktiveer, nie reeds gebruik nie).
+        let opgradering = null;
+        if (is_leen && boek_item.opgradering_koepon_kode) {
+          const koepon = await koepon_store.get(boek_item.opgradering_koepon_kode, { type: "json" });
+          const nog_geldig =
+            koepon &&
+            koepon.aktief &&
+            koepon.gebruike_tot_dusver < koepon.maks_gebruike &&
+            (!koepon.verval_op || new Date(koepon.verval_op) > new Date());
+
+          const eboek_formaat = produk && produk.formate && produk.formate.eboek;
+
+          if (nog_geldig && eboek_formaat && eboek_formaat.beskikbaar) {
+            opgradering = {
+              koepon_kode: koepon.kode,
+              afslag_sent: koepon.afslag_waarde,
+              verval_op: koepon.verval_op,
+              eboek_prys_sent: eboek_formaat.prys_sent,
+            };
+          }
+        }
+
         my_boeke.push({
           bestelnommer: bestelling.bestelnommer,
           produk_slug: boek_item.produk_slug,
@@ -105,6 +151,7 @@ exports.handler = async (event, context) => {
           verval_op: is_leen ? boek_item.verval_op || null : null,
           leen_aktief,
           dae_oor,
+          opgradering,
         });
       }
     }

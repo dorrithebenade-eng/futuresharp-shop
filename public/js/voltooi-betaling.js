@@ -25,6 +25,7 @@ const KOEPON_FOUT_SLEUTELS = {
   VERVAL: "koepon_fout_verval",
   VOLGEBRUIK: "koepon_fout_volgebruik",
   GEEN_TOEPASSING: "koepon_fout_geen_toepassing",
+  NIE_JOUNE: "koepon_fout_nie_joune",
 };
 
 function formateer_prys_sent(sent) {
@@ -351,6 +352,18 @@ async function laai_vb() {
   document.getElementById("vb-koepon-toepas").addEventListener("click", () => {
     hanteer_koepon_toepas(items, totaal, sessie.access_token);
   });
+
+  // 'n Koepon-kode kan as URL-parameter saamkom (bv. ?koepon=ABCD1234) —
+  // gebruik vir die leen-na-koop-opgradering-skakel op "My Boeke", sodat
+  // die koper nie die kode self hoef in te tik nie.
+  const url_koepon_kode = new URLSearchParams(window.location.search).get("koepon");
+  if (url_koepon_kode) {
+    const koepon_invoer = document.getElementById("vb-koepon-invoer");
+    if (koepon_invoer) {
+      koepon_invoer.value = url_koepon_kode.trim().toUpperCase();
+      hanteer_koepon_toepas(items, totaal, sessie.access_token);
+    }
+  }
 
   document.getElementById("gaan-na-betaling").addEventListener("click", async () => {
     // Voordat ons betaling begin, verseker die sessie is nog geldig —
