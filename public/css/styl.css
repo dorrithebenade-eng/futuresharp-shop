@@ -2238,6 +2238,84 @@ a.my-boek-kaart:focus-visible {
   margin: 6px 0 14px;
 }
 
+/* ---------- Bestellings-oortjie ---------- */
+
+.paneel-bestellings-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 22px;
+}
+.paneel-bestellings-filters #bestellings-soek {
+  flex: 1;
+  min-width: 200px;
+  margin: 0;
+}
+.paneel-bestellings-filters #bestellings-status-filter {
+  width: auto;
+  margin: 0;
+}
+
+.paneel-bestelling-kaart {
+  border: 1px solid #EDEBE6;
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-bottom: 14px;
+}
+.paneel-bestelling-kop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.paneel-bestelling-kop strong {
+  font-family: var(--font-opskrif);
+  font-size: 15px;
+}
+.paneel-bestelling-meta {
+  font-size: 13px;
+  color: var(--grys-teks);
+  margin: 0 0 10px;
+}
+.paneel-bestelling-items {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 8px;
+  font-size: 13px;
+}
+.paneel-bestelling-items li {
+  padding: 3px 0;
+}
+.paneel-bestelling-item-formaat {
+  color: var(--grys-teks);
+}
+.paneel-bestelling-koepon {
+  font-size: 13px;
+  color: var(--teal);
+  margin: 4px 0;
+}
+.paneel-bestelling-waarskuwing {
+  font-size: 13px;
+  color: var(--koraal);
+  font-weight: 600;
+  margin: 4px 0;
+}
+.paneel-bestelling-drukker {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed #EDEBE6;
+}
+.paneel-bestelling-drukker-status {
+  font-size: 13px;
+  color: var(--swart);
+}
+
 /* ---------- Koepon-blok (voltooi-betaling) ---------- */
 
 .vb-koepon-blok {

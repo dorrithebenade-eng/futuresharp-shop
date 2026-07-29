@@ -157,6 +157,7 @@
           <button type="button" class="paneel-kieslys-item" data-afdeling="uitnodigings" data-i18n="paneel_nav_uitnodigings">Uitnodigings</button>
           <button type="button" class="paneel-kieslys-item" data-afdeling="waarskuwings"><span data-i18n="paneel_nav_waarskuwings">⚠️ Waarskuwings</span></button>
           <button type="button" class="paneel-kieslys-item" data-afdeling="kategoriee" data-i18n="paneel_nav_kategoriee">Kategorieë</button>
+          <button type="button" class="paneel-kieslys-item" data-afdeling="bestellings">Bestellings</button>
         </nav>
 
         <div class="paneel-inhoud-kolom">
@@ -517,6 +518,29 @@
         </div>
       </section>
 
+      <section class="paneel-afdeling" data-afdeling-inhoud="bestellings">
+        <div class="paneel-afdeling-kop">
+          <h2 class="paneel-afdeling-titel">Bestellings</h2>
+        </div>
+
+        <div class="paneel-bestellings-filters">
+          <input type="text" id="bestellings-soek" class="veld-invoer" placeholder="Soek — bestelnommer of e-pos">
+          <select id="bestellings-status-filter" class="veld-invoer">
+            <option value="">Alle statusse</option>
+            <option value="Nuut">Nuut (betaal)</option>
+            <option value="Wag vir betaling">Wag vir betaling</option>
+          </select>
+          <label class="paneel-wisselaar" style="white-space:nowrap;">
+            <input type="checkbox" id="bestellings-net-onafgehandelde-druk">
+            <span>Net onafgehandelde drukwerk</span>
+          </label>
+        </div>
+
+        <div id="paneel-bestellings-lys">
+          <p class="stelsel-boodskap">Word gelaai …</p>
+        </div>
+      </section>
+
       <section id="paneel-vorm-afdeling" class="paneel-afdeling" data-afdeling-inhoud="katalogus" style="display:none;">
         <div class="paneel-afdeling-kop">
           <h2 id="paneel-vorm-titel" class="paneel-afdeling-titel" data-i18n="paneel_voeg_produk_by_titel">Voeg produk by</h2>
@@ -730,6 +754,7 @@
   <script src="js/paneel-statistieke.js"></script>
   <script src="js/paneel-waarskuwings.js"></script>
   <script src="js/paneel-kategoriee.js"></script>
+  <script src="js/paneel-bestellings.js"></script>
   <script src="js/paneel-kieslys.js"></script>
   <script src="js/paneelbord-installeer-app.js"></script>
 </body>
