@@ -73,15 +73,19 @@ async function kry_besit_info() {
 function bou_beskikbaar_merkers(eboek, hardeKopie, leen) {
   const merkers = [];
   if (eboek && eboek.beskikbaar) {
-    merkers.push(`<span class="beskikbaar-merker beskikbaar-merker--eboek">📖 ${t("eboek_etiket")}</span>`);
+    merkers.push(`<button type="button" class="beskikbaar-merker beskikbaar-merker--eboek" data-formaat="eboek">📖 ${t("eboek_etiket")}</button>`);
   }
   if (hardeKopie && hardeKopie.beskikbaar) {
-    merkers.push(`<span class="beskikbaar-merker beskikbaar-merker--hardekopie">📦 ${t("hardekopie_etiket")}</span>`);
+    merkers.push(`<button type="button" class="beskikbaar-merker beskikbaar-merker--hardekopie" data-formaat="harde_kopie">📦 ${t("hardekopie_etiket")}</button>`);
   }
   if (leen && leen.beskikbaar) {
-    merkers.push(`<span class="beskikbaar-merker beskikbaar-merker--leen">⏳ ${t("leen_etiket")}</span>`);
+    merkers.push(`<button type="button" class="beskikbaar-merker beskikbaar-merker--leen" data-formaat="leen" data-tydperk="${leen.tydperk_dae || 30}">⏳ ${t("leen_etiket")}</button>`);
   }
-  return `<div class="beskikbaar-merkers">${merkers.join("")}</div>`;
+  if (!merkers.length) return "";
+  return `
+    <p class="beskikbaar-as-etiket">${t("beskikbaar_as_etiket")}</p>
+    <div class="beskikbaar-merkers">${merkers.join("")}</div>
+  `;
 }
 
 function bou_aksie_ry(produk, formaat, formaat_data, etiket, besit, leen_dae_oor) {
@@ -129,7 +133,7 @@ function bou_aksie_ry(produk, formaat, formaat_data, etiket, besit, leen_dae_oor
         <span class="produk-formaat-etiket">${etiket}</span>
         <span class="produk-formaat-prys">${formateer_prys_sent(formaat_data.prys_sent)}</span>
         ${formaat === "leen"
-          ? `<span class="produk-leen-tydperk-nota">${t("leen_tydperk_voorvoegsel")} ${formaat_data.tydperk_dae || 30} ${t("dae_meervoud")}</span>`
+          ? `<span class="produk-leen-tydperk-nota">${t("leen_verduideliking").replace("%tydperk%", formaat_data.tydperk_dae || 30)}</span>`
           : ""}
         ${voorbestelling
           ? `<span class="produk-voorbestel-nota">${t("voorbestelling_beskikbaar_vanaf")} ${formateer_datum_af(formaat_data.vrystelling_datum)}</span>`

@@ -72,15 +72,19 @@ function bou_gradient_ster_svg_html(kleur_klas, gradient_id) {
 function bou_beskikbaar_merkers(eboek, hardeKopie, leen) {
   const merkers = [];
   if (eboek && eboek.beskikbaar) {
-    merkers.push(`<span class="beskikbaar-merker beskikbaar-merker--eboek">📖 ${t("eboek_etiket")}</span>`);
+    merkers.push(`<button type="button" class="beskikbaar-merker beskikbaar-merker--eboek" data-formaat="eboek">📖 ${t("eboek_etiket")}</button>`);
   }
   if (hardeKopie && hardeKopie.beskikbaar) {
-    merkers.push(`<span class="beskikbaar-merker beskikbaar-merker--hardekopie">📦 ${t("hardekopie_etiket")}</span>`);
+    merkers.push(`<button type="button" class="beskikbaar-merker beskikbaar-merker--hardekopie" data-formaat="harde_kopie">📦 ${t("hardekopie_etiket")}</button>`);
   }
   if (leen && leen.beskikbaar) {
-    merkers.push(`<span class="beskikbaar-merker beskikbaar-merker--leen">⏳ ${t("leen_etiket")}</span>`);
+    merkers.push(`<button type="button" class="beskikbaar-merker beskikbaar-merker--leen" data-formaat="leen" data-tydperk="${leen.tydperk_dae || 30}">⏳ ${t("leen_etiket")}</button>`);
   }
-  return `<div class="beskikbaar-merkers">${merkers.join("")}</div>`;
+  if (!merkers.length) return "";
+  return `
+    <p class="beskikbaar-as-etiket">${t("beskikbaar_as_etiket")}</p>
+    <div class="beskikbaar-merkers">${merkers.join("")}</div>
+  `;
 }
 
 function bou_kaart(produk, besit_stel) {

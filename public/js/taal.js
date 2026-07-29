@@ -140,6 +140,25 @@ const WOORDEBOEK = {
     af: "Jou leen-tydperk vir hierdie e-boek het verval. Koop dit, of leen dit weer, om verder te lees.",
     en: "Your loan period for this e-book has expired. Buy it, or borrow it again, to keep reading.",
   },
+  beskikbaar_as_etiket: { af: "Beskikbaar as:", en: "Available as:" },
+  leen_verduideliking: {
+    af: "Toegang vir %tydperk% dae. Verval dit? Koop dit binne 14 dae daarna en kry outomaties 'n afslag gelyk aan wat jy vir die leen betaal het.",
+    en: "Access for %tydperk% days. Expires? Buy it within 14 days after and automatically get a discount equal to what you paid for the loan.",
+  },
+
+  // Formaat-verduideliking-opspring-venster (klik op 'n "Beskikbaar as"-skyfie)
+  formaat_lees_teks: {
+    af: "Lees op jou rekenaar, tablet of selfoon, in 'n leser wat spesiaal vir e-boeke gemaak is.",
+    en: "Read on your computer, tablet or phone, in a reader made specially for e-books.",
+  },
+  formaat_info_eboek_opskrif: { af: "Hoe werk E-boek?", en: "How does E-book work?" },
+  formaat_info_leen_opskrif: { af: "Hoe werk Leen?", en: "How does Borrow work?" },
+  formaat_info_hardekopie_opskrif: { af: "Hoe werk Harde kopie?", en: "How does Hard copy work?" },
+  formaat_info_hardekopie_teks: {
+    af: "Ons druk en stuur die boek per koerier na die adres wat jy verskaf — binne Suid-Afrika, binne 7-14 werksdae. Hantering en aflewering is reeds by die prys ingesluit.",
+    en: "We print and courier the book to the address you provide — within South Africa, within 7-14 working days. Handling and delivery are already included in the price.",
+  },
+  formaat_info_maak_toe: { af: "Maak toe", en: "Close" },
   lees_meer: { af: "Lees meer", en: "Read more" },
   vanaf_prys: { af: "Vanaf", en: "From" },
 
