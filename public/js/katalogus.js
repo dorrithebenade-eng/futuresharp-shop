@@ -69,7 +69,7 @@ function bou_gradient_ster_svg_html(kleur_klas, gradient_id) {
   `;
 }
 
-function bou_beskikbaar_merkers(eboek, hardeKopie) {
+function bou_beskikbaar_merkers(eboek, hardeKopie, leen) {
   const merkers = [];
   if (eboek && eboek.beskikbaar) {
     merkers.push(`<span class="beskikbaar-merker beskikbaar-merker--eboek">📖 ${t("eboek_etiket")}</span>`);
@@ -77,12 +77,16 @@ function bou_beskikbaar_merkers(eboek, hardeKopie) {
   if (hardeKopie && hardeKopie.beskikbaar) {
     merkers.push(`<span class="beskikbaar-merker beskikbaar-merker--hardekopie">📦 ${t("hardekopie_etiket")}</span>`);
   }
+  if (leen && leen.beskikbaar) {
+    merkers.push(`<span class="beskikbaar-merker beskikbaar-merker--leen">⏳ ${t("leen_etiket")}</span>`);
+  }
   return `<div class="beskikbaar-merkers">${merkers.join("")}</div>`;
 }
 
 function bou_kaart(produk, besit_stel) {
   const eboek = produk.formate && produk.formate.eboek;
   const hardeKopie = produk.formate && produk.formate.harde_kopie;
+  const leen = produk.formate && produk.formate.leen;
   const besit = besit_stel instanceof Set && besit_stel.has(produk.slug);
 
   const omslagHtml = produk.omslag
@@ -128,7 +132,7 @@ function bou_kaart(produk, besit_stel) {
           ${t("lees_meer")} →
         </a>
         <div class="kaart-onderkant">
-          ${bou_beskikbaar_merkers(eboek, hardeKopie)}
+          ${bou_beskikbaar_merkers(eboek, hardeKopie, leen)}
         </div>
       </div>
     </article>
@@ -187,7 +191,9 @@ async function kry_besit_stel() {
     if (!resp.ok) return new Set();
 
     const data = await resp.json();
-    return new Set((data.boeke || []).map((boek) => boek.produk_slug));
+    // Sluit geleende items uit — 'n huur is nie dieselfde as "Alreeds
+    // joune" (permanente besit) nie. Net werklike e-boek-KOPE tel hier.
+    return new Set((data.boeke || []).filter((boek) => !boek.is_leen).map((boek) => boek.produk_slug));
   } catch (fout) {
     console.warn("Kon nie besit-status laai nie:", fout);
     return new Set();

@@ -10,12 +10,14 @@ function wys_status(teks) {
 }
 
 function bou_boek_kaart(boek) {
-  // Beskikbare boeke is 'n regte skakel na die leser — nie-beskikbare
-  // boeke (voorbestellings wat nog wag vir vrystelling) is 'n statiese
-  // kaart wat nie klikbaar is nie, met 'n datum-merker oor die omslag.
-  const el = document.createElement(boek.beskikbaar_nou ? "a" : "div");
+  // 'n Boek is oopmaakbaar as dit beskikbaar is EN (nie 'n leen is NIE, OF
+  // die leen nog aktief is — 'n verval-de leen word soos 'n
+  // nie-beskikbare boek behandel: nie-klikbaar, met 'n duidelike merker).
+  const kan_oopmaak = boek.beskikbaar_nou && (!boek.is_leen || boek.leen_aktief !== false);
+
+  const el = document.createElement(kan_oopmaak ? "a" : "div");
   el.className = "my-boek-kaart";
-  if (boek.beskikbaar_nou) {
+  if (kan_oopmaak) {
     el.href = `/leser.html?boek=${encodeURIComponent(boek.produk_slug)}`;
   } else {
     el.setAttribute("aria-disabled", "true");
@@ -47,6 +49,11 @@ function bou_boek_kaart(boek) {
       ? (window.t ? window.t("beskikbaar_vanaf") : "Beskikbaar vanaf") + " " + boek.vrystelling_datum
       : (window.t ? window.t("nog_nie_beskikbaar") : "Nog nie beskikbaar nie");
     omslag_wrap.appendChild(merker);
+  } else if (boek.is_leen && boek.leen_aktief === false) {
+    const merker = document.createElement("span");
+    merker.className = "my-boek-merker my-boek-merker--verval";
+    merker.textContent = window.t ? window.t("leen_verval_etiket") : "Leen verval";
+    omslag_wrap.appendChild(merker);
   }
 
   el.appendChild(omslag_wrap);
@@ -61,6 +68,17 @@ function bou_boek_kaart(boek) {
     outeur_el.className = "my-boek-outeur";
     outeur_el.textContent = boek.outeur;
     el.appendChild(outeur_el);
+  }
+
+  // Leen-status-reël — net vir aktiewe leen-items, wys hoeveel dae oor is.
+  if (boek.is_leen && boek.leen_aktief && typeof boek.dae_oor === "number") {
+    const leen_el = document.createElement("p");
+    leen_el.className = "my-boek-leen-status";
+    const eenheid = boek.dae_oor === 1
+      ? (window.t ? window.t("dag_enkelvoud") : "dag oor")
+      : (window.t ? window.t("dae_oor_meervoud") : "dae oor");
+    leen_el.textContent = `⏳ ${boek.dae_oor} ${eenheid}`;
+    el.appendChild(leen_el);
   }
 
   return el;

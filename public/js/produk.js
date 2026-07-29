@@ -41,26 +41,36 @@ function kry_produk_slug_uit_url() {
 // as katalogus.js. Gee 'n leë Set terug (nooit 'n fout nie) as niemand
 // aangemeld is nie, of as die versoek misluk — die produk-bladsy moet
 // steeds normaal werk vir 'n besoeker sonder rekening.
-async function kry_besit_stel() {
+async function kry_besit_info() {
+  const leeg = { eboek_besit: new Set(), leen_aktief: new Map() };
   try {
-    if (typeof identiteit_kry_huidige_sessie !== "function") return new Set();
+    if (typeof identiteit_kry_huidige_sessie !== "function") return leeg;
     const sessie = await identiteit_kry_huidige_sessie();
-    if (!sessie || !sessie.access_token) return new Set();
+    if (!sessie || !sessie.access_token) return leeg;
 
     const resp = await fetch("/.netlify/functions/kry-my-boeke", {
       headers: { Authorization: `Bearer ${sessie.access_token}` },
     });
-    if (!resp.ok) return new Set();
+    if (!resp.ok) return leeg;
 
     const data = await resp.json();
-    return new Set((data.boeke || []).map((boek) => boek.produk_slug));
+    const eboek_besit = new Set();
+    const leen_aktief = new Map(); // produk_slug -> dae_oor
+    (data.boeke || []).forEach((boek) => {
+      if (boek.is_leen) {
+        if (boek.leen_aktief) leen_aktief.set(boek.produk_slug, boek.dae_oor);
+      } else {
+        eboek_besit.add(boek.produk_slug);
+      }
+    });
+    return { eboek_besit, leen_aktief };
   } catch (fout) {
     console.warn("Kon nie besit-status laai nie:", fout);
-    return new Set();
+    return leeg;
   }
 }
 
-function bou_beskikbaar_merkers(eboek, hardeKopie) {
+function bou_beskikbaar_merkers(eboek, hardeKopie, leen) {
   const merkers = [];
   if (eboek && eboek.beskikbaar) {
     merkers.push(`<span class="beskikbaar-merker beskikbaar-merker--eboek">📖 ${t("eboek_etiket")}</span>`);
@@ -68,10 +78,13 @@ function bou_beskikbaar_merkers(eboek, hardeKopie) {
   if (hardeKopie && hardeKopie.beskikbaar) {
     merkers.push(`<span class="beskikbaar-merker beskikbaar-merker--hardekopie">📦 ${t("hardekopie_etiket")}</span>`);
   }
+  if (leen && leen.beskikbaar) {
+    merkers.push(`<span class="beskikbaar-merker beskikbaar-merker--leen">⏳ ${t("leen_etiket")}</span>`);
+  }
   return `<div class="beskikbaar-merkers">${merkers.join("")}</div>`;
 }
 
-function bou_aksie_ry(produk, formaat, formaat_data, etiket, besit) {
+function bou_aksie_ry(produk, formaat, formaat_data, etiket, besit, leen_dae_oor) {
   // E-boeke wat die koper reeds besit — geen koop-knoppie nie, net 'n
   // duidelike "Alreeds joune"-merker met 'n skakel na die leser. Harde
   // kopieë word doelbewus NIE so beperk nie (geskenke/vervangingskopieë
@@ -90,14 +103,34 @@ function bou_aksie_ry(produk, formaat, formaat_data, etiket, besit) {
     `;
   }
 
+  // 'n Aktiewe leen — wys hoeveel dae oor is, geen nuwe koop-knoppie nie.
+  if (formaat === "leen" && typeof leen_dae_oor === "number") {
+    return `
+      <div class="produk-formaat-ry">
+        <div class="produk-formaat-info">
+          <span class="produk-formaat-etiket">${etiket}</span>
+          <span class="produk-leen-aktief-merker">⏳ ${t("leen_dae_oor_voorvoegsel")} ${leen_dae_oor} ${leen_dae_oor === 1 ? t("dag_enkelvoud") : t("dae_oor_meervoud")}</span>
+        </div>
+        <a class="kaart-aksie produk-alreeds-eie-knoppie" href="leser.html?boek=${produk.slug}">
+          ${t("gaan_lees")}
+        </a>
+      </div>
+    `;
+  }
+
   const knoppie_id = `voeg-by-mandjie-${formaat}`;
   const voorbestelling = is_voorbestelling(formaat_data);
+  const knoppie_teks =
+    formaat === "leen" ? t("leen_nou_knoppie") : voorbestelling ? t("voorbestel_nou") : t("voeg_by_mandjie");
 
   return `
     <div class="produk-formaat-ry">
       <div class="produk-formaat-info">
         <span class="produk-formaat-etiket">${etiket}</span>
         <span class="produk-formaat-prys">${formateer_prys_sent(formaat_data.prys_sent)}</span>
+        ${formaat === "leen"
+          ? `<span class="produk-leen-tydperk-nota">${t("leen_tydperk_voorvoegsel")} ${formaat_data.tydperk_dae || 30} ${t("dae_meervoud")}</span>`
+          : ""}
         ${voorbestelling
           ? `<span class="produk-voorbestel-nota">${t("voorbestelling_beskikbaar_vanaf")} ${formateer_datum_af(formaat_data.vrystelling_datum)}</span>`
           : ""}
@@ -106,13 +139,13 @@ function bou_aksie_ry(produk, formaat, formaat_data, etiket, besit) {
         data-slug="${produk.slug}" data-formaat="${formaat}"
         data-titel="${produk.titel}" data-prys="${formaat_data.prys_sent}"
         data-voorbestelling="${voorbestelling}">
-        ${voorbestelling ? t("voorbestel_nou") : t("voeg_by_mandjie")}
+        ${knoppie_teks}
       </button>
     </div>
   `;
 }
 
-function wys_produk(produk, besit_stel) {
+function wys_produk(produk, besit_info) {
   document.title = `${produk.titel} — Future Shop`;
 
   const wrap = document.getElementById("produk-wrap");
@@ -123,7 +156,12 @@ function wys_produk(produk, besit_stel) {
 
   const eboek = produk.formate && produk.formate.eboek;
   const hardeKopie = produk.formate && produk.formate.harde_kopie;
-  const besit_eboek = besit_stel instanceof Set && besit_stel.has(produk.slug);
+  const leen = produk.formate && produk.formate.leen;
+  const besit_eboek = besit_info && besit_info.eboek_besit instanceof Set && besit_info.eboek_besit.has(produk.slug);
+  const leen_dae_oor =
+    besit_info && besit_info.leen_aktief instanceof Map && besit_info.leen_aktief.has(produk.slug)
+      ? besit_info.leen_aktief.get(produk.slug)
+      : null;
 
   const aksies = [];
   if (eboek && eboek.beskikbaar) {
@@ -131,6 +169,11 @@ function wys_produk(produk, besit_stel) {
   }
   if (hardeKopie && hardeKopie.beskikbaar) {
     aksies.push(bou_aksie_ry(produk, "harde_kopie", hardeKopie, t("hardekopie_etiket"), false));
+  }
+  // Geen leen-ry as die koper reeds die e-boek self besit nie — geen rede
+  // om iets te huur wat jy klaar permanent het nie.
+  if (leen && leen.beskikbaar && !besit_eboek) {
+    aksies.push(bou_aksie_ry(produk, "leen", leen, t("leen_etiket"), false, leen_dae_oor));
   }
 
   wrap.innerHTML = `
@@ -140,7 +183,7 @@ function wys_produk(produk, besit_stel) {
       <div class="produk-inligting">
         <h1 class="produk-titel">${produk.titel}</h1>
         <p class="produk-outeur">${produk.outeur}</p>
-        ${bou_beskikbaar_merkers(eboek, hardeKopie)}
+        ${bou_beskikbaar_merkers(eboek, hardeKopie, leen)}
 
         <div class="afdeling-etiket produk-beskrywing-etiket">${t("oor_hierdie_boek")}</div>
         <p class="produk-beskrywing">${produk.vol_beskrywing || produk.oorsig || ""}</p>
@@ -183,16 +226,16 @@ async function laai_produk() {
 
   let produkte;
   let demo_modus = false;
-  let besit_stel = new Set();
+  let besit_info = { eboek_besit: new Set(), leen_aktief: new Map() };
   try {
-    const [resp, opgehaalde_besit_stel] = await Promise.all([
+    const [resp, opgehaalde_besit_info] = await Promise.all([
       fetch(KATALOGUS_ENDPOINT),
-      kry_besit_stel(),
+      kry_besit_info(),
     ]);
     if (!resp.ok) throw new Error(`Status ${resp.status}`);
     const data = await resp.json();
     produkte = data.produkte || [];
-    besit_stel = opgehaalde_besit_stel;
+    besit_info = opgehaalde_besit_info;
   } catch (fout) {
     console.warn("Kon nie lewendige katalogus laai nie, wys demo-data:", fout);
     produkte = DEMO_PRODUKTE;
@@ -203,7 +246,7 @@ async function laai_produk() {
     if (demo_modus) {
       // Voorskou-gerief: sonder 'n spesifieke slug in die URL, wys net
       // die eerste demo-produk sodat die bladsy steeds bekyk kan word.
-      wys_produk(produkte[0], besit_stel);
+      wys_produk(produkte[0], besit_info);
       return;
     }
     wrap.innerHTML = `<p class="stelsel-boodskap">${t("geen_produk")} <a href="index.html">${t("terug_katalogus_skakel")}</a></p>`;
@@ -216,7 +259,7 @@ async function laai_produk() {
     return;
   }
 
-  wys_produk(produk, besit_stel);
+  wys_produk(produk, besit_info);
 
   if (!demo_modus) {
     // Agtergrond-belangstelling-telling — "fire and forget", nooit die

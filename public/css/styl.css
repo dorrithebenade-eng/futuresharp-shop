@@ -1267,6 +1267,28 @@ body {
   color: var(--wit);
 }
 
+.beskikbaar-merker--leen {
+  background: var(--amber);
+  color: var(--swart);
+}
+
+.produk-leen-aktief-merker {
+  display: inline-block;
+  font-family: var(--font-liggaam);
+  font-size: 13px;
+  font-weight: 700;
+  color: #B8860B;
+  margin-top: 4px;
+}
+
+.produk-leen-tydperk-nota {
+  display: block;
+  font-family: var(--font-liggaam);
+  font-size: 12px;
+  color: var(--grys-teks);
+  margin-top: 2px;
+}
+
 /* ---------- Katalogus-kaart: teaser + Lees meer ---------- */
 
 .kaart-teaser {
@@ -1640,6 +1662,18 @@ body {
   margin: -4px 0 0;
 }
 
+.leser-leen-kennisgewing {
+  font-family: var(--font-liggaam);
+  font-size: 13px;
+  font-weight: 700;
+  color: #B8860B;
+  background: #FCF3DA;
+  text-align: center;
+  border-radius: 8px;
+  padding: 8px 14px;
+  margin: 10px 0 0;
+}
+
 .leser-bekyker {
   display: flex;
   flex-direction: column;
@@ -1934,6 +1968,18 @@ a.my-boek-kaart:focus-visible {
   font-weight: 600;
   line-height: 1.4;
   border-radius: 3px;
+}
+
+.my-boek-merker--verval {
+  background: rgba(236, 88, 50, 0.85);
+}
+
+.my-boek-leen-status {
+  font-family: var(--font-liggaam);
+  font-size: 12px;
+  font-weight: 700;
+  color: #B8860B;
+  margin: 2px 0 0;
 }
 
 .my-boek-titel {

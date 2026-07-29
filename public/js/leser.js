@@ -32,6 +32,23 @@ function wys_status(teks) {
   if (el) el.textContent = teks;
 }
 
+function wys_leen_kennisgewing(leen) {
+  const el = document.getElementById("leser-leen-kennisgewing");
+  if (!el) return;
+  if (!leen.aktief) {
+    el.style.display = "none";
+    return;
+  }
+  const dae_oor = typeof leen.dae_oor === "number"
+    ? leen.dae_oor
+    : Math.max(0, Math.ceil((new Date(leen.verval_op) - new Date()) / (1000 * 60 * 60 * 24)));
+  const eenheid = dae_oor === 1
+    ? (window.t ? window.t("dag_enkelvoud") : "dag oor")
+    : (window.t ? window.t("dae_oor_meervoud") : "dae oor");
+  el.textContent = `⏳ ${window.t ? window.t("leen_kennisgewing_voorvoegsel") : "Geleen —"} ${dae_oor} ${eenheid}`;
+  el.style.display = "block";
+}
+
 async function kry_boek_titel(sessie, produk_slug) {
   try {
     const resp = await fetch("/.netlify/functions/kry-my-boeke", {
@@ -258,32 +275,64 @@ async function laai_leser() {
   });
 
   try {
-    // Kyk EERS plaaslik (IndexedDB) — as die boek reeds afgelaai is, laai
-    // dit direk daarvandaan, GEEN netwerk-versoek of data-gebruik nie.
+    // Vra EERS die leestoken (goedkoop, vinnig) — dit gee ons ook die
+    // leen-status. Ons doen dit VOOR die aflyn-kas-kontrole hieronder,
+    // sodat 'n reeds-VERVALDE leen nooit per ongeluk uit 'n plaaslike
+    // (IndexedDB) kopie gelees kan word wat van 'n vroeëre, nog-aktiewe
+    // besoek af oorgebly het nie.
+    const token_resp = await fetch(
+      `/.netlify/functions/kry-leser-token?produk_slug=${encodeURIComponent(produk_slug)}`,
+      { method: "POST", headers: { Authorization: `Bearer ${sessie.access_token}` } }
+    );
+
+    if (token_resp.status === 401) {
+      wys_status(window.t ? window.t("sessie_verval") : "Jou sessie het verval — meld gerus weer aan.");
+      return;
+    }
+    if (!token_resp.ok) {
+      throw new Error(`Onverwagte status: ${token_resp.status}`);
+    }
+
+    const { token, leen } = await token_resp.json();
+
+    if (leen && leen.is_leen) {
+      wys_leen_kennisgewing(leen);
+    }
+
+    if (leen && leen.is_leen && !leen.aktief) {
+      wys_status(
+        window.t
+          ? window.t("leen_verval_boodskap")
+          : "Jou leen-tydperk vir hierdie e-boek het verval. Koop dit, of leen dit weer, om verder te lees."
+      );
+      return;
+    }
+
+    // Kyk NOU eers plaaslik (IndexedDB) — as die boek reeds afgelaai is,
+    // laai dit direk daarvandaan, GEEN verdere netwerk-versoek of
+    // data-gebruik nie. Veilig om hier te doen, aangesien ons hierbo
+    // reeds bevestig het die leen (indien enige) nog aktief is.
     let pdf_grepe = await aflyn_kry_boek(produk_slug);
     let aflyn_status = "reeds_plaaslik";
 
     if (!pdf_grepe) {
-      const token_resp = await fetch(
-        `/.netlify/functions/kry-leser-token?produk_slug=${encodeURIComponent(produk_slug)}`,
-        { method: "POST", headers: { Authorization: `Bearer ${sessie.access_token}` } }
-      );
-
-      if (token_resp.status === 401) {
-        wys_status(window.t ? window.t("sessie_verval") : "Jou sessie het verval — meld gerus weer aan.");
-        return;
-      }
-      if (!token_resp.ok) {
-        throw new Error(`Onverwagte status: ${token_resp.status}`);
-      }
-
-      const { token } = await token_resp.json();
       const pdf_url = `/.netlify/functions/kry-eboek-inhoud?produk_slug=${encodeURIComponent(
         produk_slug
       )}&token=${encodeURIComponent(token)}`;
 
       const pdf_resp = await fetch(pdf_url);
       if (!pdf_resp.ok) {
+        if (pdf_resp.status === 403) {
+          const fout_data = await pdf_resp.json().catch(() => null);
+          if (fout_data && fout_data.leen_verval) {
+            wys_status(
+              window.t
+                ? window.t("leen_verval_boodskap")
+                : "Jou leen-tydperk vir hierdie e-boek het verval. Koop dit, of leen dit weer, om verder te lees."
+            );
+            return;
+          }
+        }
         throw new Error(`Onverwagte status: ${pdf_resp.status}`);
       }
       pdf_grepe = await pdf_resp.arrayBuffer();

@@ -32,7 +32,9 @@ function formateer_prys_sent(sent) {
 }
 
 function etiket_vir_formaat(formaat) {
-  return formaat === "harde_kopie" ? t("hardekopie_etiket") : t("eboek_etiket");
+  if (formaat === "harde_kopie") return t("hardekopie_etiket");
+  if (formaat === "leen") return t("leen_etiket");
+  return t("eboek_etiket");
 }
 
 function kry_of_skep_bestelnommer() {
