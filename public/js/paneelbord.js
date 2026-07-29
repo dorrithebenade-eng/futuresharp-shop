@@ -502,12 +502,20 @@ function wys_koepons_lys(koepons) {
             ? `${t("paneel_koepon_tipe_afslag")} — R${(koepon.afslag_waarde / 1).toFixed(2)}`
             : `${t("paneel_koepon_tipe_afslag")} — ${koepon.afslag_waarde}%`
           : t("paneel_koepon_tipe_gratis");
+      const formaat_teks =
+        koepon.formaat_beperking === "eboek"
+          ? t("paneel_koepon_formaat_eboek")
+          : koepon.formaat_beperking === "harde_kopie"
+          ? t("paneel_koepon_formaat_hardekopie")
+          : koepon.formaat_beperking === "leen"
+          ? t("paneel_koepon_formaat_leen")
+          : t("paneel_koepon_formaat_albei");
 
       return `
         <div class="paneel-produk-ry">
           <div class="paneel-produk-inligting">
             <strong>${koepon.kode}</strong>
-            <span class="paneel-produk-outeur">${tipe_teks} · ${boek_teks} · ${koepon.gebruike_tot_dusver}/${koepon.maks_gebruike} · ${formateer_koepon_status(koepon)}</span>
+            <span class="paneel-produk-outeur">${tipe_teks} · ${boek_teks} · ${formaat_teks} · ${koepon.gebruike_tot_dusver}/${koepon.maks_gebruike} · ${formateer_koepon_status(koepon)}</span>
             ${koepon.nota ? `<span class="paneel-produk-outeur">${koepon.nota}</span>` : ""}
           </div>
           <div class="paneel-produk-aksies">
