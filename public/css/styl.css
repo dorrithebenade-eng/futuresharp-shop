@@ -1247,24 +1247,24 @@ body {
 
 .beskikbaar-merker {
   font-family: var(--font-liggaam);
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
-  padding: 5px 11px;
+  padding: 7px 15px;
   border-radius: 20px;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
   white-space: nowrap;
 }
 
 .beskikbaar-merker--eboek {
-  background: #E3F5F1;
-  color: var(--teal);
+  background: var(--teal-helder);
+  color: var(--wit);
 }
 
 .beskikbaar-merker--hardekopie {
-  background: #FCEFE9;
-  color: var(--koraal);
+  background: var(--koraal);
+  color: var(--wit);
 }
 
 /* ---------- Katalogus-kaart: teaser + Lees meer ---------- */
@@ -1285,7 +1285,7 @@ body {
   align-items: center;
   gap: 4px;
   font-family: var(--font-liggaam);
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 800;
   color: var(--koraal);
   text-decoration: none;
