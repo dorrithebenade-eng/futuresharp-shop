@@ -797,6 +797,7 @@ function reset_vorm() {
   document.getElementById("vorm-eboek-lêer-status").textContent = "";
   document.getElementById("vorm-eboek-verdelings-lys").innerHTML = "";
   document.getElementById("vorm-hardekopie-verdelings-lys").innerHTML = "";
+  document.getElementById("vorm-leen-verdelings-lys").innerHTML = "";
   document.getElementById("vorm-outeurs-lys").innerHTML = "";
   bou_kategorie_merkblokkies([]);
   document.getElementById("vorm-etiket-pasgemaak-velde").style.display = "none";
@@ -971,6 +972,12 @@ function wys_verberg_formaat_velde() {
     document.getElementById("vorm-eboek-hosting-aan").checked ? "block" : "none";
   document.getElementById("vorm-hardekopie-hosting-velde").style.display =
     document.getElementById("vorm-hardekopie-hosting-aan").checked ? "block" : "none";
+  document.getElementById("vorm-leen-velde").style.display =
+    document.getElementById("vorm-leen-beskikbaar").checked ? "block" : "none";
+  document.getElementById("vorm-leen-verdeling-velde").style.display =
+    document.getElementById("vorm-leen-verdeling-aan").checked ? "block" : "none";
+  document.getElementById("vorm-leen-hosting-velde").style.display =
+    document.getElementById("vorm-leen-hosting-aan").checked ? "block" : "none";
   document.getElementById("vorm-etiket-velde").style.display =
     document.getElementById("vorm-etiket-aan").checked ? "block" : "none";
 }
@@ -1063,6 +1070,24 @@ function open_vorm_vir_wysig(produk) {
       : "";
   }
 
+  const leen = (produk.formate && produk.formate.leen) || {};
+  document.getElementById("vorm-leen-beskikbaar").checked = !!leen.beskikbaar;
+  document.getElementById("vorm-leen-prys").value = leen.prys_sent ? (leen.prys_sent / 100).toFixed(2) : "";
+  document.getElementById("vorm-leen-tydperk").value = leen.tydperk_dae || 30;
+  if (leen.verdelings && leen.verdelings.length) {
+    document.getElementById("vorm-leen-verdeling-aan").checked = true;
+    leen.verdelings.forEach((v) => voeg_verdeling_ry_by("leen", v));
+  }
+  if (leen.hosting) {
+    document.getElementById("vorm-leen-hosting-aan").checked = true;
+    document.getElementById("vorm-leen-hosting-tipe").value = leen.hosting.tipe || "persentasie";
+    document.getElementById("vorm-leen-hosting-waarde").value = leen.hosting.waarde
+      ? leen.hosting.tipe === "vaste_bedrag"
+        ? (leen.hosting.waarde / 100).toFixed(2)
+        : leen.hosting.waarde
+      : "";
+  }
+
   wys_verberg_formaat_velde();
   document.getElementById("paneel-vorm-afdeling").style.display = "block";
   document.getElementById("paneel-vorm-afdeling").scrollIntoView({ behavior: "smooth" });
@@ -1130,6 +1155,7 @@ function kry_etiket_vanuit_vorm() {
 function bou_produk_liggaam() {
   const eboekBeskikbaar = document.getElementById("vorm-eboek-beskikbaar").checked;
   const hardeKopieBeskikbaar = document.getElementById("vorm-hardekopie-beskikbaar").checked;
+  const leenBeskikbaar = document.getElementById("vorm-leen-beskikbaar").checked;
 
   return {
     slug: document.getElementById("vorm-slug").value.trim(),
@@ -1156,6 +1182,13 @@ function bou_produk_liggaam() {
         vrystelling_datum: document.getElementById("vorm-hardekopie-vrystelling").value || null,
         verdelings: bou_verdelings_vanuit_vorm("hardekopie"),
         hosting: kry_hosting_vanuit_vorm("hardekopie"),
+      },
+      leen: {
+        beskikbaar: leenBeskikbaar,
+        prys_sent: kry_rand_as_sent("vorm-leen-prys"),
+        tydperk_dae: Number(document.getElementById("vorm-leen-tydperk").value) || 30,
+        verdelings: bou_verdelings_vanuit_vorm("leen"),
+        hosting: kry_hosting_vanuit_vorm("leen"),
       },
     },
   };
@@ -1345,6 +1378,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("vorm-hardekopie-verdeling-aan").addEventListener("change", wys_verberg_formaat_velde);
   document.getElementById("vorm-eboek-hosting-aan").addEventListener("change", wys_verberg_formaat_velde);
   document.getElementById("vorm-hardekopie-hosting-aan").addEventListener("change", wys_verberg_formaat_velde);
+  document.getElementById("vorm-leen-beskikbaar").addEventListener("change", wys_verberg_formaat_velde);
+  document.getElementById("vorm-leen-verdeling-aan").addEventListener("change", wys_verberg_formaat_velde);
+  document.getElementById("vorm-leen-hosting-aan").addEventListener("change", wys_verberg_formaat_velde);
   document.getElementById("vorm-etiket-aan").addEventListener("change", wys_verberg_formaat_velde);
   document.getElementById("vorm-etiket-voorafgestel").addEventListener("change", (gebeurtenis) => {
     document.getElementById("vorm-etiket-pasgemaak-velde").style.display =
@@ -1369,4 +1405,5 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("vorm-eboek-voeg-verdeling-by").addEventListener("click", () => voeg_verdeling_ry_by("eboek"));
   document.getElementById("vorm-voeg-outeur-by").addEventListener("click", () => voeg_outeur_ry_by(null));
   document.getElementById("vorm-hardekopie-voeg-verdeling-by").addEventListener("click", () => voeg_verdeling_ry_by("hardekopie"));
+  document.getElementById("vorm-leen-voeg-verdeling-by").addEventListener("click", () => voeg_verdeling_ry_by("leen"));
 });

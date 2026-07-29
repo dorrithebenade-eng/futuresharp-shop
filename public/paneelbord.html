@@ -750,6 +750,59 @@
             </div>
           </fieldset>
 
+          <fieldset class="paneel-formaat-blok">
+            <legend class="paneel-formaat-titel">Leen</legend>
+            <p class="paneel-hulp-teks" style="margin-top:-4px;">
+              Gebruik dieselfde e-boek-PDF as hierbo (geen aparte oplaai nodig nie) — koper kry tydelike toegang.
+            </p>
+
+            <label class="paneel-wisselaar">
+              <input type="checkbox" id="vorm-leen-beskikbaar">
+              <span>Beskikbaar</span>
+            </label>
+
+            <div id="vorm-leen-velde" style="display:none;">
+              <div class="veld-ry">
+                <div>
+                  <label class="veld-etiket" for="vorm-leen-prys">Prys (R)</label>
+                  <input type="number" id="vorm-leen-prys" class="veld-invoer" min="0" step="0.01">
+                </div>
+                <div>
+                  <label class="veld-etiket" for="vorm-leen-tydperk">Tydperk (dae)</label>
+                  <input type="number" id="vorm-leen-tydperk" class="veld-invoer" min="1" step="1" value="30">
+                </div>
+              </div>
+
+              <label class="paneel-wisselaar">
+                <input type="checkbox" id="vorm-leen-verdeling-aan">
+                <span>Verdeling(s) (Outeur / Vennoot / Ontwerp-Admin / Printing / Aflewering)</span>
+              </label>
+
+              <div id="vorm-leen-verdeling-velde" style="display:none;">
+                <div id="vorm-leen-verdelings-lys" class="paneel-verdelings-lys"></div>
+                <button type="button" id="vorm-leen-voeg-verdeling-by" class="terug-skakel">+ Voeg verdeling by</button>
+              </div>
+
+              <label class="paneel-wisselaar">
+                <input type="checkbox" id="vorm-leen-hosting-aan">
+                <span>Hosting (dokumentasie — bedrag bly heeltemal by die hoofrekening)</span>
+              </label>
+              <p class="paneel-hosting-herinnering">
+                💡 Onthou: Hosting moet ook Paystack se ~3%-transaksiefooi indek — Verdeling(s) + Hosting saam mag nooit meer as 97% van die prys wees nie.
+              </p>
+
+              <div id="vorm-leen-hosting-velde" style="display:none;">
+                <div class="veld-ry">
+                  <select class="veld-invoer" id="vorm-leen-hosting-tipe">
+                    <option value="persentasie">Persentasie (%)</option>
+                    <option value="vaste_bedrag">Vaste bedrag (R)</option>
+                  </select>
+                  <input type="number" class="veld-invoer" id="vorm-leen-hosting-waarde" min="0" step="0.01" placeholder="Waarde">
+                </div>
+              </div>
+            </div>
+          </fieldset>
+
           <div id="paneel-vorm-foute" class="vb-foute" style="display:none;"></div>
 
           <button type="submit" id="paneel-vorm-indien" class="kaart-aksie paneel-vorm-indien" data-i18n="paneel_skep_produk">Skep produk</button>
