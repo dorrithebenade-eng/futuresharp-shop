@@ -183,21 +183,25 @@ function wys_produk(produk, besit_info) {
   wrap.innerHTML = `
     <a class="terug-skakel" href="index.html">${t("terug_katalogus")}</a>
     <div class="produk-uitleg">
-      ${omslagHtml}
-      <div class="produk-inligting">
+      <div class="produk-titel-blok">
         <h1 class="produk-titel">${produk.titel}</h1>
         <p class="produk-outeur">${produk.outeur}</p>
         ${bou_beskikbaar_merkers(eboek, hardeKopie, leen)}
+      </div>
 
+      <div class="produk-sylat">
+        ${omslagHtml}
+        <div class="koop-afdeling">
+          <div class="afdeling-etiket">${t("kies_formaat")}</div>
+          <div class="produk-aksies">${aksies.join("")}</div>
+          <p class="produk-nota" id="produk-terugvoer" role="status"></p>
+        </div>
+      </div>
+
+      <div class="produk-beskrywing-blok">
         <div class="afdeling-etiket produk-beskrywing-etiket">${t("oor_hierdie_boek")}</div>
         <p class="produk-beskrywing">${produk.vol_beskrywing || produk.oorsig || ""}</p>
       </div>
-    </div>
-
-    <div class="koop-afdeling">
-      <div class="afdeling-etiket">${t("kies_formaat")}</div>
-      <div class="produk-aksies">${aksies.join("")}</div>
-      <p class="produk-nota" id="produk-terugvoer" role="status"></p>
     </div>
   `;
 

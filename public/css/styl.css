@@ -965,12 +965,43 @@ body {
 .produk-uitleg {
   display: grid;
   grid-template-columns: 320px 1fr;
-  gap: 40px;
+  grid-template-areas:
+    "sylat   titel"
+    "sylat   beskrywing";
+  gap: 32px 40px;
   align-items: start;
 }
 
 @media (max-width: 720px) {
-  .produk-uitleg { grid-template-columns: 1fr; gap: 24px; }
+  .produk-uitleg {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "titel"
+      "sylat"
+      "beskrywing";
+    gap: 24px;
+  }
+}
+
+.produk-sylat {
+  grid-area: sylat;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  position: sticky;
+  top: 20px;
+}
+
+@media (max-width: 720px) {
+  .produk-sylat { position: static; }
+}
+
+.produk-titel-blok {
+  grid-area: titel;
+}
+
+.produk-beskrywing-blok {
+  grid-area: beskrywing;
 }
 
 .produk-omslag {
@@ -1014,11 +1045,11 @@ body {
 
 .produk-formaat-ry {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
   border: 1px solid #E8E6E1;
-  padding: 14px 18px;
+  padding: 14px 16px;
 }
 
 .produk-formaat-info {
@@ -1047,7 +1078,7 @@ body {
 }
 
 .produk-formaat-knoppie {
-  width: auto;
+  width: 100%;
   margin-top: 0;
   padding: 10px 18px;
   font-size: 14px;
@@ -1475,19 +1506,17 @@ body {
 /* ---------- Produk-bladsy: beskrywing- en koop-afdelings ---------- */
 
 .produk-beskrywing-etiket {
-  margin-top: 20px;
+  margin-top: 0;
 }
 
 .koop-afdeling {
-  max-width: 1000px;
   background: var(--grys-lig);
   border-radius: 14px;
-  padding: 28px 28px 32px;
-  margin: 24px 0 40px;
+  padding: 22px 20px 26px;
 }
 
 .koop-afdeling .produk-aksies {
-  max-width: 460px;
+  max-width: none;
 }
 
 .afdeling-etiket {
