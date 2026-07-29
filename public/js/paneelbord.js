@@ -148,10 +148,17 @@ function wys_produkte_lys(produkte) {
     .map((produk) => {
       const eboek = produk.formate && produk.formate.eboek;
       const hardeKopie = produk.formate && produk.formate.harde_kopie;
+      const leen = produk.formate && produk.formate.leen;
 
       const pryse = [];
       if (eboek && eboek.beskikbaar) pryse.push(`${t("paneel_eboek")} — ${formateer_prys_sent(eboek.prys_sent)}`);
       if (hardeKopie && hardeKopie.beskikbaar) pryse.push(`${t("paneel_hardekopie")} — ${formateer_prys_sent(hardeKopie.prys_sent)}`);
+      if (leen && leen.beskikbaar) pryse.push(`${t("leen_etiket")} — ${formateer_prys_sent(leen.prys_sent)}`);
+
+      // Wys die Leen-segment as die boek leen aanbied, OF as daar histories
+      // reeds leen-aankope was (selfs al is leen intussen afgeskakel) —
+      // anders verdwyn nuttige geskiedenis stilweg uit die oorsig.
+      const wys_leen_teller = leen || (produk.aankope_leen || 0) > 0;
 
       return `
         <div class="paneel-produk-ry ${produk.aktief ? "" : "paneel-produk-ry-onaktief"}">
@@ -163,6 +170,7 @@ function wys_produkte_lys(produkte) {
             <span class="paneel-produk-aankope">
               🛒 ${t("paneel_eboek")}: ${produk.aankope_eboek || 0} (${formateer_prys_sent(produk.opbrengs_eboek_sent || 0)})
               · ${t("paneel_hardekopie")}: ${produk.aankope_harde_kopie || 0} (${formateer_prys_sent(produk.opbrengs_harde_kopie_sent || 0)})
+              ${wys_leen_teller ? `· ${t("leen_etiket")}: ${produk.aankope_leen || 0} (${formateer_prys_sent(produk.opbrengs_leen_sent || 0)})` : ""}
             </span>
             ${!produk.aktief ? `<span class="paneel-onaktief-etiket">${t("paneel_onaktief")}</span>` : ""}
           </div>
