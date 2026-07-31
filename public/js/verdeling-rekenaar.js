@@ -97,10 +97,12 @@ function vr_herbereken_alles() {
   const direkteursVerskil = resB.direkteursRand - resA.direkteursRand;
 
   const prysEl = document.getElementById("vr-prys-verskil");
-  prysEl.textContent = `${prysVerskil >= 0 ? "+" : ""}${vr_formateer_rand(prysVerskil)}`;
+  const prysAbs = vr_formateer_rand(Math.abs(prysVerskil));
+  prysEl.textContent = prysVerskil === 0 ? "Geen verskil" : `${prysAbs} ${prysVerskil > 0 ? "hoër" : "laer"}`;
 
   const direkteursEl = document.getElementById("vr-direkteurs-verskil");
-  direkteursEl.textContent = `${direkteursVerskil >= 0 ? "+" : ""}${vr_formateer_rand(direkteursVerskil)}`;
+  const direkteursAbs = vr_formateer_rand(Math.abs(direkteursVerskil));
+  direkteursEl.textContent = direkteursVerskil === 0 ? "Geen verskil" : `${direkteursAbs} ${direkteursVerskil > 0 ? "meer" : "minder"}`;
   direkteursEl.classList.toggle("vr-vergelyking-waarde--laer", direkteursVerskil < 0);
 }
 
