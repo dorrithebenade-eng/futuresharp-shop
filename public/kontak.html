@@ -67,6 +67,13 @@
       color: var(--grys-teks);
       font-style: italic;
     }
+    .kontak-raamwerk-nota {
+      font-family: var(--font-liggaam);
+      font-size: 13px;
+      color: var(--grys-teks);
+      margin: 14px 0 0;
+      line-height: 1.5;
+    }
   </style>
 </head>
 <body>
@@ -99,9 +106,10 @@
     <div class="kontak-kaart">
       <p class="kontak-epos-etiket" data-i18n="kontak_epos_etiket">Stuur vir ons 'n e-pos</p>
       <p class="kontak-epos-adres">futureshop@futuresharp.co.za</p>
-      <a class="kontak-stuur-knoppie" href="mailto:futureshop@futuresharp.co.za?subject=Ek%20wil%20graag%20my%20boek%20verkoop">
+      <a id="kontak-stuur-knoppie" class="kontak-stuur-knoppie" href="mailto:futureshop@futuresharp.co.za?subject=Ek%20wil%20graag%20my%20boek%20verkoop">
         ✉️ <span data-i18n="kontak_stuur_knoppie">Stuur e-pos</span>
       </a>
+      <p class="kontak-raamwerk-nota" data-i18n="kontak_raamwerk_nota">As jy op die knoppie klik, open jou e-posprogram met 'n paar vrae reeds ingevul — vul dit sommer daar in voor jy stuur.</p>
     </div>
 
     <p class="kontak-opsies" data-i18n="kontak_terugvoer">Ons kontak jou binnekort terug.</p>
@@ -110,5 +118,6 @@
   <script src="js/taal.js"></script>
   <script src="js/identiteit.js"></script>
   <script src="js/nav-rekening.js"></script>
+  <script src="js/kontak.js"></script>
 </body>
 </html>
