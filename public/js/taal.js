@@ -101,6 +101,29 @@ const WOORDEBOEK = {
   kontak_epos_etiket: { af: "Stuur vir ons 'n e-pos", en: "Send us an email" },
   kontak_stuur_knoppie: { af: "Stuur e-pos", en: "Send email" },
   kontak_terugvoer: { af: "Ons kontak jou binnekort terug.", en: "We'll get back to you soon." },
+  kontak_raamwerk_nota: {
+    af: "As jy op die knoppie klik, open jou e-posprogram met 'n paar vrae reeds ingevul — vul dit sommer daar in voor jy stuur.",
+    en: "Clicking the button opens your email app with a few questions already filled in — just fill them in there before sending.",
+  },
+
+  // Vooraf-ingevulde e-pos-raamwerk (word deur kontak.js in die mailto-skakel gebou)
+  kontak_epos_onderwerp: { af: "Ek wil graag my boek(e) in Future Shop verkoop", en: "I'd like to sell my book(s) in Future Shop" },
+  kontak_raamwerk_naam: { af: "Naam", en: "Name" },
+  kontak_raamwerk_kontaknommer: { af: "Kontaknommer", en: "Contact number" },
+  kontak_raamwerk_agtergrond_vraag: {
+    af: "Vertel bietjie van jouself as skrywer:",
+    en: "Tell us a bit about yourself as a writer:",
+  },
+  kontak_raamwerk_hoeveel_boeke: { af: "Hoeveel boek(e) wil jy verkoop?", en: "How many book(s) would you like to sell?" },
+  kontak_raamwerk_titels_kategoriee_vraag: {
+    af: "Titel(s) en kategorie(ë) (bv. Fiksie, Niefiksie, Kinderboeke, Selfhelp):",
+    en: "Title(s) and categorie(s) (e.g. Fiction, Non-fiction, Children's, Self-help):",
+  },
+  kontak_raamwerk_formaat_vraag: {
+    af: "Watter formaat(e) beoog jy — e-boek, harde kopie, of albei?",
+    en: "Which format(s) are you considering — e-book, hard copy, or both?",
+  },
+  kontak_raamwerk_bykomend: { af: "Enige bykomende inligting:", en: "Any additional information:" },
 
   // Kop (tuisblad)
   kop_eyebrow: { af: "E-boeke · Harde kopieë", en: "E-books · Hard copies" },
@@ -376,6 +399,18 @@ const WOORDEBOEK = {
   paneel_outeur_naam_etiket: { af: "Naam", en: "Name" },
   paneel_kies_outeur: { af: "— kies outeur —", en: "— select author —" },
 
+  paneel_verdeling_rekenaar_titel: { af: "Verdeling-rekenaar", en: "Split calculator" },
+  paneel_verdeling_rekenaar_hulp: {
+    af: "Speel met die persentasies en koste om te sien watter boekprys en direkteursfooie elke scenario oplewer — vir gebruik tydens onderhandeling met outeurs.",
+    en: "Play with the percentages and costs to see what book price and director fees each scenario produces — for use when negotiating with authors.",
+  },
+  paneel_dokumente_titel: { af: "Dokumente", en: "Documents" },
+  paneel_dokumente_hulp: {
+    af: "Alle voorstel-dokumente, riglyne en ander lêers wat julle met outeurs of ander partye deel, op een plek. Elke dokument het 'n eie aflaai-skakel wat via e-pos of WhatsApp gestuur kan word.",
+    en: "All proposal documents, guidelines and other files you share with authors or other parties, in one place. Each document has its own download link that can be sent via email or WhatsApp.",
+  },
+  paneel_voeg_dokument_by_knoppie: { af: "+ Laai dokument op", en: "+ Upload document" },
+  paneel_dokumente_laai: { af: "Dokumente word gelaai …", en: "Loading documents …" },
   paneel_koepons_titel: { af: "Koepons", en: "Coupons" },
   paneel_voeg_koepon_by_knoppie: { af: "+ Voeg koepon by", en: "+ Add coupon" },
   paneel_koepons_laai: { af: "Koepons word gelaai …", en: "Loading coupons …" },

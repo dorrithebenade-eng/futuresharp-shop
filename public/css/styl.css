@@ -2632,3 +2632,298 @@ a.my-boek-kaart:focus-visible {
   margin-bottom: 24px;
   max-width: 560px;
 }
+
+/* ---------- Verdeling-rekenaar (paneelbord, personeel-alleen) ---------- */
+
+.vr-wrap {
+  max-width: 1000px;
+}
+
+.vr-formaat-kieser {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.vr-formaat-knoppie {
+  padding: 9px 18px;
+  border-radius: 999px;
+  border: 1px solid #ddd;
+  background: var(--wit);
+  color: #555;
+  font-family: var(--font-liggaam);
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.vr-formaat-knoppie.vr-formaat-aktief {
+  background: var(--swart);
+  color: var(--wit);
+  border-color: var(--swart);
+}
+
+.vr-gedeeld-kaart {
+  background: var(--wit);
+  border: 1px solid #e5e5e5;
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.vr-gedeeld-titel {
+  font-family: var(--font-opskrif);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #999;
+  margin-bottom: 14px;
+}
+
+.vr-gedeeld-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 14px;
+}
+
+.vr-veld {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.vr-veld span:first-child {
+  font-family: var(--font-liggaam);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: #888;
+}
+
+.vr-veld-invoer {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: var(--grys-lig);
+}
+
+.vr-veld-invoer span {
+  font-size: 13px;
+  color: #999;
+}
+
+.vr-veld-invoer input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  font-family: var(--font-liggaam);
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--swart);
+  outline: none;
+}
+
+.vr-veld-invoer input:disabled {
+  color: #bbb;
+}
+
+.vr-k-nota {
+  font-family: var(--font-liggaam);
+  font-size: 12px;
+  color: #999;
+  margin: 12px 0 0;
+}
+
+.vr-scenarios {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-bottom: 20px;
+}
+
+.vr-scenario-kaart {
+  flex: 1;
+  min-width: 280px;
+  background: var(--wit);
+  border: 1px solid #e5e5e5;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.vr-scenario-kop {
+  background: var(--teal-helder);
+  color: var(--wit);
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-opskrif);
+  font-weight: 800;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.vr-scenario-pct-invoer {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: rgba(255, 255, 255, 0.22);
+  border-radius: 8px;
+  padding: 4px 8px;
+}
+
+.vr-scenario-pct-invoer input {
+  width: 36px;
+  border: none;
+  background: transparent;
+  color: var(--wit);
+  font-weight: 800;
+  font-size: 14px;
+  text-align: right;
+  outline: none;
+}
+
+.vr-scenario-liggaam {
+  padding: 18px;
+}
+
+.vr-prys-blok {
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.vr-prys-etiket {
+  font-family: var(--font-liggaam);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #999;
+}
+
+.vr-prys-waarde {
+  font-family: var(--font-opskrif);
+  font-size: 30px;
+  font-weight: 800;
+  color: var(--swart);
+}
+
+.vr-ry {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 0;
+}
+
+.vr-ry-vet {
+  border-top: 1px solid #eee;
+  margin-top: 4px;
+  padding-top: 12px;
+}
+
+.vr-ry-etiket {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-liggaam);
+  font-size: 13px;
+  color: #555;
+}
+
+.vr-ry-vet .vr-ry-etiket {
+  font-weight: 800;
+  color: var(--swart);
+}
+
+.vr-kolletjie {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.vr-kolletjie--outeur { background: var(--teal); }
+.vr-kolletjie--koste { background: var(--amber); }
+.vr-kolletjie--direkteurs { background: var(--koraal); }
+
+.vr-ry-waarde {
+  font-family: var(--font-liggaam);
+  font-size: 13px;
+  font-weight: 700;
+  color: #333;
+}
+
+.vr-ry-vet .vr-ry-waarde {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--swart);
+}
+
+.vr-ry-pct {
+  margin-left: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #bbb;
+}
+
+.vr-waarskuwing-teks {
+  color: var(--koraal) !important;
+}
+
+.vr-waarskuwing-blok {
+  margin-top: 10px;
+  background: #FDECEA;
+  color: var(--koraal);
+  font-family: var(--font-liggaam);
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 8px;
+  padding: 10px 12px;
+  line-height: 1.4;
+}
+
+.vr-vergelyking {
+  background: var(--swart);
+  color: var(--wit);
+  border-radius: 14px;
+  padding: 20px;
+}
+
+.vr-vergelyking-titel {
+  font-family: var(--font-opskrif);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: rgba(255, 255, 255, 0.55);
+  margin-bottom: 14px;
+}
+
+.vr-vergelyking-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 18px;
+}
+
+.vr-vergelyking-etiket {
+  font-family: var(--font-liggaam);
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 4px;
+}
+
+.vr-vergelyking-waarde {
+  font-family: var(--font-opskrif);
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.vr-vergelyking-waarde--laer {
+  color: var(--amber);
+}

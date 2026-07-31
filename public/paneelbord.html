@@ -153,6 +153,8 @@
           <button type="button" class="paneel-kieslys-item" data-afdeling="ontwerp-admin">Ontwerp/Admin</button>
           <button type="button" class="paneel-kieslys-item" data-afdeling="printing">Printing</button>
           <button type="button" class="paneel-kieslys-item" data-afdeling="aflewering">Aflewering</button>
+          <button type="button" class="paneel-kieslys-item" data-afdeling="verdeling-rekenaar" data-i18n="paneel_verdeling_rekenaar_titel">Verdeling-rekenaar</button>
+          <button type="button" class="paneel-kieslys-item" data-afdeling="dokumente" data-i18n="paneel_dokumente_titel">Dokumente</button>
           <button type="button" class="paneel-kieslys-item" data-afdeling="koepons" data-i18n="paneel_koepons_titel">Koepons</button>
           <button type="button" class="paneel-kieslys-item" data-afdeling="uitnodigings" data-i18n="paneel_nav_uitnodigings">Uitnodigings</button>
           <button type="button" class="paneel-kieslys-item" data-afdeling="waarskuwings"><span data-i18n="paneel_nav_waarskuwings">⚠️ Waarskuwings</span></button>
@@ -367,6 +369,110 @@
 
             <button type="submit" id="paneel-aflewering-vorm-indien" class="kaart-aksie paneel-vorm-indien">+ Voeg by</button>
             <button type="button" id="paneel-aflewering-vorm-kanselleer" class="terug-skakel paneel-vorm-kanselleer">✕ Kanselleer</button>
+          </form>
+        </div>
+      </section>
+
+      <section class="paneel-afdeling" data-afdeling-inhoud="verdeling-rekenaar">
+        <div class="paneel-afdeling-kop">
+          <h2 class="paneel-afdeling-titel" data-i18n="paneel_verdeling_rekenaar_titel">Verdeling-rekenaar</h2>
+        </div>
+        <p class="paneel-hulp-teks" data-i18n="paneel_verdeling_rekenaar_hulp">Speel met die persentasies en koste om te sien watter boekprys en direkteursfooie elke scenario oplewer — vir gebruik tydens onderhandeling met outeurs.</p>
+
+        <div class="vr-wrap">
+          <div class="vr-formaat-kieser" id="vr-formaat-kieser">
+            <button type="button" class="vr-formaat-knoppie vr-formaat-aktief" data-formaat="eboek">E-boek</button>
+            <button type="button" class="vr-formaat-knoppie" data-formaat="leen">Leen</button>
+            <button type="button" class="vr-formaat-knoppie" data-formaat="hardekopie">Harde kopie</button>
+          </div>
+
+          <div class="vr-gedeeld-kaart">
+            <div class="vr-gedeeld-titel">Gedeelde aannames (dieselfde vir albei scenario's)</div>
+            <div class="vr-gedeeld-grid">
+              <label class="vr-veld"><span>Outeur se beoogde wins (T)</span>
+                <div class="vr-veld-invoer"><span>R</span><input type="number" id="vr-t" value="100" step="10"></div>
+              </label>
+              <label class="vr-veld"><span>Outeur se eie koste (K)</span>
+                <div class="vr-veld-invoer"><span>R</span><input type="number" id="vr-k" value="0" step="10" disabled></div>
+              </label>
+              <label class="vr-veld"><span>Paystack %</span>
+                <div class="vr-veld-invoer"><input type="number" id="vr-paystack-pct" value="2.9" step="0.1"></div>
+              </label>
+              <label class="vr-veld"><span>Paystack vaste fooi</span>
+                <div class="vr-veld-invoer"><span>R</span><input type="number" id="vr-paystack-vaste" value="1" step="0.5"></div>
+              </label>
+              <label class="vr-veld"><span>Hosting %</span>
+                <div class="vr-veld-invoer"><input type="number" id="vr-hosting-pct" value="5" step="0.5"></div>
+              </label>
+              <label class="vr-veld"><span>Admin %</span>
+                <div class="vr-veld-invoer"><input type="number" id="vr-admin-pct" value="8" step="0.5"></div>
+              </label>
+              <label class="vr-veld"><span>Ontwerp %</span>
+                <div class="vr-veld-invoer"><input type="number" id="vr-ontwerp-pct" value="5" step="0.5"></div>
+              </label>
+            </div>
+            <p class="vr-k-nota" id="vr-k-nota">K is R0 vir E-boek — geen fisiese druk-/afleweringskoste nie.</p>
+          </div>
+
+          <div class="vr-scenarios">
+            <div class="vr-scenario-kaart" id="vr-scenario-a">
+              <div class="vr-scenario-kop">
+                <span>Scenario A</span>
+                <div class="vr-scenario-pct-invoer"><input type="number" id="vr-outeur-a" value="68"><span>%</span></div>
+              </div>
+              <div class="vr-scenario-liggaam" id="vr-scenario-a-liggaam"></div>
+            </div>
+            <div class="vr-scenario-kaart" id="vr-scenario-b">
+              <div class="vr-scenario-kop">
+                <span>Scenario B</span>
+                <div class="vr-scenario-pct-invoer"><input type="number" id="vr-outeur-b" value="70"><span>%</span></div>
+              </div>
+              <div class="vr-scenario-liggaam" id="vr-scenario-b-liggaam"></div>
+            </div>
+          </div>
+
+          <div class="vr-vergelyking">
+            <div class="vr-vergelyking-titel">Verskil tussen A en B</div>
+            <div class="vr-vergelyking-grid">
+              <div>
+                <div class="vr-vergelyking-etiket">Verkoopprys verskil</div>
+                <div class="vr-vergelyking-waarde" id="vr-prys-verskil">R0.00</div>
+              </div>
+              <div>
+                <div class="vr-vergelyking-etiket">Direkteursfooie per boek verskil (B t.o.v. A)</div>
+                <div class="vr-vergelyking-waarde" id="vr-direkteurs-verskil">R0.00</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="paneel-afdeling" data-afdeling-inhoud="dokumente">
+        <div class="paneel-afdeling-kop">
+          <h2 class="paneel-afdeling-titel" data-i18n="paneel_dokumente_titel">Dokumente</h2>
+          <button id="paneel-voeg-dokument-by-knoppie" class="kaart-aksie paneel-voeg-by-knoppie" type="button" data-i18n="paneel_voeg_dokument_by_knoppie">+ Laai dokument op</button>
+        </div>
+        <p class="paneel-hulp-teks" data-i18n="paneel_dokumente_hulp">Alle voorstel-dokumente, riglyne en ander lêers wat julle met outeurs of ander partye deel, op een plek. Elke dokument het 'n eie aflaai-skakel wat via e-pos of WhatsApp gestuur kan word.</p>
+        <div id="paneel-dokumente-lys">
+          <p class="stelsel-boodskap" data-i18n="paneel_dokumente_laai">Dokumente word gelaai …</p>
+        </div>
+
+        <div id="paneel-dokument-vorm-afdeling" style="display:none;">
+          <form id="paneel-dokument-vorm">
+            <label class="veld-etiket" for="dokument-vorm-naam"><span>Naam</span> <span class="veld-verplig">(verplig)</span></label>
+            <input type="text" id="dokument-vorm-naam" class="veld-invoer" required placeholder="Bv. Voorstel vir Outeurs">
+
+            <label class="veld-etiket" for="dokument-vorm-beskrywing"><span>Kort beskrywing</span> <span class="veld-opsioneel">(opsioneel)</span></label>
+            <input type="text" id="dokument-vorm-beskrywing" class="veld-invoer">
+
+            <label class="veld-etiket" for="dokument-vorm-lêer"><span>Lêer</span> <span class="veld-verplig">(verplig)</span></label>
+            <input type="file" id="dokument-vorm-lêer" class="veld-invoer" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx" required>
+            <p class="paneel-hulp-teks">Word, PDF, Excel of PowerPoint — maksimum 4MB.</p>
+
+            <div id="paneel-dokument-vorm-foute" class="vb-foute" style="display:none;"></div>
+
+            <button type="submit" id="paneel-dokument-vorm-indien" class="kaart-aksie paneel-vorm-indien">+ Voeg by</button>
+            <button type="button" id="paneel-dokument-vorm-kanselleer" class="terug-skakel paneel-vorm-kanselleer">✕ Kanselleer</button>
           </form>
         </div>
       </section>
@@ -819,6 +925,7 @@
   <script src="js/taal.js"></script>
   <script src="js/paneelbord.js"></script>
   <script src="js/paneel-registers.js"></script>
+  <script src="js/dokumente.js"></script>
   <script src="js/paneel-uitnodigings.js"></script>
   <script src="js/paneel-statistieke.js"></script>
   <script src="js/paneel-waarskuwings.js"></script>
@@ -826,6 +933,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
   <script src="js/paneel-bestellings.js"></script>
   <script src="js/paneel-kieslys.js"></script>
+  <script src="js/verdeling-rekenaar.js"></script>
   <script src="js/paneelbord-installeer-app.js"></script>
 </body>
 </html>
