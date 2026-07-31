@@ -90,20 +90,8 @@ function vr_herbereken_alles() {
   const outeurA = Number(document.getElementById("vr-outeur-a").value) || 0;
   const outeurB = Number(document.getElementById("vr-outeur-b").value) || 0;
 
-  const resA = vr_wys_scenario("a", outeurA);
-  const resB = vr_wys_scenario("b", outeurB);
-
-  const prysVerskil = resB.P - resA.P;
-  const direkteursVerskil = resB.direkteursRand - resA.direkteursRand;
-
-  const prysEl = document.getElementById("vr-prys-verskil");
-  const prysAbs = vr_formateer_rand(Math.abs(prysVerskil));
-  prysEl.textContent = prysVerskil === 0 ? "Geen verskil" : `${prysAbs} ${prysVerskil > 0 ? "hoër" : "laer"}`;
-
-  const direkteursEl = document.getElementById("vr-direkteurs-verskil");
-  const direkteursAbs = vr_formateer_rand(Math.abs(direkteursVerskil));
-  direkteursEl.textContent = direkteursVerskil === 0 ? "Geen verskil" : `${direkteursAbs} ${direkteursVerskil > 0 ? "meer" : "minder"}`;
-  direkteursEl.classList.toggle("vr-vergelyking-waarde--laer", direkteursVerskil < 0);
+  vr_wys_scenario("a", outeurA);
+  vr_wys_scenario("b", outeurB);
 }
 
 function vr_kies_formaat(sleutel) {
