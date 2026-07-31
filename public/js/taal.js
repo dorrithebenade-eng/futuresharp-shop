@@ -107,7 +107,7 @@ const WOORDEBOEK = {
   },
 
   // Vooraf-ingevulde e-pos-raamwerk (word deur kontak.js in die mailto-skakel gebou)
-  kontak_epos_onderwerp: { af: "Ek wil graag my boek(e) in Future Shop verkoop", en: "I'd like to sell my book(s) in Future Shop" },
+  kontak_epos_onderwerp: { af: "Future Shop Outeurs-belangstelling", en: "Future Shop Authors Interest" },
   kontak_raamwerk_naam: { af: "Naam", en: "Name" },
   kontak_raamwerk_kontaknommer: { af: "Kontaknommer", en: "Contact number" },
   kontak_raamwerk_agtergrond_vraag: {
