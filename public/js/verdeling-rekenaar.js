@@ -135,10 +135,20 @@ function vr_koppel_gebeurtenisse() {
     "vr-outeur-a", "vr-outeur-b",
   ];
   invoer_ids.forEach((id) => {
-    document.getElementById(id).addEventListener("input", vr_herbereken_alles);
+    const el = document.getElementById(id);
+    if (!el) return; // veiligheidsnet — moenie die hele koppeling laat omval as een veld ontbreek nie
+    el.addEventListener("input", vr_herbereken_alles);
+    el.addEventListener("change", vr_herbereken_alles); // rugsteun vir blaaiers/toestelle waar 'input' nie altyd konsekwent op number-velde afvuur nie
   });
 
   vr_herbereken_alles();
 }
 
-document.addEventListener("DOMContentLoaded", vr_koppel_gebeurtenisse);
+// As hierdie skrip om een of ander rede eers ná DOMContentLoaded laai
+// (bv. 'n stadige netwerk-vertraging), sou 'n gewone addEventListener
+// nooit afvuur nie — kyk eers self of die dokument reeds klaar is.
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", vr_koppel_gebeurtenisse);
+} else {
+  vr_koppel_gebeurtenisse();
+}
