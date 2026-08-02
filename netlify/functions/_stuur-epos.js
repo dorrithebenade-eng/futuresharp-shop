@@ -48,31 +48,74 @@ function kry_vervoerder() {
   return vervoerder;
 }
 
-// Sit die weergawe in 'n eenvoudige, veilige HTML-raam. Geen eksterne
-// beelde of style-lêers nie — poskliënte blokkeer dit dikwels, en 'n
-// kennisgewing moet leesbaar wees selfs wanneer alles geblokkeer word.
-function bou_html(opskrif, reels) {
+// DIE UITLEG IS 'N TABEL, NIE 'N DIV NIE. Outlook ignoreer max-width en
+// border-radius op 'n gewone blok — 'n boodskap wat mooi lyk in Gmail strek
+// dan oor die hele venster en verloor sy rand. 'n Tabel met 'n vaste breedte
+// van 600px is die enigste ding wat oral hou.
+//
+// GEEN BEELDE NIE. Die kop is 'n gekleurde band met teks, nie 'n logo nie.
+// Poskliënte blokkeer beelde by verstek, en 'n kennisgewing moet presies
+// dieselfde lyk vir wie prente afgeskakel het. Alle style is inlyn, want
+// <style>-blokke word deur baie kliënte gestroop.
+
+const TEAL = "#479F91";
+const KORAAL = "#EC5832";
+const FONT = "Segoe UI,Helvetica,Arial,sans-serif";
+
+// Ontsnap teks wat in HTML beland. Reels mag eenvoudige HTML bevat en word
+// NIE ontsnap nie — maar 'n knoppie se teks en 'n URL kom dikwels uit data.
+function ontsnap(teks) {
+  return String(teks || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function bou_html(opskrif, reels, knoppie) {
   const paragrawe = reels
-    .map((r) => `<p style="margin:0 0 14px;font-size:15px;line-height:1.6;color:#171717;">${r}</p>`)
+    .map((r) => `<p style="margin:0 0 15px;font-family:${FONT};font-size:15px;line-height:1.65;color:#333333;">${r}</p>`)
     .join("");
 
-  return `<!DOCTYPE html><html lang="af"><body style="margin:0;padding:24px;background:#EDEBE6;font-family:Helvetica,Arial,sans-serif;">
-  <div style="max-width:560px;margin:0 auto;background:#FFFFFF;border-radius:14px;padding:28px 26px;">
-    <p style="margin:0 0 4px;font-size:11px;font-weight:bold;letter-spacing:1.5px;color:#479F91;">FUTURE SHOP</p>
-    <h1 style="margin:0 0 18px;font-size:21px;line-height:1.3;color:#171717;">${opskrif}</h1>
-    ${paragrawe}
-    <p style="margin:24px 0 0;padding-top:16px;border-top:1px solid #E6E4E0;font-size:12px;color:#8B8781;">
-      Future Shop · futureshop.futuresharp.co.za
-    </p>
-  </div>
+  const knoppie_ry = knoppie && knoppie.url
+    ? `<tr><td style="padding:10px 32px 26px;">
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+          <td style="background:${KORAAL};padding:12px 24px;">
+            <a href="${ontsnap(knoppie.url)}" style="font-family:${FONT};font-size:14px;font-weight:700;color:#FFFFFF;text-decoration:none;">${ontsnap(knoppie.teks || "Gaan na Future Shop")}</a>
+          </td>
+        </tr></table>
+      </td></tr>`
+    : "";
+
+  return `<!DOCTYPE html>
+<html lang="af"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#EDEBE6;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#EDEBE6;">
+<tr><td align="center" style="padding:28px 12px;">
+  <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:600px;background:#FFFFFF;border:1px solid #E2DFD9;">
+    <tr><td style="background:${TEAL};padding:22px 32px;">
+      <p style="margin:0 0 3px;font-family:${FONT};font-size:11px;font-weight:700;letter-spacing:2px;color:#FFFFFF;">FUTURE SHARP</p>
+      <p style="margin:0;font-family:${FONT};font-size:24px;font-weight:700;color:#FFFFFF;">Future Shop</p>
+    </td></tr>
+    <tr><td style="padding:30px 32px 8px;">
+      <h1 style="margin:0 0 18px;font-family:${FONT};font-size:23px;line-height:1.3;color:#171717;font-weight:700;">${opskrif}</h1>
+      ${paragrawe}
+    </td></tr>
+    ${knoppie_ry}
+    <tr><td style="padding:16px 32px 22px;border-top:1px solid #EFEDE9;">
+      <p style="margin:0;font-family:${FONT};font-size:12px;line-height:1.6;color:#8B8781;">Future Shop &middot; futureshop.futuresharp.co.za</p>
+    </td></tr>
+  </table>
+</td></tr></table>
 </body></html>`;
 }
 
 // Plat-teks weergawe. Party kliënte wys dit, en dit hou die pos uit
 // gemorspos uit — 'n boodskap met net HTML lyk verdag.
-function bou_teks(opskrif, reels) {
+function bou_teks(opskrif, reels, knoppie) {
   const skoon = reels.map((r) => r.replace(/<[^>]+>/g, ""));
-  return `${opskrif}\n\n${skoon.join("\n\n")}\n\n—\nFuture Shop · futureshop.futuresharp.co.za`;
+  const skakel = knoppie && knoppie.url ? `\n\n${knoppie.teks || "Gaan na Future Shop"}: ${knoppie.url}` : "";
+  return `${opskrif}\n\n${skoon.join("\n\n")}${skakel}\n\n—\nFuture Shop · futureshop.futuresharp.co.za`;
 }
 
 /**
@@ -83,8 +126,9 @@ function bou_teks(opskrif, reels) {
  * @param {string} opsies.onderwerp  onderwerpreël
  * @param {string} opsies.opskrif    groot opskrif binne die pos
  * @param {string[]} opsies.reels    paragrawe (eenvoudige HTML toegelaat)
+ * @param {object} [opsies.knoppie]  { teks, url } — opsionele aksieknoppie
  */
-async function stuur_epos({ aan, onderwerp, opskrif, reels }) {
+async function stuur_epos({ aan, onderwerp, opskrif, reels, knoppie }) {
   if (!aan || !onderwerp) {
     return { ok: false, fout: "Ontbrekende ontvanger of onderwerp" };
   }
@@ -103,8 +147,8 @@ async function stuur_epos({ aan, onderwerp, opskrif, reels }) {
       from: `"${van_naam}" <${process.env.EPOS_GEBRUIKER}>`,
       to: aan,
       subject: onderwerp,
-      text: bou_teks(opskrif || onderwerp, lys),
-      html: bou_html(opskrif || onderwerp, lys),
+      text: bou_teks(opskrif || onderwerp, lys, knoppie),
+      html: bou_html(opskrif || onderwerp, lys, knoppie),
     });
     return { ok: true, id: uitslag.messageId };
   } catch (fout) {

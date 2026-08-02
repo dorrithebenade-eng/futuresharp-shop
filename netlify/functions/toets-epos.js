@@ -51,10 +51,11 @@ exports.handler = async (event, context) => {
     onderwerp: "Toetspos van Future Shop",
     opskrif: "Die e-posdiens werk",
     reels: [
-      "Hierdie is 'n toetspos. Kry jy dit, is die SMTP-opstelling korrek en kan die res van die kennisgewings daarop gebou word.",
+      "Hierdie is 'n toetspos. Kry jy dit, is die opstelling korrek en kan die res van die kennisgewings daarop gebou word.",
       `Gestuur op ${new Date().toLocaleString("af-ZA", { timeZone: "Africa/Johannesburg" })}.`,
       "Gaan gerus jou gemorspos na indien dit nie in die inkassie is nie — dit sê iets oor die aflewerbaarheid.",
     ],
+    knoppie: { teks: "Gaan na Future Shop", url: "https://futureshop.futuresharp.co.za" },
   });
 
   return {
