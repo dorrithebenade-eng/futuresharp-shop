@@ -3457,7 +3457,8 @@ body.vennoot-modus .paneel-dokument-skrap-knoppie {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 14px;
+  column-gap: 14px;
+  row-gap: 14px;
   flex-wrap: wrap;
   margin: 0 0 28px;
 }
@@ -3471,6 +3472,10 @@ body.vennoot-modus .paneel-dokument-skrap-knoppie {
   align-items: center;
   gap: 8px;
   flex-shrink: 0;
+  /* Pas alles op één ry, hou space-between hulle uitmekaar. Is die skyfies
+     te breed en breek die blok na 'n tweede ry, stoot hierdie marge hom
+     steeds na regs — anders sou hy links onder beland en toevallig lyk. */
+  margin-left: auto;
 }
 
 .katalogus-sorteer-etiket {
@@ -3499,6 +3504,6 @@ body.vennoot-modus .paneel-dokument-skrap-knoppie {
 
 @media (max-width: 560px) {
   .katalogus-balk { align-items: flex-start; }
-  .katalogus-sorteer { width: 100%; }
+  .katalogus-sorteer { width: 100%; margin-left: 0; }
   .katalogus-sorteer select { flex: 1; }
 }
