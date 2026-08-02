@@ -31,7 +31,10 @@ exports.handler = async (event, context) => {
 
   return {
     statusCode: 200,
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      "Cache-Control": "no-store, no-cache, must-revalidate",
+    },
     body: JSON.stringify({
       totaal: totaal?.telling || 0,
       vandag: dag?.telling || 0,

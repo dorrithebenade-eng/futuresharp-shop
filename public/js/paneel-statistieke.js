@@ -39,6 +39,7 @@ async function paneel_statistieke_laai() {
   try {
     const resp = await fetch("/.netlify/functions/kry-statistieke", {
       headers: kry_outorisasie_kop(),
+      cache: "no-store",
     });
     if (!resp.ok) throw new Error(`Status ${resp.status}`);
     const data = await resp.json();
