@@ -48,6 +48,7 @@ async function paneel_statistieke_laai() {
     document.getElementById("statistiek-vandag").textContent = data.vandag;
     document.getElementById("statistiek-week").textContent = data.hierdie_week;
     document.getElementById("statistiek-maand").textContent = data.hierdie_maand;
+    document.getElementById("statistiek-week-info").title = t("statistiek_week_nota");
     wys_maandelikse_geskiedenis(data.maandelikse_geskiedenis);
   } catch (fout) {
     console.error("Kon nie statistieke laai nie:", fout);

@@ -31,6 +31,10 @@ const WOORDEBOEK = {
   statistiek_totaal: { af: "Totaal", en: "Total" },
   statistiek_vandag: { af: "Vandag", en: "Today" },
   statistiek_week: { af: "Hierdie week", en: "This week" },
+  statistiek_week_nota: {
+    af: "Herstel elke Maandag (ISO-week). Val toevallig saam met 'Totaal' as die teller self nog binne sy eerste week is.",
+    en: "Resets every Monday (ISO week). Coincides with 'Total' if the counter itself is still within its first week.",
+  },
   statistiek_maand: { af: "Hierdie maand", en: "This month" },
   statistiek_maandelikse_geskiedenis: { af: "Maandelikse geskiedenis", en: "Monthly history" },
   statistiek_herstel_bevestig: {
