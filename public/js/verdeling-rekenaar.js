@@ -110,6 +110,19 @@ const vr_outeur_som = () =>
 const vr_outeur_etiket = (outeur, indeks) =>
   String(outeur.naam || "").trim() || `Outeur ${indeks + 1}`;
 
+// Die bewoording van die invoervelde volg die aantal outeurs. Word 'n
+// outeur bygevoeg of verwyder, moet die etikette saam skuif — vandaar een
+// helper eerder as die teks op drie plekke ingebak.
+const vr_wins_etiket = () =>
+  vr_outeurs.length > 1 ? "Outeurs se wins" : "Outeur se wins";
+
+function vr_werk_begin_etikette_by() {
+  VR_FORMATE.forEach((f) => {
+    const el = document.getElementById(`vr-begin-etiket-${f.sleutel}`);
+    if (el && vr_modus === "wins") el.textContent = vr_wins_etiket();
+  });
+}
+
 // Versprei die outeursdeel eweredig. Werk in honderdstes sodat 70 oor drie
 // nie 23,333… gee nie; die oorskiet gaan na die eerste ry.
 function vr_versprei_outeurs() {
@@ -161,6 +174,7 @@ function vr_bou_outeur_rye() {
   });
 
   vr_wys_outeur_som();
+  vr_werk_begin_etikette_by();
 }
 
 function vr_wys_outeur_som() {
@@ -288,8 +302,8 @@ function vr_aansig_uiteen(uitslae) {
         <tr class="vr-r-groep"><td colspan="4">Gaan uit</td></tr>
         ${ry(vr_outeurs.length > 1 ? "Outeurs saam" : "Outeur ontvang", (u) => u.outeurRand, true, false)}
         ${vr_outeurs.length > 1 ? vr_outeurs.map((o, i) => ry(`— ${vr_outeur_etiket(o, i)} (${o.pct}%)`, (u) => (o.pct / 100) * u.P, false, false)).join("") : ""}
-        ${enigeK ? ry("Sy eie druk-/afleweringskoste", (u) => -u.K, false, false) : ""}
-        ${enigeK ? ry("Outeur se wins", (u) => u.outeurWins, false, true) : ""}
+        ${enigeK ? ry("Eie druk-/afleweringskoste", (u) => -u.K, false, false) : ""}
+        ${enigeK ? ry(vr_outeurs.length > 1 ? "Outeurs se wins" : "Outeur se wins", (u) => u.outeurWins, false, true) : ""}
         <tr class="vr-r-groep"><td colspan="4">Bly by Future Sharp</td></tr>
         ${ry("Paystack (met BTW)", (u) => u.paystackRand, false, false)}
         ${ry("Hosting", (u) => u.hostingRand, false, false)}
@@ -392,10 +406,10 @@ function vr_bou_formaat_rye() {
     (f) => `
     <div class="vr-formaat-ry">
       <div class="vr-formaat-naam">${f.naam}${f.sub ? `<small>${f.sub}</small>` : ""}</div>
-      <label class="vr-veld"><span id="vr-begin-etiket-${f.sleutel}">Outeur se wins</span>
+      <label class="vr-veld"><span id="vr-begin-etiket-${f.sleutel}">${vr_wins_etiket()}</span>
         <div class="vr-veld-invoer"><span>R</span><input type="number" id="vr-begin-${f.sleutel}" value="${f.verstek_begin}" step="10"></div>
       </label>
-      <label class="vr-veld"><span>Outeur se eie koste</span>
+      <label class="vr-veld"><span>Eie druk-/afleweringskoste</span>
         <div class="vr-veld-invoer"><span>R</span><input type="number" id="vr-k-${f.sleutel}" value="${f.verstek_k}" step="10" ${f.k_wysigbaar ? "" : "disabled"}></div>
       </label>
       ${f.sleutel === "leen" ? `<button type="button" class="vr-wenk" id="vr-wenk-leen">≈ 35% van e-boek</button>` : `<span class="vr-wenk-leeg"></span>`}
@@ -435,7 +449,7 @@ function vr_stel_modus(nuwe_modus) {
     const veld = document.getElementById(`vr-begin-${u.formaat.sleutel}`);
     const etiket = document.getElementById(`vr-begin-etiket-${u.formaat.sleutel}`);
     if (veld) veld.value = Math.round((nuwe_modus === "prys" ? u.P : u.outeurWins) * 100) / 100;
-    if (etiket) etiket.textContent = nuwe_modus === "prys" ? "Verkoopprys" : "Outeur se wins";
+    if (etiket) etiket.textContent = nuwe_modus === "prys" ? "Verkoopprys" : vr_wins_etiket();
   });
 
   vr_herbereken_alles();
