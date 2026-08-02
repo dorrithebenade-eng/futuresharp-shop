@@ -9,6 +9,7 @@
 
 const { kry_store } = require("./_blob-store");
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
+const { kry_maks_verdeling_persentasie, beskryf_minimum } = require("./_paystack-koste.js");
 
 const GELDIGE_ROL_TIPES = ["outeur", "vennoot", "ontwerp_admin", "printing", "aflewering"];
 
@@ -93,7 +94,7 @@ function oorskry_hoofrekening_minimum(verdelings, hosting, prys_sent) {
       : hosting.waarde
     : 0;
 
-  return verdelings_persentasie + hosting_persentasie > 97;
+  return verdelings_persentasie + hosting_persentasie > kry_maks_verdeling_persentasie(prys_sent);
 }
 
 exports.handler = async (event, context) => {
@@ -168,7 +169,7 @@ exports.handler = async (event, context) => {
     if (f && f.beskikbaar && oorskry_hoofrekening_minimum(f.verdelings || [], f.hosting, f.prys_sent || 0)) {
       return {
         statusCode: 400,
-        body: `Die ${etiket} se verdeling(s) plus Hosting los minder as 3% oor vir Future Sharp se hoofrekening — verminder die persentasie/bedrae sodat ten minste 3% oorbly.`,
+        body: `Die ${etiket} se verdeling(s) plus Hosting los te min oor vir Future Sharp se hoofrekening — Paystack se fooi (2,9% + R1 + BTW) moet gedek word. Verminder die persentasie/bedrae sodat ${beskryf_minimum(f.prys_sent || 0)} oorbly.`,
       };
     }
   }

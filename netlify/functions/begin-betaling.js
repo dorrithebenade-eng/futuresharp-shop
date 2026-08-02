@@ -41,6 +41,7 @@
 
 const { kry_store } = require("./_blob-store");
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
+const { kry_maks_verdeling_sent } = require("./_paystack-koste.js");
 
 // Rol_tipe → watter Blobs-store die entiteit se subrekening-kode in is.
 const ROL_TIPE_STORES = {
@@ -395,7 +396,7 @@ exports.handler = async (event, context) => {
   // vir data wat van vóór hierdie reël bestaan het — sodat 'n koper se
   // betaling nooit hierom kan misluk nie.
   const totale_verdeling_sent = Object.values(verdeling_per_subrekening).reduce((a, b) => a + b, 0);
-  const maks_verdeling_sent = Math.floor(totaal_sent * 0.97) - hosting_totaal_sent;
+  const maks_verdeling_sent = kry_maks_verdeling_sent(totaal_sent) - hosting_totaal_sent;
   if (totale_verdeling_sent > maks_verdeling_sent && totale_verdeling_sent > 0) {
     const skaal_faktor = Math.max(maks_verdeling_sent, 0) / totale_verdeling_sent;
     for (const kode of Object.keys(verdeling_per_subrekening)) {

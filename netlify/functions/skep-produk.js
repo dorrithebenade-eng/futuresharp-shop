@@ -11,6 +11,7 @@
 
 const { kry_store } = require("./_blob-store");
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
+const { kry_maks_verdeling_persentasie, beskryf_minimum } = require("./_paystack-koste.js");
 
 const GELDIGE_ROL_TIPES = ["outeur", "vennoot", "ontwerp_admin", "printing", "aflewering"];
 
@@ -31,7 +32,11 @@ async function kry_outeur_naam_string(outeur_ids) {
   return `${name_lys.slice(0, -1).join(", ")} en ${name_lys[name_lys.length - 1]}`;
 }
 
-// Future Sharp se hoofrekening moet ALTYD ten minste 3% + Hosting% van 'n
+// Future Sharp se hoofrekening moet ALTYD genoeg behou om Paystack se
+// transaksiekoste te dek, plus die ooreengekome hosting-aandeel. Die
+// vereiste is NIE 'n plat 3% nie — Paystack hef 2,9% PLUS R1 (plus BTW),
+// dus is die minimum by 'n lae prys heelwat hoër. Sien _paystack-koste.js.
+// (Oorspronklike nota: ten minste 3% + Hosting% van 'n
 // formaat se prys behou — dit dek Paystack se eie transaksiekoste plus
 // die ooreengekome hosting-aandeel. Paystack self weier ook enige
 // verdeling waar die handelaar se aandeel nul of minder is, so ons keer
@@ -50,7 +55,7 @@ function oorskry_hoofrekening_minimum(verdelings, hosting, prys_sent) {
       : hosting.waarde
     : 0;
 
-  return verdelings_persentasie + hosting_persentasie > 97;
+  return verdelings_persentasie + hosting_persentasie > kry_maks_verdeling_persentasie(prys_sent);
 }
 
 // Valideer 'n opsionele lys verdelings — gee 'n LEË lys terug (geen
@@ -153,7 +158,7 @@ exports.handler = async (event, context) => {
   if (oorskry_hoofrekening_minimum(eboek_verdelings, eboek_hosting, formate.eboek.prys_sent || 0)) {
     return {
       statusCode: 400,
-      body: "Die e-boek se verdeling(s) plus Hosting los minder as 3% oor vir Future Sharp se hoofrekening — verminder die persentasie/bedrae sodat ten minste 3% oorbly.",
+      body: "Die e-boek se verdeling(s) plus Hosting los te min oor vir Future Sharp se hoofrekening — Paystack se fooi (2,9% + R1 + BTW) moet gedek word. Verminder die persentasie/bedrae sodat " + beskryf_minimum(formate.eboek.prys_sent || 0) + " oorbly.",
     };
   }
   const hardekopie_verdelings = kry_geldige_verdelings(formate.harde_kopie && formate.harde_kopie.verdelings);
@@ -165,7 +170,7 @@ exports.handler = async (event, context) => {
   ) {
     return {
       statusCode: 400,
-      body: "Die harde-kopie se verdeling(s) plus Hosting los minder as 3% oor vir Future Sharp se hoofrekening — verminder die persentasie/bedrae sodat ten minste 3% oorbly.",
+      body: "Die harde-kopie se verdeling(s) plus Hosting los te min oor vir Future Sharp se hoofrekening — Paystack se fooi (2,9% + R1 + BTW) moet gedek word. Verminder die persentasie/bedrae sodat " + beskryf_minimum(formate.harde_kopie.prys_sent || 0) + " oorbly.",
     };
   }
 
@@ -184,7 +189,7 @@ exports.handler = async (event, context) => {
     if (oorskry_hoofrekening_minimum(leen_verdelings, leen_hosting, formate.leen.prys_sent || 0)) {
       return {
         statusCode: 400,
-        body: "Die leen-verdeling(s) plus Hosting los minder as 3% oor vir Future Sharp se hoofrekening — verminder die persentasie/bedrae sodat ten minste 3% oorbly.",
+        body: "Die leen-verdeling(s) plus Hosting los te min oor vir Future Sharp se hoofrekening — Paystack se fooi (2,9% + R1 + BTW) moet gedek word. Verminder die persentasie/bedrae sodat " + beskryf_minimum(formate.leen.prys_sent || 0) + " oorbly.",
       };
     }
   }
