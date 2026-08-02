@@ -60,8 +60,38 @@ function kry_bearer_token(event) {
   return kop.slice(7).trim();
 }
 
+// WAAROM DIT NIE process.env.URL GEBRUIK NIE (Augustus 2026):
+//
+// process.env.URL is die werf se PRIMÊRE domein. Sodra 'n eie domein
+// bygevoeg is, word dit iets soos https://futureshop.futuresharp.co.za.
+// 'n Function wat dáárheen terugbel, moet oor die publieke internet gaan
+// en die naam self oplos — en dit het gebreek:
+//
+//   ERR_TLS_CERT_ALTNAME_INVALID
+//   Host: futureshop.futuresharp.co.za is not in the cert's altnames:
+//   DNS:bayek.aserv.co.za
+//
+// Die domein het 'n wildcard-rekord (*.futuresharp.co.za) wat na Afrihost
+// se bediener wys. Netlify se Function-omgewing los die naam na die
+// wildcard op i.p.v. na die CNAME, land by Afrihost, en die TLS-handdruk
+// misluk. Die blaaier los dit korrek op — daarom werk die winkel vir 'n
+// gebruiker terwyl elke beskermde Function 403 gee.
+//
+// Die netlify.app-adres het nie hierdie probleem nie: dit los altyd na
+// Netlify op, ongeag wat by die domeinverskaffer gebeur. Dit bly ook
+// geldig al word die primêre domein later verander.
+//
+// Volgorde: 'n uitdruklike oorskryf (indien ooit nodig), dan die werf se
+// naam, dan die ontplooiing se eie adres. process.env.URL word doelbewus
+// LAASTE gebruik — slegs as niks anders beskikbaar is nie.
 function kry_identity_basis_url() {
-  const werf_url = process.env.URL || process.env.DEPLOY_URL;
+  const werf_url =
+    process.env.FUTURE_SHOP_IDENTITY_URL ||
+    (process.env.SITE_NAME ? `https://${process.env.SITE_NAME}.netlify.app` : null) ||
+    process.env.DEPLOY_PRIME_URL ||
+    process.env.DEPLOY_URL ||
+    process.env.URL;
+
   return `${werf_url}/.netlify/identity`;
 }
 
