@@ -379,7 +379,7 @@
         <div class="paneel-afdeling-kop">
           <h2 class="paneel-afdeling-titel" data-i18n="paneel_verdeling_rekenaar_titel">Verdeling-rekenaar</h2>
         </div>
-        <p class="paneel-hulp-teks" data-i18n="paneel_verdeling_rekenaar_hulp">Speel met die persentasies en koste om te sien watter boekprys en direkteursfooie elke scenario oplewer — vir gebruik tydens onderhandeling met outeurs.</p>
+        <p class="paneel-hulp-teks" data-i18n="paneel_verdeling_rekenaar_hulp">Die outeur se 70% bepaal die prys. Hierdie rekenaar wys hoe die oorblywende 30% intern verdeel — en wat as direkteursfooie oorbly.</p>
 
         <div class="vr-wrap">
           <div class="vr-formaat-kieser" id="vr-formaat-kieser">
@@ -388,8 +388,13 @@
             <button type="button" class="vr-formaat-knoppie" data-formaat="hardekopie">Harde kopie</button>
           </div>
 
+          <div class="vr-anker">
+            <span class="vr-anker-pct">70%</span>
+            <span class="vr-anker-teks">gaan aan die outeur. Hierdie rekenaar wys hoe die oorblywende 30% verdeel.</span>
+          </div>
+
           <div class="vr-gedeeld-kaart">
-            <div class="vr-gedeeld-titel">Gedeelde aannames (dieselfde vir albei scenario's)</div>
+            <div class="vr-gedeeld-titel">Aannames</div>
             <div class="vr-gedeeld-grid">
               <label class="vr-veld"><span>Outeur se beoogde wins (T)</span>
                 <div class="vr-veld-invoer"><span>R</span><input type="number" id="vr-t" value="100" step="10"></div>
@@ -402,6 +407,9 @@
               </label>
               <label class="vr-veld"><span>Paystack vaste fooi</span>
                 <div class="vr-veld-invoer"><span>R</span><input type="number" id="vr-paystack-vaste" value="1" step="0.5"></div>
+              </label>
+              <label class="vr-veld"><span>BTW op Paystack %</span>
+                <div class="vr-veld-invoer"><input type="number" id="vr-btw-pct" value="15" step="1"></div>
               </label>
               <label class="vr-veld"><span>Hosting %</span>
                 <div class="vr-veld-invoer"><input type="number" id="vr-hosting-pct" value="5" step="0.5"></div>
@@ -416,22 +424,7 @@
             <p class="vr-k-nota" id="vr-k-nota">K is R0 vir E-boek — geen fisiese druk-/afleweringskoste nie.</p>
           </div>
 
-          <div class="vr-scenarios">
-            <div class="vr-scenario-kaart" id="vr-scenario-a">
-              <div class="vr-scenario-kop">
-                <span>Scenario A</span>
-                <div class="vr-scenario-pct-invoer"><input type="number" id="vr-outeur-a" value="68"><span>%</span></div>
-              </div>
-              <div class="vr-scenario-liggaam" id="vr-scenario-a-liggaam"></div>
-            </div>
-            <div class="vr-scenario-kaart" id="vr-scenario-b">
-              <div class="vr-scenario-kop">
-                <span>Scenario B</span>
-                <div class="vr-scenario-pct-invoer"><input type="number" id="vr-outeur-b" value="70"><span>%</span></div>
-              </div>
-              <div class="vr-scenario-liggaam" id="vr-scenario-b-liggaam"></div>
-            </div>
-          </div>
+          <div class="vr-enkel-kaart" id="vr-uitslag"></div>
         </div>
       </section>
 
@@ -923,5 +916,6 @@
   <script src="js/paneel-kieslys.js"></script>
   <script src="js/verdeling-rekenaar.js"></script>
   <script src="js/paneelbord-installeer-app.js"></script>
+  <script src="js/wagwoord-ogie.js"></script>
 </body>
 </html>

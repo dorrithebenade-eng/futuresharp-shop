@@ -1,14 +1,29 @@
 // public/js/verdeling-rekenaar.js
 //
 // Interne beplanningshulpmiddel (personeel-alleen, leef binne die
-// paneelbord se "Verdeling-rekenaar"-afdeling). Wys hoeveel 'n boek moet
-// kos, en wat elke party ontvang, gegewe 'n outeur-persentasie, die
-// outeur se beoogde wins (T), hul eie druk-/afleweringskoste (K, net vir
-// Harde kopie), en Future Sharp se eie koste-lyne (Paystack, Hosting,
-// Admin, Ontwerp). Twee scenario's langs mekaar (A/B) sodat personeel
-// dadelik 'n vergelyking kan wys tydens 'n gesprek — bv. 68% teenoor 70%.
+// paneelbord se "Verdeling-rekenaar"-afdeling).
+//
+// WAT DIT DOEN: die outeur se 70% is 'n vaste gegewe — dit is die anker wat
+// die prys bepaal, nie iets om oor te besluit nie. Voer die outeur se
+// beoogde wins (T) in, plus sy eie druk-/afleweringskoste (K, net vir Harde
+// kopie), en die prys volg. Alles wat die rekenaar dan wys, is hoe die
+// oorblywende 30% INTERN verdeel: Paystack, Hosting, Admin, Ontwerp, en die
+// direkteursfooie as die oorblyfsel.
+//
+// WAAROM DAAR NIE MEER TWEE SCENARIO'S IS NIE (Augustus 2026): A en B het
+// bestaan om persentasies te vergelyk — 68% teenoor 70%. Future Sharp werk
+// nou uitsluitlik op 70/30, dus sou twee scenario's presies dieselfde
+// antwoord gegee het. Die persentasie-invoer is saam verwyder.
+//
+// WAAROM DAAR 'N BTW-VELD BYGEKOM HET: Paystack se fooi dra BTW. Die ou
+// berekening (2,9% + R1) het R3,90 op R100 gegee, maar 'n werklike
+// transaksie op 2 Augustus 2026 is teen R4,49 gehef —
+// (2,9% + R1) × 1,15 = R4,485. Sonder die BTW-lyn is die direkteursfooie
+// omtrent 60c per R100 te optimisties.
 //
 // Suiwer front-end-berekening, raak geen Blobs-store of Function aan nie.
+
+const VR_OUTEUR_PCT = 70;
 
 const VR_FORMATE = {
   eboek: { etiket: "E-boek", verstek_k: 0, k_wysigbaar: false },
@@ -21,29 +36,39 @@ function vr_formateer_rand(bedrag) {
   return `R${bedrag.toFixed(2)}`;
 }
 
-function vr_bereken({ outeurPct, T, K, paystackPct, paystackVaste, hostingPct, adminPct, ontwerpPct }) {
-  const P = outeurPct > 0 ? (T + K) / (outeurPct / 100) : 0;
+function vr_getal(id) {
+  const el = document.getElementById(id);
+  return el ? Number(el.value) || 0 : 0;
+}
 
-  const outeurRand = (outeurPct / 100) * P;
-  const paystackRand = (paystackPct / 100) * P + paystackVaste;
+function vr_bereken() {
+  const T = vr_getal("vr-t");
+  const K = vr_getal("vr-k");
+  const paystackPct = vr_getal("vr-paystack-pct");
+  const paystackVaste = vr_getal("vr-paystack-vaste");
+  const btwPct = vr_getal("vr-btw-pct");
+  const hostingPct = vr_getal("vr-hosting-pct");
+  const adminPct = vr_getal("vr-admin-pct");
+  const ontwerpPct = vr_getal("vr-ontwerp-pct");
+
+  // Die prys word terugwaarts uit die outeur se wins bereken.
+  const P = (T + K) / (VR_OUTEUR_PCT / 100);
+
+  const outeurRand = (VR_OUTEUR_PCT / 100) * P;
+  const paystackRand = ((paystackPct / 100) * P + paystackVaste) * (1 + btwPct / 100);
   const hostingRand = (hostingPct / 100) * P;
   const adminRand = (adminPct / 100) * P;
   const ontwerpRand = (ontwerpPct / 100) * P;
-  const direkteursRand = P - outeurRand - paystackRand - hostingRand - adminRand - ontwerpRand;
-  const direkteursPct = P > 0 ? (direkteursRand / P) * 100 : 0;
 
-  return { P, outeurRand, paystackRand, hostingRand, adminRand, ontwerpRand, direkteursRand, direkteursPct };
-}
+  const futureSharpRand = P - outeurRand;
+  const direkteursRand = futureSharpRand - paystackRand - hostingRand - adminRand - ontwerpRand;
 
-function vr_kry_gedeelde_waardes() {
+  const pct = (rand) => (P > 0 ? (rand / P) * 100 : 0);
+
   return {
-    T: Number(document.getElementById("vr-t").value) || 0,
-    K: Number(document.getElementById("vr-k").value) || 0,
-    paystackPct: Number(document.getElementById("vr-paystack-pct").value) || 0,
-    paystackVaste: Number(document.getElementById("vr-paystack-vaste").value) || 0,
-    hostingPct: Number(document.getElementById("vr-hosting-pct").value) || 0,
-    adminPct: Number(document.getElementById("vr-admin-pct").value) || 0,
-    ontwerpPct: Number(document.getElementById("vr-ontwerp-pct").value) || 0,
+    P, outeurRand, paystackRand, hostingRand, adminRand, ontwerpRand,
+    futureSharpRand, direkteursRand, pct,
+    hostingPct, adminPct, ontwerpPct,
   };
 }
 
@@ -62,36 +87,31 @@ function vr_ry_html(etiket, rand, persentasie, kleur_klas, vet, waarskuwing) {
   `;
 }
 
-function vr_wys_scenario(scenario_letter, outeurPct) {
-  const gedeeld = vr_kry_gedeelde_waardes();
-  const resultaat = vr_bereken({ outeurPct, ...gedeeld });
-  const negatief = resultaat.direkteursRand < 0;
-  const paystack_pct_wys = resultaat.P > 0 ? (resultaat.paystackRand / resultaat.P) * 100 : 0;
+function vr_herbereken_alles() {
+  const uitslag = document.getElementById("vr-uitslag");
+  if (!uitslag) return;
 
-  const liggaam = document.getElementById(`vr-scenario-${scenario_letter}-liggaam`);
-  liggaam.innerHTML = `
+  const r = vr_bereken();
+  const negatief = r.direkteursRand < 0;
+
+  uitslag.innerHTML = `
     <div class="vr-prys-blok">
       <div class="vr-prys-etiket">Verkoopprys (P)</div>
-      <div class="vr-prys-waarde">${vr_formateer_rand(resultaat.P)}</div>
+      <div class="vr-prys-waarde">${vr_formateer_rand(r.P)}</div>
     </div>
-    ${vr_ry_html("Outeur ontvang", resultaat.outeurRand, outeurPct, "outeur", true, false)}
-    ${vr_ry_html("Paystack", resultaat.paystackRand, paystack_pct_wys, null, false, false)}
-    ${vr_ry_html("Hosting", resultaat.hostingRand, gedeeld.hostingPct, "koste", false, false)}
-    ${vr_ry_html("Admin", resultaat.adminRand, gedeeld.adminPct, "koste", false, false)}
-    ${vr_ry_html("Ontwerp", resultaat.ontwerpRand, gedeeld.ontwerpPct, "koste", false, false)}
-    ${vr_ry_html("Direkteursfooie (oorblywend)", resultaat.direkteursRand, resultaat.direkteursPct, "direkteurs", true, negatief)}
-    ${negatief ? `<div class="vr-waarskuwing-blok">⚠ Direkteursfooie is negatief — Paystack + Hosting + Admin + Ontwerp saam is meer as Future Sharp se hele aandeel by hierdie persentasie.</div>` : ""}
+
+    <div class="vr-afdeling-kop">Gaan uit</div>
+    ${vr_ry_html("Outeur ontvang", r.outeurRand, VR_OUTEUR_PCT, "outeur", true, false)}
+
+    <div class="vr-afdeling-kop">Bly by Future Sharp — ${vr_formateer_rand(r.futureSharpRand)}</div>
+    ${vr_ry_html("Paystack (met BTW)", r.paystackRand, r.pct(r.paystackRand), null, false, false)}
+    ${vr_ry_html("Hosting", r.hostingRand, r.hostingPct, "koste", false, false)}
+    ${vr_ry_html("Admin", r.adminRand, r.adminPct, "koste", false, false)}
+    ${vr_ry_html("Ontwerp", r.ontwerpRand, r.ontwerpPct, "koste", false, false)}
+    ${vr_ry_html("Direkteursfooie (oorblywend)", r.direkteursRand, r.pct(r.direkteursRand), "direkteurs", true, negatief)}
+
+    ${negatief ? `<div class="vr-waarskuwing-blok">⚠ Direkteursfooie is negatief — Paystack + Hosting + Admin + Ontwerp saam is meer as die 30% wat by Future Sharp bly. Verhoog T, of verlaag een van die koste-lyne.</div>` : ""}
   `;
-
-  return resultaat;
-}
-
-function vr_herbereken_alles() {
-  const outeurA = Number(document.getElementById("vr-outeur-a").value) || 0;
-  const outeurB = Number(document.getElementById("vr-outeur-b").value) || 0;
-
-  vr_wys_scenario("a", outeurA);
-  vr_wys_scenario("b", outeurB);
 }
 
 function vr_kies_formaat(sleutel) {
@@ -120,9 +140,8 @@ function vr_koppel_gebeurtenisse() {
   });
 
   const invoer_ids = [
-    "vr-t", "vr-k", "vr-paystack-pct", "vr-paystack-vaste",
+    "vr-t", "vr-k", "vr-paystack-pct", "vr-paystack-vaste", "vr-btw-pct",
     "vr-hosting-pct", "vr-admin-pct", "vr-ontwerp-pct",
-    "vr-outeur-a", "vr-outeur-b",
   ];
   invoer_ids.forEach((id) => {
     const el = document.getElementById(id);
