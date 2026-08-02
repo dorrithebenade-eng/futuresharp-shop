@@ -1,7 +1,8 @@
 # Future Shop
 
 Tweetalige (Afrikaans/Engels) e-boekwinkel-platform vir **Future Sharp**
-(`futuresharp-shop.netlify.app`). Verkoop e-boeke en harde kopieë, met
+(`futureshop.futuresharp.co.za`, ook bereikbaar op `futuresharp-shop.netlify.app`).
+Verkoop e-boeke, harde kopieë en tydelike leen-toegang, met
 outeurs/vennote/dienverskaffers wat via omset-verdeling vergoed word.
 
 > **Let wel oor hierdie README:** die projek is oor baie sessies in stappe
@@ -52,6 +53,17 @@ in ons kode nie, maar iets wat elders ook gerapporteer is:
    nie. **Omweg** (`_rol-kontrole.js`): elke beskermde Function verifieer
    die JWT self, direk teen `/.netlify/identity/user`.
 
+`_rol-kontrole.js` het in Aug 2026 twee dinge bygekry: 'n **kort kas
+(60s)** en **in-vlug-samevoeging**, sodat die paneelbord se ~10 gelyktydige
+Functions saam één Identity-aanroep doen i.p.v. tien. Dit onderskei ook nou
+tussen "token is ongeldig" (401/403 — moenie herprobeer nie) en "Identity
+kon nou nie antwoord nie" (429/5xx — herprobeer een keer). Voorheen was
+albei stilweg `null`, wat 'n koersbeperking presies soos 'n ongeldige token
+laat lyk het.
+
+*Kas-afweging:* 'n rol wat verwyder word, kan tot 60 sekondes lank nog
+toegang gee. Bewus gekies — kort genoeg om onbelangrik te wees.
+
 Albei omwegte is intussen **in produksie bewys** en behoort onafhanklik
 van Netlify se eie herstel te bly werk. **Bygewerkte risiko-status (Jul
 2026):** Netlify het in Feb 2025 aangekondig hulle gaan Identity afskaf,
@@ -66,6 +78,43 @@ stoorformaat wat 'n regte migrasie sou verg na iets soos Cloudflare
 KV/R2 of 'n databasis. 'n Eenvoudige periodieke JSON-uitvoer-rugsteun van
 al die stores sou die goedkoopste versekering wees hierteen (nog nie
 gebou nie — op die huishouding-lysie).
+
+---
+
+## Eie domein — en die slaggat wat dit meegebring het (Aug 2026)
+
+Die winkel leef nou op **`futureshop.futuresharp.co.za`** (CNAME by
+Afrihost → `futuresharp-shop.netlify.app`, Let's Encrypt-sertifikaat deur
+Netlify uitgereik). Netlify merk 'n bygevoegde eie domein outomaties as
+**Primary domain**, en dit het alles gebreek.
+
+**Wat gebeur het:** `process.env.URL` is die *primêre* domein. `_rol-kontrole.js`
+het daarheen teruggebel om die JWT te verifieer. Maar `futuresharp.co.za`
+het 'n **wildcard-rekord** (`*.futuresharp.co.za`) wat na Afrihost se
+bediener wys, en Netlify se Function-omgewing los die naam na die wildcard
+op i.p.v. na die CNAME:
+
+```
+ERR_TLS_CERT_ALTNAME_INVALID
+Host: futureshop.futuresharp.co.za is not in the cert's altnames:
+DNS:bayek.aserv.co.za
+```
+
+Elke beskermde Function het 403 gegee. Die simptoom was **wisselvallig** —
+sommige paneelbord-oortjies het gelaai, ander nie, en elke herlaai het 'n
+ander mengsel gegee (DNS-kas per Function-instansie). Die blaaier los die
+naam korrek op, dus het die winkel vir 'n gebruiker gewerk terwyl elke
+Function gedruip het.
+
+**Die reël hieruit:** 'n Function moet **nooit** oor die publieke internet
+na sy eie werf terugbel via `process.env.URL` nie. `_rol-kontrole.js`
+gebruik nou `https://${process.env.SITE_NAME}.netlify.app`, wat altyd na
+Netlify oplos ongeag wat by die domeinverskaffer gebeur.
+
+**Tweede gevolg:** 'n token wat op een oorsprong uitgereik is, word op 'n
+ander geweier. Almal wat op `netlify.app` aangemeld was, moes een keer weer
+aanmeld. Nie 'n voortdurende probleem nie, maar dit lyk soos 'n stukkende
+winkel wanneer dit gebeur.
 
 ---
 
@@ -156,9 +205,31 @@ status word outomaties `"wag_vir_subrekening"` totdat personeel dit self
 by Paystack opstel en later invoer (via "Wysig"). `kontak_inligting` is 'n
 wit-lys-gesaniteerde objek (nie elke veld geld vir elke rol nie).
 
-**Business-reël:** Future Sharp se hoofrekening moet altyd ≥3% + Hosting%
-behou (dek Paystack-transaksiekoste) — afgedwing in `skep-produk.js`/
-`wysig-produk.js`.
+**Business-reël:** Future Sharp se hoofrekening moet altyd genoeg behou om
+Paystack se transaksiekoste te dek, plus Hosting% — afgedwing in
+`skep-produk.js`/`wysig-produk.js` by stoor-tyd, en as vangnet-klamp in
+`begin-betaling.js`.
+
+Die reël was aanvanklik 'n plat **3%**. Dit is verkeerd, en dit is in Aug
+2026 by 'n R50-leen ontdek toe Paystack die transaksie geweier het met
+*"Merchant share cannot be lower than zero"*. Paystack SA hef **2,9% + R1,
+plus BTW** — dus `3,335% × bedrag + R1,15`. Die vaste deel is die probleem:
+op R500 is 3% ruim, op R50 is 3% net R1,50 teenoor 'n werklike koste van
+R2,82.
+
+Die formule leef nou op één plek — **`_paystack-koste.js`** — en al drie
+bogenoemde Functions gebruik dit. Die minimum is `3,5% + R1,30`, altyd net
+bo die werklike fooi:
+
+| Prys | Werklike fooi | Minimum behou |
+|---|---|---|
+| R50 | R2,82 | R3,06 (6,1%) |
+| R100 | R4,49 | R4,81 (4,8%) |
+| R250 | R9,49 | R10,06 (4,0%) |
+| R500 | R17,83 | R18,81 (3,8%) |
+
+**Gevolg vir prysstelling:** 'n 90%-outeursdeel is by lae pryse wiskundig
+onmoontlik. 'n Boek teen R250+ dra dit gemaklik; 'n boek teen R50 nie.
 
 **Paystack Transaction Splits** word dinamies per bestelling geskep
 ("op die vlug") in `begin-betaling.js` — nooit die kliënt se prys/
@@ -204,6 +275,17 @@ tegnologies-gemaklike gebruikers.
    op
 3. `dankie.html` — vriendelike terugkeerbladsy, NIE gesaghebbend nie, wys
    e-boek vs. harde-kopie-boodskap, ruim mandjie op
+4. `mandjie-opruiming.js` (Aug 2026) — padonafhanklike opruiming. Die
+   mandjie is voorheen NET op `dankie.html` leeggemaak; 'n koper wat die
+   venster toemaak of wegnavigeer voor daardie bladsy laai, sit met 'n
+   item wat hy reeds besit — en kan dit 'n tweede keer betaal. Hierdie
+   lêer (op `mandjie.html`, `my-boeke.html`, `voltooi-betaling.html`)
+   vergelyk die mandjie met wat die koper werklik besit.
+   **Die reëls is doelbewus eng:** 'n e-boek word slegs verwyder as die
+   koper 'n PERMANENTE kopie het — nie by 'n aktiewe leen nie, want die
+   leen-na-koop-opgradering sit juis 'n e-boek in die mandjie terwyl die
+   leen loop. Harde kopieë word nooit verwyder nie ('n tweede eksemplaar
+   as geskenk is wettig).
 
 ⚠️ Onthou: Paystack Live Webhook URL was op 'n stadium leeg (verklaar
 waarom aankope nie in "My Boeke" verskyn het nie) — reeds reggestel,
@@ -317,25 +399,63 @@ geslaag).
 ## Oop items (nie afgehandel nie)
 
 **Nuwe bou-werk:**
-1. **Ooreenkoms/tekenstap** — formele terme+tariewe-tekening (naam +
-   datum + akkoord-blokkie, onveranderlik gestoor) per rol, gekoppel aan
-   die T&C-raamwerk hierbo. Prioriteit — bankbesonderhede word reeds
-   sonder hierdie stap ingesamel.
-2. **Besoekteller** — eenvoudige, privaatheidsvriendelike telling
-   (totaal/vandag/week/maand) vir tuisblad-besoeke, later uitgebrei na
-   per-produk-belangstelling (gekoppel aan 'n moontlike korter-oorsig-
-   plus-"Lees meer"-herontwerp van die katalogus-kaarte)
-3. **Kategorieë + filter** op die katalogus (voorheen bespreek, nog nie gebou nie)
-4. **Skakel terug na futuresharp.co** (LearnWorlds-kursusplatform) — in
-   winkel-nav, moontlik ook "My Boeke"/app
+1. **Ooreenkoms/tekenstap** — formele terme+tariewe-tekening per rol,
+   gekoppel aan die T&C-raamwerk hierbo. **Hoogste prioriteit:** dit is die
+   enigste ontbrekende skakel in die outeurs-ketting, en bankbesonderhede
+   word reeds sonder hierdie stap ingesamel.
+2. **`vennoot`-Identity-rol** — Ignatius en Eugene kry lees-alleen toegang
+   tot **slegs** Dokumente en die Verdeling-rekenaar. Geen produkte,
+   verkope of koperdata nie. `skrap-dokument.js` moet 'n vennoot stééds
+   weier, anders is dit nie meer lees-alleen nie. `_rol-kontrole.js`
+   aanvaar reeds 'n lys rolle (`["personeel", "vennoot"]`) — die
+   voorbereiding is gedoen.
+3. **E-posdiens** — drie dinge wag hierop: outeur-kennisgewing by 'n
+   verkoop, "jou leen verval binnekort", en dokumente wat vanaf
+   `futureshop@futuresharp.co.za` uitgaan i.p.v. uit iemand se eie inpos.
+   Die posbus bestaan by Afrihost; die SPF-rekord (`v=spf1
+   include:spf.aserv.co.za +a +mx -all`) moet aangepas word, nie 'n tweede
+   TXT bygevoeg nie. SMTP via daardie rekening vermy 'n nuwe verskaffer.
+4. **ISBN-veld** op die produkbladsy — Future Shop reik nie ISBN's uit nie,
+   maar wys dit as die outeur een het. Word in die outeursdokumente belowe.
+5. **"My Leeskamer"** — hernoem van die koper se area, met "My Boeke"
+   daarbinne. Naam nog nie finaal nie: dit moet later webinare kan huisves.
+6. **Identity-e-possjabloon** — die herstelpos sê tans *"Reset your password
+   for futuresharp-shop.netlify.app"* van `no-reply@netlify.com` af. Vir 'n
+   koper wat pas op `futureshop.futuresharp.co.za` gekoop het, lyk dit soos
+   phishing. Aanpasbaar in Netlify → Identity → Emails.
+7. **"Sessie verval"-boodskap** op My Boeke gee geen knoppie om weer aan te
+   meld nie — die koper moet self na `/aanmeld.html?terug=/my-boeke.html`.
 
 **Huishouding:**
-5. Kode-opruiming (ongebruikte CSS-reëls, oorbodige funksies)
-6. Data-kennisgewing op die uitnodiging-vorm + tempo-beperking op
-   `voltooi-uitnodiging.js` (POPIA-oorweging — sien "Uitnodigings" bo)
-7. Periodieke Blobs-JSON-rugsteun-uittreksel (kontinuïteitsversekering, nie dringend nie)
+8. Kode-opruiming (ongebruikte CSS-reëls, oorbodige funksies)
+9. Data-kennisgewing op die uitnodiging-vorm + tempo-beperking op
+   `voltooi-uitnodiging.js` (POPIA-oorweging)
+10. Periodieke Blobs-JSON-rugsteun-uittreksel
+11. **Statistiek-teller-anomalie** (1 Aug): Totaal/Vandag/Week/Maand het nie
+    ooreengestem nie. Nog nie ondersoek nie.
+12. Die skakel op `futuresharp.co` na die winkel wys waarskynlik nog na
+    `netlify.app` — kan na die nuwe adres verander.
+13. Die twee PWA's is vanaf `netlify.app` geïnstalleer; hulle werk, maar dis
+    netjieser om hulle vanaf die nuwe adres te herinstalleer.
 
-**Verifikasie/toetse (nie nuwe bou-werk nie):**
-8. Responsiewe ontwerp-deurgang — stelselmatig oor foon/tablet/rekenaar
-9. End-tot-end koop-tot-leser-toets — volle koper-vloei in een sitting,
-   privaat/inkognito-venster
+**Verifikasie/toetse:**
+14. Responsiewe ontwerp-deurgang — foon/tablet/rekenaar
+15. End-tot-end koop-tot-leser-toets in 'n privaat venster
+
+---
+
+## Klein dinge wat in Aug 2026 bygekom het
+
+- **`wagwoord-ogie.js`** — wys/versteek-knoppie op **elke** wagwoordveld.
+  Dit spoor velde self op (met 'n `MutationObserver` vir vorms wat later
+  sigbaar word, soos die registreer-blok), sodat 'n nuwe bladsy dit vanself
+  kry. *Het 'n dooie lêer met dieselfde naam vervang:* die ou weergawe is
+  vir Netlify se Identity-widget geskryf en het net Shadow DOM hanteer — die
+  widget is lankal weg, en geen bladsy het die lêer nog gelaai nie. Die
+  paneelbord se eie twee ogie-knoppies (in `paneelbord.html`, gedryf deur
+  `paneelbord.js`) bly soos hulle is.
+- **Verdeling-rekenaar** — die twee scenario's (A/B) is één geword. Hulle
+  het bestaan om 68% teenoor 70% te vergelyk; Future Sharp werk nou
+  uitsluitlik op 70/30, dus was hulle identies. Die 70% is 'n vaste anker,
+  en 'n BTW-veld het bygekom (die ou berekening het R3,90 op R100 gegee
+  waar Paystack werklik R4,49 hef).
