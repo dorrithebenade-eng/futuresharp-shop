@@ -168,6 +168,14 @@ const WOORDEBOEK = {
     en: "Your loan period for this e-book has expired. Buy it, or borrow it again, to keep reading.",
   },
   beskikbaar_as_etiket: { af: "Beskikbaar as:", en: "Available as:" },
+
+  // Katalogus-sortering (winkel) — sien katalogus-sorteer.js
+  sorteer_etiket: { af: "Sorteer", en: "Sort" },
+  sorteer_nuutste: { af: "Nuutste eerste", en: "Newest first" },
+  sorteer_titel: { af: "Titel A\u2013Z", en: "Title A\u2013Z" },
+  sorteer_outeur: { af: "Outeur A\u2013Z", en: "Author A\u2013Z" },
+  sorteer_prys_op: { af: "Prys \u2014 laagste eerste", en: "Price \u2014 lowest first" },
+  sorteer_prys_af: { af: "Prys \u2014 hoogste eerste", en: "Price \u2014 highest first" },
   leen_verduideliking: {
     af: "Leen die e-boek vir %tydperk% dae.",
     en: "Borrow the e-book for %tydperk% days.",

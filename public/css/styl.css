@@ -3447,3 +3447,58 @@ body.vennoot-modus .paneel-dokument-skrap-knoppie {
   margin: 0 0 16px;
   min-height: 17px;
 }
+
+/* ---------- Katalogus: sorteerkeuse langs die kategorie-skyfies ---------- */
+/* Die omhulsel word deur katalogus-sorteer.js geskep en skuif die
+   bestaande #katalogus-filter daarin. Die skyfies se eie onderste marge
+   word hier na die ry toe verskuif sodat albei kante belyn. */
+
+.katalogus-balk {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin: 0 0 28px;
+}
+
+.katalogus-balk .katalogus-filter {
+  margin: 0;
+}
+
+.katalogus-sorteer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.katalogus-sorteer-etiket {
+  font-family: var(--font-liggaam);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--grys-teks);
+}
+
+.katalogus-sorteer select {
+  font-family: var(--font-liggaam);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--swart);
+  background: var(--wit);
+  border: 1px solid #D8D6D1;
+  border-radius: 999px;
+  padding: 9px 15px;
+  cursor: pointer;
+  outline: none;
+}
+
+.katalogus-sorteer select:focus {
+  border-color: var(--teal);
+}
+
+@media (max-width: 560px) {
+  .katalogus-balk { align-items: flex-start; }
+  .katalogus-sorteer { width: 100%; }
+  .katalogus-sorteer select { flex: 1; }
+}
