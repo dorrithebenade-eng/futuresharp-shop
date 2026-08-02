@@ -116,6 +116,22 @@ function kry_geldige_etiket(etiket) {
   };
 }
 
+// Valideer die opsionele ISBN's. Future Shop reik NIE ISBN's uit nie — dis
+// die outeur se eie nommer, en ons wys dit net. 'n Gedrukte en 'n
+// elektroniese uitgawe het elk sy eie nommer, dus twee velde. Ons stoor
+// die nommer presies soos die outeur dit verskaf het (met of sonder
+// koppeltekens), net met spasies aan die kante afgesny en tot 20 karakters
+// beperk. Geen kontrolesyfer-toets nie — 'n verkeerde nommer moet nie 'n
+// produk keer om te stoor nie. null as albei leeg is, sodat 'n boek sonder
+// ISBN presies lyk soos voorheen.
+function kry_geldige_isbn(isbn) {
+  if (!isbn) return null;
+  const eboek = String(isbn.eboek || "").trim().slice(0, 20);
+  const harde_kopie = String(isbn.harde_kopie || "").trim().slice(0, 20);
+  if (!eboek && !harde_kopie) return null;
+  return { eboek, harde_kopie };
+}
+
 // Valideer 'n opsionele vrystellingsdatum vir voorbestellings — 'n geldige
 // ISO-datumstring, of null (geen voorbestelling nie, produk is dadelik
 // beskikbaar).
@@ -217,6 +233,7 @@ exports.handler = async (event, context) => {
     oorsig: invoer.oorsig || "",
     vol_beskrywing: invoer.vol_beskrywing || "",
     omslag: invoer.omslag || "",
+    isbn: kry_geldige_isbn(invoer.isbn),
     etiket: kry_geldige_etiket(invoer.etiket),
     formate: {
       eboek: {

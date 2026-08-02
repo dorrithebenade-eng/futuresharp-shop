@@ -2986,3 +2986,56 @@ a.my-boek-kaart:focus-visible {
 .vr-vergelyking-waarde--laer {
   color: var(--amber);
 }
+
+/* ---------- Produk-bladsy: ISBN-blok ---------- */
+/* Onopvallend, onderaan die beskrywing — 'n verwysingsnommer, nie 'n
+   verkoopspunt nie. Die blok word glad nie gerender as daar geen ISBN is
+   nie (sien bou_isbn_blok in produk.js). */
+
+.produk-isbn-blok {
+  border-top: 1px solid #E6E4DF;
+  padding-top: 16px;
+  margin-top: 4px;
+  max-width: 55ch;
+}
+
+.produk-isbn-etiket {
+  font-family: var(--font-opskrif);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  color: var(--grys-teks);
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+
+.produk-isbn-ry {
+  display: flex;
+  gap: 10px;
+  font-family: var(--font-liggaam);
+  font-size: 13.5px;
+  color: #444;
+  line-height: 1.7;
+}
+
+.produk-isbn-formaat {
+  color: var(--grys-teks);
+  min-width: 104px;
+}
+
+.produk-isbn-nommer {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.2px;
+}
+
+/* ---------- Paneelbord: ISBN-veldpaar ---------- */
+
+.paneel-isbn-paar {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 20px;
+}
+
+@media (max-width: 640px) {
+  .paneel-isbn-paar { grid-template-columns: 1fr; }
+}

@@ -77,6 +77,17 @@ function kry_geldige_datum(waarde) {
   return waarde;
 }
 
+// Selfde validasie as skep-produk.js — sien dié lêer vir die volledige
+// opmerking. BELANGRIK: hierdie handler gebruik `...wysigings`, dus sou 'n
+// rou isbn-veld andersins ONGEVALIDEER deurgaan.
+function kry_geldige_isbn(isbn) {
+  if (!isbn) return null;
+  const eboek = String(isbn.eboek || "").trim().slice(0, 20);
+  const harde_kopie = String(isbn.harde_kopie || "").trim().slice(0, 20);
+  if (!eboek && !harde_kopie) return null;
+  return { eboek, harde_kopie };
+}
+
 // Selfde reël as skep-produk.js: Future Sharp se hoofrekening moet ALTYD
 // ten minste 3% + Hosting% behou (dek Paystack se transaksiekoste plus
 // die ooreengekome hosting-aandeel).
@@ -191,6 +202,7 @@ exports.handler = async (event, context) => {
     outeur: nuwe_outeur_naam,
     formate: nuwe_formate,
     etiket: "etiket" in wysigings ? kry_geldige_etiket(wysigings.etiket) : bestaande.etiket,
+    isbn: "isbn" in wysigings ? kry_geldige_isbn(wysigings.isbn) : bestaande.isbn || null,
     bygewerk_op: new Date().toISOString(),
     bygewerk_deur: gebruiker.email,
   };

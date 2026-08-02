@@ -88,6 +88,39 @@ function bou_beskikbaar_merkers(eboek, hardeKopie, leen) {
   `;
 }
 
+// Bou die ISBN-blok onderaan die beskrywing. Reëls:
+//  · Geen ISBN → leë string, die hele blok verskyn nie.
+//  · Albei nommers → twee reëls, elk met sy formaat-etiket.
+//  · Net een nommer → die nommer alleen, sonder formaat-etiket ('n enkele
+//    "E-boek: 978-…" sonder 'n tweede reël daarnaas lees onnodig).
+//  · Leen kry NOOIT 'n eie reël nie — dis dieselfde PDF as die e-boek,
+//    dus dieselfde nommer.
+function bou_isbn_blok(produk) {
+  const isbn = produk.isbn;
+  if (!isbn) return "";
+
+  const eboek = (isbn.eboek || "").trim();
+  const harde_kopie = (isbn.harde_kopie || "").trim();
+  if (!eboek && !harde_kopie) return "";
+
+  let reels;
+  if (eboek && harde_kopie) {
+    reels = [
+      `<div class="produk-isbn-ry"><span class="produk-isbn-formaat">${t("isbn_eboek")}</span><span class="produk-isbn-nommer">${eboek}</span></div>`,
+      `<div class="produk-isbn-ry"><span class="produk-isbn-formaat">${t("isbn_hardekopie")}</span><span class="produk-isbn-nommer">${harde_kopie}</span></div>`,
+    ].join("");
+  } else {
+    reels = `<div class="produk-isbn-ry"><span class="produk-isbn-nommer">${eboek || harde_kopie}</span></div>`;
+  }
+
+  return `
+    <div class="produk-isbn-blok">
+      <p class="produk-isbn-etiket">${t("isbn_etiket")}</p>
+      ${reels}
+    </div>
+  `;
+}
+
 function bou_aksie_ry(produk, formaat, formaat_data, etiket, besit, leen_dae_oor) {
   // E-boeke wat die koper reeds besit — geen koop-knoppie nie, net 'n
   // duidelike "Alreeds joune"-merker met 'n skakel na die leser. Harde
@@ -201,6 +234,7 @@ function wys_produk(produk, besit_info) {
       <div class="produk-beskrywing-blok">
         <div class="afdeling-etiket produk-beskrywing-etiket">${t("oor_hierdie_boek")}</div>
         <p class="produk-beskrywing">${produk.vol_beskrywing || produk.oorsig || ""}</p>
+        ${bou_isbn_blok(produk)}
       </div>
     </div>
   `;

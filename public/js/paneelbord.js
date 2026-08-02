@@ -1024,6 +1024,8 @@ function open_vorm_vir_wysig(produk) {
   bou_kategorie_merkblokkies(produk.kategorie_ids || []);
   document.getElementById("vorm-oorsig").value = produk.oorsig || "";
   document.getElementById("vorm-vol-beskrywing").value = produk.vol_beskrywing || "";
+  document.getElementById("vorm-isbn-eboek").value = (produk.isbn && produk.isbn.eboek) || "";
+  document.getElementById("vorm-isbn-hardekopie").value = (produk.isbn && produk.isbn.harde_kopie) || "";
   document.getElementById("vorm-omslag").value = produk.omslag || "";
   wys_omslag_voorskou(produk.omslag || "");
 
@@ -1139,6 +1141,16 @@ function kry_hosting_vanuit_vorm(voorvoegsel) {
   return { tipe, waarde };
 }
 
+// Lees die twee opsionele ISBN-velde. null as albei leeg is — dan verskyn
+// die ISBN-blok glad nie op die produkbladsy nie. Future Shop reik nie
+// ISBN's uit nie; dis die outeur se eie nommer en ons wys dit net.
+function kry_isbn_vanuit_vorm() {
+  const eboek = document.getElementById("vorm-isbn-eboek").value.trim();
+  const harde_kopie = document.getElementById("vorm-isbn-hardekopie").value.trim();
+  if (!eboek && !harde_kopie) return null;
+  return { eboek, harde_kopie };
+}
+
 function kry_etiket_vanuit_vorm() {
   const aan = document.getElementById("vorm-etiket-aan").checked;
   if (!aan) return null;
@@ -1181,6 +1193,7 @@ function bou_produk_liggaam() {
     oorsig: document.getElementById("vorm-oorsig").value.trim(),
     vol_beskrywing: document.getElementById("vorm-vol-beskrywing").value.trim(),
     omslag: document.getElementById("vorm-omslag").value.trim(),
+    isbn: kry_isbn_vanuit_vorm(),
     etiket: kry_etiket_vanuit_vorm(),
     formate: {
       eboek: {

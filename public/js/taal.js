@@ -195,6 +195,9 @@ const WOORDEBOEK = {
   terug_katalogus_skakel: { af: "Terug na katalogus", en: "Back to catalogue" },
   voeg_by_mandjie: { af: "Voeg by mandjie", en: "Add to cart" },
   oor_hierdie_boek: { af: "Oor hierdie boek", en: "About this book" },
+  isbn_etiket: { af: "ISBN", en: "ISBN" },
+  isbn_eboek: { af: "E-boek", en: "E-book" },
+  isbn_hardekopie: { af: "Harde kopie", en: "Hard copy" },
   kies_formaat: { af: "Kies jou formaat", en: "Choose your format" },
   voorbestel_nou: { af: "Voorbestel nou", en: "Pre-order now" },
   voorbestelling_beskikbaar_vanaf: { af: "Voorbestelling — beskikbaar vanaf", en: "Pre-order — available from" },
@@ -335,6 +338,12 @@ const WOORDEBOEK = {
   vorm_vol_beskrywing_etiket: {
     af: "Volledige beskrywing (verskyn op die produk-bladsy)",
     en: "Full description (appears on the product page)",
+  },
+  vorm_isbn_eboek_etiket: { af: "ISBN — e-boek", en: "ISBN — e-book" },
+  vorm_isbn_hardekopie_etiket: { af: "ISBN — harde kopie", en: "ISBN — hard copy" },
+  vorm_isbn_hulp: {
+    af: "Future Shop reik nie ISBN's uit nie. Vul slegs in wat die outeur verskaf het — die nommer verskyn dan op die produkbladsy. 'n Gedrukte en 'n elektroniese uitgawe het elk sy eie nommer.",
+    en: "Future Shop does not issue ISBNs. Enter only what the author has supplied — the number then appears on the product page. A printed and an electronic edition each have their own number.",
   },
   vorm_omslag_etiket: { af: "Omslag — beeld-URL/-pad", en: "Cover — image URL/path" },
   vorm_omslag_hulp: {
