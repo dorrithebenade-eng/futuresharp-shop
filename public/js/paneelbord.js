@@ -651,7 +651,7 @@ async function hanteer_koepon_vorm_indiening(gebeurtenis) {
 
 const ROL_TIPE_KONFIG = {
   outeur: { kas: () => outeurs_kas, idveld: "outeur_id", etiket: "Outeur" },
-  vennoot: { kas: () => (window.paneel_register_kas && window.paneel_register_kas["vennote"]) || [], idveld: "vennoot_id", etiket: "Vennoot" },
+  vennoot: { kas: () => (window.paneel_register_kas && window.paneel_register_kas["vennote"]) || [], idveld: "vennoot_id", etiket: "Vennoot (direkteur)" },
   ontwerp_admin: { kas: () => (window.paneel_register_kas && window.paneel_register_kas["ontwerp-admin"]) || [], idveld: "ontwerp_admin_id", etiket: "Ontwerp/Admin" },
   printing: { kas: () => (window.paneel_register_kas && window.paneel_register_kas["printing"]) || [], idveld: "printing_id", etiket: "Printing" },
   aflewering: { kas: () => (window.paneel_register_kas && window.paneel_register_kas["aflewering"]) || [], idveld: "aflewering_id", etiket: "Aflewering" },

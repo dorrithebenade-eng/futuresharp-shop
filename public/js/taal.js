@@ -58,7 +58,7 @@ const WOORDEBOEK = {
   },
   uitnodiging_rol_etiket: { af: "Rol", en: "Role" },
   rol_outeur: { af: "Outeur", en: "Author" },
-  rol_vennoot: { af: "Vennoot", en: "Partner" },
+  rol_vennoot: { af: "Vennoot (direkteur)", en: "Partner (director)" },
   rol_ontwerp_admin: { af: "Ontwerp/Admin", en: "Design/Admin" },
   rol_printing: { af: "Printing", en: "Printing" },
   rol_aflewering: { af: "Aflewering", en: "Delivery" },

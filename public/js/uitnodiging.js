@@ -4,7 +4,7 @@
 
 const ROL_ETIKETTE = {
   outeur: "Outeur",
-  vennoot: "Vennoot",
+  vennoot: "Vennoot (direkteur)",
   ontwerp_admin: "Ontwerp/Admin",
   printing: "Printing",
   aflewering: "Aflewering",
