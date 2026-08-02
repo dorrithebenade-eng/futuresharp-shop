@@ -382,26 +382,30 @@
         <p class="paneel-hulp-teks" data-i18n="paneel_verdeling_rekenaar_hulp">Die outeur se 70% bepaal die prys. Hierdie rekenaar wys hoe die oorblywende 30% intern verdeel — en wat as direkteursfooie oorbly.</p>
 
         <div class="vr-wrap">
-          <div class="vr-formaat-kieser" id="vr-formaat-kieser">
-            <button type="button" class="vr-formaat-knoppie vr-formaat-aktief" data-formaat="eboek">E-boek</button>
-            <button type="button" class="vr-formaat-knoppie" data-formaat="leen">Leen</button>
-            <button type="button" class="vr-formaat-knoppie" data-formaat="hardekopie">Harde kopie</button>
-          </div>
-
           <div class="vr-anker">
-            <span class="vr-anker-pct">70%</span>
-            <span class="vr-anker-teks">gaan aan die outeur. Hierdie rekenaar wys hoe die oorblywende 30% verdeel.</span>
+            <span class="vr-anker-invoer"><input type="number" id="vr-outeur-pct" value="70" step="1" min="1" max="99"><span>%</span></span>
+            <span class="vr-anker-teks">gaan aan die outeur. Hierdie rekenaar wys hoe die res verdeel.</span>
+            <span class="vr-anker-afwyking" id="vr-anker-afwyking">Afwyking van die standaard 70%</span>
           </div>
 
           <div class="vr-gedeeld-kaart">
-            <div class="vr-gedeeld-titel">Aannames</div>
+            <div class="vr-gedeeld-titel">Die boek — al drie formate</div>
+            <div id="vr-formaat-rye"></div>
+            <div class="vr-balk">
+              <span class="vr-balk-etiket">Begin by</span>
+              <span class="vr-seg" id="vr-seg-modus">
+                <button type="button" data-modus="wins" class="vr-seg-aktief">Wins</button><button type="button" data-modus="prys">Prys</button>
+              </span>
+              <span class="vr-balk-etiket">Rond pryse af</span>
+              <span class="vr-seg" id="vr-seg-rond">
+                <button type="button" data-rond="0" class="vr-seg-aktief">Geen</button><button type="button" data-rond="5">R5</button><button type="button" data-rond="10">R10</button>
+              </span>
+            </div>
+          </div>
+
+          <div class="vr-gedeeld-kaart">
+            <div class="vr-gedeeld-titel">Aannames — geld vir al drie</div>
             <div class="vr-gedeeld-grid">
-              <label class="vr-veld"><span>Outeur se beoogde wins (T)</span>
-                <div class="vr-veld-invoer"><span>R</span><input type="number" id="vr-t" value="100" step="10"></div>
-              </label>
-              <label class="vr-veld"><span>Outeur se eie koste (K)</span>
-                <div class="vr-veld-invoer"><span>R</span><input type="number" id="vr-k" value="0" step="10" disabled></div>
-              </label>
               <label class="vr-veld"><span>Paystack %</span>
                 <div class="vr-veld-invoer"><input type="number" id="vr-paystack-pct" value="2.9" step="0.1"></div>
               </label>
@@ -421,10 +425,29 @@
                 <div class="vr-veld-invoer"><input type="number" id="vr-ontwerp-pct" value="5" step="0.5"></div>
               </label>
             </div>
-            <p class="vr-k-nota" id="vr-k-nota">K is R0 vir E-boek — geen fisiese druk-/afleweringskoste nie.</p>
+          </div>
+
+          <div class="vr-oortjie-balk">
+            <div class="vr-oortjies" id="vr-oortjies">
+              <button type="button" class="vr-oortjie vr-oortjie-aktief" data-aansig="opstel">Opstel<small>wat om in te tik</small></button>
+              <button type="button" class="vr-oortjie" data-aansig="uiteen">Uiteensetting<small>elke rolspeler</small></button>
+            </div>
+            <button type="button" class="vr-wys-knoppie" id="vr-wys-outeur">👁 Wys vir 'n outeur</button>
           </div>
 
           <div class="vr-enkel-kaart" id="vr-uitslag"></div>
+        </div>
+
+        <!-- Volskerm-oorlegsel vir 'n outeur. Bevat GEEN invoervelde en geen
+             interne persentasies nie — sien verdeling-rekenaar.js. -->
+        <div class="vr-oorlegsel" id="vr-oorlegsel" role="dialog" aria-modal="true" aria-label="Outeursaansig">
+          <button type="button" class="vr-oorlegsel-sluit" id="vr-oorlegsel-sluit">✕ Sluit</button>
+          <div class="vr-oorlegsel-bl">
+            <div class="vr-oorlegsel-anker">
+              <b id="vr-oorlegsel-pct">70%</b><span>van elke verkoop gaan aan die outeur.</span>
+            </div>
+            <div id="vr-oorlegsel-inhoud"></div>
+          </div>
         </div>
       </section>
 
