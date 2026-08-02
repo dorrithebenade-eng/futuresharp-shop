@@ -607,6 +607,16 @@
         <div id="paneel-waarskuwings-lys">
           <p class="stelsel-boodskap" data-i18n="paneel_word_gelaai">Word gelaai …</p>
         </div>
+
+        <div class="epos-toets-blok">
+          <h3 class="epos-toets-titel">E-posdiens</h3>
+          <p class="epos-toets-hulp">Stuur een toetspos om te bevestig dat die posbus-opstelling werk. Laat die veld leeg om na Future Shop se eie adres te stuur.</p>
+          <div class="epos-toets-ry">
+            <input type="email" id="epos-toets-aan" class="veld-invoer" placeholder="Stuur na … (opsioneel)" autocomplete="off">
+            <button type="button" id="epos-toets-knoppie" class="kaart-aksie">Stuur toetspos</button>
+          </div>
+          <div id="epos-toets-uitslag"></div>
+        </div>
       </section>
 
       <section class="paneel-afdeling" data-afdeling-inhoud="kategoriee">
@@ -951,6 +961,7 @@
   <script src="js/dokumente.js"></script>
   <script src="js/paneel-vennoot.js"></script>
   <script src="js/paneel-katalogus-soek.js"></script>
+  <script src="js/paneel-epos-toets.js"></script>
   <script src="js/paneel-uitnodigings.js"></script>
   <script src="js/paneel-statistieke.js"></script>
   <script src="js/paneel-waarskuwings.js"></script>

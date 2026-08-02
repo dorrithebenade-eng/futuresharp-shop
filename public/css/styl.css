@@ -3558,3 +3558,60 @@ body.vennoot-modus .paneel-dokument-skrap-knoppie {
 @media (max-width: 560px) {
   .vr-outeur-ry { grid-template-columns: 1fr 90px 34px; gap: 7px; }
 }
+
+/* ---------- Paneelbord: e-posdiens-toets ---------- */
+/* Leef onderaan die Waarskuwings-afdeling. Sien paneel-epos-toets.js. */
+
+.epos-toets-blok {
+  margin-top: 30px;
+  padding-top: 22px;
+  border-top: 1px solid #E6E4E0;
+  max-width: 640px;
+}
+
+.epos-toets-titel {
+  font-family: var(--font-opskrif);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--swart);
+  margin: 0 0 6px;
+}
+
+.epos-toets-hulp {
+  font-size: 12.5px;
+  color: var(--grys-teks);
+  line-height: 1.55;
+  margin: 0 0 14px;
+}
+
+.epos-toets-ry {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.epos-toets-ry .veld-invoer {
+  flex: 1;
+  min-width: 200px;
+  width: auto;
+}
+
+.epos-toets-uitslag {
+  margin-top: 14px;
+  border-radius: 9px;
+  padding: 12px 14px;
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+
+.epos-toets-ja { background: #EAF5F2; border: 1px solid #B9DED5; color: #1F5C50; }
+.epos-toets-nee { background: #FDEDE8; border: 1px solid #F6C3B4; color: #8A2E14; }
+
+.epos-toets-fyn {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 11.5px;
+  opacity: 0.85;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
