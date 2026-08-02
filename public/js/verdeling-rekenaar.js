@@ -36,6 +36,21 @@
 // nie tussen die Aannames nie: 70/30 staan vas vir nuwe outeurs, en die
 // veld is daar vir bestaande boeke wat op ander voorwaardes opgestel is.
 //
+// MEER AS EEN OUTEUR: die outeursdeel word oor 'n lys rye versprei, een
+// per outeur. Die persentasies is van die VERKOOPPRYS, nie van die 70%
+// nie — dis hoe die katalogusvorm dit vra, want elke verdelingsry is 'n
+// persentasie van die volle prys. Twee outeurs op 35% elk deel dus 70%.
+//
+// 'n Onewe deling (70 oor drie) laat 'n oorskiet: dit gaan na die eerste
+// ry, sodat die totaal presies klop. Die kontrole onder die rye sê wanneer
+// dit nie klop nie — 'n halwe persent wat kortkom, gaan stil na Future
+// Sharp toe en kan 'n jaar lank onopgemerk bly.
+//
+// DIE OUTEURSAANSIG VERANDER NIE by meer as een outeur nie. Mense wat saam
+// 'n boek geskryf het, weet reeds dat hulle die 70% deel; hoe hulle dit
+// onderling verdeel, is hulle ooreenkoms en nie 'n rekenaarding nie. Net
+// die bewoording word meervoud.
+//
 // PAYSTACK SE FOOI dra BTW: (2,9% + R1) x 1,15. Sonder die BTW-lyn is die
 // direkteursfooie omtrent 60c per R100 te optimisties.
 //
@@ -85,6 +100,93 @@ function vr_afrond(prys) {
   return vr_rond > 0 ? Math.ceil(prys / vr_rond) * vr_rond : prys;
 }
 
+// ---------- Outeurs ----------
+
+let vr_outeurs = [{ naam: "", pct: VR_STANDAARD_OUTEUR_PCT }];
+
+const vr_outeur_som = () =>
+  vr_outeurs.reduce((som, o) => som + (Number(o.pct) || 0), 0);
+
+const vr_outeur_etiket = (outeur, indeks) =>
+  String(outeur.naam || "").trim() || `Outeur ${indeks + 1}`;
+
+// Versprei die outeursdeel eweredig. Werk in honderdstes sodat 70 oor drie
+// nie 23,333… gee nie; die oorskiet gaan na die eerste ry.
+function vr_versprei_outeurs() {
+  const aantal = vr_outeurs.length;
+  const totaal = Math.round(vr_outeur_pct() * 100);
+  const elk = Math.floor(totaal / aantal);
+  const oorskiet = totaal - elk * aantal;
+  vr_outeurs.forEach((o, i) => {
+    o.pct = (elk + (i === 0 ? oorskiet : 0)) / 100;
+  });
+}
+
+function vr_bou_outeur_rye() {
+  const wrap = document.getElementById("vr-outeur-rye");
+  if (!wrap) return;
+
+  wrap.innerHTML = vr_outeurs
+    .map(
+      (o, i) => `
+    <div class="vr-outeur-ry">
+      <label class="vr-veld"><span>Outeur ${i + 1}</span>
+        <div class="vr-veld-invoer"><input type="text" data-vr-i="${i}" data-vr-veld="naam" value="${String(o.naam || "").replace(/"/g, "&quot;")}" placeholder="Naam (opsioneel)"></div>
+      </label>
+      <label class="vr-veld"><span>Sy deel</span>
+        <div class="vr-veld-invoer"><input type="number" data-vr-i="${i}" data-vr-veld="pct" value="${o.pct}" step="0.5"><span>%</span></div>
+      </label>
+      <button type="button" class="vr-outeur-uit" data-vr-uit="${i}" ${vr_outeurs.length === 1 ? "disabled" : ""} aria-label="Verwyder outeur">✕</button>
+    </div>`
+    )
+    .join("");
+
+  wrap.querySelectorAll("input").forEach((el) => {
+    el.addEventListener("input", () => {
+      const i = Number(el.dataset.vrI);
+      const veld = el.dataset.vrVeld;
+      vr_outeurs[i][veld] = veld === "pct" ? Number(el.value) || 0 : el.value;
+      vr_wys_outeur_som();
+      vr_herbereken_alles();
+    });
+  });
+
+  wrap.querySelectorAll("[data-vr-uit]").forEach((knoppie) => {
+    knoppie.addEventListener("click", () => {
+      vr_outeurs.splice(Number(knoppie.dataset.vrUit), 1);
+      vr_versprei_outeurs();
+      vr_bou_outeur_rye();
+      vr_herbereken_alles();
+    });
+  });
+
+  vr_wys_outeur_som();
+}
+
+function vr_wys_outeur_som() {
+  const blok = document.getElementById("vr-outeur-som");
+  if (!blok) return;
+
+  const som = vr_outeur_som();
+  const doel = vr_outeur_pct();
+  const verskil = Number((doel - som).toFixed(2));
+  const klop = Math.abs(verskil) < 0.005;
+
+  blok.innerHTML = `
+    <div class="vr-kontrole ${klop ? "vr-kontrole--ja" : "vr-kontrole--nee"}">
+      <span>${klop ? "✓" : "⚠"}</span>
+      <span>${
+        klop
+          ? `Die ${vr_outeurs.length} ${vr_outeurs.length === 1 ? "ry" : "rye"} tel saam <b>${som.toFixed(2)}%</b> — presies die outeursdeel.`
+          : `Die rye tel <b>${som.toFixed(2)}%</b>, maar die outeursdeel is <b>${doel}%</b>. ${
+              verskil > 0
+                ? `<b>${verskil.toFixed(2)}%</b> kort`
+                : `<b>${Math.abs(verskil).toFixed(2)}%</b> te veel`
+            } — dit gaan andersins stil na Future Sharp toe.`
+      }</span>
+    </div>`;
+}
+
 // ---------- Berekening ----------
 
 function vr_bereken(formaat) {
@@ -125,7 +227,8 @@ function vr_aansig_opstel(uitslae) {
   const admin = vr_getal("vr-admin-pct");
   const ontwerp = vr_getal("vr-ontwerp-pct");
   const ontwerpAdmin = admin + ontwerp;
-  const saam = outeurPct + ontwerpAdmin + hosting;
+  const saam = vr_outeur_som() + ontwerpAdmin + hosting;
+  const somKlop = Math.abs(outeurPct - vr_outeur_som()) < 0.005;
 
   const kop = uitslae.map((u) => `<th>${u.formaat.naam}</th>`).join("");
   const prysRy = uitslae
@@ -143,12 +246,13 @@ function vr_aansig_opstel(uitslae) {
       <tbody>
         <tr class="vr-r-prys"><td>Prys (R)</td>${prysRy}</tr>
         <tr class="vr-r-groep"><td colspan="4">Verdelings</td></tr>
-        ${selfdeRy("Outeur", `${outeurPct} %`)}
+        ${vr_outeurs.map((o, i) => selfdeRy(`Outeur — ${vr_outeur_etiket(o, i)}`, `${o.pct} %`)).join("")}
         ${selfdeRy("Ontwerp/Admin", `${ontwerpAdmin} %`, `admin ${admin} % + ontwerp ${ontwerp} %`)}
         <tr class="vr-r-groep"><td colspan="4">Hosting</td></tr>
         ${selfdeRy("Hosting", `${hosting} %`)}
       </tbody>
     </table>
+    ${!somKlop ? `<div class="vr-kontrole vr-kontrole--nee"><span>⚠</span><span>Die outeursrye tel nie op tot ${outeurPct}% nie — maak dit eers reg voordat jy die vorm invul.</span></div>` : ""}
     <div class="vr-kontrole ${slegte.length ? "vr-kontrole--nee" : "vr-kontrole--ja"}">
       <span>${slegte.length ? "⚠" : "✓"}</span>
       <span>${
@@ -182,7 +286,8 @@ function vr_aansig_uiteen(uitslae) {
       <tbody>
         <tr class="vr-r-prys"><td>Verkoopprys</td>${uitslae.map((u) => `<td><span class="vr-getal">${vr_formateer_rand(u.P)}</span></td>`).join("")}</tr>
         <tr class="vr-r-groep"><td colspan="4">Gaan uit</td></tr>
-        ${ry("Outeur ontvang", (u) => u.outeurRand, true, false)}
+        ${ry(vr_outeurs.length > 1 ? "Outeurs saam" : "Outeur ontvang", (u) => u.outeurRand, true, false)}
+        ${vr_outeurs.length > 1 ? vr_outeurs.map((o, i) => ry(`— ${vr_outeur_etiket(o, i)} (${o.pct}%)`, (u) => (o.pct / 100) * u.P, false, false)).join("") : ""}
         ${enigeK ? ry("Sy eie druk-/afleweringskoste", (u) => -u.K, false, false) : ""}
         ${enigeK ? ry("Outeur se wins", (u) => u.outeurWins, false, true) : ""}
         <tr class="vr-r-groep"><td colspan="4">Bly by Future Sharp</td></tr>
@@ -242,7 +347,7 @@ function vr_aansig_outeur(uitslae) {
         <div class="vr-oa-formaat">${u.formaat.naam}</div>
         <div class="vr-oa-prys">Verkoopprys ${vr_formateer_rand(u.P)}</div>
         <div class="vr-oa-kry">${vr_formateer_rand(u.outeurRand)}</div>
-        <div class="vr-oa-kry-etiket">gaan aan die outeur</div>
+        <div class="vr-oa-kry-etiket">gaan aan die ${vr_outeurs.length > 1 ? "outeurs" : "outeur"}</div>
       </div>`
         )
         .join("")}
@@ -255,7 +360,7 @@ function vr_aansig_outeur(uitslae) {
           .join("")}
       </div>
     </div>
-    <p class="vr-oa-nota">Die outeur behou ${vr_outeur_pct()}% van elke verkoop. Die res dek Paystack se transaksiefooi, die platform, en Future Sharp se deel.</p>`;
+    <p class="vr-oa-nota">Die ${vr_outeurs.length > 1 ? "outeurs behou saam" : "outeur behou"} ${vr_outeur_pct()}% van elke verkoop. Die res dek Paystack se transaksiefooi, die platform, en Future Sharp se deel.</p>`;
 }
 
 // ---------- Teken ----------
@@ -341,6 +446,8 @@ function vr_maak_oorlegsel_oop() {
   if (!oorlegsel) return;
   document.getElementById("vr-oorlegsel-inhoud").innerHTML = vr_aansig_outeur(vr_bereken_alles());
   document.getElementById("vr-oorlegsel-pct").textContent = `${vr_outeur_pct()}%`;
+  const ankerTeks = document.getElementById("vr-oorlegsel-anker-teks");
+  if (ankerTeks) ankerTeks.textContent = `van elke verkoop gaan aan die ${vr_outeurs.length > 1 ? "outeurs" : "outeur"}.`;
   oorlegsel.classList.add("vr-oorlegsel-oop");
   document.body.classList.add("vr-oorlegsel-aktief");
 }
@@ -357,6 +464,27 @@ function vr_koppel_gebeurtenisse() {
   if (!wrap) return; // afdeling nie op hierdie bladsy nie
 
   vr_bou_formaat_rye();
+  vr_bou_outeur_rye();
+
+  const voegOuteur = document.getElementById("vr-voeg-outeur");
+  if (voegOuteur) {
+    voegOuteur.addEventListener("click", () => {
+      vr_outeurs.push({ naam: "", pct: 0 });
+      vr_versprei_outeurs();
+      vr_bou_outeur_rye();
+      vr_herbereken_alles();
+    });
+  }
+
+  // Verander die outeursdeel in die ankerbalk, moet die rye saam skuif —
+  // anders klop die som dadelik nie meer nie.
+  const ankerVeld = document.getElementById("vr-outeur-pct");
+  if (ankerVeld) {
+    ankerVeld.addEventListener("input", () => {
+      vr_versprei_outeurs();
+      vr_bou_outeur_rye();
+    });
+  }
 
   const segModus = document.getElementById("vr-seg-modus");
   if (segModus) {

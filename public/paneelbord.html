@@ -384,8 +384,15 @@
         <div class="vr-wrap">
           <div class="vr-anker">
             <span class="vr-anker-invoer"><input type="number" id="vr-outeur-pct" value="70" step="1" min="1" max="99"><span>%</span></span>
-            <span class="vr-anker-teks">gaan aan die outeur. Hierdie rekenaar wys hoe die res verdeel.</span>
+            <span class="vr-anker-teks">gaan aan die outeur(s). Hierdie rekenaar wys hoe die res verdeel.</span>
             <span class="vr-anker-afwyking" id="vr-anker-afwyking">Afwyking van die standaard 70%</span>
+          </div>
+
+          <div class="vr-gedeeld-kaart">
+            <div class="vr-gedeeld-titel">Outeur(s)</div>
+            <div id="vr-outeur-rye"></div>
+            <button type="button" class="vr-voeg-outeur" id="vr-voeg-outeur">+ Voeg outeur by</button>
+            <div id="vr-outeur-som"></div>
           </div>
 
           <div class="vr-gedeeld-kaart">
@@ -444,7 +451,7 @@
           <button type="button" class="vr-oorlegsel-sluit" id="vr-oorlegsel-sluit">✕ Sluit</button>
           <div class="vr-oorlegsel-bl">
             <div class="vr-oorlegsel-anker">
-              <b id="vr-oorlegsel-pct">70%</b><span>van elke verkoop gaan aan die outeur.</span>
+              <b id="vr-oorlegsel-pct">70%</b><span id="vr-oorlegsel-anker-teks">van elke verkoop gaan aan die outeur.</span>
             </div>
             <div id="vr-oorlegsel-inhoud"></div>
           </div>

@@ -3507,3 +3507,54 @@ body.vennoot-modus .paneel-dokument-skrap-knoppie {
   .katalogus-sorteer { width: 100%; margin-left: 0; }
   .katalogus-sorteer select { flex: 1; }
 }
+
+/* ---------- Verdeling-rekenaar: meer as een outeur ---------- */
+/* Een ry per outeur, met 'n naamveld, 'n persentasie en 'n verwyder-knoppie.
+   Die kontrole onder die rye leen die vr-kontrole-styl hierbo. */
+
+.vr-outeur-ry {
+  display: grid;
+  grid-template-columns: 1fr 118px 34px;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #F4F2EF;
+}
+
+.vr-outeur-ry:last-child { border-bottom: none; }
+
+.vr-outeur-uit {
+  border: 1px solid #E4E1DB;
+  background: var(--wit);
+  color: #AEAAA3;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  align-self: end;
+  margin-bottom: 1px;
+}
+
+.vr-outeur-uit:hover { color: var(--koraal); border-color: #F6C3B4; }
+.vr-outeur-uit:disabled { opacity: 0.3; cursor: default; }
+
+.vr-voeg-outeur {
+  border: 1px dashed #D8D5CF;
+  background: transparent;
+  color: #6E6A63;
+  font-family: var(--font-liggaam);
+  font-size: 12.5px;
+  font-weight: 700;
+  padding: 9px 14px;
+  border-radius: 9px;
+  cursor: pointer;
+  margin-top: 12px;
+}
+
+.vr-voeg-outeur:hover { background: #F7F5F2; }
+
+@media (max-width: 560px) {
+  .vr-outeur-ry { grid-template-columns: 1fr 90px 34px; gap: 7px; }
+}
