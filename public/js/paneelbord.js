@@ -70,9 +70,21 @@ async function genereer_verslag_skakel(rol_tipe, entiteit_id, knoppie) {
   }
 }
 
+function kry_rolle(gebruiker) {
+  return (gebruiker && gebruiker.app_metadata && gebruiker.app_metadata.roles) || [];
+}
+
 function het_personeel_rol(gebruiker) {
-  const rolle = (gebruiker && gebruiker.app_metadata && gebruiker.app_metadata.roles) || [];
-  return rolle.includes("personeel");
+  return kry_rolle(gebruiker).includes("personeel");
+}
+
+// 'n Vennoot (direkteur) sonder personeel-rol kom die paneelbord binne,
+// maar sien SLEGS Dokumente en die Verdeling-rekenaar, lees-alleen. Die
+// beperking self leef in paneel-vennoot.js; hier besluit ons net wie
+// deurgelaat word en watter data gelaai word.
+function het_slegs_vennoot_rol(gebruiker) {
+  const rolle = kry_rolle(gebruiker);
+  return rolle.includes("vennoot") && !rolle.includes("personeel");
 }
 
 // --- Aanmeld-status ---
@@ -85,6 +97,19 @@ function verberg_alle_auth_afdelings() {
 }
 
 function wys_aangemeld_toestand(gebruiker) {
+  if (het_slegs_vennoot_rol(gebruiker)) {
+    // Vennoot-modus: geen produkte, outeurs of koepons word gelaai nie —
+    // daardie Functions sou in elk geval 403 gee. Net die raamwerk wys;
+    // dokumente.js laai self wanneer sy afdeling sigbaar word.
+    verberg_alle_auth_afdelings();
+    document.getElementById("paneel-afmeld-knoppie").style.display = "inline-flex";
+    document.getElementById("paneel-gebruiker-epos").textContent = gebruiker.email;
+    document.getElementById("paneel-inhoud").style.display = "block";
+    document.getElementById("paneel-hoof").style.visibility = "visible";
+    if (typeof paneel_vennoot_beperk === "function") paneel_vennoot_beperk();
+    return;
+  }
+
   if (!het_personeel_rol(gebruiker)) {
     // Nie personeel nie — moet NOOIT enigiets van die paneelbord se
     // binnekant sien nie, nie eens 'n foutboodskap wat na "personeel-rol"

@@ -3367,3 +3367,15 @@ body.vr-oorlegsel-aktief { overflow: hidden; }
   .vr-oa-blokke, .vr-oa-leer-rye { grid-template-columns: 1fr; }
   .vr-strook-grid { gap: 4px; }
 }
+
+/* ---------- Vennoot-modus (lees-alleen paneelbord) ---------- */
+/* 'n Vennoot (direkteur) sien slegs Dokumente en die Verdeling-rekenaar.
+   Hierdie reëls verberg die aksies wat hy nie mag doen nie. Dit is NIE
+   die sekuriteit nie — laai-dokument-op.js en skrap-dokument.js bly
+   personeel-alleen en weier hom bediener-kant. Sien paneel-vennoot.js. */
+
+body.vennoot-modus #paneel-voeg-dokument-by-knoppie,
+body.vennoot-modus #paneel-dokument-vorm-afdeling,
+body.vennoot-modus .paneel-dokument-skrap-knoppie {
+  display: none !important;
+}
