@@ -373,6 +373,11 @@ body {
   font-size: 15px;
 }
 
+/* Sonder hierdie reël wen die blaaier se verstek-blou. Raak die leë
+   mandjie, 'n produk wat nie gevind is nie, en die aanmeldboodskap op
+   die betaalbladsy. */
+.stelsel-boodskap a { color: var(--teal); }
+
 .paneel-kleur-swatches {
   display: flex;
   gap: 10px;
