@@ -517,6 +517,10 @@ const WOORDEBOEK = {
   meld_aan_vir_my_boeke: { af: "Meld eers aan om jou boeke te sien.", en: "Log in to see your books." },
   laai_tans: { af: "Laai …", en: "Loading …" },
   sessie_verval: { af: "Sessie verval — meld weer aan.", en: "Session expired — log in again." },
+  // Korter weergawe, vir waar 'n aanmeldknoppie langsaan staan (sien
+  // sessie-verval.js). Die ou sleutel bly vir leser.js, wat nog nie
+  // omgeskakel is nie.
+  sessie_verval_kort: { af: "Sessie verval.", en: "Session expired." },
   geen_boeke_nog: { af: "Nog geen boeke gekoop nie.", en: "No books purchased yet." },
   fout_boeke_laai: { af: "Kon nie boeke laai nie. Probeer weer.", en: "Couldn't load books. Try again." },
   leen_opgradering_knoppie: { af: "Koop nou —", en: "Buy now —" },

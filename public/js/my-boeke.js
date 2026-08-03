@@ -135,9 +135,15 @@ async function laai_my_boeke() {
     });
 
     if (resp.status === 401) {
-      wys_status(
-        window.t ? window.t("sessie_verval") : "Jou sessie het verval — meld gerus weer aan."
-      );
+      // sessie-verval.js skryf die boodskap én 'n aanmeldknoppie in die
+      // status-houer. Val terug op gewone teks indien die lêer nie gelaai
+      // is nie.
+      const status_el = document.getElementById("my-boeke-status");
+      if (window.wys_sessie_verval) {
+        window.wys_sessie_verval(status_el, "/my-boeke.html");
+      } else {
+        wys_status(window.t ? window.t("sessie_verval_kort") : "Sessie verval.");
+      }
       return;
     }
 
