@@ -286,7 +286,15 @@ async function laai_leser() {
     );
 
     if (token_resp.status === 401) {
-      wys_status(window.t ? window.t("sessie_verval") : "Jou sessie het verval — meld gerus weer aan.");
+      // Sien sessie-verval.js. Geen terug-pad word gegee nie, sodat die
+      // helper die huidige adres MET sy ?boek=-parameter gebruik — die
+      // koper moet ná aanmelding by dieselfde boek terugkom.
+      const status_el = document.getElementById("leser-status");
+      if (window.wys_sessie_verval) {
+        window.wys_sessie_verval(status_el);
+      } else {
+        wys_status(window.t ? window.t("sessie_verval_kort") : "Sessie verval.");
+      }
       return;
     }
     if (!token_resp.ok) {
