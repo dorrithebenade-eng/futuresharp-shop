@@ -129,7 +129,11 @@ function bou_html(opskrif, reels, knoppie) {
 // Plat-teks weergawe. Party kliënte wys dit, en dit hou die pos uit
 // gemorspos uit — 'n boodskap met net HTML lyk verdag.
 function bou_teks(opskrif, reels, knoppie) {
-  const skoon = reels.map((r) => r.replace(/<[^>]+>/g, ""));
+  // <br> eers 'n reëlbreuk maak voordat die res van die merkers wegval —
+  // andersins loop 'n adres of 'n bedrae-blok in één string saam.
+  const skoon = reels.map((r) =>
+    r.replace(/<br\s*\/?>/gi, "\n").replace(/<[^>]+>/g, "")
+  );
   const skakel = knoppie && knoppie.url ? `\n\n${knoppie.teks || "Gaan na Future Shop"}: ${knoppie.url}` : "";
   return `${opskrif}\n\n${skoon.join("\n\n")}${skakel}\n\n—\nFuture Shop · futureshop.futuresharp.co.za`;
 }
@@ -174,4 +178,4 @@ async function stuur_epos({ aan, onderwerp, opskrif, reels, knoppie }) {
   }
 }
 
-module.exports = { stuur_epos };
+module.exports = { stuur_epos, ontsnap };

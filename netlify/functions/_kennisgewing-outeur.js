@@ -6,19 +6,19 @@
 // meer as een outeur hê. Daarom word eers per outeur gegroepeer en dan
 // een pos gestuur — twee poste vir dieselfde bestelling lees soos 'n fout.
 //
-// HARDE KOPIEË WORD (NOG) NIE HANTEER NIE. Daardie pos moet die koper se
-// afleweringsbesonderhede dra. Die betaalvorm vra nou wel 'n
-// ontvangernaam — aflewering.ontvanger, saam met straat, stad, provinsie
-// en poskode — so die blokkasie is weg. Wat nog gedoen moet word:
-// "harde_kopie" by FORMATE_WAT_POS_KRY, die adres in die sjabloon, en 'n
-// vangnet vir bestellings van vóór 3 Aug 2026, wat geen ontvanger het nie.
+// HARDE KOPIEË kry ook 'n pos, met die afleweradres daarby. Die outeur
+// druk en pos self, dus is daardie adres die punt van die hele boodskap.
+// Die adres kom uit die koper se eie getikte teks en word ontsnap —
+// alles anders in 'n pos kom uit die katalogus of die outeursrekord.
+// Bestellings van vóór 3 Aug 2026 het geen aflewering.ontvanger nie; dan
+// sê die pos dit eerder as om 'n naamlose adres te gee.
 //
 // Hierdie module gooi nooit 'n fout op sodat 'n betaling breek nie: die
 // aanroeper hou dit in 'n try/catch, en stuur_epos() gee self { ok, fout }
 // terug in plaas van te gooi.
 
 const { kry_store } = require("./_blob-store");
-const { stuur_epos } = require("./_stuur-epos");
+const { stuur_epos, ontsnap } = require("./_stuur-epos");
 
 // Die eie domein, nie process.env.URL nie — 'n wildcard-DNS-rekord op
 // futuresharp.co.za laat interne terugroepe by die verkeerde bediener
@@ -26,7 +26,7 @@ const { stuur_epos } = require("./_stuur-epos");
 // die regte een.
 const WERF_URL = "https://futureshop.futuresharp.co.za";
 
-const FORMATE_WAT_POS_KRY = ["eboek", "leen"];
+const FORMATE_WAT_POS_KRY = ["eboek", "leen", "harde_kopie"];
 
 function rand(sent) {
   return "R" + (Number(sent || 0) / 100).toFixed(2).replace(".", ",");
@@ -100,7 +100,41 @@ function beskryf_item(reël_item) {
     const dae = tydperk_dae > 0 ? tydperk_dae : 30;
     return `<b>${titel}</b> is vir ${dae} dae uitgeleen.`;
   }
+  if (formaat === "harde_kopie") {
+    return `<b>${titel}</b> is as harde kopie verkoop.`;
+  }
   return `<b>${titel}</b> is as e-boek verkoop.`;
+}
+
+// Die adres, as één paragraaf met reëlbreuke. Alles hierin kom uit die
+// koper se eie invoer, dus word elke stuk ontsnap.
+function aflewering_blok(bestelling) {
+  const aflewering = bestelling.aflewering;
+  if (!aflewering) {
+    return "Geen afleweradres is by hierdie bestelling gestoor nie. Kontak Future Shop voordat jy die boek pos.";
+  }
+
+  const reels = [];
+  if (aflewering.ontvanger) reels.push(`<b>${ontsnap(aflewering.ontvanger)}</b>`);
+  if (aflewering.straat) reels.push(ontsnap(aflewering.straat));
+  if (aflewering.stad) reels.push(ontsnap(aflewering.stad));
+
+  const onderste = [aflewering.provinsie, aflewering.poskode]
+    .filter(Boolean)
+    .map(ontsnap)
+    .join(", ");
+  if (onderste) reels.push(onderste);
+
+  const selfoon = bestelling.koper && bestelling.koper.selfoonnommer;
+  if (selfoon) reels.push(`Selfoon ${ontsnap(selfoon)}`);
+
+  // Ou bestellings het geen ontvanger nie. 'n Naamlose adres laat die
+  // outeur raai; dit is beter om te sê waar die gaping is.
+  if (!aflewering.ontvanger) {
+    reels.push("Geen ontvangernaam is by hierdie bestelling gestoor nie — kontak Future Shop.");
+  }
+
+  return `Stuur na<br>${reels.join("<br>")}`;
 }
 
 function bedrae_blok(reël_item) {
@@ -121,21 +155,33 @@ function bedrae_blok(reël_item) {
   ].join("<br>");
 }
 
-function bou_pos(outeur, reël_items) {
+function bou_pos(outeur, reël_items, bestelling) {
   const enkel = reël_items.length === 1;
   const enige_aandeel = reël_items.some((i) => i.aandeel_sent > 0);
+  const enige_harde_kopie = reël_items.some((i) => i.formaat === "harde_kopie");
 
   let onderwerp;
   let opskrif;
 
   if (enkel) {
-    const is_leen = reël_items[0].formaat === "leen";
-    onderwerp = is_leen
-      ? `Uitgeleen op Future Shop — ${reël_items[0].titel}`
-      : `Verkoop op Future Shop — ${reël_items[0].titel}`;
-    opskrif = is_leen ? "Jou boek is uitgeleen" : "Jou boek is verkoop";
+    const formaat = reël_items[0].formaat;
+    const titel = reël_items[0].titel;
+    if (formaat === "leen") {
+      onderwerp = `Uitgeleen op Future Shop — ${titel}`;
+      opskrif = "Jou boek is uitgeleen";
+    } else if (formaat === "harde_kopie") {
+      // Die onderwerp sê "harde kopie" sodat die outeur in sy inkassie
+      // kan sien watter poste werk verg en watter net inligting is.
+      onderwerp = `Harde kopie verkoop op Future Shop — ${titel}`;
+      opskrif = "Jou boek is verkoop";
+    } else {
+      onderwerp = `Verkoop op Future Shop — ${titel}`;
+      opskrif = "Jou boek is verkoop";
+    }
   } else {
-    onderwerp = "Verkope op Future Shop";
+    onderwerp = enige_harde_kopie
+      ? "Verkope op Future Shop — een is 'n harde kopie"
+      : "Verkope op Future Shop";
     opskrif = "Jou boeke op Future Shop";
   }
 
@@ -144,6 +190,13 @@ function bou_pos(outeur, reël_items) {
   for (const reël_item of reël_items) {
     reels.push(beskryf_item(reël_item));
     reels.push(bedrae_blok(reël_item));
+  }
+
+  if (enige_harde_kopie) {
+    reels.push(aflewering_blok(bestelling));
+    if (bestelling.bestelnommer) {
+      reels.push(`Bestelnommer <b>${ontsnap(bestelling.bestelnommer)}</b>`);
+    }
   }
 
   if (enige_aandeel) {
@@ -219,7 +272,7 @@ async function stuur_outeur_kennisgewings(bestelling, opsies = {}) {
       continue;
     }
 
-    const { onderwerp, opskrif, reels } = bou_pos(outeur, reël_items);
+    const { onderwerp, opskrif, reels } = bou_pos(outeur, reël_items, bestelling);
     const verslag_url = await kry_verslag_url(outeur_id);
     const aan = oorheers_aan || outeur_epos;
 
