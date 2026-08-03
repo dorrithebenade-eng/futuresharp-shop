@@ -9,6 +9,7 @@
 
 const crypto = require("crypto");
 const { kry_store } = require("./_blob-store");
+const { stuur_outeur_kennisgewings } = require("./_kennisgewing-outeur");
 
 // Dieselfde patroon as skep-koepon.js — leesbaar-genoeg om oor die
 // telefoon deur te gee, sonder dubbelsinnige karakters (0/O, 1/I/L).
@@ -215,6 +216,19 @@ exports.handler = async (event) => {
     }
   } catch (fout) {
     console.error(`Webhook: kon nie per-produk aankope-tellers bywerk vir ${bestelnommer} nie:`, fout);
+  }
+
+  // Laat elke outeur weet van sy eie boeke in hierdie bestelling. Laaste
+  // stap, en in 'n try/catch soos die twee hierbo: die betaling is reeds
+  // bevestig en gestoor, en 'n pos wat nie deurkom nie mag dit nooit
+  // ongedaan maak nie.
+  //
+  // Slegs e-boeke en lene. Die harde-kopie-pos wag op 'n ontvangernaam in
+  // die betaalvorm — sien _kennisgewing-outeur.js.
+  try {
+    await stuur_outeur_kennisgewings(bygewerkte_bestelling);
+  } catch (fout) {
+    console.error(`Webhook: kon nie outeur-kennisgewings stuur nie vir ${bestelnommer}:`, fout);
   }
 
   // E-boek-ontsluiting (Fase 4) sal hierdie status = "Nuut" +
