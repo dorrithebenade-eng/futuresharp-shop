@@ -516,7 +516,10 @@ const WOORDEBOEK = {
   nog_nie_beskikbaar: { af: "Nog nie beskikbaar nie", en: "Not yet available" },
   meld_aan_vir_my_boeke: { af: "Meld eers aan om jou boeke te sien.", en: "Log in to see your books." },
   laai_tans: { af: "Laai …", en: "Loading …" },
-  // Word saam met 'n aanmeldknoppie gewys — sien sessie-verval.js.
+  sessie_verval: { af: "Sessie verval — meld weer aan.", en: "Session expired — log in again." },
+  // Korter weergawe, vir waar 'n aanmeldknoppie langsaan staan (sien
+  // sessie-verval.js). Die ou sleutel bly vir leser.js, wat nog nie
+  // omgeskakel is nie.
   sessie_verval_kort: { af: "Sessie verval.", en: "Session expired." },
   geen_boeke_nog: { af: "Nog geen boeke gekoop nie.", en: "No books purchased yet." },
   fout_boeke_laai: { af: "Kon nie boeke laai nie. Probeer weer.", en: "Couldn't load books. Try again." },
@@ -556,13 +559,13 @@ const WOORDEBOEK = {
   stuur_herstel_knoppie: { af: "Stuur herstel-skakel", en: "Send reset link" },
   terug_na_aanmeld: { af: "Terug na aanmeld", en: "Back to login" },
   meld_tans_aan: { af: "Meld aan …", en: "Logging in …" },
-  aanmeld_fout: { af: "Verkeerde epos of wagwoord.", en: "Incorrect email or password." },
+  aanmeld_fout: { af: "Verkeerde e-pos of wagwoord.", en: "Incorrect email or password." },
   registreer_tans: { af: "Skep rekening …", en: "Creating account …" },
-  registreer_sukses_bevestig_epos: { af: "Rekening geskep. Bevestig dit via die skakel in jou epos.", en: "Account created. Confirm it via the link in your email." },
+  registreer_sukses_bevestig_epos: { af: "Rekening geskep. Bevestig dit via die skakel in jou e-pos.", en: "Account created. Confirm it via the link in your email." },
   registreer_fout: { af: "Kon nie registreer nie. Probeer weer.", en: "Couldn't register. Try again." },
   stuur_tans_herstel: { af: "Stuur …", en: "Sending …" },
-  herstel_epos_gestuur: { af: "Herstel-skakel gestuur — kyk jou epos.", en: "Reset link sent — check your email." },
-  herstel_fout: { af: "Kon nie die epos stuur nie. Probeer weer.", en: "Couldn't send the email. Try again." },
+  herstel_epos_gestuur: { af: "Herstel-skakel gestuur — kyk jou e-pos.", en: "Reset link sent — check your email." },
+  herstel_fout: { af: "Kon nie die e-pos stuur nie. Probeer weer.", en: "Couldn't send the email. Try again." },
 
   // Bevestig (e-pos-skakel-verwerking)
   bevestig_titel: { af: "Stel jou wagwoord", en: "Set your password" },

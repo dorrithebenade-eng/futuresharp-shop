@@ -1622,6 +1622,38 @@ body {
 .vb-foute p { margin: 0 0 4px; }
 .vb-foute p:last-child { margin-bottom: 0; }
 
+/* ---------- Boodskapboks: aanmeld en bevestig ----------
+   Een boks wat drie dinge moet kan sê. Voorheen het hy permanent
+   .vb-foute gedra, sodat 'n suksesboodskap in 'n rooi foutboks beland
+   het — en 'n leë boks 'n rooi strook op 'n skoon bladsy gelaat het.
+   aanmeld.js en bevestig.js skakel reeds .boodskap-sukses en
+   .boodskap-fout; net die CSS het ontbreek. */
+
+.aanmeld-boodskap {
+  background: var(--grys-lig);
+  border: 1px solid #E3E1DC;
+  color: var(--grys-teks);
+  padding: 12px 16px;
+  font-family: var(--font-liggaam);
+  font-size: 13px;
+  margin-top: 20px;
+}
+
+/* Geen teks, geen boks. Bespaar 'n JS-verandering op albei bladsye. */
+.aanmeld-boodskap:empty { display: none; }
+
+.aanmeld-boodskap.boodskap-sukses {
+  background: #EAF5F2;
+  border-color: var(--teal);
+  color: #2F6F64;
+}
+
+.aanmeld-boodskap.boodskap-fout {
+  background: #FDEDEA;
+  border-color: var(--koraal);
+  color: #A8331B;
+}
+
 .vb-betaal-knoppie { margin-top: 8px; }
 
 .vb-bevestiging {
