@@ -696,8 +696,10 @@ geslaag).
 
 9. **`.terug-skakel` op 'n `<button>`** wys die blaaier se verstek-
    knoppiechroom, want die klas stel nie `background`/`border` nie. Sigbaar
-   op aanmeld ("Terug na aanmeld", "Registreer hier"). Dieselfde klas word
-   op agt plekke op die paneelbord gebruik ("Genereer", "Kopieer",
+   op aanmeld ("Terug na aanmeld", "Registreer hier") en op
+   `voltooi-betaling.html` ("Wissel koepon"), waar dit die meeste tel —
+   dit is die laaste skerm voor Paystack. Dieselfde klas word op agt
+   plekke op die paneelbord gebruik ("Genereer", "Kopieer",
    "+ Voeg verdeling by"), dus verander 'n regstelling al agt saam — dit
    verdien 'n voorskou.
 
@@ -705,19 +707,41 @@ geslaag).
     se eie woorde deur sonder om deur `taal.js` te gaan; 'n koper op AF
     sien bv. *"Rate limit exceeded, try again later"*.
 
+11. **Die afleweradres wys nêrens op die paneelbord nie.** Dit word by
+    elke harde-kopie-bestelling gestoor, maar `paneel-bestellings.js`
+    raak nooit aan `bestelling.aflewering` nie. Sedert 3 Aug kry die
+    outeur dit per e-pos, so niks is gebreek nie — maar personeel kan
+    nie self naslaan waarheen 'n bestelling moes gaan nie, en by 'n
+    navraag is dít die eerste ding wat gevra word.
+
+12. **Twee dinge wat verkope kos by die aanmeld-hindernis.**
+    - *Gasbetaling vir bestellings met net harde kopieë.* 'n Rekening
+      bestaan sodat 'n koper sy e-boeke en leen-toegang kan lees. 'n
+      Harde kopie word gepos — daar is niks om aan te meld en te lees
+      nie. Dit is die enigste verandering wat die hindernis heeltemal
+      weghaal, maar dit raak `begin-betaling.js` se identiteitsmodel,
+      wat doelbewus nooit die kliënt se eie voorstel van wie hy is
+      vertrou nie. Nie klein nie.
+    - *Verwagting stel ná registrasie.* 'n Nuwe koper met 'n vol mandjie
+      moet die winkel verlaat, 'n Engelse pos van `no-reply@netlify.com`
+      gaan soek, en terugkom. As die boodskap sê dat die pos in Engels
+      en van Netlify af kom, en dat die mandjie behoue bly, wag hy
+      eerder as om te dink iets het gebreek. Drie reëls werk; sien ook
+      punt 5.
+
 **Huishouding:**
 
-11. Kode-opruiming. Die ou Verdeling-rekenaar se CSS (`vr-formaat-kieser`,
+13. Kode-opruiming. Die ou Verdeling-rekenaar se CSS (`vr-formaat-kieser`,
    `vr-scenario-*`, `vr-prys-blok`, `vr-ry*`, `vr-kolletjie*`) is nie meer
    in gebruik nie.
-12. Data-kennisgewing op die uitnodiging-vorm + tempo-beperking op
+14. Data-kennisgewing op die uitnodiging-vorm + tempo-beperking op
     `voltooi-uitnodiging.js` (POPIA-oorweging)
-13. Periodieke Blobs-JSON-rugsteun-uittreksel
-14. Die twee PWA's is vanaf `netlify.app` geïnstalleer. 'n PWA is aan sy
+15. Periodieke Blobs-JSON-rugsteun-uittreksel
+16. Die twee PWA's is vanaf `netlify.app` geïnstalleer. 'n PWA is aan sy
     oorsprong gebind, dus leef daardie installasies nog op die ou domein
     met hul eie sessies. Hulle moet afgeskaf en herinstalleer word — beter
     voor bekendstelling as daarna.
-15. **`identiteit.js` se mandjie-kommentaar oorskat wat gebeur.** Dit sê
+17. **`identiteit.js` se mandjie-kommentaar oorskat wat gebeur.** Dit sê
     die mandjie word leeg gemaak sodat dit nie na 'n ander persoon op
     dieselfde toestel oorleef nie — maar `identiteit_meld_af()` loop net
     wanneer iemand die knoppie klik. Sonder "Bly aangemeld" leef die
@@ -731,15 +755,51 @@ geslaag).
     weg. Wat reggemaak moet word, is die kommentaar, sodat die volgende
     leser nie 'n beskerming aanneem wat nie daar is nie.
 
-16. **Die repo is publiek.** Geen sleutel is blootgestel nie (alles leef in
-    omgewingsveranderlikes), maar die volledige winkellogika, insluitend
-    die verdeling-argitektuur en die rolkontroles, is leesbaar vir enigeen.
-    Die moeite werd om een keer bewustelik te bevestig.
+18. **Repo-sigbaarheid — en die manuskrip wat in die geskiedenis lê.**
+    Die repo is sedert 3 Aug 2026 **privaat**.
+
+    Die rede: op 3 Aug om 08:59 het commit `d198bd3` per ongeluk
+    `Books/From no hope to new hope/` ingesleep — 'n PDF van 1,37 MB en
+    'n `.doc` van 1,33 MB, die volledige manuskrip van 'n boek wat vir
+    R350 te koop is. Saam daarmee `FSLOGOouteurs.jpg`, `Untitled.png`,
+    die bemarkings-jpg, `Future-Shop-Leesmodel-Opsies.docx` en
+    `voorskou-paneelbord.html`. 'n `git add` sonder padname het hulle
+    gevat — presies waarteen die reël "nooit `git add .`" bestaan.
+
+    Die blootstelling het 'n paar uur geduur, op 'n repo met 0 sterre en
+    0 kykers. Hoogs onwaarskynlik dat iemand dit gekry het.
+
+    **MOENIE die repo weer publiek maak voordat die geskiedenis
+    skoongemaak is nie.** Privaat maak het die deur gesluit, nie die
+    lêer verwyder nie: `d198bd3` bestaan nog, en publiek maak neem die
+    hele geskiedenis saam. Die lêers is nie meer in die lêerlys sigbaar
+    nie, dus is daar niks wat 'n mens hieraan herinner nie — daarom
+    staan dit hier.
+
+    Om skoon te maak: `git filter-repo` (installasie nodig), dan 'n
+    geforseerde stoot. Veilig, want net een mens werk in die repo.
+    Terwyl dit tog gedoen word: die wortel se rommel uithaal en
+    `.gitignore` uitbrei — dit bevat tans net `.netlify`, wat is hoekom
+    niks van die bogenoemde gekeer is nie.
+
+    Wat publiek maak in elk geval kos: die volledige winkellogika,
+    insluitend die verdeling-argitektuur en die rolkontroles, is dan
+    leesbaar vir enigeen. Geen sleutel is blootgestel nie — alles leef in
+    omgewingsveranderlikes. Die afweging is vantevore bewustelik
+    aanvaar; dit is die moeite werd om dit een keer met oop oë te
+    herhaal.
+
+    Terwyl die repo privaat is, kan Claude dit nie self lees nie. Daar
+    is geen GitHub-koppelaar in die gids nie (nagegaan 3 Aug 2026), en 'n
+    toegangstoken in 'n gesprek is dieselfde soort risiko as 'n
+    `sk_live_`-sleutel. Solank dit so bly, moet lêers opgelaai word — en
+    die "kyk eerste, vra daarna"-werkwyse val weg, saam met die
+    beskerming teen aannames wat dit gee.
 
 **Verifikasie/toetse:**
 
-17. Responsiewe ontwerp-deurgang — foon/tablet/rekenaar
-18. End-tot-end koop-tot-leser-toets in 'n privaat venster
+19. Responsiewe ontwerp-deurgang — foon/tablet/rekenaar
+20. End-tot-end koop-tot-leser-toets in 'n privaat venster
 
 ---
 
