@@ -256,9 +256,10 @@ const WOORDEBOEK = {
   },
   aflewering_titel: { af: "Aflewering", en: "Delivery" },
   aflewering_nota: {
-    af: "Jou mandjie bevat 'n harde-kopie-item — verskaf asseblief 'n afleweradres.",
-    en: "Your cart contains a hard-copy item — please provide a delivery address.",
+    af: "Jou mandjie bevat 'n harde-kopie-item — verskaf asseblief die ontvanger se naam en afleweradres.",
+    en: "Your cart contains a hard-copy item — please provide the recipient's name and delivery address.",
   },
+  ontvanger_naam: { af: "Ontvanger se naam en van", en: "Recipient's full name" },
   straatadres: { af: "Straatadres", en: "Street address" },
   stad: { af: "Stad", en: "City" },
   provinsie: { af: "Provinsie", en: "Province" },
@@ -269,6 +270,10 @@ const WOORDEBOEK = {
   verplig: { af: "(verplig)", en: "(required)" },
   epos_verplig: { af: "E-pos is verplig.", en: "Email is required." },
   selfoon_verplig: { af: "Selfoonnommer is verplig.", en: "Cellphone number is required." },
+  ontvanger_verplig: {
+    af: "Die ontvanger se naam is verplig.",
+    en: "The recipient's name is required.",
+  },
   volledige_adres_verplig: {
     af: "Vul asseblief die volledige afleweradres in.",
     en: "Please fill in the complete delivery address.",

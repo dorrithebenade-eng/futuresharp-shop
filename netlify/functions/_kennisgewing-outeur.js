@@ -7,10 +7,11 @@
 // een pos gestuur — twee poste vir dieselfde bestelling lees soos 'n fout.
 //
 // HARDE KOPIEË WORD (NOG) NIE HANTEER NIE. Daardie pos moet die koper se
-// afleweringsbesonderhede dra, en die betaalvorm vra tans nie 'n
-// ontvangernaam nie — net e-pos, selfoon, straat, stad, provinsie en
-// poskode. 'n Outeur kan nie 'n pakkie pos sonder 'n naam nie. Sodra die
-// vorm 'n naamveld het, kom "harde_kopie" by FORMATE_WAT_POS_KRY.
+// afleweringsbesonderhede dra. Die betaalvorm vra nou wel 'n
+// ontvangernaam — aflewering.ontvanger, saam met straat, stad, provinsie
+// en poskode — so die blokkasie is weg. Wat nog gedoen moet word:
+// "harde_kopie" by FORMATE_WAT_POS_KRY, die adres in die sjabloon, en 'n
+// vangnet vir bestellings van vóór 3 Aug 2026, wat geen ontvanger het nie.
 //
 // Hierdie module gooi nooit 'n fout op sodat 'n betaling breek nie: die
 // aanroeper hou dit in 'n try/catch, en stuur_epos() gee self { ok, fout }

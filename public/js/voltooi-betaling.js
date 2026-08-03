@@ -89,6 +89,8 @@ function bou_aflewer_afdeling() {
       <p class="vb-afdeling-nota">${t("aflewering_nota")}</p>
 
       <div id="aflewer-adres-blok" class="aflewer-blok">
+        <label class="veld-etiket" for="adres-ontvanger">${t("ontvanger_naam")}</label>
+        <input type="text" id="adres-ontvanger" class="veld-invoer" autocomplete="name">
         <label class="veld-etiket" for="adres-straat">${t("straatadres")}</label>
         <input type="text" id="adres-straat" class="veld-invoer">
         <label class="veld-etiket" for="adres-stad">${t("stad")}</label>
@@ -132,15 +134,21 @@ function valideer_en_bou_bestelling(items, totaal, bestelnommer, bevat_harde_kop
   let aflewering = null;
 
   if (bevat_harde_kopie) {
+    // Die ontvanger is nie noodwendig die koper nie — 'n boek word as
+    // geskenk gekoop. Daarom leef die naam by die adres, nie by koper.
+    const ontvanger = document.getElementById("adres-ontvanger").value.trim();
     const straat = document.getElementById("adres-straat").value.trim();
     const stad = document.getElementById("adres-stad").value.trim();
     const provinsie = document.getElementById("adres-provinsie").value.trim();
     const poskode = document.getElementById("adres-poskode").value.trim();
 
+    if (!ontvanger) foute.push(t("ontvanger_verplig"));
     if (!straat || !stad || !provinsie || !poskode) {
       foute.push(t("volledige_adres_verplig"));
-    } else {
-      aflewering = { straat, stad, provinsie, poskode };
+    }
+
+    if (ontvanger && straat && stad && provinsie && poskode) {
+      aflewering = { ontvanger, straat, stad, provinsie, poskode };
     }
   }
 
