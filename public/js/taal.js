@@ -546,6 +546,11 @@ const WOORDEBOEK = {
   aanmeld_titel: { af: "Meld aan", en: "Log in" },
   epos_etiket: { af: "E-pos", en: "Email" },
   wagwoord_etiket: { af: "Wagwoord", en: "Password" },
+  // Vir die wys/versteek-ogie op elke wagwoordveld (wagwoord-ogie.js).
+  // Word nie op die skerm gewys nie — dit is die aria-label wat 'n
+  // skermleser voorlees.
+  wagwoord_wys: { af: "Wys wagwoord", en: "Show password" },
+  wagwoord_versteek: { af: "Versteek wagwoord", en: "Hide password" },
   meld_aan_knoppie: { af: "Meld aan", en: "Log in" },
   bly_aangemeld_etiket: { af: "Bly aangemeld op hierdie toestel", en: "Stay signed in on this device" },
   geen_rekening_nog: { af: "Het jy nog geen rekening nie?", en: "Don't have an account yet?" },
