@@ -1,8 +1,9 @@
 // Koper-beskermd — stoor die koper se huidige leesposisie (bladsynommer)
 // vir 'n spesifieke e-boek. Word deur leser.js aangeroep elke keer as
-// die koper 'n bladsy blaai. Bevestig eers werklik dat hulle hierdie
-// boek gekoop het, presies soos kry-eboek-inhoud.js — 'n mens moet nie
-// vordering vir 'n boek kan stoor wat jy nie besit nie.
+// die koper 'n bladsy blaai. Bevestig eers werklik dat hulle toegang tot
+// hierdie boek het, presies soos kry-eboek-inhoud.js — 'n gekoopte
+// e-boek, of 'n leen wat nog nie verval het nie. 'n Mens moet nie
+// vordering kan stoor vir 'n boek waartoe jy geen toegang het nie.
 
 const { kry_store } = require("./_blob-store");
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
@@ -29,6 +30,17 @@ async function besit_boek(gebruiker_id, produk_slug) {
 
     const items = Array.isArray(bestelling.items) ? bestelling.items : [];
     if (items.some((i) => i.produk_slug === produk_slug && i.formaat === "eboek")) {
+      return true;
+    }
+
+    // 'n Aktiewe leen tel ook. Dieselfde toets as kry-leser-token.js en
+    // kry-eboek-inhoud.js: die leen moet bestaan én nog nie verval het
+    // nie. Sonder hierdie tak kry elke lener 'n 403 en verloor hy sy
+    // leesposisie by elke besoek, al kan hy die boek self lees.
+    const leen_item = items.find(
+      (i) => i.produk_slug === produk_slug && i.formaat === "leen"
+    );
+    if (leen_item && leen_item.verval_op && new Date(leen_item.verval_op) > new Date()) {
       return true;
     }
   }
