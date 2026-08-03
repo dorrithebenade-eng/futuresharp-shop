@@ -152,11 +152,19 @@ function bou_pos(outeur, reël_items) {
   return { onderwerp, opskrif, reels };
 }
 
-async function stuur_outeur_kennisgewings(bestelling) {
+// Opsies (albei net vir die toetsroete — die webhook gee niks deur nie):
+//   droog          — bereken alles, stuur niks, gee die beplande poste terug
+//   oorheers_aan   — stuur alles na hierdie adres i.p.v. die outeur s'n
+//
+// Gee 'n lys terug van wat beplan of gestuur is, sodat 'n toets kan sien
+// wat sou gebeur sonder om die logs te lees.
+async function stuur_outeur_kennisgewings(bestelling, opsies = {}) {
+  const { droog = false, oorheers_aan = null } = opsies;
+
   const items = (bestelling.items || []).filter((i) =>
     FORMATE_WAT_POS_KRY.includes(i.formaat)
   );
-  if (!items.length) return;
+  if (!items.length) return [];
 
   const katalogus = kry_store("katalogus");
   const outeurs_store = kry_store("outeurs");
@@ -188,23 +196,48 @@ async function stuur_outeur_kennisgewings(bestelling) {
     }
   }
 
+  const opsomming = [];
+
   for (const [outeur_id, reël_items] of per_outeur) {
     const outeur = await outeurs_store.get(outeur_id, { type: "json" });
     if (!outeur) {
       console.warn(`Kennisgewing oorgeslaan — outeur "${outeur_id}" nie gevind nie`);
+      opsomming.push({ outeur_id, oorgeslaan: "outeur nie gevind nie" });
       continue;
     }
 
-    const aan = outeur.kontak_inligting && outeur.kontak_inligting.epos;
-    if (!aan) {
+    const outeur_epos = outeur.kontak_inligting && outeur.kontak_inligting.epos;
+    if (!outeur_epos) {
       console.warn(`Kennisgewing oorgeslaan — geen e-posadres vir outeur "${outeur_id}"`);
+      opsomming.push({ outeur_id, oorgeslaan: "geen e-posadres nie" });
       continue;
     }
 
-    if (!wil_hoor_van_verkope(outeur)) continue;
+    if (!wil_hoor_van_verkope(outeur)) {
+      opsomming.push({ outeur_id, oorgeslaan: "voorkeur is af" });
+      continue;
+    }
 
     const { onderwerp, opskrif, reels } = bou_pos(outeur, reël_items);
     const verslag_url = await kry_verslag_url(outeur_id);
+    const aan = oorheers_aan || outeur_epos;
+
+    const rekord = {
+      outeur_id,
+      naam: outeur.naam,
+      aan,
+      outeur_epos,
+      onderwerp,
+      opskrif,
+      reels,
+      verslag_skakel: Boolean(verslag_url),
+      items: reël_items.length,
+    };
+
+    if (droog) {
+      opsomming.push({ ...rekord, gestuur: false, droog: true });
+      continue;
+    }
 
     const uitslag = await stuur_epos({
       aan,
@@ -217,7 +250,10 @@ async function stuur_outeur_kennisgewings(bestelling) {
     if (!uitslag.ok) {
       console.error(`Kennisgewing aan outeur "${outeur_id}" het misluk:`, uitslag.fout);
     }
+    opsomming.push({ ...rekord, gestuur: uitslag.ok, fout: uitslag.fout || null });
   }
+
+  return opsomming;
 }
 
 module.exports = { stuur_outeur_kennisgewings };
