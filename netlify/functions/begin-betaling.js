@@ -42,6 +42,7 @@
 const { kry_store } = require("./_blob-store");
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 const { kry_maks_verdeling_sent } = require("./_paystack-koste.js");
+const { stuur_outeur_kennisgewings } = require("./_kennisgewing-outeur");
 
 // Rol_tipe → watter Blobs-store die entiteit se subrekening-kode in is.
 const ROL_TIPE_STORES = {
@@ -378,6 +379,17 @@ exports.handler = async (event, context) => {
       }
     } catch (fout) {
       console.error(`Kon nie per-produk aankope-tellers bywerk nie vir gratis-bestelling ${bestelnommer}:`, fout);
+    }
+
+    // Outeur-kennisgewings. Die webhook doen dit vir 'n betaalde
+    // bestelling; hier moet dit self gebeur, anders hoor 'n outeur niks
+    // van 'n boek wat deur 'n 100%-koepon weggegee is nie. Dieselfde
+    // try/catch as die twee stappe hierbo: die bestelling is klaar
+    // gestoor en 'n pos wat misluk mag dit nie ongedaan maak nie.
+    try {
+      await stuur_outeur_kennisgewings(gratis_bestelling);
+    } catch (fout) {
+      console.error(`Kon nie outeur-kennisgewings stuur nie vir gratis-bestelling ${bestelnommer}:`, fout);
     }
 
     return {

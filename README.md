@@ -633,21 +633,23 @@ geslaag).
    die res nie.
    - *Outeur by 'n e-boek- of leenverkoop.* **Klaar** (3 Aug 2026) — sien
      die afdeling hierbo. Nog nie teen 'n regte verkoop getoets nie.
-   - *Harde-kopie-bestelling.* **Geblokkeer.** Nie 'n voorkeur nie, 'n
-     verpligting: die outeur druk en versend self, en die pos is hoe hy
-     weet 'n bestelling wag. Maar `voltooi-betaling.js` vra e-pos,
-     selfoon, straat, stad, provinsie en poskode — en **nooit 'n
-     ontvangernaam nie**. 'n Outeur kan nie 'n pakkie pos aan 'n adres
-     sonder 'n naam nie. Die betaalvorm moet eers 'n naamveld kry; dan
-     kom `"harde_kopie"` by `FORMATE_WAT_POS_KRY` in
-     `_kennisgewing-outeur.js`.
+   - *Harde-kopie-bestelling.* **Klaar** (3 Aug 2026). Die pos dra die
+     afleweradres onder "Stuur na", met die bestelnommer daaronder, en
+     die onderwerp sê "Harde kopie" sodat 'n outeur in sy inkassie kan
+     sien watter pos werk verg. Die adres kom uit die koper se eie
+     getikte teks en word ontsnap — die eerste keer dat onvertroude
+     invoer in 'n pos beland. Bestellings van vóór 3 Aug het geen
+     `aflewering.ontvanger` nie; dan sê die pos dit eerder as om 'n
+     naamlose adres te gee. Nog nie teen 'n regte verkoop getoets nie.
    - *Leen verval binnekort.* Vereis 'n geskeduleerde Function.
    - *Staat van verkope en besigtigings*, weekliks of maandeliks volgens
      die outeur se voorkeur.
-   - *Gratis bestellings stuur niks.* Die 100%-koepon-kortpad in
-     `begin-betaling.js` merk die bestelling self as betaal en die webhook
-     vuur nooit — dus ook nie die kennisgewing nie. Dieselfde aanroep sou
-     daar moes bykom.
+   - *Gratis bestellings.* **Klaar** (3 Aug 2026). Die 100%-koepon-
+     kortpad in `begin-betaling.js` roep nou self
+     `stuur_outeur_kennisgewings()` aan, in dieselfde try/catch as die
+     koepon-rekord en die tellers daarbo. Raak al drie formate, nie net
+     harde kopieë nie. Die bedrae-blok sê "Gratis — geen inkomste vir
+     hierdie een" in plaas van "Verkoopprys R0,00".
 
 3. **Voorkeurvelde op die outeursrekord** — die kennisgewingkeuses moet
    iewers gestoor word. 'n Aparte veld op die outeursrekord, nie by
@@ -686,9 +688,11 @@ geslaag).
 7. **"My Leeskamer"** — hernoem van die koper se area, met "My Boeke"
    daarbinne. Naam nog nie finaal nie.
 
-8. **Ontvangernaam op die betaalvorm.** Sien punt 2 — dit blokkeer die
-   harde-kopie-kennisgewing, en dit is in elk geval nodig om 'n pakkie te
-   kan pos.
+8. **Ontvangernaam op die betaalvorm.** **Klaar** (3 Aug 2026).
+   `aflewering.ontvanger`, eerste in die aflewer-blok, met 'n eie
+   foutboodskap sodat 'n koper met 'n volledige adres en geen naam weet
+   waarheen om terug te gaan. Dit leef by die adres en nie by `koper`
+   nie — die ontvanger is nie noodwendig die koper nie.
 
 9. **`.terug-skakel` op 'n `<button>`** wys die blaaier se verstek-
    knoppiechroom, want die klas stel nie `background`/`border` nie. Sigbaar
@@ -713,15 +717,29 @@ geslaag).
     oorsprong gebind, dus leef daardie installasies nog op die ou domein
     met hul eie sessies. Hulle moet afgeskaf en herinstalleer word — beter
     voor bekendstelling as daarna.
-15. **Die repo is publiek.** Geen sleutel is blootgestel nie (alles leef in
+15. **`identiteit.js` se mandjie-kommentaar oorskat wat gebeur.** Dit sê
+    die mandjie word leeg gemaak sodat dit nie na 'n ander persoon op
+    dieselfde toestel oorleef nie — maar `identiteit_meld_af()` loop net
+    wanneer iemand die knoppie klik. Sonder "Bly aangemeld" leef die
+    sessie in `sessionStorage` en sterf saam met die laaste oortjie,
+    terwyl die mandjie in `localStorage` bly staan. Die koper is dan
+    uitgeteken met 'n vol mandjie.
+
+    **Die gedrag self moet bly.** 'n Nuwe koper sit sy boek in die
+    mandjie terwyl hy uitgeteken is, registreer, gaan uit na sy e-pos en
+    kom terug — as die mandjie dit nie oorleef nie, is die bestelling
+    weg. Wat reggemaak moet word, is die kommentaar, sodat die volgende
+    leser nie 'n beskerming aanneem wat nie daar is nie.
+
+16. **Die repo is publiek.** Geen sleutel is blootgestel nie (alles leef in
     omgewingsveranderlikes), maar die volledige winkellogika, insluitend
     die verdeling-argitektuur en die rolkontroles, is leesbaar vir enigeen.
     Die moeite werd om een keer bewustelik te bevestig.
 
 **Verifikasie/toetse:**
 
-16. Responsiewe ontwerp-deurgang — foon/tablet/rekenaar
-17. End-tot-end koop-tot-leser-toets in 'n privaat venster
+17. Responsiewe ontwerp-deurgang — foon/tablet/rekenaar
+18. End-tot-end koop-tot-leser-toets in 'n privaat venster
 
 ---
 

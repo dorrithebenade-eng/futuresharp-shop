@@ -223,8 +223,8 @@ exports.handler = async (event) => {
   // bevestig en gestoor, en 'n pos wat nie deurkom nie mag dit nooit
   // ongedaan maak nie.
   //
-  // Slegs e-boeke en lene. Die harde-kopie-pos wag op 'n ontvangernaam in
-  // die betaalvorm — sien _kennisgewing-outeur.js.
+  // E-boeke, lene en harde kopieë. By 'n harde kopie dra die pos die
+  // afleweradres — sien _kennisgewing-outeur.js.
   try {
     await stuur_outeur_kennisgewings(bygewerkte_bestelling);
   } catch (fout) {

@@ -140,6 +140,12 @@ function aflewering_blok(bestelling) {
 function bedrae_blok(reël_item) {
   const prys_etiket = reël_item.formaat === "leen" ? "Leenprys" : "Verkoopprys";
 
+  // 'n 100%-koepon gee 'n item van R0. "Verkoopprys R0,00" lees soos 'n
+  // fout; sê eerder wat gebeur het.
+  if (!reël_item.prys_sent) {
+    return "Gratis — geen inkomste vir hierdie een.";
+  }
+
   // Geen verdeling vir hierdie outeur op hierdie formaat nie: wys net die
   // prys. "Jou deel R0,00" is verkeerd sowel as onrusbarend — dit beteken
   // die verdeling is nog nie opgestel nie, en dit is 'n admin-saak.
