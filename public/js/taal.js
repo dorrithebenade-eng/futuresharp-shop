@@ -520,6 +520,14 @@ const WOORDEBOEK = {
   beskikbaar_vanaf: { af: "Beskikbaar vanaf", en: "Available from" },
   nog_nie_beskikbaar: { af: "Nog nie beskikbaar nie", en: "Not yet available" },
   meld_aan_vir_my_boeke: { af: "Meld eers aan om jou boeke te sien.", en: "Log in to see your books." },
+  // Eie sleutel vir die betaalbladsy — 'n koper wat staan en betaal, soek
+  // nie sy boeke nie, en 'n nuwe koper moet weet dat registrasie hier kan
+  // gebeur.
+  meld_aan_vir_bestelling: {
+    af: "Meld aan om jou bestelling te voltooi — of registreer as jy nog nie 'n rekening het nie.",
+    en: "Log in to complete your order — or register if you don't have an account yet.",
+  },
+  meld_aan_of_registreer: { af: "Meld aan of registreer", en: "Log in or register" },
   laai_tans: { af: "Laai …", en: "Loading …" },
   sessie_verval: { af: "Sessie verval — meld weer aan.", en: "Session expired — log in again." },
   // Korter weergawe, vir waar 'n aanmeldknoppie langsaan staan (sien

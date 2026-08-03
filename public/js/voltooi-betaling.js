@@ -306,8 +306,8 @@ function wys_meld_aan_boodskap() {
   const wrap = document.getElementById("vb-inhoud");
   wrap.innerHTML = `
     <p class="stelsel-boodskap">
-      ${t("meld_aan_vir_my_boeke")}
-      <a href="/aanmeld.html?terug=/voltooi-betaling.html">${t("meld_aan_knoppie")}</a>
+      ${t("meld_aan_vir_bestelling")}
+      <a href="/aanmeld.html?terug=/voltooi-betaling.html">${t("meld_aan_of_registreer")}</a>
     </p>
   `;
 }
