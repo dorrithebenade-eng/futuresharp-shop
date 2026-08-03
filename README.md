@@ -470,18 +470,71 @@ SPF-reël.
 wat nie deurkom nie mag nooit 'n betaling, 'n bestelling of 'n
 stoor-aksie laat misluk nie.
 
-**Die sjabloon is 'n tabel van 600px, sonder beelde.** Outlook ignoreer
-`max-width` en `border-radius` op 'n gewone blok — 'n boodskap wat mooi
-lyk in Gmail strek dan oor die hele venster. Die kop is 'n teal band met
-teks, nie 'n logo nie, sodat dit presies dieselfde lyk vir wie prente
-afgeskakel het. Alle style inlyn; `<style>`-blokke word gestroop.
+**Die sjabloon is 'n tabel van 600px.** Outlook ignoreer `max-width` en
+`border-radius` op 'n gewone blok — 'n boodskap wat mooi lyk in Gmail strek
+dan oor die hele venster en verloor sy rand. Alle style inlyn;
+`<style>`-blokke word gestroop.
+
+**Die kop dra die wordmerk oor die volle breedte** (598px, uit
+`public/images/future-shop-woordmerk.png`), met die teal teksband
+daaronder. Die logo se `alt` is doelbewus **leeg**: poskliënte blokkeer
+prente by verstek — Outlook doen dit vir elke nuwe stuurder — en die band
+sê reeds in teks wie praat. Val die prent weg, lyk die boodskap presies
+soos die ou ontwerp sonder dat iets breek. Bevestig in Outlook op
+3 Aug 2026, met prente aan én af. Die logo word van die werf af gelaai,
+nie aangeheg nie; 'n aanhegsel of base64-beeld word deur meer kliënte
+geweier as 'n gewone URL.
 
 `toets-epos.js` is 'n personeel-beskermde toetsroete — 'n betaling se
 webhook is die verkeerde plek om 'n SMTP-verbinding vir die eerste keer
 te toets. Bevestig werkend op 2 Aug 2026.
 
-Nog nie gekoppel nie: outeur-kennisgewing by 'n verkoop, leen-vervalpos,
-en dokumente wat vanaf die adres uitgaan.
+**Gekoppel:** outeur-kennisgewing by 'n e-boek- of leenverkoop
+(`_kennisgewing-outeur.js`, sien hieronder).
+**Nog nie:** die harde-kopie-pos (geblokkeer — sien oop items),
+leen-vervalpos, en dokumente wat vanaf die adres uitgaan.
+
+---
+
+## Outeur-kennisgewing by 'n verkoop (Aug 2026)
+
+`_kennisgewing-outeur.js` — aangeroep heel laaste in
+`paystack-webhook.js`, ná die tellers, in 'n `try/catch`. Die betaling is
+teen daardie punt reeds bevestig en gestoor; 'n pos wat nie deurkom nie
+mag dit nooit ongedaan maak nie.
+
+**Een pos per outeur, nie per item nie.** 'n Bestelling kan boeke van
+verskeie outeurs bevat, en 'n boek kan meer as een outeur hê. Daar word
+eers per outeur gegroepeer — twee poste vir dieselfde bestelling lees soos
+'n fout.
+
+**Wie hoor van 'n item:** dieselfde twee bronne as `kry-verslag.js` — die
+outeurs op `produk.outeur_ids`, plus enigeen met `rol_tipe: "outeur"` in
+daardie formaat se verdeling. 'n Outeur kan gekrediteer wees sonder 'n
+verdeling, en andersom.
+
+**Drie getalle**, soos vasgestel: prys, sy deel, Future Sharp se deel.
+Die berekening is dieselfde as `begin-betaling.js`, insluitend die vangnet
+vir die ou `{ outeur_id }`-skema. Is daar **geen** verdeling vir daardie
+outeur op daardie formaat nie, wys die pos net die prys en laat die
+uitbetalingsreël weg — "Jou deel R0,00" is verkeerd sowel as
+onrusbarend, en beteken in werklikheid dat die verdeling nog nie opgestel
+is nie.
+
+Die knoppie gaan na die outeur se bestaande selfdiens-staat, opgesoek in
+`verslag-skakels-indeks` onder `outeur:<id>`. Daar word **nooit** hier een
+geskep nie; bestaan daar nie een nie, val die knoppie weg eerder as om 'n
+dooie skakel te stuur.
+
+**Voorkeure bestaan nog nie.** `wil_hoor_van_verkope()` lees
+`outeur.kennisgewings.by_verkoop` en behandel afwesig as "ja", sodat die
+voorkeurlaag later inskuif sonder om iets te herskryf.
+
+`toets-outeur-kennisgewing.js` — personeel-beskermd, laat die
+kennisgewing vir 'n **bestaande** bestelnommer weer loop. Drie vorms:
+`{ bestelnommer, droog: true }` bereken alles en stuur niks;
+`{ bestelnommer, aan: "..." }` stuur werklik maar alles na een adres;
+`{ bestelnommer }` stuur aan die outeurs self. **Nog nie uitgevoer nie.**
 
 ---
 
@@ -576,19 +629,25 @@ geslaag).
    Function wat sy eie boeke en syfers gee, 'n indienvorm, en die
    kennisgewing aan admin.
 
-2. **Kennisgewings koppel aan die e-posdiens** — die diens werk; niks is
-   nog daaraan gekoppel nie.
-   - *Outeur by 'n verkoop.* Haak in aan die einde van
-     `paystack-webhook.js`, ná die tellers. Moet in 'n `try/catch`, soos
-     die koeponstap en die tellers reeds is. Een bestelling kan boeke van
-     verskeie outeurs bevat — elkeen kry pos oor sy eie boeke. 'n Boek kan
-     meer as een outeur hê — albei kry pos.
-   - *Harde-kopie-bestelling.* Nie 'n voorkeur nie, 'n verpligting: die
-     outeur druk en versend self, en die pos is hoe hy weet 'n bestelling
-     wag. Sluit die koper se afleweringsbesonderhede in.
+2. **Kennisgewings koppel aan die e-posdiens** — die verkoop-pos werk;
+   die res nie.
+   - *Outeur by 'n e-boek- of leenverkoop.* **Klaar** (3 Aug 2026) — sien
+     die afdeling hierbo. Nog nie teen 'n regte verkoop getoets nie.
+   - *Harde-kopie-bestelling.* **Geblokkeer.** Nie 'n voorkeur nie, 'n
+     verpligting: die outeur druk en versend self, en die pos is hoe hy
+     weet 'n bestelling wag. Maar `voltooi-betaling.js` vra e-pos,
+     selfoon, straat, stad, provinsie en poskode — en **nooit 'n
+     ontvangernaam nie**. 'n Outeur kan nie 'n pakkie pos aan 'n adres
+     sonder 'n naam nie. Die betaalvorm moet eers 'n naamveld kry; dan
+     kom `"harde_kopie"` by `FORMATE_WAT_POS_KRY` in
+     `_kennisgewing-outeur.js`.
    - *Leen verval binnekort.* Vereis 'n geskeduleerde Function.
    - *Staat van verkope en besigtigings*, weekliks of maandeliks volgens
      die outeur se voorkeur.
+   - *Gratis bestellings stuur niks.* Die 100%-koepon-kortpad in
+     `begin-betaling.js` merk die bestelling self as betaal en die webhook
+     vuur nooit — dus ook nie die kennisgewing nie. Dieselfde aanroep sou
+     daar moes bykom.
 
 3. **Voorkeurvelde op die outeursrekord** — die kennisgewingkeuses moet
    iewers gestoor word. 'n Aparte veld op die outeursrekord, nie by
@@ -598,10 +657,26 @@ geslaag).
 4. **Ooreenkoms afhandel** — `[REGISTRASIENOMMER]`, `[ADRES]`,
    `[OPSEGTYDPERK]`, en 'n regsdeurgang.
 
-5. **Identity-e-possjabloon** — die herstelpos sê tans *"Reset your
-   password for futuresharp-shop.netlify.app"* van `no-reply@netlify.com`
-   af. Vir 'n koper wat pas op `futureshop.futuresharp.co.za` gekoop het,
-   lyk dit soos phishing. Aanpasbaar in Netlify → Identity → Emails.
+5. **Identity se e-pos — besluit: laat staan.** Die herstelpos kom van
+   `no-reply@netlify.com` af met die onderwerp *"Reset your password for
+   futuresharp-shop.netlify.app"*. Nagegaan op 3 Aug 2026: die span se
+   plan is `nf_team_dev`, en Netlify se dokumentasie stel dit duidelik —
+   eie sjablone **en** 'n eie stuuradres vereis albei Pro of hoër. Daar is
+   dus geen instelling om te verander nie.
+
+   Die **skakel self gaan wél na `futureshop.futuresharp.co.za`**, en
+   `index.html` stuur 'n token in die adres dadelik na `bevestig.html`
+   deur. Funksioneel is die ketting heel; net die onderwerp en die
+   stuuradres bly Netlify s'n.
+
+   'n Eie herstelvloei is moontlik binne die gratis vlak — eie vorm,
+   kode in Blobs met 'n verval, pos deur `_stuur-epos.js`, eie bladsy —
+   maar die laaste stap vereis 'n GoTrue-adminsleutel wat die projek nie
+   het nie (`voltooi-uitnodiging.js` skep rekeninge deur die publieke
+   `/signup`-eindpunt juis daarom). So 'n sleutel kan gewoonlik veel meer
+   as net wagwoorde stel. **Heroorweeg wanneer die outeurspaneelbord kom**
+   — 'n Engelse pos van `no-reply@netlify.com` af is 'n ander soort
+   probleem vir 'n vreemde professionele outeur as vir 'n koper.
 
 6. **Winkel: soek en outeur-filter.** Sortering is gedoen; soek nie.
    'n Klikbare outeursnaam vereis `outeur_ids` op elke produk, en ou
@@ -611,35 +686,78 @@ geslaag).
 7. **"My Leeskamer"** — hernoem van die koper se area, met "My Boeke"
    daarbinne. Naam nog nie finaal nie.
 
-8. **"Sessie verval"-boodskap** op My Boeke gee geen knoppie om weer aan
-   te meld nie.
+8. **Ontvangernaam op die betaalvorm.** Sien punt 2 — dit blokkeer die
+   harde-kopie-kennisgewing, en dit is in elk geval nodig om 'n pakkie te
+   kan pos.
+
+9. **`.terug-skakel` op 'n `<button>`** wys die blaaier se verstek-
+   knoppiechroom, want die klas stel nie `background`/`border` nie. Sigbaar
+   op aanmeld ("Terug na aanmeld", "Registreer hier"). Dieselfde klas word
+   op agt plekke op die paneelbord gebruik ("Genereer", "Kopieer",
+   "+ Voeg verdeling by"), dus verander 'n regstelling al agt saam — dit
+   verdien 'n voorskou.
+
+10. **Bedienerfoute wys in Engels.** `aanmeld.js` gee 'n mislukte versoek
+    se eie woorde deur sonder om deur `taal.js` te gaan; 'n koper op AF
+    sien bv. *"Rate limit exceeded, try again later"*.
 
 **Huishouding:**
 
-9. Kode-opruiming. Die ou Verdeling-rekenaar se CSS (`vr-formaat-kieser`,
+11. Kode-opruiming. Die ou Verdeling-rekenaar se CSS (`vr-formaat-kieser`,
    `vr-scenario-*`, `vr-prys-blok`, `vr-ry*`, `vr-kolletjie*`) is nie meer
    in gebruik nie.
-10. Data-kennisgewing op die uitnodiging-vorm + tempo-beperking op
+12. Data-kennisgewing op die uitnodiging-vorm + tempo-beperking op
     `voltooi-uitnodiging.js` (POPIA-oorweging)
-11. Periodieke Blobs-JSON-rugsteun-uittreksel
-12. Die twee PWA's is vanaf `netlify.app` geïnstalleer. 'n PWA is aan sy
+13. Periodieke Blobs-JSON-rugsteun-uittreksel
+14. Die twee PWA's is vanaf `netlify.app` geïnstalleer. 'n PWA is aan sy
     oorsprong gebind, dus leef daardie installasies nog op die ou domein
     met hul eie sessies. Hulle moet afgeskaf en herinstalleer word — beter
     voor bekendstelling as daarna.
-13. **Die repo is publiek.** Geen sleutel is blootgestel nie (alles leef in
+15. **Die repo is publiek.** Geen sleutel is blootgestel nie (alles leef in
     omgewingsveranderlikes), maar die volledige winkellogika, insluitend
     die verdeling-argitektuur en die rolkontroles, is leesbaar vir enigeen.
     Die moeite werd om een keer bewustelik te bevestig.
 
 **Verifikasie/toetse:**
 
-14. Responsiewe ontwerp-deurgang — foon/tablet/rekenaar
-15. End-tot-end koop-tot-leser-toets in 'n privaat venster
+16. Responsiewe ontwerp-deurgang — foon/tablet/rekenaar
+17. End-tot-end koop-tot-leser-toets in 'n privaat venster
 
 ---
 
 ## Klein dinge wat in Aug 2026 bygekom het
 
+- **`sessie-verval.js`** — die "sessie verval"-toestand op één plek, vir
+  My Boeke en die leser. 'n Boodskap sonder 'n knoppie het die koper op 'n
+  doodloopstraat gelaat. Die helper **vee die sessie eers uit**: 'n 401
+  beteken die bediener het die token verwerp, maar plaaslik lyk dit nog
+  geldig (`identiteit_kry_huidige_sessie()` oordeel net aan die klok), en
+  `aanmeld.js` se "reeds aangemeld"-kontrole het die koper dan onmiddellik
+  teruggestuur na die bladsy wat pas die 401 gekry het — 'n kringloop. Dit
+  gebruik `identiteit_verwyder_sessie()` en **nie** `identiteit_meld_af()`
+  nie: afmeld maak ook die mandjie leeg, en 'n verwerpte token is geen
+  rede om iemand se mandjie weg te gooi nie. Die leser gee geen terug-pad
+  deur nie, sodat `?boek=` behoue bly.
+- **`stoor-lees-vordering.js` het lene stil laat val.** Die
+  eienaarskapskontrole het net `formaat === "eboek"` aanvaar, so elke
+  lener het 'n 403 gekry en sy leesposisie by elke besoek verloor — al kon
+  hy die boek lees, want `kry-leser-token.js` en `kry-eboek-inhoud.js`
+  hanteer 'n leen wél. Nou dieselfde verval-toets as daardie twee.
+- **Boodskapboks op aanmeld en bevestig.** Die boks het permanent
+  `.vb-foute` gedra, sodat 'n suksesboodskap in 'n rooi foutboks beland
+  het en 'n leë boks 'n rooi strook op 'n skoon bladsy gelaat het.
+  `aanmeld.js` en `bevestig.js` skakel reeds `.boodskap-sukses` en
+  `.boodskap-fout` — net die CSS het ontbreek. Nuwe klas
+  `.aanmeld-boodskap` met drie state plus `:empty { display: none }`;
+  geen JS-verandering. `.vb-foute` self bly onaangeraak, want dit is 'n
+  werklike foutboks op die paneelbord, uitnodiging en voltooi-betaling.
+- **"epos" → "e-pos"** in vier Afrikaanse taalsleutels.
+- **`wagwoord_wys` / `wagwoord_versteek`** het in `taal.js` ontbreek —
+  `wagwoord-ogie.js` het na hulle gevra en op sy eie terugval gestaan. Dit
+  is aria-etikette, nie skermteks nie.
+- **`mobile-web-app-capable`** bygevoeg op `my-boeke.html`,
+  `leser.html` en `paneelbord.html`. Die `apple-`-weergawe bly vir ouer
+  iOS; Chrome vra uitdruklik dat die standaard-etiket daarby kom.
 - **`wagwoord-ogie.js`** — wys/versteek-knoppie op **elke** wagwoordveld.
   Dit spoor velde self op (met 'n `MutationObserver` vir vorms wat later
   sigbaar word), sodat 'n nuwe bladsy dit vanself kry. *Het 'n dooie lêer
