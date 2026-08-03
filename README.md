@@ -157,6 +157,23 @@ enige aanmelding 'n register-inskrywing te skep — maar net binne die noue
 grense van 'n vooraf-deur-personeel-gegenereerde, eenmalige token. Geen
 publieke Function ken ooit 'n Identity-rol toe nie.
 
+**Die `vennoot`-rol (Aug 2026).** Ignatius en Eugene meld met `vennoot`
+aan en sien **slegs** Dokumente en die Verdeling-rekenaar, lees-alleen.
+Presies één Function is oopgemaak — `kry-dokumente.js` aanvaar
+`["personeel", "vennoot"]`. `laai-dokument-op.js` en `skrap-dokument.js`
+bly personeel-alleen, sodat 'n vennoot nie kan oplaai of skrap nie.
+
+Die front-end-kant leef in `paneel-vennoot.js`: dit verwyder die
+kieslys-items wat nie geld nie, en 'n `body.vennoot-modus`-klas verberg
+die oplaai- en skrap-knoppies via CSS. Die CSS is **nie** die sekuriteit
+nie — 'n verborge knoppie kan in die blaaier sigbaar gemaak word, en die
+Function weier dan steeds. Die rede vir CSS eerder as JavaScript is dat
+`dokumente.js` sy lys asinkroon herbou; 'n CSS-reël geld outomaties vir
+elke ry wat later bykom.
+
+Die rol word handmatig in Netlify → Identity toegeken. Het iemand albei
+rolle, wen `personeel`.
+
 ---
 
 ## Katalogus & produkte
@@ -172,6 +189,14 @@ sonder herontplooi.
 - `vrystelling_datum` per formaat = voorbestelling ("betaal nou, ontvang later"); `null` = normale, dadelik-beskikbare produk
 - **Boek-etikette** (sterretjie-plakkers): 5 voorafingestelde tweetalige opsies (Nuut!/New!, Topverkoper/Bestseller, ens.) + pasgemaak, 4 kleure (amber/koraal/teal/swart)
 - Omslag-beeld-oplaai: `laai-omslag-op.js`/`kry-omslag.js`, aparte "omslae"-Blobs-store
+- **ISBN** (Aug 2026): twee opsionele velde op elke produk, `isbn.eboek` en
+  `isbn.harde_kopie`. 'n Gedrukte en 'n elektroniese uitgawe het elk sy eie
+  nommer; leen deel die e-boek s'n. Op die produkbladsy verskyn die blok
+  glad nie sonder 'n nommer nie, en by net één nommer val die
+  formaat-etiket weg. Future Shop reik nie ISBN's uit nie — dit word net
+  vertoon. **Let wel:** `wysig-produk.js` gebruik `...wysigings`, dus is
+  `kry_geldige_isbn()` uitdruklik bygevoeg — 'n nuwe top-vlak veld gaan
+  andersins ongevalideer deur.
 
 ### Verdeling-argitektuur (5 registers, uitgebrei van oorspronklike enkele-outeur-model)
 
@@ -359,15 +384,149 @@ identiese `skep-*.js`/`wysig-*.js`-Functions agter die skerms — sien
 "Kode-opruiming" onder). Skrap-vloei waarsku (nie blokkeer nie) as 'n
 inskrywing reeds op 'n boek se verdeling gebruik word.
 
+**Katalogus-soek en -sortering** (`paneel-katalogus-soek.js`, Aug 2026).
+Een soekveld oor titel, outeur én slug tegelyk — nie 'n aparte
+outeur-soek nie, want dan moet mens eers besluit waarna jy soek. Slug is
+ingesluit omdat dit die veld is wat in Blobs-sleutels en opdragte verskyn.
+Ses sorteeropsies, waarvan "Onaktiewe eerste" die nuttigste word soos die
+katalogus groei. Die lêer **omhul** `wys_produkte_lys()` eerder as om
+`paneelbord.js` te wysig.
+
+**Verdeling-rekenaar** — sien die eie afdeling onder.
+
+**Dokumente** — oplaai, lys, skrap, en deel via e-pos/WhatsApp. Die
+deelskakel (`kry-dokument.js`) is **doelbewus publiek**: enigeen met die
+URL kan aflaai. Dis wat dit bruikbaar maak vir 'n outeur, en dis ook
+waarom getekende dokumente met persoonlike besonderhede nie daar hoort
+nie.
+
+**Waarskuwings** — betaling-waarskuwings, plus (Aug 2026) 'n
+toetsknoppie vir die e-posdiens (`paneel-epos-toets.js`). Misluk die
+toets, wys dit watter `EPOS_`-instellings die bediener gevind het —
+sonder die wagwoord — sodat 'n ontbrekende veranderlike dadelik sigbaar
+is.
+
 ---
 
-## Dokumentasie
+## Verdeling-rekenaar (paneelbord, personeel-alleen)
 
-`Future-Sharp-TC-Raamwerk.docx` — 'n **beginpunt-raamwerk** (nie finale
-regsadvies nie) vir terme/voorwaardes/tarief-ooreenkomste, met Future
-Sharp se branding (logo's, kleure, Montserrat/Poppins-fonte). Nog nie aan
-enige tegniese stelsel gekoppel nie — dis presies waarvoor die oop
-"Ooreenkoms/tekenstap"-item hieronder is.
+Suiwer front-end (`verdeling-rekenaar.js`) — raak geen store of Function
+nie. In Augustus 2026 heeltemal herbou:
+
+**Al drie formate gelyk.** 'n Boek is nie een prys nie. Die rekenaar het
+voorheen een formaat op 'n slag hanteer, wat beteken het mens moes hom
+drie keer loop en die getalle onthou terwyl die produkvorm ingevul word.
+
+**Twee invoerrigtings.** Die enigste verskil tussen hulle is één reël:
+`P = modus === "wins" ? (begin + K) / (outeurPct/100) : begin`. Die
+prys-rigting is die praktiese een — 'n winkel prys op R150, nie op
+R142,86 nie — en dis ook die enigste rigting wat kan wys dat 'n prys
+**nie werk nie**.
+
+**Drie aansigte van dieselfde som:**
+- *Opstel* — presies wat in die katalogusvorm ingetik word, met 'n
+  kontrole wat sê of die vorm dit gaan aanvaar. Dit vang die "Merchant
+  share cannot be lower than zero"-fout vóór die vorm oopgemaak word.
+- *Uiteensetting* — elke rolspeler se randbedrag, plus 'n staafstrook wat
+  wys wat prys aan die direkteursfooie doen. Die kromme kom heeltemal van
+  Paystack se vaste fooi.
+- *Outeursaansig* — 'n **volskerm-oorlegsel**, nie 'n oortjie nie. 'n
+  Oortjie sou die Aannames sigbaar laat, en dié is boonop invoervelde wat
+  'n besoeker kan verander. Die oorlegsel bevat geen interne syfer en geen
+  invoerveld nie.
+
+**Meer as een outeur.** Een ry per outeur, met outomatiese verspreiding
+(die oorskiet van 'n onewe deling gaan na die eerste ry) en 'n
+som-kontrole. Die persentasies is van die **verkoopprys**, nie van die
+70% nie — so vra die katalogusvorm dit. Die outeursaansig verander nié by
+meer as een outeur nie: mense wat saam geskryf het, weet reeds dat hulle
+die 70% deel.
+
+**Admin en Ontwerp** bly apart in die rekenaar (twee soorte werk, twee
+koste) maar word in Opstel saamgetel tot één Ontwerp/Admin-ry, want die
+produkvorm het één rol. Daardie vertaalwerk is presies waarvoor die
+rekenaar bestaan.
+
+Die outeurspersentasie is wysigbaar, maar leef in die **ankerbalk** en
+nie tussen die Aannames nie: 70/30 staan vas vir nuwe outeurs, en die
+veld is daar vir bestaande boeke op ander voorwaardes.
+
+---
+
+## E-posdiens (Aug 2026)
+
+`_stuur-epos.js` — gedeelde helper, `nodemailer` via Future Shop se eie
+posbus by Afrihost. Omgewingsveranderlikes: `EPOS_GASHEER`, `EPOS_POORT`,
+`EPOS_GEBRUIKER`, `EPOS_WAGWOORD`, `EPOS_VAN`.
+
+**Waarom die eie posbus en nie 'n transaksionele diens nie:** die pos kom
+van dieselfde bediener wat die domein se bestaande SPF-rekord reeds dek —
+geen DNS-verandering, en geen risiko om 'n tweede SPF-rekord by te voeg
+wat albei sou breek. Wil ons later na Postmark of Resend skuif vir
+aflewerinsverslae, verander net hierdie lêer plus 'n `include` in die
+SPF-reël.
+
+**`stuur_epos()` gooi nooit nie.** Dit gee `{ ok, fout }` terug. 'n Pos
+wat nie deurkom nie mag nooit 'n betaling, 'n bestelling of 'n
+stoor-aksie laat misluk nie.
+
+**Die sjabloon is 'n tabel van 600px, sonder beelde.** Outlook ignoreer
+`max-width` en `border-radius` op 'n gewone blok — 'n boodskap wat mooi
+lyk in Gmail strek dan oor die hele venster. Die kop is 'n teal band met
+teks, nie 'n logo nie, sodat dit presies dieselfde lyk vir wie prente
+afgeskakel het. Alle style inlyn; `<style>`-blokke word gestroop.
+
+`toets-epos.js` is 'n personeel-beskermde toetsroete — 'n betaling se
+webhook is die verkeerde plek om 'n SMTP-verbinding vir die eerste keer
+te toets. Bevestig werkend op 2 Aug 2026.
+
+Nog nie gekoppel nie: outeur-kennisgewing by 'n verkoop, leen-vervalpos,
+en dokumente wat vanaf die adres uitgaan.
+
+---
+
+## Dokumentasie vir outeurs (Aug 2026)
+
+Drie dokumente, in die volgorde waarin hulle gebruik word. Almal met die
+logo net op bladsy een, die bladsynommer bo in die middel, en
+Montserrat/Poppins soos die winkel.
+
+1. **`1-Future-Shop.docx`** — bekendstelling én hoe die winkel werk. Vier
+   afdelings: Formate, Verantwoordelikhede, Prys en inkomste, Om voort te
+   gaan.
+2. **`2-Outeursooreenkoms.docx`** — 14 klousules plus 'n bylae vir
+   bankbesonderhede. Geld per outeur, nie per titel nie.
+3. **`3-Boekvorm.docx`** — per titel, herhaalbaar. Die manuskrip en die
+   omslag kom per e-pos; die vorm dra hulle nie.
+
+**Register:** derde persoon, volsinne, "die outeur" en "Future Sharp" —
+dieselfde woorde as die ooreenkoms, sodat die dokumente met mekaar praat.
+Die boekvorm is die uitsondering: daar is elke instruksie direk (*Dui
+aan…*, *Voltooi slegs waar…*).
+
+**Wat uitgehaal is, en hoekom.** Vroeë weergawes het argumente gevoer wat
+niemand gevra het nie ("baie lae pryse werk swakker as wat mens dink"),
+en het interne argitektuur bevat wat 'n outeur nie nodig het nie — hoe die
+verdeling meganies werk, Paystack se naam, en die subrekening-struktuur.
+Wat 'n outeur moet weet, is **wanneer** hy sy geld kry, nie hoe die geld
+beweeg nie. Paystack se eie pryslys sê twee werksdae; die dokument sê
+"gewoonlik binne twee werksdae", sonder om die diens te noem.
+
+Daar is ook nie 'n aparte registrasiedokument nie. Wat 'n handtekening
+verg, sit in die ooreenkoms; wat per titel verander, in die boekvorm; en
+wat 'n outeur self moet kan verander — sy kontakbesonderhede en
+kennisgewingvoorkeure — hoort in die komende outeurspaneelbord. Die ou
+registrasievorm was 'n versameling van al drie soorte, en dis presies
+waarom dit oorvleuel het.
+
+**Die ooreenkoms het geen Bylae A vir titels nie.** Dit is geteken
+vóórdat daar 'n boek is; 'n tabel wat na niks verwys nie, span die kar
+voor die perde in. Klousule 5 sê in plaas daarvan dat prys en verdeling
+skriftelik bevestig word voordat 'n titel te koop aangebied word.
+
+**Nog nie afgehandel nie:** `[REGISTRASIENOMMER]`, `[ADRES]` en
+`[OPSEGTYDPERK]` in die ooreenkoms, en 'n deurgang deur iemand met
+regskennis.
 
 ---
 
@@ -399,46 +558,81 @@ geslaag).
 ## Oop items (nie afgehandel nie)
 
 **Nuwe bou-werk:**
-1. **Ooreenkoms/tekenstap** — formele terme+tariewe-tekening per rol,
-   gekoppel aan die T&C-raamwerk hierbo. **Hoogste prioriteit:** dit is die
-   enigste ontbrekende skakel in die outeurs-ketting, en bankbesonderhede
-   word reeds sonder hierdie stap ingesamel.
-2. **`vennoot`-Identity-rol** — Ignatius en Eugene kry lees-alleen toegang
-   tot **slegs** Dokumente en die Verdeling-rekenaar. Geen produkte,
-   verkope of koperdata nie. `skrap-dokument.js` moet 'n vennoot stééds
-   weier, anders is dit nie meer lees-alleen nie. `_rol-kontrole.js`
-   aanvaar reeds 'n lys rolle (`["personeel", "vennoot"]`) — die
-   voorbereiding is gedoen.
-3. **E-posdiens** — drie dinge wag hierop: outeur-kennisgewing by 'n
-   verkoop, "jou leen verval binnekort", en dokumente wat vanaf
-   `futureshop@futuresharp.co.za` uitgaan i.p.v. uit iemand se eie inpos.
-   Die posbus bestaan by Afrihost; die SPF-rekord (`v=spf1
-   include:spf.aserv.co.za +a +mx -all`) moet aangepas word, nie 'n tweede
-   TXT bygevoeg nie. SMTP via daardie rekening vermy 'n nuwe verskaffer.
-4. **ISBN-veld** op die produkbladsy — Future Shop reik nie ISBN's uit nie,
-   maar wys dit as die outeur een het. Word in die outeursdokumente belowe.
-5. **"My Leeskamer"** — hernoem van die koper se area, met "My Boeke"
-   daarbinne. Naam nog nie finaal nie: dit moet later webinare kan huisves.
-6. **Identity-e-possjabloon** — die herstelpos sê tans *"Reset your password
-   for futuresharp-shop.netlify.app"* van `no-reply@netlify.com` af. Vir 'n
-   koper wat pas op `futureshop.futuresharp.co.za` gekoop het, lyk dit soos
-   phishing. Aanpasbaar in Netlify → Identity → Emails.
-7. **"Sessie verval"-boodskap** op My Boeke gee geen knoppie om weer aan te
-   meld nie — die koper moet self na `/aanmeld.html?terug=/my-boeke.html`.
+
+1. **Outeurspaneelbord** — die grootste oorblywende stuk, en die een wat
+   die res sinvol maak. 'n Outeur meld aan en sien sy eie boeke, sy
+   besigtigings en verkope, sy uitstaande harde-kopie-bestellings, en 'n
+   knoppie om 'n nuwe boek in te dien. Dan hoef niemand 'n skakel te
+   genereer nie, en die boekvorm word elektronies.
+
+   Sy kontakbesonderhede en kennisgewingvoorkeure hoort hier, want hy moet
+   hulle self kan verander. Wat hy **nie** sien nie: koperdata (buiten die
+   afleweringsbesonderhede by 'n harde kopie wat hy moet stuur), en die
+   30% se uitsplitsing.
+
+   Baie van die infrastruktuur bestaan: Identity-rekeninge word reeds
+   outomaties vir outeurs geskep, `_rol-kontrole.js` aanvaar 'n lys rolle,
+   en die verslagfunksie werk. Wat gebou moet word: `outeur.html`, 'n
+   Function wat sy eie boeke en syfers gee, 'n indienvorm, en die
+   kennisgewing aan admin.
+
+2. **Kennisgewings koppel aan die e-posdiens** — die diens werk; niks is
+   nog daaraan gekoppel nie.
+   - *Outeur by 'n verkoop.* Haak in aan die einde van
+     `paystack-webhook.js`, ná die tellers. Moet in 'n `try/catch`, soos
+     die koeponstap en die tellers reeds is. Een bestelling kan boeke van
+     verskeie outeurs bevat — elkeen kry pos oor sy eie boeke. 'n Boek kan
+     meer as een outeur hê — albei kry pos.
+   - *Harde-kopie-bestelling.* Nie 'n voorkeur nie, 'n verpligting: die
+     outeur druk en versend self, en die pos is hoe hy weet 'n bestelling
+     wag. Sluit die koper se afleweringsbesonderhede in.
+   - *Leen verval binnekort.* Vereis 'n geskeduleerde Function.
+   - *Staat van verkope en besigtigings*, weekliks of maandeliks volgens
+     die outeur se voorkeur.
+
+3. **Voorkeurvelde op die outeursrekord** — die kennisgewingkeuses moet
+   iewers gestoor word. 'n Aparte veld op die outeursrekord, nie by
+   `kontak_inligting` nie (dis 'n instelling, nie kontakinligting nie).
+   Die wit-lys in `skep-outeur.js` gooi enigiets buite die lys stilweg weg.
+
+4. **Ooreenkoms afhandel** — `[REGISTRASIENOMMER]`, `[ADRES]`,
+   `[OPSEGTYDPERK]`, en 'n regsdeurgang.
+
+5. **Identity-e-possjabloon** — die herstelpos sê tans *"Reset your
+   password for futuresharp-shop.netlify.app"* van `no-reply@netlify.com`
+   af. Vir 'n koper wat pas op `futureshop.futuresharp.co.za` gekoop het,
+   lyk dit soos phishing. Aanpasbaar in Netlify → Identity → Emails.
+
+6. **Winkel: soek en outeur-filter.** Sortering is gedoen; soek nie.
+   'n Klikbare outeursnaam vereis `outeur_ids` op elke produk, en ou
+   produkte van vóór daardie skuif het dit nie almal nie — dit moet eers
+   nagegaan word.
+
+7. **"My Leeskamer"** — hernoem van die koper se area, met "My Boeke"
+   daarbinne. Naam nog nie finaal nie.
+
+8. **"Sessie verval"-boodskap** op My Boeke gee geen knoppie om weer aan
+   te meld nie.
 
 **Huishouding:**
-8. Kode-opruiming (ongebruikte CSS-reëls, oorbodige funksies)
-9. Data-kennisgewing op die uitnodiging-vorm + tempo-beperking op
-   `voltooi-uitnodiging.js` (POPIA-oorweging)
-10. Periodieke Blobs-JSON-rugsteun-uittreksel
-11. **Statistiek-teller-anomalie** (1 Aug): Totaal/Vandag/Week/Maand het nie
-    ooreengestem nie. Nog nie ondersoek nie.
-12. Die skakel op `futuresharp.co` na die winkel wys waarskynlik nog na
-    `netlify.app` — kan na die nuwe adres verander.
-13. Die twee PWA's is vanaf `netlify.app` geïnstalleer; hulle werk, maar dis
-    netjieser om hulle vanaf die nuwe adres te herinstalleer.
+
+9. Kode-opruiming. Die ou Verdeling-rekenaar se CSS (`vr-formaat-kieser`,
+   `vr-scenario-*`, `vr-prys-blok`, `vr-ry*`, `vr-kolletjie*`) is nie meer
+   in gebruik nie.
+10. Data-kennisgewing op die uitnodiging-vorm + tempo-beperking op
+    `voltooi-uitnodiging.js` (POPIA-oorweging)
+11. Periodieke Blobs-JSON-rugsteun-uittreksel
+12. Die twee PWA's is vanaf `netlify.app` geïnstalleer. 'n PWA is aan sy
+    oorsprong gebind, dus leef daardie installasies nog op die ou domein
+    met hul eie sessies. Hulle moet afgeskaf en herinstalleer word — beter
+    voor bekendstelling as daarna.
+13. **Die repo is publiek.** Geen sleutel is blootgestel nie (alles leef in
+    omgewingsveranderlikes), maar die volledige winkellogika, insluitend
+    die verdeling-argitektuur en die rolkontroles, is leesbaar vir enigeen.
+    Die moeite werd om een keer bewustelik te bevestig.
 
 **Verifikasie/toetse:**
+
 14. Responsiewe ontwerp-deurgang — foon/tablet/rekenaar
 15. End-tot-end koop-tot-leser-toets in 'n privaat venster
 
@@ -448,14 +642,28 @@ geslaag).
 
 - **`wagwoord-ogie.js`** — wys/versteek-knoppie op **elke** wagwoordveld.
   Dit spoor velde self op (met 'n `MutationObserver` vir vorms wat later
-  sigbaar word, soos die registreer-blok), sodat 'n nuwe bladsy dit vanself
-  kry. *Het 'n dooie lêer met dieselfde naam vervang:* die ou weergawe is
-  vir Netlify se Identity-widget geskryf en het net Shadow DOM hanteer — die
-  widget is lankal weg, en geen bladsy het die lêer nog gelaai nie. Die
-  paneelbord se eie twee ogie-knoppies (in `paneelbord.html`, gedryf deur
-  `paneelbord.js`) bly soos hulle is.
-- **Verdeling-rekenaar** — die twee scenario's (A/B) is één geword. Hulle
-  het bestaan om 68% teenoor 70% te vergelyk; Future Sharp werk nou
-  uitsluitlik op 70/30, dus was hulle identies. Die 70% is 'n vaste anker,
-  en 'n BTW-veld het bygekom (die ou berekening het R3,90 op R100 gegee
-  waar Paystack werklik R4,49 hef).
+  sigbaar word), sodat 'n nuwe bladsy dit vanself kry. *Het 'n dooie lêer
+  met dieselfde naam vervang:* die ou weergawe is vir Netlify se
+  Identity-widget geskryf en het net Shadow DOM hanteer.
+- **`mandjie-opruiming.js`** — verwyder items uit die mandjie wat die koper
+  reeds besit. 'n E-boek word net by 'n permanente kopie verwyder, nie by
+  'n aktiewe leen nie (die opgraderingsvloei hang daarvan af), en harde
+  kopieë nooit.
+- **`_paystack-koste.js`** — die plat 3%-reël was verkeerd en het 'n
+  R50-leen laat faal met "Merchant share cannot be lower than zero".
+  Paystack SA is 2,9% + R1, plus BTW = 3,335% + R1,15; die minimum is nou
+  3,5% + R1,30.
+- **Winkelkatalogus-sortering** (`katalogus-sorteer.js`) — vyf opsies langs
+  die kategorie-skyfies, verstek nuutste eerste, keuse behou in
+  `localStorage`. Die verstek is één konstante (`KS_VERSTEK`), en die
+  lêer se kopnota verduidelik hoe 'n eie volgorde of 'n
+  bestsellersortering later inskuif. Die navorsing sê 'n saamgestelde
+  volgorde is die beter verstek — maar met 'n handjievol boeke is dit
+  ruis, nie inligting nie.
+- **Vennoot-etiket** — die UI sê "Vennoot (direkteur)". Slegs vertoonteks;
+  `rol_tipe: "vennoot"` bly onveranderd, sodat die rol beskikbaar bly vir
+  'n toekomstige mede-uitgewer of befondser. 'n Volledige hernoeming sou
+  'n skema-migrasie verg.
+- **Die statistiek-"anomalie" van 1 Augustus was geen anomalie nie.** Die
+  teller tel winkelbesoeke, en daar was daardie dag eenvoudig geen — die
+  werk was in die paneelbord.
