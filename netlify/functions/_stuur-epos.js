@@ -53,14 +53,27 @@ function kry_vervoerder() {
 // dan oor die hele venster en verloor sy rand. 'n Tabel met 'n vaste breedte
 // van 600px is die enigste ding wat oral hou.
 //
-// GEEN BEELDE NIE. Die kop is 'n gekleurde band met teks, nie 'n logo nie.
-// Poskliënte blokkeer beelde by verstek, en 'n kennisgewing moet presies
-// dieselfde lyk vir wie prente afgeskakel het. Alle style is inlyn, want
-// <style>-blokke word deur baie kliënte gestroop.
+// EEN BEELD, EN DIT MAG WEGVAL. Die kop dra die wordmark oor die volle
+// breedte, maar die teal band daaronder bly staan en sê dieselfde in
+// teks. Poskliënte blokkeer beelde by verstek — Outlook doen dit vir
+// elke nuwe stuurder — en dan lyk die boodskap presies soos die ou
+// ontwerp sonder dat iets breek. Die alt-teks is doelbewus leeg: dit sou
+// net die band se woorde herhaal, en by volle breedte teen die linkerrand
+// vasgesit het. Alle style is inlyn, want <style>-blokke word deur baie
+// kliënte gestroop.
+//
+// Die logo word van die werf af gelaai, nie aangeheg nie. 'n Aanhegsel
+// of 'n base64-beeld word deur meer kliënte geweier as 'n gewone URL.
 
 const TEAL = "#479F91";
 const KORAAL = "#EC5832";
 const FONT = "Segoe UI,Helvetica,Arial,sans-serif";
+
+// Volle absolute URL — 'n relatiewe pad beteken niks in 'n poskliënt.
+// 598px is die 600px-boks minus sy 1px-rand aan elke kant. Die bronbeeld
+// is 986px breed, dus bly dit skerp op 'n retina-skerm.
+const LOGO_URL = "https://futureshop.futuresharp.co.za/images/future-shop-woordmerk.png";
+const LOGO_BREEDTE = 598;
 
 // Ontsnap teks wat in HTML beland. Reels mag eenvoudige HTML bevat en word
 // NIE ontsnap nie — maar 'n knoppie se teks en 'n URL kom dikwels uit data.
@@ -93,9 +106,12 @@ function bou_html(opskrif, reels, knoppie) {
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#EDEBE6;">
 <tr><td align="center" style="padding:28px 12px;">
   <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:600px;background:#FFFFFF;border:1px solid #E2DFD9;">
-    <tr><td style="background:${TEAL};padding:22px 32px;">
+    <tr><td style="padding:0;font-size:0;line-height:0;">
+      <img src="${LOGO_URL}" width="${LOGO_BREEDTE}" alt="" style="display:block;width:${LOGO_BREEDTE}px;max-width:100%;height:auto;border:0;">
+    </td></tr>
+    <tr><td style="background:${TEAL};padding:18px 32px;">
       <p style="margin:0 0 3px;font-family:${FONT};font-size:11px;font-weight:700;letter-spacing:2px;color:#FFFFFF;">FUTURE SHARP</p>
-      <p style="margin:0;font-family:${FONT};font-size:24px;font-weight:700;color:#FFFFFF;">Future Shop</p>
+      <p style="margin:0;font-family:${FONT};font-size:22px;font-weight:700;color:#FFFFFF;">Future Shop</p>
     </td></tr>
     <tr><td style="padding:30px 32px 8px;">
       <h1 style="margin:0 0 18px;font-family:${FONT};font-size:23px;line-height:1.3;color:#171717;font-weight:700;">${opskrif}</h1>
