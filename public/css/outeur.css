@@ -52,3 +52,98 @@
   color: var(--grys-teks);
   margin-top: 2px;
 }
+
+/* --- Kieslys --- */
+/* Groei saam met die afdelings: elke volgende stap voeg 'n knoppie by. */
+.outeur-kieslys {
+  display: flex;
+  gap: 6px;
+  margin: 0 0 22px;
+  border-bottom: 1px solid #E4E2DD;
+  overflow-x: auto;
+}
+
+.outeur-kieslys-item {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 9px 4px;
+  margin-right: 16px;
+  font-family: var(--font-liggaam);
+  font-size: 14px;
+  color: var(--grys-teks);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.outeur-kieslys-item:hover { color: var(--swart); }
+
+.outeur-kieslys-item.aktief {
+  color: var(--swart);
+  border-bottom-color: var(--teal);
+  font-weight: 500;
+}
+
+/* --- Afdelings --- */
+.outeur-afdeling { display: none; }
+.outeur-afdeling.wys { display: block; }
+
+/* --- 'n Titel --- */
+.outeur-titel {
+  border: 1px solid #E4E2DD;
+  border-radius: 9px;
+  padding: 16px 18px;
+  margin-bottom: 12px;
+}
+
+.outeur-titel-kop {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.outeur-titel-naam {
+  font-family: var(--font-opskrif);
+  font-size: 16px;
+  margin: 0;
+}
+
+.outeur-merkie {
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.outeur-merkie.lewend { background: #E3F2EF; color: #2E6F64; }
+.outeur-merkie.stil { background: #EFEDE8; color: var(--grys-teks); }
+
+.outeur-titel-formate {
+  font-size: 12px;
+  color: var(--grys-teks);
+  margin: 5px 0 0;
+}
+
+.outeur-titel-syfers {
+  display: flex;
+  gap: 28px;
+  margin-top: 14px;
+  padding-top: 13px;
+  border-top: 1px solid #F0EEEA;
+  flex-wrap: wrap;
+}
+
+.outeur-titel-syfer-waarde {
+  display: block;
+  font-family: var(--font-opskrif);
+  font-size: 17px;
+}
+
+.outeur-titel-syfer-etiket {
+  display: block;
+  font-size: 12px;
+  color: var(--grys-teks);
+  margin-top: 1px;
+}

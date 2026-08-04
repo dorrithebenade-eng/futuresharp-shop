@@ -61,7 +61,19 @@
         <span data-i18n="outeur_uitbetaling_wag_teks">Jy kan intussen 'n boek indien — dit word te koop aangebied sodra die rekening gereed is.</span>
       </div>
 
-      <div class="outeur-syfers" id="outeur-syfers"></div>
+      <nav class="outeur-kieslys" id="outeur-kieslys">
+        <button type="button" class="outeur-kieslys-item aktief" data-gaan="oorsig" data-i18n="outeur_nav_oorsig">Oorsig</button>
+        <button type="button" class="outeur-kieslys-item" data-gaan="titels" data-i18n="outeur_nav_titels">My boeke</button>
+      </nav>
+
+      <section class="outeur-afdeling wys" data-afdeling="oorsig">
+        <div class="outeur-syfers" id="outeur-syfers"></div>
+      </section>
+
+      <section class="outeur-afdeling" data-afdeling="titels">
+        <div id="outeur-titels-status" class="stelsel-boodskap" aria-live="polite"></div>
+        <div id="outeur-titels-lys"></div>
+      </section>
     </div>
   </main>
 
@@ -70,5 +82,6 @@
   <script src="js/nav-rekening.js"></script>
   <script src="js/sessie-verval.js"></script>
   <script src="js/outeur.js"></script>
+  <script src="js/outeur-titels.js"></script>
 </body>
 </html>

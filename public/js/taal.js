@@ -622,6 +622,20 @@ const WOORDEBOEK = {
     af: "Kon nie verbind nie. Kontroleer jou verbinding en probeer weer.",
     en: "Could not connect. Check your connection and try again.",
   },
+  outeur_nav_oorsig: { af: "Oorsig", en: "Overview" },
+  outeur_nav_titels: { af: "My boeke", en: "My books" },
+  outeur_status_te_koop: { af: "Te koop", en: "On sale" },
+  outeur_status_nie_aktief: { af: "Nie te koop nie", en: "Not on sale" },
+  outeur_kolom_besigtigings: { af: "Besigtigings", en: "Views" },
+  outeur_kolom_verkope: { af: "Verkope", en: "Sales" },
+  outeur_kolom_my_deel: { af: "Jou deel", en: "Your share" },
+  outeur_geen_titels: {
+    af: "Jy het nog geen titels op Future Shop nie.",
+    en: "You do not have any titles on Future Shop yet.",
+  },
+  formaat_eboek: { af: "E-boek", en: "E-book" },
+  formaat_harde_kopie: { af: "Harde kopie", en: "Hard copy" },
+  formaat_leen: { af: "Leen", en: "Loan" },
 };
 
 function kry_huidige_taal() {

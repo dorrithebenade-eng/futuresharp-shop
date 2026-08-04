@@ -98,6 +98,11 @@ function wys_outeur(data) {
   teken_syfers(data);
 
   document.getElementById("outeur-inhoud").hidden = false;
+
+  // Sein vir die afdeling-lêers (outeur-titels.js en later ander) dat die
+  // outeur bevestig is en hulle mag begin laai. Hulle weet niks van
+  // aanmelding nie; dit bly hier.
+  document.dispatchEvent(new CustomEvent("outeur-gereed", { detail: data }));
 }
 
 async function laai_outeur() {
