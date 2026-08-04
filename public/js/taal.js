@@ -623,7 +623,7 @@ const WOORDEBOEK = {
     en: "Could not connect. Check your connection and try again.",
   },
   outeur_nav_oorsig: { af: "Oorsig", en: "Overview" },
-  outeur_nav_titels: { af: "My boeke", en: "My books" },
+  outeur_nav_titels: { af: "My titels", en: "My titles" },
   outeur_status_te_koop: { af: "Te koop", en: "On sale" },
   outeur_status_nie_aktief: { af: "Nie te koop nie", en: "Not on sale" },
   outeur_kolom_besigtigings: { af: "Besigtigings", en: "Views" },
