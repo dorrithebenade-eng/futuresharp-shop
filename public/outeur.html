@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="af">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My paneelbord — Future Shop</title>
+  <link rel="stylesheet" href="css/styl.css" />
+  <link rel="stylesheet" href="css/outeur.css" />
+
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#3FB6A4">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-ikoon.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Future Shop">
+
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("/sw.js").catch((fout) => {
+          console.error("Service worker-registrasie het misluk:", fout);
+        });
+      });
+    }
+  </script>
+</head>
+<body>
+  <header class="mini-kop">
+   <div class="mini-kop-inner">
+    <a href="index.html" class="mini-kop-merk">
+      <span class="merk-sharp">Future Sharp</span>
+      <span class="merk-skeier">—</span>
+      <span class="merk-shop">Future Shop</span>
+    </a>
+    <div class="mini-kop-regs">
+      <span id="nav-rekening-plek" class="mini-kop-rekening-plek"></span>
+      <div class="taal-wisselaar" role="group" aria-label="Taal / Language">
+        <button type="button" class="taal-knoppie" data-taal="af">AF</button>
+        <button type="button" class="taal-knoppie" data-taal="en">EN</button>
+      </div>
+    </div>
+   </div>
+  </header>
+
+  <main class="vb-wrap">
+    <!-- Status: aanmeld-versoek, laai-boodskap of foute. sessie-verval.js
+         skryf hier 'n aanmeldknoppie in wanneer 'n token verval het. -->
+    <div id="outeur-status" class="stelsel-boodskap" aria-live="polite"></div>
+
+    <!-- Alles hieronder bly weg tot die outeur bevestig is. -->
+    <div id="outeur-inhoud" hidden>
+      <h1 class="mandjie-titel" id="outeur-groet">My paneelbord</h1>
+      <p class="vb-afdeling-nota" data-i18n="outeur_subtitel">
+        'n Oorsig van jou titels op Future Shop.
+      </p>
+
+      <!-- Wys slegs solank die uitbetalingsrekening nog opgestel word. -->
+      <div id="outeur-status-kaart" class="outeur-status-kaart" hidden>
+        <strong data-i18n="outeur_uitbetaling_wag_titel">Jou uitbetalingsrekening word opgestel.</strong>
+        <span data-i18n="outeur_uitbetaling_wag_teks">Jy kan intussen 'n boek indien — dit word te koop aangebied sodra die rekening gereed is.</span>
+      </div>
+
+      <div class="outeur-syfers" id="outeur-syfers"></div>
+    </div>
+  </main>
+
+  <script src="js/taal.js"></script>
+  <script src="js/identiteit.js"></script>
+  <script src="js/nav-rekening.js"></script>
+  <script src="js/sessie-verval.js"></script>
+  <script src="js/outeur.js"></script>
+</body>
+</html>

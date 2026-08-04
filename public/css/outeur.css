@@ -1,0 +1,54 @@
+/* public/css/outeur.css
+ *
+ * Slegs die outeurspaneelbord. Apart van styl.css sodat 'n verandering hier
+ * niks aan die winkel kan doen nie. Die veranderlikes (--teal, --amber,
+ * ensovoorts) kom uit styl.css, wat voor hierdie lêer laai.
+ */
+
+/* --- Statuskaart --- */
+/* Wys net solank die uitbetalingsrekening nog opgestel word. Amber, want
+   dit is 'n wagtoestand en nie 'n fout nie. */
+.outeur-status-kaart {
+  border: 1px solid #E4E2DD;
+  border-left: 4px solid var(--amber);
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin: 0 0 24px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.outeur-status-kaart strong {
+  display: block;
+  margin-bottom: 3px;
+}
+
+.outeur-status-kaart span {
+  color: var(--grys-teks);
+}
+
+/* --- Syfers --- */
+.outeur-syfers {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.outeur-syfer {
+  background: var(--grys-lig);
+  border-radius: 8px;
+  padding: 14px 16px;
+}
+
+.outeur-syfer-waarde {
+  font-family: var(--font-opskrif);
+  font-size: 24px;
+  line-height: 1.2;
+}
+
+.outeur-syfer-etiket {
+  font-size: 12px;
+  color: var(--grys-teks);
+  margin-top: 2px;
+}
