@@ -64,6 +64,7 @@
       <nav class="outeur-kieslys" id="outeur-kieslys">
         <button type="button" class="outeur-kieslys-item aktief" data-gaan="oorsig" data-i18n="outeur_nav_oorsig">Oorsig</button>
         <button type="button" class="outeur-kieslys-item" data-gaan="titels" data-i18n="outeur_nav_titels">My titels</button>
+        <button type="button" class="outeur-kieslys-item" data-gaan="bestellings" data-i18n="outeur_nav_bestellings">Bestellings</button>
       </nav>
 
       <section class="outeur-afdeling wys" data-afdeling="oorsig">
@@ -74,6 +75,19 @@
         <div id="outeur-titels-status" class="stelsel-boodskap" aria-live="polite"></div>
         <div id="outeur-titels-lys"></div>
       </section>
+
+      <section class="outeur-afdeling" data-afdeling="bestellings">
+        <p class="vb-afdeling-nota" data-i18n="outeur_bestellings_nota">
+          Harde kopiee wat gekoop is en gestuur moet word.
+        </p>
+        <div id="outeur-bestellings-status" class="stelsel-boodskap" aria-live="polite"></div>
+
+        <h2 class="outeur-sub-opskrif" data-i18n="outeur_om_te_stuur_kop">Om te stuur</h2>
+        <div id="outeur-om-te-stuur"></div>
+
+        <h2 class="outeur-sub-opskrif" data-i18n="outeur_reeds_gestuur_kop">Reeds gestuur</h2>
+        <div id="outeur-reeds-gestuur"></div>
+      </section>
     </div>
   </main>
 
@@ -83,5 +97,6 @@
   <script src="js/sessie-verval.js"></script>
   <script src="js/outeur.js"></script>
   <script src="js/outeur-titels.js"></script>
+  <script src="js/outeur-bestellings.js"></script>
 </body>
 </html>

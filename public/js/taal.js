@@ -636,6 +636,43 @@ const WOORDEBOEK = {
   formaat_eboek: { af: "E-boek", en: "E-book" },
   formaat_harde_kopie: { af: "Harde kopie", en: "Hard copy" },
   formaat_leen: { af: "Leen", en: "Loan" },
+  outeur_nav_bestellings: { af: "Bestellings", en: "Orders" },
+  outeur_bestellings_nota: {
+    af: "Harde kopie\u00eb wat gekoop is en gestuur moet word.",
+    en: "Hard copies that have been bought and need to be sent.",
+  },
+  outeur_om_te_stuur_kop: { af: "Om te stuur", en: "To send" },
+  outeur_reeds_gestuur_kop: { af: "Reeds gestuur", en: "Already sent" },
+  outeur_om_te_stuur: { af: "Om te stuur", en: "To send" },
+  outeur_gestuur: { af: "Gestuur", en: "Sent" },
+  outeur_merk_gestuur: { af: "Merk as gestuur", en: "Mark as sent" },
+  outeur_wysig_versending: { af: "Wysig", en: "Edit" },
+  outeur_terugtrek: { af: "Trek terug", en: "Undo" },
+  outeur_versend_datum: { af: "Datum van versending", en: "Date sent" },
+  outeur_spoornommer: { af: "Spoornommer \u2014 opsioneel", en: "Tracking number \u2014 optional" },
+  outeur_spoornommer_kort: { af: "Spoornommer", en: "Tracking number" },
+  outeur_spoornommer_hulp: {
+    af: "Die spoornommer help wanneer die koper later navraag doen.",
+    en: "The tracking number helps when the buyer follows up later.",
+  },
+  outeur_gestuur_op: { af: "Gestuur op", en: "Sent on" },
+  outeur_niks_om_te_stuur: { af: "Niks om te stuur nie.", en: "Nothing to send." },
+  outeur_niks_gestuur: { af: "Nog niks gestuur nie.", en: "Nothing sent yet." },
+  outeur_geen_ontvanger: {
+    af: "Geen ontvangernaam is by hierdie bestelling gestoor nie. Kontak Future Sharp voordat jy dit stuur.",
+    en: "No recipient name was stored with this order. Contact Future Sharp before sending it.",
+  },
+  bevestig: { af: "Bevestig", en: "Confirm" },
+  kanselleer: { af: "Kanselleer", en: "Cancel" },
+  outeur_wyse: { af: "Wie het dit gestuur?", en: "Who sent it?" },
+  outeur_wyse_self: { af: "Ek het dit self gepos", en: "I posted it myself" },
+  outeur_wyse_verskaffer: {
+    af: "\u2019n Drukker of verspreider het dit gestuur",
+    en: "A printer or distributor sent it",
+  },
+  outeur_verskaffer: { af: "Drukker of verspreider", en: "Printer or distributor" },
+  outeur_verskaffer_verwysing: { af: "Sy bestelnommer", en: "Their order number" },
+  outeur_deur: { af: "Deur", en: "By" },
 };
 
 function kry_huidige_taal() {

@@ -147,3 +147,129 @@
   color: var(--grys-teks);
   margin-top: 1px;
 }
+
+/* --- Bestellings --- */
+.outeur-sub-opskrif {
+  font-family: var(--font-opskrif);
+  font-size: 15px;
+  margin: 26px 0 12px;
+}
+.outeur-sub-opskrif:first-of-type { margin-top: 14px; }
+
+.outeur-bestelling {
+  border: 1px solid #E4E2DD;
+  border-radius: 9px;
+  padding: 16px 18px;
+  margin-bottom: 12px;
+}
+
+/* Wat klaar is, tree terug sonder om weg te raak. */
+.outeur-bestelling.klaar {
+  background: #FAFAF8;
+  border-color: #EDEBE6;
+}
+
+.outeur-bestelling-kop {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.outeur-bestelling-nommer {
+  font-family: var(--font-opskrif);
+  font-size: 15px;
+}
+
+.outeur-bestelling-datum {
+  font-size: 12px;
+  color: var(--grys-teks);
+  margin-left: auto;
+}
+
+.outeur-bestelling-titel { font-size: 14px; margin: 4px 0 0; }
+.outeur-bestelling-hoeveel { color: var(--grys-teks); font-size: 13px; }
+
+.outeur-merkie.wag { background: #FDF3DC; color: #8A6A16; }
+
+/* --- Adres --- */
+.outeur-adres {
+  background: var(--grys-lig);
+  border-radius: 7px;
+  padding: 12px 14px;
+  margin-top: 13px;
+  font-size: 13px;
+  line-height: 1.55;
+}
+.outeur-adres strong { display: block; font-size: 14px; margin-bottom: 2px; }
+.outeur-adres a { color: var(--teal); }
+.outeur-adres-nota { color: var(--koraal); margin: 8px 0 0; font-size: 12px; }
+
+/* --- Aksie --- */
+.outeur-bestelling-aksie {
+  margin-top: 14px;
+  padding-top: 13px;
+  border-top: 1px solid #F0EEEA;
+}
+
+.outeur-gestuur-reel {
+  font-size: 13px;
+  color: var(--grys-teks);
+  margin: 0 0 10px;
+}
+
+.outeur-versend-vorm { margin-top: 12px; }
+
+.outeur-veld-paar {
+  display: grid;
+  grid-template-columns: 175px 1fr;
+  gap: 12px;
+}
+@media (max-width: 560px) { .outeur-veld-paar { grid-template-columns: 1fr; } }
+
+.outeur-versend-vorm label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.outeur-hulp { font-size: 12px; color: var(--grys-teks); margin: 6px 0 0; }
+
+.outeur-versend-fout {
+  color: var(--koraal);
+  font-size: 13px;
+  margin: 9px 0 0;
+  min-height: 0;
+}
+
+.outeur-knoppie-ry {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 14px;
+}
+
+.outeur-knoppie-teks {
+  background: none;
+  border: none;
+  color: var(--grys-teks);
+  text-decoration: underline;
+  font-family: var(--font-liggaam);
+  font-size: 13px;
+  padding: 0;
+  cursor: pointer;
+}
+.outeur-knoppie-teks:hover { color: var(--swart); }
+.outeur-terugtrek { color: var(--koraal); }
+.outeur-terugtrek:hover { color: #C63F1E; }
+
+.outeur-leeg {
+  color: var(--grys-teks);
+  font-size: 14px;
+  padding: 14px 0;
+}
+
+.outeur-wyse-veld { margin-bottom: 12px; }
+.outeur-wyse-veld select { max-width: 340px; }
+.outeur-verskaffer-blok { margin-bottom: 12px; }

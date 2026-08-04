@@ -164,11 +164,13 @@ exports.handler = async (event, context) => {
       inskrywing.uitset.my_deel_sent += aandeel;
       inskrywing.uitset.my_verkope += 1;
 
-      // 'n Harde kopie is uitstaande tot die drukwerk geplaas is. Dit is
-      // dieselfde veld wat die personeelpaneelbord gebruik.
+      // 'n Harde kopie is uitstaande tot die OUTEUR dit as gestuur gemerk
+      // het. Nie drukker.bestelling_geplaas nie — daardie veld beteken die
+      // bestelling is by die drukverskaffer geplaas, wat personeel se
+      // vloei is en nie sê of die pakkie die pos in is nie.
       if (
         item.formaat === "harde_kopie" &&
-        !(bestelling.drukker && bestelling.drukker.bestelling_geplaas)
+        !(bestelling.versending && bestelling.versending.gestuur)
       ) {
         bestellings_uitstaande += 1;
       }
