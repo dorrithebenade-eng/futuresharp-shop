@@ -610,12 +610,12 @@ const WOORDEBOEK = {
   outeur_syfer_deel: { af: "Jou deel tot op datum", en: "Your share to date" },
   outeur_syfer_bestellings: { af: "Bestellings om te stuur", en: "Orders to send" },
   outeur_geen_inskrywing: {
-    af: "Hierdie rekening is nie as \u2019n outeur geregistreer nie. Skakel gerus met Future Sharp as jy dink dit is verkeerd.",
-    en: "This account is not registered as an author. Please contact Future Sharp if you believe this is incorrect.",
+    af: "Hierdie rekening is nie as \u2019n outeur geregistreer nie. Skakel Future Sharp indien jy dink dat daar \u2019n fout is by die volgende e-pos: futureshop@futuresharp.co.za",
+    en: "This account is not registered as an author. Contact Future Sharp at the following address if you believe there is a mistake: futureshop@futuresharp.co.za",
   },
   outeur_dubbel_inskrywing: {
-    af: "Meer as een outeur is by hierdie e-posadres geregistreer. Kontak Future Sharp sodat dit reggestel kan word.",
-    en: "More than one author is registered under this email address. Please contact Future Sharp so it can be corrected.",
+    af: "Meer as een outeur is by hierdie e-posadres geregistreer. Skakel Future Sharp by die volgende e-pos sodat dit reggestel kan word: futureshop@futuresharp.co.za",
+    en: "More than one author is registered under this email address. Contact Future Sharp at the following address so it can be corrected: futureshop@futuresharp.co.za",
   },
   fout_algemeen: { af: "Iets het verkeerd geloop. Probeer asseblief weer.", en: "Something went wrong. Please try again." },
   fout_netwerk: {

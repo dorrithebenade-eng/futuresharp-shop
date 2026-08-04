@@ -20,6 +20,33 @@ function outeur_vertaal(sleutel, terugval) {
   return window.t ? window.t(sleutel) : terugval;
 }
 
+// Skryf 'n boodskap en maak 'n e-posadres daarin klikbaar. Ons bou dit met
+// DOM-nodes eerder as innerHTML — vertaalde teks moet nooit as HTML
+// vertolk word nie. styl.css gee reeds .stelsel-boodskap a die huiskleur.
+function outeur_wys_status_met_epos(teks, adres) {
+  const el = document.getElementById("outeur-status");
+  if (!el) return;
+
+  el.textContent = "";
+  const posisie = teks.indexOf(adres);
+
+  if (posisie === -1) {
+    el.textContent = teks;
+    return;
+  }
+
+  el.appendChild(document.createTextNode(teks.slice(0, posisie)));
+
+  const skakel = document.createElement("a");
+  skakel.href = `mailto:${adres}`;
+  skakel.textContent = adres;
+  el.appendChild(skakel);
+
+  el.appendChild(document.createTextNode(teks.slice(posisie + adres.length)));
+}
+
+const FUTURE_SHOP_EPOS = "futureshop@futuresharp.co.za";
+
 // Die vier syfers op die oorsig. In stap 1 is die getalle nog leeg — die
 // Function wat hulle bereken, kom saam met My boeke. Die blok word nou
 // reeds geteken sodat die uitleg nie later verskuif nie.
@@ -104,21 +131,23 @@ async function laai_outeur() {
     // 'n gewone koper wat by die adres uitgekom het — nie 'n fout nie, en
     // die boodskap moet dit nie soos een laat klink nie.
     if (resp.status === 404) {
-      outeur_wys_status(
+      outeur_wys_status_met_epos(
         outeur_vertaal(
           "outeur_geen_inskrywing",
-          "Hierdie rekening is nie as 'n outeur geregistreer nie. Skakel gerus met Future Sharp as jy dink dit is verkeerd."
-        )
+          `Hierdie rekening is nie as 'n outeur geregistreer nie. Skakel Future Sharp indien jy dink dat daar 'n fout is by die volgende e-pos: ${FUTURE_SHOP_EPOS}`
+        ),
+        FUTURE_SHOP_EPOS
       );
       return;
     }
 
     if (resp.status === 409) {
-      outeur_wys_status(
+      outeur_wys_status_met_epos(
         outeur_vertaal(
           "outeur_dubbel_inskrywing",
-          "Meer as een outeur is by hierdie e-posadres geregistreer. Kontak Future Sharp sodat dit reggestel kan word."
-        )
+          `Meer as een outeur is by hierdie e-posadres geregistreer. Skakel Future Sharp by die volgende e-pos sodat dit reggestel kan word: ${FUTURE_SHOP_EPOS}`
+        ),
+        FUTURE_SHOP_EPOS
       );
       return;
     }
