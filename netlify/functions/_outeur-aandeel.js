@@ -1,87 +1,92 @@
-// public/js/paneel-epos-toets.js
+// netlify/functions/_outeur-aandeel.js
 //
-// Een knoppie in die Waarskuwings-afdeling wat 'n toetspos stuur, sodat die
-// SMTP-opstelling bevestig kan word sonder om die blaaier se konsole te
-// gebruik.
+// BEDIENERLEER — geen blaaier-API's hier nie. Kom daar ooit 'n verwysing
+// na `document` of `window` in hierdie lêer, is dit die verkeerde lêer.
 //
-// WAAROM DIT BLY NÁ DIE TOETSFASE: dit is nie 'n eenmalige hulpmiddel nie.
-// 'n Posbus se wagwoord verander, 'n gasheer se instellings skuif, en dan
-// stop kennisgewings stil. Hierdie knoppie sê binne sekondes of pos nog
-// uitgaan — sonder om vir 'n werklike verkoop te wag om agter te kom.
+// Een plek waar bereken word wat 'n outeur uit 'n item kry, en wie by 'n
+// item betrokke is. Dit is dieselfde logika wat _kennisgewing-outeur.js
+// reeds gebruik en wat teen werklike bestellings getoets is.
 //
-// Die Function self (toets-epos.js) is personeel-beskermd; hierdie bladsy-
-// kode is net die knoppie.
+// WAAROM 'N EIE MODULE: die outeurspaneelbord moet presies dieselfde som
+// maak as die kennisgewingspos. Wyk hulle uiteen, sien 'n outeur een bedrag
+// op sy skerm en 'n ander in sy inkassie, en dan is daar geen manier om te
+// sê watter een reg is nie.
+//
+// _kennisgewing-outeur.js hou voorlopig sy eie kopie — dit werk, en om dit
+// nou te verander is 'n risiko sonder wins. Wanneer daar 'n rede is om
+// daardie lêer in elk geval oop te maak, kan dit hierheen wys.
 
-const EPOS_TOETS_ENDPOINT = "/.netlify/functions/toets-epos";
+// Tel op wat hierdie een outeur uit hierdie een item kry.
+//
+// Die vangnet vir die ou skema ({ outeur_id } in plaas van { rol_tipe,
+// entiteit_id }) bly nodig: ouer produkte in die katalogus is nooit
+// oorgeskryf nie, en 'n boek wat sy verdeling voor die skema-verandering
+// gekry het, sou andersins stilweg R0 wys.
+//
+// 'n Vaste bedrag word by die prys gekap. Verkoop 'n boek teen 'n koepon
+// goedkoper as die vaste bedrag, kan die outeur nie meer kry as wat die
+// koper betaal het nie.
+function outeur_aandeel_sent(verdelings, outeur_id, prys_sent) {
+  let som = 0;
+  for (const v of verdelings || []) {
+    if (!v) continue;
+    const rol_tipe = v.rol_tipe || (v.outeur_id ? "outeur" : null);
+    const entiteit_id = v.entiteit_id || v.outeur_id;
+    if (rol_tipe !== "outeur" || entiteit_id !== outeur_id) continue;
 
-function epos_toets_wys(boodskap, geslaag) {
-  const wrap = document.getElementById("epos-toets-uitslag");
-  if (!wrap) return;
-  wrap.innerHTML = `<div class="epos-toets-uitslag ${geslaag ? "epos-toets-ja" : "epos-toets-nee"}">${boodskap}</div>`;
-}
-
-async function epos_toets_stuur() {
-  const knoppie = document.getElementById("epos-toets-knoppie");
-  const veld = document.getElementById("epos-toets-aan");
-  if (!knoppie) return;
-
-  const oorspronklike_teks = knoppie.textContent;
-  knoppie.disabled = true;
-  knoppie.textContent = "Besig …";
-  epos_toets_wys("Word gestuur …", true);
-
-  try {
-    const sessie = typeof identiteit_kry_sessie === "function" ? identiteit_kry_sessie() : null;
-    const resp = await fetch(EPOS_TOETS_ENDPOINT, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(sessie ? { Authorization: `Bearer ${sessie.access_token}` } : {}),
-      },
-      body: JSON.stringify({ aan: (veld && veld.value.trim()) || undefined }),
-    });
-
-    let data = null;
-    try {
-      data = await resp.json();
-    } catch {
-      // Die Function gee by 'n 403 gewone teks terug, nie JSON nie.
-    }
-
-    if (resp.ok && data && data.ok) {
-      epos_toets_wys(
-        `✓ Gestuur na <b>${data.aan}</b>. Kyk in die inkassie — en in gemorspos, want dít sê iets oor die aflewerbaarheid.`,
-        true
-      );
-    } else if (resp.status === 403) {
-      epos_toets_wys("⚠ Geen toegang nie. Meld weer aan en probeer dan opnuut.", false);
-    } else {
-      // Wys die instellings wat die bediener wél gevind het — dit wys
-      // dadelik of 'n omgewingsveranderlike ontbreek, sonder om die
-      // wagwoord self te vertoon.
-      const o = (data && data.opstelling) || {};
-      const detail = data && data.fout ? `<br><span class="epos-toets-fyn">${data.fout}</span>` : "";
-      const opstelling = o.gasheer
-        ? `<br><span class="epos-toets-fyn">Gasheer ${o.gasheer} · poort ${o.poort} · gebruiker ${o.gebruiker || "—"} · wagwoord ${o.wagwoord_gestel ? "gestel" : "ONTBREEK"}</span>`
-        : `<br><span class="epos-toets-fyn">Geen EPOS_-instellings gevind nie — kyk by Netlify se omgewingsveranderlikes.</span>`;
-      epos_toets_wys(`⚠ Kon nie stuur nie.${detail}${opstelling}`, false);
-    }
-  } catch (fout) {
-    epos_toets_wys(`⚠ Kon nie die bediener bereik nie: ${fout.message}`, false);
-  } finally {
-    knoppie.disabled = false;
-    knoppie.textContent = oorspronklike_teks;
+    som +=
+      v.tipe === "vaste_bedrag"
+        ? Math.min(v.waarde, prys_sent)
+        : Math.round((prys_sent * v.waarde) / 100);
   }
+  return som;
 }
 
-function epos_toets_koppel() {
-  const knoppie = document.getElementById("epos-toets-knoppie");
-  if (!knoppie) return;
-  knoppie.addEventListener("click", epos_toets_stuur);
+// Wie is by hierdie item betrokke? Twee bronne, want hulle val nie saam
+// nie: 'n outeur kan op die produk gekrediteer wees sonder 'n verdeling
+// (hy skryf, maar die geld gaan elders heen), en hy kan 'n verdeling hê
+// sonder om gekrediteer te wees (byvoorbeeld 'n vertaler wat as outeur
+// betaal word).
+function outeur_ids_vir_item(produk, formaat_data) {
+  const ids = new Set();
+
+  for (const id of (produk && produk.outeur_ids) || []) {
+    if (id) ids.add(id);
+  }
+  for (const v of (formaat_data && formaat_data.verdelings) || []) {
+    if (!v) continue;
+    const rol_tipe = v.rol_tipe || (v.outeur_id ? "outeur" : null);
+    const entiteit_id = v.entiteit_id || v.outeur_id;
+    if (rol_tipe === "outeur" && entiteit_id) ids.add(entiteit_id);
+  }
+  return [...ids];
 }
 
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", epos_toets_koppel);
-} else {
-  epos_toets_koppel();
+// Kom hierdie outeur enigsins by hierdie produk voor — in enige formaat?
+//
+// LET WEL: hier word ALLE drie formate gekyk, ook `leen`. kry-verslag.js
+// kyk net na eboek en harde_kopie en mis dus 'n boek wat slegs geleen
+// word. Dit is 'n bestaande fout in daardie lêer, nie hier nie.
+function outeur_by_produk_betrokke(produk, outeur_id) {
+  if (!produk) return false;
+
+  if (Array.isArray(produk.outeur_ids) && produk.outeur_ids.includes(outeur_id)) {
+    return true;
+  }
+
+  const formate = produk.formate || {};
+  return ["eboek", "harde_kopie", "leen"].some((naam) =>
+    ((formate[naam] && formate[naam].verdelings) || []).some((v) => {
+      if (!v) return false;
+      const rol_tipe = v.rol_tipe || (v.outeur_id ? "outeur" : null);
+      const entiteit_id = v.entiteit_id || v.outeur_id;
+      return rol_tipe === "outeur" && entiteit_id === outeur_id;
+    })
+  );
 }
+
+module.exports = {
+  outeur_aandeel_sent,
+  outeur_ids_vir_item,
+  outeur_by_produk_betrokke,
+};
