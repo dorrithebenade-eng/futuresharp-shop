@@ -593,6 +593,35 @@ const WOORDEBOEK = {
   bevestig_fout: { af: "Kon nie bevestig nie.", en: "Couldn't confirm." },
   bevestig_fout_titel: { af: "Hierdie skakel werk nie meer nie", en: "This link no longer works" },
   bevestig_fout_hulp: { af: "Die skakel is dalk reeds gebruik, of het verval. Probeer weer registreer of aanmeld.", en: "The link may have already been used, or has expired. Try registering or logging in again." },
+  // --- Outeurspaneelbord ---
+  meld_aan_vir_paneelbord: { af: "Meld eers aan om jou paneelbord te sien.", en: "Log in to see your dashboard." },
+  outeur_groet: { af: "Goeiedag", en: "Hello" },
+  outeur_subtitel: { af: "\u2019n Oorsig van jou titels op Future Shop.", en: "An overview of your titles on Future Shop." },
+  outeur_uitbetaling_wag_titel: {
+    af: "Jou uitbetalingsrekening word opgestel.",
+    en: "Your payout account is being set up.",
+  },
+  outeur_uitbetaling_wag_teks: {
+    af: "Jy kan intussen \u2019n boek indien \u2014 dit word te koop aangebied sodra die rekening gereed is.",
+    en: "You can submit a book in the meantime \u2014 it will go on sale once the account is ready.",
+  },
+  outeur_syfer_titels: { af: "Titels te koop", en: "Titles on sale" },
+  outeur_syfer_verkope: { af: "Verkope tot op datum", en: "Sales to date" },
+  outeur_syfer_deel: { af: "Jou deel tot op datum", en: "Your share to date" },
+  outeur_syfer_bestellings: { af: "Bestellings om te stuur", en: "Orders to send" },
+  outeur_geen_inskrywing: {
+    af: "Hierdie rekening is nie as \u2019n outeur geregistreer nie. Skakel gerus met Future Sharp as jy dink dit is verkeerd.",
+    en: "This account is not registered as an author. Please contact Future Sharp if you believe this is incorrect.",
+  },
+  outeur_dubbel_inskrywing: {
+    af: "Meer as een outeur is by hierdie e-posadres geregistreer. Kontak Future Sharp sodat dit reggestel kan word.",
+    en: "More than one author is registered under this email address. Please contact Future Sharp so it can be corrected.",
+  },
+  fout_algemeen: { af: "Iets het verkeerd geloop. Probeer asseblief weer.", en: "Something went wrong. Please try again." },
+  fout_netwerk: {
+    af: "Kon nie verbind nie. Kontroleer jou verbinding en probeer weer.",
+    en: "Could not connect. Check your connection and try again.",
+  },
 };
 
 function kry_huidige_taal() {
