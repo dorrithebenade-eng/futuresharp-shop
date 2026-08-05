@@ -29,9 +29,9 @@ const FORMAAT_ETIKETTE = {
 // --- Kieslys ---
 
 function stel_kieslys_op() {
-  document.querySelectorAll(".outeur-kieslys-item").forEach((knoppie) => {
+  document.querySelectorAll(".outeur-pil").forEach((knoppie) => {
     knoppie.addEventListener("click", () => {
-      document.querySelectorAll(".outeur-kieslys-item").forEach((k) => k.classList.remove("aktief"));
+      document.querySelectorAll(".outeur-pil").forEach((k) => k.classList.remove("aktief"));
       knoppie.classList.add("aktief");
 
       const doel = knoppie.getAttribute("data-gaan");
@@ -58,6 +58,15 @@ function vul_syfers(opsomming) {
   houer.querySelectorAll(".outeur-syfer-waarde").forEach((el, i) => {
     if (waardes[i] !== undefined && waardes[i] !== null) el.textContent = waardes[i];
   });
+
+  // Die telling op die Bestellings-pil. Dit verskyn slegs wanneer daar
+  // werklik iets is — 'n nul in 'n koraal sirkel lyk soos 'n taak.
+  const telling = document.getElementById("outeur-telling");
+  if (telling) {
+    const aantal = opsomming.bestellings_uitstaande || 0;
+    telling.textContent = aantal;
+    telling.hidden = aantal === 0;
+  }
 }
 
 // --- Die lys titels ---

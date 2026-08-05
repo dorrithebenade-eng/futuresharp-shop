@@ -47,32 +47,30 @@ function outeur_wys_status_met_epos(teks, adres) {
 
 const FUTURE_SHOP_EPOS = "futureshop@futuresharp.co.za";
 
-// Die vier syfers op die oorsig. In stap 1 is die getalle nog leeg — die
-// Function wat hulle bereken, kom saam met My boeke. Die blok word nou
-// reeds geteken sodat die uitleg nie later verskuif nie.
-function teken_syfers(data) {
+// Die vier syfers leef in die band. Hulle word hier as strepies geteken en
+// deur outeur-titels.js met werklike waardes gevul — die uitleg staan dus
+// klaar voordat die syfers arriveer, en niks skuif nie.
+const OUTEUR_SYFERS = [
+  { sleutel: "outeur_syfer_titels", terugval: "Titels te koop" },
+  { sleutel: "outeur_syfer_verkope", terugval: "Verkope tot op datum" },
+  { sleutel: "outeur_syfer_deel", terugval: "Jou deel tot op datum" },
+  { sleutel: "outeur_syfer_bestellings", terugval: "Om te stuur", let: true },
+];
+
+function teken_syfers() {
   const houer = document.getElementById("outeur-syfers");
   if (!houer) return;
 
-  const syfers = [
-    { sleutel: "outeur_syfer_titels", terugval: "Titels te koop", waarde: data.titels_te_koop },
-    { sleutel: "outeur_syfer_verkope", terugval: "Verkope tot op datum", waarde: data.verkope_totaal },
-    { sleutel: "outeur_syfer_deel", terugval: "Jou deel tot op datum", waarde: data.deel_totaal },
-    { sleutel: "outeur_syfer_bestellings", terugval: "Bestellings om te stuur", waarde: data.bestellings_uitstaande },
-  ];
-
   houer.innerHTML = "";
-  syfers.forEach((syfer) => {
+  OUTEUR_SYFERS.forEach((syfer) => {
     const blok = document.createElement("div");
-    blok.className = "outeur-syfer";
+    blok.className = "outeur-syfer" + (syfer.let ? " outeur-syfer--let" : "");
 
-    const waarde = document.createElement("div");
+    const waarde = document.createElement("span");
     waarde.className = "outeur-syfer-waarde";
-    // Nog geen syfer beskikbaar nie — 'n streep lees beter as 'n nul wat
-    // soos 'n werklike resultaat lyk.
-    waarde.textContent = syfer.waarde === undefined || syfer.waarde === null ? "—" : syfer.waarde;
+    waarde.textContent = "\u2014";
 
-    const etiket = document.createElement("div");
+    const etiket = document.createElement("span");
     etiket.className = "outeur-syfer-etiket";
     etiket.textContent = outeur_vertaal(syfer.sleutel, syfer.terugval);
 
@@ -85,23 +83,20 @@ function teken_syfers(data) {
 function wys_outeur(data) {
   document.getElementById("outeur-status").textContent = "";
 
-  const groet = document.getElementById("outeur-groet");
-  const eerste_naam = String(data.naam || "").trim().split(/\s+/)[0];
-  if (groet && eerste_naam) {
-    groet.textContent = `${outeur_vertaal("outeur_groet", "Goeiedag")}, ${eerste_naam}`;
-  }
+  // Die volle naam is die opskrif. Op die winkel se tuisblad is die
+  // woordmerk die held; hier is die outeur dit.
+  const naam = document.getElementById("outeur-naam");
+  if (naam && data.naam) naam.textContent = data.naam;
 
   // Die kaart wys net solank die uitbetaling nog nie opgestel is nie.
   const kaart = document.getElementById("outeur-status-kaart");
   if (kaart) kaart.hidden = Boolean(data.uitbetaling_gereed);
 
-  teken_syfers(data);
-
+  teken_syfers();
   document.getElementById("outeur-inhoud").hidden = false;
 
-  // Sein vir die afdeling-lêers (outeur-titels.js en later ander) dat die
-  // outeur bevestig is en hulle mag begin laai. Hulle weet niks van
-  // aanmelding nie; dit bly hier.
+  // Sein vir die afdeling-lêers (outeur-titels.js, outeur-bestellings.js)
+  // dat die outeur bevestig is en hulle mag begin laai.
   document.dispatchEvent(new CustomEvent("outeur-gereed", { detail: data }));
 }
 

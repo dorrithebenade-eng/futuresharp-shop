@@ -43,51 +43,62 @@
    </div>
   </header>
 
-  <main class="vb-wrap">
+  <main>
     <!-- Status: aanmeld-versoek, laai-boodskap of foute. sessie-verval.js
          skryf hier 'n aanmeldknoppie in wanneer 'n token verval het. -->
-    <div id="outeur-status" class="stelsel-boodskap" aria-live="polite"></div>
+    <div id="outeur-status" class="stelsel-boodskap outeur-status-buite" aria-live="polite"></div>
 
     <!-- Alles hieronder bly weg tot die outeur bevestig is. -->
     <div id="outeur-inhoud" hidden>
-      <h1 class="mandjie-titel" id="outeur-groet">My paneelbord</h1>
-      <p class="vb-afdeling-nota" data-i18n="outeur_subtitel">
-        'n Oorsig van jou titels op Future Shop.
-      </p>
 
-      <!-- Wys slegs solank die uitbetalingsrekening nog opgestel word. -->
-      <div id="outeur-status-kaart" class="outeur-status-kaart" hidden>
-        <strong data-i18n="outeur_uitbetaling_wag_titel">Jou uitbetalingsrekening word opgestel.</strong>
-        <span data-i18n="outeur_uitbetaling_wag_teks">Jy kan intussen 'n boek indien — dit word te koop aangebied sodra die rekening gereed is.</span>
+      <!-- Die band. Op die winkel se tuisblad dra hierdie band 'n
+           bemarkingsboodskap; hier dra dit die outeur se werk. -->
+      <div class="outeur-band">
+        <img src="images/future-shop-woordmerk.png" alt="" class="outeur-band-merk">
+        <div class="outeur-band-inner">
+          <span class="outeur-oog" data-i18n="outeur_oog">Outeurspaneel</span>
+          <h1 class="outeur-naam" id="outeur-naam">&nbsp;</h1>
+          <p class="outeur-lei" data-i18n="outeur_lei">
+            Jou boeke, jou syfers en die bestellings wat wag om gestuur te word.
+          </p>
+          <div class="outeur-syfers" id="outeur-syfers"></div>
+        </div>
       </div>
 
+      <!-- Die kieslys dok in die band se onderrand in. -->
       <nav class="outeur-kieslys" id="outeur-kieslys">
-        <button type="button" class="outeur-kieslys-item aktief" data-gaan="oorsig" data-i18n="outeur_nav_oorsig">Oorsig</button>
-        <button type="button" class="outeur-kieslys-item" data-gaan="titels" data-i18n="outeur_nav_titels">My titels</button>
-        <button type="button" class="outeur-kieslys-item" data-gaan="bestellings" data-i18n="outeur_nav_bestellings">Bestellings</button>
+        <button type="button" class="outeur-pil aktief" data-gaan="titels" data-i18n="outeur_nav_titels">My titels</button>
+        <button type="button" class="outeur-pil" data-gaan="bestellings">
+          <span data-i18n="outeur_nav_bestellings">Bestellings</span>
+          <span class="outeur-telling" id="outeur-telling" hidden></span>
+        </button>
       </nav>
 
-      <section class="outeur-afdeling wys" data-afdeling="oorsig">
-        <div class="outeur-syfers" id="outeur-syfers"></div>
-      </section>
+      <div class="outeur-inhoud-wrap">
+        <!-- Wys slegs solank die uitbetalingsrekening nog opgestel word. -->
+        <div id="outeur-status-kaart" class="outeur-status-kaart" hidden>
+          <strong data-i18n="outeur_uitbetaling_wag_titel">Jou uitbetalingsrekening word opgestel.</strong>
+          <span data-i18n="outeur_uitbetaling_wag_teks">Jy kan intussen 'n boek indien — dit word te koop aangebied sodra die rekening gereed is.</span>
+        </div>
 
-      <section class="outeur-afdeling" data-afdeling="titels">
-        <div id="outeur-titels-status" class="stelsel-boodskap" aria-live="polite"></div>
-        <div id="outeur-titels-lys"></div>
-      </section>
+        <section class="outeur-afdeling wys" data-afdeling="titels">
+          <div id="outeur-titels-status" class="stelsel-boodskap" aria-live="polite"></div>
+          <div id="outeur-titels-lys"></div>
+        </section>
 
-      <section class="outeur-afdeling" data-afdeling="bestellings">
-        <p class="vb-afdeling-nota" data-i18n="outeur_bestellings_nota">
-          Harde kopiee wat gekoop is en gestuur moet word.
-        </p>
-        <div id="outeur-bestellings-status" class="stelsel-boodskap" aria-live="polite"></div>
+        <section class="outeur-afdeling" data-afdeling="bestellings">
+          <p class="outeur-lei-binne" data-i18n="outeur_bestellings_nota">
+            Harde kopieë wat gekoop is en gestuur moet word.
+          </p>
+          <div id="outeur-bestellings-status" class="stelsel-boodskap" aria-live="polite"></div>
 
-        <h2 class="outeur-sub-opskrif" data-i18n="outeur_om_te_stuur_kop">Om te stuur</h2>
-        <div id="outeur-om-te-stuur"></div>
+          <h2 class="outeur-sub-opskrif" data-i18n="outeur_om_te_stuur_kop">Om te stuur</h2>
+          <div id="outeur-om-te-stuur"></div>
 
-        <h2 class="outeur-sub-opskrif" data-i18n="outeur_reeds_gestuur_kop">Reeds gestuur</h2>
-        <div id="outeur-reeds-gestuur"></div>
-      </section>
+          <h2 class="outeur-sub-opskrif" data-i18n="outeur_reeds_gestuur_kop">Reeds gestuur</h2>
+          <div id="outeur-reeds-gestuur"></div>
+        </section>
+      </div>
     </div>
   </main>
 

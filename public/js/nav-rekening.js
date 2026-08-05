@@ -107,6 +107,41 @@
   });
 })();
 
+// --- Is hierdie koper ook 'n outeur? ---
+//
+// 'n Outeur het GEEN eie Identity-rol nie (sien kry-my-outeur.js) — die
+// enigste manier om te weet, is om te vra. Dit gebeur op 11 bladsye, dus
+// word die antwoord vir die sessie gekas: een oproep per aanmelding, nie
+// een per bladsy nie.
+//
+// Misluk die oproep, wys ons eenvoudig geen skakel nie. 'n Ontbrekende
+// skakel is 'n ongerief; 'n skakel wat 'n 404 gee, is 'n fout.
+const NAV_OUTEUR_SLEUTEL = "future_shop_is_outeur";
+
+async function nav_is_outeur(sessie) {
+  try {
+    const gekas = sessionStorage.getItem(NAV_OUTEUR_SLEUTEL);
+    if (gekas !== null) return gekas === "ja";
+  } catch {
+    // sessionStorage kan geblokkeer wees — dan vra ons elke keer.
+  }
+
+  try {
+    const resp = await fetch("/.netlify/functions/kry-my-outeur", {
+      headers: { Authorization: `Bearer ${sessie.access_token}` },
+    });
+    const is_outeur = resp.ok;
+    try {
+      sessionStorage.setItem(NAV_OUTEUR_SLEUTEL, is_outeur ? "ja" : "nee");
+    } catch {
+      /* nie krities nie */
+    }
+    return is_outeur;
+  } catch {
+    return false;
+  }
+}
+
 // --- 2. Rekening-aftrekkieslys ---
 (async function () {
   const plek = document.getElementById("nav-rekening-plek");
@@ -162,4 +197,19 @@
     identiteit_meld_af();
     window.location.href = "index.html";
   });
+
+  // Die outeurspaneel-skakel kom NA die kop geteken is, want dit wag op 'n
+  // bediener-antwoord. Hy word voor "My Boeke" ingevoeg: die outeur se eie
+  // werk staan voor sy aankope.
+  if (await nav_is_outeur(sessie)) {
+    const groep = document.querySelector(".nav-rekening-groep");
+    const my_boeke = groep && groep.querySelector('a[href="my-boeke.html"]');
+    if (groep) {
+      const skakel = document.createElement("a");
+      skakel.href = "outeur.html";
+      skakel.className = "nav-rekening-skakel";
+      skakel.textContent = window.t ? window.t("nav_outeurspaneel") : "Outeurspaneel";
+      groep.insertBefore(skakel, my_boeke);
+    }
+  }
 })();
