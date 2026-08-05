@@ -11,17 +11,23 @@
 // aanbied om dit in te vul. sessionStorage en nie Blobs nie — dit is 'n
 // konsep, nie data nie, en dit hoort nie 'n bediener-rondte te kos nie.
 //
-// PAYSTACK IS DIE DEEL WAT MAKLIK VERKEERD GAAN. Die vennote kry wat
-// oorbly nadat die hoofrekening se minimum afgetrek is — en daardie
-// minimum is NIE die fooi wat Paystack hef nie:
+// DRIE SOORTE RYE, MEER NIE: Outeur (een per outeur), Ontwerp/Admin, en
+// Hosting as merkblokkie. Die direkteursfooie is NIE 'n verdelingsry nie —
+// dit is wat in die hoofrekening oorbly nadat die outeur, Ontwerp/Admin,
+// Hosting en Paystack afgetrek is. Skep 'n mens tog daardie ry, word die
+// direkteursdeel uitbetaal én daar bly niks vir Paystack nie.
+//
+// Die oorblyfsel word wel bereken en gewys, sodat 'n mens sien wat oorbly
+// en dadelik sien wanneer daar te veel weggegee is. Die berekening gebruik
+// die AFGEDWINGE MINIMUM, nie die werklike fooi nie:
 //
 //     werklike fooi   = 3,335% + R1,15
 //     afgedwinge min  = 3,5%   + R1,30   (_paystack-koste.js)
 //
 // Reken ons met die fooi, is die som 'n paar sent te hoog en skep-produk.js
-// weier die boek. Ons reken dus met die minimum. En omdat daardie R1,30
-// vas is, verskil die vennote se persentasie PER FORMAAT — by 'n R45-leen
-// weeg dit swaar, by 'n R280-boek amper nie.
+// weier die boek. En omdat daardie R1,30 vas is, verskil die oorblyfsel se
+// persentasie per formaat — by 'n R45-leen weeg dit swaar, by 'n R280-boek
+// amper nie.
 //
 // EIE LÊER: paneelbord.js en verdeling-rekenaar.js bly onaangeraak. Die
 // rye word deur die vorm se EIE voeg_verdeling_ry_by() geskep, nie met
@@ -71,17 +77,19 @@ function pro_bou_uitslag() {
   const hosting = pro_getal("vr-hosting-pct");
 
   const pryse = {};
-  const vennoot = {};
+  const direkteure = {};
 
+  // Hosting bly in die hoofrekening, net soos die direkteursfooie, maar dit
+  // word eenkant gehou en tel dus nie hier saam nie.
   PRO_FORMATE.forEach((f) => {
     const prys = pro_getal(`vr-begin-${f.vr_sleutel}`);
     pryse[f.sleutel] = prys;
-    vennoot[f.sleutel] = Number(
+    direkteure[f.sleutel] = Number(
       (100 - outeur_som - hosting - ontwerp_admin - pro_minimum_pct(prys)).toFixed(2)
     );
   });
 
-  return { tyd: new Date().toISOString(), outeurs, ontwerp_admin, hosting, vennoot, pryse };
+  return { tyd: new Date().toISOString(), outeurs, ontwerp_admin, hosting, direkteure, pryse };
 }
 
 function pro_stel_rekenaar_op() {
@@ -120,7 +128,12 @@ function pro_stel_rekenaar_op() {
 function pro_lees_oordrag() {
   try {
     const rou = sessionStorage.getItem(PRO_SLEUTEL);
-    return rou ? JSON.parse(rou) : null;
+    if (!rou) return null;
+    const oordrag = JSON.parse(rou);
+    // 'n Uitslag wat deur die ou weergawe gestoor is, het 'n vennoot-veld.
+    if (!oordrag.direkteure && oordrag.vennoot) oordrag.direkteure = oordrag.vennoot;
+    if (!oordrag.direkteure) return null;
+    return oordrag;
   } catch {
     return null;
   }
@@ -175,21 +188,13 @@ function pro_vul_in(oordrag) {
       });
     });
 
-    // Ontwerp/Admin en Vennoot word ALTYD geskep, ook by 0 of 'n negatiewe
-    // syfer. 'n Ry wat sigbaar is, kan weggeklik word; een wat stilweg
-    // ontbreek, word gemis.
+    // Ontwerp/Admin word ALTYD geskep, ook by 0. 'n Ry wat sigbaar is, kan
+    // weggeklik word; een wat stilweg ontbreek, word gemis.
     voeg_verdeling_ry_by(f.sleutel, {
       rol_tipe: "ontwerp_admin",
       entiteit_id: "",
       tipe: "persentasie",
       waarde: oordrag.ontwerp_admin,
-    });
-
-    voeg_verdeling_ry_by(f.sleutel, {
-      rol_tipe: "vennoot",
-      entiteit_id: "",
-      tipe: "persentasie",
-      waarde: oordrag.vennoot[f.sleutel],
     });
 
     // Hosting is 'n merkblokkie op die vorm, nie 'n verdelingsry nie —
@@ -222,13 +227,25 @@ function pro_wys_strook() {
   const strook = document.createElement("div");
   strook.id = "pro-strook";
 
+  const oorblyfsels = PRO_FORMATE.map((f) => Number(oordrag.direkteure[f.sleutel]) || 0);
+  const te_min = oorblyfsels.some((waarde) => waarde < 0);
+
   const teks = document.createElement("span");
-  const vennote = PRO_FORMATE.map((f) => `${oordrag.vennoot[f.sleutel].toFixed(1)}%`).join(" / ");
+  const gelys = oorblyfsels.map((waarde) => `${waarde.toFixed(1)}%`).join(" / ");
   teks.textContent =
     `Daar is 'n uitslag van die Verdeling-rekenaar van ${pro_tyd_kort(oordrag.tyd)} — ` +
-    `${oordrag.outeurs.length} outeur(s), ${oordrag.ontwerp_admin}% Ontwerp/Admin, ` +
-    `vennote ${vennote} (e-boek / leen / harde kopie).`;
+    `${oordrag.outeurs.length} outeur(s), ${oordrag.ontwerp_admin}% Ontwerp/Admin` +
+    (oordrag.hosting > 0 ? `, ${oordrag.hosting}% Hosting` : "") +
+    `. Vir Future Sharp bly ${gelys} oor (e-boek / leen / harde kopie).`;
   strook.appendChild(teks);
+
+  if (te_min) {
+    const waarsku = document.createElement("span");
+    waarsku.className = "pro-strook-waarsku";
+    waarsku.textContent =
+      "By ten minste een formaat bly daar niks vir Future Sharp oor nie. Die boek sal geweier word.";
+    strook.appendChild(waarsku);
+  }
 
   const vul = document.createElement("button");
   vul.type = "button";
@@ -266,6 +283,7 @@ function pro_stel_styl_op() {
     }
     #pro-strook > span { flex: 1; min-width: 220px; }
     #pro-strook .knoppie-primer { padding: 7px 15px; font-size: 12px; }
+    .pro-strook-waarsku { flex-basis: 100%; color: #9a2b2b; font-weight: 600; }
     .pro-strook-teks {
       background: none; border: none; color: #6b5610; text-decoration: underline;
       font-family: var(--font-liggaam); font-size: 12px; cursor: pointer; padding: 0;
