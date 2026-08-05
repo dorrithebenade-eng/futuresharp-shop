@@ -5,6 +5,13 @@
  * ensovoorts) kom uit styl.css, wat voor hierdie lêer laai.
  */
 
+/* Die statusblokkie sit bo die band en moet geen ruimte neem wanneer dit
+   leeg is nie — andersins is daar 'n wit strook tussen die kop en die teal. */
+#outeur-status.outeur-status-buite:empty {
+  padding: 0;
+  margin: 0;
+}
+
 /* --- Die band ---
  *
  * Dieselfde teal-band as die winkel se tuisblad, maar met ander werk. Daar
@@ -29,14 +36,18 @@
 /* Klein en stil regs bo. Die outeur se naam is die opskrif hier, nie die
    winkel nie — die woordmerk sê net "dieselfde huis". Op 'n foon val dit
    weg sodat dit nie met die syfers baklei nie. */
+/* Die PNG het 'n WIT agtergrond, nie 'n deursigtige een nie — sonder
+   mix-blend-mode sit hy as 'n wit kaartjie op die teal. `multiply` laat die
+   wit verdwyn en hou die blokkies se kleure. */
 .outeur-band-merk {
   position: absolute;
-  right: 24px;
-  top: 30px;
-  width: 190px;
+  right: 28px;
+  top: 34px;
+  width: 210px;
   height: auto;
-  opacity: .9;
   z-index: 0;
+  mix-blend-mode: multiply;
+  opacity: .92;
 }
 
 @media (max-width: 860px) {
@@ -118,7 +129,7 @@
    inhoud daaronder in plaas van twee los stukke. */
 .outeur-kieslys {
   max-width: 1100px;
-  margin: -24px auto 0;
+  margin: -23px auto 0;
   padding: 0 24px;
   display: flex;
   gap: 9px;
@@ -160,6 +171,10 @@
   .outeur-pil { transition: none; }
   .outeur-pil:hover { transform: none; }
 }
+
+/* [hidden] moet display: grid klop, anders wys 'n nul in 'n koraal sirkel
+   soos 'n taak wat nie bestaan nie. */
+.outeur-telling[hidden] { display: none; }
 
 .outeur-telling {
   background: var(--koraal);

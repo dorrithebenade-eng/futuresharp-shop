@@ -13,7 +13,11 @@
 
 function outeur_wys_status(teks) {
   const el = document.getElementById("outeur-status");
-  if (el) el.textContent = teks;
+  if (!el) return;
+  el.textContent = teks;
+  // Sonder dit hou 'n leë blokkie sy opvulling en laat 'n wit strook
+  // tussen die swart kop en die teal band.
+  el.hidden = !teks;
 }
 
 function outeur_vertaal(sleutel, terugval) {
@@ -81,7 +85,7 @@ function teken_syfers() {
 }
 
 function wys_outeur(data) {
-  document.getElementById("outeur-status").textContent = "";
+  outeur_wys_status("");
 
   // Die volle naam is die opskrif. Op die winkel se tuisblad is die
   // woordmerk die held; hier is die outeur dit.
