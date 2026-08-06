@@ -214,36 +214,40 @@ function vr_bereken(formaat) {
   const begin = vr_getal(`vr-begin-${formaat.sleutel}`);
   const K = vr_getal(`vr-k-${formaat.sleutel}`);
 
-  // Die prys bestaan uit twee dele. Die KOSTEDEEL bring die outeur se druk
-  // en aflewering teen kosprys terug; die 0,965 is 1 minus Paystack se
-  // afgedwinge 3,5%, sodat die fooi op daardie deel deur die koper gedra
-  // word en nie uit Future Sharp se deel kom nie. Die BOEKDEEL is wat
-  // oorbly, en dit is die enigste ding waarop 70/30 geld.
+  // DIE BOEK HET EEN PRYS. Wat 'n harde kopie duurder maak, is nie 'n ander
+  // verdeling nie — dit is versending wat bo-op kom. Die 70/30 geld op die
+  // BOEKPRYS, en die outeur se druk en aflewering loop skoon daardeur.
   //
-  // By 'n e-boek en 'n leen is K nul, die kostedeel verdwyn, en die som is
-  // presies wat dit altyd was.
+  // Die kostedeel word deur 0,965 gedeel (1 minus die afgedwinge 3,5%).
+  // Daardie opstoot bly in die hoofrekening en betaal Paystack se fooi op
+  // die versending. Die outeur kry sy K presies terug, nie meer nie — gee
+  // 'n mens hom die opgestote bedrag, dra Future Sharp die fooi steeds.
+  //
+  // By 'n e-boek en 'n leen is K nul en die som is wat dit altyd was.
+  const boekprys = vr_modus === "wins" ? begin / (outeurPct / 100) : begin;
   const kosteDeel = K > 0 ? K / VR_KOSTE_DEELTAL : 0;
 
-  // Die ENIGSTE verskil tussen die twee invoerrigtings.
-  let P = vr_modus === "wins" ? kosteDeel + begin / (outeurPct / 100) : begin;
+  let P = boekprys + kosteDeel;
   const P_rou = P;
   P = vr_afrond(P);
 
+  // Ná afronding is die boekdeel wat werklik oorbly die basis vir elke
+  // persentasie. Andersins tel die afronding stil by iemand se deel.
   const B = Math.max(0, P - kosteDeel);
 
-  // Die outeur kry twee dinge: sy koste terug as 'n vaste bedrag, en sy
-  // persentasie op die boekdeel. In die katalogus is dit twee rye wat
+  // Die outeur kry twee dinge: sy koste presies terug as 'n vaste bedrag,
+  // en sy persentasie op die boekprys. In die katalogus is dit twee rye wat
   // bymekaar tel.
   const outeurVasteRand = K;
   const outeurPersRand = (outeurPct / 100) * B;
   const outeurRand = outeurVasteRand + outeurPersRand;
-  const outeurWins = outeurRand - K;
+  const outeurWins = outeurPersRand;
 
   // Paystack reken op die VOLLE prys — hy weet niks van boekdele nie.
   const paystackRand = ((vr_getal("vr-paystack-pct") / 100) * P + vr_getal("vr-paystack-vaste")) * (1 + vr_getal("vr-btw-pct") / 100);
 
-  // Die res geld op die boekdeel. Andersins verdien Future Sharp op die
-  // outeur se posgeld, en dit is presies wat hierdie formule wegneem.
+  // Die res geld op die boekprys. Andersins verdien Future Sharp op die
+  // outeur se posgeld.
   const hostingRand = (vr_getal("vr-hosting-pct") / 100) * B;
   const adminRand = (vr_getal("vr-admin-pct") / 100) * B;
   const ontwerpRand = (vr_getal("vr-ontwerp-pct") / 100) * B;
@@ -496,8 +500,8 @@ function vr_stel_modus(nuwe_modus) {
   vorige.forEach((u) => {
     const veld = document.getElementById(`vr-begin-${u.formaat.sleutel}`);
     const etiket = document.getElementById(`vr-begin-etiket-${u.formaat.sleutel}`);
-    if (veld) veld.value = Math.round((nuwe_modus === "prys" ? u.P : u.outeurWins) * 100) / 100;
-    if (etiket) etiket.textContent = nuwe_modus === "prys" ? "Verkoopprys" : vr_wins_etiket();
+    if (veld) veld.value = Math.round((nuwe_modus === "prys" ? u.B : u.outeurWins) * 100) / 100;
+    if (etiket) etiket.textContent = nuwe_modus === "prys" ? (u.K > 0 ? "Boekprys (sonder versending)" : "Verkoopprys") : vr_wins_etiket();
   });
 
   vr_herbereken_alles();
