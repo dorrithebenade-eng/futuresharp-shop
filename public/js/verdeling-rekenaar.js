@@ -66,7 +66,7 @@ const VR_LEEN_BREUK = 0.35;
 // koper Paystack se fooi op daardie deel te laat dra, word dit deur 0,965
 // gedeel - 1 minus die afgedwinge 3,5%. Die vaste R1,30 sit nie hierin
 // nie; dit is eenmalig per transaksie en hoort by die boek self.
-const VR_KOSTE_DEELTAL = 0.965;
+// VS_KOSTE_DEELTAL leef in verdeling-som.js — die som se enigste tuiste.
 
 const VR_EENHEID_STYL = `.vr-eenheid { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
 .vr-eenheid button { font-size: 11px; padding: 4px 12px; border-radius: 6px; border: 1px solid #E5E2DC; background: none; cursor: pointer; font-family: var(--font-liggaam); }
@@ -225,69 +225,29 @@ function vr_wys_outeur_som() {
 
 // ---------- Berekening ----------
 
+// Hierdie funksie LEES net die velde. Die som self leef in
+// verdeling-som.js, want die outeur se indienvorm moet presies dieselfde
+// berekening loop. Verskil twee weergawes met 'n sent, weier
+// skep-produk.js die boek — en dan sien 'n outeur die fout, nie Dorrithe nie.
 function vr_bereken(formaat) {
-  const outeurPct = vr_outeur_pct();
-  const begin = vr_getal(`vr-begin-${formaat.sleutel}`);
-  const K = vr_getal(`vr-k-${formaat.sleutel}`);
+  const u = vs_bereken({
+    modus: vr_modus,
+    begin: vr_getal(`vr-begin-${formaat.sleutel}`),
+    koste: vr_getal(`vr-k-${formaat.sleutel}`),
+    outeurPct: vr_outeur_pct(),
+    hostingPct: vr_getal("vr-hosting-pct"),
+    adminPct: vr_getal("vr-admin-pct"),
+    ontwerpPct: vr_getal("vr-ontwerp-pct"),
+    paystackPct: vr_getal("vr-paystack-pct"),
+    paystackVaste: vr_getal("vr-paystack-vaste"),
+    btwPct: vr_getal("vr-btw-pct"),
+    rond: vr_rond,
+  });
 
-  // DIE BOEK HET EEN PRYS. Wat 'n harde kopie duurder maak, is nie 'n ander
-  // verdeling nie — dit is versending wat bo-op kom. Die 70/30 geld op die
-  // BOEKPRYS, en die outeur se druk en aflewering loop skoon daardeur.
-  //
-  // Die kostedeel word deur 0,965 gedeel (1 minus die afgedwinge 3,5%).
-  // Daardie opstoot bly in die hoofrekening en betaal Paystack se fooi op
-  // die versending. Die outeur kry sy K presies terug, nie meer nie — gee
-  // 'n mens hom die opgestote bedrag, dra Future Sharp die fooi steeds.
-  //
-  // By 'n e-boek en 'n leen is K nul en die som is wat dit altyd was.
-  const boekprys = vr_modus === "wins" ? begin / (outeurPct / 100) : begin;
-  const kosteDeel = K > 0 ? K / VR_KOSTE_DEELTAL : 0;
-
-  let P = boekprys + kosteDeel;
-  if (P <= 0) {
-    return {
-      formaat, P: 0, P_rou: 0, afgerond: false, leeg: true,
-      B: 0, kosteDeel: 0, outeurVasteRand: 0, outeurPersRand: 0,
-      outeurRand: 0, outeurWins: 0, K: 0, paystackRand: 0, hostingRand: 0,
-      adminRand: 0, ontwerpRand: 0, futureSharpRand: 0, direkteursRand: 0,
-      pct: () => 0,
-    };
-  }
-  const P_rou = P;
-  P = vr_afrond(P);
-
-  // Ná afronding is die boekdeel wat werklik oorbly die basis vir elke
-  // persentasie. Andersins tel die afronding stil by iemand se deel.
-  const B = Math.max(0, P - kosteDeel);
-
-  // Die outeur kry twee dinge: sy koste presies terug as 'n vaste bedrag,
-  // en sy persentasie op die boekprys. In die katalogus is dit twee rye wat
-  // bymekaar tel.
-  const outeurVasteRand = K;
-  const outeurPersRand = (outeurPct / 100) * B;
-  const outeurRand = outeurVasteRand + outeurPersRand;
-  const outeurWins = outeurPersRand;
-
-  // Paystack reken op die VOLLE prys — hy weet niks van boekdele nie.
-  const paystackRand = ((vr_getal("vr-paystack-pct") / 100) * P + vr_getal("vr-paystack-vaste")) * (1 + vr_getal("vr-btw-pct") / 100);
-
-  // Die res geld op die boekprys. Andersins verdien Future Sharp op die
-  // outeur se posgeld.
-  const hostingRand = (vr_getal("vr-hosting-pct") / 100) * B;
-  const adminRand = (vr_getal("vr-admin-pct") / 100) * B;
-  const ontwerpRand = (vr_getal("vr-ontwerp-pct") / 100) * B;
-
-  const futureSharpRand = P - outeurRand;
-  const direkteursRand = futureSharpRand - paystackRand - hostingRand - adminRand - ontwerpRand;
-
-  const pct = (rand) => (P > 0 ? (rand / P) * 100 : 0);
-
-  return {
-    formaat, P, P_rou, afgerond: Math.abs(P - P_rou) > 0.005,
-    B, kosteDeel, outeurVasteRand, outeurPersRand,
-    outeurRand, outeurWins, K, paystackRand, hostingRand, adminRand, ontwerpRand,
-    futureSharpRand, direkteursRand, pct,
-  };
+  return Object.assign({}, u, {
+    formaat,
+    pct: (rand) => (u.P > 0 ? (rand / u.P) * 100 : 0),
+  });
 }
 
 const vr_bereken_alles = () => VR_FORMATE.map(vr_bereken);
