@@ -74,18 +74,35 @@ function pro_lees_outeurs() {
   return [{ naam: "", pct: pro_getal("vr-outeur-pct") }];
 }
 
+// Die uitslag word HIER na persentasies van die prys omgereken, sodat die
+// produkvorm niks hoef te weet van boekdele nie.
+//
+// vr_bereken_alles() is die enigste bron. Die invoerveld vr-begin-<formaat>
+// is in wins-modus die outeur se VERLANGDE WINS, nie 'n prys nie — dit lees
+// en as 'n prys deurgee, sit 'n te lae prys in die vorm.
 function pro_bou_uitslag() {
-  const pryse = {};
-  PRO_FORMATE.forEach((f) => {
-    pryse[f.sleutel] = pro_getal(`vr-begin-${f.sleutel}`);
+  if (typeof vr_bereken_alles !== "function") return null;
+
+  const outeurs = pro_lees_outeurs();
+  const ontwerp_admin = pro_getal("vr-admin-pct") + pro_getal("vr-ontwerp-pct");
+  const hosting = pro_getal("vr-hosting-pct");
+  const formate = {};
+
+  vr_bereken_alles().forEach((u) => {
+    const P = u.P;
+    // 'n Persentasie wat op die boekdeel geld, word 'n kleiner persentasie
+    // van die volle prys. Die katalogus ken net die volle prys.
+    const van_boekdeel = (pct) => (P > 0 ? (pct / 100) * u.B / P * 100 : 0);
+    formate[u.formaat.sleutel] = {
+      prys: Number(P.toFixed(2)),
+      vaste: Number(u.K) || 0,
+      outeurs: outeurs.map((o) => ({ naam: o.naam, pct: Number(van_boekdeel(o.pct).toFixed(2)) })),
+      ontwerp_admin: Number(van_boekdeel(ontwerp_admin).toFixed(2)),
+      hosting: Number(van_boekdeel(hosting).toFixed(2)),
+    };
   });
-  return {
-    tyd: new Date().toISOString(),
-    outeurs: pro_lees_outeurs(),
-    ontwerp_admin: pro_getal("vr-admin-pct") + pro_getal("vr-ontwerp-pct"),
-    hosting: pro_getal("vr-hosting-pct"),
-    pryse,
-  };
+
+  return { tyd: new Date().toISOString(), formate };
 }
 
 function pro_stel_rekenaar_op() {
@@ -106,7 +123,9 @@ function pro_stel_rekenaar_op() {
 
   knoppie.addEventListener("click", () => {
     try {
-      sessionStorage.setItem(PRO_SLEUTEL, JSON.stringify(pro_bou_uitslag()));
+      const uitslag = pro_bou_uitslag();
+      if (!uitslag) { boodskap.textContent = "Die rekenaar is nie gereed nie."; return; }
+      sessionStorage.setItem(PRO_SLEUTEL, JSON.stringify(uitslag));
       boodskap.textContent = "Gestoor. Maak 'n boek se vorm oop om dit in te vul.";
     } catch (fout) {
       console.error("Kon nie die uitslag stoor nie:", fout);
@@ -126,7 +145,7 @@ function pro_lees_oordrag() {
     const rou = sessionStorage.getItem(PRO_SLEUTEL);
     if (!rou) return null;
     const oordrag = JSON.parse(rou);
-    return oordrag && Array.isArray(oordrag.outeurs) ? oordrag : null;
+    return oordrag && oordrag.formate ? oordrag : null;
   } catch {
     return null;
   }
@@ -194,34 +213,38 @@ function pro_vul_in(s, oordrag) {
     return;
   }
 
+  const u = oordrag.formate[s];
+  if (!u) return;
+
   pro_afskrifte[s] = pro_neem_afskrif(s);
 
   // Wat die rekenaar nie ken nie, bly staan.
   const behou = pro_afskrifte[s].rye.filter((ry) => !PRO_EIE_ROLLE.includes(ry.rol_tipe));
 
-  const nuwe = oordrag.outeurs.map((outeur) => ({
-    rol_tipe: "outeur",
-    entiteit_id: "",
-    tipe: "persentasie",
-    waarde: outeur.pct,
-  }));
+  const nuwe = [];
+
+  // Die outeur se druk- en afleweringskoste kom teen kosprys terug — 'n
+  // vaste bedrag in rand, nie 'n persentasie nie. Dit is die eerste van sy
+  // twee rye; die twee tel in begin-betaling.js bymekaar.
+  if (u.vaste > 0) {
+    nuwe.push({ rol_tipe: "outeur", entiteit_id: "", tipe: "vaste_bedrag", waarde: u.vaste });
+  }
+
+  u.outeurs.forEach((outeur) => {
+    nuwe.push({ rol_tipe: "outeur", entiteit_id: "", tipe: "persentasie", waarde: outeur.pct });
+  });
 
   // Ontwerp/Admin word altyd geskep, ook by 0. 'n Ry wat sigbaar is, kan
   // weggeklik word; een wat stilweg ontbreek, word gemis.
-  nuwe.push({
-    rol_tipe: "ontwerp_admin",
-    entiteit_id: "",
-    tipe: "persentasie",
-    waarde: oordrag.ontwerp_admin,
-  });
+  nuwe.push({ rol_tipe: "ontwerp_admin", entiteit_id: "", tipe: "persentasie", waarde: u.ontwerp_admin });
 
   pro_skryf_stand(s, {
-    prys: oordrag.pryse[s] > 0 ? oordrag.pryse[s] : pro_afskrifte[s].prys,
+    prys: u.prys > 0 ? u.prys : pro_afskrifte[s].prys,
     verdeling_aan: true,
     rye: nuwe.concat(behou),
-    hosting_aan: oordrag.hosting > 0 ? true : pro_afskrifte[s].hosting_aan,
-    hosting_tipe: oordrag.hosting > 0 ? "persentasie" : pro_afskrifte[s].hosting_tipe,
-    hosting_waarde: oordrag.hosting > 0 ? oordrag.hosting : pro_afskrifte[s].hosting_waarde,
+    hosting_aan: u.hosting > 0 ? true : pro_afskrifte[s].hosting_aan,
+    hosting_tipe: u.hosting > 0 ? "persentasie" : pro_afskrifte[s].hosting_tipe,
+    hosting_waarde: u.hosting > 0 ? u.hosting : pro_afskrifte[s].hosting_waarde,
   });
 
   pro_teken(s);
@@ -314,13 +337,14 @@ function pro_teken(s) {
   if (oordrag) {
     const aanbod = document.createElement("span");
     aanbod.className = "pro-balk-aanbod";
-    const prys = oordrag.pryse[s];
+    const u = oordrag.formate[s] || {};
     aanbod.textContent =
       `Rekenaar ${pro_tyd_kort(oordrag.tyd)}` +
-      (prys > 0 ? ` · R${Number(prys).toFixed(2)}` : "") +
-      ` · ${oordrag.outeurs.length} outeur(s) ${oordrag.outeurs.map((o) => o.pct).join("/")}%` +
-      ` · Ontwerp/Admin ${oordrag.ontwerp_admin}%` +
-      (oordrag.hosting > 0 ? ` · Hosting ${oordrag.hosting}%` : "");
+      (u.prys > 0 ? ` · R${u.prys.toFixed(2)}` : "") +
+      (u.vaste > 0 ? ` · druk/aflewering R${u.vaste.toFixed(2)} vas` : "") +
+      ` · ${(u.outeurs || []).length} outeur(s) ${(u.outeurs || []).map((o) => o.pct).join("/")}%` +
+      ` · Ontwerp/Admin ${u.ontwerp_admin}%` +
+      (u.hosting > 0 ? ` · Hosting ${u.hosting}%` : "");
     balk.appendChild(aanbod);
 
     const knoppie = document.createElement("button");

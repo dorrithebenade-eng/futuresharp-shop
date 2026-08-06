@@ -456,8 +456,9 @@ function vr_bou_formaat_rye() {
       <label class="vr-veld"><span id="vr-begin-etiket-${f.sleutel}">${vr_wins_etiket()}</span>
         <div class="vr-veld-invoer"><span>R</span><input type="number" id="vr-begin-${f.sleutel}" value="${f.verstek_begin}" step="10"></div>
       </label>
-      <label class="vr-veld"><span>Eie druk-/afleweringskoste${f.k_wysigbaar ? `<span class="vr-fynskrif">kom teen kosprys terug; die verdeling geld op die res</span>` : ""}</span>
+      <label class="vr-veld"><span>Eie druk-/afleweringskoste</span>
         <div class="vr-veld-invoer"><span>R</span><input type="number" id="vr-k-${f.sleutel}" value="${f.verstek_k}" step="10" ${f.k_wysigbaar ? "" : "disabled"}></div>
+        ${f.k_wysigbaar ? `<span class="vr-fynskrif">Kom teen kosprys terug. Die verdeling geld op die res.</span>` : ""}
       </label>
       ${f.sleutel === "leen" ? `<button type="button" class="vr-wenk" id="vr-wenk-leen">≈ 35% van e-boek</button>` : `<span class="vr-wenk-leeg"></span>`}
     </div>`
