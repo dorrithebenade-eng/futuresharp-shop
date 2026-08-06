@@ -62,6 +62,12 @@ const VR_STANDAARD_OUTEUR_PCT = 70;
 // net 'n vertrekpunt vir die "≈"-knoppie, nie 'n reël nie.
 const VR_LEEN_BREUK = 0.35;
 
+// Die outeur se druk- en afleweringskoste kom teen kosprys terug. Om die
+// koper Paystack se fooi op daardie deel te laat dra, word dit deur 0,965
+// gedeel - 1 minus die afgedwinge 3,5%. Die vaste R1,30 sit nie hierin
+// nie; dit is eenmalig per transaksie en hoort by die boek self.
+const VR_KOSTE_DEELTAL = 0.965;
+
 const VR_FORMATE = [
   { sleutel: "eboek", naam: "E-boek", sub: "", verstek_k: 0, k_wysigbaar: false, verstek_begin: 100 },
   { sleutel: "leen", naam: "Leen", sub: "30 dae", verstek_k: 0, k_wysigbaar: false, verstek_begin: 35 },
@@ -208,26 +214,50 @@ function vr_bereken(formaat) {
   const begin = vr_getal(`vr-begin-${formaat.sleutel}`);
   const K = vr_getal(`vr-k-${formaat.sleutel}`);
 
+  // Die prys bestaan uit twee dele. Die KOSTEDEEL bring die outeur se druk
+  // en aflewering teen kosprys terug; die 0,965 is 1 minus Paystack se
+  // afgedwinge 3,5%, sodat die fooi op daardie deel deur die koper gedra
+  // word en nie uit Future Sharp se deel kom nie. Die BOEKDEEL is wat
+  // oorbly, en dit is die enigste ding waarop 70/30 geld.
+  //
+  // By 'n e-boek en 'n leen is K nul, die kostedeel verdwyn, en die som is
+  // presies wat dit altyd was.
+  const kosteDeel = K > 0 ? K / VR_KOSTE_DEELTAL : 0;
+
   // Die ENIGSTE verskil tussen die twee invoerrigtings.
-  let P = vr_modus === "wins" ? (begin + K) / (outeurPct / 100) : begin;
+  let P = vr_modus === "wins" ? kosteDeel + begin / (outeurPct / 100) : begin;
   const P_rou = P;
   P = vr_afrond(P);
 
-  const outeurRand = (outeurPct / 100) * P;
+  const B = Math.max(0, P - kosteDeel);
+
+  // Die outeur kry twee dinge: sy koste terug as 'n vaste bedrag, en sy
+  // persentasie op die boekdeel. In die katalogus is dit twee rye wat
+  // bymekaar tel.
+  const outeurVasteRand = K;
+  const outeurPersRand = (outeurPct / 100) * B;
+  const outeurRand = outeurVasteRand + outeurPersRand;
   const outeurWins = outeurRand - K;
+
+  // Paystack reken op die VOLLE prys — hy weet niks van boekdele nie.
   const paystackRand = ((vr_getal("vr-paystack-pct") / 100) * P + vr_getal("vr-paystack-vaste")) * (1 + vr_getal("vr-btw-pct") / 100);
-  const hostingRand = (vr_getal("vr-hosting-pct") / 100) * P;
-  const adminRand = (vr_getal("vr-admin-pct") / 100) * P;
-  const ontwerpRand = (vr_getal("vr-ontwerp-pct") / 100) * P;
+
+  // Die res geld op die boekdeel. Andersins verdien Future Sharp op die
+  // outeur se posgeld, en dit is presies wat hierdie formule wegneem.
+  const hostingRand = (vr_getal("vr-hosting-pct") / 100) * B;
+  const adminRand = (vr_getal("vr-admin-pct") / 100) * B;
+  const ontwerpRand = (vr_getal("vr-ontwerp-pct") / 100) * B;
 
   const futureSharpRand = P - outeurRand;
   const direkteursRand = futureSharpRand - paystackRand - hostingRand - adminRand - ontwerpRand;
 
+  const pct = (rand) => (P > 0 ? (rand / P) * 100 : 0);
+
   return {
     formaat, P, P_rou, afgerond: Math.abs(P - P_rou) > 0.005,
+    B, kosteDeel, outeurVasteRand, outeurPersRand,
     outeurRand, outeurWins, K, paystackRand, hostingRand, adminRand, ontwerpRand,
-    futureSharpRand, direkteursRand,
-    pct: (rand) => (P > 0 ? (rand / P) * 100 : 0),
+    futureSharpRand, direkteursRand, pct,
   };
 }
 
@@ -241,17 +271,23 @@ function vr_aansig_opstel(uitslae) {
   const admin = vr_getal("vr-admin-pct");
   const ontwerp = vr_getal("vr-ontwerp-pct");
   const ontwerpAdmin = admin + ontwerp;
-  const saam = vr_outeur_som() + ontwerpAdmin + hosting;
   const somKlop = Math.abs(outeurPct - vr_outeur_som()) < 0.005;
+  const enigeK = uitslae.some((u) => u.K > 0);
 
   const kop = uitslae.map((u) => `<th>${u.formaat.naam}</th>`).join("");
   const prysRy = uitslae
     .map((u) => `<td><span class="vr-getal">${u.P.toFixed(2)}</span>${u.afgerond ? `<span class="vr-fynskrif">van ${u.P_rou.toFixed(2)}</span>` : ""}</td>`)
     .join("");
-  const selfdeRy = (etiket, waarde, fyn) =>
-    `<tr><td>${etiket}${fyn ? `<span class="vr-fynskrif">${fyn}</span>` : ""}</td>${uitslae.map(() => `<td class="vr-getal">${waarde}</td>`).join("")}</tr>`;
 
-  const slegte = uitslae.filter((u) => u.direkteursRand < 0).map((u) => u.formaat.naam);
+  // Die persentasies verskil nou PER FORMAAT. By 'n harde kopie geld hulle
+  // op die boekdeel, en die persentasie van die volle prys is dus laer.
+  // Een kolom vir al drie sou 'n verkeerde getal in die vorm laat beland.
+  const ry = (etiket, kies, fyn, klas) =>
+    `<tr class="${klas || ""}"><td>${etiket}${fyn ? `<span class="vr-fynskrif">${fyn}</span>` : ""}</td>${uitslae
+      .map((u) => `<td class="vr-getal">${kies(u)}</td>`)
+      .join("")}</tr>`;
+
+  const pctVan = (u, deel) => (u.P > 0 ? ((deel / 100) * u.B / u.P) * 100 : 0);
 
   return `
     <p class="vr-lei">Tik dit so in by <b>Katalogus &rarr; produk</b>, een kolom per formaat.</p>
@@ -260,21 +296,32 @@ function vr_aansig_opstel(uitslae) {
       <tbody>
         <tr class="vr-r-prys"><td>Prys (R)</td>${prysRy}</tr>
         <tr class="vr-r-groep"><td colspan="4">Verdelings</td></tr>
-        ${vr_outeurs.map((o, i) => selfdeRy(`Outeur — ${vr_outeur_etiket(o, i)}`, `${o.pct} %`)).join("")}
-        ${selfdeRy("Ontwerp/Admin", `${ontwerpAdmin} %`, `admin ${admin} % + ontwerp ${ontwerp} %`)}
+        ${enigeK ? ry("Outeur — druk en aflewering", (u) => (u.K > 0 ? `R${u.K.toFixed(2)}` : "—"), "vaste bedrag, nie 'n persentasie nie") : ""}
+        ${vr_outeurs
+          .map((o, i) => ry(`Outeur — ${vr_outeur_etiket(o, i)}`, (u) => `${((o.pct / 100) * u.B / (u.P || 1) * 100).toFixed(1)} %`))
+          .join("")}
+        ${enigeK ? ry("Outeur — saam", (u) => `${u.pct(u.outeurRand).toFixed(1)} %`, "die twee rye bymekaar", "vr-r-vet") : ""}
+        ${ry("Ontwerp/Admin", (u) => `${pctVan(u, ontwerpAdmin).toFixed(1)} %`, `admin ${admin} % + ontwerp ${ontwerp} %`)}
         <tr class="vr-r-groep"><td colspan="4">Hosting</td></tr>
-        ${selfdeRy("Hosting", `${hosting} %`)}
+        ${ry("Hosting", (u) => `${pctVan(u, hosting).toFixed(1)} %`)}
       </tbody>
     </table>
+    ${enigeK ? `<p class="vr-fynskrif vr-lei">Die harde kopie se persentasies lyk laer omdat sy prys die outeur se druk- en poskoste insluit. Trek dit af, en die verdeling is presies dieselfde ${outeurPct}/${100 - outeurPct} as die e-boek s'n.</p>` : ""}
     ${!somKlop ? `<div class="vr-kontrole vr-kontrole--nee"><span>⚠</span><span>Die outeursrye tel nie op tot ${outeurPct}% nie — maak dit eers reg voordat jy die vorm invul.</span></div>` : ""}
-    <div class="vr-kontrole ${slegte.length ? "vr-kontrole--nee" : "vr-kontrole--ja"}">
-      <span>${slegte.length ? "⚠" : "✓"}</span>
-      <span>${
-        slegte.length
-          ? `<b>${slegte.join(" en ")}</b> los te min oor vir die hoofrekening — die direkteursfooie is negatief. Verhoog die prys of verlaag 'n koste-lyn.`
-          : `Verdelings plus Hosting = <b>${saam.toFixed(1)}%</b>. Die hoofrekening hou ${(100 - saam).toFixed(1)}% terug — genoeg vir Paystack se fooi by al drie pryse.`
-      }</span>
-    </div>`;
+    ${vr_opstel_kontrole(uitslae)}`;
+}
+
+// Die kontrole reken per formaat, want die persentasies verskil nou per
+// formaat. 'n Enkele som oor al drie sou by een van hulle lieg.
+function vr_opstel_kontrole(uitslae) {
+  const slegte = uitslae.filter((u) => u.direkteursRand < 0).map((u) => u.formaat.naam);
+  if (slegte.length) {
+    return `<div class="vr-kontrole vr-kontrole--nee"><span>⚠</span><span><b>${slegte.join(" en ")}</b> los te min oor vir die hoofrekening — die direkteursfooie is negatief. Verhoog die prys of verlaag 'n koste-lyn.</span></div>`;
+  }
+  const reels = uitslae
+    .map((u) => `${u.formaat.naam} ${(100 - u.pct(u.outeurRand) - u.pct(u.hostingRand) - u.pct(u.adminRand) - u.pct(u.ontwerpRand)).toFixed(1)}%`)
+    .join(" · ");
+  return `<div class="vr-kontrole vr-kontrole--ja"><span>✓</span><span>Wat die hoofrekening terughou: ${reels}. Genoeg vir Paystack se fooi by al drie pryse.</span></div>`;
 }
 
 // ---------- Aansig 2: Uiteensetting ----------
@@ -374,7 +421,7 @@ function vr_aansig_outeur(uitslae) {
           .join("")}
       </div>
     </div>
-    <p class="vr-oa-nota">Die ${vr_outeurs.length > 1 ? "outeurs behou saam" : "outeur behou"} ${vr_outeur_pct()}% van elke verkoop. Die res dek Paystack se transaksiefooi, die platform, en Future Sharp se deel.</p>`;
+    <p class="vr-oa-nota">${uitslae.some((u) => u.K > 0) ? "Druk- en afleweringskoste kom volledig terug — Future Sharp verdien nie daarop nie. " : ""}Die ${vr_outeurs.length > 1 ? "outeurs behou saam" : "outeur behou"} ${vr_outeur_pct()}% van elke verkoop se boekwaarde. Die res dek Paystack se transaksiefooi, die platform, en Future Sharp se deel.</p>`;
 }
 
 // ---------- Teken ----------
@@ -409,7 +456,7 @@ function vr_bou_formaat_rye() {
       <label class="vr-veld"><span id="vr-begin-etiket-${f.sleutel}">${vr_wins_etiket()}</span>
         <div class="vr-veld-invoer"><span>R</span><input type="number" id="vr-begin-${f.sleutel}" value="${f.verstek_begin}" step="10"></div>
       </label>
-      <label class="vr-veld"><span>Eie druk-/afleweringskoste</span>
+      <label class="vr-veld"><span>Eie druk-/afleweringskoste${f.k_wysigbaar ? `<span class="vr-fynskrif">kom teen kosprys terug; die verdeling geld op die res</span>` : ""}</span>
         <div class="vr-veld-invoer"><span>R</span><input type="number" id="vr-k-${f.sleutel}" value="${f.verstek_k}" step="10" ${f.k_wysigbaar ? "" : "disabled"}></div>
       </label>
       ${f.sleutel === "leen" ? `<button type="button" class="vr-wenk" id="vr-wenk-leen">≈ 35% van e-boek</button>` : `<span class="vr-wenk-leeg"></span>`}
