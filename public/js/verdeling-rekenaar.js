@@ -69,9 +69,9 @@ const VR_LEEN_BREUK = 0.35;
 const VR_KOSTE_DEELTAL = 0.965;
 
 const VR_FORMATE = [
-  { sleutel: "eboek", naam: "E-boek", sub: "", verstek_k: 0, k_wysigbaar: false, verstek_begin: 100 },
-  { sleutel: "leen", naam: "Leen", sub: "30 dae", verstek_k: 0, k_wysigbaar: false, verstek_begin: 35 },
-  { sleutel: "hardekopie", naam: "Harde kopie", sub: "druk + aflewering", verstek_k: 140, k_wysigbaar: true, verstek_begin: 100 },
+  { sleutel: "eboek", naam: "E-boek", sub: "", verstek_k: "", k_wysigbaar: false, verstek_begin: "" },
+  { sleutel: "leen", naam: "Leen", sub: "30 dae", verstek_k: "", k_wysigbaar: false, verstek_begin: "" },
+  { sleutel: "hardekopie", naam: "Harde kopie", sub: "druk + aflewering", verstek_k: "", k_wysigbaar: true, verstek_begin: "" },
 ];
 
 // Die pryse in die Uiteensetting se strook. Vas gekies om die vorm van die
@@ -228,6 +228,15 @@ function vr_bereken(formaat) {
   const kosteDeel = K > 0 ? K / VR_KOSTE_DEELTAL : 0;
 
   let P = boekprys + kosteDeel;
+  if (P <= 0) {
+    return {
+      formaat, P: 0, P_rou: 0, afgerond: false, leeg: true,
+      B: 0, kosteDeel: 0, outeurVasteRand: 0, outeurPersRand: 0,
+      outeurRand: 0, outeurWins: 0, K: 0, paystackRand: 0, hostingRand: 0,
+      adminRand: 0, ontwerpRand: 0, futureSharpRand: 0, direkteursRand: 0,
+      pct: () => 0,
+    };
+  }
   const P_rou = P;
   P = vr_afrond(P);
 
@@ -280,7 +289,7 @@ function vr_aansig_opstel(uitslae) {
 
   const kop = uitslae.map((u) => `<th>${u.formaat.naam}</th>`).join("");
   const prysRy = uitslae
-    .map((u) => `<td><span class="vr-getal">${u.P.toFixed(2)}</span>${u.afgerond ? `<span class="vr-fynskrif">van ${u.P_rou.toFixed(2)}</span>` : ""}</td>`)
+    .map((u) => u.leeg ? "<td>—</td>" : `<td><span class="vr-getal">${u.P.toFixed(2)}</span>${u.afgerond ? `<span class="vr-fynskrif">van ${u.P_rou.toFixed(2)}</span>` : ""}</td>`)
     .join("");
 
   // Die persentasies verskil nou PER FORMAAT. By 'n harde kopie geld hulle
@@ -318,11 +327,13 @@ function vr_aansig_opstel(uitslae) {
 // Die kontrole reken per formaat, want die persentasies verskil nou per
 // formaat. 'n Enkele som oor al drie sou by een van hulle lieg.
 function vr_opstel_kontrole(uitslae) {
-  const slegte = uitslae.filter((u) => u.direkteursRand < 0).map((u) => u.formaat.naam);
+  const slegte = uitslae.filter((u) => !u.leeg && u.direkteursRand < 0).map((u) => u.formaat.naam);
   if (slegte.length) {
     return `<div class="vr-kontrole vr-kontrole--nee"><span>⚠</span><span><b>${slegte.join(" en ")}</b> los te min oor vir die hoofrekening — die direkteursfooie is negatief. Verhoog die prys of verlaag 'n koste-lyn.</span></div>`;
   }
-  const reels = uitslae
+  const gevul = uitslae.filter((u) => !u.leeg);
+  if (!gevul.length) return "";
+  const reels = gevul
     .map((u) => `${u.formaat.naam} ${(100 - u.pct(u.outeurRand) - u.pct(u.hostingRand) - u.pct(u.adminRand) - u.pct(u.ontwerpRand)).toFixed(1)}%`)
     .join(" · ");
   return `<div class="vr-kontrole vr-kontrole--ja"><span>✓</span><span>Wat die hoofrekening terughou: ${reels}. Genoeg vir Paystack se fooi by al drie pryse.</span></div>`;
@@ -343,7 +354,7 @@ function vr_aansig_uiteen(uitslae) {
       .join("")}</tr>`;
 
   const enigeK = uitslae.some((u) => u.K > 0);
-  const negatief = uitslae.filter((u) => u.direkteursRand < 0).map((u) => u.formaat.naam);
+  const negatief = uitslae.filter((u) => !u.leeg && u.direkteursRand < 0).map((u) => u.formaat.naam);
 
   return `
     <table class="vr-tabel">
@@ -460,10 +471,7 @@ function vr_bou_formaat_rye() {
       <label class="vr-veld"><span id="vr-begin-etiket-${f.sleutel}">${vr_wins_etiket()}</span>
         <div class="vr-veld-invoer"><span>R</span><input type="number" id="vr-begin-${f.sleutel}" value="${f.verstek_begin}" step="10"></div>
       </label>
-      <label class="vr-veld"><span>Eie druk-/afleweringskoste</span>
-        <div class="vr-veld-invoer"><span>R</span><input type="number" id="vr-k-${f.sleutel}" value="${f.verstek_k}" step="10" ${f.k_wysigbaar ? "" : "disabled"}></div>
-        ${f.k_wysigbaar ? `<span class="vr-fynskrif">Kom teen kosprys terug. Die verdeling geld op die res.</span>` : ""}
-      </label>
+      ${f.k_wysigbaar ? `<label class="vr-veld"><span>Eie druk-/afleweringskoste</span><div class="vr-veld-invoer"><span>R</span><input type="number" id="vr-k-${f.sleutel}" value="${f.verstek_k}" step="10" placeholder="0"></div><span class="vr-fynskrif">Kom teen kosprys terug. Die verdeling geld op die res.</span></label>` : `<span class="vr-veld-leeg"></span>`}
       ${f.sleutel === "leen" ? `<button type="button" class="vr-wenk" id="vr-wenk-leen">≈ 35% van e-boek</button>` : `<span class="vr-wenk-leeg"></span>`}
     </div>`
   ).join("");
