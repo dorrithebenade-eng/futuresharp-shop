@@ -642,6 +642,31 @@ const WOORDEBOEK = {
     en: "Hard copies that have been bought and need to be sent.",
   },
   outeur_om_te_stuur_kop: { af: "Om te stuur", en: "To send" },
+
+  // --- My indienings ---
+  // Die groepopskrifte is voller as die merkies op die kaarte: 'n opskrif
+  // mag \'n groep beskryf, 'n merkie moet in een oogopslag lees.
+  outeur_nav_indienings: { af: "My indienings", en: "My submissions" },
+  outeur_indienings_nota: {
+    af: "Elke boek se vorm, van konsep tot op die rak.",
+    en: "Each book's form, from draft to shelf.",
+  },
+  oi_nuwe_vorm: { af: "+ Begin 'n nuwe boekvorm", en: "+ Start a new book form" },
+  oi_kop_ingedien: { af: "Ingedien vir prosessering", en: "Submitted for processing" },
+  oi_kop_rak: { af: "Op die Winkelrak", en: "On the shop shelf" },
+  oi_kop_konsep: { af: "In proses v\u00f3\u00f3r indien", en: "In progress before submitting" },
+  oi_merk_konsep: { af: "In proses", en: "In progress" },
+  oi_merk_ingedien: { af: "Ingedien", en: "Submitted" },
+  oi_merk_wysiging: { af: "Wysiging hangend", en: "Change pending" },
+  oi_merk_rak: { af: "Op die rak", en: "On the shelf" },
+  oi_geen_titel: { af: "Sonder titel", en: "Untitled" },
+  oi_gaan_voort: { af: "Gaan voort", en: "Continue" },
+  oi_bekyk: { af: "Bekyk", en: "View" },
+  oi_onttrek: { af: "Onttrek", en: "Withdraw" },
+  oi_niks: {
+    af: "Nog geen boekvorm nie. Begin een sodra jy gereed is.",
+    en: "No book form yet. Start one when you are ready.",
+  },
   outeur_reeds_gestuur_kop: { af: "Reeds gestuur", en: "Already sent" },
   outeur_om_te_stuur: { af: "Om te stuur", en: "To send" },
   outeur_gestuur: { af: "Gestuur", en: "Sent" },
