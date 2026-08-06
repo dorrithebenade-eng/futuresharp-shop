@@ -420,3 +420,90 @@
 .outeur-wyse-veld { margin-bottom: 12px; }
 .outeur-wyse-veld select { max-width: 340px; }
 .outeur-verskaffer-blok { margin-bottom: 12px; }
+
+/* ---------- My indienings ----------
+   Elke boekvorm bly hier so lank as die boek. Die kaarte volg dieselfde
+   vorm as die bestellings s'n: 'n kop met die titel en 'n merkie, dan wat
+   die outeur moet weet, dan wat hy kan doen. */
+
+.oi-begin { margin: 0 0 22px; }
+
+.oi-kaart {
+  background: #fff;
+  border: 1px solid var(--rand, #E3E0DA);
+  border-radius: 10px;
+  padding: 16px 18px;
+  margin-bottom: 12px;
+}
+
+.oi-kaart-kop {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.oi-titel {
+  font-size: 17px;
+  font-weight: 700;
+  margin: 0 0 2px;
+}
+
+.oi-nr {
+  font-size: 13px;
+  color: #6E6A63;
+  letter-spacing: .3px;
+}
+
+/* Die merkie is korter as die groepopskrif — hy moet in een oogopslag lees. */
+.oi-merk {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.oi-konsep { background: #F1EFEA; color: #5A554D; }
+.oi-ingedien { background: #FFF3D6; color: #7A5B10; }
+.oi-hangend { background: #FFF3D6; color: #7A5B10; }
+.oi-rak { background: #DFF1EC; color: var(--teal-donker, #17685E); }
+
+/* 'n Opmerking is wat hy moet DOEN — dit staan bo die knoppies, nie in
+   fynskrif nie. */
+.oi-opmerking {
+  background: #FFF7E6;
+  border-left: 3px solid var(--amber, #E0A020);
+  border-radius: 0 6px 6px 0;
+  padding: 10px 13px;
+  margin: 13px 0 0;
+  font-size: 14px;
+  color: #6b5610;
+}
+
+.oi-aksies {
+  display: flex;
+  gap: 9px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+
+.oi-knoppie {
+  display: inline-block;
+  border: 1px solid var(--rand, #E3E0DA);
+  background: #fff;
+  color: inherit;
+  border-radius: 7px;
+  padding: 8px 17px;
+  font-family: inherit;
+  font-size: 14px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.oi-hoof {
+  background: var(--teal, #1F8A7D);
+  border-color: var(--teal, #1F8A7D);
+  color: #fff;
+  font-weight: 600;
+}

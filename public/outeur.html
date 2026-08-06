@@ -72,6 +72,7 @@
           <span data-i18n="outeur_nav_bestellings">Bestellings</span>
           <span class="outeur-telling" id="outeur-telling" hidden></span>
         </button>
+        <button type="button" class="outeur-pil" data-gaan="indienings" data-i18n="outeur_nav_indienings">My indienings</button>
       </nav>
 
       <div class="outeur-inhoud-wrap">
@@ -98,6 +99,19 @@
           <h2 class="outeur-sub-opskrif" data-i18n="outeur_reeds_gestuur_kop">Reeds gestuur</h2>
           <div id="outeur-reeds-gestuur"></div>
         </section>
+
+        <!-- Elke boekvorm bly hier so lank as die boek. 'n Wysiging gaan
+             deur DIESELFDE vorm, nie 'n nuwe een nie. -->
+        <section class="outeur-afdeling" data-afdeling="indienings">
+          <p class="outeur-lei-binne" data-i18n="outeur_indienings_nota">
+            Elke boek se vorm, van konsep tot op die rak.
+          </p>
+          <p class="oi-begin">
+            <a class="oi-knoppie oi-hoof" href="indien.html" data-i18n="oi_nuwe_vorm">+ Begin 'n nuwe boekvorm</a>
+          </p>
+          <div id="outeur-indienings-status" class="stelsel-boodskap" aria-live="polite"></div>
+          <div id="outeur-indienings-lys"></div>
+        </section>
       </div>
     </div>
   </main>
@@ -109,5 +123,6 @@
   <script src="js/outeur.js"></script>
   <script src="js/outeur-titels.js"></script>
   <script src="js/outeur-bestellings.js"></script>
+  <script src="js/outeur-indienings.js"></script>
 </body>
 </html>
