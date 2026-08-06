@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="af">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Toets — indienings</title>
+<style>
+  body { margin:0; background:#F4F2EE; color:#1C1A17; font-size:16px; line-height:1.6;
+         font-family:-apple-system,"Segoe UI",Roboto,sans-serif; }
+  .kop { background:#14100E; color:#fff; padding:14px 26px; font-weight:700; }
+  .kop i { color:#3AB4A0; font-style:normal; }
+  .wrap { max-width:760px; margin:0 auto; padding:30px 22px 80px; }
+  h1 { font-size:24px; margin:0 0 6px; }
+  p.lei { color:#6E6A63; margin:0 0 24px; }
+  .kaart { background:#fff; border:1px solid #E3E0DA; border-radius:10px; padding:20px 22px; margin-bottom:16px; }
+  .kaart h2 { font-size:17px; margin:0 0 4px; }
+  .kaart p { color:#6E6A63; font-size:14.5px; margin:0 0 14px; }
+  button { background:#1F8A7D; color:#fff; border:0; border-radius:7px; padding:10px 20px;
+           font:inherit; font-weight:600; cursor:pointer; }
+  button:disabled { opacity:.5; cursor:default; }
+  pre { background:#14100E; color:#D8F3EC; padding:14px 16px; border-radius:8px;
+        font-size:13px; overflow-x:auto; white-space:pre-wrap; word-break:break-word; margin:14px 0 0; }
+  .goed { color:#17685E; font-weight:700; }
+  .sleg { color:#8A2B2B; font-weight:700; }
+  .stand { margin:0 0 20px; padding:12px 15px; border-radius:8px; font-size:14.5px; }
+  .stand.ok { background:#DFF1EC; color:#17685E; }
+  .stand.nee { background:#FDECEC; color:#8A2B2B; }
+</style>
+</head>
+<body>
+
+<div class="kop">Future Sharp — <i>Future Shop</i> · toetsbladsy</div>
+
+<div class="wrap">
+  <h1>Toets die indienings</h1>
+  <p class="lei">Meld eers by die winkel aan met 'n rekening wat as outeur geregistreer is, en maak dan hierdie bladsy oop.</p>
+
+  <div id="sessie" class="stand">Kyk of jy aangemeld is…</div>
+
+  <div class="kaart">
+    <h2>1 · Stoor 'n konsep</h2>
+    <p>Skep 'n nuwe konsep met die titel "Toets". Jy behoort 'n vormnommer terug te kry.</p>
+    <button id="k1" onclick="stoor()">Stoor 'n toets-konsep</button>
+    <pre id="u1" style="display:none"></pre>
+  </div>
+
+  <div class="kaart">
+    <h2>2 · Lees die lys</h2>
+    <p>Gee alles terug wat aan hierdie rekening behoort.</p>
+    <button id="k2" onclick="lys()">Wys my indienings</button>
+    <pre id="u2" style="display:none"></pre>
+  </div>
+
+  <div class="kaart">
+    <h2>3 · Werk die konsep by</h2>
+    <p>Stoor weer, met dieselfde nommer. Dit moet die bestaande een bywerk, nie 'n tweede skep nie.</p>
+    <button id="k3" onclick="bywerk()" disabled>Werk by (stoor eers hierbo)</button>
+    <pre id="u3" style="display:none"></pre>
+  </div>
+</div>
+
+<script>
+const SLEUTEL = "future_shop_identiteit_sessie_winkel";
+let laaste_nommer = null;
+
+function sessie() {
+  try {
+    const rou = sessionStorage.getItem(SLEUTEL) || localStorage.getItem(SLEUTEL);
+    return rou ? JSON.parse(rou) : null;
+  } catch { return null; }
+}
+
+function wys(id, status, teks) {
+  const el = document.getElementById(id);
+  el.style.display = "block";
+  const merk = status >= 200 && status < 300 ? "GESLAAG" : "MISLUK";
+  el.textContent = merk + "  ·  HTTP " + status + "\n\n" + teks;
+}
+
+async function roep(pad, opsies) {
+  const s = sessie();
+  if (!s) return { status: 0, teks: "Nie aangemeld nie" };
+  const o = opsies || {};
+  o.headers = Object.assign({ Authorization: "Bearer " + s.access_token }, o.headers || {});
+  try {
+    const r = await fetch("/.netlify/functions/" + pad, o);
+    return { status: r.status, teks: await r.text() };
+  } catch (fout) {
+    return { status: 0, teks: String(fout) };
+  }
+}
+
+async function stoor() {
+  document.getElementById("k1").disabled = true;
+  const a = await roep("stoor-indiening", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ data: { titel: "Toets", taal: "Afrikaans" } })
+  });
+  wys("u1", a.status, a.teks);
+  try {
+    const d = JSON.parse(a.teks);
+    if (d.nommer) {
+      laaste_nommer = d.nommer;
+      const k = document.getElementById("k3");
+      k.disabled = false;
+      k.textContent = "Werk " + d.nommer + " by";
+    }
+  } catch {}
+  document.getElementById("k1").disabled = false;
+}
+
+async function lys() {
+  const a = await roep("kry-my-indienings");
+  let teks = a.teks;
+  try { teks = JSON.stringify(JSON.parse(a.teks), null, 2); } catch {}
+  wys("u2", a.status, teks);
+}
+
+async function bywerk() {
+  const a = await roep("stoor-indiening", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      nommer: laaste_nommer,
+      data: { titel: "Toets — bygewerk", taal: "Afrikaans", bladsye: 120 }
+    })
+  });
+  wys("u3", a.status, a.teks);
+}
+
+const s = sessie();
+const el = document.getElementById("sessie");
+if (s && s.access_token) {
+  el.className = "stand ok";
+  el.textContent = "Aangemeld as " + ((s.gebruiker && s.gebruiker.email) || "onbekend");
+} else {
+  el.className = "stand nee";
+  el.textContent = "Nie by die winkel aangemeld nie. Meld eers aan, dan herlaai hierdie bladsy.";
+}
+</script>
+</body>
+</html>
