@@ -507,3 +507,95 @@
   color: #fff;
   font-weight: 600;
 }
+
+/* ---------- Die boekvorm ----------
+   'n Dokument wat 'n mens invul, nie 'n bemarkingsbladsy nie: die kop staan
+   teen wit, want die woordmerk-PNG dra sy eie wit agtergrond. */
+
+.iv-brief {
+  background: #fff;
+  border-bottom: 1px solid #E3E0DA;
+  padding: 26px 22px 22px;
+  text-align: center;
+}
+.iv-merk { display: block; width: 250px; max-width: 60%; margin: 0 auto 20px; }
+.iv-titel { font-size: 27px; margin: 0 0 4px; }
+.iv-lei { color: #6E6A63; margin: 0; font-size: 15px; }
+
+.iv-wrap { max-width: 780px; margin: 0 auto; padding: 26px 22px 80px; }
+
+/* Kleef bo-aan: die stand moet sigbaar bly deur agt dele. */
+.iv-staaf {
+  position: sticky; top: 0; z-index: 5;
+  background: #fff; border: 1px solid #E3E0DA; border-radius: 10px;
+  padding: 11px 16px; margin-bottom: 18px;
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 12px; flex-wrap: wrap; font-size: 14px;
+}
+.iv-nommer { font-weight: 700; letter-spacing: .4px; }
+.iv-nommer.iv-nog { color: #6E6A63; font-weight: 400; }
+.iv-stand { color: #6E6A63; }
+.iv-stand.besig { color: var(--amber, #E0A020); }
+.iv-stand.klaar { color: var(--teal-donker, #17685E); }
+.iv-stand.fout { color: #8A2B2B; font-weight: 600; }
+
+/* 'n Opmerking is wat hy moet DOEN. Daarom bo-aan, nie in fynskrif nie. */
+.iv-opmerking {
+  background: #FFF7E6; border: 1px solid var(--amber, #E0A020);
+  border-radius: 8px; padding: 14px 16px; margin-bottom: 18px;
+  font-size: 15px; color: #6b5610;
+}
+
+.iv-deel {
+  border: 1px solid #E3E0DA; border-radius: 10px; background: #fff;
+  padding: 20px 22px; margin: 0 0 18px;
+}
+.iv-deel legend {
+  font-weight: 700; font-size: 14px; letter-spacing: .4px;
+  text-transform: uppercase; color: #6E6A63; padding: 0 8px;
+}
+.iv-nota { font-size: 14.5px; color: #6E6A63; margin: -4px 0 16px; }
+
+.iv-veld { display: block; margin: 0 0 15px; }
+.iv-veld > span { display: block; font-size: 15px; font-weight: 600; margin-bottom: 5px; }
+.iv-veld small { display: block; font-weight: 400; color: #6E6A63; font-size: 13.5px; margin: -3px 0 5px; }
+.iv-veld input[type=text], .iv-veld input[type=number], .iv-veld input[type=date],
+.iv-veld select, .iv-veld textarea, .iv-mede-ry input {
+  width: 100%; padding: 9px 11px; border: 1px solid #E3E0DA;
+  border-radius: 8px; font: inherit; font-size: 16px; background: #FAF9F7;
+}
+.iv-veld textarea { min-height: 90px; resize: vertical; }
+.iv-veld textarea.iv-lank { min-height: 150px; }
+.iv-veld.iv-kort { max-width: 220px; }
+.iv-twee { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
+
+.iv-formaat { border: 1px solid #E3E0DA; border-radius: 8px; padding: 15px 16px; margin-bottom: 14px; }
+.iv-formaat.af { opacity: .55; }
+.iv-formaat-kop { display: flex; align-items: center; gap: 9px; font-weight: 700; }
+.iv-formaat-velde { margin-top: 14px; }
+
+.iv-som {
+  background: #FFF7E6; border: 1px solid var(--amber, #E0A020);
+  border-radius: 8px; padding: 14px 16px; margin-top: 6px; font-size: 15px;
+}
+.iv-som-ry { display: flex; justify-content: space-between; gap: 12px; padding: 3px 0; }
+.iv-som-ry.iv-vet { font-weight: 700; border-top: 1px solid #E8D5A8; margin-top: 6px; padding-top: 7px; }
+.iv-som-fout { background: #FDECEC; border-color: #D98A8A; color: #8A2B2B; }
+
+.iv-merk { display: flex; align-items: flex-start; gap: 9px; margin-bottom: 11px; font-size: 15.5px; }
+.iv-merk input { margin-top: 4px; }
+.iv-onderteken { margin-top: 16px; }
+
+.iv-mede-ry { display: grid; grid-template-columns: 1.2fr 1.5fr auto; gap: 8px; margin-bottom: 8px; }
+.iv-weg { background: none; border: 1px solid #E3E0DA; border-radius: 7px; cursor: pointer; padding: 0 13px; font-size: 18px; }
+
+.iv-val {
+  border: 1px dashed #E3E0DA; border-radius: 8px; padding: 18px;
+  text-align: center; color: #6E6A63; background: #FAF9F7; font-size: 14.5px;
+}
+
+.iv-aksies { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; align-items: center; }
+
+@media (max-width: 620px) {
+  .iv-twee, .iv-mede-ry { grid-template-columns: 1fr; }
+}

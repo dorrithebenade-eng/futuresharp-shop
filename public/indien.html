@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="af">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Boekvorm — Future Shop</title>
+  <link rel="stylesheet" href="css/styl.css" />
+  <link rel="stylesheet" href="css/outeur.css" />
+
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#3FB6A4">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-ikoon.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+</head>
+<body>
+  <header class="mini-kop">
+   <div class="mini-kop-inner">
+    <a href="index.html" class="mini-kop-merk">
+      <span class="merk-sharp">Future Sharp</span>
+      <span class="merk-skeier">—</span>
+      <span class="merk-shop">Future Shop</span>
+    </a>
+    <div class="mini-kop-regs">
+      <span id="nav-rekening-plek" class="mini-kop-rekening-plek"></span>
+      <div class="taal-wisselaar" role="group" aria-label="Taal / Language">
+        <button type="button" class="taal-knoppie" data-taal="af">AF</button>
+        <button type="button" class="taal-knoppie" data-taal="en">EN</button>
+      </div>
+    </div>
+   </div>
+  </header>
+
+  <main>
+    <!-- outeur.js skryf hier: aanmeld-versoek, laai-boodskap, of die
+         boodskap dat hierdie rekening nie 'n outeur is nie. -->
+    <div id="outeur-status" class="stelsel-boodskap outeur-status-buite" aria-live="polite"></div>
+
+    <div id="outeur-inhoud" hidden>
+
+      <!-- Die vorm se eie kop. Teen wit, want die logo se PNG dra sy eie
+           wit agtergrond en 'n dokument wat 'n mens invul, hoort nie 'n
+           bemarkingsband te hê nie. -->
+      <div class="iv-brief">
+        <img src="images/future-shop-woordmerk.png" alt="Future Shop" class="iv-merk">
+        <h1 class="iv-titel" data-i18n="iv_titel">Boekvorm</h1>
+        <p class="iv-lei" data-i18n="iv_lei">
+          Word vir elke titel afsonderlik voltooi. Jy kan enige tyd stoor en later voltooi.
+        </p>
+      </div>
+
+      <div class="iv-wrap">
+
+        <!-- Kleef bo-aan sodat die stand sigbaar bly terwyl hy deur agt dele
+             werk. Sonder dit weet hy nie of hy die bladsy kan toemaak nie. -->
+        <div class="iv-staaf">
+          <span class="iv-nommer iv-nog" id="iv-nommer" data-i18n="iv_nog_nie_gestoor">Nog nie gestoor nie</span>
+          <span class="iv-stand" id="iv-stand" data-i18n="iv_stoor_outomaties">Word outomaties gestoor terwyl jy tik</span>
+        </div>
+
+        <!-- Wys net wanneer die vorm teruggestuur is met 'n opmerking. -->
+        <div class="iv-opmerking" id="iv-opmerking" hidden></div>
+
+        <form id="iv-vorm" autocomplete="off">
+
+          <fieldset class="iv-deel">
+            <legend data-i18n="iv_deel1">Deel 1 · Die titel</legend>
+            <label class="iv-veld"><span data-i18n="iv_titel_veld">Titel</span>
+              <input type="text" id="iv-titel" data-veld="titel"></label>
+            <label class="iv-veld"><span data-i18n="iv_subtitel">Subtitel</span>
+              <input type="text" data-veld="subtitel"></label>
+            <div class="iv-twee">
+              <label class="iv-veld"><span data-i18n="iv_taal">Taal</span>
+                <select data-veld="taal">
+                  <option value="">—</option>
+                  <option>Afrikaans</option>
+                  <option>Engels</option>
+                  <option data-i18n="iv_taal_ander">Ander</option>
+                </select></label>
+              <label class="iv-veld"><span data-i18n="iv_bladsye">Ongeveer hoeveel bladsye</span>
+                <input type="number" min="1" data-veld="bladsye"></label>
+            </div>
+            <label class="iv-veld"><span data-i18n="iv_kategorie">Kategorie</span>
+              <input type="text" data-veld="kategorie" placeholder="Fiksie, geestelik, opvoedkundig, geskiedenis, selfhelp"></label>
+          </fieldset>
+
+          <fieldset class="iv-deel">
+            <legend data-i18n="iv_deel2">Deel 2 · Beskrywings</legend>
+            <p class="iv-nota" data-i18n="iv_deel2_nota">
+              Die kort beskrywing verskyn op die katalogus-kaart, die volledige beskrywing op die boek se eie bladsy. Albei word gepubliseer soos verskaf.
+            </p>
+            <label class="iv-veld"><span data-i18n="iv_kort">Kort beskrywing</span>
+              <small data-i18n="iv_kort_fyn">Ongeveer 100 woorde</small>
+              <textarea data-veld="kort_beskrywing"></textarea></label>
+            <label class="iv-veld"><span data-i18n="iv_volledig">Volledige beskrywing</span>
+              <textarea class="iv-lank" data-veld="volledige_beskrywing"></textarea></label>
+          </fieldset>
+
+          <fieldset class="iv-deel">
+            <legend data-i18n="iv_deel3">Deel 3 · ISBN</legend>
+            <p class="iv-nota" data-i18n="iv_deel3_nota">
+              Verskaf indien beskikbaar. Future Shop reik nie ISBN's uit nie.
+            </p>
+            <div class="iv-twee">
+              <label class="iv-veld"><span data-i18n="iv_isbn_eboek">ISBN — e-boek</span>
+                <input type="text" data-veld="isbn_eboek"></label>
+              <label class="iv-veld"><span data-i18n="iv_isbn_hard">ISBN — harde kopie</span>
+                <input type="text" data-veld="isbn_hardekopie"></label>
+            </div>
+          </fieldset>
+
+          <fieldset class="iv-deel">
+            <legend data-i18n="iv_deel4">Deel 4 · Formate en prys</legend>
+            <p class="iv-nota" data-i18n="iv_deel4_nota">
+              Dui aan watter formate vir hierdie titel aangebied word. Gee 'n prys, of die bedrag wat jy per verkoop wil verdien — dan word die prys daaruit bereken. Die prys word bevestig voordat die titel te koop aangebied word.
+            </p>
+            <div id="iv-formate"></div>
+          </fieldset>
+
+          <fieldset class="iv-deel" id="iv-deel5" hidden>
+            <legend data-i18n="iv_deel5">Deel 5 · Gedrukte eksemplare</legend>
+            <p class="iv-nota" data-i18n="iv_deel5_nota">
+              Wat hier aangedui word, verskyn op die boek se bladsy.
+            </p>
+            <div class="iv-twee">
+              <label class="iv-veld"><span data-i18n="iv_aflewertyd">Afleweringstyd</span>
+                <small data-i18n="iv_aflewertyd_fyn">Gereken vanaf ontvangs van die bestelling</small>
+                <input type="text" data-veld="aflewering.tyd" placeholder="5 tot 7 werksdae"></label>
+              <label class="iv-veld"><span data-i18n="iv_gebiede">Gebiede waarheen afgelewer word</span>
+                <input type="text" data-veld="aflewering.gebiede" placeholder="Suid-Afrika"></label>
+            </div>
+            <label class="iv-veld"><span data-i18n="iv_voorraad">Voorraad</span>
+              <select data-veld="aflewering.voorraad">
+                <option value="gehou" data-i18n="iv_voorraad_gehou">Voorraad word gehou</option>
+                <option value="per_bestelling" data-i18n="iv_voorraad_per">Elke bestelling word gedruk</option>
+              </select></label>
+          </fieldset>
+
+          <fieldset class="iv-deel">
+            <legend data-i18n="iv_deel6">Deel 6 · Mede-outeurs</legend>
+            <p class="iv-nota" data-i18n="iv_deel6_nota">
+              Voltooi slegs waar meer as een outeur aan hierdie titel gewerk het. Elke mede-outeur sluit sy eie ooreenkoms met Future Sharp.
+            </p>
+            <div id="iv-mede"></div>
+            <button type="button" class="oi-knoppie" id="iv-voeg-mede" data-i18n="iv_voeg_mede">+ Voeg mede-outeur by</button>
+          </fieldset>
+
+          <fieldset class="iv-deel">
+            <legend data-i18n="iv_deel7">Deel 7 · Lêers</legend>
+            <p class="iv-nota" data-i18n="iv_deel7_nota">
+              Die manuskrip en die omslag word saam met die indiening opgelaai. Solank die vorm 'n konsep is, word hulle nog nie gestuur nie.
+            </p>
+            <label class="iv-veld"><span data-i18n="iv_manuskrip">Die manuskrip</span>
+              <small data-i18n="iv_manuskrip_fyn">PDF — die finale weergawe, met bladsynommers en 'n inhoudsopgawe waar van toepassing</small>
+              <div class="iv-val" data-i18n="iv_val">Word by indiening opgelaai</div></label>
+            <label class="iv-veld"><span data-i18n="iv_omslag">Die omslag</span>
+              <small data-i18n="iv_omslag_fyn">JPEG, PNG, WEBP of GIF · hoogstens 4MB · verhouding 1530 × 2322</small>
+              <div class="iv-val" data-i18n="iv_val">Word by indiening opgelaai</div></label>
+          </fieldset>
+
+          <fieldset class="iv-deel">
+            <legend data-i18n="iv_deel8">Deel 8 · Bevestiging</legend>
+            <label class="iv-merk"><input type="checkbox" data-veld="bevestigings.skepper">
+              <span data-i18n="iv_bev1">Ek is die skepper van hierdie werk, of is geregtig om dit te publiseer.</span></label>
+            <label class="iv-merk"><input type="checkbox" data-veld="bevestigings.kopiereg">
+              <span data-i18n="iv_bev2">Die werk skend geen ander party se kopiereg nie.</span></label>
+            <label class="iv-merk"><input type="checkbox" data-veld="bevestigings.korrek">
+              <span data-i18n="iv_bev3">Die besonderhede hierbo is korrek.</span></label>
+            <div class="iv-twee iv-onderteken">
+              <label class="iv-veld"><span data-i18n="iv_naam_van">Naam en van</span>
+                <input type="text" data-veld="onderteken_naam"></label>
+              <label class="iv-veld"><span data-i18n="iv_datum">Datum</span>
+                <input type="date" data-veld="onderteken_datum"></label>
+            </div>
+          </fieldset>
+
+        </form>
+
+        <div class="iv-aksies">
+          <button type="button" class="oi-knoppie oi-hoof" id="iv-stoor" data-i18n="iv_stoor">Stoor as konsep</button>
+          <a class="oi-knoppie" href="outeur.html" data-i18n="iv_terug">Terug na my indienings</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/taal.js"></script>
+  <script src="js/identiteit.js"></script>
+  <script src="js/nav-rekening.js"></script>
+  <script src="js/sessie-verval.js"></script>
+  <script src="js/verdeling-som.js"></script>
+  <script src="js/outeur.js"></script>
+  <script src="js/outeur-indien.js"></script>
+</body>
+</html>
