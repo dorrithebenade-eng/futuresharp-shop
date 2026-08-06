@@ -122,10 +122,15 @@ const vr_outeur_etiket = (outeur, indeks) =>
 const vr_wins_etiket = () =>
   vr_outeurs.length > 1 ? "Outeurs se wins" : "Outeur se wins";
 
+const vr_begin_etiket = (f) =>
+  vr_modus === "prys"
+    ? (f.k_wysigbaar ? "Boekprys — versending kom by" : "Verkoopprys")
+    : vr_wins_etiket();
+
 function vr_werk_begin_etikette_by() {
   VR_FORMATE.forEach((f) => {
     const el = document.getElementById(`vr-begin-etiket-${f.sleutel}`);
-    if (el && vr_modus === "wins") el.textContent = vr_wins_etiket();
+    if (el) el.textContent = vr_begin_etiket(f);
   });
 }
 
@@ -468,7 +473,7 @@ function vr_bou_formaat_rye() {
     (f) => `
     <div class="vr-formaat-ry">
       <div class="vr-formaat-naam">${f.naam}${f.sub ? `<small>${f.sub}</small>` : ""}</div>
-      <label class="vr-veld"><span id="vr-begin-etiket-${f.sleutel}">${vr_wins_etiket()}</span>
+      <label class="vr-veld"><span id="vr-begin-etiket-${f.sleutel}">${vr_begin_etiket(f)}</span>
         <div class="vr-veld-invoer"><span>R</span><input type="number" id="vr-begin-${f.sleutel}" value="${f.verstek_begin}" step="10"></div>
       </label>
       ${f.k_wysigbaar ? `<label class="vr-veld"><span>Eie druk-/afleweringskoste</span><div class="vr-veld-invoer"><span>R</span><input type="number" id="vr-k-${f.sleutel}" value="${f.verstek_k}" step="10" placeholder="0"></div><span class="vr-fynskrif">Kom teen kosprys terug. Die verdeling geld op die res.</span></label>` : `<span class="vr-veld-leeg"></span>`}
@@ -509,7 +514,7 @@ function vr_stel_modus(nuwe_modus) {
     const veld = document.getElementById(`vr-begin-${u.formaat.sleutel}`);
     const etiket = document.getElementById(`vr-begin-etiket-${u.formaat.sleutel}`);
     if (veld) veld.value = Math.round((nuwe_modus === "prys" ? u.B : u.outeurWins) * 100) / 100;
-    if (etiket) etiket.textContent = nuwe_modus === "prys" ? (u.K > 0 ? "Boekprys (sonder versending)" : "Verkoopprys") : vr_wins_etiket();
+    if (etiket) etiket.textContent = vr_begin_etiket(u.formaat);
   });
 
   vr_herbereken_alles();
