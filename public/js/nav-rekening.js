@@ -116,12 +116,35 @@
 //
 // Misluk die oproep, wys ons eenvoudig geen skakel nie. 'n Ontbrekende
 // skakel is 'n ongerief; 'n skakel wat 'n 404 gee, is 'n fout.
+//
+// DIE KAS HANG AAN DIE GEBRUIKER, nie net aan die oortjie nie. 'n Koper wat
+// afmeld en as iemand anders in dieselfde oortjie weer aanmeld, kry 'n nuwe
+// sessie maar dieselfde sessionStorage — sonder die e-pos in die waarde erf
+// hy die vorige rekening se antwoord, en 'n gewone koper sien 'n
+// "Outeurspaneel"-skakel wat vir hom 'n foutbladsy is. Dit het op 6 Aug
+// gebeur.
+//
+// Dit vang ook die omgekeerde: word 'n aangemelde koper as outeur
+// geregistreer, is sy gekaste "nee" nou aan sy e-pos gekoppel maar steeds
+// vals tot die oortjie toegaan. Daarvoor is die skoonmaak by afmeld nie
+// genoeg nie — dit bly 'n bekende beperking, en 'n nuwe oortjie los dit.
 const NAV_OUTEUR_SLEUTEL = "future_shop_is_outeur";
 
+function nav_outeur_kas_waarde(sessie, is_outeur) {
+  const wie = (sessie && sessie.gebruiker && sessie.gebruiker.email) || "";
+  return `${is_outeur ? "ja" : "nee"}:${wie}`;
+}
+
 async function nav_is_outeur(sessie) {
+  const verwag_ja = nav_outeur_kas_waarde(sessie, true);
+  const verwag_nee = nav_outeur_kas_waarde(sessie, false);
+
   try {
     const gekas = sessionStorage.getItem(NAV_OUTEUR_SLEUTEL);
-    if (gekas !== null) return gekas === "ja";
+    // Enigiets anders — 'n ander rekening, of die ou formaat sonder e-pos —
+    // word geignoreer en oorgeskryf.
+    if (gekas === verwag_ja) return true;
+    if (gekas === verwag_nee) return false;
   } catch {
     // sessionStorage kan geblokkeer wees — dan vra ons elke keer.
   }
@@ -132,7 +155,7 @@ async function nav_is_outeur(sessie) {
     });
     const is_outeur = resp.ok;
     try {
-      sessionStorage.setItem(NAV_OUTEUR_SLEUTEL, is_outeur ? "ja" : "nee");
+      sessionStorage.setItem(NAV_OUTEUR_SLEUTEL, nav_outeur_kas_waarde(sessie, is_outeur));
     } catch {
       /* nie krities nie */
     }
@@ -140,6 +163,7 @@ async function nav_is_outeur(sessie) {
   } catch {
     return false;
   }
+
 }
 
 // --- 2. Rekening-aftrekkieslys ---

@@ -198,6 +198,14 @@ function identiteit_meld_af() {
   if (typeof maak_mandjie_leeg === "function") {
     maak_mandjie_leeg();
   }
+  // Dieselfde rede: die kop se "is hierdie koper 'n outeur"-antwoord is
+  // gedeelde oortjie-toestand. Bly dit staan, sien die volgende persoon
+  // wat in hierdie oortjie aanmeld die vorige een se antwoord.
+  try {
+    sessionStorage.removeItem("future_shop_is_outeur");
+  } catch {
+    /* nie krities nie */
+  }
 }
 
 function identiteit_het_rol(gebruiker, rol) {
