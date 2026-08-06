@@ -36,18 +36,24 @@
 /* Klein en stil regs bo. Die outeur se naam is die opskrif hier, nie die
    winkel nie — die woordmerk sê net "dieselfde huis". Op 'n foon val dit
    weg sodat dit nie met die syfers baklei nie. */
-/* Die PNG het 'n WIT agtergrond, nie 'n deursigtige een nie — sonder
-   mix-blend-mode sit hy as 'n wit kaartjie op die teal. `multiply` laat die
-   wit verdwyn en hou die blokkies se kleure. */
+/* Die PNG het 'n WIT agtergrond, nie 'n deursigtige een nie. `multiply`
+   het die wit laat verdwyn, maar dit vermenigvuldig ELKE kleur met die teal
+   — die geel word vaal en die letters se wit binnekant word teal. Die logo
+   gebruik wit as 'n KLEUR, nie net as agtergrond nie, so wegsny is ook geen
+   uitweg nie: die U, R, O en S word hol.
+   Die wit staan dus doelbewus, as 'n paneel. Kom daar ooit 'n weergawe met
+   'n deursigtige agtergrond, val hierdie hele blok weg. */
 .outeur-band-merk {
   position: absolute;
   right: 28px;
-  top: 34px;
-  width: 210px;
+  top: 30px;
+  width: 200px;
   height: auto;
   z-index: 0;
-  mix-blend-mode: multiply;
-  opacity: .92;
+  background: #fff;
+  padding: 14px 18px;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, .10);
 }
 
 @media (max-width: 860px) {
