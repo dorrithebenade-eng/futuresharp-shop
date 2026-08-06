@@ -68,6 +68,17 @@ const VR_LEEN_BREUK = 0.35;
 // nie; dit is eenmalig per transaksie en hoort by die boek self.
 const VR_KOSTE_DEELTAL = 0.965;
 
+const VR_EENHEID_STYL = `.vr-eenheid { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+.vr-eenheid button { font-size: 11px; padding: 4px 12px; border-radius: 6px; border: 1px solid #E5E2DC; background: none; cursor: pointer; font-family: var(--font-liggaam); }
+.vr-eenheid button.vr-seg-aktief { background: #fff; border-color: #C9C4BB; font-weight: 700; }
+`;
+if (!document.getElementById("vr-eenheid-styl")) {
+  const s = document.createElement("style");
+  s.id = "vr-eenheid-styl";
+  s.textContent = VR_EENHEID_STYL;
+  document.head.appendChild(s);
+}
+
 const VR_FORMATE = [
   { sleutel: "eboek", naam: "E-boek", sub: "", verstek_k: "", k_wysigbaar: false, verstek_begin: "" },
   { sleutel: "leen", naam: "Leen", sub: "30 dae", verstek_k: "", k_wysigbaar: false, verstek_begin: "" },
@@ -283,48 +294,71 @@ const vr_bereken_alles = () => VR_FORMATE.map(vr_bereken);
 
 // ---------- Aansig 1: Opstel ----------
 
+// Die tabel se werk is om te sê wat om in te tik, en die vorm neem
+// persentasies. Maar as KONTROLE is rand die eerlike aansig: daar is elke
+// ry dieselfde oor die formate behalwe die versending, en die persentasie
+// wat by 'n harde kopie vrae uitlok, blyk net die e-boek se bedrag te wees.
+let vr_opstel_eenheid = "pct";
+
+document.addEventListener("click", (e) => {
+  const knoppie = e.target.closest("[data-vr-eenheid]");
+  if (!knoppie) return;
+  vr_opstel_eenheid = knoppie.dataset.vrEenheid;
+  vr_herbereken_alles();
+});
+
 function vr_aansig_opstel(uitslae) {
   const outeurPct = vr_outeur_pct();
   const hosting = vr_getal("vr-hosting-pct");
   const admin = vr_getal("vr-admin-pct");
   const ontwerp = vr_getal("vr-ontwerp-pct");
-  const ontwerpAdmin = admin + ontwerp;
   const somKlop = Math.abs(outeurPct - vr_outeur_som()) < 0.005;
   const enigeK = uitslae.some((u) => u.K > 0);
+  const inRand = vr_opstel_eenheid === "rand";
 
   const kop = uitslae.map((u) => `<th>${u.formaat.naam}</th>`).join("");
   const prysRy = uitslae
     .map((u) => u.leeg ? "<td>—</td>" : `<td><span class="vr-getal">${u.P.toFixed(2)}</span>${u.afgerond ? `<span class="vr-fynskrif">van ${u.P_rou.toFixed(2)}</span>` : ""}</td>`)
     .join("");
 
-  // Die persentasies verskil nou PER FORMAAT. By 'n harde kopie geld hulle
-  // op die boekdeel, en die persentasie van die volle prys is dus laer.
-  // Een kolom vir al drie sou 'n verkeerde getal in die vorm laat beland.
+  // Elke ry ken sy BEDRAG; die persentasie word daaruit afgelei. Andersins
+  // sou die twee aansigte twee somme wees wat kan verskil.
+  const wys = (u, rand) => {
+    if (u.leeg) return "—";
+    return inRand ? `R${rand.toFixed(2)}` : `${u.pct(rand).toFixed(1)} %`;
+  };
+
   const ry = (etiket, kies, fyn, klas) =>
     `<tr class="${klas || ""}"><td>${etiket}${fyn ? `<span class="vr-fynskrif">${fyn}</span>` : ""}</td>${uitslae
       .map((u) => `<td class="vr-getal">${kies(u)}</td>`)
       .join("")}</tr>`;
 
-  const pctVan = (u, deel) => (u.P > 0 ? ((deel / 100) * u.B / u.P) * 100 : 0);
-
   return `
-    <p class="vr-lei">Tik dit so in by <b>Katalogus &rarr; produk</b>, een kolom per formaat.</p>
+    <div class="vr-eenheid">
+      <span class="vr-fynskrif">Wys as</span>
+      <button type="button" data-vr-eenheid="pct" class="${inRand ? "" : "vr-seg-aktief"}">Persentasie</button>
+      <button type="button" data-vr-eenheid="rand" class="${inRand ? "vr-seg-aktief" : ""}">Rand</button>
+    </div>
+    <p class="vr-lei">Tik dit so in by <b>Katalogus &rarr; produk</b>, een kolom per formaat.${inRand ? " Die vorm neem persentasies — hierdie aansig is om te kontroleer." : ""}</p>
     <table class="vr-tabel">
       <thead><tr><th>Veld</th>${kop}</tr></thead>
       <tbody>
         <tr class="vr-r-prys"><td>Prys (R)</td>${prysRy}</tr>
         <tr class="vr-r-groep"><td colspan="4">Verdelings</td></tr>
-        ${enigeK ? ry("Outeur — druk en aflewering", (u) => (u.K > 0 ? `R${u.K.toFixed(2)}` : "—"), "vaste bedrag, nie 'n persentasie nie") : ""}
+        ${enigeK ? ry("Outeur — druk en aflewering", (u) => (u.K > 0 ? `R${u.K.toFixed(2)}` : "—"), "altyd 'n vaste bedrag, nooit 'n persentasie nie") : ""}
         ${vr_outeurs
-          .map((o, i) => ry(`Outeur — ${vr_outeur_etiket(o, i)}`, (u) => `${((o.pct / 100) * u.B / (u.P || 1) * 100).toFixed(1)} %`))
+          .map((o, i) => ry(`Outeur — ${vr_outeur_etiket(o, i)}`, (u) => wys(u, (o.pct / 100) * u.B)))
           .join("")}
-        ${enigeK ? ry("Outeur — saam", (u) => `${u.pct(u.outeurRand).toFixed(1)} %`, "die twee rye bymekaar", "vr-r-vet") : ""}
-        ${ry("Ontwerp/Admin", (u) => `${pctVan(u, ontwerpAdmin).toFixed(1)} %`, `admin ${admin} % + ontwerp ${ontwerp} %`)}
+        ${enigeK ? ry("Outeur — saam", (u) => wys(u, u.outeurRand), "die twee rye bymekaar", "vr-r-vet") : ""}
+        ${ry("Ontwerp/Admin", (u) => wys(u, u.adminRand + u.ontwerpRand), `admin ${admin} % + ontwerp ${ontwerp} %`)}
         <tr class="vr-r-groep"><td colspan="4">Hosting</td></tr>
-        ${ry("Hosting", (u) => `${pctVan(u, hosting).toFixed(1)} %`)}
+        ${ry("Hosting", (u) => wys(u, u.hostingRand))}
+        <tr class="vr-r-groep"><td colspan="4">Bly in die hoofrekening — word nie ingetik nie</td></tr>
+        ${ry("Paystack", (u) => wys(u, u.paystackRand), "die fooi op die volle prys")}
+        ${ry("Direkteursfooie", (u) => wys(u, u.direkteursRand), "wat oorbly nadat almal betaal is", "vr-r-vet")}
       </tbody>
     </table>
-    ${enigeK ? `<p class="vr-fynskrif vr-lei">Die harde kopie se persentasies lyk laer omdat sy prys die outeur se druk- en poskoste insluit. Trek dit af, en die verdeling is presies dieselfde ${outeurPct}/${100 - outeurPct} as die e-boek s'n.</p>` : ""}
+    ${enigeK && !inRand ? `<p class="vr-fynskrif vr-lei">Die harde kopie se persentasies lyk laer omdat sy prys die outeur se druk- en poskoste insluit. Kyk in rand, en elke ry is dieselfde as die e-boek s'n.</p>` : ""}
     ${!somKlop ? `<div class="vr-kontrole vr-kontrole--nee"><span>⚠</span><span>Die outeursrye tel nie op tot ${outeurPct}% nie — maak dit eers reg voordat jy die vorm invul.</span></div>` : ""}
     ${vr_opstel_kontrole(uitslae)}`;
 }
