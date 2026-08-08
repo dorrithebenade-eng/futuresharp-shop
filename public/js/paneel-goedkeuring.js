@@ -359,12 +359,73 @@ async function pg_maak_oop(nommer) {
 // Authorization-kop stuur nie, en die Function laat niks sonder een deur.
 
 let PG_LEER_URL = null;
+let PG_PDF = null;
+let PG_BLADSY = 1;
+
+async function pg_teken_bladsy(nommer) {
+  if (!PG_PDF) return;
+  const totaal = PG_PDF.numPages;
+  PG_BLADSY = Math.min(Math.max(1, nommer), totaal);
+
+  const doek = document.getElementById("pg-doek");
+  const teller = document.getElementById("pg-bladsy-teller");
+  if (!doek) return;
+
+  const bladsy = await PG_PDF.getPage(PG_BLADSY);
+
+  // Skaal na die houer se breedte, sodat die bladsy pas sonder om te rol.
+  const rou = bladsy.getViewport({ scale: 1 });
+  const breedte = doek.parentElement ? doek.parentElement.clientWidth - 4 : 700;
+  const skaal = breedte > 0 ? breedte / rou.width : 1;
+  const aansig = bladsy.getViewport({ scale: skaal });
+
+  doek.width = aansig.width;
+  doek.height = aansig.height;
+  await bladsy.render({ canvasContext: doek.getContext("2d"), viewport: aansig }).promise;
+
+  if (teller) teller.textContent = PG_BLADSY + " / " + totaal;
+}
+
+async function pg_render_pdf(grepe, bak) {
+  if (!bak) return;
+
+  if (typeof pdfjsLib === "undefined") {
+    bak.innerHTML = '<p class="stelsel-boodskap">' +
+      pg_ontsnap(pg_t("pg_pdf_fout", "Kon nie die PDF-leser laai nie.")) + "</p>";
+    return;
+  }
+
+  bak.innerHTML =
+    '<div class="pg-pdf-balk">' +
+    '<button type="button" class="pg-wys" id="pg-vorige">' +
+    pg_ontsnap(pg_t("pg_vorige", "Vorige")) + "</button>" +
+    '<span class="pg-bladsy-teller" id="pg-bladsy-teller">…</span>' +
+    '<button type="button" class="pg-wys" id="pg-volgende">' +
+    pg_ontsnap(pg_t("pg_volgende", "Volgende")) + "</button></div>" +
+    '<div class="pg-doek-bak"><canvas id="pg-doek"></canvas></div>';
+
+  try {
+    PG_PDF = await pdfjsLib.getDocument({ data: grepe }).promise;
+    PG_BLADSY = 1;
+    await pg_teken_bladsy(1);
+
+    document.getElementById("pg-vorige")
+      .addEventListener("click", () => pg_teken_bladsy(PG_BLADSY - 1));
+    document.getElementById("pg-volgende")
+      .addEventListener("click", () => pg_teken_bladsy(PG_BLADSY + 1));
+  } catch (fout) {
+    console.error("Kon nie die PDF render nie:", fout);
+    bak.innerHTML = '<p class="stelsel-boodskap">' +
+      pg_ontsnap(pg_t("pg_pdf_fout", "Kon nie die PDF-leser laai nie.")) + "</p>";
+  }
+}
 
 function pg_maak_leser_toe() {
   const leser = document.getElementById("pg-leser");
   if (leser) leser.style.display = "none";
   const bak = document.getElementById("pg-leser-bak");
   if (bak) bak.innerHTML = "";
+  PG_PDF = null;
   if (PG_LEER_URL) {
     URL.revokeObjectURL(PG_LEER_URL);
     PG_LEER_URL = null;
@@ -414,15 +475,22 @@ async function pg_wys_leer(nommer, soort, knoppie) {
         PG_OOP.leers[soort].naam) || soort);
     }
 
-    if (bak) {
-      bak.innerHTML = soort === "manuskrip"
-        ? '<iframe class="pg-raam" src="' + PG_LEER_URL + '" title="Manuskrip"></iframe>'
-        : '<img class="pg-beeld" src="' + PG_LEER_URL + '" alt="Omslag">';
-    }
     if (leser) {
       leser.style.display = "";
       leser.scrollIntoView({ behavior: "smooth", block: "start" });
     }
+
+    if (soort !== "manuskrip") {
+      if (bak) bak.innerHTML = '<img class="pg-beeld" src="' + PG_LEER_URL + '" alt="Omslag">';
+      return;
+    }
+
+    // 'n IFRAME WERK NIE VIR 'N PDF NIE. Chrome se instelling "Download PDFs
+    // instead of automatically opening them" wys 'n plekhouer in plaas van
+    // die dokument, en geen kode omseil dit — dit is 'n bewuste keuse van
+    // die gebruiker. Ons render dus self met PDF.js, presies soos die winkel
+    // se leser, en dan maak die instelling nie saak nie.
+    await pg_render_pdf(await blob.arrayBuffer(), bak);
   } catch (fout) {
     console.error("Kon nie die lêer wys nie:", fout);
     alert(pg_t("pg_leer_fout", "Kon nie die lêer oopmaak nie."));
