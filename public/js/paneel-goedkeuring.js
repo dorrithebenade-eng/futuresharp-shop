@@ -370,7 +370,14 @@ async function pg_wys_leer(nommer, soort, knoppie) {
     );
     if (!resp.ok) throw new Error(await resp.text());
 
-    const blob = await resp.blob();
+    // Die tipe moet UITDRUKLIK op die blob staan. Sonder dit weet die
+    // blaaier nie wat hy kry nie en laai die lêer af in plaas daarvan om
+    // hom te wys — wat presies gebeur het toe dit die eerste keer gebou is.
+    const rou = await resp.blob();
+    const tipe = resp.headers.get("Content-Type") || rou.type ||
+      (soort === "manuskrip" ? "application/pdf" : "image/jpeg");
+    const blob = new Blob([rou], { type: tipe });
+
     const url = URL.createObjectURL(blob);
     window.open(url, "_blank", "noopener");
     // Die blaaier het die URL nodig tot die oortjie hom gelaai het.

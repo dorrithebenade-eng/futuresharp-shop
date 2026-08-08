@@ -265,6 +265,7 @@ async function il_laai_op(soort, nommer, token) {
 
 const IL_KORT_TEKS = {
   titel: ["il_kort_titel", "Die titel in Deel 1 moet ingevul wees."],
+  formaat: ["il_kort_formaat", "Ten minste een formaat in Deel 4 moet aangedui wees, met 'n bedrag."],
   manuskrip: ["il_kort_manuskrip", "Die manuskrip moet gekies wees."],
   omslag: ["il_kort_omslag", "Die omslag moet gekies wees."],
   bevestigings: ["il_kort_bevestigings", "Al drie bevestigings in Deel 8 moet gemerk wees."],
@@ -299,6 +300,13 @@ function il_kort_plaaslik() {
   const o = il_toestand.omslag;
   if ((!m.leer && !m.opgelaai) || m.fout) kort.push("manuskrip");
   if ((!o.leer && !o.opgelaai) || o.fout) kort.push("omslag");
+
+  const het_formaat = ["eboek", "hardekopie", "leen"].some((s) => {
+    const aan = document.getElementById("iv-aan-" + s);
+    const veld = document.querySelector('[data-veld="formate.' + s + '.invoer"]');
+    return aan && aan.checked && veld && Number(veld.value) > 0;
+  });
+  if (!het_formaat) kort.push("formaat");
 
   const bev = ["bevestigings.skepper", "bevestigings.kopiereg", "bevestigings.korrek"];
   const almal = bev.every((pad) => {

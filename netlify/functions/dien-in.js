@@ -50,6 +50,19 @@ function wat_kort(inhoud, leers) {
     kort.push("bevestigings");
   }
 
+  // 'n Boek sonder 'n formaat kan nie 'n prys hê nie, en sonder 'n prys kan
+  // dit nie 'n boek word nie. Ons toets die INVOER, nie 'n berekende prys
+  // nie — die som leef in die blaaier, en die getal wat hy ingee is wat
+  // hier moet wees.
+  const formate = (inhoud && inhoud.formate) || {};
+  const het_formaat = ["eboek", "hardekopie", "leen"].some((s) => {
+    const blok = formate[s];
+    return blok && blok.aan && Number(blok.invoer) > 0;
+  });
+  if (!het_formaat) {
+    kort.push("formaat");
+  }
+
   return kort;
 }
 

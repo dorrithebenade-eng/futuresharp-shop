@@ -797,6 +797,7 @@ const WOORDEBOEK = {
   pg_haal: { af: "Haal …", en: "Fetching …" },
   pg_leer_fout: { af: "Kon nie die lêer oopmaak nie.", en: "Could not open the file." },
   il_kort_titel: { af: "Die titel in Deel 1 moet ingevul wees.", en: "The title in Part 1 must be filled in." },
+  il_kort_formaat: { af: "Ten minste een formaat in Deel 4 moet aangedui wees, met 'n bedrag.", en: "At least one format in Part 4 must be indicated, with an amount." },
   il_kort_manuskrip: { af: "Die manuskrip moet gekies wees.", en: "The manuscript must be chosen." },
   il_kort_omslag: { af: "Die omslag moet gekies wees.", en: "The cover must be chosen." },
   il_kort_bevestigings: { af: "Al drie bevestigings in Deel 8 moet gemerk wees.", en: "All three confirmations in Part 8 must be ticked." },
