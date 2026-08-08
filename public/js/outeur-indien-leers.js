@@ -32,6 +32,9 @@ const il_toestand = {
 };
 
 let il_besig = false;
+// 'n Ingediende vorm is toe. Die bediener weier in elk geval (409), maar 'n
+// knoppie wat niks doen nie, is erger as geen knoppie nie.
+let il_toe = false;
 
 function il_t(sleutel, terugval) {
   return window.t ? window.t(sleutel) : terugval;
@@ -93,8 +96,9 @@ function il_teken(soort) {
       '<div class="il-teks"><div class="il-naam">' + il_ontsnap(naam) + "</div>" +
       '<div class="il-fyn">' + il_t("il_opgelaai", "Opgelaai") +
       (grootte ? " \u00b7 " + grootte : "") + "</div></div>" +
-      '<button type="button" class="il-ruil" data-il-ruil="' + soort + '">' +
-      il_t("il_kies_ander", "Kies 'n ander") + "</button></div>";
+      (il_toe ? "" :
+        '<button type="button" class="il-ruil" data-il-ruil="' + soort + '">' +
+        il_t("il_kies_ander", "Kies 'n ander") + "</button>") + "</div>";
     return;
   }
 
@@ -130,6 +134,14 @@ function il_teken(soort) {
       '<span class="il-val-knop">' + il_t("il_kies_weer", "Kies weer") + "</span>" +
       "<small>" + il_ontsnap(t.vorige_naam) + " \u2014 " +
       il_t("il_nie_gestoor", "die lêer self is nie gestoor nie, net sy naam") + "</small></div>";
+    return;
+  }
+
+  if (il_toe) {
+    blok.innerHTML =
+      '<div class="il-gekies"><span class="il-ikoon">\u2014</span>' +
+      '<div class="il-teks"><div class="il-fyn">' +
+      il_t("il_geen_leer", "Geen lêer") + "</div></div></div>";
     return;
   }
 
@@ -374,6 +386,7 @@ async function il_dien_in() {
 
     const uit = await resp.json();
     il_besig = false;
+    il_toe = true;
     il_stel_stand("klaar", il_t("il_ingedien", "Ingedien"));
 
     if (knop) {
@@ -412,6 +425,8 @@ async function il_laai_bestaande(nommer) {
     const rekord = await resp.json();
     const leers = rekord.leers || {};
 
+    if (rekord.stand === "ingedien" || rekord.stand === "wysiging") il_toe = true;
+
     ["manuskrip", "omslag"].forEach((soort) => {
       if (!leers[soort]) return;
       il_toestand[soort].vorige_naam = leers[soort].naam || "";
@@ -419,9 +434,14 @@ async function il_laai_bestaande(nommer) {
       il_teken(soort);
     });
 
-    if (rekord.stand === "ingedien" || rekord.stand === "wysiging") {
+    if (il_toe) {
+      ["manuskrip", "omslag"].forEach(il_teken);
       const knop = document.getElementById("il-dien-in");
       if (knop) { knop.disabled = true; knop.textContent = il_t("il_ingedien", "Ingedien"); }
+      const stoor = document.getElementById("iv-stoor");
+      if (stoor) stoor.hidden = true;
+      document.querySelectorAll("#iv-vorm input, #iv-vorm select, #iv-vorm textarea")
+        .forEach((el) => { el.disabled = true; });
     }
   } catch (fout) {
     console.error("Kon nie die lêers laai nie:", fout);

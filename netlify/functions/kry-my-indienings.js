@@ -73,6 +73,9 @@ exports.handler = async (event, context) => {
         ...opsomming(rekord),
         data: rekord.data || {},
         hangend: rekord.hangend || null,
+        // Wat opgelaai is. Sonder hierdie reël teken die vorm sy lêerblokke
+        // leeg ná 'n herlaai en lyk dit of die manuskrip weg is.
+        leers: rekord.leers || null,
         geskiedenis: rekord.geskiedenis || [],
       }),
     };

@@ -737,6 +737,7 @@ const WOORDEBOEK = {
   il_indien_nie_deur: { af: "Die indiening het nie deurgegaan nie.", en: "The submission did not go through." },
   il_geen_nommer: { af: "Die vorm moet eers stoor voordat dit ingedien kan word.", en: "The form must save before it can be submitted." },
   il_kort_kop: { af: "Nog nie gereed om in te dien nie:", en: "Not yet ready to submit:" },
+  il_geen_leer: { af: "Geen lêer", en: "No file" },
   il_kort_titel: { af: "Die titel in Deel 1 moet ingevul wees.", en: "The title in Part 1 must be filled in." },
   il_kort_manuskrip: { af: "Die manuskrip moet gekies wees.", en: "The manuscript must be chosen." },
   il_kort_omslag: { af: "Die omslag moet gekies wees.", en: "The cover must be chosen." },
