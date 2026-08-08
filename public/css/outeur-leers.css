@@ -1,0 +1,101 @@
+/* public/css/outeur-leers.css
+   Deel 7 se lêerblokke. 'n Eie lêer sodat outeur.css onaangeraak bly.
+   Die kleure en rande kom uit outeur.css se stel — hier is niks nuuts nie,
+   net die vorms wat daar nog nie bestaan het nie. */
+
+.il-val {
+  border: 1px dashed #E3E0DA;
+  border-radius: 8px;
+  padding: 18px;
+  text-align: center;
+  color: #6E6A63;
+  background: #FAF9F7;
+  font-size: 14.5px;
+  cursor: pointer;
+  transition: border-color .15s, background .15s;
+}
+.il-val:hover,
+.il-val.il-oor {
+  border-color: var(--teal, #1F8A7D);
+  background: #F1F8F7;
+}
+.il-val:focus-visible {
+  outline: 2px solid var(--teal, #1F8A7D);
+  outline-offset: 2px;
+}
+.il-val-knop {
+  color: var(--teal-donker, #17685E);
+  font-weight: 600;
+  text-decoration: underline;
+}
+.il-val small {
+  display: block;
+  margin-top: 5px;
+  font-size: 13px;
+}
+
+/* Gekies, besig, klaar of stukkend — een vorm, vier kleure. */
+.il-gekies {
+  border: 1px solid #E3E0DA;
+  border-radius: 8px;
+  padding: 13px 15px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14.5px;
+}
+.il-gekies.il-wag { background: #FFF7E6; border-color: var(--amber, #E0A020); }
+.il-gekies.il-klaar { background: #F1F8F7; border-color: var(--teal, #1F8A7D); }
+.il-gekies.il-fout { background: #FDECEC; border-color: #D98A8A; }
+
+.il-ikoon { font-size: 20px; line-height: 1; flex: 0 0 auto; }
+.il-teks { flex: 1 1 auto; min-width: 0; }
+.il-naam { font-weight: 600; word-break: break-all; }
+.il-fyn { color: #6E6A63; font-size: 13px; }
+.il-gekies.il-fout .il-fyn { color: #8A2B2B; }
+
+.il-ruil {
+  background: none;
+  border: 1px solid #E3E0DA;
+  border-radius: 7px;
+  padding: 5px 11px;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+.il-ruil:hover { background: #FAF9F7; }
+
+.il-balk {
+  height: 5px;
+  background: #E3E0DA;
+  border-radius: 3px;
+  margin-top: 7px;
+  overflow: hidden;
+}
+.il-balk i {
+  display: block;
+  height: 100%;
+  background: var(--teal, #1F8A7D);
+  width: 0;
+  transition: width .2s;
+}
+
+/* Wat nog kort. Amber, soos die opmerking bo-aan die vorm — dit is iets
+   om te DOEN, nie 'n fout wat gemaak is nie. */
+.il-kort {
+  background: #FFF7E6;
+  border: 1px solid var(--amber, #E0A020);
+  border-radius: 8px;
+  padding: 12px 15px;
+  margin-top: 14px;
+  font-size: 14.5px;
+  color: #6b5610;
+}
+.il-kort ul { margin: 7px 0 0; padding-left: 20px; }
+.il-kort li { margin-bottom: 3px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .il-val, .il-balk i { transition: none; }
+}

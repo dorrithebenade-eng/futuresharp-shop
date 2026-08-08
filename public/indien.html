@@ -6,6 +6,7 @@
   <title>Boekvorm — Future Shop</title>
   <link rel="stylesheet" href="css/styl.css" />
   <link rel="stylesheet" href="css/outeur.css" />
+  <link rel="stylesheet" href="css/outeur-leers.css" />
 
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#3FB6A4">
@@ -150,12 +151,15 @@
             <p class="iv-nota" data-i18n="iv_deel7_nota">
               Die manuskrip en die omslag word saam met die indiening opgelaai. Solank die vorm 'n konsep is, word hulle nog nie gestuur nie.
             </p>
-            <label class="iv-veld"><span data-i18n="iv_manuskrip">Die manuskrip</span>
-              <small data-i18n="iv_manuskrip_fyn">PDF — die finale weergawe, met bladsynommers en 'n inhoudsopgawe waar van toepassing</small>
-              <div class="iv-val" data-i18n="iv_val">Word by indiening opgelaai</div></label>
-            <label class="iv-veld"><span data-i18n="iv_omslag">Die omslag</span>
-              <small data-i18n="iv_omslag_fyn">JPEG, PNG, WEBP of GIF · hoogstens 4MB · verhouding 1530 × 2322</small>
-              <div class="iv-val" data-i18n="iv_val">Word by indiening opgelaai</div></label>
+            <label class="iv-veld" for="il-in-manuskrip"><span data-i18n="iv_manuskrip">Die manuskrip</span>
+              <small data-i18n="iv_manuskrip_fyn">PDF — die finale weergawe, met bladsynommers en 'n inhoudsopgawe waar van toepassing</small></label>
+            <input type="file" id="il-in-manuskrip" accept="application/pdf" hidden>
+            <div id="il-blok-manuskrip"></div>
+
+            <label class="iv-veld" for="il-in-omslag" style="margin-top:18px"><span data-i18n="iv_omslag">Die omslag</span>
+              <small data-i18n="iv_omslag_fyn">JPEG, PNG, WEBP of GIF · hoogstens 4MB · verhouding 1530 × 2322</small></label>
+            <input type="file" id="il-in-omslag" accept="image/jpeg,image/png,image/webp,image/gif" hidden>
+            <div id="il-blok-omslag"></div>
           </fieldset>
 
           <fieldset class="iv-deel">
@@ -177,8 +181,14 @@
         </form>
 
         <div class="iv-aksies">
-          <button type="button" class="oi-knoppie oi-hoof" id="iv-stoor" data-i18n="iv_stoor">Stoor as konsep</button>
+          <button type="button" class="oi-knoppie oi-hoof" id="il-dien-in" data-i18n="il_dien_in">Dien in</button>
+          <button type="button" class="oi-knoppie" id="iv-stoor" data-i18n="iv_stoor">Stoor as konsep</button>
           <a class="oi-knoppie" href="outeur.html" data-i18n="iv_terug">Terug na my indienings</a>
+        </div>
+
+        <div class="il-kort" id="il-kort" hidden>
+          <strong data-i18n="il_kort_kop">Nog nie gereed om in te dien nie:</strong>
+          <ul id="il-kort-lys"></ul>
         </div>
       </div>
     </div>
@@ -191,5 +201,6 @@
   <script src="js/verdeling-som.js"></script>
   <script src="js/outeur.js"></script>
   <script src="js/outeur-indien.js"></script>
+  <script src="js/outeur-indien-leers.js"></script>
 </body>
 </html>
