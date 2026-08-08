@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Personeel-paneelbord — Future Shop</title>
   <link rel="stylesheet" href="css/styl.css">
+  <link rel="stylesheet" href="css/paneel-goedkeuring.css">
   <script src="js/identiteit.js"></script>
 
   <!-- PWA: Future Shop Paneelbord-app (aparte omvang, net hierdie bladsy) -->
@@ -153,6 +154,7 @@
       <div class="paneel-uitleg">
         <nav id="paneel-sy-kieslys" class="paneel-sy-kieslys" aria-label="Paneelbord-afdelings">
           <button type="button" class="paneel-kieslys-item aktief" data-afdeling="katalogus" data-i18n="paneel_katalogus_titel">Katalogus</button>
+          <button type="button" class="paneel-kieslys-item" data-afdeling="indienings" data-i18n="pg_titel">Indienings</button>
           <button type="button" class="paneel-kieslys-item" data-afdeling="outeurs" data-i18n="paneel_outeurs_titel">Outeurs</button>
           <button type="button" class="paneel-kieslys-item" data-afdeling="vennote">Vennote (direkteure)</button>
           <button type="button" class="paneel-kieslys-item" data-afdeling="ontwerp-admin">Ontwerp/Admin</button>
@@ -177,6 +179,24 @@
         <div id="paneel-produkte-lys">
           <p class="stelsel-boodskap" data-i18n="paneel_produkte_laai">Produkte word gelaai …</p>
         </div>
+      </section>
+
+      <section class="paneel-afdeling" data-afdeling-inhoud="indienings">
+        <div class="paneel-afdeling-kop">
+          <h2 class="paneel-afdeling-titel" data-i18n="pg_titel">Indienings</h2>
+          <button id="pg-herlaai" class="kaart-aksie" type="button" data-i18n="pg_herlaai">Herlaai</button>
+        </div>
+        <p class="paneel-hulp-teks" data-i18n="pg_hulp">Wat outeurs ingedien het. Maak 'n vorm oop om die besonderhede en die l&ecirc;ers te sien.</p>
+
+        <div class="pg-een" id="pg-een" style="display:none;">
+          <div class="pg-een-balk">
+            <span class="pg-een-kop" id="pg-een-kop"></span>
+            <button type="button" class="kaart-aksie" id="pg-een-toe" data-i18n="pg_toe">Maak toe</button>
+          </div>
+          <div id="pg-een-inhoud"></div>
+        </div>
+
+        <div id="pg-lys"></div>
       </section>
 
       <section class="paneel-afdeling" data-afdeling-inhoud="outeurs">
@@ -976,6 +996,7 @@
   <script src="js/paneel-kieslys.js"></script>
   <script src="js/verdeling-som.js"></script>
   <script src="js/verdeling-rekenaar.js"></script>
+  <script src="js/paneel-goedkeuring.js"></script>
   <script src="js/paneelbord-installeer-app.js"></script>
   <script src="js/wagwoord-ogie.js"></script>
 </body>

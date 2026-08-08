@@ -1,0 +1,155 @@
+/* public/css/paneel-goedkeuring.css
+   Die Indienings-afdeling. 'n Eie lêer sodat styl.css onaangeraak bly. */
+
+.pg-groep {
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+  color: #6E6A63;
+  margin: 22px 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.pg-groep:first-child { margin-top: 4px; }
+.pg-tel {
+  background: #EFEDE8;
+  border-radius: 10px;
+  padding: 1px 8px;
+  font-size: 12.5px;
+  letter-spacing: 0;
+}
+
+.pg-kaart {
+  border: 1px solid #E3E0DA;
+  border-radius: 10px;
+  background: #fff;
+  padding: 13px 16px;
+  margin-bottom: 9px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: border-color .15s, background .15s;
+}
+.pg-kaart:hover { border-color: #1F8A7D; background: #F7FBFA; }
+.pg-kaart-teks { flex: 1 1 auto; min-width: 0; }
+.pg-kaart-titel { font-weight: 700; }
+.pg-kaart-fyn { color: #6E6A63; font-size: 13px; margin-top: 2px; }
+
+.pg-merk {
+  flex: 0 0 auto;
+  border-radius: 12px;
+  padding: 3px 11px;
+  font-size: 12.5px;
+  background: #EFEDE8;
+  color: #55524C;
+  white-space: nowrap;
+}
+.pg-merk-ingedien { background: #FFF7E6; color: #6b5610; }
+.pg-merk-wysiging { background: #FFF7E6; color: #6b5610; }
+.pg-merk-op_rak { background: #E9F5F3; color: #17685E; }
+
+/* --- Een indiening --- */
+
+.pg-een {
+  border: 1px solid #E3E0DA;
+  border-radius: 10px;
+  background: #fff;
+  padding: 20px 22px;
+  margin-bottom: 20px;
+}
+.pg-een-balk {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.pg-een-kop { font-size: 18px; font-weight: 700; flex: 1 1 auto; min-width: 0; }
+
+.pg-kop {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+  color: #6E6A63;
+  margin: 20px 0 8px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #EFEDE8;
+}
+.pg-kop:first-child { margin-top: 0; }
+
+.pg-ry {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 12px;
+  padding: 6px 0;
+  border-bottom: 1px solid #F4F2EE;
+  font-size: 14.5px;
+}
+.pg-etiket { color: #6E6A63; }
+.pg-waarde { word-break: break-word; white-space: pre-wrap; }
+.pg-leeg { color: #A8A39A; }
+
+/* Wat verander het, moet in een oogopslag lees. */
+.pg-ry-verander { background: #FFFBF2; }
+.pg-oud { color: #8A8680; text-decoration: line-through; }
+.pg-pyl { color: #6E6A63; margin: 0 8px; }
+
+.pg-formaat {
+  border: 1px solid #E3E0DA;
+  border-radius: 8px;
+  padding: 13px 15px;
+  margin-bottom: 11px;
+}
+.pg-formaat-prys { border-color: #E0A020; background: #FFFBF2; }
+.pg-formaat-kop {
+  font-weight: 700;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.pg-prysmerk {
+  background: #E0A020;
+  color: #fff;
+  border-radius: 10px;
+  padding: 2px 9px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.pg-nota, .pg-opmerking {
+  background: #FFF7E6;
+  border: 1px solid #E0A020;
+  border-radius: 8px;
+  padding: 12px 15px;
+  margin-bottom: 14px;
+  font-size: 14.5px;
+  color: #6b5610;
+}
+
+.pg-wys {
+  background: none;
+  border: 1px solid #E3E0DA;
+  border-radius: 7px;
+  padding: 3px 11px;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  margin-left: 8px;
+}
+.pg-wys:hover { background: #FAF9F7; }
+.pg-wys[disabled] { opacity: .5; cursor: default; }
+
+.pg-geskiedenis {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 13.5px;
+  color: #6E6A63;
+}
+.pg-geskiedenis li { margin-bottom: 3px; }
+
+@media (max-width: 620px) {
+  .pg-ry { grid-template-columns: 1fr; gap: 0; }
+  .pg-etiket { font-size: 13px; }
+}
