@@ -497,6 +497,7 @@ async function il_laai_bestaande(nommer) {
     if (il_toe) {
       ["manuskrip", "omslag"].forEach(il_teken);
       il_wys_toe_knoppies();
+      if (rekord.stand === "goedgekeur") { const ont = document.getElementById("il-onttrek"); if (ont) ont.style.display = "none"; }
       document.querySelectorAll("#iv-vorm input, #iv-vorm select, #iv-vorm textarea")
         .forEach((el) => { el.disabled = true; });
     }

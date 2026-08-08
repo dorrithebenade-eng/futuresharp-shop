@@ -333,7 +333,8 @@ async function iv_laai_bestaande(nommer) {
       if (blok) { blok.hidden = false; blok.textContent = rekord.opmerking; }
     }
 
-    iv_stel_stand("", iv_t("iv_stoor_outomaties", "Word outomaties gestoor terwyl jy tik"));
+    const iv_woord = { ingedien: ["oi_merk_ingedien", "Ingedien"], wysiging: ["oi_merk_wysiging", "Wysiging hangend"], goedgekeur: ["oi_merk_goedgekeur", "Goedgekeur"], op_rak: ["oi_merk_rak", "Op die rak"] }[rekord.stand];
+    if (iv_woord) { iv_stel_stand("klaar", iv_t(iv_woord[0], iv_woord[1])); } else { iv_stel_stand("", iv_t("iv_stoor_outomaties", "Word outomaties gestoor terwyl jy tik")); }
   } catch (fout) {
     console.error("Kon nie die vorm laai nie:", fout);
     iv_stel_stand("fout", iv_t("iv_nie_gevind", "Hierdie vorm kon nie gelaai word nie."));
