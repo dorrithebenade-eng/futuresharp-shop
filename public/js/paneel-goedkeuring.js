@@ -23,6 +23,7 @@ let PG_OOP = null;
 
 const PG_GROEPE = [
   { sleutel: "wag", stande: ["ingedien", "wysiging"], i18n: "pg_groep_wag", verstek: "Wag vir hantering" },
+  { sleutel: "goedgekeur", stande: ["goedgekeur"], i18n: "pg_groep_goedgekeur", verstek: "Goedgekeur — wag om opgestel te word" },
   { sleutel: "rak", stande: ["op_rak"], i18n: "pg_groep_rak", verstek: "Op die winkelrak" },
   { sleutel: "konsep", stande: ["konsep"], i18n: "pg_groep_konsep", verstek: "In proses by die outeur" },
 ];
@@ -31,6 +32,7 @@ const PG_MERKIES = {
   konsep: ["pg_merk_konsep", "In proses"],
   ingedien: ["pg_merk_ingedien", "Ingedien"],
   wysiging: ["pg_merk_wysiging", "Wysiging hangend"],
+  goedgekeur: ["pg_merk_goedgekeur", "Goedgekeur"],
   op_rak: ["pg_merk_rak", "Op die rak"],
 };
 
@@ -317,7 +319,70 @@ function pg_besonderhede_html(rekord) {
     uit += "</ul>";
   }
 
+  // --- Wat die produkvorm nodig het ---
+  if (rekord.eboek_sleutel || rekord.omslag) {
+    uit += '<h4 class="pg-kop">' +
+      pg_ontsnap(pg_t("pg_katalogus", "In die katalogus se stores")) + "</h4>";
+    if (rekord.eboek_sleutel) {
+      uit += pg_ry(pg_t("pg_eboek_sleutel", "E-boek-sleutel"), rekord.eboek_sleutel, false);
+    }
+    if (rekord.omslag) {
+      uit += pg_ry(pg_t("pg_omslag_pad", "Omslag-pad"), rekord.omslag, false);
+    }
+  }
+
+  // --- Die twee handelinge ---
+  //
+  // Daar is GEEN afkeur nie. 'n Afkeur eindig 'n gesprek; 'n opmerking hou
+  // hom aan die gang, en die geskiedenis wys later hoe die boek by sy
+  // finale vorm uitgekom het.
+  if (rekord.stand === "ingedien" || rekord.stand === "wysiging") {
+    uit += '<div class="pg-aksies">' +
+      '<button type="button" class="kaart-aksie pg-keur" id="pg-keur-goed">' +
+      pg_ontsnap(pg_t("pg_keur_goed", "Keur goed")) + "</button>" +
+      '<button type="button" class="kaart-aksie" id="pg-stuur-terug">' +
+      pg_ontsnap(pg_t("pg_stuur_terug", "Stuur terug met \u2019n opmerking")) + "</button>" +
+      "</div>" +
+      '<div class="pg-terug-blok" id="pg-terug-blok" hidden>' +
+      '<label for="pg-opmerking">' +
+      pg_ontsnap(pg_t("pg_opmerking_etiket", "Wat moet die outeur regmaak?")) + "</label>" +
+      '<textarea id="pg-opmerking" rows="4"></textarea>' +
+      '<button type="button" class="kaart-aksie pg-keur" id="pg-terug-stuur">' +
+      pg_ontsnap(pg_t("pg_terug_stuur", "Stuur terug")) + "</button></div>";
+  }
+
   return uit;
+}
+
+// --- Die twee handelinge ---
+
+async function pg_handeling(pad, liggaam, knoppie, besig_teks) {
+  const oorspronklik = knoppie ? knoppie.textContent : "";
+  if (knoppie) { knoppie.disabled = true; knoppie.textContent = besig_teks; }
+
+  try {
+    const resp = await fetch("/.netlify/functions/" + pad, {
+      method: "POST",
+      headers: Object.assign({ "Content-Type": "application/json" }, kry_outorisasie_kop()),
+      body: JSON.stringify(liggaam),
+    });
+    if (!resp.ok) throw new Error(await resp.text());
+
+    const uit = await resp.json();
+
+    // Blobs se list() loop agter. Werk die PLAASLIKE lys by in plaas van
+    // weer te vra — anders lyk dit of niks gebeur het nie.
+    const ry = PG_INDIENINGS.find((r) => r.nommer === uit.nommer);
+    if (ry) ry.stand = uit.stand;
+    pg_teken_lys();
+
+    pg_maak_leser_toe();
+    await pg_maak_oop(uit.nommer);
+  } catch (fout) {
+    console.error("Die handeling het misluk:", fout);
+    alert(String(fout.message || fout) || pg_t("pg_handeling_fout", "Die handeling het misluk."));
+    if (knoppie) { knoppie.disabled = false; knoppie.textContent = oorspronklik; }
+  }
 }
 
 async function pg_maak_oop(nommer) {
@@ -512,6 +577,38 @@ document.addEventListener("click", (e) => {
   if (wys) {
     e.stopPropagation();
     pg_wys_leer(wys.getAttribute("data-pg-vir"), wys.getAttribute("data-pg-wys"), wys);
+    return;
+  }
+
+  const keur = e.target.closest("#pg-keur-goed");
+  if (keur) {
+    pg_handeling("keur-goed", { nommer: PG_OOP.nommer }, keur,
+      pg_t("pg_besig", "Besig \u2026"));
+    return;
+  }
+
+  const wys_terug = e.target.closest("#pg-stuur-terug");
+  if (wys_terug) {
+    const blok = document.getElementById("pg-terug-blok");
+    if (blok) {
+      blok.hidden = false;
+      const veld = document.getElementById("pg-opmerking");
+      if (veld) veld.focus();
+    }
+    return;
+  }
+
+  const stuur = e.target.closest("#pg-terug-stuur");
+  if (stuur) {
+    const veld = document.getElementById("pg-opmerking");
+    const opmerking = veld ? veld.value.trim() : "";
+    if (!opmerking) {
+      alert(pg_t("pg_opmerking_verplig", "Skryf eers 'n opmerking."));
+      if (veld) veld.focus();
+      return;
+    }
+    pg_handeling("stuur-terug", { nommer: PG_OOP.nommer, opmerking }, stuur,
+      pg_t("pg_besig", "Besig \u2026"));
     return;
   }
 

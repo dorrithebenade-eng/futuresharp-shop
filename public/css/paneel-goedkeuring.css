@@ -195,3 +195,35 @@
 @media (max-width: 620px) {
   .pg-doek-bak { max-height: 62vh; }
 }
+
+/* --- Die twee handelinge --- */
+
+.pg-aksies {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid #EFEDE8;
+}
+.pg-keur { background: #1F8A7D; border-color: #1F8A7D; color: #fff; font-weight: 600; }
+.pg-keur:hover { background: #17685E; }
+
+.pg-terug-blok { margin-top: 14px; }
+.pg-terug-blok label {
+  display: block;
+  font-size: 14.5px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.pg-terug-blok textarea {
+  width: 100%;
+  border: 1px solid #E3E0DA;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font: inherit;
+  font-size: 15px;
+  resize: vertical;
+  margin-bottom: 10px;
+}
+.pg-merk-goedgekeur { background: #E9F5F3; color: #17685E; }

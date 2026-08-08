@@ -31,6 +31,12 @@ function opsomming(rekord) {
     het_hangende_wysiging: Boolean(rekord.hangend),
     opmerking: rekord.opmerking || "",
     produk_id: rekord.produk_id || null,
+    // Ná goedkeuring: waar die lêers in die katalogus se stores beland het.
+    // Hierdie Function bou veld vir veld — 'n nuwe veld kom NIE vanself deur
+    // nie, en dit is presies hoe `leers` een keer verlore geraak het.
+    eboek_sleutel: rekord.eboek_sleutel || null,
+    omslag: rekord.omslag || null,
+    goedgekeur_op: rekord.goedgekeur_op || null,
     het_manuskrip: Boolean(leers.manuskrip),
     het_omslag: Boolean(leers.omslag),
     geskep_op: rekord.geskep_op || null,
