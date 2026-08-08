@@ -191,6 +191,7 @@ function pg_formaat_prys(blok) {
     begin: Number(blok.invoer) || 0,
     koste: Number(blok.koste) || 0,
     outeurPct: PG_OUTEUR_PCT,
+    rond: 5,
     paystackPct: PG_AANNAMES.paystackPct,
     paystackVaste: PG_AANNAMES.paystackVaste,
     btwPct: PG_AANNAMES.btwPct,
