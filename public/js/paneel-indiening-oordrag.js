@@ -29,11 +29,24 @@
 // die indienvorm se "voorraad word gehou / elke bestelling word gedruk" is
 // nie dieselfde vraag as die katalogus se "beskikbaar / uitverkoop" nie.
 //
-// GEEN LEË RYE NIE. Slegs die outeur se rye word geskryf. Ontwerp/Admin en
-// Hosting weet die indiening niks van nie, en 'n ry wat op nul staan, is 'n
-// ry wat later gemis word.
+// GEEN LEË RYE NIE. Slegs die outeur se rye word geskryf. Ontwerp/Admin
+// weet die indiening niks van nie, en 'n ry wat op nul staan, is 'n ry wat
+// later gemis word.
+//
+// HOSTING IS DIE UITSONDERING: dit word altyd gemerk, op 5% van die
+// BOEKPRYS. Dit is Future Sharp se eie aandeel en geld op elke boek, dus is
+// die verstek 'n gemerkte blokkie wat afgesit kan word, nie 'n leë een wat
+// onthou moet word. Die 5% geld op die boekdeel en word na 'n persentasie
+// van die VOLLE prys omgereken, want die katalogus ken net die volle prys —
+// die outeur se versending mag nie Hosting betaal nie.
+//
+// 'n GEMERKTE BLOKKIE SONDER 'N WAARDE STOOR AS NIKS.
+// kry_hosting_vanuit_vorm() gee null terug by 'n leë of nul-veld, en dan lyk
+// die skerm of Hosting aan is terwyl daar niks gestoor word nie. Die merkie
+// en die getal gaan dus altyd saam.
 
 const PIO_OUTEUR_PCT = 70;
+const PIO_HOSTING_PCT = 5;
 const PIO_AANNAMES = { paystackPct: 2.9, paystackVaste: 1, btwPct: 15 };
 const PIO_ROND = 5;
 
@@ -80,6 +93,7 @@ function pio_som(blok) {
     begin: Number(blok.invoer) || 0,
     koste: Number(blok.koste) || 0,
     outeurPct: PIO_OUTEUR_PCT,
+    hostingPct: PIO_HOSTING_PCT,
     rond: PIO_ROND,
     paystackPct: PIO_AANNAMES.paystackPct,
     paystackVaste: PIO_AANNAMES.paystackVaste,
@@ -143,6 +157,14 @@ function pio_vul_formaat(s, blok, outeur_id) {
     tipe: "persentasie",
     waarde: Number(pct.toFixed(2)),
   });
+
+  // Hosting: altyd gemerk, met sy getal. hostingRand kom uit dieselfde som
+  // en geld op die boekdeel; hier word dit 'n persentasie van die volle
+  // prys, want dit is wat die vorm stoor.
+  const hosting_pct = u.P > 0 ? (u.hostingRand / u.P) * 100 : 0;
+  pio_merk("vorm-" + s + "-hosting-aan", true);
+  pio_veld("vorm-" + s + "-hosting-tipe", "persentasie");
+  pio_veld("vorm-" + s + "-hosting-waarde", Number(hosting_pct.toFixed(2)));
 }
 
 function pio_wys_nota(reels) {
