@@ -128,6 +128,10 @@ exports.handler = async (event, context) => {
   // 'n Ingediende rekord is toe — dieselfde reël as stoor-indiening.js. 'n
   // Boek op die rak mag wel 'n nuwe lêer kry; dit hoort by die hangende
   // wysiging en word eers by goedkeuring lewendig.
+  if (rekord.stand === "goedgekeur") {
+    return { statusCode: 409, body: "Hierdie vorm is goedgekeur. Die leers is reeds oorgedra." };
+  }
+
   if (rekord.stand === "ingedien" || rekord.stand === "wysiging") {
     return {
       statusCode: 409,

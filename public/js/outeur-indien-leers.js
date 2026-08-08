@@ -484,7 +484,7 @@ async function il_laai_bestaande(nommer) {
     const rekord = await resp.json();
     const leers = rekord.leers || {};
 
-    if (rekord.stand === "ingedien" || rekord.stand === "wysiging") il_toe = true;
+    if (rekord.stand === "ingedien" || rekord.stand === "wysiging" || rekord.stand === "goedgekeur") il_toe = true;
 
     ["manuskrip", "omslag"].forEach((soort) => {
       if (!leers[soort]) return;

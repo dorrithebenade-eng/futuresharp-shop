@@ -144,6 +144,10 @@ exports.handler = async (event, context) => {
     return { statusCode: 403, body: "Hierdie vorm behoort nie aan hierdie rekening nie" };
   }
 
+  if (rekord.stand === "goedgekeur") {
+    return { statusCode: 409, body: "Hierdie vorm is goedgekeur en wag om opgestel te word." };
+  }
+
   if (rekord.stand === "ingedien" || rekord.stand === "wysiging") {
     return {
       statusCode: 409,

@@ -881,6 +881,7 @@ const WOORDEBOEK = {
     af: "Jou boeke, jou syfers en die bestellings wat wag om gestuur te word.",
     en: "Your books, your figures, and the orders waiting to be sent.",
   },
+  oi_merk_goedgekeur: { af: "Goedgekeur", en: "Approved" },
   nav_outeurspaneel: { af: "Outeurspaneel", en: "Author panel" },
 };
 

@@ -12,9 +12,15 @@
 //   Op die Winkelrak           — goedgekeur en te koop
 //   In proses vóór indien      — sy konsepte
 //
+// `goedgekeur` HOORT BY DIE EERSTE GROEP. Die vorm is goedgekeur maar die
+// boek is nog nie opgestel nie; die werk lê steeds by Future Sharp. Sonder
+// hierdie reël val die stand deur na die laaste tak en dan lees 'n
+// goedgekeurde boek as "In proses" in sy eie konsepte — asof die indiening
+// ongedaan gemaak is.
+//
 // Die merkies op die kaarte is KORTER as die opskrifte — In proses,
-// Ingedien, Wysiging hangend, Op die rak — want 'n merkie moet in een
-// oogopslag lees waar 'n opskrif 'n groep mag beskryf.
+// Ingedien, Goedgekeur, Wysiging hangend, Op die rak — want 'n merkie moet
+// in een oogopslag lees waar 'n opskrif 'n groep mag beskryf.
 //
 // DIE WINKEL SE NAAM HOORT NIE HIER NIE. Die skerm gaan oor sy boek, nie
 // oor Future Sharp nie.
@@ -34,6 +40,9 @@ function oi_merkie(indiening) {
   }
   if (indiening.stand === "wysiging") {
     return { klas: "oi-hangend", teks: oi_vertaal("oi_merk_wysiging", "Wysiging hangend") };
+  }
+  if (indiening.stand === "goedgekeur") {
+    return { klas: "oi-ingedien", teks: oi_vertaal("oi_merk_goedgekeur", "Goedgekeur") };
   }
   if (indiening.stand === "ingedien") {
     return { klas: "oi-ingedien", teks: oi_vertaal("oi_merk_ingedien", "Ingedien") };
@@ -135,6 +144,7 @@ function oi_teken(indienings) {
 
   const ingedien = indienings.filter(
     (i) => i.stand === "ingedien" || i.stand === "wysiging" ||
+           i.stand === "goedgekeur" ||
            (i.stand === "op_rak" && i.het_hangende_wysiging)
   );
   const op_rak = indienings.filter((i) => i.stand === "op_rak" && !i.het_hangende_wysiging);
