@@ -358,6 +358,19 @@ async function pg_maak_oop(nommer) {
 // Fetch met die kop, dan 'n blob-URL. 'n Gewone skakel kan nie 'n
 // Authorization-kop stuur nie, en die Function laat niks sonder een deur.
 
+let PG_LEER_URL = null;
+
+function pg_maak_leser_toe() {
+  const leser = document.getElementById("pg-leser");
+  if (leser) leser.style.display = "none";
+  const bak = document.getElementById("pg-leser-bak");
+  if (bak) bak.innerHTML = "";
+  if (PG_LEER_URL) {
+    URL.revokeObjectURL(PG_LEER_URL);
+    PG_LEER_URL = null;
+  }
+}
+
 async function pg_wys_leer(nommer, soort, knoppie) {
   const oorspronklik = knoppie ? knoppie.textContent : "";
   if (knoppie) { knoppie.disabled = true; knoppie.textContent = pg_t("pg_haal", "Haal …"); }
@@ -370,18 +383,46 @@ async function pg_wys_leer(nommer, soort, knoppie) {
     );
     if (!resp.ok) throw new Error(await resp.text());
 
-    // Die tipe moet UITDRUKLIK op die blob staan. Sonder dit weet die
-    // blaaier nie wat hy kry nie en laai die lêer af in plaas daarvan om
-    // hom te wys — wat presies gebeur het toe dit die eerste keer gebou is.
+    // Die tipe moet UITDRUKLIK op die blob staan, anders weet die blaaier
+    // nie wat hy kry nie.
     const rou = await resp.blob();
     const tipe = resp.headers.get("Content-Type") || rou.type ||
       (soort === "manuskrip" ? "application/pdf" : "image/jpeg");
     const blob = new Blob([rou], { type: tipe });
 
-    const url = URL.createObjectURL(blob);
-    window.open(url, "_blank", "noopener");
-    // Die blaaier het die URL nodig tot die oortjie hom gelaai het.
-    setTimeout(() => URL.revokeObjectURL(url), 60000);
+    pg_maak_leser_toe();
+    PG_LEER_URL = URL.createObjectURL(blob);
+
+    // IN DIE BLADSY, nie 'n nuwe oortjie nie. Chrome se instelling
+    // "Download PDFs instead of automatically opening them" laat 'n
+    // window.open van 'n PDF aflaai; 'n iframe omseil dit. En 'n manuskrip
+    // wat naas sy eie besonderhede lees, is in elk geval die beter plek om
+    // hom te beoordeel.
+    const leser = document.getElementById("pg-leser");
+    const bak = document.getElementById("pg-leser-bak");
+    const kop = document.getElementById("pg-leser-kop");
+    const aflaai = document.getElementById("pg-leser-aflaai");
+
+    if (kop) {
+      kop.textContent = (soort === "manuskrip"
+        ? pg_t("pg_manuskrip", "Manuskrip")
+        : pg_t("pg_omslag", "Omslag")) + " · " + nommer;
+    }
+    if (aflaai) {
+      aflaai.href = PG_LEER_URL;
+      aflaai.download = ((PG_OOP && PG_OOP.leers && PG_OOP.leers[soort] &&
+        PG_OOP.leers[soort].naam) || soort);
+    }
+
+    if (bak) {
+      bak.innerHTML = soort === "manuskrip"
+        ? '<iframe class="pg-raam" src="' + PG_LEER_URL + '" title="Manuskrip"></iframe>'
+        : '<img class="pg-beeld" src="' + PG_LEER_URL + '" alt="Omslag">';
+    }
+    if (leser) {
+      leser.style.display = "";
+      leser.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   } catch (fout) {
     console.error("Kon nie die lêer wys nie:", fout);
     alert(pg_t("pg_leer_fout", "Kon nie die lêer oopmaak nie."));
@@ -406,8 +447,12 @@ document.addEventListener("click", (e) => {
     return;
   }
 
+  const leser_toe = e.target.closest("#pg-leser-toe");
+  if (leser_toe) { pg_maak_leser_toe(); return; }
+
   const toe = e.target.closest("#pg-een-toe");
   if (toe) {
+    pg_maak_leser_toe();
     const paneel = document.getElementById("pg-een");
     if (paneel) paneel.style.display = "none";
     PG_OOP = null;

@@ -751,6 +751,7 @@ const WOORDEBOEK = {
   pg_geen: { af: "Daar is nog geen indienings nie.", en: "There are no submissions yet." },
   pg_geen_titel: { af: "Sonder titel", en: "Untitled" },
   pg_toe: { af: "Maak toe", en: "Close" },
+  pg_leser_aflaai: { af: "Laai af", en: "Download" },
   pg_groep_wag: { af: "Wag vir hantering", en: "Awaiting handling" },
   pg_groep_rak: { af: "Op die winkelrak", en: "On the shop shelf" },
   pg_groep_konsep: { af: "In proses by die outeur", en: "In progress with the author" },
