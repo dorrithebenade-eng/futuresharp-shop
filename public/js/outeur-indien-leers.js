@@ -312,6 +312,23 @@ function il_kort_plaaslik() {
 
 // --- Dien in ---
 
+// 'n Ingediende vorm het EEN handeling: Onttrek. "Dien in" verdwyn — die
+// staaf bo sê reeds Ingedien, en 'n dooie groen knoppie trek die oog weg van
+// die een wat werk.
+function il_wys_toe_knoppies() {
+  const dien = document.getElementById("il-dien-in");
+  if (dien) dien.style.display = "none";
+
+  const stoor = document.getElementById("iv-stoor");
+  if (stoor) stoor.style.display = "none";
+
+  const ont = document.getElementById("il-onttrek");
+  if (ont) {
+    ont.style.display = "inline-block";
+    ont.classList.add("oi-hoof");
+  }
+}
+
 function il_stel_stand(klas, teks) {
   const el = document.getElementById("iv-stand");
   if (!el) return;
@@ -376,7 +393,7 @@ async function il_dien_in() {
     if (resp.status === 422) {
       const uit = await resp.json();
       il_wys_kort(uit.kort || []);
-      herstel("", "");
+      herstel("", il_t("iv_stoor_outomaties", "Word outomaties gestoor terwyl jy tik"));
       return;
     }
 
@@ -390,20 +407,12 @@ async function il_dien_in() {
     il_toe = true;
     il_stel_stand("klaar", il_t("il_ingedien", "Ingedien"));
 
-    if (knop) {
-      knop.textContent = il_t("il_ingedien", "Ingedien");
-      knop.disabled = true;
-    }
+    il_wys_toe_knoppies();
+    ["manuskrip", "omslag"].forEach(il_teken);
+
     // Die vorm is toe. Wat hy nou tik, sal die bediener in elk geval weier.
     document.querySelectorAll("#iv-vorm input, #iv-vorm select, #iv-vorm textarea")
       .forEach((el) => { el.disabled = true; });
-    document.querySelectorAll("[data-il-kies], [data-il-ruil]")
-      .forEach((el) => { el.remove(); });
-
-    const stoor = document.getElementById("iv-stoor");
-    if (stoor) stoor.style.display = "none";
-    const ont = document.getElementById("il-onttrek");
-    if (ont) ont.style.display = "inline-block";
 
     console.log("Ingedien:", uit.nommer, uit.stand);
   } catch (fout) {
@@ -479,12 +488,7 @@ async function il_laai_bestaande(nommer) {
 
     if (il_toe) {
       ["manuskrip", "omslag"].forEach(il_teken);
-      const knop = document.getElementById("il-dien-in");
-      if (knop) { knop.disabled = true; knop.textContent = il_t("il_ingedien", "Ingedien"); }
-      const stoor = document.getElementById("iv-stoor");
-      if (stoor) stoor.style.display = "none";
-      const ont = document.getElementById("il-onttrek");
-      if (ont) ont.style.display = "inline-block";
+      il_wys_toe_knoppies();
       document.querySelectorAll("#iv-vorm input, #iv-vorm select, #iv-vorm textarea")
         .forEach((el) => { el.disabled = true; });
     }
