@@ -132,6 +132,7 @@ function iv_reken() {
     const u = vs_bereken({
       modus, begin: invoer, koste,
       outeurPct: IV_OUTEUR_PCT,
+      rond: 5,
       paystackPct: IV_AANNAMES.paystackPct,
       paystackVaste: IV_AANNAMES.paystackVaste,
       btwPct: IV_AANNAMES.btwPct,

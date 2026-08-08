@@ -882,6 +882,11 @@ const WOORDEBOEK = {
     en: "Your books, your figures, and the orders waiting to be sent.",
   },
   oi_merk_goedgekeur: { af: "Goedgekeur", en: "Approved" },
+  pio_stel_op: { af: "Stel op", en: "Set up" },
+  pio_nota: { af: "ingevul uit die indiening. Die prys is op na die naaste R5 gerond. Kategorie\u00eb, die etiket en die vrystellingsdatum bly leeg.", en: "filled in from the submission. The price is rounded up to the nearest R5. Categories, the label and the release date stay empty." },
+  pio_kategorie: { af: "Die outeur het aangedui:", en: "The author indicated:" },
+  pio_geen_outeur: { af: "Hierdie outeur het nog geen inskrywing in die Outeurs-oortjie nie.", en: "This author does not yet have an entry in the Authors tab." },
+  pio_merk_fout: { af: "Die boek is geskep, maar die indiening kon nie as opgestel gemerk word nie.", en: "The book was created, but the submission could not be marked as set up." },
   nav_outeurspaneel: { af: "Outeurspaneel", en: "Author panel" },
 };
 
