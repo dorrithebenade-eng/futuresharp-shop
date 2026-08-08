@@ -27,8 +27,8 @@ const IL_MAKS_OMSLAG = 4 * 1024 * 1024;
 const IL_BEELD_TIPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 
 const il_toestand = {
-  manuskrip: { leer: null, vorige_naam: null, opgelaai: false, fout: null, vordering: -1 },
-  omslag: { leer: null, vorige_naam: null, opgelaai: false, fout: null, vordering: -1 },
+  manuskrip: { leer: null, vorige_naam: null, vorige_grootte: 0, opgelaai: false, fout: null, vordering: -1 },
+  omslag: { leer: null, vorige_naam: null, vorige_grootte: 0, opgelaai: false, fout: null, vordering: -1 },
 };
 
 let il_besig = false;
@@ -90,7 +90,8 @@ function il_teken(soort) {
 
   if (t.opgelaai) {
     const naam = t.leer ? t.leer.name : t.vorige_naam;
-    const grootte = t.leer ? il_grepe(t.leer.size) : "";
+    const grepe = t.leer ? t.leer.size : t.vorige_grootte;
+    const grootte = grepe ? il_grepe(grepe) : "";
     blok.innerHTML =
       '<div class="il-gekies il-klaar"><span class="il-ikoon">\u2713</span>' +
       '<div class="il-teks"><div class="il-naam">' + il_ontsnap(naam) + "</div>" +
@@ -400,12 +401,53 @@ async function il_dien_in() {
       .forEach((el) => { el.remove(); });
 
     const stoor = document.getElementById("iv-stoor");
-    if (stoor) stoor.hidden = true;
+    if (stoor) stoor.style.display = "none";
+    const ont = document.getElementById("il-onttrek");
+    if (ont) ont.style.display = "inline-block";
 
     console.log("Ingedien:", uit.nommer, uit.stand);
   } catch (fout) {
     console.error("Kon nie indien nie:", fout);
     herstel("fout", il_t("il_indien_fout", "Kon nie indien nie \u2014 probeer weer."));
+  }
+}
+
+// --- Onttrek ---
+//
+// Hy trek terug om iets reg te maak, nie om oor te begin nie. Die lêers en
+// die hangende voorstel bly staan; net die stand skuif. Daarna herlaai ons
+// die bladsy — die vorm kom vars terug as 'n konsep, met alles nog daar.
+
+async function il_onttrek() {
+  if (il_besig) return;
+  const nommer = il_nommer();
+  if (!nommer) return;
+
+  const knop = document.getElementById("il-onttrek");
+  il_besig = true;
+  if (knop) { knop.disabled = true; knop.textContent = il_t("il_onttrek_besig", "Onttrek \u2026"); }
+
+  try {
+    const sessie = await identiteit_kry_huidige_sessie();
+    if (!sessie || !sessie.access_token) throw new Error("Geen sessie");
+
+    const resp = await fetch("/.netlify/functions/onttrek", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${sessie.access_token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ nommer }),
+    });
+
+    if (!resp.ok) throw new Error(await resp.text());
+
+    window.location.reload();
+  } catch (fout) {
+    console.error("Kon nie onttrek nie:", fout);
+    il_besig = false;
+    if (knop) { knop.disabled = false; knop.textContent = il_t("il_onttrek", "Onttrek"); }
+    il_stel_stand("fout", il_t("il_onttrek_fout", "Kon nie onttrek nie \u2014 probeer weer."));
   }
 }
 
@@ -430,6 +472,7 @@ async function il_laai_bestaande(nommer) {
     ["manuskrip", "omslag"].forEach((soort) => {
       if (!leers[soort]) return;
       il_toestand[soort].vorige_naam = leers[soort].naam || "";
+      il_toestand[soort].vorige_grootte = Number(leers[soort].grootte) || 0;
       il_toestand[soort].opgelaai = true;
       il_teken(soort);
     });
@@ -439,7 +482,9 @@ async function il_laai_bestaande(nommer) {
       const knop = document.getElementById("il-dien-in");
       if (knop) { knop.disabled = true; knop.textContent = il_t("il_ingedien", "Ingedien"); }
       const stoor = document.getElementById("iv-stoor");
-      if (stoor) stoor.hidden = true;
+      if (stoor) stoor.style.display = "none";
+      const ont = document.getElementById("il-onttrek");
+      if (ont) ont.style.display = "inline-block";
       document.querySelectorAll("#iv-vorm input, #iv-vorm select, #iv-vorm textarea")
         .forEach((el) => { el.disabled = true; });
     }
@@ -465,6 +510,9 @@ document.addEventListener("outeur-gereed", () => {
 
   const knop = document.getElementById("il-dien-in");
   if (knop) knop.addEventListener("click", il_dien_in);
+
+  const ont = document.getElementById("il-onttrek");
+  if (ont) ont.addEventListener("click", il_onttrek);
 
   const gevra = new URLSearchParams(window.location.search).get("nommer");
   if (gevra) il_laai_bestaande(gevra);
