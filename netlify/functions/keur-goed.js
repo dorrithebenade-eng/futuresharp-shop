@@ -23,6 +23,23 @@
 // 'N WYSIGING WERK ANDERS: daar is reeds 'n produk. Die hangende voorstel
 // word die lewendige data en die stand gaan terug na `op_rak`. Die winkel
 // self verander eers wanneer die produkvorm gestoor word.
+//
+// 'N WYSIGING RAAK NOOIT DIE LEERS NIE. Wat gewysig kan word, is die
+// formate en die prys — 'n harde kopie by of af, 'n e-boek by of af, Leen
+// aan of af. 'n Nuwe manuskrip of omslag is 'n nuwe boekopstelling en gaan
+// as 'n NUWE indiening in, met sy eie vormnommer.
+//
+// Daarom loop die kopieerblok slegs by 'n EERSTE goedkeuring. Het hy ook by
+// 'n wysiging geloop, sou elke goedgekeurde wysiging 'n tweede afskrif van
+// dieselfde manuskrip in `eboeke` gemaak het — tot 60MB elk — waarna die
+// produk steeds na die eerste afskrif wys. Die nuwe afskrif doen niks
+// behalwe plek opneem.
+//
+// `bywerking_wagtend` MERK 'n goedgekeurde wysiging wat nog nie in die
+// produk beland het nie. Sonder dit staan die indiening op `op_rak`, net
+// soos elke ander boek op die rak, en die Werk by-knoppie weet nie by watter
+// een hy hoort nie. Die merk leef op die INDIENING, nooit op die produk nie:
+// die winkel dra geen inligting oor wat in die paneelbord hanteer word nie.
 
 const { kry_store } = require("./_blob-store");
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
@@ -101,8 +118,12 @@ exports.handler = async (event, context) => {
   // maak daardie rekord halfleeg.
 
   const leers = rekord.leers || {};
-  const bron = kry_store(LEERS_STORE);
   const uitslag = { eboek_sleutel: rekord.eboek_sleutel || null, omslag: rekord.omslag || null };
+
+  // SLEGS by 'n eerste goedkeuring. By 'n wysiging bly `eboek_sleutel` en
+  // `omslag` presies soos hulle is — die produk wys reeds daarheen.
+  if (!is_wysiging) {
+  const bron = kry_store(LEERS_STORE);
 
   try {
     if (leers.manuskrip && leers.manuskrip.sleutel) {
@@ -131,6 +152,7 @@ exports.handler = async (event, context) => {
     console.error("Kon nie die lêers oordra nie:", fout);
     return { statusCode: 500, body: "Kon nie die lêers na die katalogus oordra nie" };
   }
+  }
 
   // --- Die rekord ---
 
@@ -142,8 +164,10 @@ exports.handler = async (event, context) => {
     rekord.data = rekord.hangend;
     rekord.hangend = null;
     rekord.stand = "op_rak";
+    rekord.bywerking_wagtend = true;
   } else {
     rekord.stand = "goedgekeur";
+    rekord.bywerking_wagtend = false;
   }
 
   rekord.eboek_sleutel = uitslag.eboek_sleutel;
@@ -172,6 +196,7 @@ exports.handler = async (event, context) => {
     body: JSON.stringify({
       nommer: rekord.nommer,
       stand: rekord.stand,
+      bywerking_wagtend: rekord.bywerking_wagtend,
       eboek_sleutel: uitslag.eboek_sleutel,
       omslag: uitslag.omslag,
     }),

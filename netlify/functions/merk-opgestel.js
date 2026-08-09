@@ -17,6 +17,15 @@
 //
 // ROL: personeel. 'n Outeur raak nooit die winkel nie, en hierdie handeling
 // sê presies dat 'n boek in die winkel is.
+//
+// TWEE PAAIE, EEN FUNCTION. Die eerste is hierbo: `goedgekeur → op_rak`,
+// 'n nuwe boek. Die tweede is 'n goedgekeurde WYSIGING aan 'n boek wat
+// reeds op die rak staan — daar skuif niks nie, want die stand is klaar
+// `op_rak`. Wat dan gebeur, is dat `bywerking_wagtend` afgehaal word, en
+// die Werk by-knoppie verdwyn.
+//
+// Dieselfde kontrole geld vir albei: die katalogus moet werklik 'n rekord
+// met hierdie slug hê. 'n Vorm wat gekanselleer is, mag niks merk nie.
 
 const { kry_store } = require("./_blob-store");
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
@@ -65,8 +74,12 @@ exports.handler = async (event, context) => {
   if (!rekord) {
     return { statusCode: 404, body: "Hierdie vorm bestaan nie" };
   }
-  if (rekord.stand !== "goedgekeur") {
-    return { statusCode: 409, body: "Slegs 'n goedgekeurde vorm kan as opgestel gemerk word" };
+  // Pad een: 'n nuwe boek. Pad twee: 'n goedgekeurde wysiging aan 'n boek
+  // wat reeds op die rak staan.
+  const is_bywerking = rekord.stand === "op_rak" && Boolean(rekord.bywerking_wagtend);
+
+  if (rekord.stand !== "goedgekeur" && !is_bywerking) {
+    return { statusCode: 409, body: "Hierdie vorm wag nie om opgestel of bygewerk te word nie" };
   }
 
   // Die produk moet werklik bestaan. Sien die nota bo-aan: die kliënt se
@@ -87,9 +100,15 @@ exports.handler = async (event, context) => {
 
   rekord.stand = "op_rak";
   rekord.produk_id = slug;
+  rekord.bywerking_wagtend = false;
   rekord.gewysig_op = nou;
 
-  voeg_geskiedenis_by(rekord, "opgestel in die katalogus", gebruiker.email || "", slug);
+  voeg_geskiedenis_by(
+    rekord,
+    is_bywerking ? "wysiging in die katalogus bygewerk" : "opgestel in die katalogus",
+    gebruiker.email || "",
+    slug
+  );
 
   try {
     await indienings.setJSON(rekord.nommer, rekord);
@@ -101,6 +120,11 @@ exports.handler = async (event, context) => {
   return {
     statusCode: 200,
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ nommer: rekord.nommer, stand: rekord.stand, produk_id: slug }),
+    body: JSON.stringify({
+      nommer: rekord.nommer,
+      stand: rekord.stand,
+      produk_id: slug,
+      bywerking_wagtend: false,
+    }),
   };
 };

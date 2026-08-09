@@ -31,6 +31,12 @@ function opsomming(rekord) {
     het_hangende_wysiging: Boolean(rekord.hangend),
     opmerking: rekord.opmerking || "",
     produk_id: rekord.produk_id || null,
+    // 'n Goedgekeurde WYSIGING wat nog nie in die produk beland het nie. Die
+    // stand is `op_rak`, net soos elke ander boek op die rak — sonder hierdie
+    // merk weet die Werk by-knoppie nie by watter een hy hoort nie. Dit gaan
+    // NET na personeel: kry-my-indienings.js gee dit doelbewus nie deur nie,
+    // want vir die outeur is sy wysiging goedgekeur en klaar.
+    bywerking_wagtend: Boolean(rekord.bywerking_wagtend),
     // Ná goedkeuring: waar die lêers in die katalogus se stores beland het.
     // Hierdie Function bou veld vir veld — 'n nuwe veld kom NIE vanself deur
     // nie, en dit is presies hoe `leers` een keer verlore geraak het.
