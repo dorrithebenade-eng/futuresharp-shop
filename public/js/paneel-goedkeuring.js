@@ -279,7 +279,9 @@ function pg_formate_html(data, ou_data) {
     } else if (v.prys_anders && ou_u) {
       uit += pg_ry_oud_nuut(pg_t("pg_prys", "Prys"), pg_rand(ou_u.P), pg_rand(u.P));
     } else {
-      uit += pg_ry(pg_t("pg_prys", "Prys"), pg_rand(u.P), v.soort === "bygesit");
+      // Geen ekstra merk op die prys by 'n bygesitte formaat nie: die blok is
+      // reeds groen met sy merkie, en twee merke baklei om dieselfde aandag.
+      uit += pg_ry(pg_t("pg_prys", "Prys"), pg_rand(u.P), false);
     }
 
     if (u) {
