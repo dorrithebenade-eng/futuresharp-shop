@@ -199,33 +199,99 @@ function pg_formaat_prys(blok) {
   return u && !u.leeg ? u : null;
 }
 
+// Wat 'n wysiging aan die formate gedoen het. EEN funksie, want die
+// goedkeuringskerm en die Werk by-nota moet dieselfde antwoord gee — 'n som
+// wat op twee plekke apart leef, verskil vroeër of later.
+//
+// Die outeur kan net drie soorte dinge wysig: 'n formaat by of af, die
+// boekprys, en sy druk-/afleweringskoste. Elkeen kry sy eie soort.
+//
+// `null` vir ou_data beteken dit is 'n EERSTE indiening — daar is niks om
+// teen te vergelyk nie en niks word gemerk nie.
+function pg_formaat_verskil(sleutel, data, ou_data) {
+  const blok = (data.formate || {})[sleutel] || {};
+  const aan = Boolean(blok.aan);
+
+  if (!ou_data) return { aan, soort: "" };
+
+  const ou_blok = (ou_data.formate || {})[sleutel] || {};
+  const ou_aan = Boolean(ou_blok.aan);
+
+  if (aan && !ou_aan) return { aan, soort: "bygesit", ou_blok };
+  if (!aan && ou_aan) return { aan, soort: "afgehaal", ou_blok };
+  if (!aan && !ou_aan) return { aan, soort: "" };
+
+  // Albei aan: het die prys of die koste geskuif?
+  const u = pg_formaat_prys(blok);
+  const ou_u = pg_formaat_prys(ou_blok);
+  const prys_anders = Boolean(u && ou_u && Math.abs(ou_u.P - u.P) > 0.005);
+  const koste_anders = Boolean(u && ou_u && Math.abs((ou_u.K || 0) - (u.K || 0)) > 0.005);
+
+  if (prys_anders || koste_anders) {
+    return { aan, soort: "verander", ou_blok, prys_anders, koste_anders };
+  }
+  return { aan, soort: "", ou_blok };
+}
+
+const PG_MERKE = {
+  bygesit: ["pg_f_bygesit", "Bygesit"],
+  afgehaal: ["pg_f_afgehaal", "Afgehaal"],
+  verander: ["pg_prys_verander", "Prysverandering"],
+};
+
 function pg_formate_html(data, ou_data) {
   let uit = "";
   PG_FORMATE.forEach(([sleutel, i18n, naam]) => {
     const blok = (data.formate || {})[sleutel] || {};
-    if (!blok.aan) return;
+    const v = pg_formaat_verskil(sleutel, data, ou_data);
+
+    // 'n Formaat wat af is EN af was, hoort nêrens. Maar een wat AFGEHAAL is,
+    // moet wys — 'n verdwyning wat niks teken nie, lyk soos 'n normale skerm.
+    if (!v.aan && v.soort !== "afgehaal") return;
+
+    const merk = PG_MERKE[v.soort];
+    const klas = v.soort === "afgehaal" ? " pg-formaat-af"
+      : v.soort === "bygesit" ? " pg-formaat-by"
+      : v.soort === "verander" ? " pg-formaat-prys" : "";
+
+    uit += '<div class="pg-formaat' + klas + '">' +
+      '<div class="pg-formaat-kop">' + pg_ontsnap(pg_t(i18n, naam)) +
+      (merk ? '<span class="pg-merk-' + v.soort + '">' +
+        pg_ontsnap(pg_t(merk[0], merk[1])) + "</span>" : "") +
+      "</div>";
+
+    // Afgehaal: wys wat wegval, nie wat oorbly nie.
+    if (v.soort === "afgehaal") {
+      const ou_u = pg_formaat_prys(v.ou_blok);
+      uit += pg_ry(pg_t("pg_prys", "Prys"), ou_u ? pg_rand(ou_u.P) : "", false);
+      uit += '<div class="pg-af-nota">' +
+        pg_ontsnap(pg_t("pg_f_afgehaal_nota",
+          "Hierdie formaat word uit die winkel verwyder. Bestellings wat reeds betaal is, staan.")) +
+        "</div></div>";
+      return;
+    }
 
     const u = pg_formaat_prys(blok);
-    const ou_blok = ou_data ? (ou_data.formate || {})[sleutel] : null;
-    const ou_u = ou_blok ? pg_formaat_prys(ou_blok) : null;
-    const prys_verander = Boolean(ou_u && u && Math.abs(ou_u.P - u.P) > 0.005);
-
-    uit += '<div class="pg-formaat' + (prys_verander ? " pg-formaat-prys" : "") + '">' +
-      '<div class="pg-formaat-kop">' + pg_ontsnap(pg_t(i18n, naam)) +
-      (prys_verander ? '<span class="pg-prysmerk">' +
-        pg_ontsnap(pg_t("pg_prys_verander", "Prysverandering")) + "</span>" : "") +
-      "</div>";
+    const ou_u = v.ou_blok ? pg_formaat_prys(v.ou_blok) : null;
 
     if (!u) {
       uit += pg_ry(pg_t("pg_prys", "Prys"), pg_t("pg_geen_prys", "Nog nie ingevul nie"), false);
-    } else if (prys_verander) {
+    } else if (v.prys_anders && ou_u) {
       uit += pg_ry_oud_nuut(pg_t("pg_prys", "Prys"), pg_rand(ou_u.P), pg_rand(u.P));
     } else {
-      uit += pg_ry(pg_t("pg_prys", "Prys"), pg_rand(u.P), false);
+      uit += pg_ry(pg_t("pg_prys", "Prys"), pg_rand(u.P), v.soort === "bygesit");
     }
 
     if (u) {
-      if (u.K > 0) uit += pg_ry(pg_t("pg_koste", "Outeur se koste, terug"), pg_rand(u.K), false);
+      // Die koste is die outeur se eie getal en die enigste rede waarom 'n
+      // prys kan skuif sonder dat hy die prys aangeraak het. Dit kry sy eie
+      // ou-naas-nuut, anders sien 'n mens die gevolg sonder die oorsaak.
+      if (v.koste_anders && ou_u) {
+        uit += pg_ry_oud_nuut(pg_t("pg_koste", "Outeur se koste, terug"),
+          pg_rand(ou_u.K || 0), pg_rand(u.K || 0));
+      } else if (u.K > 0) {
+        uit += pg_ry(pg_t("pg_koste", "Outeur se koste, terug"), pg_rand(u.K), false);
+      }
       uit += pg_ry(pg_t("pg_outeur_wins", "Outeur verdien aan die boek"), pg_rand(u.outeurWins), false);
       uit += pg_ry(pg_t("pg_fs", "Future Sharp ontvang"), pg_rand(u.futureSharpRand), false);
     }

@@ -109,13 +109,29 @@
   align-items: center;
   gap: 9px;
 }
-.pg-prysmerk {
-  background: #E0A020;
+.pg-prysmerk,
+.pg-merk-verander,
+.pg-merk-bygesit,
+.pg-merk-afgehaal {
   color: #fff;
   border-radius: 10px;
   padding: 2px 9px;
   font-size: 12px;
   font-weight: 600;
+}
+.pg-prysmerk, .pg-merk-verander { background: #E0A020; }
+
+/* Bygesit is groen: iets kom by. Afgehaal is rooi en die blok verbleik —
+   die formaat is nog sigbaar, maar hy is op pad uit. */
+.pg-merk-bygesit { background: #2E8B6F; }
+.pg-merk-afgehaal { background: #B4472F; }
+
+.pg-formaat-by { border-color: #2E8B6F; background: #F2FAF7; }
+.pg-formaat-af { border-color: #B4472F; background: #FBF4F2; opacity: 0.72; }
+.pg-af-nota {
+  margin-top: 7px;
+  font-size: 13px;
+  color: #8A4030;
 }
 
 .pg-nota, .pg-opmerking {
