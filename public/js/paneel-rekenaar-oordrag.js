@@ -157,18 +157,37 @@ function pro_tyd_kort(iso) {
   return `${String(datum.getHours()).padStart(2, "0")}:${String(datum.getMinutes()).padStart(2, "0")}`;
 }
 
-// Lees die rye se ROU invoerwaardes. Nie kry_verdelings_uit_vorm() nie —
-// daardie een skakel 'n vaste bedrag na sent om, en 'n afskrif moet
-// teruggeskryf kan word in dieselfde eenheid as wat die veld verwag.
+// Lees die rye uit die vorm, in die eenheid wat DIE RYBOUER verwag.
+//
+// skep_verdeling_ry_element() aanvaar net 'n GETAL — Number.isFinite() op 'n
+// string is vals, en dan teken hy die veld leeg. Die veld se `.value` is 'n
+// string, dus moet dit hier deur Number().
+//
+// En hy verwag 'n vaste bedrag in SENT, want hy deel deur 100 om te wys.
+// Die veld wys rand. Sonder die × 100 word 'n bewaarde R25,00-ry as R0,25
+// teruggeskryf.
+//
+// Dit is dieselfde omskakeling as kry_verdelings_uit_vorm() s'n. Die rede om
+// dit nie net te roep nie, is dat daardie een die rol- en entiteitvelde
+// anders lees; die eenheid is nou wel dieselfde.
 function pro_lees_rye(s) {
   const lys = document.getElementById(`vorm-${s}-verdelings-lys`);
   if (!lys) return [];
-  return Array.from(lys.querySelectorAll(".paneel-verdeling-ry")).map((ry) => ({
-    rol_tipe: ry.querySelector(".paneel-verdeling-rol-tipe").value,
-    entiteit_id: ry.querySelector(".paneel-verdeling-entiteit").value,
-    tipe: ry.querySelector(".paneel-verdeling-tipe").value,
-    waarde: ry.querySelector(".paneel-verdeling-waarde").value,
-  }));
+  return Array.from(lys.querySelectorAll(".paneel-verdeling-ry")).map((ry) => {
+    const tipe = ry.querySelector(".paneel-verdeling-tipe").value;
+    const rou = parseFloat(ry.querySelector(".paneel-verdeling-waarde").value);
+    // 'n Leë veld bly leeg — nie 0 nie. 'n Nul wat verskyn waar niks was,
+    // lyk soos 'n besluit.
+    const waarde = Number.isFinite(rou)
+      ? (tipe === "vaste_bedrag" ? Math.round(rou * 100) : rou)
+      : null;
+    return {
+      rol_tipe: ry.querySelector(".paneel-verdeling-rol-tipe").value,
+      entiteit_id: ry.querySelector(".paneel-verdeling-entiteit").value,
+      tipe,
+      waarde,
+    };
+  });
 }
 
 function pro_neem_afskrif(s) {
@@ -227,7 +246,13 @@ function pro_vul_in(s, oordrag) {
   // vaste bedrag in rand, nie 'n persentasie nie. Dit is die eerste van sy
   // twee rye; die twee tel in begin-betaling.js bymekaar.
   if (u.vaste > 0) {
-    nuwe.push({ rol_tipe: "outeur", entiteit_id: "", tipe: "vaste_bedrag", waarde: u.vaste });
+    // Die rekenaar werk in rand; die rybouer verwag sent.
+    nuwe.push({
+      rol_tipe: "outeur",
+      entiteit_id: "",
+      tipe: "vaste_bedrag",
+      waarde: Math.round(u.vaste * 100),
+    });
   }
 
   u.outeurs.forEach((outeur) => {
@@ -260,17 +285,19 @@ function pro_ontdoen(s) {
 
 // --- Die tel ---
 //
-// Alles word na 'n persentasie van die prys omgereken. 'n Vaste bedrag
-// staan in RAND in die veld (die omskakeling na sent gebeur eers by
-// stoortyd), dus is die prys nodig om dit te kan saamtel.
+// Alles word na 'n persentasie van die prys omgereken. Die prys staan in
+// RAND, maar pro_lees_rye() gee 'n vaste bedrag in SENT (dit is wat die
+// rybouer verwag), dus word dit hier eers teruggedeel voordat dit teen die
+// prys gemeet word.
 
 function pro_tel(s) {
   const prys = Number((document.getElementById(`vorm-${s}-prys`) || {}).value) || 0;
   if (prys <= 0) return { prys: 0 };
 
-  const na_pct = (tipe, waarde) => {
+  const na_pct = (tipe, waarde, in_sent) => {
     const getal = Number(waarde) || 0;
-    return tipe === "vaste_bedrag" ? (getal / prys) * 100 : getal;
+    const rand = tipe === "vaste_bedrag" && in_sent ? getal / 100 : getal;
+    return tipe === "vaste_bedrag" ? (rand / prys) * 100 : rand;
   };
 
   const verdeling_aan = (document.getElementById(`vorm-${s}-verdeling-aan`) || {}).checked;
@@ -279,7 +306,7 @@ function pro_tel(s) {
 
   if (verdeling_aan) {
     pro_lees_rye(s).forEach((ry) => {
-      const pct = na_pct(ry.tipe, ry.waarde);
+      const pct = na_pct(ry.tipe, ry.waarde, true);
       uit += pct;
       dele.push(`${pct.toFixed(1)}%`);
     });
@@ -288,9 +315,12 @@ function pro_tel(s) {
   const hosting_aan = (document.getElementById(`vorm-${s}-hosting-aan`) || {}).checked;
   let hosting = 0;
   if (hosting_aan) {
+    // Hosting kom REGSTREEKS uit sy veld, dus in rand — nie deur
+    // pro_lees_rye() nie.
     hosting = na_pct(
       (document.getElementById(`vorm-${s}-hosting-tipe`) || {}).value,
-      (document.getElementById(`vorm-${s}-hosting-waarde`) || {}).value
+      (document.getElementById(`vorm-${s}-hosting-waarde`) || {}).value,
+      false
     );
   }
 
