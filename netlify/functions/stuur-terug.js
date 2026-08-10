@@ -19,6 +19,7 @@
 
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 const { kry_indienings_store, voeg_geskiedenis_by } = require("./_indienings");
+const { stuur_terugstuur_kennisgewing } = require("./_kennisgewing-indiening");
 
 const MAKS_OPMERKING = 4000;
 
@@ -84,9 +85,21 @@ exports.handler = async (event, context) => {
     return { statusCode: 500, body: "Kon nie die vorm terugstuur nie" };
   }
 
+  // NÁ die stoor, en nooit voor. Die handeling is klaar; die pos is 'n
+  // gunsie bo-op. stuur_terugstuur_kennisgewing() gooi nie en gee { gestuur,
+  // rede } terug, sodat 'n stukkende posbediener nie 'n terugstuur wat
+  // reeds gestoor is, as 'n 500 laat lyk nie.
+  const pos = await stuur_terugstuur_kennisgewing(rekord, opmerking);
+  if (!pos.gestuur) {
+    console.warn(`Terugstuur-pos vir ${rekord.nommer} nie gestuur nie: ${pos.rede}`);
+  }
+
   return {
     statusCode: 200,
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ nommer: rekord.nommer, stand: rekord.stand }),
+    // `pos_gestuur` sodat die paneelbord later kan sê of die outeur ingelig
+    // is. Die skerm gebruik dit nog nie; die veld kos niks en die inligting
+    // is andersins net in die logs.
+    body: JSON.stringify({ nommer: rekord.nommer, stand: rekord.stand, pos_gestuur: pos.gestuur }),
   };
 };
