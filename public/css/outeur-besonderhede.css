@@ -4,6 +4,15 @@
    .oi-kaart en .outeur-bestelling, sodat die kaarte hier dieselfde lyk as
    die res van die paneel. */
 
+/* Die statusblokkie is hier byna altyd leeg — hy dra net die
+   sessie-verval-boodskap. .stelsel-boodskap gee hom 48px opvulling bo en
+   onder, en dit is 96px wit tussen die leireël en die eerste kaart.
+   Dieselfde regstelling as #outeur-status in outeur.css. */
+#outeur-besonderhede-status:empty {
+  padding: 0;
+  margin: 0;
+}
+
 .mb-kaart {
   background: #fff;
   border: 1px solid #E4E2DD;
