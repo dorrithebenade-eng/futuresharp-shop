@@ -6,6 +6,7 @@
   <title>My paneelbord — Future Shop</title>
   <link rel="stylesheet" href="css/styl.css" />
   <link rel="stylesheet" href="css/outeur.css" />
+  <link rel="stylesheet" href="css/outeur-besonderhede.css" />
 
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#3FB6A4">
@@ -73,6 +74,7 @@
           <span class="outeur-telling" id="outeur-telling" hidden></span>
         </button>
         <button type="button" class="outeur-pil" data-gaan="indienings" data-i18n="outeur_nav_indienings">My Indienings</button>
+        <button type="button" class="outeur-pil" data-gaan="besonderhede" data-i18n="outeur_nav_besonderhede">My besonderhede</button>
       </nav>
 
       <div class="outeur-inhoud-wrap">
@@ -112,6 +114,108 @@
           <div id="outeur-indienings-status" class="stelsel-boodskap" aria-live="polite"></div>
           <div id="outeur-indienings-lys"></div>
         </section>
+
+        <!-- Grootliks LEES. Net drie dinge is 'n keuse: die
+             verkoopkennisgewing, die selfoon en die adres. Alles onder
+             "Op rekord" raak die ooreenkoms of die uitbetaling. -->
+        <section class="outeur-afdeling" data-afdeling="besonderhede">
+          <p class="outeur-lei-binne" data-i18n="ob_nota">
+            Wat Future Sharp van jou het, en hoe jy van jou boeke wil hoor.
+          </p>
+          <div id="outeur-besonderhede-status" class="stelsel-boodskap" aria-live="polite"></div>
+
+          <div class="mb-kaart">
+            <h2 class="mb-kop" data-i18n="ob_kennisgewings_kop">Kennisgewings</h2>
+            <p class="mb-onder" data-i18n="ob_kennisgewings_onder">
+              Wanneer Future Shop vir jou 'n e-pos stuur.
+            </p>
+
+            <div class="mb-keuse">
+              <input type="checkbox" id="mb-verkoop" />
+              <label for="mb-verkoop">
+                <b data-i18n="ob_verkoop_titel">Elke e-boek- of leenverkoop</b>
+                <small data-i18n="ob_verkoop_teks">
+                  'n E-pos elke keer as een van jou boeke as e-boek verkoop of uitgeleen word.
+                </small>
+              </label>
+            </div>
+
+            <!-- Die twee wat altyd deurkom, is NIE afgeskakelde kontroles
+                 nie. 'n Grys blokkie lees soos iets wat iemand vir hom
+                 toegemaak het. -->
+            <div class="mb-vaste">
+              <span class="mb-tik" aria-hidden="true">&#10003;</span>
+              <div>
+                <b data-i18n="ob_hardekopie_titel">Harde kopieë</b>
+                <small>
+                  <em class="mb-permanent" data-i18n="ob_permanent">Permanent aktief.</em>
+                  <span data-i18n="ob_hardekopie_teks">
+                    Sodra 'n boek van jou as harde kopie beskikbaar is, kry jy outomaties 'n e-pos by elke verkoop.
+                  </span>
+                </small>
+              </div>
+            </div>
+
+            <div class="mb-vaste">
+              <span class="mb-tik" aria-hidden="true">&#10003;</span>
+              <div>
+                <b data-i18n="ob_terug_titel">Wanneer 'n vorm teruggestuur word</b>
+                <small>
+                  <em class="mb-permanent" data-i18n="ob_permanent">Permanent aktief.</em>
+                  <span data-i18n="ob_terug_teks">
+                    Daar is iets wat jy moet regmaak voordat die boek verder kan gaan.
+                  </span>
+                </small>
+              </div>
+            </div>
+
+            <div class="mb-stoor-ry">
+              <button type="button" class="mb-knop" id="mb-stoor-kennis" data-i18n="ob_stoor" disabled>Stoor</button>
+              <span class="mb-stoor-nota" id="mb-nota-kennis" aria-live="polite"></span>
+            </div>
+          </div>
+
+          <div class="mb-kaart">
+            <h2 class="mb-kop" data-i18n="ob_kontak_kop">Kontakbesonderhede</h2>
+            <p class="mb-onder" data-i18n="ob_kontak_onder">
+              Hoe Future Sharp jou bereik, en waarheen 'n bestelling se navrae gaan.
+            </p>
+
+            <label class="mb-veld">
+              <span data-i18n="ob_selfoon">Selfoon</span>
+              <input type="text" id="mb-selfoon" autocomplete="tel" />
+            </label>
+            <label class="mb-veld">
+              <span data-i18n="ob_adres">Adres</span>
+              <input type="text" id="mb-adres" autocomplete="street-address" />
+            </label>
+
+            <div class="mb-stoor-ry">
+              <button type="button" class="mb-knop" id="mb-stoor-kontak" data-i18n="ob_stoor" disabled>Stoor</button>
+              <span class="mb-stoor-nota" id="mb-nota-kontak" aria-live="polite"></span>
+            </div>
+          </div>
+
+          <div class="mb-kaart">
+            <h2 class="mb-kop" data-i18n="ob_rekord_kop">Op rekord</h2>
+            <p class="mb-onder" data-i18n="ob_rekord_onder">
+              Wat in jou ooreenkoms staan en waarheen jou geld gaan.
+            </p>
+
+            <div class="mb-ry"><span class="mb-et" data-i18n="ob_naam">Naam</span><span class="mb-wa" id="mb-w-naam"></span></div>
+            <div class="mb-ry"><span class="mb-et" data-i18n="ob_epos">E-pos</span><span class="mb-wa" id="mb-w-epos"></span></div>
+            <div class="mb-ry"><span class="mb-et" data-i18n="ob_id">ID-nommer</span><span class="mb-wa" id="mb-w-id"></span></div>
+            <div class="mb-ry"><span class="mb-et" data-i18n="ob_btw">BTW-nommer</span><span class="mb-wa" id="mb-w-btw"></span></div>
+            <div class="mb-ry"><span class="mb-et" data-i18n="ob_bank">Bank</span><span class="mb-wa" id="mb-w-bank"></span></div>
+            <div class="mb-ry"><span class="mb-et" data-i18n="ob_takkode">Takkode</span><span class="mb-wa" id="mb-w-takkode"></span></div>
+            <div class="mb-ry"><span class="mb-et" data-i18n="ob_rekening">Rekeningnommer</span><span class="mb-wa" id="mb-w-rekening"></span></div>
+            <div class="mb-ry"><span class="mb-et" data-i18n="ob_uitbetaling">Uitbetaling</span><span class="mb-wa" id="mb-w-uitbetaling"></span></div>
+
+            <!-- Die sin word deur outeur-besonderhede.js geskryf, sodat die
+                 e-posadres 'n skakel kan wees. data-i18n sou dit uitwis. -->
+            <p class="mb-vas-nota" id="mb-vas-nota"></p>
+          </div>
+        </section>
       </div>
     </div>
   </main>
@@ -124,5 +228,6 @@
   <script src="js/outeur-titels.js"></script>
   <script src="js/outeur-bestellings.js"></script>
   <script src="js/outeur-indienings.js"></script>
+  <script src="js/outeur-besonderhede.js"></script>
 </body>
 </html>

@@ -1,0 +1,195 @@
+/* public/css/outeur-besonderhede.css
+   My besonderhede se drie kaarte. 'n Eie lêer sodat outeur.css onaangeraak
+   bly. Die kleure kom uit styl.css se stel; die rande en die radius volg
+   .oi-kaart en .outeur-bestelling, sodat die kaarte hier dieselfde lyk as
+   die res van die paneel. */
+
+.mb-kaart {
+  background: #fff;
+  border: 1px solid #E4E2DD;
+  border-radius: 9px;
+  padding: 20px 22px;
+  margin: 0 0 16px;
+}
+
+.mb-kop {
+  font-family: var(--font-opskrif);
+  font-size: 16px;
+  margin: 0 0 4px;
+}
+
+.mb-onder {
+  margin: 0 0 16px;
+  font-size: 13px;
+  color: var(--grys-teks);
+  line-height: 1.55;
+}
+
+/* --- Rye: 'n etiket links, sy waarde regs --- */
+
+.mb-ry {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 0;
+  border-bottom: 1px solid #F1EFEB;
+  font-size: 15px;
+}
+.mb-ry:last-of-type { border-bottom: 0; }
+
+.mb-ry .mb-et {
+  color: var(--grys-teks);
+  flex: 0 0 42%;
+}
+
+.mb-ry .mb-wa {
+  text-align: right;
+  font-weight: 600;
+  word-break: break-word;
+}
+
+/* Nie verskaf nie is nie 'n fout nie — dit tree terug sonder om weg te raak. */
+.mb-ry .mb-wa.mb-leeg {
+  font-weight: 400;
+  font-style: italic;
+  color: #A5A19B;
+}
+
+.mb-gereed {
+  display: inline-block;
+  background: #E3F2EF;
+  color: #2E6F64;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 11px;
+}
+
+/* --- Velde --- */
+
+.mb-veld { display: block; margin: 0 0 14px; }
+
+.mb-veld span {
+  display: block;
+  font-size: 13px;
+  color: var(--grys-teks);
+  margin-bottom: 5px;
+}
+
+.mb-veld input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #E3E0DA;
+  border-radius: 7px;
+  font-size: 15px;
+  font-family: inherit;
+  background: #fff;
+}
+.mb-veld input:focus {
+  outline: 2px solid var(--teal);
+  outline-offset: -1px;
+}
+
+/* --- Die keuse, en die twee wat altyd deurkom --- */
+
+.mb-keuse,
+.mb-vaste {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 13px 0;
+  border-bottom: 1px solid #F1EFEB;
+}
+.mb-keuse:last-of-type,
+.mb-vaste:last-of-type { border-bottom: 0; }
+
+.mb-keuse input {
+  margin-top: 3px;
+  width: 17px;
+  height: 17px;
+  flex: 0 0 auto;
+}
+
+.mb-keuse b,
+.mb-vaste b {
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.mb-keuse small,
+.mb-vaste small {
+  display: block;
+  font-size: 13px;
+  color: var(--grys-teks);
+  line-height: 1.5;
+  margin-top: 2px;
+}
+
+/* Die merkie, nie 'n afgeskakelde blokkie nie. 'n Grys blokkie lees soos
+   iets wat iemand vir hom toegemaak het; hierdie lees soos 'n feit oor hoe
+   die stelsel werk. */
+.mb-tik {
+  flex: 0 0 auto;
+  width: 17px;
+  margin-top: 2px;
+  color: var(--teal);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.mb-permanent {
+  color: var(--teal);
+  font-weight: 600;
+}
+
+/* --- Stoor --- */
+
+.mb-stoor-ry {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.mb-knop {
+  background: var(--koraal);
+  color: #fff;
+  border: 0;
+  border-radius: 7px;
+  padding: 11px 22px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+}
+.mb-knop:disabled {
+  background: #CFCBC5;
+  cursor: default;
+}
+
+.mb-stoor-nota {
+  font-size: 13px;
+  color: var(--grys-teks);
+}
+.mb-stoor-nota.mb-ok { color: #2E6F64; }
+.mb-stoor-nota.mb-fout { color: var(--koraal); }
+
+/* --- Die nota onder "Op rekord" --- */
+
+.mb-vas-nota {
+  background: #FBF7EC;
+  border-left: 3px solid var(--amber);
+  padding: 11px 14px;
+  font-size: 13px;
+  color: #6B5B2E;
+  line-height: 1.55;
+  margin: 14px 0 0;
+}
+.mb-vas-nota a { color: #6B5B2E; }
+
+@media (max-width: 560px) {
+  .mb-ry { font-size: 14px; }
+  .mb-ry .mb-et { flex: 0 0 44%; }
+}
