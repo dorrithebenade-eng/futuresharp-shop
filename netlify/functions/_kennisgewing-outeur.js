@@ -89,7 +89,22 @@ async function kry_verslag_url(outeur_id) {
 
 // Voorkeure bestaan nog nie op die outeursrekord nie. Afwesig beteken
 // "ja" — sodra die veld bykom, hoef niks hier te verander nie.
-function wil_hoor_van_verkope(outeur) {
+//
+// 'N HARDE KOPIE KEN GEEN VOORKEUR NIE. Die keuse geld verkope waar die pos
+// bloot inligting dra: 'n e-boek en 'n leen gebeur klaar sonder hom. 'n Harde
+// kopie verg dat hy druk en pos, en 'n koper wat betaal het, wag daarop. Sou
+// die voorkeur daardie pos onderdruk, is die geld geneem en niemand weet van
+// die bestelling nie.
+//
+// Die toets kyk dus na die REËLS in hierdie pos, nie net na die voorkeur nie.
+// Dieselfde `enige_harde_kopie` wat bou_pos() gebruik om die afleweringsblok
+// by te sit.
+function wil_hoor_van_verkope(outeur, reël_items) {
+  const bevat_harde_kopie = (reël_items || []).some(
+    (i) => i && i.formaat === "harde_kopie"
+  );
+  if (bevat_harde_kopie) return true;
+
   const voorkeure = outeur && outeur.kennisgewings;
   return !(voorkeure && voorkeure.by_verkoop === false);
 }
@@ -273,7 +288,7 @@ async function stuur_outeur_kennisgewings(bestelling, opsies = {}) {
       continue;
     }
 
-    if (!wil_hoor_van_verkope(outeur)) {
+    if (!wil_hoor_van_verkope(outeur, reël_items)) {
       opsomming.push({ outeur_id, oorgeslaan: "voorkeur is af" });
       continue;
     }
