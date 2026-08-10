@@ -646,6 +646,83 @@ const WOORDEBOEK = {
   // --- My indienings ---
   // Die groepopskrifte is voller as die merkies op die kaarte: 'n opskrif
   // mag \'n groep beskryf, 'n merkie moet in een oogopslag lees.
+
+  // --- My besonderhede ---
+  // Die skerm is grootliks LEES. Net twee dinge is werklik 'n keuse: die
+  // verkoopkennisgewing en die twee kontakvelde. Alles onder "Op rekord"
+  // raak die ooreenkoms of die uitbetaling en gaan deur Future Sharp.
+  outeur_nav_besonderhede: { af: "My besonderhede", en: "My details" },
+  ob_nota: {
+    af: "Wat Future Sharp van jou het, en hoe jy van jou boeke wil hoor.",
+    en: "What Future Sharp has on record, and how you want to hear about your books.",
+  },
+
+  ob_kennisgewings_kop: { af: "Kennisgewings", en: "Notifications" },
+  ob_kennisgewings_onder: {
+    af: "Wanneer Future Shop vir jou 'n e-pos stuur.",
+    en: "When Future Shop sends you an email.",
+  },
+  ob_verkoop_titel: { af: "Elke e-boek- of leenverkoop", en: "Every e-book or loan sale" },
+  ob_verkoop_teks: {
+    af: "'n E-pos elke keer as een van jou boeke as e-boek verkoop of uitgeleen word. Skakel dit af as jy eerder net af en toe wil gaan kyk.",
+    en: "An email each time one of your books sells as an e-book or is loaned out. Switch it off if you would rather check in now and then.",
+  },
+  // Die twee wat altyd deurkom, is NIE afgeskakelde kontroles nie. 'n Grys
+  // blokkie lees soos iets wat iemand vir hom toegemaak het; 'n merkie lees
+  // soos 'n feit oor hoe die stelsel werk.
+  ob_permanent: { af: "Permanent aktief.", en: "Always on." },
+  ob_hardekopie_titel: { af: "Harde kopie\u00eb", en: "Hard copies" },
+  ob_hardekopie_teks: {
+    af: "Sodra 'n boek van jou as harde kopie beskikbaar is, kry jy outomaties 'n e-pos by elke verkoop, met die koper se afleweringsbesonderhede.",
+    en: "As soon as one of your books is available as a hard copy, you automatically receive an email with every sale, including the buyer's delivery details.",
+  },
+  ob_terug_titel: { af: "Wanneer 'n vorm teruggestuur word", en: "When a form is sent back" },
+  ob_terug_teks: {
+    af: "Daar is iets wat jy moet regmaak voordat die boek verder kan gaan.",
+    en: "There is something to correct before the book can go further.",
+  },
+
+  ob_kontak_kop: { af: "Kontakbesonderhede", en: "Contact details" },
+  ob_kontak_onder: {
+    af: "Hoe Future Sharp jou bereik, en waarheen 'n bestelling se navrae gaan.",
+    en: "How Future Sharp reaches you, and where order queries go.",
+  },
+  ob_selfoon: { af: "Selfoon", en: "Mobile" },
+  ob_adres: { af: "Adres", en: "Address" },
+
+  ob_rekord_kop: { af: "Op rekord", en: "On record" },
+  ob_rekord_onder: {
+    af: "Wat in jou ooreenkoms staan en waarheen jou geld gaan.",
+    en: "What your agreement states and where your money goes.",
+  },
+  ob_naam: { af: "Naam", en: "Name" },
+  ob_epos: { af: "E-pos", en: "Email" },
+  ob_id: { af: "ID-nommer", en: "ID number" },
+  ob_btw: { af: "BTW-nommer", en: "VAT number" },
+  ob_bank: { af: "Bank", en: "Bank" },
+  ob_takkode: { af: "Takkode", en: "Branch code" },
+  ob_rekening: { af: "Rekeningnommer", en: "Account number" },
+  ob_uitbetaling: { af: "Uitbetaling", en: "Payout" },
+  ob_gereed: { af: "Gereed", en: "Ready" },
+  ob_wag: { af: "Word opgestel", en: "Being set up" },
+  ob_nie_verskaf: { af: "nie verskaf nie", en: "not provided" },
+  // Die adres staan in die sin self, want 'n outeur wat dit lees, is op die
+  // punt om te skryf.
+  ob_vas_nota: {
+    af: "Hierdie besonderhede raak jou ooreenkoms en jou uitbetalings, en word daarom nie hier verander nie. Stuur 'n e-pos aan futureshop@futuresharp.co.za en dit word vir jou reggemaak.",
+    en: "These details affect your agreement and your payouts, and are therefore not changed here. Send an email to futureshop@futuresharp.co.za and it will be corrected for you.",
+  },
+
+  ob_stoor: { af: "Stoor", en: "Save" },
+  ob_stoor_besig: { af: "Stoor\u2026", en: "Saving\u2026" },
+  ob_gestoor: { af: "Gestoor", en: "Saved" },
+  ob_stoor_fout: { af: "Kon nie stoor nie", en: "Could not save" },
+  ob_laai: { af: "Laai\u2026", en: "Loading\u2026" },
+  ob_laai_fout: {
+    af: "Kon nie jou besonderhede laai nie. Herlaai die bladsy.",
+    en: "Could not load your details. Reload the page.",
+  },
+
   outeur_nav_indienings: { af: "My indienings", en: "My submissions" },
   outeur_indienings_nota: {
     af: "Elke boek se vorm, van konsep tot op die rak.",
