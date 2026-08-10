@@ -18,6 +18,7 @@
 
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 const { kry_indienings_store } = require("./_indienings");
+const { kontroleer_rak } = require("./_rak-kontrole");
 
 function opsomming(rekord) {
   const data = rekord.data || {};
@@ -74,6 +75,11 @@ exports.handler = async (event, context) => {
       return { statusCode: 404, body: "Hierdie vorm bestaan nie" };
     }
 
+    // Die katalogus besit die feit of hierdie boek in die winkel is. Sê die
+    // rekord `op_rak` terwyl die produk weg is, gaan hy hier terug na
+    // `goedgekeur` — sien _rak-kontrole.js.
+    await kontroleer_rak(rekord, store);
+
     return {
       statusCode: 200,
       headers: { "Content-Type": "application/json" },
@@ -106,6 +112,10 @@ exports.handler = async (event, context) => {
         .map((sleutel) => store.get(sleutel, { type: "json" }).catch(() => null))
     )
   ).filter(Boolean);
+
+  // Net rekords wat die rak claim, kos 'n oproep na die katalogus. Wie se
+  // boek nie meer daar is, gaan terug na "wag om opgestel te word".
+  await kontroleer_rak(rekords, store);
 
   // Wat ingedien is, kom eerste — dit is wat aandag verg. Binne 'n groep
   // die oudste eerste, want wie langste wag, wag die langste.

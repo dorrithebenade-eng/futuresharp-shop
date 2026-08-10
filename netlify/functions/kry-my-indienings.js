@@ -15,6 +15,7 @@
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 const { kry_my_outeur } = require("./_my-outeur");
 const { kry_indienings_store, is_myne } = require("./_indienings");
+const { kontroleer_rak } = require("./_rak-kontrole");
 
 // Genoeg om 'n kaart te teken: die titel, die stand, wanneer laas geraak.
 function opsomming(rekord) {
@@ -66,6 +67,10 @@ exports.handler = async (event, context) => {
       return { statusCode: 403, body: "Hierdie vorm behoort nie aan hierdie rekening nie" };
     }
 
+    // Dieselfde kontrole as die personeelkant: is die boek werklik nog in
+    // die winkel? Sien _rak-kontrole.js.
+    await kontroleer_rak(rekord, store);
+
     return {
       statusCode: 200,
       headers: { "Content-Type": "application/json" },
@@ -96,6 +101,8 @@ exports.handler = async (event, context) => {
       sleutels.map((sleutel) => store.get(sleutel, { type: "json" }).catch(() => null))
     )
   ).filter((r) => is_myne(r, outeur));
+
+  await kontroleer_rak(rekords, store);
 
   // Nuutste eerste. Die skerm groepeer self volgens stand.
   rekords.sort((a, b) => String(b.gewysig_op || "").localeCompare(String(a.gewysig_op || "")));
