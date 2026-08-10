@@ -75,4 +75,69 @@ async function stuur_terugstuur_kennisgewing(rekord, opmerking) {
   }
 }
 
-module.exports = { stuur_terugstuur_kennisgewing, bou_pos };
+// --- Die admin se kant ---
+//
+// TWEE POSTE, EN NET TWEE: 'n nuwe indiening en 'n nuwe wysiging. Geen
+// verkoopsposte nie. 'n Kanaal wat elke transaksie dra, word binne 'n maand
+// een wat niemand meer lees nie, en dan word die een wat saak maak ook
+// gemis.
+//
+// DIE POS SÊ NIE WAT IN DIE VORM STAAN NIE. Wie dit lees, gaan in elk geval
+// kyk; 'n opsomming wat verouder voordat sy dit oopmaak, help niemand. Wat
+// hier hoort, is genoeg om te weet of dit nou aandag verg: wie, watter boek,
+// en watter nommer.
+//
+// WAARHEEN: ADMIN_EPOS as dit gestel is, anders die posbus self. Future
+// Shop se eie adres is futureshop@futuresharp.co.za, en 'n pos van daardie
+// posbus na homself kom deur — so werk dit sonder 'n nuwe veranderlike, en
+// 'n ander adres is later net 'n instelling in Netlify.
+function admin_adres() {
+  return process.env.ADMIN_EPOS || process.env.EPOS_GEBRUIKER || "";
+}
+
+function bou_admin_pos(rekord, is_wysiging) {
+  const titel = (rekord.data && rekord.data.titel) || "";
+  const naam = titel || "sonder titel";
+  const outeur = rekord.outeur_naam || "'n outeur";
+
+  return {
+    onderwerp: is_wysiging
+      ? `Wysiging ingedien \u2014 ${naam}`
+      : `Nuwe indiening \u2014 ${naam}`,
+    opskrif: is_wysiging ? "'n Wysiging wag vir hantering" : "'n Nuwe indiening wag",
+    reels: [
+      is_wysiging
+        ? `${ontsnap(outeur)} het 'n wysiging vir <b>${ontsnap(naam)}</b> ingedien.`
+        : `${ontsnap(outeur)} het <b>${ontsnap(naam)}</b> ingedien.`,
+      `Verwysing: ${ontsnap(rekord.nommer)}`,
+    ],
+    knoppie: { teks: "Maak die paneelbord oop", url: `${WERF_URL}/paneelbord.html` },
+  };
+}
+
+// Soos die outeur se een: gee { gestuur, rede } terug en gooi nooit.
+async function stuur_admin_indiening_kennisgewing(rekord, is_wysiging) {
+  try {
+    const aan = admin_adres();
+    if (!aan) return { gestuur: false, rede: "geen admin-adres opgestel nie" };
+
+    const { onderwerp, opskrif, reels, knoppie } = bou_admin_pos(rekord, Boolean(is_wysiging));
+
+    const uitslag = await stuur_epos({ aan, onderwerp, opskrif, reels, knoppie });
+    if (!uitslag.ok) {
+      console.error(`Admin-pos vir ${rekord.nommer} het misluk:`, uitslag.fout);
+      return { gestuur: false, rede: uitslag.fout };
+    }
+    return { gestuur: true, rede: null };
+  } catch (fout) {
+    console.error("Admin-pos het gestort:", fout && fout.message);
+    return { gestuur: false, rede: (fout && fout.message) || "onbekende fout" };
+  }
+}
+
+module.exports = {
+  stuur_terugstuur_kennisgewing,
+  stuur_admin_indiening_kennisgewing,
+  bou_pos,
+  bou_admin_pos,
+};

@@ -26,6 +26,7 @@
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 const { kry_my_outeur } = require("./_my-outeur");
 const { kry_indienings_store, voeg_geskiedenis_by, is_myne } = require("./_indienings");
+const { stuur_admin_indiening_kennisgewing } = require("./_kennisgewing-indiening");
 
 function nommer_is_geldig(nommer) {
   return /^BV-\d{4}-\d{4}$/.test(String(nommer || ""));
@@ -160,6 +161,14 @@ exports.handler = async (event, context) => {
   } catch (fout) {
     console.error("Kon nie die indiening stoor nie:", fout);
     return { statusCode: 500, body: "Kon nie die vorm indien nie" };
+  }
+
+  // NÁ die stoor. Die indiening is klaar; die pos is 'n gunsie bo-op en mag
+  // dit nie kan breek nie. Die outeur hoor niks hiervan nie \u2014 dit is
+  // admin se kennisgewing, nie sy bevestiging nie.
+  const pos = await stuur_admin_indiening_kennisgewing(rekord, is_wysiging);
+  if (!pos.gestuur) {
+    console.warn(`Admin-pos vir ${rekord.nommer} nie gestuur nie: ${pos.rede}`);
   }
 
   return {
