@@ -40,7 +40,7 @@ function bou_pos(titel, opmerking, nommer) {
     reels: [
       `Jou indiening vir <b>${ontsnap(naam)}</b> is teruggestuur sodat jy iets kan regmaak.`,
       haal_aan(opmerking),
-      "Die vorm staan weer oop in jou outeurspaneel. Maak die veranderinge en dien dit weer in.",
+      "Die boek indieningsvorm is weer oop vir wysigings. Maak die veranderinge en dien dit weer in.",
       `Verwysing: ${ontsnap(nommer)}`,
     ],
     knoppie: { teks: "Maak die vorm oop", url: `${WERF_URL}/outeur.html` },
