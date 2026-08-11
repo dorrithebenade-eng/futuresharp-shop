@@ -454,9 +454,16 @@ async function os_laai_af_as_excel() {
     });
     totaal_ry.commit();
 
-    blad.columns = [
-      { width: 4 }, { width: 40 }, { width: 26 }, { width: 14 }, { width: 12 }, { width: 14 },
-    ];
+    // Twee sente, deurgaans. 'n Staat waarteen iemand sy bankstaat hou, mag
+    // nie "31" wys waar dit R31,00 is nie.
+    blad.getColumn(6).numFmt = "#,##0.00";
+
+    // Elke kolom afsonderlik. 'n Toekenning aan blad.columns VERVANG die
+    // blad se hele kolom-model, en die ingebedde logo gaan saam verlore —
+    // dit is presies hoekom die eerste uitvoer sonder logo uitgekom het.
+    [4, 40, 26, 14, 12, 14].forEach((breedte, i) => {
+      blad.getColumn(i + 1).width = breedte;
+    });
 
     const buffer = await werkboek.xlsx.writeBuffer();
     const blob = new Blob([buffer], {
