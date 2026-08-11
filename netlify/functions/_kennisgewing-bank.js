@@ -35,11 +35,11 @@ function bou_admin_pos(outeur_naam, het_opmerking) {
     onderwerp: "Bankbesonderhede \u2014 verandering versoek",
     opskrif: "'n Verandering van bankbesonderhede wag",
     reels: [
-      `${ontsnap(naam)} het 'n verandering van sy bankbesonderhede versoek.`,
+      `${ontsnap(naam)} het 'n verandering van bankbesonderhede versoek.`,
       het_opmerking
         ? "Die nuwe besonderhede en sy opmerking staan in die paneelbord."
         : "Die nuwe besonderhede staan in die paneelbord.",
-      "Verander dit eers by die betaaldiens, en merk dit dan as gedoen \u2014 dit is die stap wat die rekord bywerk.",
+      "Verander die rekening in Paystack se dashboard, en merk dit dan as gedoen in die paneelbord. Die knoppie verander niks \u2014 dit teken aan dat dit klaar is.",
     ],
     knoppie: { teks: "Maak die paneelbord oop", url: `${WERF_URL}/paneelbord.html` },
   };

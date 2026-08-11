@@ -1,0 +1,92 @@
+/* public/css/paneel-bankversoeke.css
+   Die bankversoek-blok bo-aan die Outeurs-afdeling. Eie lêer, sodat
+   paneelbord.css en paneel-goedkeuring.css onaangeraak bly. */
+
+#pbv-blok:empty { display: none; }
+
+.pbv-kop {
+  font-family: var(--font-opskrif);
+  font-size: 16px;
+  margin: 0 0 4px;
+}
+
+.pbv-kaart {
+  background: #fff;
+  border: 1px solid #E4E2DD;
+  border-left: 3px solid var(--amber);
+  border-radius: 0 9px 9px 0;
+  padding: 16px 18px;
+  margin: 0 0 14px;
+}
+
+.pbv-naam {
+  font-size: 15px;
+  font-weight: 700;
+  margin: 0 0 2px;
+}
+
+.pbv-datum {
+  font-size: 12px;
+  color: var(--grys-teks);
+  margin: 0 0 12px;
+}
+
+.pbv-ry {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 6px 0;
+  border-bottom: 1px solid #F1EFEB;
+  font-size: 14px;
+}
+.pbv-ry:last-of-type { border-bottom: 0; }
+
+.pbv-ry .pbv-et { color: var(--grys-teks); }
+.pbv-ry .pbv-wa { font-weight: 600; text-align: right; word-break: break-word; }
+
+/* Wat tans op rekord staan — genoeg om by die betaaldiens te herken dat
+   jy by die regte subrekening is. */
+.pbv-oud {
+  font-size: 12px;
+  color: var(--grys-teks);
+  margin: 10px 0 0;
+}
+
+.pbv-opmerking {
+  font-size: 13px;
+  line-height: 1.55;
+  background: #FBFAF8;
+  border-left: 3px solid var(--teal);
+  padding: 10px 13px;
+  margin: 12px 0 0;
+}
+
+/* Die knoppie bly dof tot hierdie afgemerk is. 'n Bevestigingsvenster ná
+   die klik word binne 'n week iets wat 'n mens outomaties wegklik; hierdie
+   verg 'n handeling voordat daar iets kan gebeur. */
+.pbv-merkry {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 16px 0 12px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.pbv-merkry input {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 auto;
+  cursor: pointer;
+}
+
+.pbv-knop:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.pbv-boodskap {
+  font-size: 13px;
+  color: var(--koraal);
+  margin: 10px 0 0;
+}
