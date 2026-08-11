@@ -1,0 +1,255 @@
+/* public/css/outeur-staat.css
+   Die outeur se staat. 'n Eie lêer sodat outeur.css onaangeraak bly. Die
+   kleure kom uit styl.css; die rande en die radius volg .mb-kaart en
+   .outeur-bestelling, sodat hierdie skerm dieselfde lyk as die res. */
+
+.os-kaart {
+  background: #fff;
+  border: 1px solid #E4E2DD;
+  border-radius: 9px;
+  padding: 20px 22px;
+  margin: 0 0 16px;
+}
+
+.os-kop {
+  font-family: var(--font-opskrif);
+  font-size: 16px;
+  margin: 0 0 4px;
+}
+
+.os-onder {
+  margin: 0 0 16px;
+  font-size: 13px;
+  color: var(--grys-teks);
+  line-height: 1.55;
+}
+
+/* --- Die venster --- */
+
+.os-venster {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.os-veld { display: block; }
+
+.os-veld span {
+  display: block;
+  font-size: 13px;
+  color: var(--grys-teks);
+  margin-bottom: 5px;
+}
+
+.os-veld input {
+  padding: 10px 12px;
+  border: 1px solid #E3E0DA;
+  border-radius: 7px;
+  font-size: 15px;
+  font-family: inherit;
+  background: #fff;
+}
+.os-veld input:focus {
+  outline: 2px solid var(--teal);
+  outline-offset: -1px;
+}
+
+.os-vinnig {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+.os-vinnig button {
+  border: 1px solid #E4E2DD;
+  background: #fff;
+  border-radius: 16px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--grys-teks);
+  cursor: pointer;
+}
+
+.os-vinnig button.aktief {
+  background: #F1F7F5;
+  border-color: var(--teal);
+  color: #2E6F64;
+  font-weight: 600;
+}
+
+/* --- Die vier syfers ---
+   Nie die band se syfers nie: daardie vier is "tot op datum" en verander
+   nooit. Hierdie vier hoort by die venster en skuif saam daarmee, dus staan
+   hulle hier en nie daar bo nie. */
+
+.os-som {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 0 16px;
+  background: #fff;
+  border: 1px solid #E4E2DD;
+  border-radius: 9px;
+  overflow: hidden;
+}
+
+.os-som div {
+  flex: 1 1 150px;
+  padding: 16px 18px;
+  border-right: 1px solid #F1EFEB;
+}
+.os-som div:last-child { border-right: 0; }
+
+.os-som b {
+  display: block;
+  font-family: var(--font-opskrif);
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+.os-som small {
+  display: block;
+  font-size: 12px;
+  color: var(--grys-teks);
+  margin-top: 3px;
+}
+
+/* --- Die tabel --- */
+
+.os-tabel {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.os-tabel th {
+  text-align: left;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--grys-teks);
+  font-weight: 600;
+  padding: 0 0 8px;
+  border-bottom: 1px solid #E4E2DD;
+}
+
+.os-tabel th.os-r,
+.os-tabel td.os-r { text-align: right; }
+
+.os-tabel td {
+  padding: 11px 0;
+  border-bottom: 1px solid #F1EFEB;
+  vertical-align: top;
+}
+
+.os-tabel tbody tr:last-child td { border-bottom: 0; }
+
+.os-titel { font-weight: 600; }
+
+.os-fyn {
+  display: block;
+  font-size: 12px;
+  color: var(--grys-teks);
+  margin-top: 2px;
+}
+
+.os-tabel tfoot td {
+  border-top: 2px solid #E4E2DD;
+  border-bottom: 0;
+  padding-top: 12px;
+  font-weight: 700;
+}
+
+.os-leeg {
+  padding: 28px 0;
+  text-align: center;
+  color: var(--grys-teks);
+  font-size: 14px;
+}
+
+/* --- Knoppies --- */
+
+.os-knop-ry {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+
+.os-knop {
+  background: var(--koraal);
+  color: #fff;
+  border: 0;
+  border-radius: 7px;
+  padding: 11px 22px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+}
+.os-knop:disabled { background: #CFCBC5; cursor: default; }
+
+.os-knop.os-sag {
+  background: #fff;
+  color: #171717;
+  border: 1px solid #E3E0DA;
+  font-weight: 600;
+}
+
+.os-nota {
+  background: #FBF7EC;
+  border-left: 3px solid var(--amber);
+  padding: 11px 14px;
+  font-size: 13px;
+  color: #6B5B2E;
+  line-height: 1.55;
+  margin: 16px 0 0;
+}
+
+/* --- Op 'n foon ---
+   Die tabel se drie syferkolomme knyp die titel dood. Hulle word kleiner
+   en die formaatreël val weg — 'n mens kyk op 'n foon na die syfers, nie
+   na watter formate beskikbaar is nie. */
+@media (max-width: 560px) {
+  .os-kaart { padding: 16px 14px; }
+  .os-tabel { font-size: 13px; }
+  .os-tabel th { font-size: 11px; letter-spacing: .04em; }
+  .os-veld input { width: 100%; }
+  .os-veld { flex: 1 1 140px; }
+  .os-som b { font-size: 19px; }
+}
+
+/* --- Druk ---
+   Die band, die kieslys en die knoppies is skermgereedskap. Op papier bly
+   net die staat oor. Sonder hierdie blok druk 'n mens 'n teal balk en 'n
+   ry knoppies saam met sy syfers. */
+@media print {
+  .outeur-band,
+  .outeur-kieslys,
+  .outeur-status-kaart,
+  .os-knop-ry,
+  .os-vinnig,
+  header,
+  footer {
+    display: none !important;
+  }
+
+  .outeur-inhoud-wrap { padding: 0; }
+
+  .os-kaart,
+  .os-som {
+    border: 1px solid #999;
+    break-inside: avoid;
+  }
+
+  .os-tabel { font-size: 12px; }
+
+  /* Die maandvelde is op papier net twee getalle; die etikette daarby laat
+     dit soos 'n vorm lyk. Die tydperk staan reeds onder die opskrif. */
+  .os-venster { display: none; }
+
+  a[href]::after { content: ""; }
+}

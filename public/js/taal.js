@@ -737,6 +737,69 @@ const WOORDEBOEK = {
     en: "Future Sharp handles this and updates this page once it is done. Your next payout may be a day or two later while the bank verifies the new account, and a payout already on its way will still go to the old account.",
   },
   ob_bank_onttrek: { af: "Onttrek", en: "Withdraw" },
+  // --- Staat ---
+  // Die venster is HELE MAANDE, nie dae nie: besigtigings bestaan net per
+  // maand, en twee soorte tyd op een skerm sou nie te verdedig wees nie.
+  os_nav_staat: { af: "Staat", en: "Statement" },
+  os_nota: {
+    af: "Wat jou boeke in 'n gekose tydperk gedoen het.",
+    en: "What your books did in a chosen period.",
+  },
+  os_tydperk_kop: { af: "Tydperk", en: "Period" },
+  os_tydperk_onder: {
+    af: "Hele maande. Besigtigings word per maand getel, dus loop albei syfers oor dieselfde venster.",
+    en: "Whole months. Views are counted per month, so both figures cover the same window.",
+  },
+  os_van: { af: "Van", en: "From" },
+  os_tot: { af: "Tot", en: "To" },
+  // Staan tussen twee maandname: "Junie tot Augustus 2026".
+  os_tot_woord: { af: "tot", en: "to" },
+  os_vinnig_maand: { af: "Hierdie maand", en: "This month" },
+  os_vinnig_drie: { af: "Laaste 3 maande", en: "Last 3 months" },
+  os_vinnig_twaalf: { af: "Laaste 12 maande", en: "Last 12 months" },
+  os_vinnig_alles: { af: "Alles", en: "Everything" },
+  os_som_verkope: { af: "Verkope", en: "Sales" },
+  os_som_deel: { af: "Jou deel", en: "Your share" },
+  os_som_besigtigings: { af: "Besigtigings", en: "Views" },
+  os_som_titels: { af: "Titels met verkope", en: "Titles with sales" },
+  os_per_titel: { af: "Per titel", en: "Per title" },
+  os_kol_titel: { af: "Titel", en: "Title" },
+  os_kol_formate: { af: "Formate", en: "Formats" },
+  os_totaal: { af: "Totaal", en: "Total" },
+  // Die twaalf maandname in EEN sleutel, met | tussenin. Die blaaier se eie
+  // Afrikaanse maandname is nie oral betroubaar nie.
+  os_maande: {
+    af: "Januarie|Februarie|Maart|April|Mei|Junie|Julie|Augustus|September|Oktober|November|Desember",
+    en: "January|February|March|April|May|June|July|August|September|October|November|December",
+  },
+  os_excel: { af: "Laai af as Excel", en: "Download as Excel" },
+  os_excel_kop: { af: "Outeursstaat", en: "Author statement" },
+  os_excel_fout: {
+    af: "Kon nie die Excel-l\u00eaer saamstel nie \u2014 probeer weer.",
+    en: "Could not compile the Excel file \u2014 please try again.",
+  },
+  os_druk: { af: "Druk", en: "Print" },
+  os_besig: { af: "Word saamgestel\u2026", en: "Compiling\u2026" },
+  os_geen: { af: "Geen beweging in hierdie tydperk nie.", en: "No activity in this period." },
+  os_omgekeer: {
+    af: "Die begin van die tydperk l\u00ea n\u00e1 die einde.",
+    en: "The start of the period falls after the end.",
+  },
+  // Die maandnaam kom tussen die twee helftes in, uit die bediener se
+  // antwoord: "... sedert Augustus 2026. Maande daarvoor ...".
+  os_nota_vanaf: {
+    af: "Besigtigings word per maand gehou sedert",
+    en: "Views have been counted per month since",
+  },
+  os_nota_daarvoor: {
+    af: "Maande daarvoor wys geen besigtigings nie, al was daar wel verkope.",
+    en: "Months before that show no views, even where there were sales.",
+  },
+  os_laai: { af: "Laai\u2026", en: "Loading\u2026" },
+  os_laai_fout: {
+    af: "Kon nie jou staat laai nie. Herlaai die bladsy.",
+    en: "Could not load your statement. Reload the page.",
+  },
   ob_bank_fout: { af: "Kon nie die versoek stuur nie", en: "Could not send the request" },
   pbv_kop: { af: "Bankbesonderhede-versoeke", en: "Banking detail requests" },
   pbv_hulp: {

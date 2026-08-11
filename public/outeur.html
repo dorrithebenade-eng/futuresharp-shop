@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="css/styl.css" />
   <link rel="stylesheet" href="css/outeur.css" />
   <link rel="stylesheet" href="css/outeur-besonderhede.css" />
+  <link rel="stylesheet" href="css/outeur-staat.css" />
 
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#3FB6A4">
@@ -75,6 +76,7 @@
         </button>
         <button type="button" class="outeur-pil" data-gaan="indienings" data-i18n="outeur_nav_indienings">My Indienings</button>
         <button type="button" class="outeur-pil" data-gaan="besonderhede" data-i18n="outeur_nav_besonderhede">My besonderhede</button>
+        <button type="button" class="outeur-pil" data-gaan="staat" data-i18n="os_nav_staat">Staat</button>
       </nav>
 
       <div class="outeur-inhoud-wrap">
@@ -286,6 +288,82 @@
             <p class="mb-boodskap" id="mb-bank-boodskap" style="display:none;" aria-live="polite"></p>
           </div>
         </section>
+
+        <!-- Wat die boeke in 'n gekose tydperk gedoen het. Laai eers
+             wanneer die oortjie oopgemaak word — kry-my-staat.js loop elke
+             bestelling deur. -->
+        <section class="outeur-afdeling" data-afdeling="staat">
+          <p class="outeur-lei-binne" data-i18n="os_nota">
+            Wat jou boeke in 'n gekose tydperk gedoen het.
+          </p>
+          <div id="outeur-staat-status" class="stelsel-boodskap" aria-live="polite"></div>
+
+          <div id="os-inhoud" hidden>
+            <div class="os-kaart">
+              <h2 class="os-kop" data-i18n="os_tydperk_kop">Tydperk</h2>
+              <p class="os-onder" data-i18n="os_tydperk_onder">
+                Hele maande. Besigtigings word per maand getel, dus loop albei syfers oor dieselfde venster.
+              </p>
+
+              <div class="os-venster">
+                <label class="os-veld">
+                  <span data-i18n="os_van">Van</span>
+                  <input type="month" id="os-van">
+                </label>
+                <label class="os-veld">
+                  <span data-i18n="os_tot">Tot</span>
+                  <input type="month" id="os-tot">
+                </label>
+              </div>
+
+              <div class="os-vinnig" id="os-vinnig">
+                <button type="button" data-maande="1" data-i18n="os_vinnig_maand">Hierdie maand</button>
+                <button type="button" data-maande="3" data-i18n="os_vinnig_drie">Laaste 3 maande</button>
+                <button type="button" data-maande="12" data-i18n="os_vinnig_twaalf">Laaste 12 maande</button>
+                <button type="button" data-maande="0" data-i18n="os_vinnig_alles">Alles</button>
+              </div>
+            </div>
+
+            <div class="os-som">
+              <div><b id="os-s-verkope">&#8212;</b><small data-i18n="os_som_verkope">Verkope</small></div>
+              <div><b id="os-s-deel">&#8212;</b><small data-i18n="os_som_deel">Jou deel</small></div>
+              <div><b id="os-s-besigtigings">&#8212;</b><small data-i18n="os_som_besigtigings">Besigtigings</small></div>
+              <div><b id="os-s-titels">&#8212;</b><small data-i18n="os_som_titels">Titels met verkope</small></div>
+            </div>
+
+            <div class="os-kaart">
+              <h2 class="os-kop" data-i18n="os_per_titel">Per titel</h2>
+              <p class="os-onder" id="os-tydperk-teks"></p>
+
+              <table class="os-tabel">
+                <thead>
+                  <tr>
+                    <th data-i18n="os_kol_titel">Titel</th>
+                    <th class="os-r" data-i18n="os_som_besigtigings">Besigtigings</th>
+                    <th class="os-r" data-i18n="os_som_verkope">Verkope</th>
+                    <th class="os-r" data-i18n="os_som_deel">Jou deel</th>
+                  </tr>
+                </thead>
+                <tbody id="os-lyf"></tbody>
+                <tfoot>
+                  <tr>
+                    <td data-i18n="os_totaal">Totaal</td>
+                    <td class="os-r" id="os-t-besigtigings"></td>
+                    <td class="os-r" id="os-t-verkope"></td>
+                    <td class="os-r" id="os-t-deel"></td>
+                  </tr>
+                </tfoot>
+              </table>
+
+              <div class="os-knop-ry">
+                <button type="button" class="os-knop" id="os-uitvoer" data-i18n="os_excel">Laai af as Excel</button>
+                <button type="button" class="os-knop os-sag" id="os-druk" data-i18n="os_druk">Druk</button>
+              </div>
+
+              <p class="os-nota" id="os-nota" style="display:none;"></p>
+            </div>
+          </div>
+        </section>
       </div>
     </div>
   </main>
@@ -299,5 +377,8 @@
   <script src="js/outeur-bestellings.js"></script>
   <script src="js/outeur-indienings.js"></script>
   <script src="js/outeur-besonderhede.js"></script>
+  <!-- Slegs vir die staat se Excel-uitvoer; dieselfde weergawe as die paneelbord. -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
+  <script src="js/outeur-staat.js"></script>
 </body>
 </html>
