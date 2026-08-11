@@ -709,10 +709,35 @@ const WOORDEBOEK = {
   // Die adres staan in die sin self, want 'n outeur wat dit lees, is op die
   // punt om te skryf.
   ob_vas_nota: {
-    af: "Hierdie besonderhede raak jou ooreenkoms en jou uitbetalings, en word daarom nie hier verander nie. Stuur 'n e-pos aan futureshop@futuresharp.co.za en dit word vir jou reggemaak.",
-    en: "These details affect your agreement and your payouts, and are therefore not changed here. Send an email to futureshop@futuresharp.co.za and it will be corrected for you.",
+    af: "Jou naam, jou e-pos en jou ID raak jou ooreenkoms en word nie hier verander nie. Stuur 'n e-pos aan futureshop@futuresharp.co.za. Jou bankbesonderhede versoek jy hieronder.",
+    en: "Your name, email and ID affect your agreement and are not changed here. Send an email to futureshop@futuresharp.co.za. Your banking details are requested below.",
   },
 
+  ob_bank_versoek_knoppie: { af: "Versoek 'n verandering van bankbesonderhede", en: "Request a change to your banking details" },
+  ob_bank_merk: { af: "Verandering versoek", en: "Change requested" },
+  ob_bank_vorm_kop: { af: "Nuwe bankbesonderhede", en: "New banking details" },
+  ob_bank_vorm_onder: {
+    af: "Future Sharp verander dit by die betaaldiens en werk dan hierdie bladsy by. Jou huidige besonderhede bly geld tot dit klaar is.",
+    en: "Future Sharp changes this with the payment service and then updates this page. Your current details stay in effect until it is done.",
+  },
+  ob_bank_houer: { af: "Rekeninghouer, soos dit by die bank staan", en: "Account holder, as it appears at the bank" },
+  ob_bank_houer_wenk: { af: "Verskil dit van jou naam hierbo, s\u00ea in die opmerking hoekom.", en: "If this differs from your name above, say why in the comment." },
+  ob_bank_houer_ry: { af: "Rekeninghouer", en: "Account holder" },
+  ob_bank_kies: { af: "Kies jou bank", en: "Choose your bank" },
+  ob_bank_ander: { af: "Ander", en: "Other" },
+  ob_bank_kode_wenk: { af: "Word vir jou ingevul sodra jy 'n bank kies.", en: "Filled in for you as soon as you choose a bank." },
+  ob_bank_kode_fout: { af: "Die takkode is ses syfers.", en: "The branch code is six digits." },
+  ob_bank_rek_fout: { af: "Die rekeningnommer is net syfers, tussen ses en dertien.", en: "The account number is digits only, between six and thirteen." },
+  ob_bank_opmerking: { af: "Opmerking (opsioneel)", en: "Comment (optional)" },
+  ob_bank_stuur: { af: "Stuur versoek", en: "Send request" },
+  ob_bank_kanselleer: { af: "Kanselleer", en: "Cancel" },
+  ob_bank_hangend_kop: { af: "Verandering van bankbesonderhede versoek", en: "Change to banking details requested" },
+  ob_bank_hangend_nota: {
+    af: "Future Sharp hanteer dit en werk hierdie bladsy by sodra dit klaar is. Jou eersvolgende uitbetaling kan 'n dag of wat later wees terwyl die bank die nuwe rekening verifieer, en 'n uitbetaling wat reeds onderweg is, gaan nog na die ou rekening.",
+    en: "Future Sharp handles this and updates this page once it is done. Your next payout may be a day or two later while the bank verifies the new account, and a payout already on its way will still go to the old account.",
+  },
+  ob_bank_onttrek: { af: "Onttrek", en: "Withdraw" },
+  ob_bank_fout: { af: "Kon nie die versoek stuur nie", en: "Could not send the request" },
   ob_stoor: { af: "Stoor", en: "Save" },
   ob_stoor_besig: { af: "Stoor\u2026", en: "Saving\u2026" },
   ob_gestoor: { af: "Gestoor", en: "Saved" },
