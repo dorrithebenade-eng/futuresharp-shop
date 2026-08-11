@@ -76,6 +76,14 @@ function bou_antwoord(inskrywing) {
     uitbetaling_gereed: Boolean(inskrywing.subrekening_kode),
     kontak_inligting: sigbaar,
     kennisgewings: inskrywing.kennisgewings || {},
+    // Die hangende bankversoek. Hierdie bouer werk VELD VIR VELD, dus kom
+    // 'n nuwe veld op die rekord nie vanself deur nie — dieselfde slaggat
+    // wat op 8 Aug die outeur se lêers laat verdwyn het.
+    //
+    // Die rekeningnommer kom VOL terug, anders as die een op rekord. Hy het
+    // dit self ingetik en moet 'n tikfout kan sien voordat Future Sharp dit
+    // oorneem; verdoeseling begin weer sodra dit deurgevoer is.
+    bank_versoek: inskrywing.bank_versoek || null,
     geskep_op: inskrywing.geskep_op || null,
   };
 }

@@ -197,7 +197,7 @@
           </div>
 
           <div class="mb-kaart">
-            <h2 class="mb-kop" data-i18n="ob_rekord_kop">Op rekord</h2>
+            <h2 class="mb-kop" data-i18n="ob_rekord_kop">Op rekord</h2><span class="mb-merk" id="mb-bank-merk" style="display:none;" data-i18n="ob_bank_merk">Verandering versoek</span>
             <p class="mb-onder" data-i18n="ob_rekord_onder">
               Wat in jou ooreenkoms staan en waarheen jou geld gaan.
             </p>
@@ -214,6 +214,76 @@
             <!-- Die sin word deur outeur-besonderhede.js geskryf, sodat die
                  e-posadres 'n skakel kan wees. data-i18n sou dit uitwis. -->
             <p class="mb-vas-nota" id="mb-vas-nota"></p>
+
+            <!-- Drie toestande, style.display eerder as hidden: 'n klas wat
+                 display stel, klop die blaaier se [hidden]-verstek. -->
+            <div id="mb-bank-rus">
+              <div class="mb-knop-ry">
+                <button type="button" class="mb-knop mb-sag" id="mb-bank-open" data-i18n="ob_bank_versoek_knoppie">Versoek 'n verandering van bankbesonderhede</button>
+              </div>
+            </div>
+
+            <div class="mb-vorm" id="mb-bank-vorm" style="display:none;">
+              <h3 class="mb-vorm-kop" data-i18n="ob_bank_vorm_kop">Nuwe bankbesonderhede</h3>
+              <p class="mb-onder" data-i18n="ob_bank_vorm_onder">
+                Future Sharp verander dit by die betaaldiens en werk dan hierdie bladsy by. Jou huidige besonderhede bly geld tot dit klaar is.
+              </p>
+
+              <label class="mb-veld">
+                <span data-i18n="ob_bank_houer">Rekeninghouer, soos dit by die bank staan</span>
+                <input type="text" id="mb-bank-houer" autocomplete="off" />
+                <small class="mb-wenk" data-i18n="ob_bank_houer_wenk">Verskil dit van jou naam hierbo, sê in die opmerking hoekom.</small>
+              </label>
+
+              <label class="mb-veld">
+                <span data-i18n="ob_bank">Bank</span>
+                <select id="mb-bank-keuse">
+                  <option value="" data-i18n="ob_bank_kies">Kies jou bank</option>
+                </select>
+              </label>
+
+              <label class="mb-veld">
+                <span data-i18n="ob_takkode">Takkode</span>
+                <input type="text" id="mb-bank-kode" inputmode="numeric" maxlength="6" autocomplete="off" />
+                <small class="mb-wenk" data-i18n="ob_bank_kode_wenk">Word vir jou ingevul sodra jy 'n bank kies.</small>
+                <small class="mb-fout" id="mb-bank-kode-fout" style="display:none;" data-i18n="ob_bank_kode_fout">Die takkode is ses syfers.</small>
+              </label>
+
+              <label class="mb-veld">
+                <span data-i18n="ob_rekening">Rekeningnommer</span>
+                <input type="text" id="mb-bank-rek" inputmode="numeric" maxlength="16" autocomplete="off" />
+                <small class="mb-fout" id="mb-bank-rek-fout" style="display:none;" data-i18n="ob_bank_rek_fout">Die rekeningnommer is net syfers, tussen ses en dertien.</small>
+              </label>
+
+              <label class="mb-veld">
+                <span data-i18n="ob_bank_opmerking">Opmerking (opsioneel)</span>
+                <input type="text" id="mb-bank-opmerking" maxlength="200" autocomplete="off" />
+              </label>
+
+              <div class="mb-knop-ry">
+                <button type="button" class="mb-knop" id="mb-bank-stuur" data-i18n="ob_bank_stuur" disabled>Stuur versoek</button>
+                <button type="button" class="mb-knop mb-sag" id="mb-bank-kanselleer" data-i18n="ob_bank_kanselleer">Kanselleer</button>
+              </div>
+            </div>
+
+            <div id="mb-bank-hangend" style="display:none;">
+              <div class="mb-hangend">
+                <p class="mb-hangend-kop" data-i18n="ob_bank_hangend_kop">Verandering van bankbesonderhede versoek</p>
+                <p class="mb-hangend-datum" id="mb-h-datum"></p>
+                <div class="mb-hry"><span data-i18n="ob_bank_houer_ry">Rekeninghouer</span><span id="mb-h-houer"></span></div>
+                <div class="mb-hry"><span data-i18n="ob_bank">Bank</span><span id="mb-h-bank"></span></div>
+                <div class="mb-hry"><span data-i18n="ob_takkode">Takkode</span><span id="mb-h-kode"></span></div>
+                <div class="mb-hry"><span data-i18n="ob_rekening">Rekeningnommer</span><span id="mb-h-rek"></span></div>
+              </div>
+              <p class="mb-vas-nota" data-i18n="ob_bank_hangend_nota">
+                Future Sharp hanteer dit en werk hierdie bladsy by sodra dit klaar is. Jou eersvolgende uitbetaling kan 'n dag of wat later wees terwyl die bank die nuwe rekening verifieer, en 'n uitbetaling wat reeds onderweg is, gaan nog na die ou rekening.
+              </p>
+              <div class="mb-knop-ry">
+                <button type="button" class="mb-knop mb-sag" id="mb-bank-onttrek" data-i18n="ob_bank_onttrek">Onttrek</button>
+              </div>
+            </div>
+
+            <p class="mb-boodskap" id="mb-bank-boodskap" style="display:none;" aria-live="polite"></p>
           </div>
         </section>
       </div>

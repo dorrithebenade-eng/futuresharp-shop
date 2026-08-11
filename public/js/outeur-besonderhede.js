@@ -139,6 +139,7 @@ function mb_vul(data) {
   mb_stel_uitbetaling(Boolean(data && data.uitbetaling_gereed));
 
   mb_skryf_vas_nota();
+  mb_vul_hangend(data && data.bank_versoek);
   mb_kyk_kennis();
   mb_kyk_kontak();
 }
@@ -295,6 +296,212 @@ function mb_koppel() {
 
   const kontak = mb_el("mb-stoor-kontak");
   if (kontak) kontak.addEventListener("click", () => mb_stoor("kontak"));
+
+  mb_bank_koppel();
+}
+
+
+// --- Bankbesonderhede: die versoek ---
+//
+// DIE SKERM SKRYF NIE DIE BANKVELDE NIE. Dit stuur 'n VOORSTEL. Die geld
+// volg die rekening wat binne die betaaldiens aan sy subrekening gekoppel
+// is, en dit verander 'n mens met die hand; hierdie vorm is hoe die outeur
+// dit gevra kry, nie hoe dit gebeur nie.
+//
+// Drie toestande in dieselfde kaart: rus, vorm, hangend. style.display,
+// nie hidden nie — 'n klas wat display stel, klop die blaaier se
+// [hidden]-verstek.
+
+// Elke Suid-Afrikaanse bank het EEN universele takkode, dus is dit nie 'n
+// vraag wat 'n mens hoef te vra nie. Nagegaan teen verskeie bronne, Aug
+// 2026. Banke waarvan die kode nie bevestig kon word nie, staan doelbewus
+// nie hier nie — daarvoor is "Ander", waar hy self intik.
+const MB_BANKE = [
+  ["Absa", "632005"],
+  ["African Bank", "430000"],
+  ["Bidvest Bank", "462005"],
+  ["Capitec", "470010"],
+  ["Discovery Bank", "679000"],
+  ["FNB", "250655"],
+  ["Investec", "580105"],
+  ["Nedbank", "198765"],
+  ["Standard Bank", "051001"],
+  ["TymeBank", "678910"],
+];
+
+const MB_VERSOEK_FUNKSIE = "/.netlify/functions/versoek-bankbesonderhede";
+
+function mb_wys(id, aan) {
+  const el = mb_el(id);
+  if (el) el.style.display = aan ? "" : "none";
+}
+
+function mb_toon(watter) {
+  mb_wys("mb-bank-rus", watter === "rus");
+  mb_wys("mb-bank-vorm", watter === "vorm");
+  mb_wys("mb-bank-hangend", watter === "hangend");
+  mb_wys("mb-bank-merk", watter === "hangend");
+}
+
+function mb_vul_banke() {
+  const keuse = mb_el("mb-bank-keuse");
+  if (!keuse || keuse.options.length > 1) return;
+
+  MB_BANKE.forEach(([naam, kode]) => {
+    const opsie = document.createElement("option");
+    opsie.value = naam + "|" + kode;
+    opsie.textContent = naam;
+    keuse.appendChild(opsie);
+  });
+
+  const ander = document.createElement("option");
+  ander.value = "ander|";
+  ander.textContent = mb_vertaal("ob_bank_ander", "Ander");
+  keuse.appendChild(ander);
+}
+
+function mb_bank_geldig() {
+  const houer = (mb_el("mb-bank-houer").value || "").trim();
+  const bank = mb_el("mb-bank-keuse").value;
+  const kode = (mb_el("mb-bank-kode").value || "").trim();
+  const rek = (mb_el("mb-bank-rek").value || "").replace(/[\s-]/g, "");
+  return houer.length > 1 && Boolean(bank) && /^\d{6}$/.test(kode) && /^\d{6,13}$/.test(rek);
+}
+
+function mb_bank_kyk() {
+  const kode = (mb_el("mb-bank-kode").value || "").trim();
+  const rek = (mb_el("mb-bank-rek").value || "").replace(/[\s-]/g, "");
+  mb_wys("mb-bank-kode-fout", kode.length > 0 && !/^\d{6}$/.test(kode));
+  mb_wys("mb-bank-rek-fout", rek.length > 0 && !/^\d{6,13}$/.test(rek));
+
+  const knoppie = mb_el("mb-bank-stuur");
+  if (knoppie) knoppie.disabled = !mb_bank_geldig();
+}
+
+function mb_leesbare_datum(iso) {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (isNaN(d)) return "";
+  const maande = ["Januarie", "Februarie", "Maart", "April", "Mei", "Junie",
+    "Julie", "Augustus", "September", "Oktober", "November", "Desember"];
+  return d.getDate() + " " + maande[d.getMonth()] + " " + d.getFullYear();
+}
+
+function mb_vul_hangend(versoek) {
+  if (!versoek) { mb_toon("rus"); return; }
+
+  const stel = (id, waarde) => { const el = mb_el(id); if (el) el.textContent = waarde || ""; };
+  stel("mb-h-datum", mb_leesbare_datum(versoek.versoek_op));
+  stel("mb-h-houer", versoek.houer);
+  stel("mb-h-bank", versoek.bank_naam);
+  stel("mb-h-kode", versoek.bank_tak_kode);
+  stel("mb-h-rek", versoek.bank_rekeningnommer);
+  mb_toon("hangend");
+}
+
+function mb_bank_fout(teks) {
+  const el = mb_el("mb-bank-boodskap");
+  if (!el) return;
+  el.textContent = teks || "";
+  el.style.display = teks ? "" : "none";
+}
+
+async function mb_bank_stuur(aksie) {
+  const knoppies = ["mb-bank-stuur", "mb-bank-onttrek"].map(mb_el).filter(Boolean);
+  knoppies.forEach((k) => { k.disabled = true; });
+  mb_bank_fout("");
+
+  const las = aksie === "onttrek"
+    ? { aksie: "onttrek" }
+    : {
+        aksie: "versoek",
+        houer: (mb_el("mb-bank-houer").value || "").trim(),
+        bank_naam: (mb_el("mb-bank-keuse").value || "").split("|")[0],
+        bank_tak_kode: (mb_el("mb-bank-kode").value || "").trim(),
+        bank_rekeningnommer: (mb_el("mb-bank-rek").value || "").trim(),
+        opmerking: (mb_el("mb-bank-opmerking").value || "").trim(),
+      };
+
+  try {
+    const sessie = await identiteit_kry_huidige_sessie();
+    if (!sessie || !sessie.access_token) {
+      if (typeof wys_sessie_verval === "function") {
+        wys_sessie_verval(mb_el("outeur-besonderhede-status"), "/outeur.html");
+      }
+      return;
+    }
+
+    const resp = await fetch(MB_VERSOEK_FUNKSIE, {
+      method: "POST",
+      headers: {
+        Authorization: "Bearer " + sessie.access_token,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(las),
+    });
+
+    if (resp.status === 401) {
+      if (typeof wys_sessie_verval === "function") {
+        wys_sessie_verval(mb_el("outeur-besonderhede-status"), "/outeur.html");
+      }
+      return;
+    }
+
+    if (!resp.ok) {
+      // Die bediener se rede is bruikbaar — dit se watter veld verkeerd is.
+      const rede = await resp.text();
+      mb_bank_fout(rede || mb_vertaal("ob_bank_fout", "Kon nie die versoek stuur nie"));
+      mb_bank_kyk();
+      return;
+    }
+
+    const antwoord = await resp.json();
+    if (antwoord.bank_versoek) {
+      mb_vul_hangend(antwoord.bank_versoek);
+    } else {
+      ["mb-bank-houer", "mb-bank-kode", "mb-bank-rek", "mb-bank-opmerking"]
+        .forEach((id) => { const el = mb_el(id); if (el) el.value = ""; });
+      const keuse = mb_el("mb-bank-keuse");
+      if (keuse) keuse.value = "";
+      mb_toon("rus");
+    }
+  } catch (fout) {
+    console.error("Bankversoek het misluk:", fout);
+    mb_bank_fout(mb_vertaal("fout_netwerk", "Kon nie verbind nie. Kontroleer jou verbinding en probeer weer."));
+  } finally {
+    knoppies.forEach((k) => { k.disabled = false; });
+    mb_bank_kyk();
+  }
+}
+
+function mb_bank_koppel() {
+  mb_vul_banke();
+
+  const keuse = mb_el("mb-bank-keuse");
+  if (keuse) {
+    keuse.addEventListener("change", () => {
+      const kode = (keuse.value || "").split("|")[1];
+      if (kode) mb_el("mb-bank-kode").value = kode;
+      mb_bank_kyk();
+    });
+  }
+
+  ["mb-bank-houer", "mb-bank-kode", "mb-bank-rek"].forEach((id) => {
+    const el = mb_el(id);
+    if (el) el.addEventListener("input", mb_bank_kyk);
+  });
+
+  const open = mb_el("mb-bank-open");
+  if (open) open.addEventListener("click", () => { mb_bank_fout(""); mb_toon("vorm"); });
+
+  const kanselleer = mb_el("mb-bank-kanselleer");
+  if (kanselleer) kanselleer.addEventListener("click", () => { mb_bank_fout(""); mb_toon("rus"); });
+
+  const stuur = mb_el("mb-bank-stuur");
+  if (stuur) stuur.addEventListener("click", () => mb_bank_stuur("versoek"));
+
+  const onttrek = mb_el("mb-bank-onttrek");
+  if (onttrek) onttrek.addEventListener("click", () => mb_bank_stuur("onttrek"));
 }
 
 document.addEventListener("outeur-gereed", (gebeurtenis) => {
