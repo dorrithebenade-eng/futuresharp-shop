@@ -4,14 +4,9 @@
    .oi-kaart en .outeur-bestelling, sodat die kaarte hier dieselfde lyk as
    die res van die paneel. */
 
-/* Die statusblokkie is hier byna altyd leeg — hy dra net die
-   sessie-verval-boodskap. .stelsel-boodskap gee hom 48px opvulling bo en
-   onder, en dit is 96px wit tussen die leireël en die eerste kaart.
-   Dieselfde regstelling as #outeur-status in outeur.css. */
-#outeur-besonderhede-status:empty {
-  padding: 0;
-  margin: 0;
-}
+/* Die leë statusblokkie is nie meer hier nie. Die reël het net hierdie een
+   oortjie gedek terwyl al vier dieselfde 96px wit gehad het; sy staan nou
+   in outeur.css as .outeur-afdeling .stelsel-boodskap:empty. */
 
 .mb-kaart {
   background: #fff;
@@ -51,10 +46,14 @@
   flex: 0 0 42%;
 }
 
+/* `word-break: break-word` breek middel-in 'n woord: "Labus-chagne" en
+   "dorrithe@face-to-fa-ce.co.za". `overflow-wrap: anywhere` breek by die
+   spasie waar daar een is, en val eers binne 'n woord terug wanneer die
+   woord self te lank is vir die reël. */
 .mb-ry .mb-wa {
   text-align: right;
   font-weight: 600;
-  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 /* Nie verskaf nie is nie 'n fout nie — dit tree terug sonder om weg te raak. */
@@ -198,11 +197,6 @@
 }
 .mb-vas-nota a { color: #6B5B2E; }
 
-@media (max-width: 560px) {
-  .mb-ry { font-size: 14px; }
-  .mb-ry .mb-et { flex: 0 0 44%; }
-}
-
 /* --- Die bankversoek --- */
 
 .mb-merk {
@@ -314,4 +308,42 @@
   font-size: 14px;
 }
 .mb-hry span:first-child { color: var(--grys-teks); }
-.mb-hry span:last-child { font-weight: 600; text-align: right; word-break: break-word; }
+.mb-hry span:last-child { font-weight: 600; text-align: right; overflow-wrap: anywhere; }
+
+/* --- Op 'n foon stapel die rye ---
+ *
+ * Twee kolomme in 44% / 56% laat 'n e-posadres oor drie reëls kruip terwyl
+ * die etiket langsaan alleen staan. Etiket bo, waarde onder, albei links:
+ * die waarde kry die volle breedte en die oog lees af in plaas van heen en
+ * weer. Die skeilyn tussen die rye hou hulle uit mekaar.
+ *
+ * Die blok staan heel onderaan die lêer, NA .mb-hry. 'n @media-blok voeg
+ * niks by die spesifisiteit nie, dus sou .mb-hry se display: flex hierdie
+ * een geklop het as hy hoër op gestaan het. */
+@media (max-width: 560px) {
+  .mb-ry {
+    display: block;
+    padding: 12px 0;
+    font-size: 15px;
+  }
+
+  .mb-ry .mb-et {
+    display: block;
+    flex: none;
+    font-size: 13px;
+    margin-bottom: 2px;
+  }
+
+  .mb-ry .mb-wa {
+    display: block;
+    text-align: left;
+  }
+
+  /* Die hangende bankversoek se rye is dieselfde patroon en knyp dieselfde. */
+  .mb-hry {
+    display: block;
+    padding: 8px 0;
+  }
+  .mb-hry span:first-child { display: block; font-size: 13px; }
+  .mb-hry span:last-child { display: block; text-align: left; }
+}

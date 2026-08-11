@@ -6,8 +6,15 @@
  */
 
 /* Die statusblokkie sit bo die band en moet geen ruimte neem wanneer dit
-   leeg is nie — andersins is daar 'n wit strook tussen die kop en die teal. */
-#outeur-status.outeur-status-buite:empty {
+   leeg is nie — andersins is daar 'n wit strook tussen die kop en die teal.
+
+   Dieselfde geld vir ELKE oortjie se eie blokkie: .stelsel-boodskap dra
+   48px opvulling bo en onder, en op 'n oortjie waar niks fout is nie, is
+   dit 96px wit tussen die leireël en die eerste kaart. Die reël is aan
+   .outeur-afdeling gekoppel, nie aan 'n lys id's nie, sodat 'n oortjie wat
+   later bykom dit vanself kry. */
+#outeur-status.outeur-status-buite:empty,
+.outeur-afdeling .stelsel-boodskap:empty {
   padding: 0;
   margin: 0;
 }
@@ -176,6 +183,40 @@
 @media (prefers-reduced-motion: reduce) {
   .outeur-pil { transition: none; }
   .outeur-pil:hover { transform: none; }
+}
+
+/* --- Die kieslys op 'n foon ---
+ *
+ * Die -23px-indok veronderstel EEN ry pille. Met vyf pille vou hulle op 'n
+ * smal skerm oor twee en drie rye, en dan hang die tweede ry oor die rand
+ * van die teal met die derde los daaronder. Horisontaal rol is ook nie 'n
+ * uitweg nie: die vyfde pil is dan onsigbaar en niemand weet hy is daar nie.
+ *
+ * Onder 700px begin die kieslys dus ONDER die band, as 'n rooster van twee
+ * ewe breë kolomme. Die band se onderste opvulling val weg saam met die
+ * indok, en die pille word breed genoeg om met 'n duim te druk.
+ *
+ * Hierdie blok moet NA .outeur-kieslys en .outeur-pil staan. 'n @media-blok
+ * voeg niks by die spesifisiteit nie — die laaste reël wen, en 'n blok wat
+ * voor staan, doen niks.
+ */
+@media (max-width: 700px) {
+  .outeur-band { padding-bottom: 26px; }
+
+  .outeur-kieslys {
+    margin: 0 auto;
+    padding: 18px 24px 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 9px;
+    overflow-x: visible;
+  }
+
+  .outeur-pil {
+    width: 100%;
+    justify-content: center;
+    padding: 13px 14px;
+  }
 }
 
 /* [hidden] moet display: grid klop, anders wys 'n nul in 'n koraal sirkel
