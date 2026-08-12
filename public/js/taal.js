@@ -71,6 +71,14 @@ const WOORDEBOEK = {
   uitnodiging_status_voltooi: { af: "Voltooi", en: "Completed" },
   uitnodiging_status_hangend: { af: "Hangend sedert", en: "Pending since" },
   uitnodiging_kon_nie_laai: { af: "Kon nie uitnodigings laai nie.", en: "Could not load invitations." },
+  uitnodiging_status_verstreke: { af: "Verstreke", en: "Expired" },
+  uitnodiging_verval_vandag: { af: "Verval vandag", en: "Expires today" },
+  uitnodiging_verval_more: { af: "Verval môre", en: "Expires tomorrow" },
+  uitnodiging_verval_oor: { af: "Verval oor", en: "Expires in" },
+  uitnodiging_dae: { af: "dae", en: "days" },
+  uitnodiging_skrap: { af: "Skrap", en: "Delete" },
+  uitnodiging_skrap_bevestig: { af: "Skrap hierdie uitnodiging? Die skakel werk dan nie meer nie.", en: "Delete this invitation? The link will stop working." },
+  uitnodiging_skrap_fout: { af: "Kon nie die uitnodiging skrap nie", en: "Could not delete the invitation" },
 
   // Waarskuwings-afdeling
   waarskuwing_titel: { af: "⚠️ Betaling-waarskuwings", en: "⚠️ Payment warnings" },

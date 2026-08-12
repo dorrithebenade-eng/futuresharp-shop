@@ -1,0 +1,56 @@
+/* paneel-uitnodigings.css — net die Uitnodigings-oortjie se eie reëls.
+   'n Eie lêer eerder as 'n byvoeging tot styl.css, sodat 'n verandering
+   hier niks anders in die paneelbord kan raak nie. Voorvoegsel pu- om
+   botsings te vermy. */
+
+/* Die derde toestand naas --wag en --voltooi: verstreke. Grys en nie
+   rooi nie — 'n skakel wat verval het, is die stelsel wat sy werk doen,
+   nie 'n fout nie. */
+.paneel-status-merker--verstreke {
+  background: #EDEDED;
+  color: #6B6B6B;
+}
+
+.pu-verval {
+  display: inline-block;
+  margin-left: 10px;
+  font-size: 12px;
+  color: var(--grys-teks);
+  font-family: var(--font-liggaam);
+}
+
+/* Leeg beteken weg — 'n rekord sonder 'n bruikbare datum moet nie 'n
+   spasie oophou nie. */
+.pu-verval:empty {
+  display: none;
+}
+
+.pu-skrap {
+  background: none;
+  border: 1px solid #D8D6D1;
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--grys-teks);
+  cursor: pointer;
+  font-family: var(--font-liggaam);
+  flex: 0 0 auto;
+}
+
+.pu-skrap:hover {
+  border-color: var(--koraal);
+  color: var(--koraal);
+}
+
+.pu-skrap:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+@media (max-width: 700px) {
+  .pu-verval {
+    display: block;
+    margin: 4px 0 0;
+  }
+}

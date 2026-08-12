@@ -4,6 +4,7 @@
 
 const { kry_store } = require("./_blob-store");
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
+const { verval_op_van, is_verval } = require("./_uitnodiging-geldig");
 
 exports.handler = async (event, context) => {
   if (event.httpMethod !== "GET") {
@@ -18,9 +19,26 @@ exports.handler = async (event, context) => {
   const store = kry_store("uitnodigings");
   const { blobs } = await store.list();
 
-  const uitnodigings = await Promise.all(
+  const rou = await Promise.all(
     blobs.map((b) => store.get(b.key, { type: "json" }))
   );
+
+  const nou = new Date();
+
+  // filter(Boolean) is nie oorversigtigheid nie: list() is eventueel
+  // konsekwent, dus kan 'n pas geskrapte sleutel nog gelys word terwyl
+  // get() reeds null gee. Sonder die filter val die sort op null om.
+  //
+  // verval_op en is_verval word HIER opgelos, nie op die skerm nie —
+  // dan bly die tydperk 'n bedienerbesluit en die skerm hoef dit nie
+  // te ken nie.
+  const uitnodigings = rou
+    .filter(Boolean)
+    .map((u) => ({
+      ...u,
+      verval_op: verval_op_van(u),
+      is_verval: is_verval(u, nou),
+    }));
 
   uitnodigings.sort((a, b) => new Date(b.geskep_op) - new Date(a.geskep_op));
 

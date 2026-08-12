@@ -83,6 +83,13 @@ const ROL_VELDE = {
 // dus 'n wagwoord kies. Ander rolle sien geen wagwoord-velde nie.
 const ROLLE_MET_REKENING = ["outeur", "vennoot"];
 
+// Slegs die outeur teken 'n Outeursooreenkoms. Die dokument word vooraf
+// per e-pos gestuur en is doelbewus NIE hier as skakel nie — die .docx'e
+// leef nie op die werf nie, en 'n skakel na iets wat nie bestaan nie, is
+// erger as geen skakel. Die merkblokkie bevestig wat hy reeds ontvang
+// het; hy is nie 'n handtekening nie.
+const ROLLE_MET_OOREENKOMS = ["outeur"];
+
 function kry_token_uit_url() {
   const params = new URLSearchParams(window.location.search);
   return (params.get("token") || "").trim();
@@ -113,6 +120,20 @@ function bou_velde(rol_tipe) {
     )
     .join("");
 
+  // Ná die bankvelde en VOOR die wagwoord: dit is die laaste ding wat hy
+  // bevestig oor die ooreenkoms self, voordat die vorm oorgaan na sy
+  // winkelrekening.
+  const ooreenkomsHtml = ROLLE_MET_OOREENKOMS.includes(rol_tipe)
+    ? `
+        <div class="uitn-ooreenkoms">
+          <label class="uitn-merk-etiket" for="uitn-ooreenkoms">
+            <input type="checkbox" id="uitn-ooreenkoms" class="uitn-merkblokkie" required>
+            <span>Ek het die Outeursooreenkoms van Future Sharp ontvang en gelees, en ek aanvaar die inhoud daarvan.</span>
+          </label>
+        </div>
+      `
+    : "";
+
   const rekeningHtml = ROLLE_MET_REKENING.includes(rol_tipe)
     ? `
         <div class="uitn-rekening-afdeling">
@@ -138,7 +159,7 @@ function bou_velde(rol_tipe) {
       `
     : "";
 
-  wrap.innerHTML = veldeHtml + rekeningHtml;
+  wrap.innerHTML = veldeHtml + ooreenkomsHtml + rekeningHtml;
 }
 
 function kry_kontak_inligting_uit_vorm(rol_tipe) {
@@ -158,6 +179,17 @@ async function hanteer_indiening(gebeurtenis, token, rol_tipe) {
 
   const naam = document.getElementById("uitn-naam").value.trim();
   const knoppie = document.getElementById("uitnodiging-indien-knoppie");
+
+  const vereis_ooreenkoms = ROLLE_MET_OOREENKOMS.includes(rol_tipe);
+  const ooreenkoms_aanvaar = vereis_ooreenkoms
+    ? document.getElementById("uitn-ooreenkoms").checked
+    : false;
+
+  if (vereis_ooreenkoms && !ooreenkoms_aanvaar) {
+    foutWrap.textContent = "Bevestig asseblief dat jy die Outeursooreenkoms ontvang en gelees het.";
+    foutWrap.style.display = "block";
+    return;
+  }
 
   let wagwoord = "";
   if (ROLLE_MET_REKENING.includes(rol_tipe)) {
@@ -187,6 +219,7 @@ async function hanteer_indiening(gebeurtenis, token, rol_tipe) {
         token,
         naam,
         wagwoord,
+        ooreenkoms_aanvaar,
         kontak_inligting: kry_kontak_inligting_uit_vorm(rol_tipe),
       }),
     });
@@ -205,9 +238,17 @@ async function hanteer_indiening(gebeurtenis, token, rol_tipe) {
         "Dankie! Jou inligting is ontvang, en jou rekening is geskep — jy kan nou by die Future Shop-winkel aanmeld met jou e-pos en hierdie wagwoord.",
         false
       );
-    } else if (ROLLE_MET_REKENING.includes(rol_tipe) && !resultaat.rekening_geskep) {
+    } else if (ROLLE_MET_REKENING.includes(rol_tipe) && resultaat.rekening_bestaan_reeds) {
+      // Nie 'n fout nie, en dit moet nie so lees nie: hy het reeds 'n
+      // Future Shop-rekening en het niks van Future Sharp nodig om aan te
+      // meld nie. Die ou boodskap het hom vir niks gestuur.
       wys_status(
-        "Dankie! Jou inligting is ontvang. Die winkel-rekening kon egter nie outomaties geskep word nie (moontlik bestaan daardie e-posadres reeds) — kontak Future Sharp as jy nie kan aanmeld nie.",
+        "Dankie! Jou inligting is ontvang. Jy het reeds 'n Future Shop-rekening met hierdie e-posadres — meld daarmee aan, met jou bestaande wagwoord. Die wagwoord wat jy hier gekies het, is nie gebruik nie.",
+        false
+      );
+    } else if (ROLLE_MET_REKENING.includes(rol_tipe)) {
+      wys_status(
+        "Dankie! Jou inligting is ontvang. Die winkel-rekening kon egter nie outomaties geskep word nie — kontak Future Sharp as jy nie kan aanmeld nie.",
         false
       );
     } else {
@@ -234,6 +275,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   try {
     const resp = await fetch(`/.netlify/functions/kry-uitnodiging?token=${encodeURIComponent(token)}`);
+
+    // 410 is nie 404 nie: die skakel WAS geldig. "Nie geldig nie" laat
+    // iemand dink hy het die adres verkeerd oorgetik en dit weer probeer.
+    if (resp.status === 410) {
+      wys_status("Hierdie skakel het verval. Kontak Future Sharp vir 'n nuwe een.", true);
+      return;
+    }
+
     if (!resp.ok) {
       wys_status("Hierdie skakel is nie geldig nie. Kontak Future Sharp vir 'n nuwe skakel.", true);
       return;

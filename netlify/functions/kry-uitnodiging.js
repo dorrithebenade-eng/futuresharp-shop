@@ -4,6 +4,7 @@
 // besonderhede soos wie dit geskep het nie.
 
 const { kry_store } = require("./_blob-store");
+const { is_verval } = require("./_uitnodiging-geldig");
 
 exports.handler = async (event) => {
   if (event.httpMethod !== "GET") {
@@ -20,6 +21,13 @@ exports.handler = async (event) => {
 
   if (!uitnodiging) {
     return { statusCode: 404, body: "Hierdie skakel is nie geldig nie" };
+  }
+
+  // 410 en nie 404 nie: die skakel WAS geldig en het verval. Die bladsy
+  // sê dit dan so, want "nie geldig nie" laat iemand dink hy het die
+  // adres verkeerd oorgetik.
+  if (is_verval(uitnodiging)) {
+    return { statusCode: 410, body: "Hierdie skakel het verval" };
   }
 
   return {

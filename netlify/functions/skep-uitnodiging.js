@@ -9,6 +9,7 @@
 const crypto = require("crypto");
 const { kry_store } = require("./_blob-store");
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
+const { nuwe_verval_op } = require("./_uitnodiging-geldig");
 
 const GELDIGE_ROLLE = ["outeur", "vennoot", "ontwerp_admin", "printing", "aflewering"];
 
@@ -36,11 +37,17 @@ exports.handler = async (event, context) => {
 
   const token = crypto.randomBytes(24).toString("hex");
 
+  const geskep_op = new Date().toISOString();
+
   const uitnodiging = {
     token,
     rol_tipe,
     status: "hangend", // hangend | voltooi
-    geskep_op: new Date().toISOString(),
+    geskep_op,
+    // Die skakel se eie einde, op die rekord geskryf en nie afgelei nie —
+    // sodat 'n latere verandering aan die tydperk nie 'n reeds gestuurde
+    // skakel onder iemand se voete uittrek nie.
+    verval_op: nuwe_verval_op(geskep_op),
     geskep_deur: gebruiker.email,
     voltooi_op: null,
     geskepte_entiteit_id: null,
