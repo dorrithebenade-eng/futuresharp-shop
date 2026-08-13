@@ -344,14 +344,15 @@ function wys_outeurs_lys(outeurs) {
   });
 }
 
-const OUTEUR_KONTAK_VELDE = ["epos", "selfoon", "id-nommer", "adres", "bank-naam", "bank-rekeningnommer", "bank-tak-kode"];
+const OUTEUR_KONTAK_VELDE = ["epos", "selfoon", "id-nommer", "adres", "bank-rekeninghouer", "bank-naam", "bank-rekeningnommer", "bank-tak-kode", "bank-tipe"];
 // Bediener-kant KONTAK_VELDE gebruik onderstrepe (id_nommer, bank_naam, ens.);
 // HTML-veld-ID's hierbo gebruik koppeltekens (foutbestande CSS-konvensie in
 // hierdie kodebasis) — hierdie kaart versoen die twee.
 const OUTEUR_KONTAK_VELD_SLEUTELS = {
   "epos": "epos", "selfoon": "selfoon", "id-nommer": "id_nommer",
-  "adres": "adres", "bank-naam": "bank_naam",
-  "bank-rekeningnommer": "bank_rekeningnommer", "bank-tak-kode": "bank_tak_kode",
+  "adres": "adres", "bank-rekeninghouer": "bank_rekeninghouer",
+  "bank-naam": "bank_naam", "bank-rekeningnommer": "bank_rekeningnommer",
+  "bank-tak-kode": "bank_tak_kode", "bank-tipe": "bank_tipe",
 };
 
 function open_outeur_vorm(outeur) {

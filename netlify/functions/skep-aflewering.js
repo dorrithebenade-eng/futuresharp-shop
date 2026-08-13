@@ -26,9 +26,14 @@ function maak_slug(teks) {
 // ekstra velde ongesanitiseerd gestoor word. Nie elke rol gebruik elke
 // veld nie (bv. net Outeurs gebruik id_nommer) — onbetrokke velde bly
 // eenvoudig leeg/afwesig.
+// bank_rekeninghouer en bank_tipe: Paystack vereis dat die rekeninghouer se
+// naam met die bankrekening klop, en daardie naam is nie noodwendig die
+// persoon se eie naam nie. Hierdie lys filter VELD VIR VELD — 'n veld wat
+// nie hier staan nie, val stil weg by die stoor.
 const KONTAK_VELDE = [
   "epos", "selfoon", "adres",
-  "bank_naam", "bank_rekeningnommer", "bank_tak_kode",
+  "bank_rekeninghouer", "bank_naam", "bank_rekeningnommer",
+  "bank_tak_kode", "bank_tipe",
   "id_nommer", "btw_nommer", "dekkingsarea",
 ];
 

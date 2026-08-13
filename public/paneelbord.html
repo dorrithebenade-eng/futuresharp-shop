@@ -240,14 +240,23 @@
             <label class="veld-etiket" for="outeur-vorm-adres"><span>Adres</span> <span class="veld-opsioneel">(opsioneel)</span></label>
             <input type="text" id="outeur-vorm-adres" class="veld-invoer">
 
+            <label class="veld-etiket" for="outeur-vorm-bank-rekeninghouer"><span>Rekeninghouer</span> <span class="veld-opsioneel">(opsioneel)</span></label>
+            <input type="text" id="outeur-vorm-bank-rekeninghouer" class="veld-invoer">
             <label class="veld-etiket" for="outeur-vorm-bank-naam"><span>Bank</span> <span class="veld-opsioneel">(opsioneel)</span></label>
             <input type="text" id="outeur-vorm-bank-naam" class="veld-invoer">
 
             <label class="veld-etiket" for="outeur-vorm-bank-rekeningnommer"><span>Rekeningnommer</span> <span class="veld-opsioneel">(opsioneel)</span></label>
             <input type="text" id="outeur-vorm-bank-rekeningnommer" class="veld-invoer">
 
-            <label class="veld-etiket" for="outeur-vorm-bank-tak-kode"><span>Tak-kode</span> <span class="veld-opsioneel">(opsioneel)</span></label>
+            <label class="veld-etiket" for="outeur-vorm-bank-tak-kode"><span>Taknommer</span> <span class="veld-opsioneel">(opsioneel)</span></label>
             <input type="text" id="outeur-vorm-bank-tak-kode" class="veld-invoer">
+            <label class="veld-etiket" for="outeur-vorm-bank-tipe"><span>Rekeningtipe</span> <span class="veld-opsioneel">(opsioneel)</span></label>
+            <select id="outeur-vorm-bank-tipe" class="veld-invoer">
+              <option value="">Kies …</option>
+              <option value="Tjekrekening">Tjekrekening</option>
+              <option value="Spaarrekening">Spaarrekening</option>
+              <option value="Transmissierekening">Transmissierekening</option>
+            </select>
 
             <div id="paneel-outeur-vorm-foute" class="vb-foute" style="display:none;"></div>
 
@@ -280,12 +289,21 @@
             <input type="email" id="vennote-vorm-epos" class="veld-invoer">
             <label class="veld-etiket" for="vennote-vorm-selfoon"><span>Selfoonnommer</span> <span class="veld-opsioneel">(opsioneel)</span></label>
             <input type="tel" id="vennote-vorm-selfoon" class="veld-invoer">
+            <label class="veld-etiket" for="vennote-vorm-bank_rekeninghouer"><span>Rekeninghouer</span> <span class="veld-opsioneel">(opsioneel)</span></label>
+            <input type="text" id="vennote-vorm-bank_rekeninghouer" class="veld-invoer">
             <label class="veld-etiket" for="vennote-vorm-bank_naam"><span>Bank</span> <span class="veld-opsioneel">(opsioneel)</span></label>
             <input type="text" id="vennote-vorm-bank_naam" class="veld-invoer">
             <label class="veld-etiket" for="vennote-vorm-bank_rekeningnommer"><span>Rekeningnommer</span> <span class="veld-opsioneel">(opsioneel)</span></label>
             <input type="text" id="vennote-vorm-bank_rekeningnommer" class="veld-invoer">
-            <label class="veld-etiket" for="vennote-vorm-bank_tak_kode"><span>Tak-kode</span> <span class="veld-opsioneel">(opsioneel)</span></label>
+            <label class="veld-etiket" for="vennote-vorm-bank_tak_kode"><span>Taknommer</span> <span class="veld-opsioneel">(opsioneel)</span></label>
             <input type="text" id="vennote-vorm-bank_tak_kode" class="veld-invoer">
+            <label class="veld-etiket" for="vennote-vorm-bank_tipe"><span>Rekeningtipe</span> <span class="veld-opsioneel">(opsioneel)</span></label>
+            <select id="vennote-vorm-bank_tipe" class="veld-invoer">
+              <option value="">Kies …</option>
+              <option value="Tjekrekening">Tjekrekening</option>
+              <option value="Spaarrekening">Spaarrekening</option>
+              <option value="Transmissierekening">Transmissierekening</option>
+            </select>
             <label class="veld-etiket" for="vennote-vorm-btw_nommer"><span>BTW-nommer</span> <span class="veld-opsioneel">(opsioneel)</span></label>
             <input type="text" id="vennote-vorm-btw_nommer" class="veld-invoer">
             <div id="paneel-vennote-vorm-foute" class="vb-foute" style="display:none;"></div>
@@ -319,12 +337,21 @@
             <input type="email" id="ontwerp-admin-vorm-epos" class="veld-invoer">
             <label class="veld-etiket" for="ontwerp-admin-vorm-selfoon"><span>Selfoonnommer</span> <span class="veld-opsioneel">(opsioneel)</span></label>
             <input type="tel" id="ontwerp-admin-vorm-selfoon" class="veld-invoer">
+            <label class="veld-etiket" for="ontwerp-admin-vorm-bank_rekeninghouer"><span>Rekeninghouer</span> <span class="veld-opsioneel">(opsioneel)</span></label>
+            <input type="text" id="ontwerp-admin-vorm-bank_rekeninghouer" class="veld-invoer">
             <label class="veld-etiket" for="ontwerp-admin-vorm-bank_naam"><span>Bank</span> <span class="veld-opsioneel">(opsioneel)</span></label>
             <input type="text" id="ontwerp-admin-vorm-bank_naam" class="veld-invoer">
             <label class="veld-etiket" for="ontwerp-admin-vorm-bank_rekeningnommer"><span>Rekeningnommer</span> <span class="veld-opsioneel">(opsioneel)</span></label>
             <input type="text" id="ontwerp-admin-vorm-bank_rekeningnommer" class="veld-invoer">
-            <label class="veld-etiket" for="ontwerp-admin-vorm-bank_tak_kode"><span>Tak-kode</span> <span class="veld-opsioneel">(opsioneel)</span></label>
+            <label class="veld-etiket" for="ontwerp-admin-vorm-bank_tak_kode"><span>Taknommer</span> <span class="veld-opsioneel">(opsioneel)</span></label>
             <input type="text" id="ontwerp-admin-vorm-bank_tak_kode" class="veld-invoer">
+            <label class="veld-etiket" for="ontwerp-admin-vorm-bank_tipe"><span>Rekeningtipe</span> <span class="veld-opsioneel">(opsioneel)</span></label>
+            <select id="ontwerp-admin-vorm-bank_tipe" class="veld-invoer">
+              <option value="">Kies …</option>
+              <option value="Tjekrekening">Tjekrekening</option>
+              <option value="Spaarrekening">Spaarrekening</option>
+              <option value="Transmissierekening">Transmissierekening</option>
+            </select>
             <div id="paneel-ontwerp-admin-vorm-foute" class="vb-foute" style="display:none;"></div>
 
             <button type="submit" id="paneel-ontwerp-admin-vorm-indien" class="kaart-aksie paneel-vorm-indien">+ Voeg by</button>
@@ -356,12 +383,21 @@
             <input type="email" id="printing-vorm-epos" class="veld-invoer">
             <label class="veld-etiket" for="printing-vorm-selfoon"><span>Selfoonnommer</span> <span class="veld-opsioneel">(opsioneel)</span></label>
             <input type="tel" id="printing-vorm-selfoon" class="veld-invoer">
+            <label class="veld-etiket" for="printing-vorm-bank_rekeninghouer"><span>Rekeninghouer</span> <span class="veld-opsioneel">(opsioneel)</span></label>
+            <input type="text" id="printing-vorm-bank_rekeninghouer" class="veld-invoer">
             <label class="veld-etiket" for="printing-vorm-bank_naam"><span>Bank</span> <span class="veld-opsioneel">(opsioneel)</span></label>
             <input type="text" id="printing-vorm-bank_naam" class="veld-invoer">
             <label class="veld-etiket" for="printing-vorm-bank_rekeningnommer"><span>Rekeningnommer</span> <span class="veld-opsioneel">(opsioneel)</span></label>
             <input type="text" id="printing-vorm-bank_rekeningnommer" class="veld-invoer">
-            <label class="veld-etiket" for="printing-vorm-bank_tak_kode"><span>Tak-kode</span> <span class="veld-opsioneel">(opsioneel)</span></label>
+            <label class="veld-etiket" for="printing-vorm-bank_tak_kode"><span>Taknommer</span> <span class="veld-opsioneel">(opsioneel)</span></label>
             <input type="text" id="printing-vorm-bank_tak_kode" class="veld-invoer">
+            <label class="veld-etiket" for="printing-vorm-bank_tipe"><span>Rekeningtipe</span> <span class="veld-opsioneel">(opsioneel)</span></label>
+            <select id="printing-vorm-bank_tipe" class="veld-invoer">
+              <option value="">Kies …</option>
+              <option value="Tjekrekening">Tjekrekening</option>
+              <option value="Spaarrekening">Spaarrekening</option>
+              <option value="Transmissierekening">Transmissierekening</option>
+            </select>
             <div id="paneel-printing-vorm-foute" class="vb-foute" style="display:none;"></div>
 
             <button type="submit" id="paneel-printing-vorm-indien" class="kaart-aksie paneel-vorm-indien">+ Voeg by</button>
@@ -395,12 +431,21 @@
             <input type="tel" id="aflewering-vorm-selfoon" class="veld-invoer">
             <label class="veld-etiket" for="aflewering-vorm-dekkingsarea"><span>Dekkingsarea</span> <span class="veld-opsioneel">(opsioneel)</span></label>
             <input type="text" id="aflewering-vorm-dekkingsarea" class="veld-invoer">
+            <label class="veld-etiket" for="aflewering-vorm-bank_rekeninghouer"><span>Rekeninghouer</span> <span class="veld-opsioneel">(opsioneel)</span></label>
+            <input type="text" id="aflewering-vorm-bank_rekeninghouer" class="veld-invoer">
             <label class="veld-etiket" for="aflewering-vorm-bank_naam"><span>Bank</span> <span class="veld-opsioneel">(opsioneel)</span></label>
             <input type="text" id="aflewering-vorm-bank_naam" class="veld-invoer">
             <label class="veld-etiket" for="aflewering-vorm-bank_rekeningnommer"><span>Rekeningnommer</span> <span class="veld-opsioneel">(opsioneel)</span></label>
             <input type="text" id="aflewering-vorm-bank_rekeningnommer" class="veld-invoer">
-            <label class="veld-etiket" for="aflewering-vorm-bank_tak_kode"><span>Tak-kode</span> <span class="veld-opsioneel">(opsioneel)</span></label>
+            <label class="veld-etiket" for="aflewering-vorm-bank_tak_kode"><span>Taknommer</span> <span class="veld-opsioneel">(opsioneel)</span></label>
             <input type="text" id="aflewering-vorm-bank_tak_kode" class="veld-invoer">
+            <label class="veld-etiket" for="aflewering-vorm-bank_tipe"><span>Rekeningtipe</span> <span class="veld-opsioneel">(opsioneel)</span></label>
+            <select id="aflewering-vorm-bank_tipe" class="veld-invoer">
+              <option value="">Kies …</option>
+              <option value="Tjekrekening">Tjekrekening</option>
+              <option value="Spaarrekening">Spaarrekening</option>
+              <option value="Transmissierekening">Transmissierekening</option>
+            </select>
             <div id="paneel-aflewering-vorm-foute" class="vb-foute" style="display:none;"></div>
 
             <button type="submit" id="paneel-aflewering-vorm-indien" class="kaart-aksie paneel-vorm-indien">+ Voeg by</button>

@@ -6,9 +6,14 @@
 const { kry_store } = require("./_blob-store");
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 
+// bank_rekeninghouer en bank_tipe: Paystack vereis dat die rekeninghouer se
+// naam met die bankrekening klop, en daardie naam is nie noodwendig die
+// persoon se eie naam nie. Hierdie lys filter VELD VIR VELD — 'n veld wat
+// nie hier staan nie, val stil weg by die stoor.
 const KONTAK_VELDE = [
   "epos", "selfoon", "adres",
-  "bank_naam", "bank_rekeningnommer", "bank_tak_kode",
+  "bank_rekeninghouer", "bank_naam", "bank_rekeningnommer",
+  "bank_tak_kode", "bank_tipe",
   "id_nommer", "btw_nommer", "dekkingsarea",
 ];
 

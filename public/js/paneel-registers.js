@@ -7,6 +7,19 @@
 // paneelbord.js, wat eerste laai. Apart gehou sodat paneelbord.js se
 // bestaande logika nie geraak word nie.
 
+// Dieselfde vyf bankvelde as die uitnodigingsvorm se BANK_VELDE, en om
+// dieselfde rede: Paystack vereis dat die REKENINGHOUER se naam klop, en
+// daardie naam is nie noodwendig die persoon se eie naam nie. Verskil
+// hierdie lys van die vorm s'n, kan 'n veld ingevul word wat nooit weer
+// wysigbaar is nie.
+const BANK_KONTAK_VELDE = [
+  "bank_rekeninghouer",
+  "bank_naam",
+  "bank_rekeningnommer",
+  "bank_tak_kode",
+  "bank_tipe",
+];
+
 const PANEEL_REGISTERS = [
   {
     sleutel: "vennote",
@@ -22,7 +35,7 @@ const PANEEL_REGISTERS = [
     fout_teks: "Kon nie vennote laai nie.",
     knoppie_teks: "+ Voeg vennoot by",
     het_verslag: true,
-    kontak_velde: ["epos", "selfoon", "bank_naam", "bank_rekeningnommer", "bank_tak_kode", "btw_nommer"],
+    kontak_velde: ["epos", "selfoon", "btw_nommer", ...BANK_KONTAK_VELDE],
   },
   {
     sleutel: "ontwerp-admin",
@@ -37,7 +50,7 @@ const PANEEL_REGISTERS = [
     leeg_teks: "Nog geen inskrywings bygevoeg nie.",
     fout_teks: "Kon nie laai nie.",
     knoppie_teks: "+ Voeg by",
-    kontak_velde: ["epos", "selfoon", "bank_naam", "bank_rekeningnommer", "bank_tak_kode"],
+    kontak_velde: ["epos", "selfoon", ...BANK_KONTAK_VELDE],
   },
   {
     sleutel: "printing",
@@ -52,7 +65,7 @@ const PANEEL_REGISTERS = [
     leeg_teks: "Nog geen inskrywings bygevoeg nie.",
     fout_teks: "Kon nie laai nie.",
     knoppie_teks: "+ Voeg by",
-    kontak_velde: ["epos", "selfoon", "bank_naam", "bank_rekeningnommer", "bank_tak_kode"],
+    kontak_velde: ["epos", "selfoon", ...BANK_KONTAK_VELDE],
   },
   {
     sleutel: "aflewering",
@@ -67,7 +80,7 @@ const PANEEL_REGISTERS = [
     leeg_teks: "Nog geen inskrywings bygevoeg nie.",
     fout_teks: "Kon nie laai nie.",
     knoppie_teks: "+ Voeg by",
-    kontak_velde: ["epos", "selfoon", "dekkingsarea", "bank_naam", "bank_rekeningnommer", "bank_tak_kode"],
+    kontak_velde: ["epos", "selfoon", "dekkingsarea", ...BANK_KONTAK_VELDE],
   },
 ];
 
