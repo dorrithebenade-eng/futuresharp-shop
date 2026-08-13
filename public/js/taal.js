@@ -85,6 +85,24 @@ const WOORDEBOEK = {
   ods_gekopieer: { af: "Gekopieer", en: "Copied" },
   ods_kon_nie: { af: "Kon nie kopieer nie", en: "Could not copy" },
 
+  // --- Die ooreenkoms-blok in die outeursvorm (paneel-ooreenkoms.js) ---
+  po_kop: { af: "Ooreenkoms en dokumente", en: "Agreement and documents" },
+  po_merk_wag: { af: "Wag vir bevestiging", en: "Awaiting confirmation" },
+  po_merk_klaar: { af: "Bevestig", en: "Confirmed" },
+  po_onderteken_deur: { af: "Onderteken deur", en: "Signed by" },
+  po_op: { af: "Op", en: "On" },
+  po_weergawe: { af: "Weergawe", en: "Version" },
+  po_bevestig_deur: { af: "Bevestig deur", en: "Confirmed by" },
+  po_bankbrief: { af: "Bankbrief", en: "Bank letter" },
+  po_idafskrif: { af: "ID-afskrif", en: "ID copy" },
+  po_bevestig_lei: { af: "Bevestig die registrasie sodra die uitbetalingsrekening opgestel is. Dit is Future Sharp se ondertekening ingevolge klousule 14, en dit kan nie ongedaan gemaak word nie.", en: "Confirm the registration once the payout account has been set up. This is Future Sharp's signature in terms of clause 14, and it cannot be undone." },
+  po_bevestig_knoppie: { af: "Bevestig registrasie", en: "Confirm registration" },
+  po_bevestig_vra: { af: "Bevestig hierdie registrasie? Dit teken Future Sharp se aanvaarding van die ooreenkoms aan en kan nie ongedaan gemaak word nie.", en: "Confirm this registration? This records Future Sharp's acceptance of the agreement and cannot be undone." },
+  po_besig: { af: "Besig …", en: "Working …" },
+  po_geen: { af: "Hierdie outeur is met die hand bygevoeg en het nie deur die aansluitvorm geregistreer nie. Daar is geen ondertekende ooreenkoms of dokumente op die rekord nie.", en: "This author was added by hand and did not register through the joining form. There is no signed agreement or documents on the record." },
+  po_dok_fout: { af: "Kon nie die dokument oopmaak nie", en: "Could not open the document" },
+  po_bevestig_fout: { af: "Kon nie bevestig nie", en: "Could not confirm" },
+
   // --- Die outeur se aansluitvorm (uitnodiging-outeur.js) ---
   uo_kop_sub: { af: "Sluit aan as outeur", en: "Join as an author" },
   uo_stap1: { af: "Naam en e-pos", en: "Name and email" },

@@ -370,6 +370,10 @@ function open_outeur_vorm(outeur) {
   document.getElementById("paneel-outeur-vorm-indien").textContent = outeur
     ? "Stoor wysigings"
     : t("paneel_voeg_outeur_by_knoppie");
+  // Die ooreenkoms-blok leef in paneel-ooreenkoms.js. Hy kry die volle
+  // rekord, want die handtekening en die dokumente sit daarop.
+  if (typeof window.po_wys === "function") window.po_wys(outeur);
+
   document.getElementById("paneel-outeur-vorm-afdeling").style.display = "block";
   document.getElementById("paneel-outeur-vorm-afdeling").scrollIntoView({ behavior: "smooth" });
 }

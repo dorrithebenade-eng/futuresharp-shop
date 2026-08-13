@@ -1,0 +1,117 @@
+/* paneel-ooreenkoms.css — die "Ooreenkoms en dokumente"-blok bo-aan die
+   outeursvorm. 'n Eie lêer sodat 'n verandering hier niks aan die res van
+   die paneelbord kan doen nie. Voorvoegsel po- om botsings te vermy. */
+
+.po-blok {
+  border: 1px solid #D8D6D1;
+  border-radius: 12px;
+  margin: 0 0 26px;
+  overflow: hidden;
+}
+
+.po-kop {
+  background: var(--grys-lig);
+  padding: 13px 18px;
+  font-family: var(--font-opskrif);
+  font-size: 14px;
+  font-weight: 700;
+  border-bottom: 1px solid #E4E2DE;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.po-lyf { padding: 18px; }
+
+.po-ry {
+  display: flex;
+  gap: 14px;
+  font-size: 14px;
+  line-height: 1.6;
+  padding: 3px 0;
+}
+.po-ry span:first-child { color: var(--grys-teks); flex: 0 0 128px; }
+.po-ry span:last-child { font-weight: 500; }
+
+/* Die getikte naam wys in 'n handtekeningletter — dit is wat geteken het,
+   nie 'n gewone veld nie. */
+.po-handtekening {
+  font-family: 'Segoe Script', 'Bradley Hand', cursive;
+  font-size: 19px;
+}
+
+.po-merk {
+  display: inline-block;
+  padding: 3px 11px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: var(--font-opskrif);
+}
+.po-merk--wag { background: #FCF3DA; color: #6B5411; }
+.po-merk--klaar { background: #E3F5F1; color: var(--teal); }
+
+.po-dokumente {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #EFEDE9;
+}
+
+.po-dok {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  background: var(--wit);
+  border: 1px solid #D8D6D1;
+  border-radius: 9px;
+  padding: 10px 15px;
+  font-size: 14px;
+  cursor: pointer;
+  font-family: var(--font-liggaam);
+  color: var(--swart);
+}
+.po-dok:hover { border-color: var(--teal-helder); }
+.po-dok:disabled { opacity: .5; cursor: default; }
+.po-dok-naam { color: var(--grys-teks); font-size: 12px; }
+
+.po-bevestig {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid #EFEDE9;
+}
+.po-bevestig-lei {
+  font-size: 13px;
+  color: var(--grys-teks);
+  line-height: 1.5;
+  margin: 0 0 12px;
+}
+
+.po-knoppie {
+  background: var(--koraal);
+  color: var(--wit);
+  border: 0;
+  border-radius: 9px;
+  padding: 12px 22px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: var(--font-opskrif);
+}
+.po-knoppie:disabled { opacity: .5; cursor: default; }
+
+.po-leeg {
+  font-size: 14px;
+  color: var(--grys-teks);
+  line-height: 1.55;
+  margin: 0;
+}
+
+@media (max-width: 700px) {
+  .po-ry { flex-wrap: wrap; gap: 2px; }
+  .po-ry span:first-child { flex: 1 1 100%; font-size: 12px; }
+  .po-dok { flex: 1 1 100%; }
+}

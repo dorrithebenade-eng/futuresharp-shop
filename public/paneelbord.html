@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="css/paneel-goedkeuring.css">
   <link rel="stylesheet" href="css/paneel-bankversoeke.css">
   <link rel="stylesheet" href="css/paneel-uitnodigings.css">
+  <link rel="stylesheet" href="css/paneel-ooreenkoms.css">
   <script src="js/identiteit.js"></script>
 
   <!-- PWA: Future Shop Paneelbord-app (aparte omvang, net hierdie bladsy) -->
@@ -221,6 +222,14 @@
         </div>
 
         <div id="paneel-outeur-vorm-afdeling" style="display:none;">
+          <div id="po-blok" class="po-blok" style="display:none;">
+            <div class="po-kop">
+              <span data-i18n="po_kop">Ooreenkoms en dokumente</span>
+              <span id="po-merk"></span>
+            </div>
+            <div class="po-lyf" id="po-lyf"></div>
+          </div>
+
           <form id="paneel-outeur-vorm">
             <label class="veld-etiket" for="outeur-vorm-naam"><span data-i18n="paneel_outeur_naam_etiket">Naam</span> <span class="veld-verplig" data-i18n="verplig">(verplig)</span></label>
             <input type="text" id="outeur-vorm-naam" class="veld-invoer" required>
@@ -1036,6 +1045,7 @@
 
   <script src="js/taal.js"></script>
   <script src="js/paneelbord.js"></script>
+  <script src="js/paneel-ooreenkoms.js"></script>
   <script src="js/paneel-registers.js"></script>
   <script src="js/dokumente.js"></script>
   <script src="js/paneel-vennoot.js"></script>
