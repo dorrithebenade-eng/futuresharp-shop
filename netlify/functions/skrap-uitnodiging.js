@@ -48,6 +48,21 @@ exports.handler = async (event, context) => {
     };
   }
 
+  // Die lêers eerste, dan die rekord. Andersom, en 'n mislukking tussenin
+  // laat 'n bankbrief en 'n ID-afskrif agter met niks wat na hulle wys
+  // nie — onvindbaar, maar steeds daar.
+  const leers = (uitnodiging.leers && typeof uitnodiging.leers === "object") ? uitnodiging.leers : {};
+  const leer_store = kry_store("uitnodiging-leers");
+  for (const soort of Object.keys(leers)) {
+    const sleutel = leers[soort] && leers[soort].sleutel;
+    if (!sleutel) continue;
+    try {
+      await leer_store.delete(sleutel);
+    } catch (fout) {
+      console.error(`Kon nie ${sleutel} skrap nie:`, fout);
+    }
+  }
+
   await store.delete(token);
 
   return {

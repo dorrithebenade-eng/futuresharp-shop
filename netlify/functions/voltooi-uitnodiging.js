@@ -39,9 +39,19 @@ const ROLLE_MET_REKENING = ["outeur", "vennoot"];
 // bestaan nie, is erger as geen merkblokkie.
 const ROLLE_MET_OOREENKOMS = ["outeur"];
 
+// Die weergawe van die ooreenkoms wat tans op die werf staan. Die BEDIENER
+// besluit dit, nie die klient nie — anders teken iemand 'n weergawe wat hy
+// self benoem het. Verander ooreenkoms-en.html, verander hierdie getal ook.
+const OOREENKOMS_WEERGAWE = "1.0";
+const OOREENKOMS_TAAL = "en";
+
+// Die twee aanhegsels wat klousule 6 vereis.
+const VEREISTE_DOKUMENTE = ["bankbrief", "idafskrif"];
+
 const KONTAK_VELDE = [
   "epos", "selfoon", "adres",
-  "bank_naam", "bank_rekeningnommer", "bank_tak_kode",
+  "bank_rekeninghouer", "bank_naam", "bank_rekeningnommer",
+  "bank_tak_kode", "bank_tipe",
   "id_nommer", "btw_nommer", "dekkingsarea",
 ];
 
@@ -168,14 +178,39 @@ exports.handler = async (event) => {
   const kontak_inligting = skoon_kontak_inligting(invoer.kontak_inligting);
   const benodig_rekening = ROLLE_MET_REKENING.includes(uitnodiging.rol_tipe);
 
-  // Die merkblokkie is nie 'n handtekening nie en gee nie voor om een te
-  // wees. Wat hy doen, is 'n datum op die rekord sit wat sê die
-  // Outeursooreenkoms was by die outeur voordat hy sy ID en bank gegee
-  // het. Afgedwing op die bediener, want 'n merkblokkie in die blaaier
-  // is 'n versoek, nie 'n vereiste nie.
+  // DIE ONDERTEKENING. Die merkblokkie alleen is nie 'n handtekening nie —
+  // wat teken, is die GETIKTE NAAM saam met die bevestiging. Die naam moet
+  // ooreenstem met die naam waarop die ooreenkoms staan; 'n handtekening
+  // wat van die party se naam verskil, teken niks.
+  //
+  // Alles hier word op die BEDIENER afgedwing. Die vorm dwing dit ook af,
+  // maar 'n vorm is 'n versoek, nie 'n slot nie.
   const vereis_ooreenkoms = ROLLE_MET_OOREENKOMS.includes(uitnodiging.rol_tipe);
-  if (vereis_ooreenkoms && invoer.ooreenkoms_aanvaar !== true) {
-    return { statusCode: 400, body: "Die Outeursooreenkoms moet bevestig word voordat die vorm ingedien kan word" };
+  const handtekening = String(invoer.handtekening || "").trim();
+
+  if (vereis_ooreenkoms) {
+    if (invoer.ooreenkoms_aanvaar !== true) {
+      return { statusCode: 400, body: "Die outeursooreenkoms moet bevestig word voordat die vorm ingedien kan word" };
+    }
+    if (!handtekening) {
+      return { statusCode: 400, body: "Die ooreenkoms moet onderteken word" };
+    }
+    if (handtekening.toLowerCase() !== naam.toLowerCase()) {
+      return { statusCode: 400, body: "Die getekende naam stem nie ooreen met die volle naam nie" };
+    }
+
+    // Klousule 6 vereis albei aanhegsels. Hulle is reeds opgelaai teen die
+    // token; hier word net nagegaan dat hulle werklik daar is.
+    const gelaai = (uitnodiging.leers && typeof uitnodiging.leers === "object") ? uitnodiging.leers : {};
+    const kort = VEREISTE_DOKUMENTE.filter((soort) => !gelaai[soort]);
+    if (kort.length) {
+      return {
+        statusCode: 400,
+        body: kort.includes("bankbrief")
+          ? "Die bankbrief is nog nie opgelaai nie"
+          : "Die afskrif van die ID of paspoort is nog nie opgelaai nie",
+      };
+    }
   }
 
   if (benodig_rekening) {
@@ -209,11 +244,39 @@ exports.handler = async (event) => {
     geskep_deur: "self-diens (uitnodiging)",
   };
 
-  // Op die INSKRYWING, nie net op die uitnodiging nie: die uitnodiging
-  // is 'n token wat mettertyd niks meer beteken nie, terwyl die
-  // outeursrekord bly. Dit is die rekord wat later 'n vraag beantwoord.
+  // Op die INSKRYWING, nie net op die uitnodiging nie: die uitnodiging is
+  // 'n token wat mettertyd niks meer beteken nie, terwyl die outeursrekord
+  // bly. Dit is die rekord wat later 'n vraag beantwoord — wie het wat
+  // geteken, wanneer, en watter weergawe was voor hom.
   if (vereis_ooreenkoms) {
-    inskrywing.ooreenkoms_aanvaar_op = new Date().toISOString();
+    inskrywing.ooreenkoms = {
+      handtekening,
+      aanvaar_op: new Date().toISOString(),
+      weergawe: OOREENKOMS_WEERGAWE,
+      taal: OOREENKOMS_TAAL,
+      // Future Sharp se kant. Dit bly leeg totdat die registrasie bevestig
+      // word — daardie oomblik IS Future Sharp se ondertekening, ingevolge
+      // klousule 14.
+      bevestig_op: null,
+      bevestig_deur: "",
+    };
+
+    // Die lêers bly waar hulle is (`uitnodiging-leers`, sleutel op die
+    // token). Die rekord dra die VERWYSING. Kopieer beteken twee plekke
+    // met dieselfde ID-afskrif, en dit is die laaste ding wat 'n mens van
+    // gevoelige data wil hê.
+    inskrywing.dokumente = {};
+    for (const soort of VEREISTE_DOKUMENTE) {
+      const leer = uitnodiging.leers[soort];
+      inskrywing.dokumente[soort] = {
+        store: "uitnodiging-leers",
+        sleutel: leer.sleutel,
+        naam: leer.naam,
+        grootte: leer.grootte,
+        inhoud_tipe: leer.inhoud_tipe,
+        op: leer.op,
+      };
+    }
   }
 
   await register_store.setJSON(entiteit_id, inskrywing);

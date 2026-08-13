@@ -300,6 +300,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("uitnodiging-subtitel").textContent =
       `Sluit aan as ${rol_etiket} — dit neem net 'n paar minute`;
 
+    // Die outeur se pad is 'n ander vorm: vier stappe met die ooreenkoms
+    // en die ondertekening daarin. Hy word oorhandig aan
+    // uitnodiging-outeur.js en niks hieronder loop vir hom nie. Vennoot,
+    // printing, aflewering en ontwerp/admin het geen ooreenkoms nie en
+    // hou hierdie enkelbladsy-vorm presies soos hy was.
+    if (data.rol_tipe === "outeur" && typeof uo_begin === "function") {
+      uo_begin(token, data);
+      return;
+    }
+
     bou_velde(data.rol_tipe);
     document.getElementById("uitnodiging-status").style.display = "none";
     document.getElementById("uitnodiging-vorm").style.display = "block";

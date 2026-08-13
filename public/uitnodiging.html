@@ -157,6 +157,7 @@
       text-align: center;
     }
   </style>
+  <link rel="stylesheet" href="css/uitnodiging-outeur.css">
 </head>
 <body>
   <header class="mini-kop">
@@ -169,7 +170,7 @@
    </div>
   </header>
 
-  <main class="uitn-raam">
+  <main id="uitn-hoof" class="uitn-raam">
     <div class="uitn-kop">
       <img src="/icons/ikoon-512.png" alt="Future Sharp" onerror="this.style.display='none'">
       <h1 id="uitnodiging-titel">Welkom by Future Sharp!</h1>
@@ -197,6 +198,185 @@
     </div>
   </main>
 
+<main id="uo-vorm" class="uitn-raam" style="display:none;">
+  <div class="uitn-kop">
+    <div class="uo-taal-wissel">
+      <button type="button" class="uo-taal-knoppie uo-taal-aktief" data-taal="af">AF</button>
+      <button type="button" class="uo-taal-knoppie" data-taal="en">EN</button>
+    </div>
+    <img src="/icons/ikoon-512.png" alt="Future Sharp" onerror="this.style.display='none'">
+      <h1>Welkom by Future Sharp!</h1>
+    <p data-i18n="uo_kop_sub"></p>
+  </div>
+
+  <div class="uitn-stappe" id="uo-stappe">
+    <div class="uitn-stap uitn-stap--aktief" data-stap="1"><div class="uitn-stap-bal">1</div><span data-i18n="uo_stap1"></span></div>
+    <div class="uitn-stap" data-stap="2"><div class="uitn-stap-bal">2</div><span data-i18n="uo_stap2"></span></div>
+    <div class="uitn-stap" data-stap="3"><div class="uitn-stap-bal">3</div><span data-i18n="uo_stap3"></span></div>
+    <div class="uitn-stap" data-stap="4"><div class="uitn-stap-bal">4</div><span data-i18n="uo_stap4"></span></div>
+  </div>
+
+  <div class="uitn-inhoud">
+    <div class="uitn-foute" id="uo-foute"></div>
+
+    <section class="uitn-bladsy uitn-bladsy--aktief" data-uo-bladsy="1">
+      <h2 class="uitn-bladsy-titel" data-i18n="uo_s1_titel"></h2>
+      <p class="uitn-bladsy-lei" data-i18n="uo_s1_lei"></p>
+      <div class="uitn-veld-groep">
+        <label class="uitn-etiket-groot" for="uo-naam"><span class="uitn-ikoon-etiket">&#128100;</span><span data-i18n="uo_f_naam"></span><span class="veld-verplig" data-i18n="uo_verplig"></span></label>
+        <input type="text" id="uo-naam" class="uitn-invoer-groot" autocomplete="name">
+        <p class="uitn-veld-hulp" data-i18n="uo_f_naam_hulp"></p>
+      </div>
+      <div class="uitn-veld-groep">
+        <label class="uitn-etiket-groot" for="uo-epos"><span class="uitn-ikoon-etiket">&#128231;</span><span data-i18n="uo_f_epos"></span><span class="veld-verplig" data-i18n="uo_verplig"></span></label>
+        <input type="email" id="uo-epos" class="uitn-invoer-groot" autocomplete="email">
+      </div>
+      <div class="uitn-knoppies">
+        <button type="button" class="uitn-knoppie-groot" data-uo-volgende data-i18n="uo_volgende"></button>
+      </div>
+    </section>
+
+    <section class="uitn-bladsy" data-uo-bladsy="2">
+      <h2 class="uitn-bladsy-titel" data-i18n="uo_s2_titel"></h2>
+      <p class="uitn-bladsy-lei" data-i18n="uo_s2_lei"></p>
+      <p class="uitn-engels-nota" data-i18n="uo_s2_engels"></p>
+
+      <div class="uitn-ooreenkoms-venster" id="uo-ooreenkoms" tabindex="0">
+
+      </div>
+
+      <p class="uitn-rol-nota" id="uo-rol-nota" data-i18n="uo_rol_nota"></p>
+
+      <div class="uitn-teken" lang="en">
+        <p class="uitn-teken-kop">Sign</p>
+        <p class="uitn-teken-lei">Type your full name exactly as you gave it in step 1.</p>
+        <input type="text" id="uo-handtekening" class="uitn-handtekening" placeholder="Your full name" autocomplete="off">
+        <div class="uitn-handtekening-lyn"><span>Signature</span><span id="uo-teken-datum"></span></div>
+        <label class="uitn-merk-etiket" for="uo-bevestig">
+          <input type="checkbox" id="uo-bevestig" class="uitn-merkblokkie">
+          <span>By typing my name above, I sign this agreement electronically and accept that it is binding on me.</span>
+        </label>
+      </div>
+
+      <div class="uitn-knoppies">
+        <button type="button" class="uitn-terug" data-uo-terug data-i18n="uo_terug"></button>
+        <button type="button" id="uo-teken-knoppie" class="uitn-knoppie-groot" data-uo-volgende data-i18n="uo_teken_gaan"></button>
+      </div>
+    </section>
+
+    <section class="uitn-bladsy" data-uo-bladsy="3">
+      <h2 class="uitn-bladsy-titel" data-i18n="uo_s3_titel"></h2>
+      <p class="uitn-bladsy-lei" data-i18n="uo_s3_lei"></p>
+
+      <p class="uitn-groep-kop" data-i18n="uo_g_kontak"></p>
+      <div class="uitn-veld-groep">
+        <label class="uitn-etiket-groot" for="uo-selfoon"><span class="uitn-ikoon-etiket">&#128241;</span><span data-i18n="uo_f_selfoon"></span><span class="veld-verplig" data-i18n="uo_verplig"></span></label>
+        <input type="tel" id="uo-selfoon" class="uitn-invoer-groot" autocomplete="tel">
+      </div>
+      <div class="uitn-veld-groep">
+        <label class="uitn-etiket-groot" for="uo-adres"><span class="uitn-ikoon-etiket">&#127968;</span><span data-i18n="uo_f_adres"></span><span class="veld-opsioneel" data-i18n="uo_opsioneel"></span></label>
+        <input type="text" id="uo-adres" class="uitn-invoer-groot" autocomplete="off">
+      </div>
+
+      <p class="uitn-groep-kop" data-i18n="uo_g_identiteit"></p>
+      <div class="uitn-veld-groep">
+        <label class="uitn-etiket-groot" for="uo-id-nommer"><span class="uitn-ikoon-etiket">&#129706;</span><span data-i18n="uo_f_id"></span><span class="veld-verplig" data-i18n="uo_verplig"></span></label>
+        <input type="text" id="uo-id-nommer" class="uitn-invoer-groot" autocomplete="off">
+      </div>
+
+      <p class="uitn-groep-kop" data-i18n="uo_g_bank"></p>
+      <div class="uitn-veld-groep">
+        <label class="uitn-etiket-groot" for="uo-rekeninghouer"><span class="uitn-ikoon-etiket">&#127974;</span><span data-i18n="uo_f_houer"></span><span class="veld-verplig" data-i18n="uo_verplig"></span></label>
+        <input type="text" id="uo-rekeninghouer" class="uitn-invoer-groot" autocomplete="off">
+        <p class="uitn-veld-hulp" data-i18n="uo_f_houer_hulp"></p>
+      </div>
+      <div class="uitn-veld-groep">
+        <label class="uitn-etiket-groot" for="uo-bank"><span class="uitn-ikoon-etiket">&#127974;</span><span data-i18n="uo_f_bank"></span><span class="veld-verplig" data-i18n="uo_verplig"></span></label>
+        <input type="text" id="uo-bank" class="uitn-invoer-groot" autocomplete="off">
+      </div>
+      <div class="uitn-veld-groep">
+        <label class="uitn-etiket-groot" for="uo-rekening"><span class="uitn-ikoon-etiket">&#127974;</span><span data-i18n="uo_f_rekening"></span><span class="veld-verplig" data-i18n="uo_verplig"></span></label>
+        <input type="text" id="uo-rekening" class="uitn-invoer-groot" autocomplete="off">
+      </div>
+      <div class="uitn-veld-groep">
+        <label class="uitn-etiket-groot" for="uo-takkode"><span class="uitn-ikoon-etiket">&#127974;</span><span data-i18n="uo_f_takkode"></span><span class="veld-verplig" data-i18n="uo_verplig"></span></label>
+        <input type="text" id="uo-takkode" class="uitn-invoer-groot" autocomplete="off">
+      </div>
+      <div class="uitn-veld-groep">
+        <label class="uitn-etiket-groot" for="uo-rekeningtipe"><span class="uitn-ikoon-etiket">&#127974;</span><span data-i18n="uo_f_tipe"></span><span class="veld-verplig" data-i18n="uo_verplig"></span></label>
+        <select id="uo-rekeningtipe" class="uitn-invoer-groot">
+          <option value="" data-i18n="uo_f_tipe_kies"></option>
+          <option value="tjek" data-i18n="uo_f_tipe_tjek"></option>
+          <option value="spaar" data-i18n="uo_f_tipe_spaar"></option>
+          <option value="transmissie" data-i18n="uo_f_tipe_trans"></option>
+        </select>
+      </div>
+
+      <p class="uitn-groep-kop" data-i18n="uo_g_dokumente"></p>
+      <div class="uitn-veld-groep">
+        <label class="uitn-etiket-groot">&#128196; <span data-i18n="uo_f_bankbrief"></span><span class="veld-verplig" data-i18n="uo_verplig"></span></label>
+        <p class="uitn-veld-hulp" style="margin:0 0 10px;" data-i18n="uo_f_bb_hulp"></p>
+        <div class="uitn-leer" data-uo-leer>
+          <input type="file" id="uo-bankbrief" accept=".pdf,.jpg,.jpeg,.png">
+          <button type="button" class="uitn-leer-knoppie" data-uo-kies="bankbrief" data-i18n="uo_kies_leer"></button>
+          <p class="uitn-leer-naam" data-uo-naam="bankbrief" data-i18n="uo_geen_leer"></p>
+        </div>
+      </div>
+      <div class="uitn-veld-groep">
+        <label class="uitn-etiket-groot">&#128196; <span data-i18n="uo_f_idafskrif"></span><span class="veld-verplig" data-i18n="uo_verplig"></span></label>
+        <p class="uitn-veld-hulp" style="margin:0 0 10px;" data-i18n="uo_f_id_hulp"></p>
+        <div class="uitn-leer" data-uo-leer>
+          <input type="file" id="uo-idafskrif" accept=".pdf,.jpg,.jpeg,.png">
+          <button type="button" class="uitn-leer-knoppie" data-uo-kies="idafskrif" data-i18n="uo_kies_leer"></button>
+          <p class="uitn-leer-naam" data-uo-naam="idafskrif" data-i18n="uo_geen_leer"></p>
+        </div>
+      </div>
+
+      <div class="uitn-knoppies">
+        <button type="button" class="uitn-terug" data-uo-terug data-i18n="uo_terug"></button>
+        <button type="button" class="uitn-knoppie-groot" data-uo-volgende data-i18n="uo_volgende"></button>
+      </div>
+    </section>
+
+    <section class="uitn-bladsy" data-uo-bladsy="4">
+      <h2 class="uitn-bladsy-titel" data-i18n="uo_s4_titel"></h2>
+      <p class="uitn-bladsy-lei" data-i18n="uo_s4_lei"></p>
+      <p class="uitn-rekening-nota"><span data-i18n="uo_s4_nota_a"></span><strong id="uo-epos-eggo"></strong><span data-i18n="uo_s4_nota_b"></span></p>
+      <div class="uitn-veld-groep">
+        <label class="uitn-etiket-groot" for="uo-wagwoord"><span class="uitn-ikoon-etiket">&#128274;</span><span data-i18n="uo_f_wagwoord"></span><span class="veld-verplig" data-i18n="uo_verplig"></span></label>
+        <input type="password" id="uo-wagwoord" class="uitn-invoer-groot" autocomplete="new-password" minlength="6">
+      </div>
+      <div class="uitn-veld-groep">
+        <label class="uitn-etiket-groot" for="uo-wagwoord2"><span class="uitn-ikoon-etiket">&#128274;</span><span data-i18n="uo_f_wagwoord2"></span><span class="veld-verplig" data-i18n="uo_verplig"></span></label>
+        <input type="password" id="uo-wagwoord2" class="uitn-invoer-groot" autocomplete="new-password" minlength="6">
+      </div>
+      <div class="uitn-knoppies">
+        <button type="button" class="uitn-terug" data-uo-terug data-i18n="uo_terug"></button>
+        <button type="button" class="uitn-knoppie-groot" id="uo-dien-in" data-i18n="uo_dien_in"></button>
+      </div>
+    </section>
+
+    <section class="uitn-bladsy" data-uo-bladsy="5">
+      <div class="uitn-klaar">
+        <div class="uitn-klaar-merk">&#10003;</div>
+        <h2><span data-i18n="uo_klaar_kop"></span><span id="uo-klaar-naam"></span></h2>
+        <p id="uo-klaar-aanmeld" data-i18n="uo_klaar_1"></p>
+        <p data-i18n="uo_klaar_2"></p>
+        <div class="uitn-opsomming">
+          <strong data-i18n="uo_op_kop"></strong><br>
+          <span data-i18n="uo_op_deur"></span><span id="uo-op-naam"></span><br>
+          <span data-i18n="uo_op_op"></span><span id="uo-op-datum"></span><br>
+          <span data-i18n="uo_op_weergawe"></span><br>
+          <span data-i18n="uo_op_data"></span>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+  <script src="js/taal.js"></script>
+  <script src="js/uitnodiging-outeur.js"></script>
   <script src="js/uitnodiging.js"></script>
+  <script src="js/wagwoord-ogie.js"></script>
 </body>
 </html>
