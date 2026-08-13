@@ -52,7 +52,7 @@
 // die bewoording word meervoud.
 //
 // PAYSTACK SE FOOI dra BTW: (2,9% + R1) x 1,15. Sonder die BTW-lyn is die
-// direkteursfooie omtrent 60c per R100 te optimisties.
+// oorblyfsel vir Future Sharp omtrent 60c per R100 te optimisties.
 //
 // Suiwer front-end-berekening, raak geen Blobs-store of Function aan nie.
 
@@ -328,7 +328,7 @@ function vr_aansig_opstel(uitslae) {
 function vr_opstel_kontrole(uitslae) {
   const slegte = uitslae.filter((u) => !u.leeg && u.direkteursRand < 0).map((u) => u.formaat.naam);
   if (slegte.length) {
-    return `<div class="vr-kontrole vr-kontrole--nee"><span>⚠</span><span><b>${slegte.join(" en ")}</b> los te min oor vir die hoofrekening — die direkteursfooie is negatief. Verhoog die prys of verlaag 'n koste-lyn.</span></div>`;
+    return `<div class="vr-kontrole vr-kontrole--nee"><span>⚠</span><span><b>${slegte.join(" en ")}</b> los te min oor vir die hoofrekening — daar bly niks vir Future Sharp oor nie. Verhoog die prys of verlaag 'n koste-lyn.</span></div>`;
   }
   const gevul = uitslae.filter((u) => !u.leeg);
   if (!gevul.length) return "";
@@ -377,7 +377,7 @@ function vr_aansig_uiteen(uitslae) {
     ${vr_strook()}`;
 }
 
-// Wys wat prys aan die direkteursfooie doen. Die verdeling bly identies by
+// Wys wat by elke prys vir Future Sharp oorbly. Die verdeling bly identies by
 // elke prys — die kromme kom heeltemal van Paystack se vaste fooi.
 function vr_strook() {
   const outeurPct = vr_outeur_pct();
@@ -394,7 +394,7 @@ function vr_strook() {
 
   return `
     <div class="vr-strook">
-      <div class="vr-strook-kop">Wat prys aan die direkteursfooie doen</div>
+      <div class="vr-strook-kop">Wat vir Future Sharp oorbly</div>
       <p class="vr-strook-lei">Dieselfde verdeling by elke prys. Die verskil kom van Paystack se vaste fooi, wat by 'n lae prys proporsioneel alles opvreet.</p>
       <div class="vr-strook-grid">
         ${VR_STROOK_PRYSE.map((P, i) => {

@@ -9,7 +9,7 @@
 // dit verander.
 //
 // DRIE SOORTE RYE WORD GESKRYF: Outeur (een per outeur), Ontwerp/Admin, en
-// Hosting as merkblokkie. Die direkteursfooie is NIE 'n verdelingsry nie —
+// Hosting as merkblokkie. Wat vir Future Sharp oorbly, is NIE 'n verdelingsry nie —
 // dit is wat in die hoofrekening oorbly nadat die outeur, Ontwerp/Admin,
 // Hosting en Paystack afgetrek is.
 //

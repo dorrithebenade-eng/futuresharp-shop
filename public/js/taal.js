@@ -512,8 +512,8 @@ const WOORDEBOEK = {
 
   paneel_verdeling_rekenaar_titel: { af: "Verdeling-rekenaar", en: "Split calculator" },
   paneel_verdeling_rekenaar_hulp: {
-    af: "Speel met die persentasies en koste om te sien watter boekprys en direkteursfooie elke scenario oplewer — vir gebruik tydens onderhandeling met outeurs.",
-    en: "Play with the percentages and costs to see what book price and director fees each scenario produces — for use when negotiating with authors.",
+    af: "Speel met die persentasies en koste om te sien watter boekprys elke scenario oplewer, en wat vir Future Sharp oorbly — vir gebruik tydens onderhandeling met outeurs.",
+    en: "Play with the percentages and costs to see what book price each scenario produces, and what remains for Future Sharp — for use when negotiating with authors.",
   },
   paneel_dokumente_titel: { af: "Dokumente", en: "Documents" },
   paneel_dokumente_hulp: {
