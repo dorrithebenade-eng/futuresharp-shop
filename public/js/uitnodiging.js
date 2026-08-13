@@ -18,9 +18,11 @@ const VELD_IKONE = {
   selfoon: "📱",
   id_nommer: "🪪",
   adres: "🏠",
+  bank_rekeninghouer: "🏦",
   bank_naam: "🏦",
   bank_rekeningnommer: "🏦",
   bank_tak_kode: "🏦",
+  bank_tipe: "🏦",
   btw_nommer: "🧾",
   dekkingsarea: "📍",
 };
@@ -37,45 +39,57 @@ function kry_autocomplete(veld_id) {
   return VELD_AUTOCOMPLETE[veld_id] || "off";
 }
 
+// Die bankvelde is vir ELKE rol dieselfde, en hulle moet dieselfde bly:
+// Paystack vereis dat die REKENINGHOUER se naam met die bankrekening klop,
+// en daardie naam is nie noodwendig die persoon se eie naam nie — 'n
+// gesamentlike rekening, 'n trust, 'n meisiesnaam. Ontbreek dit, misluk
+// die subrekening en die opstel word 'n e-posrondte.
+const BANK_VELDE = [
+  {
+    id: "bank_rekeninghouer",
+    etiket: "Rekeninghouer",
+    tipe: "text",
+    verplig: true,
+    hulp: "Presies soos dit by die bank geregistreer is. Dit hoef nie jou eie naam te wees nie.",
+  },
+  { id: "bank_naam", etiket: "Bank", tipe: "text", verplig: true },
+  { id: "bank_rekeningnommer", etiket: "Rekeningnommer", tipe: "text", verplig: true },
+  { id: "bank_tak_kode", etiket: "Taknommer", tipe: "text", verplig: true },
+  {
+    id: "bank_tipe",
+    etiket: "Rekeningtipe",
+    tipe: "select",
+    verplig: true,
+    keuses: ["Tjekrekening", "Spaarrekening", "Transmissierekening"],
+  },
+];
+
 const ROL_VELDE = {
-  outeur: [
-    { id: "epos", etiket: "E-pos", tipe: "email", verplig: true },
-    { id: "selfoon", etiket: "Selfoonnommer", tipe: "tel", verplig: true },
-    { id: "id_nommer", etiket: "ID-/Paspoortnommer", tipe: "text", verplig: true },
-    { id: "adres", etiket: "Adres", tipe: "text", verplig: false },
-    { id: "bank_naam", etiket: "Bank", tipe: "text", verplig: true },
-    { id: "bank_rekeningnommer", etiket: "Rekeningnommer", tipe: "text", verplig: true },
-    { id: "bank_tak_kode", etiket: "Tak-kode", tipe: "text", verplig: true },
-  ],
+  // GEEN outeur-inskrywing NIE. Die outeur se vorm leef in
+  // uitnodiging-outeur.js, met die ooreenkoms en die ondertekening daarin.
+  // 'n Inskrywing hier sou 'n terugvalpad wees wat hom laat registreer
+  // sonder om te teken.
   vennoot: [
     { id: "epos", etiket: "E-pos", tipe: "email", verplig: true },
     { id: "selfoon", etiket: "Selfoonnommer", tipe: "tel", verplig: true },
     { id: "btw_nommer", etiket: "BTW-nommer (indien van toepassing)", tipe: "text", verplig: false },
-    { id: "bank_naam", etiket: "Bank", tipe: "text", verplig: true },
-    { id: "bank_rekeningnommer", etiket: "Rekeningnommer", tipe: "text", verplig: true },
-    { id: "bank_tak_kode", etiket: "Tak-kode", tipe: "text", verplig: true },
+    ...BANK_VELDE,
   ],
   ontwerp_admin: [
     { id: "epos", etiket: "E-pos", tipe: "email", verplig: true },
     { id: "selfoon", etiket: "Selfoonnommer", tipe: "tel", verplig: true },
-    { id: "bank_naam", etiket: "Bank", tipe: "text", verplig: true },
-    { id: "bank_rekeningnommer", etiket: "Rekeningnommer", tipe: "text", verplig: true },
-    { id: "bank_tak_kode", etiket: "Tak-kode", tipe: "text", verplig: true },
+    ...BANK_VELDE,
   ],
   printing: [
     { id: "epos", etiket: "E-pos", tipe: "email", verplig: true },
     { id: "selfoon", etiket: "Selfoonnommer", tipe: "tel", verplig: true },
-    { id: "bank_naam", etiket: "Bank", tipe: "text", verplig: true },
-    { id: "bank_rekeningnommer", etiket: "Rekeningnommer", tipe: "text", verplig: true },
-    { id: "bank_tak_kode", etiket: "Tak-kode", tipe: "text", verplig: true },
+    ...BANK_VELDE,
   ],
   aflewering: [
     { id: "epos", etiket: "E-pos", tipe: "email", verplig: true },
     { id: "selfoon", etiket: "Selfoonnommer", tipe: "tel", verplig: true },
     { id: "dekkingsarea", etiket: "Dekkingsarea (watter stede/provinsies)", tipe: "text", verplig: true },
-    { id: "bank_naam", etiket: "Bank", tipe: "text", verplig: true },
-    { id: "bank_rekeningnommer", etiket: "Rekeningnommer", tipe: "text", verplig: true },
-    { id: "bank_tak_kode", etiket: "Tak-kode", tipe: "text", verplig: true },
+    ...BANK_VELDE,
   ],
 };
 
@@ -83,12 +97,8 @@ const ROL_VELDE = {
 // dus 'n wagwoord kies. Ander rolle sien geen wagwoord-velde nie.
 const ROLLE_MET_REKENING = ["outeur", "vennoot"];
 
-// Slegs die outeur teken 'n Outeursooreenkoms. Die dokument word vooraf
-// per e-pos gestuur en is doelbewus NIE hier as skakel nie — die .docx'e
-// leef nie op die werf nie, en 'n skakel na iets wat nie bestaan nie, is
-// erger as geen skakel. Die merkblokkie bevestig wat hy reeds ontvang
-// het; hy is nie 'n handtekening nie.
-const ROLLE_MET_OOREENKOMS = ["outeur"];
+// GEEN rol in HIERDIE vorm teken 'n ooreenkoms nie. Slegs die outeur het
+// een, en hy lees en onderteken dit in uitnodiging-outeur.js.
 
 function kry_token_uit_url() {
   const params = new URLSearchParams(window.location.search);
@@ -107,32 +117,30 @@ function bou_velde(rol_tipe) {
   const velde = ROL_VELDE[rol_tipe] || [];
 
   const veldeHtml = velde
-    .map(
-      (veld) => `
+    .map((veld) => {
+      // 'n Keuselys eerder as 'n teksveld waar die antwoorde vas is.
+      // Rekeningtipe met die hand ingetik gee "tjek", "Tjek rek", "cheque" —
+      // en Paystack verwag een van 'n vaste stel.
+      const invoer =
+        veld.tipe === "select"
+          ? `<select id="uitn-${veld.id}" class="uitn-invoer-groot" ${veld.verplig ? "required" : ""}>
+               <option value="">Kies …</option>
+               ${(veld.keuses || []).map((k) => `<option value="${k}">${k}</option>`).join("")}
+             </select>`
+          : `<input type="${veld.tipe}" id="uitn-${veld.id}" class="uitn-invoer-groot" autocomplete="${kry_autocomplete(veld.id)}" ${veld.verplig ? "required" : ""}>`;
+
+      return `
         <div class="uitn-veld-groep">
           <label class="uitn-etiket-groot" for="uitn-${veld.id}">
             <span class="uitn-ikoon-etiket">${VELD_IKONE[veld.id] || "✏️"}</span>${veld.etiket}
             ${veld.verplig ? '<span class="veld-verplig">(verplig)</span>' : '<span class="veld-opsioneel">(opsioneel)</span>'}
           </label>
-          <input type="${veld.tipe}" id="uitn-${veld.id}" class="uitn-invoer-groot" autocomplete="${kry_autocomplete(veld.id)}" ${veld.verplig ? "required" : ""}>
+          ${invoer}
+          ${veld.hulp ? `<p class="uitn-veld-hulp">${veld.hulp}</p>` : ""}
         </div>
-      `
-    )
+      `;
+    })
     .join("");
-
-  // Ná die bankvelde en VOOR die wagwoord: dit is die laaste ding wat hy
-  // bevestig oor die ooreenkoms self, voordat die vorm oorgaan na sy
-  // winkelrekening.
-  const ooreenkomsHtml = ROLLE_MET_OOREENKOMS.includes(rol_tipe)
-    ? `
-        <div class="uitn-ooreenkoms">
-          <label class="uitn-merk-etiket" for="uitn-ooreenkoms">
-            <input type="checkbox" id="uitn-ooreenkoms" class="uitn-merkblokkie" required>
-            <span>Ek het die Outeursooreenkoms van Future Sharp ontvang en gelees, en ek aanvaar die inhoud daarvan.</span>
-          </label>
-        </div>
-      `
-    : "";
 
   const rekeningHtml = ROLLE_MET_REKENING.includes(rol_tipe)
     ? `
@@ -159,7 +167,7 @@ function bou_velde(rol_tipe) {
       `
     : "";
 
-  wrap.innerHTML = veldeHtml + ooreenkomsHtml + rekeningHtml;
+  wrap.innerHTML = veldeHtml + rekeningHtml;
 }
 
 function kry_kontak_inligting_uit_vorm(rol_tipe) {
@@ -179,17 +187,6 @@ async function hanteer_indiening(gebeurtenis, token, rol_tipe) {
 
   const naam = document.getElementById("uitn-naam").value.trim();
   const knoppie = document.getElementById("uitnodiging-indien-knoppie");
-
-  const vereis_ooreenkoms = ROLLE_MET_OOREENKOMS.includes(rol_tipe);
-  const ooreenkoms_aanvaar = vereis_ooreenkoms
-    ? document.getElementById("uitn-ooreenkoms").checked
-    : false;
-
-  if (vereis_ooreenkoms && !ooreenkoms_aanvaar) {
-    foutWrap.textContent = "Bevestig asseblief dat jy die Outeursooreenkoms ontvang en gelees het.";
-    foutWrap.style.display = "block";
-    return;
-  }
 
   let wagwoord = "";
   if (ROLLE_MET_REKENING.includes(rol_tipe)) {
@@ -219,7 +216,6 @@ async function hanteer_indiening(gebeurtenis, token, rol_tipe) {
         token,
         naam,
         wagwoord,
-        ooreenkoms_aanvaar,
         kontak_inligting: kry_kontak_inligting_uit_vorm(rol_tipe),
       }),
     });
@@ -305,7 +301,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     // uitnodiging-outeur.js en niks hieronder loop vir hom nie. Vennoot,
     // printing, aflewering en ontwerp/admin het geen ooreenkoms nie en
     // hou hierdie enkelbladsy-vorm presies soos hy was.
-    if (data.rol_tipe === "outeur" && typeof uo_begin === "function") {
+    //
+    // Laai daardie lêer om enige rede nie, STOP dit hier. Terugval na
+    // hierdie vorm sou 'n outeur laat registreer sonder om te teken, en
+    // dit is presies die ding wat nie mag gebeur nie.
+    if (data.rol_tipe === "outeur") {
+      if (typeof uo_begin !== "function") {
+        console.error("uitnodiging-outeur.js het nie gelaai nie");
+        wys_status("Hierdie bladsy kon nie ten volle laai nie. Herlaai die bladsy, of kontak Future Sharp.", true);
+        return;
+      }
       uo_begin(token, data);
       return;
     }
