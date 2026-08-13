@@ -74,6 +74,11 @@ function vul_syfers(opsomming) {
 function bou_titel_ry(titel) {
   const ry = document.createElement("article");
   ry.className = "outeur-titel";
+  // Vir outeur-deel-skakel.js, wat die Kopieer-skakel-strook byvoeg. Die
+  // kaart dra sy eie slug en status sodat daardie lêer nie die antwoord
+  // hoef oor te lees nie.
+  ry.dataset.slug = titel.slug || "";
+  ry.dataset.status = titel.status || "";
 
   const kop = document.createElement("div");
   kop.className = "outeur-titel-kop";

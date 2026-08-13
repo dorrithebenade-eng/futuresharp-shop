@@ -80,6 +80,11 @@ const WOORDEBOEK = {
   uitnodiging_skrap_bevestig: { af: "Skrap hierdie uitnodiging? Die skakel werk dan nie meer nie.", en: "Delete this invitation? The link will stop working." },
   uitnodiging_skrap_fout: { af: "Kon nie die uitnodiging skrap nie", en: "Could not delete the invitation" },
 
+  // --- Die deel-skakel op My titels (outeur-deel-skakel.js) ---
+  ods_kopieer: { af: "Kopieer skakel", en: "Copy link" },
+  ods_gekopieer: { af: "Gekopieer", en: "Copied" },
+  ods_kon_nie: { af: "Kon nie kopieer nie", en: "Could not copy" },
+
   // --- Die outeur se aansluitvorm (uitnodiging-outeur.js) ---
   uo_kop_sub: { af: "Sluit aan as outeur", en: "Join as an author" },
   uo_stap1: { af: "Naam en e-pos", en: "Name and email" },

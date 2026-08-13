@@ -1,0 +1,58 @@
+/* outeur-deel-skakel.css — die Kopieer-skakel-strook op 'n titelkaart.
+   'n Eie lêer sodat 'n verandering hier niks aan die kaart se syfers of
+   sy statusmerkie kan doen nie. Voorvoegsel ods- om botsings te vermy. */
+
+.ods-strook {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid #EFEDE9;
+}
+
+.ods-knoppie {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: 1px solid #D8D6D1;
+  border-radius: 9px;
+  padding: 9px 15px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--grys-teks);
+  cursor: pointer;
+  font-family: var(--font-liggaam);
+  flex: 0 0 auto;
+}
+
+.ods-knoppie:hover {
+  border-color: var(--teal-helder);
+  color: var(--teal);
+}
+
+.ods-knoppie--gekopieer {
+  background: #E3F5F1;
+  border-color: var(--teal-helder);
+  color: var(--teal);
+}
+
+/* Die adres staan sigbaar langs die knoppie: 'n mens wil sien wat jy stuur
+   voordat jy dit stuur, en waar die knoppie misluk kan hy dit self merk.
+   overflow-wrap: anywhere, want 'n slug het geen spasies om by te breek. */
+.ods-adres {
+  font-size: 12px;
+  color: var(--grys-teks);
+  font-family: var(--font-liggaam);
+  overflow-wrap: anywhere;
+  flex: 1 1 240px;
+  min-width: 0;
+}
+
+@media (max-width: 600px) {
+  .ods-adres {
+    flex-basis: 100%;
+  }
+}
