@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Personeel-paneelbord — Future Shop</title>
+  <title>Admin-paneelbord — Future Shop</title>
   <link rel="stylesheet" href="css/styl.css">
   <link rel="stylesheet" href="css/paneel-goedkeuring.css">
   <link rel="stylesheet" href="css/paneel-bankversoeke.css">
@@ -57,7 +57,7 @@
   </header>
 
   <main class="paneel-wrap" id="paneel-hoof" style="visibility:hidden;">
-    <h1 class="mandjie-titel" data-i18n="paneel_titel">Personeel-paneelbord</h1>
+    <h1 class="mandjie-titel" data-i18n="paneel_titel">Admin-paneelbord</h1>
     <div id="pwa-installeer-plek"></div>
 
     <!-- Aanmeld-vorm — verskyn wanneer niemand aangemeld is nie -->
@@ -156,20 +156,20 @@
 
       <div class="paneel-uitleg">
         <nav id="paneel-sy-kieslys" class="paneel-sy-kieslys" aria-label="Paneelbord-afdelings">
-          <button type="button" class="paneel-kieslys-item aktief" data-afdeling="katalogus" data-i18n="paneel_katalogus_titel">Katalogus</button>
-          <button type="button" class="paneel-kieslys-item" data-afdeling="indienings" data-i18n="pg_titel">Indienings</button>
-          <button type="button" class="paneel-kieslys-item" data-afdeling="outeurs" data-i18n="paneel_outeurs_titel">Outeurs</button>
-          <button type="button" class="paneel-kieslys-item" data-afdeling="vennote">Vennote (direkteure)</button>
-          <button type="button" class="paneel-kieslys-item" data-afdeling="ontwerp-admin">Ontwerp/Admin</button>
-          <button type="button" class="paneel-kieslys-item" data-afdeling="printing">Printing</button>
-          <button type="button" class="paneel-kieslys-item" data-afdeling="aflewering">Aflewering</button>
-          <button type="button" class="paneel-kieslys-item" data-afdeling="verdeling-rekenaar" data-i18n="paneel_verdeling_rekenaar_titel">Verdeling-rekenaar</button>
-          <button type="button" class="paneel-kieslys-item" data-afdeling="dokumente" data-i18n="paneel_dokumente_titel">Dokumente</button>
-          <button type="button" class="paneel-kieslys-item" data-afdeling="koepons" data-i18n="paneel_koepons_titel">Koepons</button>
-          <button type="button" class="paneel-kieslys-item" data-afdeling="uitnodigings" data-i18n="paneel_nav_uitnodigings">Uitnodigings</button>
-          <button type="button" class="paneel-kieslys-item" data-afdeling="waarskuwings"><span data-i18n="paneel_nav_waarskuwings">⚠️ Waarskuwings</span></button>
-          <button type="button" class="paneel-kieslys-item" data-afdeling="kategoriee" data-i18n="paneel_nav_kategoriee">Kategorieë</button>
-          <button type="button" class="paneel-kieslys-item" data-afdeling="bestellings">Bestellings</button>
+          <button type="button" class="paneel-kieslys-item rol-personeel" data-afdeling="aflewering">Aflewering</button>
+          <button type="button" class="paneel-kieslys-item rol-personeel" data-afdeling="bestellings">Bestellings</button>
+          <button type="button" class="paneel-kieslys-item rol-personeel" data-afdeling="dokumente" data-i18n="paneel_dokumente_titel">Dokumente</button>
+          <button type="button" class="paneel-kieslys-item rol-personeel" data-afdeling="indienings" data-i18n="pg_titel">Indienings</button>
+          <button type="button" class="paneel-kieslys-item rol-personeel" data-afdeling="katalogus" data-i18n="paneel_katalogus_titel">Katalogus</button>
+          <button type="button" class="paneel-kieslys-item rol-personeel" data-afdeling="kategoriee" data-i18n="paneel_nav_kategoriee">Kategorieë</button>
+          <button type="button" class="paneel-kieslys-item rol-personeel" data-afdeling="koepons" data-i18n="paneel_koepons_titel">Koepons</button>
+          <button type="button" class="paneel-kieslys-item rol-personeel" data-afdeling="ontwerp-admin">Ontwerp/Admin</button>
+          <button type="button" class="paneel-kieslys-item rol-personeel" data-afdeling="outeurs" data-i18n="paneel_outeurs_titel">Outeurs</button>
+          <button type="button" class="paneel-kieslys-item rol-personeel" data-afdeling="printing">Printing</button>
+          <button type="button" class="paneel-kieslys-item rol-personeel" data-afdeling="uitnodigings" data-i18n="paneel_nav_uitnodigings">Uitnodigings</button>
+          <button type="button" class="paneel-kieslys-item rol-personeel" data-afdeling="vennote">Vennote (direkteure)</button>
+          <button type="button" class="paneel-kieslys-item rol-personeel" data-afdeling="verdeling-rekenaar" data-i18n="paneel_verdeling_rekenaar_titel">Verdeling-rekenaar</button>
+          <button type="button" class="paneel-kieslys-item rol-personeel" data-afdeling="waarskuwings"><span data-i18n="paneel_nav_waarskuwings">Waarskuwings ⚠️</span></button>
         </nav>
 
         <div class="paneel-inhoud-kolom">

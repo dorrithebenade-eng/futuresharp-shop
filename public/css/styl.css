@@ -885,6 +885,10 @@ body {
 }
 
 .paneel-kieslys-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
   text-align: left;
   background: none;
   border: none;
@@ -909,6 +913,80 @@ body {
   color: var(--teal);
   background: var(--grys-lig);
   border-left: 3px solid var(--koraal);
+}
+
+/* ---------- Kleurkodering van die kieslys volgens rol ----------
+ *
+ * Koraal is wat die rol `personeel` vereis; teal is wat `boekhouding`
+ * vereis. Die kleur beskryf die AREA, nie jou toegang nie: Dokumente is
+ * winkelwerk en dus koraal, ongeag wie kyk. Sou die kleur toegang beskryf,
+ * wissel dieselfde afdeling van kleur na gelang van wie aangemeld is, en dan
+ * beteken 'n skermskoot niks sonder om te weet wie gekyk het.
+ *
+ * Die kolletjie kom uit ::before, nie uit die merk-op nie — dan hoef elke
+ * knoppie nie 'n ekstra <span> te dra nie.
+ */
+.paneel-kieslys-item::before,
+.paneel-kieslys-skakel::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+  background: currentColor;
+}
+
+.paneel-kieslys-item.rol-personeel { color: #B8451F; }
+.paneel-kieslys-item.rol-boekhouding,
+.paneel-kieslys-skakel.rol-boekhouding { color: #2F6B60; }
+
+.paneel-kieslys-item.aktief.rol-personeel {
+  color: var(--koraal);
+  border-left-color: var(--koraal);
+}
+
+.paneel-kieslys-item.aktief.rol-boekhouding {
+  color: var(--teal);
+  border-left-color: var(--teal);
+}
+
+/* Die opskrifte verskyn slegs wanneer daar TWEE groepe is — sien
+   paneel-boekhouding-skakel.js. 'n Opskrif wat een groep benoem terwyl daar
+   net een is, sê niks: dit is wat 'n vennoot sonder Boekhouding sou sien. */
+.paneel-kieslys-groep {
+  padding: 0 14px;
+  margin: 14px 0 5px;
+  font-size: 10.5px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--grys-teks);
+  font-weight: 600;
+}
+
+.paneel-kieslys-groep:first-child { margin-top: 0; }
+
+/* Die Boekhouding-skakel is 'n <a>, nie 'n <button> nie — hy navigeer na 'n
+   ander bladsy in plaas van 'n afdeling te wissel. SY EIE KLAS, want
+   paneel-vennoot.js verwyder elke .paneel-kieslys-item wat nie op sy lys
+   staan nie, en hierdie een het geen data-afdeling. Met die geleende klas
+   sou hy vir 'n vennoot verdwyn het. */
+.paneel-kieslys-skakel {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  text-align: left;
+  text-decoration: none;
+  border-left: 3px solid transparent;
+  padding: 12px 14px;
+  font-size: 14px;
+  font-family: inherit;
+  opacity: 0.75;
+  border-radius: 0 6px 6px 0;
+}
+
+.paneel-kieslys-skakel:hover {
+  opacity: 1;
+  background: var(--grys-lig);
 }
 
 .paneel-inhoud-kolom {

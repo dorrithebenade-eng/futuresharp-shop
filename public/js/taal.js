@@ -45,7 +45,8 @@ const WOORDEBOEK = {
 
   // Sy-kieslys-oortjies
   paneel_nav_uitnodigings: { af: "Uitnodigings", en: "Invitations" },
-  paneel_nav_waarskuwings: { af: "⚠️ Waarskuwings", en: "⚠️ Warnings" },
+  paneel_nav_waarskuwings: { af: "Waarskuwings ⚠️", en: "Warnings ⚠️" },
+  paneel_kieslys_groep_admin: { af: "Admin", en: "Admin" },
   paneel_nav_kategoriee: { af: "Kategorieë", en: "Categories" },
   paneel_word_gelaai: { af: "Word gelaai …", en: "Loading …" },
   paneel_kopieer: { af: "Kopieer", en: "Copy" },
@@ -412,7 +413,7 @@ const WOORDEBOEK = {
   terug_winkel: { af: "Terug na die winkel", en: "Back to the shop" },
 
   // Personeel-paneelbord
-  paneel_titel: { af: "Personeel-paneelbord", en: "Staff panel" },
+  paneel_titel: { af: "Admin-paneelbord", en: "Admin dashboard" },
   // ---------- Boekhouding (faktuurpaneel.html) ----------
   fp_titel: { af: "Boekhouding", en: "Accounts" },
   fp_nav_paneelbord: { af: "Paneelbord", en: "Dashboard" },

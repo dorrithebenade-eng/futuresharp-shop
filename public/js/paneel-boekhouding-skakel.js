@@ -29,6 +29,20 @@
 (function () {
   const BOEKHOUDING_ROL = "boekhouding";
 
+  function woord(sleutel, verstek) {
+    const uit = window.t ? window.t(sleutel) : null;
+    // t() gee die SLEUTEL terug wanneer hy hom nie ken nie — geen stille
+    // terugval nie. Die verstek geld net wanneer taal.js glad nie laai nie.
+    return uit && uit !== sleutel ? uit : verstek;
+  }
+
+  function bou_opskrif(teks) {
+    const kop = document.createElement("div");
+    kop.className = "paneel-kieslys-groep";
+    kop.textContent = teks;
+    return kop;
+  }
+
   function bou_skakel() {
     const kieslys = document.getElementById("paneel-sy-kieslys");
     if (!kieslys) return null;
@@ -37,9 +51,34 @@
     const skakel = document.createElement("a");
     skakel.id = "paneel-boekhouding-skakel";
     skakel.href = "faktuurpaneel.html";
-    skakel.className = "paneel-kieslys-item";
-    skakel.textContent =
-      window.t && window.t("fp_titel") !== "fp_titel" ? window.t("fp_titel") : "Boekhouding";
+
+    // SY EIE KLAS, NIE .paneel-kieslys-item NIE.
+    //
+    // paneel-vennoot.js verwyder ELKE .paneel-kieslys-item wat nie 'n
+    // data-afdeling op sy lys het nie — heeltemal uit die DOM. Hierdie skakel
+    // het geen data-afdeling nie, want hy wissel nie 'n afdeling nie; hy
+    // navigeer. Met daardie klas sou hy vir 'n vennoot verdwyn, en of dit
+    // gebeur, hang af van watter skrip eerste klaarmaak. 'n Fout wat soms
+    // werk, is erger as een wat nooit werk nie.
+    //
+    // Die styl kom uit .paneel-kieslys-skakel in styl.css, wat dieselfde lyk.
+    skakel.className = "paneel-kieslys-skakel rol-boekhouding";
+    // Die kolletjie kom uit CSS (::before), nie uit die merk-op nie — so hoef
+    // die veertien bestaande knoppies in paneelbord.html nie elkeen 'n ekstra
+    // <span> te kry nie.
+    skakel.textContent = woord("fp_titel", "Boekhouding");
+
+    // Die opskrifte verskyn slegs wanneer daar TWEE groepe is. 'n Opskrif wat
+    // een groep benoem terwyl daar net een is, sê niks — dit is wat Eugene
+    // sou sien, met "Admin" bo sy twee items en niks anders nie.
+    const admin_items = kieslys.querySelectorAll(".paneel-kieslys-item").length;
+    if (admin_items > 0) {
+      kieslys.insertBefore(
+        bou_opskrif(woord("paneel_kieslys_groep_admin", "Admin")),
+        kieslys.firstChild
+      );
+      kieslys.appendChild(bou_opskrif(woord("fp_titel", "Boekhouding")));
+    }
 
     // Heel onder. Boekhouding is 'n ander area, nie nog 'n afdeling van die
     // katalogus nie — dit hoort nie tussen Outeurs en Koepons nie.
