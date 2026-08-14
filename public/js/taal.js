@@ -417,6 +417,7 @@ const WOORDEBOEK = {
   // ---------- Boekhouding: die klienteregister ----------
   fk_skakel_titel: { af: "Klientvorm-skakel", en: "Client form link" },
   fk_kopieer: { af: "Kopieer", en: "Copy" },
+  fk_titel: { af: "Kliente", en: "Clients" },
   fk_gekopieer: { af: "Gekopieer", en: "Copied" },
   fk_soek_plek: {
     af: "Soek op nommer, naam, kontakpersoon, e-pos of selfoon",
@@ -476,6 +477,56 @@ const WOORDEBOEK = {
   fk_vee_nuwe: { af: "Vee die nuwe weg", en: "Delete the new one" },
   fk_werk_by: { af: "Werk by en vee weg", en: "Update and delete" },
   fk_dup_fout: { af: "Kon nie dit doen nie. Probeer weer.", en: "Could not do that. Please try again." },
+
+  // ---------- Begunstigderegister (faktuurpaneel.html) ----------
+  bg_titel: { af: "Begunstigdes", en: "Beneficiaries" },
+  bg_soek_plek: {
+    af: "Soek op naam, e-pos, selfoon of kode",
+    en: "Search by name, email, mobile or code",
+  },
+  bg_nuwe_knop: { af: "+ Nuwe begunstigde", en: "+ New beneficiary" },
+  bg_een: { af: "begunstigde", en: "beneficiary" },
+  bg_meer: { af: "begunstigdes", en: "beneficiaries" },
+  bg_pas_een: { af: "begunstigde pas", en: "beneficiary matches" },
+  bg_pas_meer: { af: "begunstigdes pas", en: "beneficiaries match" },
+  bg_geen: { af: "Daar is nog geen begunstigdes nie.", en: "There are no beneficiaries yet." },
+  bg_geen_pas: { af: "Geen begunstigde pas nie.", en: "No beneficiary matches." },
+  bg_laai_fout: { af: "Kon nie die begunstigdes laai nie.", en: "Could not load the beneficiaries." },
+
+  bg_nuwe: { af: "Nuwe begunstigde", en: "New beneficiary" },
+  bg_wysig: { af: "Wysig begunstigde", en: "Edit beneficiary" },
+  bg_vorm_lei: {
+    af: "Wie ’n deel van ’n betaling ontvang — ’n aanbieder, iemand wat koste terugkry, of albei.",
+    en: "Whoever receives part of a payment — a presenter, someone recovering costs, or both.",
+  },
+  bg_veld_naam: { af: "Naam", en: "Name" },
+  bg_veld_epos: { af: "E-pos", en: "Email" },
+  bg_veld_selfoon: { af: "Selfoon", en: "Mobile" },
+  bg_veld_adres: { af: "Adres", en: "Address" },
+  bg_veld_kode: { af: "Paystack-subrekening", en: "Paystack subaccount" },
+  bg_opsioneel: { af: "opsioneel", en: "optional" },
+  bg_kode_hulp: {
+    af: "Uit Paystack se paneel. Sonder ’n kode kan hierdie persoon nie in ’n verdeling gebruik word nie.",
+    en: "From the Paystack dashboard. Without a code this person cannot be used in a split.",
+  },
+  bg_oorplak: {
+    af: "Hierdie persoon is reeds ’n outeur. Gebruik sy bestaande kode:",
+    en: "This person is already an author. Use their existing code:",
+  },
+  bg_wag: { af: "Wag vir subrekening", en: "Awaiting subaccount" },
+  bg_ook_outeur: { af: "Ook outeur", en: "Also an author" },
+  bg_geen_kode: { af: "Geen subrekening", en: "No subaccount" },
+
+  bg_naam_verplig: { af: "Die naam is verplig.", en: "The name is required." },
+  bg_kode_fout: {
+    af: "Die subrekening-kode moet met ACCT_ begin.",
+    en: "The subaccount code must start with ACCT_.",
+  },
+  bg_bestaan: {
+    af: "Daar is reeds ’n begunstigde met daardie naam.",
+    en: "A beneficiary with that name already exists.",
+  },
+  bg_stoor_fout: { af: "Kon nie stoor nie. Probeer weer.", en: "Could not save. Please try again." },
   // ---------- Boekhouding (faktuurpaneel.html) ----------
   fp_titel: { af: "Boekhouding", en: "Accounts" },
   fp_nav_paneelbord: { af: "Paneelbord", en: "Dashboard" },

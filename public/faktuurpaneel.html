@@ -79,6 +79,10 @@
              een adres wat aan almal gaan. Die titel is nie versiering nie:
              die betaalskakel kry later dieselfde strook, en sonder 'n naam
              moet 'n mens elke keer die URL lees om te weet watter een dit is. -->
+        <div class="paneel-afdeling-kop">
+          <h2 class="paneel-afdeling-titel" data-i18n="fk_titel">Kliente</h2>
+        </div>
+
         <div class="fk-skakel">
           <h3 data-i18n="fk_skakel_titel">Kliëntvorm-skakel</h3>
           <div class="fk-skakel-url" id="fk-skakel-url">futureshop.futuresharp.co.za/klientvorm.html</div>
@@ -96,6 +100,27 @@
         <p class="fk-hulp" id="fk-hulp"></p>
 
         <div id="fk-lys">
+          <p class="stelsel-boodskap" data-i18n="fp_laai">Word gelaai …</p>
+        </div>
+
+        <!-- Die tweede register op dieselfde blad. Onder mekaar, elk met sy
+             eie kop; kom daar later 'n derde en vierde by, word dit
+             sub-navigasie. Twee regverdig dit nog nie. -->
+        <div class="fk-register-skei"></div>
+
+        <div class="paneel-afdeling-kop">
+          <h2 class="paneel-afdeling-titel" data-i18n="bg_titel">Begunstigdes</h2>
+        </div>
+
+        <div class="fk-soekbalk">
+          <input type="text" class="veld-invoer" id="bg-soek"
+                 data-i18n-placeholder="bg_soek_plek"
+                 placeholder="Soek op naam, e-pos, selfoon of kode">
+          <button type="button" class="kaart-aksie" id="bg-nuut" data-i18n="bg_nuwe_knop">+ Nuwe begunstigde</button>
+        </div>
+        <p class="fk-hulp" id="bg-hulp"></p>
+
+        <div id="bg-lys">
           <p class="stelsel-boodskap" data-i18n="fp_laai">Word gelaai …</p>
         </div>
       </section>
@@ -159,6 +184,65 @@
 
   <!-- Die duplikaat-skerm. Een skerm wat by 'n breekpunt oopvou: op 'n
        rekenaarskerm staan die twee langs mekaar, op 'n foon onder mekaar. -->
+  <!-- Die begunstigde-vorm. Slegs die naam keer; die subrekening-kode word
+       later bygevoeg sodra dit by Paystack opgestel is. -->
+  <div class="fk-oorlegsel" id="bg-vorm">
+    <div class="fk-venster">
+      <h2 id="bg-vorm-titel" data-i18n="bg_nuwe">Nuwe begunstigde</h2>
+      <p class="fk-lei" data-i18n="bg_vorm_lei">Wie ’n deel van ’n betaling ontvang —
+      ’n aanbieder, iemand wat koste terugkry, of albei.</p>
+
+      <div class="fk-veld">
+        <label class="veld-etiket" for="bg-naam" data-i18n="bg_veld_naam">Naam</label>
+        <input type="text" class="veld-invoer" id="bg-naam">
+      </div>
+
+      <div class="fk-twee">
+        <div class="fk-veld">
+          <label class="veld-etiket" for="bg-epos" data-i18n="bg_veld_epos">E-pos</label>
+          <input type="email" class="veld-invoer" id="bg-epos" autocomplete="off">
+        </div>
+        <div class="fk-veld">
+          <label class="veld-etiket" for="bg-selfoon" data-i18n="bg_veld_selfoon">Selfoon</label>
+          <input type="tel" class="veld-invoer" id="bg-selfoon" inputmode="tel">
+        </div>
+      </div>
+
+      <div class="fk-veld">
+        <label class="veld-etiket" for="bg-adres">
+          <span data-i18n="bg_veld_adres">Adres</span>
+          <span class="veld-opsioneel" data-i18n="bg_opsioneel">opsioneel</span>
+        </label>
+        <input type="text" class="veld-invoer" id="bg-adres" autocomplete="off">
+      </div>
+
+      <div class="fk-veld">
+        <label class="veld-etiket" for="bg-kode">
+          <span data-i18n="bg_veld_kode">Paystack-subrekening</span>
+          <span class="veld-opsioneel" data-i18n="bg_opsioneel">opsioneel</span>
+        </label>
+        <input type="text" class="veld-invoer" id="bg-kode" placeholder="ACCT_" spellcheck="false" autocomplete="off">
+        <p class="fk-veldhulp" data-i18n="bg_kode_hulp">Uit Paystack se paneel. Sonder ’n kode
+        kan hierdie persoon nie in ’n verdeling gebruik word nie.</p>
+
+        <!-- Verskyn slegs wanneer die persoon reeds ’n outeur MET ’n kode is
+             en sy begunstigde-rekord nog niks dra nie. ’n Tweede subrekening
+             beteken ’n tweede goedkeuring en ’n tweede bankrekord. -->
+        <button type="button" class="fk-oorplak" id="bg-oorplak" style="display:none;">
+          <span data-i18n="bg_oorplak">Hierdie persoon is reeds ’n outeur. Gebruik sy bestaande kode:</span>
+          <span class="fk-kode" id="bg-oorplak-kode"></span>
+        </button>
+      </div>
+
+      <div class="fk-fout" id="bg-vorm-fout" style="display:none;"></div>
+
+      <div class="fk-knoppies">
+        <button type="button" class="kaart-aksie stil" id="bg-kanselleer" data-i18n="fk_kanselleer">Kanselleer</button>
+        <button type="button" class="kaart-aksie" id="bg-stoor" data-i18n="fk_stoor">Stoor</button>
+      </div>
+    </div>
+  </div>
+
   <div class="fk-oorlegsel" id="fk-dup">
     <div class="fk-venster" id="fk-dup-venster"></div>
   </div>
@@ -168,5 +252,6 @@
   <script src="js/sessie-verval.js"></script>
   <script src="js/faktuurpaneel.js"></script>
   <script src="js/faktuurpaneel-kliente.js"></script>
+  <script src="js/faktuurpaneel-begunstigdes.js"></script>
 </body>
 </html>
