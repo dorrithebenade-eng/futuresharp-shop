@@ -1,0 +1,120 @@
+/* public/css/faktuurpaneel.css
+ *
+ * Boekhouding gebruik styl.css se bestaande klasse — paneel-wrap,
+ * paneel-afdeling, stelsel-boodskap, kaart-aksie. Hier staan net wat nie
+ * elders bestaan nie.
+ *
+ * DIE PILLE IS EIE, NIE GELEEN NIE. outeur.css se .outeur-pil hang aan die
+ * outeursband met 'n negatiewe marge; hier is daar geen band nie. Dieselfde
+ * vorm, eie klas — dan verander 'n wysiging aan die outeurspaneel nie
+ * stilweg hierdie skerm nie.
+ */
+
+.fp-kieslys {
+  display: flex;
+  gap: 9px;
+  margin: 0 0 22px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.fp-kieslys::-webkit-scrollbar { display: none; }
+
+.fp-pil {
+  flex: 0 0 auto;
+  background: var(--wit);
+  color: var(--grys-teks);
+  border: 1px solid #E4E2DD;
+  border-radius: 999px;
+  padding: 11px 20px;
+  font-family: var(--font-liggaam);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(23, 23, 23, .07);
+}
+
+.fp-pil:hover { transform: translateY(-1px); }
+
+.fp-pil.aktief {
+  background: var(--swart);
+  color: var(--wit);
+  border-color: var(--swart);
+}
+
+/* Net die gekose afdeling wys. */
+.fp-afdeling { display: none; }
+.fp-afdeling.wys { display: block; }
+
+/* --- 'n Faktuur in die lys --- */
+
+.fp-ry {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid #EDEBE6;
+}
+
+.fp-ry:last-child { border-bottom: 0; }
+
+.fp-ry-hoof {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.fp-nommer {
+  font-family: var(--font-opskrif);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.fp-klient {
+  font-size: 13px;
+  color: var(--grys-teks);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fp-ry-syfers {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  white-space: nowrap;
+}
+
+.fp-bedrag {
+  font-family: var(--font-liggaam);
+  font-weight: 600;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Die stand gaan oor GELD — nie oor lewering of uitbetaling nie. Dié twee
+   dra hul eie velde en kry later hul eie merkers. */
+.fp-stand {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .6px;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #EDEBE6;
+  color: var(--grys-teks);
+}
+
+.fp-stand-gestuur { background: #FDF3DA; color: #8a6400; }
+.fp-stand-betaal { background: #E8F3F0; color: #2f6b60; }
+.fp-stand-gekanselleer { background: #FDE7E0; color: #a8351a; }
+
+@media (max-width: 560px) {
+  .fp-ry {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}

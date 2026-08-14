@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="af">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Boekhouding — Future Shop</title>
+  <link rel="stylesheet" href="css/styl.css" />
+  <link rel="stylesheet" href="css/faktuurpaneel.css" />
+</head>
+<body>
+
+  <!--
+    BOEKHOUDING LYK NIE SOOS DIE PANEELBORD NIE — DIT IS DIE PANEELBORD,
+    met 'n ander afdeling. Die kop, die klasse en die knoppies kom almal
+    uit styl.css. Verander 'n knoppie se styl later, verander dit oral saam.
+
+    Die twee panele DEEL DIE PANEEL-SESSIE: een aanmelding vir albei. Dit
+    werk omdat identiteit.js se PANEEL_BLADSYE hierdie bladsy insluit —
+    sonder dit sou 'n mens hier die winkel se sessie gekry het en uitgeteken
+    gelyk het.
+  -->
+  <header class="mini-kop">
+   <div class="mini-kop-inner">
+    <a href="index.html" class="mini-kop-merk">
+      <span class="merk-sharp">Future Sharp</span>
+      <span class="merk-skeier">—</span>
+      <span class="merk-shop">Future Shop</span>
+    </a>
+    <div class="mini-kop-regs">
+      <div class="paneel-aanmeld-blok">
+        <span id="paneel-gebruiker-epos" class="paneel-gebruiker-epos"></span>
+        <a href="paneelbord.html" class="mini-kop-mandjie" data-i18n="fp_nav_paneelbord">Paneelbord</a>
+      </div>
+      <div class="taal-wisselaar" role="group" aria-label="Taal / Language">
+        <button type="button" class="taal-knoppie" data-taal="af">AF</button>
+        <button type="button" class="taal-knoppie" data-taal="en">EN</button>
+      </div>
+    </div>
+   </div>
+  </header>
+
+  <main class="paneel-wrap" id="fp-hoof" style="visibility:hidden;">
+
+    <h1 class="mandjie-titel" data-i18n="fp_titel">Boekhouding</h1>
+
+    <!--
+      GEEN AANMELDVORM HIER NIE. Wie nie aangemeld is nie, of nie die
+      boekhouding-rol dra nie, word na die paneelbord gestuur om daar aan te
+      meld. Twee aanmeldvorms vir dieselfde sessie sou twee plekke wees om
+      reg te hou.
+    -->
+    <section id="fp-geen-toegang" class="paneel-auth-blok" style="display:none;">
+      <p class="stelsel-boodskap" id="fp-geen-toegang-teks" data-i18n="fp_geen_toegang">
+        Hierdie bladsy is vir Boekhouding. Meld by die paneelbord aan.
+      </p>
+      <a href="paneelbord.html" class="kaart-aksie" data-i18n="fp_gaan_paneelbord">Gaan na die paneelbord</a>
+    </section>
+
+    <div id="fp-paneel" style="display:none;">
+
+      <nav class="fp-kieslys" id="fp-kieslys">
+        <button type="button" class="fp-pil aktief" data-gaan="fakture" data-i18n="fp_nav_fakture">Fakture</button>
+        <button type="button" class="fp-pil" data-gaan="registers" data-i18n="fp_nav_registers">Registers</button>
+        <button type="button" class="fp-pil" data-gaan="state" data-i18n="fp_nav_state">State</button>
+      </nav>
+
+      <section class="paneel-afdeling fp-afdeling wys" data-afdeling="fakture">
+        <div class="paneel-afdeling-kop">
+          <h2 class="paneel-afdeling-titel" data-i18n="fp_fakture_titel">Fakture</h2>
+        </div>
+        <div id="fp-fakture-lys">
+          <p class="stelsel-boodskap" data-i18n="fp_laai">Word gelaai …</p>
+        </div>
+      </section>
+
+      <section class="paneel-afdeling fp-afdeling" data-afdeling="registers">
+        <div class="paneel-afdeling-kop">
+          <h2 class="paneel-afdeling-titel" data-i18n="fp_registers_titel">Registers</h2>
+        </div>
+        <p class="stelsel-boodskap" data-i18n="fp_nog_nie">Hierdie deel word nog gebou.</p>
+      </section>
+
+      <section class="paneel-afdeling fp-afdeling" data-afdeling="state">
+        <div class="paneel-afdeling-kop">
+          <h2 class="paneel-afdeling-titel" data-i18n="fp_state_titel">State</h2>
+        </div>
+        <p class="stelsel-boodskap" data-i18n="fp_nog_nie">Hierdie deel word nog gebou.</p>
+      </section>
+
+    </div>
+  </main>
+
+  <script src="js/taal.js"></script>
+  <script src="js/identiteit.js"></script>
+  <script src="js/sessie-verval.js"></script>
+  <script src="js/faktuurpaneel.js"></script>
+</body>
+</html>

@@ -413,6 +413,32 @@ const WOORDEBOEK = {
 
   // Personeel-paneelbord
   paneel_titel: { af: "Personeel-paneelbord", en: "Staff panel" },
+  // ---------- Boekhouding (faktuurpaneel.html) ----------
+  fp_titel: { af: "Boekhouding", en: "Accounts" },
+  fp_nav_paneelbord: { af: "Paneelbord", en: "Dashboard" },
+  fp_nav_fakture: { af: "Fakture", en: "Invoices" },
+  fp_nav_registers: { af: "Registers", en: "Registers" },
+  fp_nav_state: { af: "State", en: "Statements" },
+  fp_fakture_titel: { af: "Fakture", en: "Invoices" },
+  fp_registers_titel: { af: "Registers", en: "Registers" },
+  fp_state_titel: { af: "State", en: "Statements" },
+  fp_laai: { af: "Word gelaai ...", en: "Loading ..." },
+  fp_geen_fakture: { af: "Daar is nog geen fakture nie.", en: "There are no invoices yet." },
+  fp_konsep_sonder_nommer: { af: "Konsep", en: "Draft" },
+  fp_nog_nie: { af: "Hierdie deel word nog gebou.", en: "This section is still being built." },
+  fp_laai_fout: {
+    af: "Kon nie die fakture laai nie. Probeer weer.",
+    en: "Could not load the invoices. Please try again.",
+  },
+  fp_geen_toegang: {
+    af: "Hierdie bladsy is vir Boekhouding. Meld by die paneelbord aan.",
+    en: "This page is for Accounts. Please sign in at the dashboard.",
+  },
+  fp_geen_rol: {
+    af: "Hierdie rekening het nie toegang tot Boekhouding nie. Is die rol pas bygesit, meld een keer af en weer aan.",
+    en: "This account does not have access to Accounts. If the role was just added, sign out once and sign in again.",
+  },
+  fp_gaan_paneelbord: { af: "Gaan na die paneelbord", en: "Go to the dashboard" },
   paneel_meld_af: { af: "Meld af", en: "Log out" },
   paneel_meld_aan_titel: { af: "Meld aan", en: "Log in" },
   paneel_aanmeld_hulp: {
