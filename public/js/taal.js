@@ -434,12 +434,12 @@ const WOORDEBOEK = {
   fk_instansie_hulp: { af: "bv. skool, departement, maatskappy", en: "e.g. school, department, company" },
   fk_privaat: { af: "Privaat", en: "Private" },
   fk_privaat_klient: { af: "Privaat klient", en: "Private client" },
-  fk_privaat_hulp: { af: "bv. n outeur of individu", en: "e.g. an author or individual" },
+  fk_privaat_hulp: { af: "bv. ’n outeur of individu", en: "e.g. an author or individual" },
 
   fk_nuwe_klient: { af: "Nuwe klient", en: "New client" },
   fk_wysig_klient: { af: "Wysig klient", en: "Edit client" },
   fk_vorm_lei: {
-    af: "Naam, e-pos en selfoon is nodig. n Rekord sonder hulle word as onvolledig gemerk en kan later voltooi word.",
+    af: "Naam, e-pos en selfoon is nodig. ’n Rekord sonder hulle word as onvolledig gemerk en kan later voltooi word.",
     en: "Name, email and mobile are needed. A record without them is marked incomplete and can be completed later.",
   },
   fk_naam_instansie: { af: "Naam van die instansie", en: "Name of the institution" },
@@ -457,8 +457,8 @@ const WOORDEBOEK = {
   fk_nuut: { af: "Nuut", en: "New" },
   fk_moontlike_dup: { af: "Moontlike duplikaat", en: "Possible duplicate" },
 
-  fk_dup_een: { af: "Twee inskrywings deel n e-posadres", en: "Two entries share an email address" },
-  fk_dup_meer: { af: "pare deel n e-posadres", en: "pairs share an email address" },
+  fk_dup_een: { af: "Twee inskrywings deel ’n e-posadres", en: "Two entries share an email address" },
+  fk_dup_meer: { af: "pare deel ’n e-posadres", en: "pairs share an email address" },
   fk_en: { af: "en", en: "and" },
   fk_kontroleer: { af: "Kontroleer", en: "Check" },
   fk_dup_titel: { af: "Kontroleer hierdie twee", en: "Check these two" },
@@ -466,8 +466,8 @@ const WOORDEBOEK = {
   fk_velde_verskil: { af: "velde verskil.", en: "fields differ." },
   fk_kies_waarde: { af: "Kies watter waarde moet bly.", en: "Choose which value should stay." },
   fk_niks_nuuts: {
-    af: "Elke veld is dieselfde - die nuwe indiening dra niks nuuts nie.",
-    en: "Every field is the same - the new submission brings nothing new.",
+    af: "Elke veld is dieselfde — die nuwe indiening dra niks nuuts nie.",
+    en: "Every field is the same — the new submission brings nothing new.",
   },
   fk_bestaande: { af: "Bestaande", en: "Existing" },
   fk_nuwe_indiening: { af: "Nuwe indiening", en: "New submission" },

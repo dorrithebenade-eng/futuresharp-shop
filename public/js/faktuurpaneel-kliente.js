@@ -17,6 +17,10 @@ const FK = {
   wysig: null,      // die nommer wat gewysig word, of null vir 'n nuwe een
   soort: "instansie",
   keuses: {},
+  // Pare wat reeds nagegaan is. Die bediener stuur net die ONnagegaande
+  // pare; ons lei die res daaruit af, sodat 'n plaaslike herberekening
+  // dieselfde antwoord gee.
+  nagegaan: [],
 };
 
 const FK_VELDE = [
@@ -50,6 +54,43 @@ async function fk_vra(pad, opsies) {
   });
   if (!resp.ok) throw new Error(`Status ${resp.status}`);
   return resp.status === 204 ? null : resp.json();
+}
+
+// ---------- die duplikate ----------
+//
+// Dit word PLAASLIK herbereken ná elke stoor. Sonder dit sou 'n vars
+// gestoorde kliënt wat 'n e-pos met 'n bestaande een deel, eers ná 'n
+// herlaai gemerk word — en dan lyk dit of die kontrole nie werk nie.
+//
+// Dieselfde reël as _kliente.js: die toets is die e-pos, kleinletter, en
+// niks anders nie.
+
+function fk_paar_sleutel(a, b) { return [a, b].sort().join("|"); }
+
+function fk_alle_pare() {
+  const per_epos = {};
+  FK.kliente.forEach((k) => {
+    const e = (k.epos || "").trim().toLowerCase();
+    if (!e) return;
+    if (!per_epos[e]) per_epos[e] = [];
+    per_epos[e].push(k.nommer);
+  });
+
+  const pare = [];
+  Object.keys(per_epos).forEach((e) => {
+    const lys = per_epos[e].slice().sort();
+    for (let i = 0; i < lys.length; i += 1) {
+      for (let j = i + 1; j < lys.length; j += 1) {
+        pare.push({ sleutel: fk_paar_sleutel(lys[i], lys[j]), epos: e,
+                    nommers: [lys[i], lys[j]] });
+      }
+    }
+  });
+  return pare;
+}
+
+function fk_herbereken_duplikate() {
+  FK.duplikate = fk_alle_pare().filter((p) => !FK.nagegaan.includes(p.sleutel));
 }
 
 // ---------- die lys ----------
@@ -215,8 +256,10 @@ async function fk_stoor() {
     if (ix >= 0) FK.kliente[ix] = rekord; else FK.kliente.push(rekord);
     FK.kliente.sort((a, b) => (a.naam || "").localeCompare(b.naam || "", "af-ZA"));
 
+    fk_herbereken_duplikate();
     fk_maak_vorm_toe();
     fk_teken_lys();
+    fk_teken_strook();
   } catch (f) {
     console.error("Kon nie die kliënt stoor nie:", f);
     fout.textContent = fk_t("fk_stoor_fout", "Kon nie stoor nie. Probeer weer.");
@@ -332,11 +375,10 @@ async function fk_los_dup(oud, nuwe, uitkoms) {
   oud.gesien = true;
   nuwe.gesien = true;
 
-  FK.duplikate = FK.duplikate.filter((p) =>
-    !(p.nommers.includes(oud.nommer) && p.nommers.includes(nuwe.nommer)));
-  if (uitkoms !== "hou_albei") {
-    FK.duplikate = FK.duplikate.filter((p) => !p.nommers.includes(nuwe.nommer));
+  if (uitkoms === "hou_albei") {
+    FK.nagegaan.push(fk_paar_sleutel(oud.nommer, nuwe.nommer));
   }
+  fk_herbereken_duplikate();
 
   document.getElementById("fk-dup").classList.remove("oop");
   fk_teken_lys();
@@ -351,6 +393,8 @@ async function fk_laai() {
     const data = await fk_vra("kry-kliente");
     FK.kliente = data.kliente || [];
     FK.duplikate = data.duplikate || [];
+    const oop = FK.duplikate.map((p) => p.sleutel);
+    FK.nagegaan = fk_alle_pare().map((p) => p.sleutel).filter((s) => !oop.includes(s));
     fk_teken_lys();
     fk_teken_strook();
   } catch (f) {

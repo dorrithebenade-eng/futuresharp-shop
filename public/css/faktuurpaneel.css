@@ -276,7 +276,16 @@ a.paneel-kieslys-item { text-decoration: none; }
 }
 .fk-soort-knop small { display: block; font-size: 11px; opacity: .7; margin-top: 2px; }
 
+/* styl.css se .veld-ry is 'n TWEEKOLOM-ROOSTER — etiket links, veld regs.
+   Dit werk in die produkvorm, maar hier moet die etiket bo sy veld staan.
+   Eie klas, soos met die pille en die kieslys-skakel: 'n geleende klas dra
+   sy eie aannames saam. */
+.fk-veld { margin-bottom: 14px; }
+.fk-veld .veld-etiket { margin: 0 0 5px; }
+.fk-veld .veld-invoer { width: 100%; }
+
 .fk-twee { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.fk-twee .fk-veld { margin-bottom: 0; }
 
 .fk-fout { color: var(--koraal); font-size: 12.5px; margin: 0 0 12px; }
 
@@ -340,5 +349,6 @@ a.paneel-kieslys-item { text-decoration: none; }
    bly leesbaar in een kolom. */
 @media (max-width: 620px) {
   .fk-vgl-paar { grid-template-columns: 1fr; }
-  .fk-twee { grid-template-columns: 1fr; }
+  .fk-twee { grid-template-columns: 1fr; gap: 0; }
+  .fk-twee .fk-veld { margin-bottom: 14px; }
 }
