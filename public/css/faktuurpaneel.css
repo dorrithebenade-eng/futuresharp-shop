@@ -42,6 +42,11 @@
   border-color: var(--swart);
 }
 
+/* Die Boekhouding-skakel in die paneelbord is 'n <a>, nie 'n <button> nie —
+   dit gaan na 'n ander bladsy. .paneel-kieslys-item is vir knoppies geskryf,
+   wat nooit 'n onderstreep het nie, dus stel die klas dit nêrens af nie. */
+a.paneel-kieslys-item { text-decoration: none; }
+
 /* Net die gekose afdeling wys. */
 .fp-afdeling { display: none; }
 .fp-afdeling.wys { display: block; }
