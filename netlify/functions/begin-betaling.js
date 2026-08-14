@@ -464,6 +464,24 @@ exports.handler = async (event, context) => {
   }
 
   // --- Stap 3: stoor konsep-bestelling ---
+  //
+  // DIE PAYSTACK-VERWYSING IS NIE DIE BESTELNOMMER NIE.
+  //
+  // Paystack weier 'n transaksie met 'n verwysing wat reeds bestaan. Gebruik
+  // 'n mens die bestelnommer self, misluk elke TWEEDE poging op dieselfde
+  // bestelling met 'n 502 — presies wat gebeur wanneer die koper by Paystack
+  // kanselleer en dan weer probeer. (Waargeneem 14 Augustus 2026.)
+  //
+  // Die bestelnommer bly wat hy is: die sleutel van die rekord en wat die
+  // koper sien. Die verwysing kry 'n agtervoegsel per poging. Die webhook
+  // vind die bestelling steeds, want metadata.bestelnommer gaan saam.
+  //
+  // 'n Bestaande rekord sonder `poging` kom uit die tyd voor hierdie
+  // regstelling en het sy eerste transaksie op die kaal bestelnommer gehad —
+  // daarom begin hy by 2, nie by 1 nie.
+  const poging = bestaande ? (Number(bestaande.paystack && bestaande.paystack.poging) || 1) + 1 : 1;
+  const paystack_verwysing = poging === 1 ? bestelnommer : `${bestelnommer}-${poging}`;
+
   const konsep_bestelling = {
     bestelnommer,
     geskep_op: bestaande ? bestaande.geskep_op : new Date().toISOString(),
@@ -488,7 +506,7 @@ exports.handler = async (event, context) => {
     drukker: bevat_harde_kopie
       ? { bestelling_geplaas: false, geplaas_op: null, nota: "" }
       : null,
-    paystack: { referensie: bestelnommer, geverifieer: false },
+    paystack: { referensie: paystack_verwysing, poging, geverifieer: false },
     status: "Wag vir betaling",
     status_geskiedenis: [{ status: "Wag vir betaling", op: new Date().toISOString() }],
   };
@@ -502,7 +520,7 @@ exports.handler = async (event, context) => {
     const paystackBody = {
       email: koper.epos,
       amount: totaal_sent, // Paystack verwag ook die kleinste eenheid (sent)
-      reference: bestelnommer,
+      reference: paystack_verwysing,
       callback_url: `${webwerf_url}/dankie.html?bestelnommer=${bestelnommer}`,
       metadata: {
         bestelnommer,

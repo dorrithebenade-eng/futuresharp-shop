@@ -99,7 +99,16 @@ exports.handler = async (event) => {
   }
 
   const data = gebeurtenis.data;
-  const bestelnommer = data.reference;
+
+  // DIE VERWYSING IS NIE DIE BESTELNOMMER NIE. Kanselleer 'n koper by
+  // Paystack en probeer weer, dra die tweede transaksie 'n verwysing soos
+  // FS-2026-250270-2 — Paystack weier 'n herhaalde verwysing. Die
+  // bestelnommer, wat die sleutel van die rekord is, kom uit die metadata
+  // wat begin-betaling.js saamstuur.
+  //
+  // Die terugval op data.reference hou ou transaksies geldig: voor
+  // 14 Augustus 2026 was die twee dieselfde string.
+  const bestelnommer = (data.metadata && data.metadata.bestelnommer) || data.reference;
 
   const store = kry_store("bestellings");
   const bestelling = await store.get(bestelnommer, { type: "json" });
@@ -149,7 +158,10 @@ exports.handler = async (event) => {
     ...bestelling,
     items: bygewerkte_items,
     paystack: {
-      referensie: bestelnommer,
+      // Die WERKLIKE Paystack-verwysing, nie die bestelnommer nie — dit is
+      // waarmee 'n transaksie in Paystack se paneel opgesoek word.
+      referensie: data.reference,
+      poging: (bestelling.paystack && bestelling.paystack.poging) || 1,
       geverifieer: true,
       geverifieer_op: nou,
       bedrag_bevestig_sent: data.amount,
