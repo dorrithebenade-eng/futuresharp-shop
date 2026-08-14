@@ -27,9 +27,19 @@
 // konteks nie — dit is doelbewus 'n heeltemal aparte sessie. Om by die
 // paneelbord te kom, moet 'n mens spesifiek via paneelbord.html se eie
 // aanmeld-vorm aanmeld, al is dit dieselfde rekening.
+//
+// DIE PANEEL-KANT IS MEER AS EEN BLADSY. Boekhouding (faktuurpaneel.html)
+// deel die paneel-sessie: een aanmelding vir albei. Was dit 'n toets op
+// net paneelbord.html, sou 'n mens wat op die paneelbord aangemeld is,
+// op die faktuurpaneel uitgeteken wees — dit sou die winkel se sleutel
+// gekry het. Elke nuwe personeel-kant bladsy kom hier by.
+const PANEEL_BLADSYE = ["paneelbord.html", "faktuurpaneel.html"];
+
 function kry_sessie_sleutel() {
-  const is_paneel = window.location.pathname.endsWith("/paneelbord.html") ||
-    window.location.pathname.endsWith("paneelbord.html");
+  const pad = window.location.pathname;
+  const is_paneel = PANEEL_BLADSYE.some(
+    (bladsy) => pad.endsWith(`/${bladsy}`) || pad.endsWith(bladsy)
+  );
   return is_paneel ? "future_shop_identiteit_sessie_paneel" : "future_shop_identiteit_sessie_winkel";
 }
 
