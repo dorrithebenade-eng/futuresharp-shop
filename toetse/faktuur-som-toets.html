@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="af">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>faktuur-som.js — toets</title>
+<style>
+  :root{
+    --teal:#479F91; --teal-helder:#3FB6A4; --amber:#F1BD43; --koraal:#EC5832;
+    --swart:#171717; --grys-lig:#F5F4F1; --grys-teks:#5B5B5B;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--grys-lig);color:var(--swart);
+    font-family:"Poppins",system-ui,-apple-system,"Segoe UI",sans-serif;
+    font-size:14px;line-height:1.5}
+  header{background:var(--teal);color:#fff;padding:20px 18px}
+  h1{font-family:"Montserrat",system-ui,sans-serif;font-size:19px;margin:0 0 4px;letter-spacing:.2px}
+  header p{margin:0;opacity:.85;font-size:12.5px}
+  main{padding:18px;max-width:900px;margin:0 auto}
+  .uitslag{background:#fff;border-radius:10px;padding:16px 18px;margin-bottom:16px;
+    border-left:5px solid var(--teal-helder)}
+  .uitslag.stukkend{border-left-color:var(--koraal)}
+  .uitslag strong{font-family:"Montserrat",system-ui,sans-serif;font-size:16px;display:block;margin-bottom:6px}
+  .syfer{font-variant-numeric:tabular-nums}
+  .geval{background:#fff;border-radius:10px;margin-bottom:10px;overflow:hidden}
+  .geval-kop{display:flex;justify-content:space-between;align-items:center;gap:10px;
+    padding:11px 14px;border-bottom:1px solid #EDEBE6}
+  .geval-naam{font-weight:600;font-size:13px}
+  .merk{font-size:10.5px;letter-spacing:.6px;text-transform:uppercase;
+    padding:3px 9px;border-radius:20px;background:#E8F3F0;color:#2f6b60;white-space:nowrap}
+  .merk.fout{background:#FDE7E0;color:#a8351a}
+  .rye{padding:6px 14px 12px}
+  .ry{display:flex;justify-content:space-between;gap:12px;padding:4px 0;font-size:13px}
+  .ry span:last-child{font-variant-numeric:tabular-nums;white-space:nowrap}
+  .ry.stil{color:var(--grys-teks)}
+  .ry.klem{border-top:1px solid #EDEBE6;margin-top:5px;padding-top:7px;font-weight:600}
+  .fout-teks{color:var(--koraal);font-size:12.5px;padding:0 14px 12px}
+  .geen{background:#fff;border-radius:10px;padding:18px;border-left:5px solid var(--koraal)}
+  code{background:#EDEBE6;padding:1px 5px;border-radius:3px;font-size:12.5px}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>faktuur-som.js</h1>
+  <p>Die som loop hier presies soos hy in die faktuurvorm sal loop — dieselfde lêer, geen kopie.</p>
+</header>
+
+<main id="uit">
+  <div class="geen">
+    <strong>faktuur-som.js het nie gelaai nie.</strong>
+    Die twee lêers moet in dieselfde vouer lê:
+    <code>faktuur-som.js</code> en <code>faktuur-som-toets.html</code>.
+  </div>
+</main>
+
+<script src="faktuur-som.js"></script>
+<script>
+if (typeof fs_bereken === "function") {
+
+  const r = n => "R " + (Math.round(n*100)/100)
+    .toLocaleString("af-ZA",{minimumFractionDigits:2,maximumFractionDigits:2});
+
+  // Elke geval dra sy VERWAGTE kliëntbedrag waar dit met die hand nagegaan is.
+  // Waar dit leeg is, word net getoets dat die som tot op die sent klop.
+  const GEVALLE = [
+    { naam:"Leeg — nog niks ingetik", wag:0,
+      inv:{ rigting:"totaal", rond:0, reels:[] } },
+
+    { naam:"Een lynitem, nog geen verdelingsry", wag:25000,
+      inv:{ rigting:"totaal", rond:0, reels:[
+        { soort:"verkoop", beskrywing:"Werkswinkel", bedrag:25000, verdeling:[] } ]} },
+
+    { naam:"Een aanbieder teen 70%", wag:25000,
+      inv:{ rigting:"totaal", rond:0, reels:[
+        { soort:"verkoop", beskrywing:"Werkswinkel", bedrag:25000, verdeling:[
+          { ontvanger:"Eugene", tipe:"pct", waarde:70 } ]} ]} },
+
+    { naam:"Twee aanbieders en Admin", wag:25000,
+      inv:{ rigting:"totaal", rond:0, reels:[
+        { soort:"verkoop", beskrywing:"Werkswinkel", bedrag:25000, verdeling:[
+          { ontvanger:"Eugene", tipe:"pct", waarde:45 },
+          { ontvanger:"Ignatius", tipe:"pct", waarde:25 },
+          { ontvanger:"Admin", tipe:"pct", waarde:10 } ]} ]} },
+
+    { naam:"Lynitem plus 'n kostereël wat presies terugkom", wag:27072,
+      inv:{ rigting:"totaal", rond:0, reels:[
+        { soort:"verkoop", beskrywing:"Werkswinkel", bedrag:25000, verdeling:[
+          { ontvanger:"Eugene", tipe:"pct", waarde:60 } ]},
+        { soort:"koste", beskrywing:"Reiskoste", bedrag:2072, verdeling:[
+          { ontvanger:"Eugene", tipe:"pct", waarde:100 } ]} ]} },
+
+    { naam:"Hosting — 'n ry wat nooit uitbetaal nie", wag:12000,
+      inv:{ rigting:"totaal", rond:0, reels:[
+        { soort:"verkoop", beskrywing:"Aanlyn kursus", bedrag:12000, verdeling:[
+          { ontvanger:"Eugene", tipe:"pct", waarde:50 },
+          { ontvanger:"Hosting", tipe:"pct", waarde:10 } ]} ]} },
+
+    { naam:"Future Sharp as ry — bly in die hoofrekening", wag:4500,
+      inv:{ rigting:"totaal", rond:0, reels:[
+        { soort:"verkoop", beskrywing:"Verslag", bedrag:4500, verdeling:[
+          { ontvanger:"Dorrithé", tipe:"pct", waarde:40 },
+          { ontvanger:"Future Sharp", tipe:"pct", waarde:30 } ]} ]} },
+
+    { naam:"Vaste bedrag naas 'n persentasie", wag:18000,
+      inv:{ rigting:"totaal", rond:0, reels:[
+        { soort:"verkoop", beskrywing:"Projek", bedrag:18000, verdeling:[
+          { ontvanger:"Ignatius", tipe:"vas", waarde:5000 },
+          { ontvanger:"Eugene", tipe:"pct", waarde:35 } ]} ]} },
+
+    { naam:"Oorbestee — die rye vra meer as wat inkom", wag:3000, wagOorbestee:true,
+      inv:{ rigting:"totaal", rond:0, reels:[
+        { soort:"verkoop", beskrywing:"Werksessie", bedrag:3000, verdeling:[
+          { ontvanger:"Eugene", tipe:"vas", waarde:3000 } ]} ]} },
+
+    { naam:"Opwaarts afgerond na die naaste R5", wag:1340,
+      inv:{ rigting:"totaal", rond:5, reels:[
+        { soort:"verkoop", beskrywing:"Vraelys", bedrag:1337.42, verdeling:[
+          { ontvanger:"Eugene", tipe:"pct", waarde:70 } ]} ]} },
+
+    { naam:"Opwaarts afgerond na die naaste R100", wag:8500,
+      inv:{ rigting:"totaal", rond:100, reels:[
+        { soort:"verkoop", beskrywing:"Kampuslisensie", bedrag:8433.10, verdeling:[
+          { ontvanger:"Eugene", tipe:"pct", waarde:55 },
+          { ontvanger:"Ontwerp", tipe:"vas", waarde:1200 } ]} ]} },
+
+    { naam:"Terugwaarts — Ignatius R2 000 en Eugene R13 509,17", wag:16073.03,
+      inv:{ rigting:"bedrae", rond:0, reels:[
+        { soort:"koste", beskrywing:"Reiskoste", bedrag:0, verdeling:[
+          { ontvanger:"Ignatius", tipe:"vas", waarde:2000 } ]},
+        { soort:"verkoop", beskrywing:"Werkswinkel", bedrag:0, verdeling:[
+          { ontvanger:"Eugene", tipe:"vas", waarde:13509.17 } ]} ]} },
+
+    { naam:"Terugwaarts met 'n persentasie in dieselfde reël", wag:null,
+      inv:{ rigting:"bedrae", rond:0, reels:[
+        { soort:"verkoop", beskrywing:"Werkswinkel", bedrag:0, verdeling:[
+          { ontvanger:"Eugene", tipe:"vas", waarde:8000 },
+          { ontvanger:"Admin", tipe:"pct", waarde:20 } ]} ]} },
+
+    { naam:"Terugwaarts én afgerond na R50", wag:3500,
+      inv:{ rigting:"bedrae", rond:50, reels:[
+        { soort:"verkoop", beskrywing:"Verslag", bedrag:0, verdeling:[
+          { ontvanger:"Dorrithé", tipe:"vas", waarde:3333.33 } ]} ]} },
+
+    { naam:"Vier ontvangers oor drie reëls", wag:35606.70,
+      inv:{ rigting:"totaal", rond:0, reels:[
+        { soort:"verkoop", beskrywing:"Werkswinkel", bedrag:25000, verdeling:[
+          { ontvanger:"Eugene", tipe:"pct", waarde:40 },
+          { ontvanger:"Ignatius", tipe:"pct", waarde:20 } ]},
+        { soort:"verkoop", beskrywing:"Videografie", bedrag:7500, verdeling:[
+          { ontvanger:"Dorrithé", tipe:"pct", waarde:80 } ]},
+        { soort:"koste", beskrywing:"Akkommodasie", bedrag:3106.70, verdeling:[
+          { ontvanger:"Ignatius", tipe:"pct", waarde:100 } ]} ]} },
+  ];
+
+  let geslaag = 0, gedruip = 0;
+  let blokke = "";
+
+  GEVALLE.forEach(g => {
+    const u = fs_bereken(JSON.parse(JSON.stringify(g.inv)));
+    const foute = [];
+
+    // Die werklike toets: alles saam moet die totaal wees, tot op die sent.
+    const saam = Math.round((u.uitbetaal + u.paystack + u.hosting + u.oorskot) * 100);
+    const totaal = Math.round(u.P * 100);
+    if (saam !== totaal) foute.push("Die dele tel op tot " + r(saam/100) + ", nie " + r(totaal/100) + " nie.");
+
+    if (g.wag !== null && g.wag !== undefined && Math.abs(u.P - g.wag) > 0.005)
+      foute.push("Kliëntbedrag is " + r(u.P) + ", verwag " + r(g.wag) + ".");
+
+    if (g.wagOorbestee && !u.oorbestee) foute.push("Oorbestee is nie opgetel nie.");
+    if (!g.wagOorbestee && u.oorbestee) foute.push("Verkeerdelik as oorbestee gemerk.");
+
+    Object.keys(u).forEach(k => {
+      if (typeof u[k] === "number" && !isFinite(u[k])) foute.push("NaN by " + k + ".");
+    });
+
+    foute.length ? gedruip++ : geslaag++;
+
+    const ontv = u.ontvangers.length
+      ? u.ontvangers.map(o =>
+          `<div class="ry"><span>${o.naam} <small style="color:#5B5B5B">· ${o.wat} · ${o.soort}</small></span><span>${r(o.sent/100)}</span></div>`).join("")
+      : `<div class="ry stil"><span>Geen ontvanger</span><span>—</span></div>`;
+
+    blokke += `
+      <div class="geval">
+        <div class="geval-kop">
+          <span class="geval-naam">${g.naam}</span>
+          <span class="merk ${foute.length?'fout':''}">${foute.length?'Fout':'Klop'}</span>
+        </div>
+        <div class="rye">
+          <div class="ry"><span><strong>Kliënt betaal</strong></span><span><strong>${r(u.P)}</strong></span></div>
+          ${u.afgerond ? `<div class="ry stil"><span>Opwaarts afgerond van</span><span>${r(u.P_rou)}</span></div>` : ""}
+          ${ontv}
+          ${u.hosting ? `<div class="ry stil"><span>Hosting <small>bly in die hoofrekening</small></span><span>${r(u.hosting)}</span></div>` : ""}
+          <div class="ry stil"><span>Paystack <small>3,5% + R1,30</small></span><span>${r(u.paystack)}</span></div>
+          <div class="ry klem"><span>Oorskot <small>bly in die hoofrekening</small></span><span>${r(u.oorskot)}</span></div>
+        </div>
+        ${foute.length ? `<div class="fout-teks">${foute.join("<br>")}</div>` : ""}
+      </div>`;
+  });
+
+  document.getElementById("uit").innerHTML = `
+    <div class="uitslag ${gedruip?'stukkend':''}">
+      <strong>${gedruip ? gedruip + " van " + GEVALLE.length + " gevalle klop nie" : "Al " + GEVALLE.length + " gevalle klop"}</strong>
+      <span class="syfer">Ontvangers plus Paystack plus Hosting plus die oorskot is in elke geval presies
+      wat die kliënt betaal — tot op die sent.</span>
+    </div>
+    ${blokke}`;
+}
+</script>
+</body>
+</html>
