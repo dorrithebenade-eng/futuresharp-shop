@@ -123,3 +123,222 @@ a.paneel-kieslys-item { text-decoration: none; }
     gap: 8px;
   }
 }
+
+/* ---------- Die kliënteregister ---------- */
+
+.fk-skakel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  background: var(--grys-lig);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 14px;
+}
+
+.fk-skakel h3 {
+  font-family: var(--font-opskrif);
+  font-size: 13.5px;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.fk-skakel-url {
+  flex: 1;
+  min-width: 200px;
+  background: var(--wit);
+  border: 1px solid #DDD9D2;
+  border-radius: 7px;
+  padding: 9px 12px;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 12.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Die strook verskyn slegs wanneer daar 'n moontlike duplikaat is. Dit is 'n
+   versoek om te kontroleer, nie 'n fout nie — daarom amber en nie koraal. */
+.fk-waarsku {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  background: #FDF3DA;
+  border-left: 4px solid var(--amber);
+  border-radius: 9px;
+  padding: 13px 16px;
+  margin-bottom: 14px;
+}
+
+.fk-waarsku-teks { flex: 1; min-width: 220px; font-size: 13px; }
+.fk-waarsku-teks strong {
+  display: block;
+  font-family: var(--font-opskrif);
+  font-size: 13.5px;
+  margin-bottom: 2px;
+}
+
+.fk-soekbalk { display: flex; gap: 10px; margin-bottom: 6px; }
+.fk-soekbalk .veld-invoer { flex: 1; min-width: 0; }
+.fk-hulp { font-size: 12px; color: var(--grys-teks); margin: 0 0 14px; }
+
+.fk-ry {
+  padding: 13px 0;
+  border-bottom: 1px solid #EDEBE6;
+  cursor: pointer;
+}
+.fk-ry:last-child { border-bottom: 0; }
+.fk-ry:hover { background: #FAFAF8; }
+
+.fk-ry-naam {
+  font-family: var(--font-opskrif);
+  font-weight: 600;
+  font-size: 14.5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.fk-nr {
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 11.5px;
+  color: var(--grys-teks);
+  font-weight: 400;
+}
+
+.fk-ry-onder {
+  font-size: 12.5px;
+  color: var(--grys-teks);
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fk-merkie {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .6px;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #FDF3DA;
+  color: #8a6400;
+}
+.fk-merkie-nuut { background: #E8F3F0; color: #2f6b60; }
+.fk-merkie-dup { background: #FDE7E0; color: #a8351a; }
+
+/* --- die twee oorlegsels --- */
+
+.fk-oorlegsel {
+  position: fixed;
+  inset: 0;
+  background: rgba(23, 23, 23, .45);
+  display: none;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 26px 14px;
+  overflow-y: auto;
+  z-index: 40;
+}
+.fk-oorlegsel.oop { display: flex; }
+
+.fk-venster {
+  background: var(--wit);
+  border-radius: 12px;
+  width: 100%;
+  max-width: 700px;
+  padding: 22px;
+}
+.fk-venster h2 { font-family: var(--font-opskrif); font-size: 18px; margin: 0 0 4px; }
+.fk-lei { font-size: 12.5px; color: var(--grys-teks); margin: 0 0 18px; }
+
+.fk-soort { display: flex; gap: 8px; margin-bottom: 16px; }
+.fk-soort-knop {
+  flex: 1;
+  background: var(--wit);
+  border: 1px solid #DDD9D2;
+  border-radius: 8px;
+  padding: 11px 10px;
+  font-family: var(--font-liggaam);
+  font-size: 13.5px;
+  color: var(--grys-teks);
+  cursor: pointer;
+}
+.fk-soort-knop.aan {
+  border-color: var(--swart);
+  background: var(--swart);
+  color: var(--wit);
+  font-weight: 600;
+}
+.fk-soort-knop small { display: block; font-size: 11px; opacity: .7; margin-top: 2px; }
+
+.fk-twee { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.fk-fout { color: var(--koraal); font-size: 12.5px; margin: 0 0 12px; }
+
+.fk-knoppies {
+  display: flex;
+  gap: 9px;
+  justify-content: flex-end;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+.fk-knoppies .fk-links { margin-right: auto; }
+
+/* --- die vergelyking --- */
+
+.fk-vgl {
+  border: 1px solid #EDEBE6;
+  border-radius: 9px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.fk-vgl.verskil { border-color: var(--amber); background: #FFFDF7; }
+
+.fk-vgl-etiket {
+  font-size: 11px;
+  letter-spacing: .7px;
+  text-transform: uppercase;
+  color: var(--grys-teks);
+  font-weight: 600;
+  margin-bottom: 7px;
+}
+
+.fk-vgl-eenders { font-size: 13px; color: var(--grys-teks); }
+
+.fk-vgl-paar { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+.fk-vgl-kant {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: 1px solid #DDD9D2;
+  border-radius: 7px;
+  padding: 9px 11px;
+  background: var(--wit);
+  font-family: var(--font-liggaam);
+  cursor: pointer;
+}
+.fk-vgl-kant.gekies { border-color: var(--swart); background: var(--swart); color: var(--wit); }
+
+.fk-vgl-kop {
+  display: block;
+  font-size: 10.5px;
+  letter-spacing: .6px;
+  text-transform: uppercase;
+  opacity: .7;
+  margin-bottom: 2px;
+}
+.fk-vgl-waarde { display: block; font-size: 13.5px; word-break: break-word; }
+
+/* Op 'n foon val die twee weergawes onder mekaar. Die vraag by 'n duplikaat
+   is nooit "wat staan hier alles" nie; dit is "waar verskil hulle" — en dit
+   bly leesbaar in een kolom. */
+@media (max-width: 620px) {
+  .fk-vgl-paar { grid-template-columns: 1fr; }
+  .fk-twee { grid-template-columns: 1fr; }
+}

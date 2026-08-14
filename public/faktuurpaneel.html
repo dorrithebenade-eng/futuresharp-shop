@@ -74,7 +74,30 @@
       </section>
 
       <section class="paneel-afdeling fp-afdeling" data-afdeling="registers">
-        <p class="stelsel-boodskap" data-i18n="fp_nog_nie">Hierdie deel word nog gebou.</p>
+
+        <!-- Die staande kliëntvorm-skakel. Hy dra geen kode en verval nie —
+             een adres wat aan almal gaan. Die titel is nie versiering nie:
+             die betaalskakel kry later dieselfde strook, en sonder 'n naam
+             moet 'n mens elke keer die URL lees om te weet watter een dit is. -->
+        <div class="fk-skakel">
+          <h3 data-i18n="fk_skakel_titel">Kliëntvorm-skakel</h3>
+          <div class="fk-skakel-url" id="fk-skakel-url">futureshop.futuresharp.co.za/klientvorm.html</div>
+          <button type="button" class="kaart-aksie stil" id="fk-kopieer" data-i18n="fk_kopieer">Kopieer</button>
+        </div>
+
+        <div id="fk-strook"></div>
+
+        <div class="fk-soekbalk">
+          <input type="text" class="veld-invoer" id="fk-soek"
+                 data-i18n-placeholder="fk_soek_plek"
+                 placeholder="Soek op nommer, naam, kontakpersoon, e-pos of selfoon">
+          <button type="button" class="kaart-aksie" id="fk-nuut" data-i18n="fk_nuwe_klient_knop">+ Nuwe kliënt</button>
+        </div>
+        <p class="fk-hulp" id="fk-hulp"></p>
+
+        <div id="fk-lys">
+          <p class="stelsel-boodskap" data-i18n="fp_laai">Word gelaai …</p>
+        </div>
       </section>
 
       <section class="paneel-afdeling fp-afdeling" data-afdeling="state">
@@ -84,9 +107,66 @@
     </div>
   </main>
 
+  <!-- Die kliëntvorm. Slegs die naam keer; die res kan later bygevoeg word,
+       want "+ Nuwe kliënt" moet midde-in 'n faktuur werk. -->
+  <div class="fk-oorlegsel" id="fk-vorm">
+    <div class="fk-venster">
+      <h2 id="fk-vorm-titel" data-i18n="fk_nuwe_klient">Nuwe kliënt</h2>
+      <p class="fk-lei" data-i18n="fk_vorm_lei">Naam, e-pos en selfoon is nodig. 'n Rekord
+      sonder hulle word as onvolledig gemerk en kan later voltooi word.</p>
+
+      <div class="fk-soort">
+        <button type="button" class="fk-soort-knop aan" data-soort="instansie">
+          <span data-i18n="fk_instansie">Instansie</span>
+          <small data-i18n="fk_instansie_hulp">bv. skool, departement, maatskappy</small>
+        </button>
+        <button type="button" class="fk-soort-knop" data-soort="privaat">
+          <span data-i18n="fk_privaat_klient">Privaat kliënt</span>
+          <small data-i18n="fk_privaat_hulp">bv. 'n outeur of individu</small>
+        </button>
+      </div>
+
+      <div class="veld-ry">
+        <label class="veld-etiket" for="fk-naam" id="fk-naam-etiket"
+               data-i18n="fk_naam_instansie">Naam van die instansie</label>
+        <input type="text" class="veld-invoer" id="fk-naam">
+      </div>
+
+      <div class="veld-ry" id="fk-kontak-ry">
+        <label class="veld-etiket" for="fk-kontak" data-i18n="fk_veld_kontak">Kontakpersoon</label>
+        <input type="text" class="veld-invoer" id="fk-kontak">
+      </div>
+
+      <div class="fk-twee">
+        <div class="veld-ry">
+          <label class="veld-etiket" for="fk-epos" data-i18n="fk_veld_epos">E-pos</label>
+          <input type="email" class="veld-invoer" id="fk-epos" autocomplete="off">
+        </div>
+        <div class="veld-ry">
+          <label class="veld-etiket" for="fk-selfoon" data-i18n="fk_veld_selfoon">Selfoon</label>
+          <input type="tel" class="veld-invoer" id="fk-selfoon" inputmode="tel">
+        </div>
+      </div>
+
+      <div class="fk-fout" id="fk-vorm-fout" style="display:none;"></div>
+
+      <div class="fk-knoppies">
+        <button type="button" class="kaart-aksie stil" id="fk-kanselleer" data-i18n="fk_kanselleer">Kanselleer</button>
+        <button type="button" class="kaart-aksie" id="fk-stoor" data-i18n="fk_stoor">Stoor</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Die duplikaat-skerm. Een skerm wat by 'n breekpunt oopvou: op 'n
+       rekenaarskerm staan die twee langs mekaar, op 'n foon onder mekaar. -->
+  <div class="fk-oorlegsel" id="fk-dup">
+    <div class="fk-venster" id="fk-dup-venster"></div>
+  </div>
+
   <script src="js/taal.js"></script>
   <script src="js/identiteit.js"></script>
   <script src="js/sessie-verval.js"></script>
   <script src="js/faktuurpaneel.js"></script>
+  <script src="js/faktuurpaneel-kliente.js"></script>
 </body>
 </html>
