@@ -78,6 +78,30 @@
     const taal_kloon = taal_oorspronklik.cloneNode(true);
     mobiel_balk.appendChild(taal_kloon);
   }
+  // DIE MANDJIE MOET OP 'N FOON SIGBAAR BLY.
+  //
+  // By 640px skuif .mini-kop-regs — met die mandjie en sy teller daarin —
+  // heeltemal in die skyfie-paneel in. 'n Koper wat 'n boek insit, sien dus
+  // NIKS gebeur nie, en weet ook nie waarheen om te gaan nie. 'n Mandjie wat
+  // 'n mens nie sien nie, voel soos 'n knoppie wat niks gedoen het nie.
+  //
+  // Ons sit hom dus in die altyd-sigbare balkie, links van die taal-
+  // wisselaar. Die ikoon bly staan al is die mandjie leeg — een wat eers
+  // verskyn wanneer daar iets in is, laat 'n mens die eerste keer soek.
+  const kop_mandjie = document.createElement("a");
+  kop_mandjie.href = "mandjie.html";
+  kop_mandjie.className = "kop-mandjie";
+  kop_mandjie.setAttribute("aria-label", window.t ? window.t("nav_mandjie") : "Mandjie");
+  kop_mandjie.innerHTML =
+    '<svg class="mandjie-ikoon" viewBox="0 0 24 24" fill="none" stroke="currentColor"' +
+    ' stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+    '<circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle>' +
+    '<path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>' +
+    '</svg><span class="kop-mandjie-teller" id="kop-mandjie-teller"></span>';
+  // Heel links in die balkie, voor die taal-wisselaar: die mandjie is die
+  // ding waarheen 'n koper op pad is, nie 'n instelling nie.
+  mobiel_balk.insertBefore(kop_mandjie, mobiel_balk.firstChild);
+
   mobiel_balk.appendChild(hamburger);
 
   inner.insertBefore(mobiel_balk, regs.nextSibling);
@@ -105,6 +129,50 @@
   window.addEventListener("resize", () => {
     if (window.innerWidth > 640) maak_toe();
   });
+
+  // --- Die teller, sonder om mandjie.js aan te raak ---
+  //
+  // mandjie.js se wys_mandjie_teller() ken net EEN element: #mandjie-teller,
+  // binne die skyfie-paneel. In plaas daarvan om daardie funksie te wysig
+  // (en dan twee plekke te hê wat dieselfde waarheid moet weet), kyk ons na
+  // die bestaande teller en weerspieël hom. Dieselfde MutationObserver-
+  // patroon as paneel-kieslys.js.
+  //
+  // Die voordeel: elke pad wat die mandjie verander — insit, verwyder,
+  // leegmaak, of 'n bestelling wat deurgaan — werk die ou teller by, en
+  // hierdie een volg vanself. Daar is niks om te vergeet nie.
+  const kop_teller = kop_mandjie.querySelector("#kop-mandjie-teller");
+  const bron = document.getElementById("mandjie-teller");
+
+  function werk_teller_by(klop) {
+    if (!kop_teller) return;
+    const aantal = bron ? (bron.textContent || "").trim() : "";
+    kop_teller.textContent = aantal;
+    kop_teller.classList.toggle("wys", aantal !== "");
+
+    // Een klop wanneer 'n item BYKOM. Dit is die sein dat iets gebeur het;
+    // sonder dit lyk 'n suksesvolle byvoeging soos niks.
+    if (klop && aantal !== "") {
+      kop_mandjie.classList.remove("kop-mandjie-klop");
+      void kop_mandjie.offsetWidth; // dwing die animasie om oor te begin
+      kop_mandjie.classList.add("kop-mandjie-klop");
+    }
+  }
+
+  if (bron) {
+    let vorige = (bron.textContent || "").trim();
+    new MutationObserver(() => {
+      const nuwe = (bron.textContent || "").trim();
+      const bygekom = nuwe !== "" && (vorige === "" || Number(nuwe) > Number(vorige));
+      vorige = nuwe;
+      werk_teller_by(bygekom);
+    }).observe(bron, { childList: true, characterData: true, subtree: true });
+  }
+
+  // Die eerste teken: mandjie.js roep wys_mandjie_teller() by
+  // DOMContentLoaded, ná hierdie sinkrone kode, dus wag ons daarvoor.
+  document.addEventListener("DOMContentLoaded", () => werk_teller_by(false));
+  werk_teller_by(false);
 })();
 
 // --- Is hierdie koper ook 'n outeur? ---
