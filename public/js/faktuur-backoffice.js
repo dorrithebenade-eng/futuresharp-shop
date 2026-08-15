@@ -151,16 +151,31 @@ function bo_som() {
 
 /* ═══ teken ═══ */
 
-function bo_ontvanger_opsies(gekies) {
+// Die twee lyste kry NIE dieselfde keuses nie.
+//
+//   die BEGROTING  — Future Sharp hoort daar. 'n Koste kan deur die
+//                    hoofrekening betaal word; dit is die hele punt van die
+//                    drie paaie.
+//   die VERDELING  — Future Sharp hoort NIE daar nie. Hy IS die
+//                    hoofrekening. 'n Ry vir hom verminder die oorskot
+//                    sonder om iemand te betaal: dit lyk soos 'n uitbetaling
+//                    en is nie een nie. Sy deel is wat OORBLY nadat almal
+//                    afgetrek is — presies dieselfde slaggat as die winkel
+//                    se oorskot, waar 'n ry daarvoor beteken die deel word
+//                    uitbetaal EN daar bly niks vir Paystack nie.
+function bo_ontvanger_opsies(gekies, met_hoofrekening) {
   const uit = BEGUNSTIGDES.map(
     (b) => `<option ${b.naam === gekies ? "selected" : ""}>${ontsnap(b.naam)}</option>`
   );
-  // Future Sharp is die HOOFREKENING en verskyn nooit as 'n Paystack-ry nie.
-  // Hy staan wel in die keuselys, want 'n koste kan aan die maatskappy self
-  // gaan — dan betaal iemand dit met die hand.
-  uit.push(
-    `<option ${gekies === HOOFREKENING ? "selected" : ""}>${ontsnap(HOOFREKENING)}</option>`
-  );
+  if (met_hoofrekening) {
+    uit.push(
+      `<option ${gekies === HOOFREKENING ? "selected" : ""}>${ontsnap(HOOFREKENING)}</option>`
+    );
+  } else if (gekies === HOOFREKENING) {
+    // 'n Ou konsep kan so 'n ry dra. Hy word gewys sodat 'n mens sien wat
+    // daar staan, nie stilweg na iemand anders verander nie.
+    uit.unshift(`<option selected>${ontsnap(HOOFREKENING)}</option>`);
+  }
   return uit.join("");
 }
 
@@ -176,9 +191,9 @@ function bo_teken_begroting() {
         <div class="bt-boonste">
           <input data-veld="beskrywing" value="${ontsnap(k.beskrywing)}"
                  placeholder="${fv_t("bo_beskrywing", "Beskrywing")}">
-          <select data-veld="ontvanger">${bo_ontvanger_opsies(k.ontvanger)}</select>
+          <select data-veld="ontvanger">${bo_ontvanger_opsies(k.ontvanger, true)}</select>
           <input class="n" data-veld="bedrag" inputmode="decimal"
-                 value="${((Number(k.bedrag_sent) || 0) / 100).toFixed(2)}">
+                 value="${veld_sent(k.bedrag_sent)}" placeholder="0,00">
           <button type="button" class="bo-vee" title="${fv_t("bo_verwyder", "Verwyder")}">&times;</button>
         </div>
         <div class="bt-onderste">
@@ -233,18 +248,25 @@ function bo_teken_verdeling(S) {
     .map((v, ix) => {
       const rand =
         v.tipe === "pct" ? ((Number(v.waarde) || 0) / 100) * basis : (Number(v.waarde) || 0) / 100;
-      const waarde = v.tipe === "pct" ? v.waarde : ((Number(v.waarde) || 0) / 100).toFixed(2);
+      const waarde = v.tipe === "pct" ? veld_getal(v.waarde) : veld_sent(v.waarde);
+      // Paystack kan iemand sonder 'n subrekening nie betaal nie. Sonder
+      // hierdie merkie lyk die ry soos elke ander een, en by uitreiking
+      // misluk die verdeling — of erger, dit lyk of hy betaal is.
+      const pad = bo_pad(v.ontvanger);
+      const merk = pad === "split" ? "" :
+        `<div class="vd-waarsku"><span class="bt-pad ${pad}">${bo_pad_et(pad)}</span></div>`;
       return `
       <div class="vd-ry" data-ry="${ix}">
-        <select data-veld="ontvanger">${bo_ontvanger_opsies(v.ontvanger)}</select>
+        <select data-veld="ontvanger">${bo_ontvanger_opsies(v.ontvanger, false)}</select>
         <div class="vd-tipe">
           <button type="button" data-tipe="pct" class="${v.tipe === "pct" ? "aan" : ""}">%</button>
           <button type="button" data-tipe="vas" class="${v.tipe === "vas" ? "aan" : ""}">R</button>
         </div>
-        <input class="n" data-veld="waarde" inputmode="decimal" value="${ontsnap(waarde)}">
+        <input class="n" data-veld="waarde" inputmode="decimal" value="${ontsnap(waarde)}"
+               placeholder="${v.tipe === "pct" ? "0" : "0,00"}">
         <div class="uit">${rand_uit(rand)}</div>
         <button type="button" class="bo-vee" title="${fv_t("bo_verwyder", "Verwyder")}">&times;</button>
-      </div>`;
+      </div>${merk}`;
     })
     .join("");
 
@@ -437,8 +459,8 @@ function bo_vul_velde() {
     // Nooit die veld waarin iemand tik nie — dan spring die wyser.
     if (el && el !== document.activeElement) el.value = waarde;
   };
-  stel("f-afslag", ((Number(V.afslag_sent) || 0) / 100).toFixed(2));
-  stel("f-skenking", ((Number(V.skenking_sent) || 0) / 100).toFixed(2));
+  stel("f-afslag", veld_sent(V.afslag_sent));
+  stel("f-skenking", veld_sent(V.skenking_sent));
   stel("f-hosting", String(V.hosting_pct));
   stel("f-koepon", V.koepon_kode || "");
 }
@@ -494,8 +516,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const voeg_ry = document.getElementById("vd-voeg");
   if (voeg_ry) {
     voeg_ry.addEventListener("click", () => {
-      const eerste = BEGUNSTIGDES[0];
-      V.verdeling.push({ ontvanger: eerste ? eerste.naam : HOOFREKENING, tipe: "pct", waarde: 0 });
+      // Kies iemand wat werklik betaal kan word; anders die eerste op die
+      // lys, met sy merkie wat sê wat kort.
+      const eerste =
+        BEGUNSTIGDES.find((b) => (b.subrekening_kode || "").trim()) || BEGUNSTIGDES[0];
+      if (!eerste) return;
+      V.verdeling.push({ ontvanger: eerste.naam, tipe: "vas", waarde: 0 });
       bo_teken();
       merk_vuil();
     });

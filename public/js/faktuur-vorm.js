@@ -100,6 +100,15 @@ function sent_as_teks(sent) {
   return (Number(sent || 0) / 100).toFixed(2);
 }
 
+// Leeg by nul. Die plekhouer wys 0,00 in grys, sodat 'n mens weet wat die
+// veld verwag sonder dat daar iets is om uit te vee.
+function veld_sent(sent) {
+  return Number(sent) ? (Number(sent) / 100).toFixed(2) : "";
+}
+function veld_getal(n) {
+  return Number(n) ? String(n) : "";
+}
+
 function ontsnap(waarde) {
   return String(waarde == null ? "" : waarde)
     .replace(/&/g, "&amp;")
@@ -166,7 +175,7 @@ function teken_reels() {
       <tr data-reel="${ix}">
         <td><input class="tel-invoer" data-veld="beskrywing" value="${ontsnap(r.beskrywing)}"></td>
         <td class="n"><input class="tel-invoer n" data-veld="hoeveelheid" inputmode="decimal" value="${ontsnap(r.hoeveelheid)}"></td>
-        <td class="n"><input class="tel-invoer n" data-veld="prys" inputmode="decimal" value="${sent_as_teks(r.prys_pp_sent)}"></td>
+        <td class="n"><input class="tel-invoer n" data-veld="prys" inputmode="decimal" value="${veld_sent(r.prys_pp_sent)}" placeholder="0,00"></td>
         <td class="n sterk">${rand(bedrag)}</td>
         <td class="n"><button type="button" class="dok-vee" title="${fv_t("fv_verwyder_reel", "Verwyder reël")}">&times;</button></td>
       </tr>`;

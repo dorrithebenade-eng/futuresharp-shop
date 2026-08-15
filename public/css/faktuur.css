@@ -543,3 +543,8 @@
   .vd-ry { grid-template-columns: 1fr 68px 78px 22px; }
   .vd-ry .uit { grid-column: 1 / -1; text-align: left; }
 }
+
+/* 'n Verdelingsry waarvan die ontvanger nie deur Paystack betaal kan word
+   nie. Die merkie sit ONDER die ry, oor die volle breedte — 'n vyfde kolom
+   sou die res saamdruk. */
+.vd-waarsku { margin: -3px 0 9px; }
