@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="af">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Faktuur — Future Shop</title>
+  <link rel="stylesheet" href="css/styl.css" />
+  <link rel="stylesheet" href="css/faktuur.css" />
+</head>
+<body>
+
+  <!--
+    DIE FAKTUURVORM. Een faktuur, met sy eie URL:
+
+        faktuur.html                    'n nuwe konsep
+        faktuur.html?sleutel=KONSEP-…   'n bestaande konsep
+        faktuur.html?nommer=FS/01957    'n uitgereikte faktuur
+
+    Die eie URL is nie gerief nie. 'n Konsep word begin, gelaat staan, en
+    later klaargemaak — dikwels op 'n ander dag en 'n ander toestel. Sonder 'n
+    adres om na terug te keer, is daar geen pad terug na daardie konsep nie.
+
+    DIE SESSIE kom uit die PANEEL-sleutel, dieselfde as paneelbord.html en
+    faktuurpaneel.html. Dit werk slegs omdat identiteit.js se PANEEL_BLADSYE
+    hierdie bladsy insluit — sonder dit kry 'n mens die winkel se sessie en
+    lyk uitgeteken terwyl hy aangemeld is.
+
+    DIE DOKUMENT SE TAAL is nie die platform se taal nie. Alles binne .dok
+    word met t_in(sleutel, faktuur.taal) gelees; die res van die bladsy volg
+    die gewone data-i18n-pad. Die twee pille bo-regs op die dokument stel die
+    faktuur se eie taalveld.
+  -->
+  <header class="mini-kop">
+   <div class="mini-kop-inner">
+    <a href="index.html" class="mini-kop-merk">
+      <span class="merk-sharp">Future Sharp</span>
+      <span class="merk-skeier">—</span>
+      <span class="merk-shop">Future Shop</span>
+    </a>
+    <div class="mini-kop-regs">
+      <div class="paneel-aanmeld-blok">
+        <span id="paneel-gebruiker-epos" class="paneel-gebruiker-epos"></span>
+        <a href="faktuurpaneel.html" class="mini-kop-mandjie" data-i18n="fv_nav_boekhouding">Boekhouding</a>
+      </div>
+      <div class="taal-wisselaar" role="group" aria-label="Taal / Language">
+        <button type="button" class="taal-knoppie" data-taal="af">AF</button>
+        <button type="button" class="taal-knoppie" data-taal="en">EN</button>
+      </div>
+    </div>
+   </div>
+  </header>
+
+  <main class="paneel-wrap" id="fv-hoof" style="visibility:hidden;">
+
+    <!-- Geen aanmeldvorm hier nie. Wie nie aangemeld is nie, of nie die
+         boekhouding-rol dra nie, word na die paneelbord gestuur. Twee
+         aanmeldvorms vir dieselfde sessie sou twee plekke wees om reg te
+         hou. -->
+    <section id="fv-geen-toegang" class="paneel-auth-blok" style="display:none;">
+      <p class="stelsel-boodskap" id="fv-geen-toegang-teks" data-i18n="fp_geen_toegang">
+        Hierdie bladsy is vir Boekhouding. Meld by die paneelbord aan.
+      </p>
+      <a href="paneelbord.html" class="kaart-aksie" data-i18n="fp_gaan_paneelbord">Gaan na die paneelbord</a>
+    </section>
+
+    <div id="fv-vorm" style="display:none;">
+
+      <div class="fv-balk">
+        <div class="fv-balk-links">
+          <a href="faktuurpaneel.html" class="terug-skakel" data-i18n="fv_terug">← Boekhouding</a>
+          <span class="fv-stand" id="fv-stand">Konsep</span>
+        </div>
+        <div class="fv-balk-regs">
+          <!-- Die enigste manier waarop 'n mens WEET dit is gestoor. Hy sê
+               dit ook eerlik wanneer dit misluk. -->
+          <span class="fv-stoorstand" id="fv-stoorstand"></span>
+          <button type="button" class="kaart-aksie stil" id="fv-stoor" data-i18n="fk_stoor">Stoor</button>
+        </div>
+      </div>
+
+      <!-- ═══ die dokument ═══ -->
+      <div class="dok" id="fv-dok">
+
+        <div class="dok-kop">
+          <div>
+            <div class="dok-merk">FUTURE SHARP NPC</div>
+            <!-- Die maatskappy se besonderhede, nie 'n persoon s'n nie. 'n
+                 Faktuur kom van die maatskappy; wie hom opgestel het, is
+                 interne inligting. Die registrasienommer staan hier omdat 'n
+                 institusionele koper dit in sy eie stelsel laai — 'n faktuur
+                 daarsonder kom terug. -->
+            <div class="dok-fyn">
+              Registrasienommer 2024/117444/08<br>
+              Posbus 11602, Queenswood, Pretoria, 0121<br>
+              admin@futuresharp.co.za
+            </div>
+          </div>
+          <div class="dok-nr">
+            <div class="et" id="d-soort">Proforma-faktuur</div>
+            <div class="nr" id="d-nommer">Konsep</div>
+            <div class="dok-fyn">
+              <span class="dok-taal" id="d-taal">
+                <button type="button" data-taal="af" class="aan">AF</button>
+                <button type="button" data-taal="en">EN</button>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="dok-party">
+          <div>
+            <p class="dok-et" id="d-aan">Gefaktureer aan</p>
+            <div class="dok-klient" id="d-klient"></div>
+            <div class="fv-klient-kies" id="fv-klient-kies">
+              <select id="fv-klient"></select>
+            </div>
+          </div>
+          <div>
+            <p class="dok-et" id="d-besonderhede">Besonderhede</p>
+            <div class="dok-datums">
+              <div><span id="d-datum">Datum</span><b id="d-datum-w">—</b></div>
+              <!-- betaalbaar_teen staan op die DOKUMENT en keer niks. Dit is
+                   NIE verval_op, wat die betaalskakel doodmaak. -->
+              <div>
+                <span id="d-betaalbaar">Betaalbaar teen</span>
+                <input type="date" id="fv-betaalbaar">
+              </div>
+              <div>
+                <span id="d-bestelnr">Bestelnommer</span>
+                <input type="text" id="fv-bestelnommer" maxlength="100">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <table class="dok-tabel">
+          <thead>
+            <tr>
+              <th id="d-k-beskrywing">Beskrywing</th>
+              <th style="width:82px" id="d-k-hoeveelheid">Hoeveelheid</th>
+              <th style="width:110px" id="d-k-eenheid">Eenheidsprys</th>
+              <th style="width:118px" id="d-k-bedrag">Bedrag</th>
+              <th style="width:24px"></th>
+            </tr>
+          </thead>
+          <tbody id="fv-reels"></tbody>
+        </table>
+        <button type="button" class="kaart-aksie stil klein" id="fv-voeg-reel"
+                style="margin-top:10px" data-i18n="fv_voeg_reel">Voeg reël by</button>
+
+        <div class="dok-somme" id="fv-somme"></div>
+
+        <div class="dok-nota">
+          <p class="dok-et" id="d-aantekening">Aantekening</p>
+          <!-- EEN blok, onder die reëls. Dit dra die opleidingsdatum en die
+               deelnemerslys. 'n Blok per reël sou by drie reëls drie
+               half-ingevulde blokke gee. -->
+          <textarea id="fv-nota" rows="3" maxlength="3000"></textarea>
+        </div>
+
+        <div class="dok-betaal">
+          <div>
+            <h3 id="d-eft">Onmiddellike EFT — deur die betaalskakel</h3>
+            <p id="d-eft-lei">Kaart, Instant EFT of QR. Die betaling word dadelik bevestig.</p>
+            <a class="dok-skakel dood" href="#" id="d-betaal" onclick="return false">Betaal</a>
+          </div>
+          <div>
+            <h3 id="d-bank">Bankoorbetaling</h3>
+            <p id="d-bank-lei"></p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <script src="js/taal.js"></script>
+  <script src="js/identiteit.js"></script>
+  <script src="js/sessie-verval.js"></script>
+  <script src="js/faktuur-vorm.js"></script>
+</body>
+</html>

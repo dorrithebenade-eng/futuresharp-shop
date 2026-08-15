@@ -33,7 +33,7 @@
 // net paneelbord.html, sou 'n mens wat op die paneelbord aangemeld is,
 // op die faktuurpaneel uitgeteken wees — dit sou die winkel se sleutel
 // gekry het. Elke nuwe personeel-kant bladsy kom hier by.
-const PANEEL_BLADSYE = ["paneelbord.html", "faktuurpaneel.html"];
+const PANEEL_BLADSYE = ["paneelbord.html", "faktuurpaneel.html", "faktuur.html"];
 
 function kry_sessie_sleutel() {
   const pad = window.location.pathname;

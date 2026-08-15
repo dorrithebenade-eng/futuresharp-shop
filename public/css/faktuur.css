@@ -1,0 +1,311 @@
+/* public/css/faktuur.css
+ *
+ * DIE FAKTUURVORM. Eie klasse, almal met die voorvoegsel `fv-` (die vorm) of
+ * `dok-` (die dokument self).
+ *
+ * MOENIE 'N KLAS LEEN NIE. Op 14 Augustus het dit drie keer in een sessie
+ * iets gebreek: `.veld-ry` is 'n TWEEKOLOM-ROOSTER in styl.css en het die
+ * kliëntvorm skeef laat lyk; `.outeur-pil` hang met 'n negatiewe marge aan 'n
+ * band wat hier nie bestaan nie. 'n Geleende klas dra sy eie aannames saam.
+ *
+ * Wat wel geleen word, is geleen omdat dit MOET saam verander: .kaart-aksie,
+ * .veld-etiket, .veld-invoer, .stelsel-boodskap, .mini-kop. Verander 'n
+ * knoppie se styl later, verander dit oral saam.
+ *
+ * Die palet kom uit styl.css se :root. Niks word hier herhaal nie behalwe
+ * --fv-lyn, wat 'n ligter lyn is as enigiets wat daar bestaan.
+ */
+
+:root {
+  --fv-lyn: #E4E2DD;
+}
+
+/* ── Die balk bo die dokument ─────────────────────────────────────────────
+   Die stand, die stoor-aanwyser en die pad terug. Nie deel van die dokument
+   nie: dit is die vorm se eie gereedskap en dit druk nêrens. */
+.fv-balk {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.fv-balk-links,
+.fv-balk-regs {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.fv-stand {
+  display: inline-block;
+  background: #EFEDE8;
+  color: var(--grys-teks);
+  border-radius: 999px;
+  padding: 3px 11px;
+  font-size: 11.5px;
+  font-weight: 500;
+}
+.fv-stand-gestuur { background: #E8F3F0; color: #2f6b60; }
+.fv-stand-betaal { background: var(--teal); color: #fff; }
+.fv-stand-gekanselleer { background: #F1EFEA; color: var(--grys-teks); }
+
+/* Die stoor-aanwyser is die enigste manier waarop 'n mens WEET dit is
+   gestoor. Hy sê dit ook eerlik wanneer dit misluk. */
+.fv-stoorstand {
+  font-size: 12px;
+  color: var(--grys-teks);
+  min-height: 18px;
+}
+.fv-stoorstand.fout { color: var(--koraal); font-weight: 500; }
+
+/* ── Die dokument ────────────────────────────────────────────────────────
+   Wat hier binne staan, is wat druk. Alles wat NIE druk nie, staan buite. */
+.dok {
+  background: #fff;
+  border: 1px solid var(--fv-lyn);
+  border-radius: 10px;
+  padding: 30px 32px 34px;
+  max-width: 900px;
+}
+.dok-kop {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  border-bottom: 3px solid var(--teal);
+  padding-bottom: 16px;
+  margin-bottom: 20px;
+}
+.dok-merk {
+  font-family: var(--font-opskrif);
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--teal);
+}
+.dok-fyn {
+  font-size: 11.5px;
+  color: var(--grys-teks);
+  line-height: 1.6;
+  margin-top: 5px;
+}
+.dok-nr { text-align: right; }
+.dok-nr .nr {
+  font-family: var(--font-opskrif);
+  font-size: 24px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.dok-nr .et {
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: .09em;
+  color: var(--grys-teks);
+}
+
+/* Die taalskakelaar sit OP die dokument, by die nommer. Hy hoort by die ding
+   wat hy verander, en hy is geen voorskou nie — dit is die faktuur se
+   taalveld, en dit bepaal in watter taal die proforma uitgaan. */
+.dok-taal {
+  display: inline-flex;
+  border: 1px solid var(--fv-lyn);
+  border-radius: 6px;
+  overflow: hidden;
+  vertical-align: middle;
+  margin-left: 7px;
+}
+.dok-taal button {
+  border: 0;
+  background: #fff;
+  cursor: pointer;
+  padding: 2px 9px;
+  font-family: var(--font-liggaam);
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--grys-teks);
+  letter-spacing: .03em;
+}
+.dok-taal button + button { border-left: 1px solid var(--fv-lyn); }
+.dok-taal button.aan { background: var(--teal); color: #fff; }
+.dok-taal button:focus-visible { outline: 2px solid var(--teal-helder); outline-offset: -2px; }
+
+.dok-party {
+  display: grid;
+  grid-template-columns: 1fr 220px;
+  gap: 24px;
+  margin-bottom: 22px;
+}
+.dok-et {
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: .09em;
+  color: var(--grys-teks);
+  margin: 0 0 5px;
+}
+.dok-klient { font-size: 13.5px; line-height: 1.6; }
+.dok-klient strong { font-size: 14.5px; }
+/* Die adres word gedruk soos dit gestoor is, met sy reëlbreuke. */
+.dok-klient .adres { white-space: pre-line; }
+.dok-klient .leeg { color: var(--grys-teks); font-style: italic; }
+
+.dok-datums div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  font-size: 12.5px;
+  padding: 2px 0;
+}
+.dok-datums span { color: var(--grys-teks); }
+.dok-datums input {
+  font-family: var(--font-liggaam);
+  font-size: 12.5px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  padding: 2px 4px;
+  background: transparent;
+  text-align: right;
+  max-width: 130px;
+  color: var(--swart);
+}
+.dok-datums input:hover { border-color: var(--fv-lyn); }
+.dok-datums input:focus { outline: 0; border-color: var(--teal-helder); background: #fff; }
+
+/* Die tabel. Drie kolomme plus die beskrywing:
+   Hoeveelheid x Eenheidsprys = Bedrag. */
+.dok-tabel { width: 100%; border-collapse: collapse; margin-bottom: 4px; }
+.dok-tabel th {
+  font-family: var(--font-opskrif);
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--grys-teks);
+  text-align: right;
+  padding: 0 0 7px;
+  border-bottom: 1px solid var(--fv-lyn);
+}
+.dok-tabel th:first-child { text-align: left; }
+.dok-tabel td {
+  padding: 9px 0;
+  border-bottom: 1px solid var(--fv-lyn);
+  vertical-align: top;
+  font-size: 13.5px;
+}
+.dok-tabel td.n {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  padding-left: 14px;
+}
+.dok-tabel td.n.sterk { font-weight: 600; }
+
+/* 'n Veld wat soos teks lyk tot 'n mens daaraan raak. Die dokument moet lyk
+   soos wat druk, nie soos 'n vorm nie. */
+.tel-invoer {
+  width: 100%;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  font-family: var(--font-liggaam);
+  font-size: 13.5px;
+  padding: 3px 5px;
+  background: transparent;
+  color: var(--swart);
+}
+.tel-invoer:hover { border-color: var(--fv-lyn); }
+.tel-invoer:focus { outline: 0; border-color: var(--teal-helder); background: #fff; }
+.tel-invoer.n { text-align: right; font-variant-numeric: tabular-nums; }
+.dok-vee {
+  border: 0;
+  background: none;
+  color: #c9c6c0;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  padding: 2px 0 2px 8px;
+}
+.dok-vee:hover { color: var(--koraal); }
+
+.dok-somme { margin-left: auto; width: 290px; margin-top: 12px; }
+.dok-somme div {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 6px 0;
+  font-size: 13px;
+}
+.dok-somme div.tot {
+  border-top: 2px solid var(--swart);
+  margin-top: 5px;
+  padding-top: 9px;
+  font-size: 16px;
+  font-family: var(--font-opskrif);
+  font-weight: 700;
+}
+.dok-somme b { font-variant-numeric: tabular-nums; }
+.dok-somme span { color: var(--grys-teks); }
+
+/* EEN oop teksblok onder die reëls, nie 'n subreël per item nie. */
+.dok-nota { margin-top: 24px; border-top: 1px solid var(--fv-lyn); padding-top: 16px; }
+.dok-nota textarea {
+  width: 100%;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font-family: var(--font-liggaam);
+  font-size: 13px;
+  line-height: 1.6;
+  padding: 5px 6px;
+  background: transparent;
+  resize: vertical;
+  color: var(--swart);
+}
+.dok-nota textarea:hover { border-color: var(--fv-lyn); }
+.dok-nota textarea:focus { outline: 0; border-color: var(--teal-helder); background: #fff; }
+
+/* Albei betaalpaaie word gedruk. Die woord "EFT" staan nooit alleen nie: in
+   Suid-Afrika heet 'n Instant EFT deur die skakel en 'n gewone
+   bankoorbetaling albei so, en 'n klerk lees dit as die tweede. */
+.dok-betaal {
+  margin-top: 22px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  background: #FAFAF8;
+  border: 1px solid var(--fv-lyn);
+  border-radius: 8px;
+  padding: 16px 18px;
+}
+.dok-betaal h3 { font-size: 12.5px; margin: 0 0 7px; font-family: var(--font-opskrif); }
+.dok-betaal p { margin: 0; font-size: 12.5px; line-height: 1.65; color: var(--grys-teks); }
+.dok-betaal .verw { color: var(--swart); font-weight: 600; }
+.dok-skakel {
+  display: inline-block;
+  margin-top: 9px;
+  background: var(--teal);
+  color: #fff;
+  border-radius: 6px;
+  padding: 7px 14px;
+  font-size: 12.5px;
+  font-weight: 500;
+  text-decoration: none;
+}
+.dok-skakel.dood { background: #D9D6D0; color: var(--grys-teks); cursor: default; }
+
+/* ── Die kliëntkeuse ─────────────────────────────────────────────────────
+   Nie op die dokument nie: dit is die keuse wat die dokument se kop vul. */
+.fv-klient-kies { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
+.fv-klient-kies select {
+  font-family: var(--font-liggaam);
+  font-size: 12.5px;
+  padding: 5px 8px;
+  border: 1px solid var(--fv-lyn);
+  border-radius: 6px;
+  background: #fff;
+  max-width: 320px;
+}
+
+@media (max-width: 720px) {
+  .dok { padding: 20px 18px; }
+  .dok-kop, .dok-party, .dok-betaal { grid-template-columns: 1fr; flex-direction: column; }
+  .dok-nr { text-align: left; }
+  .dok-somme { width: 100%; }
+}
