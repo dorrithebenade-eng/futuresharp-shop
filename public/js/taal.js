@@ -449,6 +449,11 @@ const WOORDEBOEK = {
   fk_veld_kontak: { af: "Kontakpersoon", en: "Contact person" },
   fk_veld_epos: { af: "E-pos", en: "Email" },
   fk_veld_selfoon: { af: "Selfoon", en: "Mobile" },
+  fk_veld_adres: { af: "Adres", en: "Address" },
+  fk_adres_hulp: {
+    af: "Word gedruk soos dit hier staan.",
+    en: "Printed exactly as entered here.",
+  },
   fk_naam_verplig: { af: "Die naam is verplig.", en: "The name is required." },
   fk_stoor: { af: "Stoor", en: "Save" },
   fk_stoor_fout: { af: "Kon nie stoor nie. Probeer weer.", en: "Could not save. Please try again." },

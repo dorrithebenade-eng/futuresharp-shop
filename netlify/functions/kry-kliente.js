@@ -68,6 +68,7 @@ exports.handler = async (event, context) => {
     kontak: r.kontak || "",
     epos: r.epos || "",
     selfoon: r.selfoon || "",
+    adres: r.adres || "",
     bron: r.bron || "paneel",
     gesien: r.gesien !== false,
     geskep_op: r.geskep_op || null,

@@ -65,6 +65,9 @@ exports.handler = async (event, context) => {
   rekord.kontak = soort === "privaat" ? "" : String(invoer.kontak || "").trim();
   rekord.epos = skoon_epos(invoer.epos);
   rekord.selfoon = String(invoer.selfoon || "").trim();
+  // Die adres bly presies soos dit ingetik is, met sy reëlbreuke — dit word
+  // so op die faktuur gedruk. Net die wit spasie aan die punte val weg.
+  rekord.adres = String(invoer.adres || "").trim();
   rekord.bygewerk_op = new Date().toISOString();
   rekord.gesien = true;
 

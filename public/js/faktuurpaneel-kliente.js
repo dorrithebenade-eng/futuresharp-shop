@@ -28,6 +28,7 @@ const FK_VELDE = [
   ["kontak", "fk_veld_kontak", "Kontakpersoon"],
   ["epos", "fk_veld_epos", "E-pos"],
   ["selfoon", "fk_veld_selfoon", "Selfoon"],
+  ["adres", "fk_veld_adres", "Adres"],
 ];
 
 function fk_t(sleutel, verstek) {
@@ -98,7 +99,7 @@ function fk_herbereken_duplikate() {
 function fk_pas(k, soek) {
   if (!soek) return true;
   const q = soek.toLowerCase().replace(/\s/g, "");
-  return [k.nommer, k.naam, k.kontak, k.epos, k.selfoon]
+  return [k.nommer, k.naam, k.kontak, k.epos, k.selfoon, k.adres]
     .some((v) => (v || "").toLowerCase().replace(/\s/g, "").includes(q));
 }
 
@@ -192,7 +193,7 @@ function fk_stel_soort(nuwe) {
 function fk_maak_vorm_oop(nommer) {
   FK.wysig = nommer || null;
   const k = FK.kliente.find((x) => x.nommer === nommer) ||
-    { soort: "instansie", naam: "", kontak: "", epos: "", selfoon: "" };
+    { soort: "instansie", naam: "", kontak: "", epos: "", selfoon: "", adres: "" };
 
   document.getElementById("fk-vorm-titel").textContent = nommer
     ? fk_t("fk_wysig_klient", "Wysig kliënt")
@@ -202,6 +203,7 @@ function fk_maak_vorm_oop(nommer) {
   document.getElementById("fk-kontak").value = k.kontak || "";
   document.getElementById("fk-epos").value = k.epos || "";
   document.getElementById("fk-selfoon").value = k.selfoon || "";
+  document.getElementById("fk-adres").value = k.adres || "";
   document.getElementById("fk-vorm-fout").style.display = "none";
   document.getElementById("fk-vorm").classList.add("oop");
   document.getElementById("fk-naam").focus();
@@ -229,6 +231,7 @@ async function fk_stoor() {
     kontak: document.getElementById("fk-kontak").value.trim(),
     epos: document.getElementById("fk-epos").value.trim(),
     selfoon: document.getElementById("fk-selfoon").value.trim(),
+    adres: document.getElementById("fk-adres").value.trim(),
   };
 
   const knoppie = document.getElementById("fk-stoor");
@@ -245,6 +248,7 @@ async function fk_stoor() {
       kontak: liggaam.soort === "privaat" ? "" : liggaam.kontak,
       epos: liggaam.epos.toLowerCase(),
       selfoon: liggaam.selfoon,
+      adres: liggaam.adres,
       bron: "paneel",
       gesien: true,
       fakture: 0,

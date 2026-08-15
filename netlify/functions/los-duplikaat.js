@@ -27,7 +27,7 @@ const {
 } = require("./_kliente");
 
 const NAGEGAAN_SLEUTEL = "_nagegaan";
-const VELDE = ["soort", "naam", "kontak", "epos", "selfoon"];
+const VELDE = ["soort", "naam", "kontak", "epos", "selfoon", "adres"];
 
 async function het_fakture(nommer) {
   try {

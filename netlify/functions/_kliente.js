@@ -80,6 +80,14 @@ function nuwe_klient(bron) {
     kontak: "",              // net by 'n instansie
     epos: "",                // altyd kleinletter
     selfoon: "",
+    // 'n VRYE TEKSBLOK, nie 'n stel velde nie. 'n Straatadres, 'n posbus en
+    // 'n skool se aflewerkantoor het nie dieselfde vorm nie, en 'n vorm wat
+    // Straat / Dorp / Kode afdwing, laat 'n mens die verkeerde ding in die
+    // verkeerde blokkie tik. Dit word gedruk soos dit gestoor is.
+    //
+    // Die adres maak NIE 'n rekord onvolledig nie: die proforma gaan per
+    // e-pos uit, en 'n adres wat ontbreek keer niks.
+    adres: "",
     geskep_op: nou,
     bygewerk_op: nou,
     // "paneel" of "vorm". 'n Indiening deur die publieke vorm dra 'n

@@ -402,3 +402,21 @@ a.paneel-kieslys-item { text-decoration: none; }
 }
 .fk-oorplak:hover { background: #DCEDE8; }
 .fk-oorplak .fk-kode { display: block; margin-top: 3px; color: #2f6b60; }
+
+/* Die kliënt se adres is 'n VRYE TEKSBLOK. 'n Textarea erf nie die blaaier
+   se liggaamsfont nie — sonder dit staan die adres in monospace terwyl elke
+   ander veld in Poppins is. */
+.fk-adres-blok {
+  font-family: var(--font-liggaam);
+  font-size: 14px;
+  line-height: 1.5;
+  resize: vertical;
+  min-height: 62px;
+}
+
+/* Die adres dra reëlbreuke, en HTML vou hulle andersins plat: 'n posbus, 'n
+   dorp en 'n kode sou in een string saamloop. `pre-line` wys die breuke en
+   laat die res gewoon vou. Dit raak die ander velde nie — hulle het geen
+   reëlbreuke nie. */
+.fk-vgl-waarde,
+.fk-vgl-eenders { white-space: pre-line; }
