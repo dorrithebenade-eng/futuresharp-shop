@@ -167,6 +167,41 @@ async function skep_nommer(store) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────
+// DIE KONSEP SE SLEUTEL
+//
+// 'n Konsep het nog GEEN nommer nie — die nommer word by stuur toegeken,
+// anders lê daar gate in die reeks van fakture wat nooit iets geword het nie.
+// Maar 'n konsep moet stoor kan word, dus het hy 'n sleutel nodig.
+//
+// Hy leef in DIESELFDE store, met 'n ander voorvoegsel. Dit werk saam met wat
+// reeds hier staan:
+//
+//   * skep_nommer() lys met prefix "FS-", dus tel 'n konsep NOOIT saam vir
+//     die nommerreeks nie. 'n Konsep kan dus geen nommer opgebruik nie.
+//   * kry-fakture.js se kale list() sien hom wel, dus verskyn hy in die lys
+//     saam met die res.
+//
+// By STUUR verhuis die rekord na sy FS-sleutel en die konsep-sleutel word
+// verwyder. Een rekord, een plek — nooit twee kopieë wat uitmekaar loop nie.
+const KONSEP_VOORVOEGSEL = "KONSEP-";
+
+// Die tyd gee 'n leesbare, sorteerbare stam; die ses ewekansige karakters
+// keer dat twee konsepte wat in dieselfde millisekonde begin, mekaar oorskryf.
+function skep_konsep_sleutel() {
+  const stam = new Date().toISOString().replace(/[-:.TZ]/g, "").slice(0, 14);
+  let staart = "";
+  const KARAKTERS = "abcdefghijklmnopqrstuvwxyz0123456789";
+  for (let i = 0; i < 6; i += 1) {
+    staart += KARAKTERS[Math.floor(Math.random() * KARAKTERS.length)];
+  }
+  return KONSEP_VOORVOEGSEL + stam + "-" + staart;
+}
+
+function is_konsep_sleutel(sleutel) {
+  return String(sleutel || "").startsWith(KONSEP_VOORVOEGSEL);
+}
+
+// ─────────────────────────────────────────────────────────────────────────
 
 // Elke handeling gaan hier in. Dit is wat later 'n vraag beantwoord oor wat
 // gebeur het en wie dit gedoen het.
@@ -226,6 +261,40 @@ function nuwe_faktuur(wie) {
     // plek waar vrye teks op die dokument beland. 'n Blok per reël sou by
     // drie reëls drie half-ingevulde blokke gee.
     dokument_nota: "",
+
+    // ── DIE BACKOFFICE: twee lyste wat NIE op die dokument verskyn nie ──
+    //
+    // Hulle val maklik saam en mag nie. Die begroting beantwoord "wat kos
+    // dit?"; die verdeling beantwoord "wie kry wat?". Gooi 'n mens hulle in
+    // een lys, lyk 'n reiskostery wat die PRYS bepaal presies soos een wat
+    // aan Eugene UITBETAAL word.
+    //
+    // Die begroting is 'n MAATSTAF, nie 'n verpligting nie: wat julle verwag
+    // om te bestee. Die werklike rekeninge kom later en kan verskil. Wat dit
+    // beantwoord, is die enigste vraag waarvoor 'n mens begroot — faktureer
+    // ons genoeg?
+    //
+    // `betaal_deur` staan hier NIE op die rekord nie. Dit is 'n GEVOLG van
+    // die ontvanger: het hy 'n subrekening, word die ry 'n verdelingsry;
+    // anders bly dit in die hoofrekening. Twee velde vir een feit is presies
+    // waar hulle later uitmekaar loop — dieselfde redenasie as `versending`
+    // teenoor `drukker` in die winkel.
+    //
+    // 'n KOSTE IS ALTYD 'N VASTE BEDRAG, nooit 'n persentasie nie. Loop dit
+    // op 'n persentasie, kry iemand 70% van sy eie petrol terug.
+    koste: [],                  // { beskrywing, ontvanger, bedrag_sent,
+                                //   inskrywing }
+
+    // Die LEWENDE verdeling, teenoor `verdeling_gevries` hieronder. Hierdie
+    // een word gewysig solank die faktuur 'n konsep is; daardie een word by
+    // uitreiking gekopieer en verander daarna nooit.
+    verdeling: [],              // { ontvanger, tipe: pct | vas, waarde }
+
+    // Future Sharp se aandeel vir die platform se koste. Dit kry 'n ry op die
+    // skerm maar word NOOIT uitbetaal nie — dit bly in die hoofrekening, soos
+    // die oorskot. Word dit ooit 'n Paystack-verdelingsry, word dit uitbetaal
+    // EN daar bly niks vir Paystack nie.
+    hosting_pct: 5,
 
     afslag_sent: 0,
     koepon_kode: null,
@@ -296,10 +365,13 @@ module.exports = {
   BETAALMETODES,
   TALE,
   BEGIN_NOMMER,
+  KONSEP_VOORVOEGSEL,
   kry_fakture_store,
   nommer_na_sleutel,
   sleutel_na_nommer,
   skep_nommer,
+  skep_konsep_sleutel,
+  is_konsep_sleutel,
   voeg_geskiedenis_by,
   nuwe_faktuur,
   is_toe,
