@@ -1,11 +1,11 @@
-/* public/css/faktuur.css
+﻿/* public/css/faktuur.css
  *
  * DIE FAKTUURVORM. Eie klasse, almal met die voorvoegsel `fv-` (die vorm) of
  * `dok-` (die dokument self).
  *
  * MOENIE 'N KLAS LEEN NIE. Op 14 Augustus het dit drie keer in een sessie
  * iets gebreek: `.veld-ry` is 'n TWEEKOLOM-ROOSTER in styl.css en het die
- * kliëntvorm skeef laat lyk; `.outeur-pil` hang met 'n negatiewe marge aan 'n
+ * kliÃ«ntvorm skeef laat lyk; `.outeur-pil` hang met 'n negatiewe marge aan 'n
  * band wat hier nie bestaan nie. 'n Geleende klas dra sy eie aannames saam.
  *
  * Wat wel geleen word, is geleen omdat dit MOET saam verander: .kaart-aksie,
@@ -20,9 +20,9 @@
   --fv-lyn: #E4E2DD;
 }
 
-/* ── Die balk bo die dokument ─────────────────────────────────────────────
+/* â”€â”€ Die balk bo die dokument â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
    Die stand, die stoor-aanwyser en die pad terug. Nie deel van die dokument
-   nie: dit is die vorm se eie gereedskap en dit druk nêrens. */
+   nie: dit is die vorm se eie gereedskap en dit druk nÃªrens. */
 .fv-balk {
   display: flex;
   align-items: center;
@@ -51,7 +51,7 @@
 .fv-stand-gekanselleer { background: #F1EFEA; color: var(--grys-teks); }
 
 /* Die stoor-aanwyser is die enigste manier waarop 'n mens WEET dit is
-   gestoor. Hy sê dit ook eerlik wanneer dit misluk. */
+   gestoor. Hy sÃª dit ook eerlik wanneer dit misluk. */
 .fv-stoorstand {
   font-size: 12px;
   color: var(--grys-teks);
@@ -59,7 +59,7 @@
 }
 .fv-stoorstand.fout { color: var(--koraal); font-weight: 500; }
 
-/* ── Die dokument ────────────────────────────────────────────────────────
+/* â”€â”€ Die dokument â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
    Wat hier binne staan, is wat druk. Alles wat NIE druk nie, staan buite. */
 .dok {
   background: #fff;
@@ -79,7 +79,7 @@
 /* Die logo en die naam staan langs mekaar; die logo is staand, dus lyn die
    teks aan die BOKANT op en nie in die middel nie. */
 .dok-merk-blok { display: flex; gap: 16px; align-items: flex-start; }
-.dok-logo { height: 96px; width: auto; display: block; flex: none; }
+.dok-logo { height: 128px; width: auto; display: block; flex: none; }
 
 .dok-merk {
   font-family: var(--font-opskrif);
@@ -108,7 +108,7 @@
 }
 
 /* Die taalskakelaar sit OP die dokument, by die nommer. Hy hoort by die ding
-   wat hy verander, en hy is geen voorskou nie — dit is die faktuur se
+   wat hy verander, en hy is geen voorskou nie â€” dit is die faktuur se
    taalveld, en dit bepaal in watter taal die proforma uitgaan. */
 .dok-taal {
   display: inline-flex;
@@ -148,7 +148,7 @@
 }
 .dok-klient { font-size: 13.5px; line-height: 1.6; }
 .dok-klient strong { font-size: 14.5px; }
-/* Die adres word gedruk soos dit gestoor is, met sy reëlbreuke. */
+/* Die adres word gedruk soos dit gestoor is, met sy reÃ«lbreuke. */
 .dok-klient .adres { white-space: pre-line; }
 .dok-klient .leeg { color: var(--grys-teks); font-style: italic; }
 
@@ -250,7 +250,7 @@
 .dok-somme b { font-variant-numeric: tabular-nums; }
 .dok-somme span { color: var(--grys-teks); }
 
-/* EEN oop teksblok onder die reëls, nie 'n subreël per item nie. */
+/* EEN oop teksblok onder die reÃ«ls, nie 'n subreÃ«l per item nie. */
 .dok-nota { margin-top: 24px; border-top: 1px solid var(--fv-lyn); padding-top: 16px; }
 .dok-nota textarea {
   width: 100%;
@@ -297,7 +297,7 @@
 .dok-skakel.dood { background: #D9D6D0; color: var(--grys-teks); cursor: default; }
 
 /* 'n Handeling BINNE die dokument. Sy is gereedskap, nie inhoud nie, en moet
-   so lees: 'n koraal-knoppie tussen die reëls en die totaal trek die oog weg
+   so lees: 'n koraal-knoppie tussen die reÃ«ls en die totaal trek die oog weg
    van die getalle af.
 
    Let op: styl.css het GEEN .stil of .klein nie. Dit bestaan net in die
@@ -316,7 +316,7 @@
 .fv-teks-knop:hover { color: var(--teal); }
 .fv-teks-knop:focus-visible { outline: 2px solid var(--teal-helder); outline-offset: 2px; }
 
-/* ── Die kliëntkeuse ─────────────────────────────────────────────────────
+/* â”€â”€ Die kliÃ«ntkeuse â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
    Nie op die dokument nie: dit is die keuse wat die dokument se kop vul. */
 .fv-klient-kies { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
 .fv-klient-kies select {
