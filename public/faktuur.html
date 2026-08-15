@@ -78,6 +78,12 @@
         </div>
       </div>
 
+      <!-- Twee dele, een getal tussen hulle. Links die faktuurblad soos hy
+           druk; regs die backoffice. Die faktuurblad bepaal die totaal, die
+           backoffice verdeel dit. Op 'n foon val die backoffice onder die
+           dokument in. -->
+      <div class="fv-blad">
+
       <!-- ═══ die dokument ═══ -->
       <div class="dok" id="fv-dok">
 
@@ -184,12 +190,93 @@
         </div>
 
       </div>
+
+      <!-- ═══ die backoffice ═══
+           Niks hierbinne verskyn op die dokument nie. -->
+      <aside class="bo" id="fv-bo">
+
+        <div class="bo-kaart">
+          <div class="bo-kop">
+            <div class="bo-titel" data-i18n="bo_begroting">Begrote koste</div>
+            <div class="bo-lei" data-i18n="bo_begroting_lei">verskyn nêrens op die dokument nie</div>
+          </div>
+          <div id="bt-lys"></div>
+          <button type="button" class="fv-teks-knop" id="bt-voeg"
+                  data-i18n="bo_voeg_koste">+ Voeg koste by</button>
+        </div>
+
+        <div class="bo-kaart">
+          <div class="bo-kop">
+            <div class="bo-titel" data-i18n="bo_verdeling">Verdeling van die faktuurtotaal</div>
+          </div>
+
+          <!-- Paystack is NIE 'n ontvanger nie. Hy is 'n geslote, berekende
+               ry — nie 'n besluit nie, dus nie 'n keuse nie. -->
+          <div class="vd-slot">
+            <div data-i18n="bo_fooi_lei">Transaksiefooi — voorsiening 3,5% + R1,30</div>
+            <b id="vd-fooi">—</b>
+          </div>
+
+          <div id="vd-lys"></div>
+          <button type="button" class="fv-teks-knop" id="vd-voeg"
+                  data-i18n="bo_voeg_verdeling">+ Voeg 'n verdeling by</button>
+
+          <div class="bo-som">
+            <div class="hoof"><span data-i18n="bo_totaal">Faktuurtotaal</span><b id="s-totaal">—</b></div>
+            <div><span data-i18n="bo_fooi">Transaksiefooi</span><b id="s-fooi">—</b></div>
+            <div><span data-i18n="bo_verdeelbaar">Verdeelbaar</span><b id="s-verdeelbaar">—</b></div>
+            <div class="bo-kopreel" data-i18n="bo_word_uitbetaal">Word uitbetaal</div>
+            <div><span id="s-aantal">—</span><b id="s-uit">—</b></div>
+            <div class="bo-kopreel" data-i18n="bo_bly_hoof">Bly in die hoofrekening</div>
+            <div class="stil"><span data-i18n="bo_hosting">Hosting</span><b id="s-hosting">—</b></div>
+            <div class="stil" id="s-skenking-ry" style="display:none;">
+              <span data-i18n="bo_skenking_na_fooi">Skenking, ná haar deel van die fooi</span>
+              <b id="s-skenking">—</b>
+            </div>
+            <div><span data-i18n="bo_oorskot">Oorskot</span><b id="s-oorskot">—</b></div>
+            <div class="stil"><span data-i18n="bo_begroot_hoof">Begroot uit die hoofrekening</span><b id="s-begroot">—</b></div>
+            <div class="hoof"><span id="s-bly-et" data-i18n="bo_bly_oor">Bly oor vir Future Sharp</span><b id="s-bly">—</b></div>
+          </div>
+
+          <div id="s-waarsku"></div>
+          <div id="s-tekort"></div>
+        </div>
+
+        <div class="bo-kaart">
+          <div class="bo-kop"><div class="bo-titel" data-i18n="bo_afslag_kop">Afslag en skenking</div></div>
+          <div class="bo-rooster">
+            <div>
+              <label class="veld-etiket" for="f-afslag" data-i18n="bo_afslag">Afslag (R)</label>
+              <input class="veld-invoer" id="f-afslag" inputmode="decimal" value="0">
+            </div>
+            <div>
+              <label class="veld-etiket" for="f-koepon" data-i18n="bo_koepon">Koeponkode</label>
+              <input class="veld-invoer" id="f-koepon" spellcheck="false" autocomplete="off">
+            </div>
+            <div>
+              <label class="veld-etiket" for="f-skenking" data-i18n="bo_skenking">Skenking (R)</label>
+              <input class="veld-invoer" id="f-skenking" inputmode="decimal" value="0">
+            </div>
+            <div>
+              <label class="veld-etiket" for="f-hosting" data-i18n="bo_hosting_pct">Hosting (%)</label>
+              <input class="veld-invoer" id="f-hosting" inputmode="decimal" value="5">
+            </div>
+          </div>
+          <p class="bo-lei" style="margin:10px 0 0" data-i18n="bo_afslag_lei">
+            Afslag verminder die verdeelbare bedrag. Skenking bly buite die verdeling.
+          </p>
+        </div>
+
+      </aside>
+      </div>
     </div>
   </main>
 
   <script src="js/taal.js"></script>
   <script src="js/identiteit.js"></script>
   <script src="js/sessie-verval.js"></script>
+  <script src="js/faktuur-som.js"></script>
   <script src="js/faktuur-vorm.js"></script>
+  <script src="js/faktuur-backoffice.js"></script>
 </body>
 </html>

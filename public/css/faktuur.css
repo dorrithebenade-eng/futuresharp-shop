@@ -1,11 +1,11 @@
-﻿/* public/css/faktuur.css
+/* public/css/faktuur.css
  *
  * DIE FAKTUURVORM. Eie klasse, almal met die voorvoegsel `fv-` (die vorm) of
  * `dok-` (die dokument self).
  *
  * MOENIE 'N KLAS LEEN NIE. Op 14 Augustus het dit drie keer in een sessie
  * iets gebreek: `.veld-ry` is 'n TWEEKOLOM-ROOSTER in styl.css en het die
- * kliÃ«ntvorm skeef laat lyk; `.outeur-pil` hang met 'n negatiewe marge aan 'n
+ * kliëntvorm skeef laat lyk; `.outeur-pil` hang met 'n negatiewe marge aan 'n
  * band wat hier nie bestaan nie. 'n Geleende klas dra sy eie aannames saam.
  *
  * Wat wel geleen word, is geleen omdat dit MOET saam verander: .kaart-aksie,
@@ -20,9 +20,9 @@
   --fv-lyn: #E4E2DD;
 }
 
-/* â”€â”€ Die balk bo die dokument â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+/* ── Die balk bo die dokument ─────────────────────────────────────────────
    Die stand, die stoor-aanwyser en die pad terug. Nie deel van die dokument
-   nie: dit is die vorm se eie gereedskap en dit druk nÃªrens. */
+   nie: dit is die vorm se eie gereedskap en dit druk nêrens. */
 .fv-balk {
   display: flex;
   align-items: center;
@@ -51,7 +51,7 @@
 .fv-stand-gekanselleer { background: #F1EFEA; color: var(--grys-teks); }
 
 /* Die stoor-aanwyser is die enigste manier waarop 'n mens WEET dit is
-   gestoor. Hy sÃª dit ook eerlik wanneer dit misluk. */
+   gestoor. Hy sê dit ook eerlik wanneer dit misluk. */
 .fv-stoorstand {
   font-size: 12px;
   color: var(--grys-teks);
@@ -59,7 +59,7 @@
 }
 .fv-stoorstand.fout { color: var(--koraal); font-weight: 500; }
 
-/* â”€â”€ Die dokument â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+/* ── Die dokument ────────────────────────────────────────────────────────
    Wat hier binne staan, is wat druk. Alles wat NIE druk nie, staan buite. */
 .dok {
   background: #fff;
@@ -79,7 +79,7 @@
 /* Die logo en die naam staan langs mekaar; die logo is staand, dus lyn die
    teks aan die BOKANT op en nie in die middel nie. */
 .dok-merk-blok { display: flex; gap: 16px; align-items: flex-start; }
-.dok-logo { height: 128px; width: auto; display: block; flex: none; }
+.dok-logo { height: 96px; width: auto; display: block; flex: none; }
 
 .dok-merk {
   font-family: var(--font-opskrif);
@@ -108,7 +108,7 @@
 }
 
 /* Die taalskakelaar sit OP die dokument, by die nommer. Hy hoort by die ding
-   wat hy verander, en hy is geen voorskou nie â€” dit is die faktuur se
+   wat hy verander, en hy is geen voorskou nie — dit is die faktuur se
    taalveld, en dit bepaal in watter taal die proforma uitgaan. */
 .dok-taal {
   display: inline-flex;
@@ -148,7 +148,7 @@
 }
 .dok-klient { font-size: 13.5px; line-height: 1.6; }
 .dok-klient strong { font-size: 14.5px; }
-/* Die adres word gedruk soos dit gestoor is, met sy reÃ«lbreuke. */
+/* Die adres word gedruk soos dit gestoor is, met sy reëlbreuke. */
 .dok-klient .adres { white-space: pre-line; }
 .dok-klient .leeg { color: var(--grys-teks); font-style: italic; }
 
@@ -250,7 +250,7 @@
 .dok-somme b { font-variant-numeric: tabular-nums; }
 .dok-somme span { color: var(--grys-teks); }
 
-/* EEN oop teksblok onder die reÃ«ls, nie 'n subreÃ«l per item nie. */
+/* EEN oop teksblok onder die reëls, nie 'n subreël per item nie. */
 .dok-nota { margin-top: 24px; border-top: 1px solid var(--fv-lyn); padding-top: 16px; }
 .dok-nota textarea {
   width: 100%;
@@ -297,7 +297,7 @@
 .dok-skakel.dood { background: #D9D6D0; color: var(--grys-teks); cursor: default; }
 
 /* 'n Handeling BINNE die dokument. Sy is gereedskap, nie inhoud nie, en moet
-   so lees: 'n koraal-knoppie tussen die reÃ«ls en die totaal trek die oog weg
+   so lees: 'n koraal-knoppie tussen die reëls en die totaal trek die oog weg
    van die getalle af.
 
    Let op: styl.css het GEEN .stil of .klein nie. Dit bestaan net in die
@@ -316,7 +316,7 @@
 .fv-teks-knop:hover { color: var(--teal); }
 .fv-teks-knop:focus-visible { outline: 2px solid var(--teal-helder); outline-offset: 2px; }
 
-/* â”€â”€ Die kliÃ«ntkeuse â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+/* ── Die kliëntkeuse ─────────────────────────────────────────────────────
    Nie op die dokument nie: dit is die keuse wat die dokument se kop vul. */
 .fv-klient-kies { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
 .fv-klient-kies select {
@@ -335,4 +335,208 @@
   .dok-kop, .dok-party, .dok-betaal { grid-template-columns: 1fr; flex-direction: column; }
   .dok-nr { text-align: left; }
   .dok-somme { width: 100%; }
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   DIE BACKOFFICE
+   
+   Niks hierbinne verskyn op die dokument nie. Die twee dele doen twee take
+   en hulle moet nie in een lys saamval nie:
+   
+       Wat kos dit?   — die begroting: koste opgetel tot 'n prys
+       Wie kry wat?   — die verdeling van daardie prys
+   
+   Die eerste weergawe van die mockup het hulle saamgegooi, en toe lyk 'n
+   reiskostery wat die PRYS bepaal presies soos een wat UITBETAAL word.
+   
+   Voorvoegsels: bt- vir die begroting, vd- vir die verdeling. NIE bg- nie —
+   dit beteken reeds 'begunstigde' in faktuurpaneel-begunstigdes.js, en twee
+   betekenisse vir een voorvoegsel is waar dit later verkeerd loop.
+   ════════════════════════════════════════════════════════════════════════ */
+
+.fv-blad {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 430px;
+  gap: 20px;
+  align-items: start;
+}
+.bo { position: sticky; top: 20px; }
+.bo-kaart {
+  background: #fff;
+  border: 1px solid var(--fv-lyn);
+  border-radius: 10px;
+  padding: 16px 17px;
+  margin-bottom: 14px;
+}
+.bo-kop {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.bo-titel { font-family: var(--font-opskrif); font-size: 13.5px; font-weight: 600; }
+.bo-lei { font-size: 11.5px; color: var(--grys-teks); }
+.bo-rooster { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* ── Die begroting ──────────────────────────────────────────────────────
+   Vyf kolomme, waarvan die vierde 'n GEVOLG is en nie 'n keuse nie: die
+   ontvanger bepaal die pad. Twee velde vir een feit is presies waar hulle
+   later uitmekaar loop. */
+.bt-ry {
+  border: 1px solid var(--fv-lyn);
+  border-radius: 7px;
+  padding: 9px 10px;
+  margin-bottom: 8px;
+  background: #fff;
+}
+.bt-boonste {
+  display: grid;
+  grid-template-columns: 1fr 150px 92px 22px;
+  gap: 7px;
+  align-items: center;
+}
+.bt-ry input, .bt-ry select {
+  font-family: var(--font-liggaam);
+  font-size: 12.5px;
+  padding: 6px 8px;
+  border: 1px solid var(--fv-lyn);
+  border-radius: 6px;
+  width: 100%;
+  background: #fff;
+  color: var(--swart);
+}
+.bt-ry input.n { text-align: right; font-variant-numeric: tabular-nums; }
+.bt-onderste { display: flex; align-items: center; gap: 9px; margin-top: 7px; }
+/* Die inskrywing is 'n rekord, nie 'n veld wat iemand moet invul — 'n
+   stippellyn sê dit sonder woorde. */
+.bt-onderste input { flex: 1; border-style: dashed; font-size: 12px; }
+
+.bt-pad {
+  font-size: 10.5px;
+  font-weight: 500;
+  border-radius: 999px;
+  padding: 2px 9px;
+  white-space: nowrap;
+}
+.bt-pad.split { background: #E8F3F0; color: #2f6b60; }
+.bt-pad.hoof { background: #F1EFEA; color: var(--grys-teks); }
+/* 'n Begunstigde SONDER 'n subrekening kan nie deur Paystack betaal word
+   nie. Sonder hierdie merkie lyk dit of hy outomaties betaal word terwyl
+   niemand hom betaal nie. */
+.bt-pad.wag { background: #FDF3E8; color: #8a6420; }
+
+/* ── Die verdeling ──────────────────────────────────────────────────────
+   Paystack staan bo-aan as 'n GESLOTE ry: die fooi word van bo af
+   weggeneem en die res verdeel. Dit kan nie gekies of getik word nie, want
+   dit is nie 'n besluit nie. */
+.vd-slot {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  background: #F1EFEA;
+  border: 1px dashed var(--fv-lyn);
+  border-radius: 6px;
+  padding: 7px 10px;
+  margin-bottom: 9px;
+  font-size: 12px;
+  color: var(--grys-teks);
+}
+.vd-slot b { font-variant-numeric: tabular-nums; font-weight: 500; white-space: nowrap; }
+
+.vd-ry {
+  display: grid;
+  grid-template-columns: 1fr 68px 78px 90px 22px;
+  gap: 7px;
+  align-items: center;
+  margin-bottom: 7px;
+}
+.vd-ry select, .vd-ry input {
+  font-family: var(--font-liggaam);
+  font-size: 12.5px;
+  padding: 6px 7px;
+  border: 1px solid var(--fv-lyn);
+  border-radius: 6px;
+  width: 100%;
+  background: #fff;
+  color: var(--swart);
+}
+.vd-ry input.n { text-align: right; font-variant-numeric: tabular-nums; }
+.vd-ry .uit {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-size: 12.5px;
+  font-weight: 500;
+}
+.vd-tipe { display: flex; border: 1px solid var(--fv-lyn); border-radius: 6px; overflow: hidden; }
+.vd-tipe button {
+  flex: 1;
+  border: 0;
+  background: #fff;
+  cursor: pointer;
+  padding: 6px 0;
+  font-family: var(--font-liggaam);
+  font-size: 12px;
+  color: var(--grys-teks);
+}
+.vd-tipe button + button { border-left: 1px solid var(--fv-lyn); }
+.vd-tipe button.aan { background: var(--swart); color: #fff; }
+
+.bo-som { margin-top: 13px; }
+.bo-som div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 0;
+  font-size: 12.5px;
+  border-bottom: 1px solid var(--fv-lyn);
+}
+.bo-som div.hoof { font-size: 14px; border-bottom: 2px solid var(--swart); }
+.bo-som div.stil span, .bo-som div.stil b { color: var(--grys-teks); font-weight: 400; }
+.bo-som span { color: var(--grys-teks); }
+.bo-som b { font-variant-numeric: tabular-nums; font-weight: 600; }
+.bo-som .tekort { color: var(--koraal); }
+.bo-kopreel {
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--grys-teks);
+  margin: 13px 0 1px;
+  border: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.bo-vee {
+  border: 0;
+  background: none;
+  color: #c9c6c0;
+  cursor: pointer;
+  font-size: 15px;
+  line-height: 1;
+  padding: 4px 0;
+}
+.bo-vee:hover { color: var(--koraal); }
+
+.bo-boodskap {
+  background: #FDF3F0;
+  border: 1px solid var(--koraal);
+  border-radius: 6px;
+  padding: 9px 11px;
+  font-size: 12px;
+  color: #8f2f13;
+  margin-top: 10px;
+}
+.bo-boodskap button { margin-left: 6px; }
+
+/* Nie alles hoort op 'n foon nie. Die backoffice val onder die dokument in
+   eerder as om in 'n kolom van 200px saam te druk. */
+@media (max-width: 1100px) {
+  .fv-blad { grid-template-columns: 1fr; }
+  .bo { position: static; }
+}
+@media (max-width: 620px) {
+  .bt-boonste { grid-template-columns: 1fr 22px; }
+  .bt-boonste select, .bt-boonste input.n { grid-column: 1 / -1; }
+  .vd-ry { grid-template-columns: 1fr 68px 78px 22px; }
+  .vd-ry .uit { grid-column: 1 / -1; text-align: left; }
 }

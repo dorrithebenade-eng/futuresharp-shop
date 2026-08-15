@@ -1333,6 +1333,83 @@ const WOORDEBOEK = {
   pio_geen_outeur: { af: "Hierdie outeur het nog geen inskrywing in die Outeurs-oortjie nie.", en: "This author does not yet have an entry in the Authors tab." },
   pio_merk_fout: { af: "Die boek is geskep, maar die indiening kon nie as opgestel gemerk word nie.", en: "The book was created, but the submission could not be marked as set up." },
   nav_outeurspaneel: { af: "Outeurspaneel", en: "Author panel" },
+  // -- Die faktuurvorm se backoffice --------------------------------------
+  // Die begroting, die verdeling en die som. Niks hiervan verskyn op die
+  // dokument nie, dus loop alles met t() op die platform se taal.
+  bo_begroting: { af: "Begrote koste", en: "Budgeted costs" },
+  bo_begroting_lei: {
+    af: "verskyn n\u00earens op die dokument nie",
+    en: "appears nowhere on the document",
+  },
+  bo_beskrywing: { af: "Beskrywing", en: "Description" },
+  bo_inskrywing_plek: {
+    af: "Inskrywing \u2014 bly by die faktuur, gaan nooit uit nie",
+    en: "Entry \u2014 stays with the invoice, never goes out",
+  },
+  bo_voeg_koste: { af: "+ Voeg koste by", en: "+ Add a cost" },
+  bo_verwyder: { af: "Verwyder", en: "Remove" },
+
+  // Die pad is 'n GEVOLG van die ontvanger, nie 'n keuse nie. Die derde een
+  // is die geval wat maklik misgekyk word: Paystack kan iemand sonder 'n
+  // subrekening nie betaal nie, dus val sy ry na die hoofrekening.
+  bo_pad_split: { af: "Verdelingsry", en: "Split line" },
+  bo_pad_hoof: { af: "Hoofrekening", en: "Main account" },
+  bo_pad_wag: {
+    af: "Hoofrekening \u2014 geen subrekening",
+    en: "Main account \u2014 no subaccount",
+  },
+
+  bo_verdeling: { af: "Verdeling van die faktuurtotaal", en: "Split of the invoice total" },
+  bo_fooi_lei: {
+    af: "Transaksiefooi \u2014 voorsiening 3,5% + R1,30",
+    en: "Transaction fee \u2014 provision 3.5% + R1.30",
+  },
+  bo_voeg_verdeling: { af: "+ Voeg 'n verdeling by", en: "+ Add a split line" },
+  bo_totaal: { af: "Faktuurtotaal", en: "Invoice total" },
+  bo_fooi: { af: "Transaksiefooi", en: "Transaction fee" },
+  bo_verdeelbaar: { af: "Verdeelbaar", en: "Distributable" },
+  bo_word_uitbetaal: { af: "Word uitbetaal", en: "Paid out" },
+  bo_een_ontvanger: { af: "1 ontvanger", en: "1 recipient" },
+  bo_ontvangers: { af: "ontvangers", en: "recipients" },
+  bo_bly_hoof: { af: "Bly in die hoofrekening", en: "Stays in the main account" },
+  bo_hosting: { af: "Hosting", en: "Hosting" },
+  bo_skenking_na_fooi: {
+    af: "Skenking, n\u00e1 haar deel van die fooi",
+    en: "Donation, after its share of the fee",
+  },
+  bo_oorskot: { af: "Oorskot", en: "Surplus" },
+  bo_begroot_hoof: { af: "Begroot uit die hoofrekening", en: "Budgeted from the main account" },
+  bo_bly_oor: { af: "Bly oor vir Future Sharp", en: "Left for Future Sharp" },
+  bo_tekort: { af: "Tekort", en: "Shortfall" },
+
+  bo_dek_nie: {
+    af: "Die faktuur dek nie die begrote koste nie.",
+    en: "The invoice does not cover the budgeted costs.",
+  },
+  bo_verhoog: { af: "Verhoog die prys tot dit dek", en: "Raise the price until it covers" },
+  bo_onoplosbaar: {
+    af: "'n Ho\u00ebr prys help nie: die persentasies vat alles wat bykom. Verlaag 'n persentasie of skuif 'n koste.",
+    en: "A higher price does not help: the percentages take everything added. Lower a percentage or move a cost.",
+  },
+  bo_oorbestee: {
+    af: "Die verdeling oorskry die verdeelbare bedrag met",
+    en: "The split exceeds the distributable amount by",
+  },
+  bo_oorbestee_lei: {
+    af: "Paystack verwerp 'n verdeling wat nie binne die transaksie klop nie.",
+    en: "Paystack rejects a split that does not balance within the transaction.",
+  },
+
+  bo_afslag_kop: { af: "Afslag en skenking", en: "Discount and donation" },
+  bo_afslag: { af: "Afslag (R)", en: "Discount (R)" },
+  bo_koepon: { af: "Koeponkode", en: "Coupon code" },
+  bo_skenking: { af: "Skenking (R)", en: "Donation (R)" },
+  bo_hosting_pct: { af: "Hosting (%)", en: "Hosting (%)" },
+  bo_afslag_lei: {
+    af: "Afslag verminder die verdeelbare bedrag. Skenking bly buite die verdeling.",
+    en: "A discount reduces the distributable amount. A donation stays outside the split.",
+  },
+
   // -- Die faktuurvorm se eie skerm ------------------------------------
   // Hierdie sleutels loop met t(), soos elke ander skerm: dit is JULLE
   // skerm. Die DOKUMENT se sleutels (fd_) loop met t_in() op die faktuur se

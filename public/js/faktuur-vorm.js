@@ -42,6 +42,13 @@ const V = {
   dokument_nota: "",
   afslag_sent: 0,
   skenking_sent: 0,
+  koepon_kode: null,
+  // Die backoffice s'n. Hulle leef HIER, in een toestand, want die
+  // faktuurtotaal en die verdeling is een som — nie twee skerms wat mekaar
+  // se getalle raai nie.
+  koste: [],              // { beskrywing, ontvanger, bedrag_sent, inskrywing }
+  verdeling: [],          // { ontvanger, tipe: pct | vas, waarde }
+  hosting_pct: 5,
   betaalbaar_teen: null,
   geskep_op: null,
   betaalskakel: null,
@@ -194,6 +201,7 @@ function bind_reels() {
           );
         }
         teken_somme();
+        if (window.bo_teken_syfers) window.bo_teken_syfers();
         merk_vuil();
       });
     });
@@ -309,6 +317,9 @@ function teken_alles() {
   teken_somme();
   teken_dok_taal();
   teken_stand();
+  // faktuur-backoffice.js haak hier in. Die wag is nie versiering nie: die
+  // dokument moet werk al is die backoffice nie gelaai nie.
+  if (window.bo_teken) window.bo_teken();
 }
 
 /* ═══ die kliëntkeuse ═══ */
@@ -373,6 +384,12 @@ function liggaam() {
     bestelnommer: V.bestelnommer,
     dokument_nota: V.dokument_nota,
     betaalbaar_teen: V.betaalbaar_teen || "",
+    koste: V.koste,
+    verdeling: V.verdeling,
+    hosting_pct: V.hosting_pct,
+    afslag_sent: V.afslag_sent,
+    skenking_sent: V.skenking_sent,
+    koepon_kode: V.koepon_kode || "",
     reels: V.reels.map((r) => ({
       soort: "verkoop",
       beskrywing: r.beskrywing,
@@ -455,6 +472,12 @@ async function laai_faktuur(vraag) {
   V.dokument_nota = f.dokument_nota || "";
   V.afslag_sent = f.afslag_sent || 0;
   V.skenking_sent = f.skenking_sent || 0;
+  V.koepon_kode = f.koepon_kode || null;
+  V.koste = Array.isArray(f.koste) ? f.koste : [];
+  V.verdeling = Array.isArray(f.verdeling) ? f.verdeling : [];
+  // hosting_pct kan wettig 0 wees, dus nie || 5 nie — dan sou iemand wat
+  // Hosting doelbewus afskakel, dit elke keer terugkry.
+  V.hosting_pct = Number.isFinite(Number(f.hosting_pct)) ? Number(f.hosting_pct) : 5;
   V.betaalbaar_teen = f.betaalbaar_teen || null;
   V.geskep_op = f.geskep_op || null;
   V.betaalskakel = f.betaalskakel || null;
