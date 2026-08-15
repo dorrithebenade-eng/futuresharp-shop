@@ -62,6 +62,7 @@
 /* ── Die dokument ────────────────────────────────────────────────────────
    Wat hier binne staan, is wat druk. Alles wat NIE druk nie, staan buite. */
 .dok {
+  min-width: 0;
   background: #fff;
   border: 1px solid var(--fv-lyn);
   border-radius: 10px;
@@ -356,7 +357,7 @@
 
 .fv-blad {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 430px;
+  grid-template-columns: minmax(0, 1fr) 400px;
   gap: 20px;
   align-items: start;
 }
@@ -530,9 +531,11 @@
 
 /* Nie alles hoort op 'n foon nie. Die backoffice val onder die dokument in
    eerder as om in 'n kolom van 200px saam te druk. */
-@media (max-width: 1100px) {
+@media (max-width: 1400px) {
   .fv-blad { grid-template-columns: 1fr; }
   .bo { position: static; }
+  /* Onder mekaar het die backoffice geen rede om smal te bly nie. */
+  .bo-kaart { max-width: 900px; }
 }
 @media (max-width: 620px) {
   .bt-boonste { grid-template-columns: 1fr 22px; }
