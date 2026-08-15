@@ -1333,6 +1333,35 @@ const WOORDEBOEK = {
   pio_geen_outeur: { af: "Hierdie outeur het nog geen inskrywing in die Outeurs-oortjie nie.", en: "This author does not yet have an entry in the Authors tab." },
   pio_merk_fout: { af: "Die boek is geskep, maar die indiening kon nie as opgestel gemerk word nie.", en: "The book was created, but the submission could not be marked as set up." },
   nav_outeurspaneel: { af: "Outeurspaneel", en: "Author panel" },
+  // -- Die faktuurvorm se eie skerm ------------------------------------
+  // Hierdie sleutels loop met t(), soos elke ander skerm: dit is JULLE
+  // skerm. Die DOKUMENT se sleutels (fd_) loop met t_in() op die faktuur se
+  // eie taalveld. Die twee mag nie meng nie.
+  fv_nav_boekhouding: { af: "Boekhouding", en: "Accounting" },
+  fv_terug: { af: "\u2190 Boekhouding", en: "\u2190 Accounting" },
+  fv_stand_konsep: { af: "Konsep", en: "Draft" },
+  fv_stand_gestuur: { af: "Gestuur", en: "Sent" },
+  fv_stand_betaal: { af: "Betaal", en: "Paid" },
+  fv_stand_gekanselleer: { af: "Gekanselleer", en: "Cancelled" },
+  fv_kies_klient: { af: "Kies 'n kli\u00ebnt \u2026", en: "Choose a client \u2026" },
+  fv_geen_klient: { af: "Nog geen kli\u00ebnt gekies nie", en: "No client chosen yet" },
+  fv_voeg_reel: { af: "Voeg re\u00ebl by", en: "Add line" },
+  fv_verwyder_reel: { af: "Verwyder re\u00ebl", en: "Remove line" },
+  fv_gestoor: { af: "Gestoor", en: "Saved" },
+  fv_nie_gestoor: { af: "Nog nie gestoor nie", en: "Not saved yet" },
+  fv_stoor_fout: {
+    af: "Kon nie stoor nie \u2014 probeer weer",
+    en: "Could not save \u2014 try again",
+  },
+  fv_toe: {
+    af: "Uitgereik \u2014 word nie meer gewysig nie",
+    en: "Issued \u2014 no longer editable",
+  },
+  fv_laai_fout: {
+    af: "Kon nie hierdie faktuur laai nie.",
+    en: "Could not load this invoice.",
+  },
+
   // -- Die faktuurdokument ----------------------------------------------
   // Hierdie sleutels word met t_in(sleutel, faktuur.taal) gelees, NIE met
   // t() nie. Die dokument se taal staan op die faktuur se eie rekord; die
