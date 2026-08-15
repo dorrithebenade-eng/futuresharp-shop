@@ -76,6 +76,11 @@
   padding-bottom: 16px;
   margin-bottom: 20px;
 }
+/* Die logo en die naam staan langs mekaar; die logo is staand, dus lyn die
+   teks aan die BOKANT op en nie in die middel nie. */
+.dok-merk-blok { display: flex; gap: 16px; align-items: flex-start; }
+.dok-logo { height: 96px; width: auto; display: block; flex: none; }
+
 .dok-merk {
   font-family: var(--font-opskrif);
   font-size: 19px;
@@ -326,6 +331,7 @@
 
 @media (max-width: 720px) {
   .dok { padding: 20px 18px; }
+  .dok-logo { height: 72px; }
   .dok-kop, .dok-party, .dok-betaal { grid-template-columns: 1fr; flex-direction: column; }
   .dok-nr { text-align: left; }
   .dok-somme { width: 100%; }
