@@ -1333,6 +1333,51 @@ const WOORDEBOEK = {
   pio_geen_outeur: { af: "Hierdie outeur het nog geen inskrywing in die Outeurs-oortjie nie.", en: "This author does not yet have an entry in the Authors tab." },
   pio_merk_fout: { af: "Die boek is geskep, maar die indiening kon nie as opgestel gemerk word nie.", en: "The book was created, but the submission could not be marked as set up." },
   nav_outeurspaneel: { af: "Outeurspaneel", en: "Author panel" },
+  // -- Die faktuurdokument ----------------------------------------------
+  // Hierdie sleutels word met t_in(sleutel, faktuur.taal) gelees, NIE met
+  // t() nie. Die dokument se taal staan op die faktuur se eie rekord; die
+  // platform se taalkeuse mag dit nie oorheers nie.
+  fd_proforma: { af: "Proforma-faktuur", en: "Proforma invoice" },
+  fd_stand_konsep: { af: "Konsep", en: "Draft" },
+  fd_stand_gestuur: { af: "Gestuur", en: "Sent" },
+  fd_stand_betaal: { af: "Betaal", en: "Paid" },
+  fd_stand_gekanselleer: { af: "Gekanselleer", en: "Cancelled" },
+  fd_gefaktureer_aan: { af: "Gefaktureer aan", en: "Billed to" },
+  fd_besonderhede: { af: "Besonderhede", en: "Details" },
+  fd_datum: { af: "Datum", en: "Date" },
+  fd_betaalbaar_teen: { af: "Betaalbaar teen", en: "Payable by" },
+  fd_bestelnommer: { af: "Bestelnommer", en: "Order number" },
+  fd_kol_beskrywing: { af: "Beskrywing", en: "Description" },
+  fd_kol_hoeveelheid: { af: "Hoeveelheid", en: "Quantity" },
+  fd_kol_eenheidsprys: { af: "Eenheidsprys", en: "Unit price" },
+  fd_kol_bedrag: { af: "Bedrag", en: "Amount" },
+  fd_subtotaal: { af: "Subtotaal", en: "Subtotal" },
+  fd_afslag: { af: "Afslag", en: "Discount" },
+  fd_skenking: { af: "Skenking", en: "Donation" },
+  fd_totaal_verskuldig: { af: "Totaal verskuldig", en: "Total due" },
+  fd_aantekening: { af: "Aantekening", en: "Note" },
+  // Die em-dash staan as \u2014 sodat die blok suiwer ASCII bly en 'n
+  // ANSI-enkodering op Windows dit nie kan breek nie.
+  fd_eft_kop: {
+    af: "Onmiddellike EFT \u2014 deur die betaalskakel",
+    en: "Instant EFT \u2014 via the payment link",
+  },
+  fd_eft_lei: {
+    af: "Kaart, Instant EFT of QR. Die betaling word dadelik bevestig.",
+    en: "Card, Instant EFT or QR. Payment is confirmed immediately.",
+  },
+  fd_betaal_knop: { af: "Betaal", en: "Pay" },
+  fd_bank_kop: { af: "Bankoorbetaling", en: "Bank transfer" },
+  fd_rekening: { af: "Rekening", en: "Account" },
+  fd_takkode: { af: "Takkode", en: "Branch code" },
+  fd_verwysing: { af: "Verwysing", en: "Reference" },
+  // Een sleutel, twaalf afkortings. Mrt/Mar, Okt/Oct en Des/Dec verskil;
+  // die res is dieselfde. Die kode split op die komma.
+  fd_maande: {
+    af: "Jan,Feb,Mrt,Apr,Mei,Jun,Jul,Aug,Sep,Okt,Nov,Des",
+    en: "Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec",
+  },
+
 };
 
 function kry_huidige_taal() {
@@ -1358,6 +1403,26 @@ function t(sleutel) {
   }
   return inskrywing[kry_huidige_taal()] || inskrywing.af;
 }
+
+// Dieselfde woordeboek, maar die taal word MEEGEGEE in plaas van uit
+// localStorage gelees.
+//
+// t() bedien die platform: die gebruiker kies 'n taal en elke skerm volg.
+// Die faktuurdokument werk anders - sy taal staan op die faktuur se eie
+// rekord, want 'n skool in die Wes-Kaap en 'n departement in Gauteng kry nie
+// noodwendig dieselfde een nie. Sou die dokument t() gebruik, sou dit in die
+// taal druk wat toevallig in hierdie blaaier gekies is.
+//
+// t() bly onaangeraak. Dit loop op elke bladsy in die stelsel.
+function t_in(sleutel, taal) {
+  const inskrywing = WOORDEBOEK[sleutel];
+  if (!inskrywing) {
+    console.warn(`Geen vertaling vir sleutel "${sleutel}" nie`);
+    return sleutel;
+  }
+  return inskrywing[taal === "en" ? "en" : "af"] || inskrywing.af;
+}
+
 
 function pas_i18n_toe() {
   document.querySelectorAll("[data-i18n]").forEach((el) => {
