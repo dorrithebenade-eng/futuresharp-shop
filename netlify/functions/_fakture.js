@@ -50,33 +50,93 @@ const STANDE = ["konsep", "gestuur", "betaal", "gekanselleer"];
 //   gratis          — R0 ná 'n koepon. Daar was nooit 'n transaksie nie.
 const BETAALMETODES = ["paystack", "bankoorbetaling", "gratis"];
 
+// Die taal waarin die DOKUMENT gedruk word. Dit staan per faktuur op die
+// rekord, nie as 'n stelselinstelling nie: 'n skool in die Wes-Kaap en 'n
+// departement in Gauteng kry nie noodwendig dieselfde een nie.
+const TALE = ["af", "en"];
+
 function kry_fakture_store() {
   return kry_store(STORE_NAAM);
 }
 
-// FS_2026-08-13-0001 — Future Sharp, die datum, die volgnommer. PER DAG
-// getel; elke dag begin by 0001.
+// ─────────────────────────────────────────────────────────────────────────
+// DIE NOMMER
+//
+// FS/01957 — Future Sharp en 'n volgnommer. DEURLOPEND: nooit teruggestel,
+// geen datum in.
+//
+// WAAROM GEEN DATUM: die dokument dra reeds 'n datumveld, en twee bronne vir
+// dieselfde feit kan mekaar weerspreek. Belangriker: die punt van 'n
+// faktuurnommer is dat 'n GAPING in die reeks sigbaar is — dit is hoe 'n mens
+// sien dat niks verdwyn het nie. 'n Teller wat elke dag of maand terugstel,
+// tel niks en wys geen gaping nie.
+//
+// WAAROM 1957: Future Sharp reik al 'n paar jaar fakture uit. Dat die vorige
+// stelsel 'n ander een was, verander nie die boeke nie — dit is dieselfde
+// besigheid en dieselfde reeks. 'n Reeks wat by 0001 begin, sou 'n bestaande
+// besigheid soos 'n nuwe een laat lyk.
+const BEGIN_NOMMER = 1957;
+
+// Vyf syfers met voorste nulle, sodat die reeks sorteerbaar bly. padStart
+// vul aan tot MINSTENS vyf; 'n sesde syfer breek niks.
+const SYFERS = 5;
+
+// OP DIE DOKUMENT STAAN `/`; IN DIE STORE STAAN `-`.
+//
+// Blobs behandel 'n skuinsstreep as 'n padskeiding. `FS/01957` sou 'n gids
+// `FS/` met 'n item `01957` word, list() sou 'n boom teruggee, en die
+// bestaan-toets hieronder sou anders werk as dié van _indienings.js.
+//
+// Die omskakeling leef op hierdie twee funksies en nêrens anders nie. Niks
+// buite hierdie lêer weet daarvan nie.
+const SLEUTEL_VOORVOEGSEL = "FS-";
+const NOMMER_VOORVOEGSEL = "FS/";
+
+function nommer_na_sleutel(nommer) {
+  const teks = String(nommer || "").trim();
+  if (!teks.startsWith(NOMMER_VOORVOEGSEL)) return null;
+  const syfers = teks.slice(NOMMER_VOORVOEGSEL.length);
+  if (!/^\d+$/.test(syfers)) return null;
+  return SLEUTEL_VOORVOEGSEL + syfers;
+}
+
+function sleutel_na_nommer(sleutel) {
+  const teks = String(sleutel || "").trim();
+  if (!teks.startsWith(SLEUTEL_VOORVOEGSEL)) return null;
+  const syfers = teks.slice(SLEUTEL_VOORVOEGSEL.length);
+  if (!/^\d+$/.test(syfers)) return null;
+  return NOMMER_VOORVOEGSEL + syfers;
+}
+
+// Die volgnommer uit 'n sleutel, of 0 as die sleutel nie een van ons s'n is
+// nie. 0 beteken "tel nie saam nie" — dit kan nooit die hoogste wees nie,
+// want die reeks begin by BEGIN_NOMMER.
+function volgnommer_van(sleutel) {
+  const nommer = sleutel_na_nommer(sleutel);
+  if (!nommer) return 0;
+  const getal = Number(nommer.slice(NOMMER_VOORVOEGSEL.length));
+  return Number.isFinite(getal) ? getal : 0;
+}
+
+// Die volgende nommer, as 'n SLEUTEL (`FS-01958`). Die aanroeper stoor
+// daarmee en sit sleutel_na_nommer() op die rekord se `nommer`-veld.
 //
 // Die nommer word by STUUR toegeken, nie by die skep van 'n konsep nie —
-// anders lê daar gate in die reeks van fakture wat nooit iets geword het
-// nie. Die datum in die nommer is dus die UITREIKINGSDATUM: 'n konsep wat
-// Dinsdag begin en Donderdag gestuur word, dra Donderdag se datum.
+// anders lê daar gate in die reeks van fakture wat nooit iets geword het nie.
+//
+// DIE VOLGENDE NOMMER IS DIE HOOGSTE VAN TWEE DINGE: BEGIN_NOMMER, en die
+// laaste bestaande sleutel plus een. Sonder die eerste sou 'n leë store die
+// reeks laat terugval na FS/00001.
 //
 // Die volgnommer kom uit die bestaande sleutels, nie uit 'n aparte teller
-// nie. Blobs se list() is eventueel konsekwent (sowat vier sekondes), dus
-// kan twee fakture kort na mekaar dieselfde nommer kry — daarom toets ons of
-// die sleutel reeds bestaan voordat hy teruggegee word. Dieselfde patroon as
+// nie. Blobs se list() is eventueel konsekwent (sowat vier sekondes), dus kan
+// twee fakture kort na mekaar dieselfde nommer kry — daarom toets ons of die
+// sleutel reeds bestaan voordat hy teruggegee word. Dieselfde patroon as
 // _indienings.js se skep_nommer.
-async function skep_nommer(store, datum) {
-  const d = datum instanceof Date ? datum : new Date();
-  const jaar = d.getFullYear();
-  const maand = String(d.getMonth() + 1).padStart(2, "0");
-  const dag = String(d.getDate()).padStart(2, "0");
-  const voorvoegsel = `FS_${jaar}-${maand}-${dag}-`;
-
+async function skep_nommer(store) {
   let sleutels = [];
   try {
-    const lys = await store.list({ prefix: voorvoegsel });
+    const lys = await store.list({ prefix: SLEUTEL_VOORVOEGSEL });
     sleutels = (lys.blobs || []).map((b) => b.key);
   } catch (fout) {
     console.error("Kon nie die fakture lys nie:", fout);
@@ -85,12 +145,15 @@ async function skep_nommer(store, datum) {
 
   let hoogste = 0;
   sleutels.forEach((sleutel) => {
-    const getal = Number(sleutel.slice(voorvoegsel.length));
-    if (Number.isFinite(getal) && getal > hoogste) hoogste = getal;
+    const getal = volgnommer_van(sleutel);
+    if (getal > hoogste) hoogste = getal;
   });
 
-  for (let poging = 1; poging <= 20; poging += 1) {
-    const kandidaat = `${voorvoegsel}${String(hoogste + poging).padStart(4, "0")}`;
+  const begin = Math.max(BEGIN_NOMMER, hoogste + 1);
+
+  for (let poging = 0; poging < 20; poging += 1) {
+    const kandidaat =
+      SLEUTEL_VOORVOEGSEL + String(begin + poging).padStart(SYFERS, "0");
     if (!sleutels.includes(kandidaat)) {
       // list() loop agter. 'n Sleutel wat nie in die lys was nie, kan reeds
       // bestaan — dus vra ons hom direk.
@@ -102,6 +165,8 @@ async function skep_nommer(store, datum) {
 
   throw new Error("Kon nie 'n vry faktuurnommer kry nie");
 }
+
+// ─────────────────────────────────────────────────────────────────────────
 
 // Elke handeling gaan hier in. Dit is wat later 'n vraag beantwoord oor wat
 // gebeur het en wie dit gedoen het.
@@ -126,19 +191,42 @@ function voeg_geskiedenis_by(rekord, handeling, wie, nota) {
 function nuwe_faktuur(wie) {
   const nou = new Date().toISOString();
   return {
-    nommer: null,               // eers by stuur
+    nommer: null,               // eers by stuur; die vorm `FS/01957`
     stand: "konsep",
     geskep_op: nou,
     bygewerk_op: nou,
     geskep_deur: wie || "",
     uitgereik_op: null,
 
+    // Die taal van die DOKUMENT, per faktuur. Afrikaans is die voorstel wat
+    // die vorm maak; dit is per faktuur oorskryfbaar, dus kos 'n verkeerde
+    // raaiskoot niks.
+    taal: "af",
+
     klient_id: null,
-    klient: { naam: "", kontakpersoon: "", epos: "", selfoon: "" },
+    // 'n Afskrif van die kliënt soos hy op die dag van uitreiking gelyk het.
+    // Die ADRES kom hier in omdat 'n institusionele koper se adres op die
+    // dokument staan — dit hoort by die kliënt, nie by die faktuur nie,
+    // anders word dit by elke faktuur oorgetik.
+    klient: {
+      naam: "",
+      kontakpersoon: "",
+      epos: "",
+      selfoon: "",
+      adres: "",               // vrye teksblok; gedruk soos dit gestoor is
+    },
     bestelnommer: "",           // die kliënt se PO; opsioneel, op die dokument
 
     reels: [],                  // { soort: verkoop | koste, beskrywing,
-                                //   bedrag_sent, op_faktuur, verdeling: [] }
+                                //   hoeveelheid, prys_pp_sent, bedrag_sent,
+                                //   op_faktuur, verdeling: [] }
+
+    // EEN oop teksblok onder die reëls — nie 'n subreël per item nie. Dit
+    // dra die opleidingsdatum en die deelnemerslys, en dit is die enigste
+    // plek waar vrye teks op die dokument beland. 'n Blok per reël sou by
+    // drie reëls drie half-ingevulde blokke gee.
+    dokument_nota: "",
+
     afslag_sent: 0,
     koepon_kode: null,
     skenking_sent: 0,           // tel by die totaal, bly BUITE die verdeling
@@ -178,8 +266,20 @@ function nuwe_faktuur(wie) {
     // nêrens in 'n uitvoer of 'n toetslêer nie.
     bron: { respondente: [], groep: "", bevestig: false },
 
-    verval_op: null,            // leeg = geen verval. Hier beteken leeg die
-                                // TEENOORGESTELDE van _uitnodiging-geldig.js
+    // TWEE DATUMS WAT NIE VERWAR MAG WORD NIE:
+    //
+    //   betaalbaar_teen — staan op die DOKUMENT. 'n Skool se finansiële
+    //                     afdeling werk teen 30 dae en het 'n datum nodig om
+    //                     teen te betaal. Dit keer niks en maak niks dood: 'n
+    //                     faktuur wat verby sy datum is, kan steeds betaal
+    //                     word.
+    //   verval_op       — maak die BETAALSKAKEL dood. Leeg = geen verval, wat
+    //                     die TEENOORGESTELDE is van _uitnodiging-geldig.js.
+    //                     Wil 'n mens 'n skakel werklik doodmaak, is dit
+    //                     kanselleer, nie 'n datum nie.
+    betaalbaar_teen: null,
+    verval_op: null,
+
     geskiedenis: [],
   };
 }
@@ -194,7 +294,11 @@ module.exports = {
   STORE_NAAM,
   STANDE,
   BETAALMETODES,
+  TALE,
+  BEGIN_NOMMER,
   kry_fakture_store,
+  nommer_na_sleutel,
+  sleutel_na_nommer,
   skep_nommer,
   voeg_geskiedenis_by,
   nuwe_faktuur,
