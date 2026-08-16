@@ -84,11 +84,29 @@ function fo_teken() {
   const plek = document.getElementById("fv-foon");
   if (!plek || typeof bo_som !== "function") return;
 
+  // 'N MISLUKTE BEREKENING MOET DIT SÊ.
+  //
+  // Die eerste weergawe het hier vroeg teruggekeer, en dan het die kaart met
+  // OU syfers bly staan: geen merkie, geen waarskuwing, en getalle wat nie
+  // meer waar is nie. Dit is presies wat 'n afwesige merkie dubbelsinnig
+  // maak — beteken hy "alles is reg" of "niks het geloop nie"?
+  //
+  // Nou beteken 'n kaart sonder merkie een ding: die som het geloop en hy
+  // klop. Misluk hy, staan dit daar.
   let S;
   try {
     S = bo_som();
   } catch (fout) {
     console.error("Kon nie die opsomming reken nie:", fout);
+    plek.innerHTML = `
+      <div class="fo-kop">
+        <span>${fo_t("fo_kop", "Verdeling — opgestel")}</span>
+        <span class="fo-merk">${fo_t("fo_fout_merk", "Fout")}</span>
+      </div>
+      <div class="fo-waarsku">${fo_t(
+        "fo_fout",
+        "Die syfers kon nie gereken word nie. Maak die faktuur op 'n groter skerm oop om te sien wat fout is."
+      )}</div>`;
     return;
   }
 
@@ -142,19 +160,29 @@ function fo_teken() {
     ry(fo_t("fo_bly_oor", "Bly oor vir Future Sharp"), fo_rand(S.bly), "groot" + (tekort ? " tekort" : ""))
   );
 
+  // TWEE OORSAKE, TWEE BOODSKAPPE, NOOIT ALBEI NIE. Oorbestee beteken die rye
+  // vra meer as wat verdeelbaar is; 'n tekort sonder oorbestee beteken die
+  // oorskot dek nie die begrote koste nie. Vuur albei, noem die tweede 'n
+  // oorsaak wat nie bestaan nie.
+  let waarskuwing = "";
+  if (S.u.oorbestee) {
+    waarskuwing = `<div class="fo-waarsku">${fo_t(
+      "fo_waarsku",
+      "Die verdeling vra meer as wat die faktuur inbring. Paystack sou dit weier — die faktuur kan nie so uitgereik word nie."
+    )}</div>`;
+  } else if (tekort) {
+    waarskuwing = `<div class="fo-waarsku">${fo_t(
+      "bo_dek_nie",
+      "Die faktuur dek nie die begrote koste nie."
+    )}</div>`;
+  }
+
   plek.innerHTML = `
     <div class="fo-kop">
       <span>${fo_t("fo_kop", "Verdeling — opgestel")}</span>
       ${tekort ? `<span class="fo-merk">${fo_t("fo_tekort", "Tekort")}</span>` : ""}
     </div>
-    ${
-      tekort
-        ? `<div class="fo-waarsku">${fo_t(
-            "fo_waarsku",
-            "Die verdeling vra meer as wat die faktuur inbring. Paystack sou dit weier — die faktuur kan nie so uitgereik word nie."
-          )}</div>`
-        : ""
-    }
+    ${waarskuwing}
     ${rye.join("")}
     <p class="fo-nota">${fo_t(
       "fo_nota",

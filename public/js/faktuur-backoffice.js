@@ -345,9 +345,19 @@ function bo_teken_somme(S) {
   const bly = g("s-bly");
   if (bly) bly.classList.toggle("tekort", tekort);
 
+  // TWEE TOETSE, TWEE OORSAKE, EN HULLE MAG NIE SAAM VUUR NIE.
+  //
+  // `oorbestee` beteken die verdelingsrye vra meer as wat verdeelbaar is.
+  // `tekort` beteken die oorskot dek nie wat uit die hoofrekening begroot is
+  // nie. Wanneer die rye oorbestee, word die oorskot OOK negatief — en dan het
+  // albei boodskappe gevuur, waarvan die tweede 'n oorsaak noem wat nie
+  // bestaan nie: "die faktuur dek nie die begrote koste nie" terwyl die
+  // begroting op R0,00 staan.
+  //
+  // Die oorbestee-boodskap is die werklike oorsaak en sy praat alleen.
   const tekort_blok = g("s-tekort");
   if (tekort_blok) {
-    tekort_blok.innerHTML = tekort
+    tekort_blok.innerHTML = tekort && !u.oorbestee
       ? `<div class="bo-boodskap">${fv_t("bo_dek_nie", "Die faktuur dek nie die begrote koste nie.")}
          <button type="button" class="fv-teks-knop" id="s-dek">${fv_t("bo_verhoog", "Verhoog die prys tot dit dek")}</button></div>`
       : "";

@@ -1736,6 +1736,14 @@ const WOORDEBOEK = {
     af: "Die verdeling vra meer as wat die faktuur inbring. Paystack sou dit weier — die faktuur kan nie so uitgereik word nie.",
     en: "The split asks for more than the invoice brings in. Paystack would refuse it — the invoice cannot be issued like this.",
   },
+  // 'n Mislukte berekening moet dit SÊ. Bly die kaart stil met ou syfers
+  // staan, is 'n afwesige merkie dubbelsinnig — beteken hy "alles is reg" of
+  // "niks het geloop nie"?
+  fo_fout_merk: { af: "Fout", en: "Error" },
+  fo_fout: {
+    af: "Die syfers kon nie gereken word nie. Maak die faktuur op 'n groter skerm oop om te sien wat fout is.",
+    en: "The figures could not be calculated. Open the invoice on a larger screen to see what is wrong.",
+  },
   fo_nota: {
     af: "Om die begroting of die verdeling te verander, is 'n groter skerm nodig.",
     en: "Changing the budget or the split requires a larger screen.",
