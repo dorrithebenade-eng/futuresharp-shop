@@ -13,9 +13,12 @@
 // 'n rekeningnommer moes staan. Presies wat tot nou toe met die strepies
 // gebeur het.
 //
-// SESSIE is 'n `let` in faktuurpaneel.js. Dit leef in die script-skoop wat
-// alle klassieke skrifte deel, maar dit verskyn NIE op window nie — die kaal
-// naam is die regte een.
+// DIE SESSIE WORD HIER SELF GEHAAL, nie by faktuurpaneel.js geleen nie —
+// dieselfde patroon as faktuurpaneel-kliente.js. Die eerste weergawe het na 'n
+// kaal `SESSIE` verwys; daardie naam leef in faktuur-vorm.js, nie op hierdie
+// bladsy nie, en die bladsy het met `SESSIE is not defined` gestort voordat
+// een veld gevul is. 'n Naam wat op EEN bladsy bestaan, is nie 'n naam wat
+// oral bestaan nie.
 
 // Die veld op die skerm, die veld op die rekord, en die plek in die voorskou.
 // Een lys, sodat 'n nuwe veld op EEN plek bygevoeg word en nie op drie nie.
@@ -31,7 +34,10 @@ const IN_VELDE = [
   ["in-tipe", "bank_rekeningtipe", "in-p-tipe"],
 ];
 
-let IN_BESIG = false;
+const IN = {
+  sessie: null,
+  besig: false,
+};
 
 function in_t(sleutel, verstek) {
   const uit = window.t ? window.t(sleutel) : null;
@@ -79,7 +85,7 @@ function in_stand(teks, is_fout) {
 async function in_laai() {
   try {
     const resp = await fetch("/.netlify/functions/kry-instellings", {
-      headers: { Authorization: `Bearer ${SESSIE.access_token}` },
+      headers: { Authorization: `Bearer ${IN.sessie.access_token}` },
     });
     if (!resp.ok) throw new Error(`Status ${resp.status}`);
     const data = await resp.json();
@@ -92,8 +98,8 @@ async function in_laai() {
 }
 
 async function in_stoor() {
-  if (IN_BESIG || !SESSIE) return;
-  IN_BESIG = true;
+  if (IN.besig || !IN.sessie) return;
+  IN.besig = true;
 
   const knop = document.getElementById("in-stoor");
   if (knop) knop.disabled = true;
@@ -110,7 +116,7 @@ async function in_stoor() {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${SESSIE.access_token}`,
+        Authorization: `Bearer ${IN.sessie.access_token}`,
       },
       body: JSON.stringify(liggaam),
     });
@@ -137,16 +143,18 @@ async function in_stoor() {
       true
     );
   } finally {
-    IN_BESIG = false;
+    IN.besig = false;
     if (knop) knop.disabled = false;
   }
 }
 
 (async function in_begin() {
-  for (let i = 0; i < 60 && !SESSIE; i += 1) {
-    await new Promise((r) => setTimeout(r, 100));
+  try {
+    IN.sessie = await identiteit_kry_huidige_sessie();
+  } catch {
+    IN.sessie = null;
   }
-  if (!SESSIE) return;
+  if (!IN.sessie || !identiteit_het_rol(IN.sessie.gebruiker, "boekhouding")) return;
 
   IN_VELDE.forEach(([veld_id]) => {
     const veld = document.getElementById(veld_id);

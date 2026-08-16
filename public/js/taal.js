@@ -1651,38 +1651,38 @@ const WOORDEBOEK = {
   // twee plekke, vasgespyker, en 'n adreswysiging sou een van hulle mis.
   fp_nav_instellings: { af: "Instellings", en: "Settings" },
 
-  in_maatskappy_kop: { af: "Die maatskappy", en: "The company" },
-  in_maatskappy_lei: {
-    af: "Wat in die kop van elke faktuur staan.",
-    en: "What appears in the header of every invoice.",
-  },
-  in_naam: { af: "Naam", en: "Name" },
+  // DIE TERM WAT 'N REKENMEESTER VERWAG, NIE 'N BESKRYWING VAN DIE VELD NIE.
+  //
+  // Die toets: sou hierdie woord op 'n bankstaat, 'n grootboek of 'n staat
+  // verskyn? So nie, is dit die verkeerde woord. "Die maatskappy" beskryf;
+  // "Maatskappybesonderhede" benoem. Hierdie skerms word gelees deur mense wie
+  // se werk versoening is, en 'n term wat hulle nie herken nie, laat hulle
+  // wonder of die stelsel weet wat dit doen.
+  //
+  // Die leidings onder die opskrifte het weggeval. 'n Sin wat verduidelik
+  // hoekom die vorige reël waar is, verdun; die opskrif dra dit reeds.
+  in_maatskappy_kop: { af: "Maatskappybesonderhede", en: "Company details" },
+  in_naam: { af: "Geregistreerde naam", en: "Registered name" },
   in_reg: { af: "Registrasienommer", en: "Registration number" },
-  in_reg_fyn: {
-    af: "'n Institusionele koper laai dit in sy eie stelsel. 'n Faktuur daarsonder kom terug.",
-    en: "An institutional buyer loads this into their own system. An invoice without it comes back.",
-  },
-  in_adres: { af: "Adres", en: "Address" },
+  in_adres: { af: "Geregistreerde adres", en: "Registered address" },
   in_adres_fyn: { af: "Word gedruk soos dit hier staan.", en: "Printed exactly as entered here." },
-  in_epos: { af: "E-pos op die dokument", en: "Email on the document" },
+  in_epos: { af: "Rekeningkundige e-posadres", en: "Accounts email address" },
 
   in_bank_kop: { af: "Bankbesonderhede", en: "Bank details" },
-  in_bank_lei: {
-    af: "Vir die kliënt wat die betaalskakel nie kan gebruik nie.",
-    en: "For the client who cannot use the payment link.",
-  },
   in_bank: { af: "Bank", en: "Bank" },
-  in_rekeningnaam: { af: "Rekeningnaam", en: "Account name" },
+  // Nie "Rekeningnaam" nie. Die bank se eie term is die rekeninghouer, en 'n
+  // betaling na 'n houer wat nie klop nie, word teruggestuur.
+  in_rekeningnaam: { af: "Rekeninghouer", en: "Account holder" },
   in_rekeningnaam_fyn: {
-    af: "Soos dit by die bank geregistreer is. Kan van die naam hierbo verskil.",
-    en: "As registered with the bank. May differ from the name above.",
+    af: "Soos dit by die bank geregistreer is. Kan van die geregistreerde naam verskil.",
+    en: "As registered with the bank. May differ from the registered name.",
   },
   in_rekeningnommer: { af: "Rekeningnommer", en: "Account number" },
   in_takkode: { af: "Takkode", en: "Branch code" },
   in_rekeningtipe: { af: "Rekeningtipe", en: "Account type" },
 
   in_stoor: { af: "Stoor", en: "Save" },
-  in_voorskou: { af: "Soos dit op die faktuur druk", en: "As it prints on the invoice" },
+  in_voorskou: { af: "Voorskou", en: "Preview" },
   // 'n Leë veld wys hierdie woord in koraal. 'n Leë plek in 'n grys blok lyk
   // soos 'n ontwerpkeuse; op 'n werklike faktuur is dit 'n gat.
   in_ontbreek: { af: "ontbreek", en: "missing" },
