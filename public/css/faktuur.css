@@ -948,3 +948,90 @@
   line-height: 1.4;
   color: #9a958d;
 }
+
+/* ════════════════════════════════════════════════════════════════════════
+   DRUK — Ctrl+P, of "Stoor as PDF"
+
+   'n SKOOL SE FINANSIELE AFDELING LAAI 'N PDF IN SY STELSEL; 'n skakel help
+   hulle nie. Tot die bediener die PDF self bou (fase 4, saam met die eposse),
+   is dit die pad: druk die bladsy, kies "Save as PDF", heg dit aan.
+
+   Die reel is eenvoudig: wat op die DOKUMENT staan, druk. Alles wat
+   gereedskap is — die kop, die balk, die backoffice, die knoppies, die
+   taalpille — verdwyn.
+
+   DRIE DINGE WAT MOET BLY:
+
+   * DIE BETAALSKAKEL BLY KLIKBAAR. 'n Skakel in 'n PDF werk; die betaalknoppie
+     word nie 'n lee blokkie op papier nie, hy is die punt.
+   * DIE BANKBESONDERHEDE BLY LANGS HOM. Iemand wat die PDF UITDRUK, het niks
+     om te klik nie.
+   * DIE QR BLY. Op papier is hy die enigste pad na die skakel.
+   ════════════════════════════════════════════════════════════════════════ */
+
+@media print {
+  /* Wit papier, geen skaduwees, geen agtergrondkleur wat ink kos. */
+  body { background: #fff; }
+
+  /* Die gereedskap. Alles hier is iets waarmee 'n mens WERK, nie iets wat 'n
+     klient lees nie. */
+  .mini-kop,
+  .fv-balk,
+  .bo,
+  .fo-kaart,
+  .fu-strook,
+  .fu-skerm,
+  .dok-taal,
+  .fv-klient-kies,
+  .fv-teks-knop,
+  .dok-vee { display: none !important; }
+
+  /* Die dokument is die bladsy. Geen raam, geen skaduwee, geen marge wat die
+     drukker se eie marge herhaal. */
+  .fv-blad { display: block; }
+
+  .dok {
+    max-width: none;
+    border: 0;
+    border-radius: 0;
+    padding: 0;
+    box-shadow: none;
+  }
+
+  /* 'n Datumveld druk andersins met sy kalender-ikoon en sy raam — 'n vorm op
+     papier. Dit moet lees soos die teks langs hom. */
+  .dok input,
+  .dok textarea,
+  .tel-invoer {
+    border: 0 !important;
+    background: transparent !important;
+    padding: 0 !important;
+    color: var(--swart) !important;
+    resize: none;
+  }
+
+  .dok input[type="date"]::-webkit-calendar-picker-indicator { display: none; }
+
+  /* 'n Leeg aantekeningblok mag nie 'n leeg blok op papier wees nie. Die
+     hoogte kom van die inhoud. */
+  .dok textarea { height: auto; min-height: 0; overflow: visible; }
+
+  /* DIE BETAALBLOK BREEK NIE OOR TWEE BLADSYE NIE. Die skakel, die
+     bankbesonderhede en die QR hoort bymekaar; 'n QR wat halfpad afgesny is,
+     skandeer nie. */
+  .dok-betaal { break-inside: avoid; page-break-inside: avoid; }
+  .dok-qr { break-inside: avoid; page-break-inside: avoid; }
+  .dok-tabel tr { break-inside: avoid; page-break-inside: avoid; }
+
+  /* Die skakel is die punt van die bladsy en bly klikbaar in 'n PDF. Hy druk
+     as teks met 'n rand in plaas van 'n gevulde blok — 'n vol teal blok kos
+     ink en lees swakker op papier. */
+  .dok-skakel {
+    background: transparent !important;
+    color: var(--teal) !important;
+    border: 1px solid var(--teal);
+    padding: 7px 14px;
+  }
+
+  .dok-skakel.dood { display: none; }
+}

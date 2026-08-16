@@ -44,6 +44,11 @@ function fu_rand(sent) {
 
 function fu_wys(html) {
   const paneel = document.getElementById("fu-paneel");
+  // Die Druk-knoppie. Geen inline onclick nie — daardie attribuut het die
+  // Betaal-knoppie se klik vir dae stilweg gekanselleer.
+  const druk = document.getElementById("fv-druk");
+  if (druk) druk.addEventListener("click", () => window.print());
+
   const skerm = document.getElementById("fu-skerm");
   if (!paneel || !skerm) return;
   paneel.innerHTML = html;
@@ -51,6 +56,11 @@ function fu_wys(html) {
 }
 
 function fu_toe() {
+  // Die Druk-knoppie. Geen inline onclick nie — daardie attribuut het die
+  // Betaal-knoppie se klik vir dae stilweg gekanselleer.
+  const druk = document.getElementById("fv-druk");
+  if (druk) druk.addEventListener("click", () => window.print());
+
   const skerm = document.getElementById("fu-skerm");
   if (skerm) skerm.hidden = true;
 }
@@ -484,6 +494,11 @@ function fu_teken_strook() {
       knop.style.display = "none";
     }
   }
+
+  // Die Druk-knoppie. Geen inline onclick nie — daardie attribuut het die
+  // Betaal-knoppie se klik vir dae stilweg gekanselleer.
+  const druk = document.getElementById("fv-druk");
+  if (druk) druk.addEventListener("click", () => window.print());
 
   const skerm = document.getElementById("fu-skerm");
   if (skerm) {

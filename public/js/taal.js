@@ -1579,6 +1579,10 @@ const WOORDEBOEK = {
   // gestuur nie: die nommer word getrek, die verdeling vries en die
   // betaalskakel word geskep. Die proforma-e-pos kom later, en dan bly die
   // woord steeds reg — uitreik is wat gebeur, en die pos is 'n gevolg.
+  // Druk die dokument. 'n Skool se finansiele afdeling laai 'n PDF in sy
+  // stelsel; 'n skakel help hulle nie.
+  fv_druk: { af: "Druk", en: "Print" },
+
   fu_reik_uit: { af: "Reik uit", en: "Issue" },
   fu_vra_kop: { af: "Reik hierdie faktuur uit?", en: "Issue this invoice?" },
   fu_vra_teks: {
