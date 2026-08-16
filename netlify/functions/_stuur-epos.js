@@ -227,8 +227,20 @@ function bou_teks(opskrif, reels, knoppie, m) {
  * @param {string} opsies.opskrif    groot opskrif binne die pos
  * @param {string[]} opsies.reels    paragrawe (eenvoudige HTML toegelaat)
  * @param {object} [opsies.knoppie]  { teks, url } — opsionele aksieknoppie
+ * @param {string} [opsies.merk]     "winkel" (verstek) of "faktuur"
+ * @param {string} [opsies.antwoord_aan]  Reply-To
+ * @param {object[]} [opsies.aanhegsels]  [{ filename, content, contentType }]
  */
-async function stuur_epos({ aan, onderwerp, opskrif, reels, knoppie, merk, antwoord_aan }) {
+async function stuur_epos({
+  aan,
+  onderwerp,
+  opskrif,
+  reels,
+  knoppie,
+  merk,
+  antwoord_aan,
+  aanhegsels,
+}) {
   if (!aan || !onderwerp) {
     return { ok: false, fout: "Ontbrekende ontvanger of onderwerp" };
   }
@@ -281,6 +293,11 @@ async function stuur_epos({ aan, onderwerp, opskrif, reels, knoppie, merk, antwo
       from: `"${van_naam}" <${posbus}>`,
       to: aan,
       ...(antwoord ? { replyTo: antwoord } : {}),
+      // AANHEGSELS. 'n Skool se finansiële afdeling laai 'n PDF in sy eie
+      // stelsel; 'n skakel help hulle nie. nodemailer se vorm is
+      // { filename, content, contentType } — content mag 'n Buffer of 'n
+      // Uint8Array wees.
+      ...(Array.isArray(aanhegsels) && aanhegsels.length ? { attachments: aanhegsels } : {}),
       subject: onderwerp,
       text: bou_teks(opskrif || onderwerp, lys, knoppie, m),
       html: bou_html(opskrif || onderwerp, lys, knoppie, m),

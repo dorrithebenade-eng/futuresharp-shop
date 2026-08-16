@@ -180,20 +180,27 @@ async function stuur_kwitansie(rekord) {
     const nommer = rekord.nommer || "";
     const bedrag = rand(rekord.betaling.ontvang_sent);
 
+    // BY R0 IS DAAR NIKS ONTVANG NIE, en 'n kwitansie wat "Bedrag ontvang:
+    // R0,00" sê, lees soos 'n fout. Die faktuur is vereffen deur 'n koepon;
+    // dit is wat gebeur het en dit is wat daar moet staan.
+    const gratis = rekord.betaling.metode === "gratis";
+
     await stuur_epos({
       merk: "faktuur",
       aan,
-      onderwerp: `Betaling ontvang — ${nommer}`,
-      opskrif: "Betaling ontvang",
+      onderwerp: gratis ? `Faktuur vereffen — ${nommer}` : `Betaling ontvang — ${nommer}`,
+      opskrif: gratis ? "Faktuur vereffen" : "Betaling ontvang",
       reels: [
-        `Dankie. Die betaling is teen faktuur <b>${ontsnap(nommer)}</b> toegewys.`,
+        gratis
+          ? `Faktuur <b>${ontsnap(nommer)}</b> is vereffen. Daar is niks betaalbaar nie.`
+          : `Dankie. Die betaling is teen faktuur <b>${ontsnap(nommer)}</b> toegewys.`,
         // GEEN DERDE PARAGRAAF NIE. Die opskrif se "Betaling ontvang", die
         // syfers staan hier, en die voetskrif dra reeds
         // admin@futuresharp.co.za. 'n Reel wat se "hierdie is 'n kwitansie"
         // se niks wat die res nie reeds se nie, en die adres twee keer noem
         // maak die pos langer sonder om iets by te voeg.
         `Faktuurnommer: <b>${ontsnap(nommer)}</b><br>` +
-          `Bedrag ontvang: <b>${bedrag}</b><br>` +
+          (gratis ? "" : `Bedrag ontvang: <b>${bedrag}</b><br>`) +
           `Datum: ${datum(rekord.betaling.ontvang_op)}`,
       ],
     });
@@ -285,16 +292,31 @@ async function stuur_kennisgewing(rekord, maatskappy, was_gekanselleer) {
     );
     const hand_sent = hand.reduce((s, r) => s + r.bedrag_sent, 0);
 
+    // BY R0 LEES "IS BETAAL", "R0,00" EN 'N LEË METODE ALMAL VERKEERD. Daar
+    // was niks om te betaal nie; 'n koepon het die bedrag tot niks verminder,
+    // en dit is wat 'n mens moet weet.
+    const gratis = rekord.betaling.metode === "gratis";
+    const kanaal = kanaal_naam(rekord.betaling.kanaal);
+
     const reels = [
-      `Faktuur <b>${ontsnap(nommer)}</b> is betaal.`,
+      gratis
+        ? `Faktuur <b>${ontsnap(nommer)}</b> is uitgereik teen R0 en is vereffen.`
+        : `Faktuur <b>${ontsnap(nommer)}</b> is betaal.`,
       `Kliënt: ${ontsnap((rekord.klient && rekord.klient.naam) || "")}<br>` +
-        `Bedrag: <b>${rand(rekord.betaling.ontvang_sent)}</b><br>` +
-        `Metode: ${ontsnap(kanaal_naam(rekord.betaling.kanaal))}`,
+        (gratis
+          ? `Bedrag: <b>R0,00</b>` +
+            (rekord.koepon_kode ? `<br>Koepon: ${ontsnap(rekord.koepon_kode)}` : "")
+          : `Bedrag: <b>${rand(rekord.betaling.ontvang_sent)}</b>` +
+            (kanaal ? `<br>Metode: ${ontsnap(kanaal)}` : "")),
       hand.length
         ? `<b>${hand.length === 1 ? "1 ontvanger" : hand.length + " ontvangers"} moet met die hand oorbetaal word — ${rand(
             hand_sent
           )}.</b><br>` + hand.map((r) => ontsnap(r.ontvanger)).join("<br>")
-        : "Al die ontvangers is direk deur die betalingsdiens uitbetaal. Daar is niks om met die hand oor te betaal nie.",
+        : // BY R0 IS DAAR GEEN ONTVANGERS NIE, en "al die ontvangers is
+          // uitbetaal" sou beteken daar was iets om uit te betaal.
+          (rekord.uitbetalings || []).length
+          ? "Al die ontvangers is direk deur die betalingsdiens uitbetaal. Daar is niks om met die hand oor te betaal nie."
+          : "Daar is niks om te verdeel nie.",
     ];
 
     if (was_gekanselleer) {
@@ -317,8 +339,14 @@ async function stuur_kennisgewing(rekord, maatskappy, was_gekanselleer) {
       aan,
       onderwerp: was_gekanselleer
         ? `Betaling op 'n gekanselleerde faktuur — ${nommer}`
+        : gratis
+        ? `Faktuur teen R0 uitgereik — ${nommer}`
         : `Betaling ontvang — ${nommer}`,
-      opskrif: was_gekanselleer ? "Betaling op 'n gekanselleerde faktuur" : "Betaling ontvang",
+      opskrif: was_gekanselleer
+        ? "Betaling op 'n gekanselleerde faktuur"
+        : gratis
+        ? "Faktuur teen R0 uitgereik"
+        : "Betaling ontvang",
       reels,
     });
   } catch (fout) {
@@ -326,4 +354,9 @@ async function stuur_kennisgewing(rekord, maatskappy, was_gekanselleer) {
   }
 }
 
-module.exports = { hanteer_faktuur_betaling };
+// stuur_kwitansie en stuur_kennisgewing word UITGEVOER sodat stuur-faktuur.js
+// se R0-tak hulle kan aanroep. By R0 word Paystack glad nie geroep nie — geen
+// /split, geen transaksie, geen webhook — en alles wat die webhook sou doen,
+// moet dáár gebeur. Twee kopieë van hierdie poste sou beteken 'n mens verander
+// die een en wonder hoekom die ander anders lees.
+module.exports = { hanteer_faktuur_betaling, stuur_kwitansie, stuur_kennisgewing };

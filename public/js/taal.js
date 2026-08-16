@@ -1876,8 +1876,21 @@ function koppel_taal_wisselaar() {
   });
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  pas_i18n_toe();
-  koppel_taal_wisselaar();
-  wys_taal_wisselaar_status();
-});
+// DIE WAG IS OMSTREDE OP DIE BEDIENER. _faktuur-pdf.js laai hierdie lêer om
+// dieselfde woordelys as die skerm te gebruik — een bron vir die dokument se
+// terme, nie 'n tweede kopie wat uit pas raak nie. In Node bestaan `document`
+// nie, en die aanroep sou stort voordat een woord gelees is.
+if (typeof document !== "undefined") {
+  document.addEventListener("DOMContentLoaded", () => {
+    pas_i18n_toe();
+    koppel_taal_wisselaar();
+    wys_taal_wisselaar_status();
+  });
+}
+
+// Node kan die woordeboek laai. t_in(sleutel, taal) is die enigste ding wat
+// die bediener nodig het: hy lees nie 'n platform-taal nie, hy kry die
+// faktuur se eie taal saam.
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = { WOORDEBOEK, t_in, t_rand };
+}

@@ -49,6 +49,14 @@ const {
   voeg_geskiedenis_by,
 } = require("./_fakture");
 const { kry_maks_verdeling_sent } = require("./_paystack-koste.js");
+const { kry_maatskappy } = require("./_instellings");
+const { bou_faktuur_pdf } = require("./_faktuur-pdf");
+const { stuur_epos, ontsnap } = require("./_stuur-epos");
+const { stuur_kwitansie, stuur_kennisgewing } = require("./_faktuur-betaling");
+// Dieselfde formateerder as die skerm en die PDF. Die desimaalteken verskil
+// per taal — R25 500,00 teenoor R25 500.00 — en dit is die konvensie waarteen
+// 'n debiteureklerk lees, nie 'n voorkeur nie.
+const { t_rand } = require("../../public/js/taal.js");
 
 // DIESELFDE LÊER WAT DIE BLAAIER LAAI. Nie 'n kopie nie — die lêer self.
 const {
@@ -444,11 +452,40 @@ exports.handler = async (event, context) => {
     );
   }
 
-  // DIE PROFORMA-E-POS KOM HIER, IN DIE VOLGENDE STAP. Hy word apart gebou,
-  // want hy vra 'n eie besluit: die faktuurmodule stuur uit
-  // admin@futuresharp.co.za, terwyl _stuur-epos.js tans uit die winkel se
-  // posbus stuur. Wanneer hy kom, staan hy in sy eie try/catch — die faktuur
-  // is klaar gestoor en 'n pos wat misluk mag dit nie ongedaan maak nie.
+  // ── die proforma ────────────────────────────────────────────────────────
+  //
+  // IN SY EIE try/catch. Die faktuur is klaar gestoor en die nommer is klaar
+  // toegeken; 'n pos wat misluk mag dit nie ongedaan maak nie. Misluk hy, staan
+  // die betaalskakel steeds op die skerm en kan 'n mens hom self stuur.
+  //
+  // DIE PDF WORD AANGEHEG. 'n Skool se finansiele afdeling laai 'n PDF in sy
+  // eie stelsel; 'n skakel help hulle nie.
+  const pos = await stuur_proforma(rekord, nuwe_sleutel, gratis);
+
+  // ── die R0-tak se eposse ────────────────────────────────────────────────
+  //
+  // By R0 word Paystack glad nie geroep nie: geen /split, geen transaksie, en
+  // dus nooit 'n webhook wat kan vuur nie. Alles wat die webhook sou doen,
+  // moet HIER gebeur — en dit is presies wat die winkel se begin-betaling.js
+  // se `totaal_sent === 0`-tak doen.
+  //
+  // Die faktuur kry dus albei: die PROFORMA hierbo, want dit is die dokument
+  // en die rekord van wat verskaf is, en die KWITANSIE, want sy is vereffen.
+  //
+  // Geen state nie. Daar is niks om te verdeel nie.
+  //
+  // Elkeen in sy eie try/catch binne die funksies self — die faktuur is klaar
+  // gestoor en 'n pos wat misluk mag dit nie ongedaan maak nie.
+  if (gratis) {
+    let maatskappy = null;
+    try {
+      maatskappy = await kry_maatskappy();
+    } catch (fout) {
+      console.error("R0-tak: kon nie die instelling lees nie:", fout);
+    }
+    await stuur_kwitansie(rekord);
+    await stuur_kennisgewing(rekord, maatskappy, false);
+  }
 
   return {
     statusCode: 200,
@@ -461,6 +498,108 @@ exports.handler = async (event, context) => {
       betaalskakel: authorization_url,
       gratis,
       verdeling_gevries,
+      // Die skerm sê eerlik of die pos uitgegaan het. 'n Stil mislukking laat
+      // iemand aanneem die klient het sy faktuur.
+      pos_gestuur: pos.ok,
+      pos_fout: pos.ok ? null : pos.fout,
     }),
   };
 };
+
+/* ═══ die proforma ═══
+
+   Die dokument as 'n PDF, plus die syfers in die pos self sodat 'n mens hom
+   kan lees sonder om die aanhegsel oop te maak. In die FAKTUUR se taal — dit
+   is die klient se dokument, nie ons skerm nie.
+
+   'n R0-faktuur kry nie 'n proforma nie. Sy is klaar betaal; wat daar hoort,
+   is 'n kwitansie, en die R0-tak stuur hom. */
+async function stuur_proforma(rekord, sleutel, gratis) {
+  try {
+    const aan = String((rekord.klient && rekord.klient.epos) || "").trim();
+    if (!aan) return { ok: false, fout: "Geen kliënt-e-pos" };
+
+    let maatskappy = null;
+    try {
+      maatskappy = await kry_maatskappy();
+    } catch (fout) {
+      console.error("Proforma: kon nie die instelling lees nie:", fout);
+    }
+
+    const taal = rekord.taal === "en" ? "en" : "af";
+    const en = taal === "en";
+    const nommer = rekord.nommer || "";
+    const bedrag = t_rand(rekord.totaal_sent, taal);
+
+    // Die PDF mag misluk sonder om die pos te keer. 'n Proforma met die
+    // syfers en die betaalskakel is bruikbaar; sonder die pos is daar niks.
+    let aanhegsels = [];
+    try {
+      const grepe = await bou_faktuur_pdf(rekord, maatskappy);
+      aanhegsels = [
+        {
+          filename: `${String(nommer).replace(/\//g, "-")}.pdf`,
+          content: Buffer.from(grepe),
+          contentType: "application/pdf",
+        },
+      ];
+    } catch (fout) {
+      console.error(`Proforma: kon nie die PDF bou vir ${sleutel} nie:`, fout);
+    }
+
+    const reels = [
+      en
+        ? `Please find the proforma invoice for <b>${ontsnap(nommer)}</b> attached.`
+        : `Hierby die proforma-faktuur <b>${ontsnap(nommer)}</b>.`,
+      `${en ? "Invoice number" : "Faktuurnommer"}: <b>${ontsnap(nommer)}</b><br>` +
+        `${en ? "Total due" : "Totaal verskuldig"}: <b>${bedrag}</b>` +
+        (rekord.betaalbaar_teen
+          ? `<br>${en ? "Payable by" : "Betaalbaar teen"}: ${ontsnap(
+              String(rekord.betaalbaar_teen).replace(/-/g, "/")
+            )}`
+          : ""),
+    ];
+
+    if (gratis) {
+      reels.push(
+        en
+          ? "Nothing is payable on this invoice."
+          : "Daar is niks op hierdie faktuur betaalbaar nie."
+      );
+    } else {
+      // DIE BANKBESONDERHEDE STAAN OOK IN DIE POS, nie net in die PDF nie.
+      // 'n Finansiele afdeling wat teen 'n bankrekening betaal, hoef nie die
+      // aanhegsel oop te maak om die nommer te kry nie. Die faktuurnommer is
+      // die verwysing.
+      const m = maatskappy || {};
+      const streep = (w) => (String(w || "").trim() ? ontsnap(String(w).trim()) : "—");
+      reels.push(
+        `<b>${en ? "Bank transfer" : "Bankoorbetaling"}</b><br>` +
+          (String(m.bank || "").trim() ? `${ontsnap(m.bank.trim())}<br>` : "") +
+          `${ontsnap(String(m.bank_rekeningnaam || m.naam || "").trim())}<br>` +
+          `${en ? "Account" : "Rekening"}: ${streep(m.bank_rekeningnommer)}<br>` +
+          `${en ? "Branch code" : "Takkode"}: ${streep(m.bank_takkode)}<br>` +
+          `${en ? "Reference" : "Verwysing"}: <b>${ontsnap(nommer)}</b>`
+      );
+    }
+
+    return await stuur_epos({
+      merk: "faktuur",
+      aan,
+      onderwerp: en ? `Proforma invoice ${nommer}` : `Proforma-faktuur ${nommer}`,
+      opskrif: en ? "Proforma invoice" : "Proforma-faktuur",
+      reels,
+      knoppie:
+        !gratis && rekord.paystack && rekord.paystack.authorization_url
+          ? {
+              teks: en ? `Pay ${nommer}` : `Betaal ${nommer}`,
+              url: rekord.paystack.authorization_url,
+            }
+          : undefined,
+      aanhegsels,
+    });
+  } catch (fout) {
+    console.error(`Proforma vir ${sleutel} het misluk:`, fout);
+    return { ok: false, fout: (fout && fout.message) || "Onbekende fout" };
+  }
+}
