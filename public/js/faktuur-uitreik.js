@@ -341,6 +341,48 @@ async function fu_doen() {
   }
 }
 
+/* ═══ die QR op die dokument ═══
+
+   Die QR is NIE vir Dorrithé nie. 'n Mens skandeer nie sy eie skerm nie; die
+   kode is daar om aan iemand te WYS, en veral om op papier te druk. Op 'n
+   gedrukte faktuur is hy die enigste pad na die betaalskakel — 'n knoppie op
+   papier is 'n leë blokkie.
+
+   HY IS DIESELFDE STRING as die betaalskakel, kliëntkant gerender. Geen
+   tweede bron, niks om uit sinchronisasie te raak nie.
+
+   SVG en nie 'n canvas nie. 'n Canvas druk as 'n lae-resolusie prent; SVG
+   druk skerp op enige drukker, en die gedrukte bladsy is die hele rede
+   waarom hierdie kode bestaan. */
+function fu_teken_qr() {
+  const blok = document.getElementById("d-qr");
+  const plek = document.getElementById("d-qr-kode");
+  if (!blok || !plek) return;
+
+  // 'N KONSEP KRY GEEN QR NIE. 'n Kode wat na niks lei, is erger as geen kode:
+  // iemand skandeer hom en land op 'n foutbladsy.
+  if (!V.betaalskakel || typeof qrcode !== "function") {
+    blok.hidden = true;
+    plek.innerHTML = "";
+    return;
+  }
+
+  try {
+    // typeNumber 0 laat die biblioteek self die kleinste weergawe kies wat die
+    // data pas; "M" is die middelste foutkorreksie en is genoeg vir 'n kode
+    // wat van 'n skoon gedrukte bladsy geskandeer word.
+    const q = qrcode(0, "M");
+    q.addData(V.betaalskakel);
+    q.make();
+    plek.innerHTML = q.createSvgTag({ scalable: true, margin: 0 });
+    blok.hidden = false;
+  } catch (fout) {
+    console.error("Kon nie die QR teken nie:", fout);
+    blok.hidden = true;
+    plek.innerHTML = "";
+  }
+}
+
 /* ═══ die betaalskakel daarna ═══
    'n STROOK MET 'N TITEL, dieselfde vorm as die kliëntvorm-skakel. Die titel
    is nie versiering nie: sonder 'n naam moet 'n mens elke keer die URL lees
@@ -456,4 +498,5 @@ function fu_teken_strook() {
   }
 
   fu_teken_strook();
+  fu_teken_qr();
 })();

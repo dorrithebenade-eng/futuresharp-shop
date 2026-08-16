@@ -213,6 +213,21 @@
                  target="_blank" sodat 'n mens nie die faktuur verloor wanneer
                  die betaalbladsy oopmaak nie. -->
             <a class="dok-skakel dood" id="d-betaal" target="_blank" rel="noopener">Betaal</a>
+
+            <!-- DIE QR IS VIR DIE GEDRUKTE BLADSY. Op 'n skerm skandeer 'n
+                 mens nie sy eie skerm nie; op papier is die kode die enigste
+                 pad na die skakel.
+
+                 Hy staan in DIESELFDE kolom as die knoppie, want hy vervang
+                 hom: dieselfde skakel, ander medium. In die bankkolom sou dit
+                 lyk of hy met die bankoorbetaling te doen het.
+
+                 'n KONSEP KRY GEEN QR NIE. 'n Kode wat na niks lei, is erger
+                 as geen kode: iemand skandeer hom en land op 'n foutbladsy. -->
+            <div class="dok-qr" id="d-qr" hidden>
+              <div id="d-qr-kode"></div>
+              <p class="dok-qr-teks" id="d-qr-teks">Skandeer om te betaal</p>
+            </div>
           </div>
           <div>
             <h3 id="d-bank">Bankoorbetaling</h3>
@@ -310,6 +325,11 @@
     <div class="fu-paneel" id="fu-paneel"></div>
   </div>
 
+  <!-- Die QR-biblioteek leef IN DIE REPO, nie op 'n CDN nie. MIT, geen
+       afhanklikhede, 56KB. 'n Gedrukte faktuur mag nie van 'n netwerkoproep
+       afhang nie, en die winkel se PDF.js-ervaring wys hoe dit voel wanneer
+       'n eksterne stuk nie laai nie. -->
+  <script src="js/qrcode.js"></script>
   <script src="js/taal.js"></script>
   <script src="js/identiteit.js"></script>
   <script src="js/sessie-verval.js"></script>

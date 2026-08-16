@@ -1477,6 +1477,9 @@ const WOORDEBOEK = {
   fd_rekening: { af: "Rekening", en: "Account" },
   fd_takkode: { af: "Takkode", en: "Branch code" },
   fd_verwysing: { af: "Verwysing", en: "Reference" },
+  // Die QR se byskrif. Die kode self is 'n URL en verander nooit met taal
+  // nie; net hierdie reël skakel saam met die dokument.
+  fd_qr_teks: { af: "Skandeer om te betaal", en: "Scan to pay" },
   // Een sleutel, twaalf afkortings. Mrt/Mar, Okt/Oct en Des/Dec verskil;
   // die res is dieselfde. Die kode split op die komma.
   fd_maande: {

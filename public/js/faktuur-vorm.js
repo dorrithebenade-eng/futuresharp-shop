@@ -287,6 +287,10 @@ function teken_dok_taal() {
   stel("d-eft", "fd_eft_kop", "Onmiddellike EFT — deur die betaalskakel");
   stel("d-eft-lei", "fd_eft_lei", "Kaart, Instant EFT of QR. Die betaling word dadelik bevestig.");
   stel("d-bank", "fd_bank_kop", "Bankoorbetaling");
+  // Die QR se byskrif is dokumentinhoud, dus die FAKTUUR se taal. Die kode
+  // self verander nooit met taal nie — dit is 'n URL — dus word hy net een
+  // keer geteken, in faktuur-uitreik.js.
+  stel("d-qr-teks", "fd_qr_teks", "Skandeer om te betaal");
 
   const datum_w = document.getElementById("d-datum-w");
   if (datum_w) datum_w.textContent = dok_datum(V.geskep_op);

@@ -769,3 +769,29 @@
   .fu-knoppe { flex-direction: column-reverse; }
   .fu-knoppe button { width: 100%; }
 }
+
+
+/* ═══ DIE QR OP DIE BETAALBLOK ═══
+
+   96px: groot genoeg om van 'n gedrukte bladsy af te skandeer, klein genoeg
+   om nie die blok te oorheers nie.
+
+   SVG en nie 'n canvas nie. 'n Canvas druk as 'n lae-resolusie prent; SVG
+   druk skerp op enige drukker, en hierdie kode se hele rede vir bestaan is
+   die gedrukte bladsy. */
+.dok-qr { margin-top: 14px; }
+.dok-qr[hidden] { display: none; }
+
+.dok-qr svg {
+  display: block;
+  width: 96px;
+  height: 96px;
+}
+
+.dok-qr-teks {
+  margin-top: 6px;
+  max-width: 96px;
+  font-size: 11px;
+  line-height: 1.4;
+  color: #9a958d;
+}
