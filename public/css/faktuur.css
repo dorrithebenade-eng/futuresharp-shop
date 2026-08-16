@@ -192,6 +192,37 @@
   border-bottom: 1px solid var(--fv-lyn);
 }
 .dok-tabel th:first-child { text-align: left; }
+
+/* DIE KOPPE HET GEEN HORISONTALE RUIMTE GEHAD.
+
+   `td.n` dra padding-left: 14px; die <th> het niks gedra nie. Op 'n breë
+   kolom val dit nie op nie, want die woorde pas met ruimte oor. Krimp die
+   kolom — 'n smal venster, 'n foon, of 'n gedrukte bladsy met 'n breë marge —
+   raak BESKRYWING en HOEVEELHEID aanmekaar en lees as een woord.
+
+   Die kop moet dieselfde ruimte kry as die sel daaronder. */
+.dok-tabel th + th { padding-left: 14px; }
+
+/* Die syferkolomme se breedtes het as `style="width:82px"` op die <th> gestaan.
+   'n Inline styl kan nie deur CSS oorheers word nie, dus kon hulle nooit op 'n
+   smal kolom krimp nie. Hulle staan nou hier, waar 'n media-navraag by hulle
+   kan kom. */
+.dok-tabel th:nth-child(2) { width: 78px; }
+.dok-tabel th:nth-child(3) { width: 104px; }
+.dok-tabel th:nth-child(4) { width: 112px; }
+
+@media (max-width: 720px) {
+  /* Minder letterspasiëring en 'n kleiner grootte gee die beskrywing sy
+     ruimte terug sonder om die woorde te verkort. Die dokument se woorde is
+     vasgestel — "Eenheidsprys" lees by elke soort reël, waar "Prys p.p." vals
+     is by 'n verslag — dus krimp die letters, nie die taal nie. */
+  .dok-tabel th { font-size: 9.5px; letter-spacing: .03em; }
+  .dok-tabel th + th { padding-left: 10px; }
+  .dok-tabel th:nth-child(2) { width: 58px; }
+  .dok-tabel th:nth-child(3) { width: 86px; }
+  .dok-tabel th:nth-child(4) { width: 94px; }
+  .dok-tabel td.n { padding-left: 10px; }
+}
 .dok-tabel td {
   padding: 9px 0;
   border-bottom: 1px solid var(--fv-lyn);
@@ -788,9 +819,11 @@
   height: 96px;
 }
 
+/* GEEN max-width NIE. Die byskrif was aan die QR se 96px gebind en het op 'n
+   smal kolom oor twee reëls gebreek — "Skandeer om / te betaal". Hy hoort by
+   die kolom se breedte, nie by die kode s'n. */
 .dok-qr-teks {
   margin-top: 6px;
-  max-width: 96px;
   font-size: 11px;
   line-height: 1.4;
   color: #9a958d;
