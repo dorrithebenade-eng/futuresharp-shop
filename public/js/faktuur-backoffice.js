@@ -290,12 +290,18 @@ function bo_teken_verdeling(S) {
 
 // Die som se getalle kom in RAND (fs_bereken werk so), nie in sent nie.
 //
-// Die formateerder leef in taal.js. Hier staan die taal VAS op Afrikaans: die
-// begroting en die verdeling is Future Sharp se eie werk en skakel nooit saam
-// met die dokument nie. Slegs die dokument skakel.
+// Die formateerder leef in taal.js. Hier geld die PLATFORM se taal, dieselfde
+// bron as t() wat elke etiket op hierdie skerm lees.
+//
+// "Die begroting bly Afrikaans" in die spesifikasie beteken sy skakel nie saam
+// met die DOKUMENT nie — nie dat sy vasgespyker is. Sy is jou skerm. Spyker 'n
+// mens die getalle vas terwyl die etiket op t() loop, lees daar "Invoice total
+// R22 000,00": Engelse etiket, Afrikaanse getal.
 function rand_uit(bedrag) {
   const sent = Math.round((Number(bedrag) || 0) * 100);
-  return window.t_rand ? t_rand(sent, "af") : "R" + (sent / 100).toFixed(2);
+  return window.t_rand
+    ? t_rand(sent, kry_huidige_taal())
+    : "R" + (sent / 100).toFixed(2);
 }
 
 function bo_teken_somme(S) {
