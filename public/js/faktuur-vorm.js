@@ -61,6 +61,15 @@ let SESSIE = null;
 // 'n uitgereikte faktuur as 'n konsep. 'n Vaste wagtyd is 'n raaiskoot; dit
 // is die feit.
 let FV_GELAAI = false;
+
+// DIE MAATSKAPPY SE BESONDERHEDE, uit die instelling. Hulle staan op die
+// dokument se kop en in die bankblok — twee plekke wat tot 16 Augustus elk sy
+// eie vasgespykerde teks gedra het. Nou is daar een bron.
+//
+// Misluk die lees, bly dit null en die blokke word nie herteken nie: die
+// bladsy se eie teks bly staan. 'n Faktuur met 'n ou adres is beter as 'n
+// faktuur met 'n leë kop.
+let MAATSKAPPY = null;
 let KLIENTE = [];
 let VUIL = false;         // daar is veranderinge wat nog nie gestoor is nie
 let BESIG = false;
@@ -303,16 +312,69 @@ function teken_dok_taal() {
   const bank = document.getElementById("d-bank-lei");
   if (bank) {
     const verw = V.nommer || dt("fd_stand_konsep", "Konsep");
-    bank.innerHTML =
-      "Future Sharp NPC<br>" +
-      `${dt("fd_rekening", "Rekening")} —<br>` +
-      `${dt("fd_takkode", "Takkode")} —<br>` +
-      `${dt("fd_verwysing", "Verwysing")}: <span class="verw">${ontsnap(verw)}</span>`;
+    const m = MAATSKAPPY || {};
+
+    // 'n ONTBREKENDE VELD DRUK AS 'N STREPIE, nie as niks nie. 'n Leë reël
+    // lyk soos 'n uitleg-keuse; 'n strepie sê daar hoort iets te wees. Die
+    // Instellings-blad waarsku boonop op die Fakture-blad self.
+    const of_streep = (waarde) => {
+      const teks = String(waarde || "").trim();
+      return teks ? ontsnap(teks) : "—";
+    };
+
+    const rye = [
+      ontsnap(String(m.bank_rekeningnaam || m.naam || "").trim()),
+      `${dt("fd_rekening", "Rekening")}: ${of_streep(m.bank_rekeningnommer)}`,
+      `${dt("fd_takkode", "Takkode")}: ${of_streep(m.bank_takkode)}`,
+    ];
+    // Die bank en die rekeningtipe verskyn slegs as hulle bestaan. Hulle is
+    // nie nodig om 'n betaling te maak nie, en 'n strepie langs "Bank" voeg
+    // niks by wat die res nie reeds sê nie.
+    if (String(m.bank || "").trim()) rye.unshift(ontsnap(m.bank.trim()));
+    if (String(m.bank_rekeningtipe || "").trim()) {
+      rye.push(ontsnap(m.bank_rekeningtipe.trim()));
+    }
+    rye.push(
+      `${dt("fd_verwysing", "Verwysing")}: <span class="verw">${ontsnap(verw)}</span>`
+    );
+
+    bank.innerHTML = rye.join("<br>");
   }
+
+  teken_maatskappy();
 
   document.querySelectorAll("#d-taal button").forEach((b) => {
     b.classList.toggle("aan", b.getAttribute("data-taal") === V.taal);
   });
+}
+
+// Die dokument se kop. Loop saam met teken_dok(), sodat 'n taalwissel of 'n
+// herteken hom nie leeg laat nie.
+function teken_maatskappy() {
+  if (!MAATSKAPPY) return;
+  const stel = (id, waarde) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = String(waarde || "").trim();
+  };
+  stel("d-mts-naam", MAATSKAPPY.naam);
+  stel("d-mts-reg", MAATSKAPPY.registrasienommer);
+  stel("d-mts-adres", MAATSKAPPY.adres);
+  stel("d-mts-epos", MAATSKAPPY.epos);
+}
+
+async function laai_maatskappy() {
+  try {
+    const resp = await fetch("/.netlify/functions/kry-instellings", {
+      headers: { Authorization: `Bearer ${SESSIE.access_token}` },
+    });
+    if (!resp.ok) throw new Error(`Status ${resp.status}`);
+    const data = await resp.json();
+    MAATSKAPPY = data.maatskappy || null;
+  } catch (fout) {
+    // Nie fataal nie. Sonder die instelling bly die bladsy se eie teks staan.
+    console.error("Kon nie die maatskappy-instelling laai nie:", fout);
+    MAATSKAPPY = null;
+  }
 }
 
 function teken_stand() {
@@ -621,6 +683,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     merk_vuil();
   });
 
+  await laai_maatskappy();
   await laai_kliente();
   const kies = document.getElementById("fv-klient");
   if (kies) {

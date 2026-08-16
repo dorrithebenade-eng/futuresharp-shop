@@ -1644,6 +1644,67 @@ const WOORDEBOEK = {
   fu_gekopieer: { af: "Gekopieer", en: "Copied" },
   fu_deel: { af: "Deel", en: "Share" },
 
+  // ── Instellings: die maatskappy se kop en die bankbesonderhede ───────
+  //
+  // Hulle leef as 'n INSTELLING en nie in die sjabloon nie. Tot 16 Augustus
+  // het die kop in faktuur.html gestaan en die bankblok in faktuur-vorm.js —
+  // twee plekke, vasgespyker, en 'n adreswysiging sou een van hulle mis.
+  fp_nav_instellings: { af: "Instellings", en: "Settings" },
+
+  in_maatskappy_kop: { af: "Die maatskappy", en: "The company" },
+  in_maatskappy_lei: {
+    af: "Wat in die kop van elke faktuur staan.",
+    en: "What appears in the header of every invoice.",
+  },
+  in_naam: { af: "Naam", en: "Name" },
+  in_reg: { af: "Registrasienommer", en: "Registration number" },
+  in_reg_fyn: {
+    af: "'n Institusionele koper laai dit in sy eie stelsel. 'n Faktuur daarsonder kom terug.",
+    en: "An institutional buyer loads this into their own system. An invoice without it comes back.",
+  },
+  in_adres: { af: "Adres", en: "Address" },
+  in_adres_fyn: { af: "Word gedruk soos dit hier staan.", en: "Printed exactly as entered here." },
+  in_epos: { af: "E-pos op die dokument", en: "Email on the document" },
+
+  in_bank_kop: { af: "Bankbesonderhede", en: "Bank details" },
+  in_bank_lei: {
+    af: "Vir die kliënt wat die betaalskakel nie kan gebruik nie.",
+    en: "For the client who cannot use the payment link.",
+  },
+  in_bank: { af: "Bank", en: "Bank" },
+  in_rekeningnaam: { af: "Rekeningnaam", en: "Account name" },
+  in_rekeningnaam_fyn: {
+    af: "Soos dit by die bank geregistreer is. Kan van die naam hierbo verskil.",
+    en: "As registered with the bank. May differ from the name above.",
+  },
+  in_rekeningnommer: { af: "Rekeningnommer", en: "Account number" },
+  in_takkode: { af: "Takkode", en: "Branch code" },
+  in_rekeningtipe: { af: "Rekeningtipe", en: "Account type" },
+
+  in_stoor: { af: "Stoor", en: "Save" },
+  in_voorskou: { af: "Soos dit op die faktuur druk", en: "As it prints on the invoice" },
+  // 'n Leë veld wys hierdie woord in koraal. 'n Leë plek in 'n grys blok lyk
+  // soos 'n ontwerpkeuse; op 'n werklike faktuur is dit 'n gat.
+  in_ontbreek: { af: "ontbreek", en: "missing" },
+  in_laai_fout: {
+    af: "Kon nie die instellings laai nie.",
+    en: "The settings could not be loaded.",
+  },
+  in_stoor_fout: {
+    af: "Kon nie stoor nie — probeer weer",
+    en: "Could not save — try again",
+  },
+
+  // DIT KEER NIKS. 'n Faktuur met 'n betaalskakel werk sonder
+  // bankbesonderhede; die skakel is die hoofpad. Maar die besonderhede druk
+  // STILWEG as strepies, en 'n mens sien dit eers op 'n dokument wat reeds by
+  // 'n kliënt is.
+  in_bank_waarsku: {
+    af: "Die bankbesonderhede ontbreek — hulle druk as strepies op elke faktuur.",
+    en: "The bank details are missing — they print as dashes on every invoice.",
+  },
+  in_bank_gaan: { af: "Vul hulle in", en: "Fill them in" },
+
 };
 
 /* ═══════════════════════════════════════════════════════════════════════

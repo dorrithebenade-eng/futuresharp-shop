@@ -523,3 +523,148 @@ a.paneel-kieslys-item { text-decoration: none; }
    reëlbreuke nie. */
 .fk-vgl-waarde,
 .fk-vgl-eenders { white-space: pre-line; }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   INSTELLINGS — die maatskappy se kop en die bankbesonderhede
+
+   Eie klasse met die voorvoegsel `in-`. Niks geleen nie: `.veld-ry` in
+   styl.css is 'n TWEEKOLOM-ROOSTER met die etiket links en die veld regs,
+   en die kliëntvorm het op 14 Augustus daaraan skeef gehang.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* Die vorm links, die voorskou regs. Onder 820px val hulle onder mekaar en
+   die voorskou volg die vorm — 'n mens tik eers en kyk dan. */
+.in-wrap {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+  align-items: start;
+}
+
+@media (max-width: 820px) {
+  .in-wrap { grid-template-columns: 1fr; }
+}
+
+/* Die vorm-kolom. Sy het geen eie styl nodig nie, maar 'n min-width van 0
+   keer dat 'n lang plekhouer die roosterkolom uitrek. */
+.in-vorm { min-width: 0; }
+
+.in-lei {
+  margin: 0 0 4px;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--grys-teks);
+}
+
+.in-tweede { margin-top: 30px; }
+
+.veld-fyn {
+  margin: 5px 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #9a958d;
+}
+
+.in-blok { resize: vertical; min-height: 76px; }
+
+.in-knoppe {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 22px;
+}
+
+.in-stand { font-size: 12.5px; color: #9a958d; }
+.in-stand.fout { color: var(--koraal); font-weight: 500; }
+
+/* Die voorskou bly staan terwyl 'n mens tik. */
+.in-voorskou { position: sticky; top: 20px; }
+
+.in-vs-blok {
+  background: var(--grys-lig);
+  border: 1px solid #E2DFD9;
+  padding: 20px;
+}
+
+.in-vs-kop {
+  font-family: var(--font-opskrif);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .6px;
+  color: var(--grys-teks);
+  margin: 0 0 14px;
+}
+
+.in-vs-dok {
+  background: #fff;
+  border: 1px solid #EFEDE9;
+  padding: 18px;
+}
+
+.in-vs-merk {
+  font-family: var(--font-opskrif);
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--teal);
+  margin-bottom: 5px;
+}
+
+.in-vs-fyn {
+  font-size: 12.5px;
+  line-height: 1.65;
+  color: var(--grys-teks);
+}
+
+.in-vs-lyn {
+  height: 2px;
+  background: var(--teal);
+  margin: 16px 0;
+}
+
+.in-vs-bank-kop { font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+
+.in-vs-bank {
+  font-size: 12.5px;
+  line-height: 1.7;
+  color: var(--grys-teks);
+}
+
+.in-vs-verw { font-weight: 700; color: var(--swart); }
+
+/* 'n LEEG VELD IS KORAAL, nie 'n leeg plek nie. 'n Leeg plek in 'n grys blok
+   lyk soos 'n ontwerpkeuse; op 'n werklike faktuur is dit 'n gat waar 'n
+   rekeningnommer moes staan. */
+.in-vs-leeg { color: var(--koraal); font-style: italic; }
+
+/* Die strook op die Fakture-blad. Dieselfde gewig as die duplikaat-strook op
+   die Registers-blad: 'n versoek om te kontroleer, nie 'n fout nie. Dit KEER
+   niks — 'n faktuur met 'n betaalskakel werk sonder bankbesonderhede. */
+.fp-let-op {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  background: #FDF3DA;
+  border-left: 3px solid var(--amber);
+  padding: 13px 16px;
+  margin-bottom: 18px;
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+
+.fp-let-op[hidden] { display: none; }
+
+.fp-let-op-knop {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  background: #fff;
+  color: var(--swart);
+  border: 1px solid #D8D3CB;
+  padding: 8px 16px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.fp-let-op-knop:hover { border-color: var(--teal); color: var(--teal); }

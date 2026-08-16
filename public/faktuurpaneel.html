@@ -62,12 +62,27 @@
         <button type="button" class="fp-pil aktief" data-gaan="fakture" data-i18n="fp_nav_fakture">Fakture</button>
         <button type="button" class="fp-pil" data-gaan="registers" data-i18n="fp_nav_registers">Registers</button>
         <button type="button" class="fp-pil" data-gaan="state" data-i18n="fp_nav_state">State</button>
+        <!-- 'n EIE PIL, nie 'n blok op die Registers-blad nie. Registers hou
+             lyste van BAIE dinge; dit is EEN rekord. -->
+        <button type="button" class="fp-pil" data-gaan="instellings" data-i18n="fp_nav_instellings">Instellings</button>
       </nav>
 
       <!-- Geen afdelingstitel hier nie: die aktiewe pil hierbo is die
            opskrif. Op die paneelbord maak die titel sin omdat die afdelings
            onder mekaar lê; hier herhaal hy net die pil. -->
       <section class="paneel-afdeling fp-afdeling wys" data-afdeling="fakture">
+
+        <!-- DIT KEER NIKS. 'n Faktuur met 'n betaalskakel werk sonder
+             bankbesonderhede; die skakel is die hoofpad. Maar die
+             besonderhede druk STILWEG as strepies, en 'n mens sien dit eers
+             op 'n dokument wat reeds by 'n klient is. Dieselfde gewig as die
+             duplikaat-strook op die Registers-blad: 'n versoek om te
+             kontroleer, nie 'n fout nie. -->
+        <div class="fp-let-op" id="fp-bank-waarskuwing" hidden>
+          <span data-i18n="in_bank_waarsku">Die bankbesonderhede ontbreek — hulle druk as strepies op elke faktuur.</span>
+          <button type="button" class="fp-let-op-knop" id="fp-bank-gaan"
+                  data-i18n="in_bank_gaan">Vul hulle in</button>
+        </div>
 
         <!-- Geen parameter agter faktuur.html nie: dit is 'n vars konsep. Die
              nommer word by STUUR toegeken, anders le daar gate in die reeks
@@ -137,6 +152,92 @@
 
       <section class="paneel-afdeling fp-afdeling" data-afdeling="state">
         <p class="stelsel-boodskap" data-i18n="fp_nog_nie">Hierdie deel word nog gebou.</p>
+      </section>
+
+      <!-- ═══ Instellings ═══
+           Wat in die kop van elke faktuur staan, en die bankbesonderhede wat
+           langs die betaalskakel druk. Hulle leef HIER en nie in die sjabloon
+           nie — 'n adreswysiging gebeur op een plek. -->
+      <section class="paneel-afdeling fp-afdeling" data-afdeling="instellings">
+        <div class="in-wrap">
+
+          <div class="in-vorm">
+            <h3 class="paneel-afdeling-titel" data-i18n="in_maatskappy_kop">Die maatskappy</h3>
+            <p class="in-lei" data-i18n="in_maatskappy_lei">Wat in die kop van elke faktuur staan.</p>
+
+            <label class="veld-etiket" for="in-naam" data-i18n="in_naam">Naam</label>
+            <input class="veld-invoer" id="in-naam" maxlength="120">
+
+            <label class="veld-etiket" for="in-reg" data-i18n="in_reg">Registrasienommer</label>
+            <input class="veld-invoer" id="in-reg" maxlength="40">
+            <p class="veld-fyn" data-i18n="in_reg_fyn">'n Institusionele koper laai dit in sy eie
+              stelsel. 'n Faktuur daarsonder kom terug.</p>
+
+            <label class="veld-etiket" for="in-adres" data-i18n="in_adres">Adres</label>
+            <textarea class="veld-invoer in-blok" id="in-adres" rows="3" maxlength="400"></textarea>
+            <p class="veld-fyn" data-i18n="in_adres_fyn">Word gedruk soos dit hier staan.</p>
+
+            <label class="veld-etiket" for="in-epos" data-i18n="in_epos">E-pos op die dokument</label>
+            <input class="veld-invoer" id="in-epos" type="email" maxlength="160">
+
+            <h3 class="paneel-afdeling-titel in-tweede" data-i18n="in_bank_kop">Bankbesonderhede</h3>
+            <p class="in-lei" data-i18n="in_bank_lei">Vir die klient wat die betaalskakel nie kan
+              gebruik nie.</p>
+
+            <label class="veld-etiket" for="in-bank" data-i18n="in_bank">Bank</label>
+            <input class="veld-invoer" id="in-bank" maxlength="60">
+
+            <label class="veld-etiket" for="in-rnaam" data-i18n="in_rekeningnaam">Rekeningnaam</label>
+            <input class="veld-invoer" id="in-rnaam" maxlength="120">
+            <p class="veld-fyn" data-i18n="in_rekeningnaam_fyn">Soos dit by die bank geregistreer is.
+              Kan van die naam hierbo verskil.</p>
+
+            <label class="veld-etiket" for="in-rnr" data-i18n="in_rekeningnommer">Rekeningnommer</label>
+            <input class="veld-invoer" id="in-rnr" inputmode="numeric" maxlength="40">
+
+            <label class="veld-etiket" for="in-tak" data-i18n="in_takkode">Takkode</label>
+            <input class="veld-invoer" id="in-tak" inputmode="numeric" maxlength="20">
+
+            <label class="veld-etiket" for="in-tipe" data-i18n="in_rekeningtipe">Rekeningtipe</label>
+            <input class="veld-invoer" id="in-tipe" maxlength="40">
+
+            <div class="in-knoppe">
+              <button type="button" class="kaart-aksie" id="in-stoor" data-i18n="in_stoor">Stoor</button>
+              <span class="in-stand" id="in-stand"></span>
+            </div>
+          </div>
+
+          <!-- DIE VOORSKOU IS NIE VERSIERING NIE. Die enigste manier om te
+               sien of 'n adres oor een reel of oor drie loop, is om hom te
+               sien loop. 'n Leeg veld wys in koraal, want 'n leeg plek in 'n
+               grys blok lyk soos 'n ontwerpkeuse terwyl dit op 'n werklike
+               faktuur 'n gat is. -->
+          <div class="in-voorskou">
+            <div class="in-vs-blok">
+              <p class="in-vs-kop" data-i18n="in_voorskou">Soos dit op die faktuur druk</p>
+              <div class="in-vs-dok">
+                <div class="in-vs-merk" id="in-p-naam"></div>
+                <div class="in-vs-fyn">
+                  <span id="in-p-reg"></span><br>
+                  <span id="in-p-adres"></span><br>
+                  <span id="in-p-epos"></span>
+                </div>
+                <div class="in-vs-lyn"></div>
+                <div class="in-vs-bank-kop" data-i18n="fd_bank_kop">Bankoorbetaling</div>
+                <div class="in-vs-bank">
+                  <span id="in-p-bank"></span><br>
+                  <span id="in-p-rnaam"></span><br>
+                  <span data-i18n="fd_rekening">Rekening</span>: <span id="in-p-rnr"></span><br>
+                  <span data-i18n="fd_takkode">Takkode</span>: <span id="in-p-tak"></span><br>
+                  <span id="in-p-tipe"></span><br>
+                  <span data-i18n="fd_verwysing">Verwysing</span>:
+                  <span class="in-vs-verw">FS/01957</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
       </section>
 
     </div>
@@ -269,5 +370,6 @@
   <script src="js/faktuurpaneel.js"></script>
   <script src="js/faktuurpaneel-kliente.js"></script>
   <script src="js/faktuurpaneel-begunstigdes.js"></script>
+  <script src="js/faktuurpaneel-instellings.js"></script>
 </body>
 </html>
