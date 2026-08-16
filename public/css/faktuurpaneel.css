@@ -116,8 +116,111 @@ a.paneel-kieslys-item { text-decoration: none; }
 .fp-stand-betaal { background: #E8F3F0; color: #2f6b60; }
 .fp-stand-gekanselleer { background: #FDE7E0; color: #a8351a; }
 
+/* --- Die ry maak oop, en die ry kan geskrap word --- */
+
+/* DIE RY IS 'N <button>, nie 'n <div> met 'n klik nie: dan werk Tab en Enter
+   vanself en 'n skermleser kondig hom as klikbaar aan. Die padding skuif van
+   .fp-ry hierheen sodat die hele hoogte klikbaar is. */
+.fp-ry-knop { padding: 0; align-items: stretch; }
+
+.fp-ry-oop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex: 1 1 auto;
+  min-width: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  background: none;
+  border: 0;
+  margin: 0;
+  padding: 14px 8px 14px 0;
+  cursor: pointer;
+}
+
+.fp-ry-oop:hover .fp-nommer { color: var(--teal); }
+.fp-ry-oop:focus-visible { outline: 2px solid var(--teal); outline-offset: -2px; }
+
+/* Die tweede reel van 'n konsep. Twee konsepte wat albei net "Konsep" heet,
+   is een woord wat twee keer staan. */
+.fp-datum { font-size: 12px; color: #9a958d; }
+
+/* Die toetsstempel. Hy leef op die REKORD, nie op 'n stelselmodus nie. */
+.fp-toets {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .6px;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #EFE7F7;
+  color: #6b4a8f;
+}
+
+/* Die skrap-knoppie sit BUITE die oopmaak-knoppie, met sy eie ruimte. */
+.fp-ry-rand {
+  display: flex;
+  align-items: center;
+  padding-left: 4px;
+}
+
+.fp-skrap {
+  font: inherit;
+  font-size: 12.5px;
+  color: #9a958d;
+  background: none;
+  border: 0;
+  padding: 8px 10px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.fp-skrap:hover { color: var(--koraal); background: #FDE7E0; }
+
+/* WEG, NIE GRYS NIE. 'n Grys knoppie nooi 'n mens om te vra hoekom; 'n
+   afwesige een se dat dit nie 'n keuse is nie. Die ruimte bly staan sodat die
+   rye in kolom bly. */
+.fp-skrap[disabled] { visibility: hidden; }
+
+/* Die bevestiging vervang die knoppie in sy eie ry, in plaas van 'n confirm()
+   wat die bladsy blokkeer en nie se WATTER faktuur nie. */
+.fp-bevestig {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  color: var(--grys-teks);
+  white-space: nowrap;
+}
+
+.fp-bevestig button {
+  font: inherit;
+  font-size: 12.5px;
+  border: 0;
+  padding: 7px 12px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.fp-bevestig-ja { background: var(--koraal); color: #fff; font-weight: 600; }
+.fp-bevestig-nee { background: #EDEBE6; color: var(--swart); }
+
+/* Die kop bo die lys: die knoppie links, die telling regs. */
+.fp-lys-kop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.fp-tel { font-size: 13px; color: var(--grys-teks); }
+
 @media (max-width: 560px) {
-  .fp-ry {
+  .fp-ry-oop {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;

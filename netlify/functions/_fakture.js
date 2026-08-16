@@ -225,6 +225,29 @@ function skep_publieke_kode() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────
+// DIE TOETSSTEMPEL
+//
+// 'n Faktuur is die rekord van waarheid. Word hy uitgereik, staan sy nommer
+// in die reeks en 'n gaping daarin is hoe 'n mens sien dat niks verdwyn het
+// nie. So iets word GEKANSELLEER, nooit uitgevee nie.
+//
+// Maar tydens die toetsfase word daar werklike fakture uitgereik wat nooit
+// bedoel was om te bly nie, en daardie data moet weg.
+//
+// DIE OPLOSSING IS 'N STEMPEL OP DIE REKORD, NIE 'N MODUS IN DIE STELSEL NIE.
+// Terwyl TOETSFASE aan is, kry elke NUWE faktuur `toets: true`. Die stempel
+// verander daarna nooit. Verwyder 'n mens die veranderlike, dra elke nuwe
+// faktuur geen stempel en is hy permanent — en daar hoef NOOIT 'n ontsluit-pad
+// in die kode te bestaan nie. Geen skakelaar wat iemand kan omdraai, geen
+// modus wat iemand kan vergeet om af te sit.
+//
+// In Netlify: TOETSFASE = aan. Enige ander waarde, of geen veranderlike,
+// beteken die toetsfase is verby.
+function is_toetsfase() {
+  return String(process.env.TOETSFASE || "").trim().toLowerCase() === "aan";
+}
+
+// ─────────────────────────────────────────────────────────────────────────
 
 // Elke handeling gaan hier in. Dit is wat later 'n vraag beantwoord oor wat
 // gebeur het en wie dit gedoen het.
@@ -339,6 +362,10 @@ function nuwe_faktuur(wie) {
     // gestel; 'n konsep het nog geen skakel om te deel nie.
     publieke_kode: null,
 
+    // Sien is_toetsfase() hierbo. Word by die SKEPPING gestel en verander
+    // daarna nooit — 'n faktuur wat as toetsdata begin het, bly dit.
+    toets: is_toetsfase(),
+
     // Hoe betaal is. Sien BETAALMETODES.
     betaling: {
       metode: null,
@@ -401,6 +428,7 @@ module.exports = {
   skep_konsep_sleutel,
   is_konsep_sleutel,
   skep_publieke_kode,
+  is_toetsfase,
   voeg_geskiedenis_by,
   nuwe_faktuur,
   is_toe,

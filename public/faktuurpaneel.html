@@ -68,6 +68,16 @@
            opskrif. Op die paneelbord maak die titel sin omdat die afdelings
            onder mekaar lê; hier herhaal hy net die pil. -->
       <section class="paneel-afdeling fp-afdeling wys" data-afdeling="fakture">
+
+        <!-- Geen parameter agter faktuur.html nie: dit is 'n vars konsep. Die
+             nommer word by STUUR toegeken, anders le daar gate in die reeks
+             van fakture wat nooit iets geword het nie. -->
+        <div class="fp-lys-kop">
+          <button type="button" class="kaart-aksie" id="fp-nuwe-faktuur"
+                  data-i18n="fp_nuwe_faktuur">+ Nuwe faktuur</button>
+          <span class="fp-tel" id="fp-tel"></span>
+        </div>
+
         <div id="fp-fakture-lys">
           <p class="stelsel-boodskap" data-i18n="fp_laai">Word gelaai …</p>
         </div>

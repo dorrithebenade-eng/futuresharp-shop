@@ -58,6 +58,10 @@ exports.handler = async (event, context) => {
       klient_naam: (rekord.klient && rekord.klient.naam) || "",
       bestelnommer: rekord.bestelnommer || "",
       totaal_sent: rekord.totaal_sent || 0,
+      // Die toetsstempel. Die skerm gebruik hom om te sê wat geskrap kan word;
+      // skrap-faktuur.js dwing dit af. DIE ANTWOORD WORD VELD VIR VELD GEBOU —
+      // 'n nuwe veld op die rekord kom nie vanself hier deur nie.
+      toets: rekord.toets === true,
       betaal_metode: (rekord.betaling && rekord.betaling.metode) || null,
       // Betaal is nie die einde nie — die verslag moet nog uitgaan. Dit is
       // GEEN stand nie; die stande gaan oor geld.

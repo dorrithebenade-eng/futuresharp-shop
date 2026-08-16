@@ -1544,6 +1544,32 @@ const WOORDEBOEK = {
     en: "Future Sharp NPC · Registration number 2024/117444/08 · PO Box 11602, Queenswood, Pretoria, 0121",
   },
 
+  // ── die faktuurlys se rye ────────────────────────────────────────────
+  fp_nuwe_faktuur: { af: "+ Nuwe faktuur", en: "+ New invoice" },
+  fp_faktuur_een: { af: "faktuur", en: "invoice" },
+  fp_faktuur_baie: { af: "fakture", en: "invoices" },
+
+  // Die stand gaan oor GELD. Lewering en uitbetaling dra hul eie velde en kry
+  // later hul eie merkers; hulle word nooit 'n stand nie.
+  fp_stand_konsep: { af: "Konsep", en: "Draft" },
+  fp_stand_gestuur: { af: "Gestuur", en: "Sent" },
+  fp_stand_betaal: { af: "Betaal", en: "Paid" },
+  fp_stand_gekanselleer: { af: "Gekanselleer", en: "Cancelled" },
+
+  // Die stempel leef op die REKORD, gegee by die skepping terwyl TOETSFASE
+  // aan is. Hy verander daarna nooit, dus is daar geen ontsluit-pad in die
+  // kode wat iemand later kan omdraai nie.
+  fp_toetsdata: { af: "Toetsdata", en: "Test data" },
+
+  fp_skrap: { af: "Skrap", en: "Delete" },
+  fp_skrap_vra: { af: "Skrap?", en: "Delete?" },
+  fp_ja: { af: "Ja", en: "Yes" },
+  fp_nee: { af: "Nee", en: "No" },
+  fp_skrap_fout: {
+    af: "Kon nie die faktuur skrap nie.",
+    en: "The invoice could not be deleted.",
+  },
+
 };
 
 function kry_huidige_taal() {
