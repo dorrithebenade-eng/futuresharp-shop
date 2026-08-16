@@ -1708,6 +1708,39 @@ const WOORDEBOEK = {
   },
   in_bank_gaan: { af: "Vul hulle in", en: "Fill them in" },
 
+  // ── die foonaansig se opsomming ─────────────────────────────────────
+  //
+  // Nie 'n verkleinde backoffice nie — die getalle wat 'n mens moet weet
+  // voordat hy stuur. Om hulle te VERANDER verg 'n groter skerm, en fo_nota
+  // sê dit uitdruklik. 'n Knoppie wat niks doen nie, is 'n leuen.
+  fo_kop: { af: "Verdeling — opgestel", en: "Split — set up" },
+  fo_totaal: { af: "Faktuurtotaal", en: "Invoice total" },
+  fo_fooi: { af: "Transaksiefooi", en: "Transaction fee" },
+  fo_verdeelbaar: { af: "Verdeelbaar", en: "Distributable" },
+  fo_uitbetaal: { af: "Word uitbetaal", en: "Paid out" },
+  fo_deur_paystack: { af: "deur Paystack", en: "by Paystack" },
+  // Die belangrikste reël op die kaart: 'n ontvanger sonder 'n subrekening
+  // word nie deur Paystack betaal nie, en iemand moet dit later self doen.
+  fo_met_hand: { af: "met die hand", en: "by hand" },
+  fo_ontvanger_een: { af: "1 ontvanger", en: "1 recipient" },
+  fo_ontvangers: { af: "ontvangers", en: "recipients" },
+  fo_bly_hoof: { af: "Bly in die hoofrekening", en: "Stays in the main account" },
+  fo_hosting: { af: "Hosting", en: "Hosting" },
+  fo_begroot: { af: "Begroot uit die hoofrekening", en: "Budgeted from the main account" },
+  fo_bly_oor: { af: "Bly oor vir Future Sharp", en: "Left for Future Sharp" },
+
+  // GEEN MERKIE BY 'N NORMALE FAKTUUR. Een wat altyd daar is, word nie meer
+  // gelees nie — en dan sien 'n mens die koraal een ook nie.
+  fo_tekort: { af: "Tekort", en: "Shortfall" },
+  fo_waarsku: {
+    af: "Die verdeling vra meer as wat die faktuur inbring. Paystack sou dit weier — die faktuur kan nie so uitgereik word nie.",
+    en: "The split asks for more than the invoice brings in. Paystack would refuse it — the invoice cannot be issued like this.",
+  },
+  fo_nota: {
+    af: "Om die begroting of die verdeling te verander, is 'n groter skerm nodig.",
+    en: "Changing the budget or the split requires a larger screen.",
+  },
+
 };
 
 /* ═══════════════════════════════════════════════════════════════════════

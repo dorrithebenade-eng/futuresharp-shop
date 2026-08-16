@@ -317,6 +317,22 @@
         </div>
 
       </aside>
+
+      <!-- ═══ die foonaansig ═══
+
+           Onder 620px verdwyn die backoffice en hierdie kaart kom in sy plek.
+           Nie 'n verkleinde backoffice nie — die GETALLE wat 'n mens moet weet
+           voordat hy stuur.
+
+           Om die begroting of die verdeling te VERANDER, verg 'n groter skerm,
+           en die laaste reel se dit uitdruklik. 'n Knoppie wat niks doen nie,
+           is 'n leuen; 'n sin wat se hoekom, is eerlik.
+
+           WAT NIE MAG WEGVAL NIE, is die waarskuwing. 'n Mens kan op 'n foon
+           'n bedrag verander en die verdeling oorbestee sonder om dit te sien,
+           en dan weier Paystack die transaksie by uitreiking. -->
+      <div class="fo-kaart" id="fv-foon"></div>
+
       </div>
     </div>
   </main>
@@ -340,5 +356,9 @@
   <script src="js/faktuur-vorm.js"></script>
   <script src="js/faktuur-backoffice.js"></script>
   <script src="js/faktuur-uitreik.js"></script>
+  <!-- NA faktuur-backoffice.js, want hy wikkel bo_teken() en bo_teken_syfers()
+       om saam met hulle te herteken. Voor hulle sou daar niks wees om te
+       wikkel nie. -->
+  <script src="js/faktuur-foon.js"></script>
 </body>
 </html>

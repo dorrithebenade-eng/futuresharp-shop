@@ -583,6 +583,126 @@
   .vd-ry .uit { grid-column: 1 / -1; text-align: left; }
 }
 
+/* ════════════════════════════════════════════════════════════════════════
+   DIE FOONAANSIG
+
+   Onder 620px verdwyn die backoffice en die opsomming kom in sy plek. Dit is
+   nie 'n verkleinde backoffice nie: die begroting, die verdelingsrye en die
+   afslagvelde val WEG, want om hulle te verander verg 'n groter skerm.
+
+   Wat bly, is die dokument — klient, reels, bedrae, taal, aantekening — plus
+   Stoor en Reik uit. Dit is die faktuur wat 'n mens tussen twee vergaderings
+   maak, en dit werk slegs omdat die verdeling reeds erens vasstaan.
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* GEEN `hidden`-attribuut NIE. Die winkel se .oi-knoppie het presies daaraan
+   gebyt: 'n klasreel wat 'n display stel, klop die blaaier se verstek
+   [hidden] { display: none }, en dan bly die ding staan. Hier besluit EEN
+   reel — die media-navraag — of die kaart bestaan. */
+.fo-kaart {
+  display: none;
+  background: #fff;
+  border: 1px solid var(--fv-lyn);
+  padding: 16px 14px;
+}
+
+.fo-kop {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 12px;
+  font-family: var(--font-opskrif);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* GEEN MERKIE BY 'N NORMALE FAKTUUR.
+
+   'n Merkie wat altyd daar is, dra geen inligting nie: verskyn hy by elke
+   faktuur, hou 'n mens op om hom te lees — en dan sien jy die koraal een ook
+   nie. Verskyn hy NET by 'n tekort, beteken sy aanwesigheid alreeds iets,
+   nog voordat jy die woord lees.
+
+   Dieselfde beginsel as die Skrap-knoppie wat WEG is by 'n faktuur wat nie
+   geskrap kan word nie — nie grys nie, weg. */
+.fo-merk {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .6px;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 999px;
+  white-space: nowrap;
+  background: #FDE7E0;
+  color: #a8351a;
+}
+
+.fo-ry {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 0;
+  font-size: 13px;
+  border-bottom: 1px solid #F1EFEB;
+}
+
+.fo-ry:last-of-type { border-bottom: 0; }
+.fo-ry span:first-child { color: var(--grys-teks); }
+
+.fo-ry b {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.fo-ry.groot {
+  padding-top: 11px;
+  border-top: 2px solid var(--swart);
+  border-bottom: 0;
+  font-size: 14.5px;
+}
+
+.fo-ry.groot span:first-child { color: var(--swart); font-weight: 600; }
+.fo-ry.tekort b { color: var(--koraal); }
+
+.fo-kopreel {
+  margin: 14px 0 2px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .7px;
+  text-transform: uppercase;
+  color: #9a958d;
+}
+
+/* Die eerlike reel. Nie 'n knoppie wat niks doen nie — 'n sin wat se hoekom
+   daar niks is om te druk nie. */
+.fo-nota {
+  margin: 16px 0 0;
+  padding-top: 13px;
+  border-top: 1px solid #F1EFEB;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #9a958d;
+}
+
+.fo-waarsku {
+  background: #FDE7E0;
+  border-left: 3px solid var(--koraal);
+  padding: 11px 13px;
+  margin: 12px 0 0;
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+
+/* Die ruil. Onder 620px is die backoffice weg en die opsomming daar. Een
+   plek besluit dit, en die JS vul die kaart altyd — 'n kaart wat nie vertoon
+   nie, kos niks om te vul nie. */
+@media (max-width: 620px) {
+  .bo { display: none; }
+  .fo-kaart { display: block; }
+}
+
 /* 'n Verdelingsry waarvan die ontvanger nie deur Paystack betaal kan word
    nie. Die merkie sit ONDER die ry, oor die volle breedte — 'n vyfde kolom
    sou die res saamdruk. */
