@@ -154,7 +154,7 @@ function fu_vra() {
     }</p>
     <dl class="fu-lys">${rye.join("")}</dl>
     <div class="fu-knoppe">
-      <button type="button" class="kaart-aksie stil" id="fu-terug">${fu_t(
+      <button type="button" class="kaart-aksie fu-stil" id="fu-terug">${fu_t(
         "fu_terug",
         "Terug"
       )}</button>
@@ -191,7 +191,7 @@ function fu_vra_epos() {
       <p class="fu-keer-fout" id="fu-epos-fout" hidden></p>
     </div>
     <div class="fu-knoppe">
-      <button type="button" class="kaart-aksie stil" id="fu-terug">${fu_t(
+      <button type="button" class="kaart-aksie fu-stil" id="fu-terug">${fu_t(
         "fu_terug",
         "Terug"
       )}</button>
@@ -327,7 +327,7 @@ async function fu_doen() {
         <p class="fu-fout-rede">${fu_ontsnap(String(fout.message || "").trim())}</p>
       </div>
       <div class="fu-knoppe">
-        <button type="button" class="kaart-aksie stil" id="fu-terug">${fu_t(
+        <button type="button" class="kaart-aksie fu-stil" id="fu-terug">${fu_t(
           "fu_terug",
           "Terug"
         )}</button>
@@ -425,9 +425,13 @@ function fu_teken_strook() {
   }
   if (!SESSIE) return;
 
-  // Nog 'n oomblik, sodat 'n bestaande faktuur klaar gelaai het voordat ons
-  // sy stand lees.
-  await new Promise((r) => setTimeout(r, 60));
+  // WAG OP DIE SEIN, NIE OP 'N KLOK NIE. laai_faktuur() is 'n netwerkoproep;
+  // 'n vaste 60 ms is 'n raaiskoot wat op 'n stadige verbinding misluk, en dan
+  // lees hierdie lêer 'n uitgereikte faktuur as 'n konsep — die betaalskakel
+  // verskyn nooit en die knoppie staan waar hy nie hoort nie.
+  for (let i = 0; i < 60 && !FV_GELAAI; i += 1) {
+    await new Promise((r) => setTimeout(r, 100));
+  }
 
   const knop = document.getElementById("fv-uitreik");
   if (knop) {

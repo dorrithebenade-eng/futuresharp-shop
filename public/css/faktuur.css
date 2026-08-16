@@ -631,6 +631,21 @@
   justify-content: flex-end;
 }
 
+/* DIE STIL KNOPPIE.
+
+   `stil` bestaan NIE in styl.css nie — hy leef slegs in die mockups, waar hy
+   plaaslik gedefinieer is. `class="kaart-aksie stil"` gee dus 'n vol
+   koraal-knoppie, en dan is Terug prominenter as die handeling langs hom.
+   Dieselfde fout as om 'n klas te leen, net andersom: 'n klas gebruik wat nie
+   bestaan nie. */
+.fu-stil {
+  background: #fff;
+  color: var(--swart);
+  border: 1px solid #D8D3CB;
+}
+
+.fu-stil:hover { border-color: var(--teal); color: var(--teal); }
+
 .fu-doen { background: var(--teal); color: #fff; }
 .fu-doen:hover { background: #3d8b7f; }
 .fu-doen[disabled] { opacity: .6; cursor: default; }

@@ -329,13 +329,13 @@ exports.handler = async (event, context) => {
             statusCode: 502,
             body: `Paystack kon nie die verdeling skep nie: ${
               (data && data.message) || "onbekende fout"
-            }. Die faktuur bly 'n konsep.`,
+            }.`,
           };
         }
         split_code = data.data.split_code;
       } catch (fout) {
         console.error(`Fout tydens split-skepping vir ${nuwe_sleutel}:`, fout);
-        return { statusCode: 502, body: "Kon nie by Paystack uitkom nie. Die faktuur bly 'n konsep." };
+        return { statusCode: 502, body: "Kon nie by Paystack uitkom nie." };
       }
     }
 
@@ -377,13 +377,13 @@ exports.handler = async (event, context) => {
           statusCode: 502,
           body: `Paystack kon nie die betaling begin nie: ${
             (data && data.message) || "onbekende fout"
-          }. Die faktuur bly 'n konsep.`,
+          }.`,
         };
       }
       authorization_url = data.data.authorization_url;
     } catch (fout) {
       console.error(`Fout tydens Paystack-inisiëring vir ${nuwe_sleutel}:`, fout);
-      return { statusCode: 502, body: "Kon nie by Paystack uitkom nie. Die faktuur bly 'n konsep." };
+      return { statusCode: 502, body: "Kon nie by Paystack uitkom nie." };
     }
   }
 

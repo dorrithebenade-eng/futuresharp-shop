@@ -55,6 +55,12 @@ const V = {
 };
 
 let SESSIE = null;
+
+// DIE SEIN DAT DIE FAKTUUR GELAAI IS. faktuur-uitreik.js het dit nodig: hy
+// mag nie die stand lees terwyl laai_faktuur() nog loop nie, anders sien hy
+// 'n uitgereikte faktuur as 'n konsep. 'n Vaste wagtyd is 'n raaiskoot; dit
+// is die feit.
+let FV_GELAAI = false;
 let KLIENTE = [];
 let VUIL = false;         // daar is veranderinge wat nog nie gestoor is nie
 let BESIG = false;
@@ -641,6 +647,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   teken_alles();
 
   if (V.stand !== "konsep") sluit_toe();
+
+  FV_GELAAI = true;
 
   // By blur stoor ons dadelik in plaas van te wag — iemand wat wegklik, is
   // dikwels iemand wat weggaan.
