@@ -160,7 +160,7 @@ async function hanteer_faktuur_betaling(data, nou) {
     console.error("Faktuur-webhook: kon nie die instelling lees nie:", fout);
   }
 
-  await stuur_kwitansie(rekord, maatskappy);
+  await stuur_kwitansie(rekord);
   await stuur_state(rekord);
   await stuur_kennisgewing(rekord, maatskappy, was_gekanselleer);
 
@@ -172,7 +172,7 @@ async function hanteer_faktuur_betaling(data, nou) {
    DIT IS DIE KWITANSIE. Geen aparte dokument, geen aanhegsel — die
    faktuurnommer, die bedrag en die datum is wat 'n mens nodig het om 'n
    betaling te versoen. */
-async function stuur_kwitansie(rekord, maatskappy) {
+async function stuur_kwitansie(rekord) {
   try {
     const aan = String((rekord.klient && rekord.klient.epos) || "").trim();
     if (!aan) return;
@@ -187,12 +187,14 @@ async function stuur_kwitansie(rekord, maatskappy) {
       opskrif: "Betaling ontvang",
       reels: [
         `Dankie. Die betaling is teen faktuur <b>${ontsnap(nommer)}</b> toegewys.`,
+        // GEEN DERDE PARAGRAAF NIE. Die opskrif se "Betaling ontvang", die
+        // syfers staan hier, en die voetskrif dra reeds
+        // admin@futuresharp.co.za. 'n Reel wat se "hierdie is 'n kwitansie"
+        // se niks wat die res nie reeds se nie, en die adres twee keer noem
+        // maak die pos langer sonder om iets by te voeg.
         `Faktuurnommer: <b>${ontsnap(nommer)}</b><br>` +
           `Bedrag ontvang: <b>${bedrag}</b><br>` +
           `Datum: ${datum(rekord.betaling.ontvang_op)}`,
-        `Hierdie boodskap dien as kwitansie. Rig navrae aan ${ontsnap(
-          (maatskappy && maatskappy.epos) || "admin@futuresharp.co.za"
-        )}.`,
       ],
     });
   } catch (fout) {
