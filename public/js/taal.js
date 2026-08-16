@@ -1504,9 +1504,12 @@ const WOORDEBOEK = {
   bk_merk_onbekend: { af: "Onbevestig", en: "Unconfirmed" },
 
   bk_kop_betaal: { af: "Betaling ontvang", en: "Payment received" },
+  // GEEN "'n KWITANSIE VOLG" NIE. Die webhook stuur die kwitansie voordat
+  // Paystack die klient na hierdie bladsy terugstuur — teen die tyd dat hy
+  // dit lees, is die pos reeds weg. "Volg" was verkeerd.
   bk_teks_betaal: {
-    af: "Die betaling is teen hierdie faktuur toegewys. 'n Kwitansie volg per e-pos.",
-    en: "The payment has been allocated to this invoice. A receipt follows by email.",
+    af: "Die betaling is teen hierdie faktuur toegewys.",
+    en: "The payment has been allocated to this invoice.",
   },
 
   bk_kop_loop: { af: "Betaling in verwerking", en: "Payment processing" },
