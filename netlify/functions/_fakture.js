@@ -417,6 +417,22 @@ function nuwe_faktuur(wie) {
 
 // 'n Betaalde faktuur is toe. Elke skryf-Function moet dit vra voordat hy
 // iets verander.
+/* 'N DATUM SOOS HY OP DIE DOKUMENT STAAN: 2026/08/20.
+
+   stoor-faktuur.js stoor 'n VOLLE ISO-datumtyd — new Date(x).toISOString().
+   'n Blote replace(/-/g, "/") daarop gee 2026/08/20T00:00:00.000Z, en dit het
+   op 16 Augustus so in 'n proforma-e-pos by 'n klient beland.
+
+   Die eerste tien karakters is die datum. Hulle word GESNY en nie deur 'n
+   Date gestuur nie: 'n ISO-datum is UTC, en new Date(...).getDate() sou hom
+   in 'n ander tydsone 'n dag kon skuif. */
+function datum_dokument(waarde) {
+  const teks = String(waarde || "").trim();
+  if (!teks) return "";
+  const d = teks.slice(0, 10);
+  return /^\d{4}-\d{2}-\d{2}$/.test(d) ? d.replace(/-/g, "/") : teks;
+}
+
 function is_toe(rekord) {
   return Boolean(rekord && (rekord.stand === "betaal" || rekord.stand === "gekanselleer"));
 }
@@ -437,6 +453,7 @@ module.exports = {
   skep_publieke_kode,
   is_toetsfase,
   voeg_geskiedenis_by,
+  datum_dokument,
   nuwe_faktuur,
   is_toe,
 };

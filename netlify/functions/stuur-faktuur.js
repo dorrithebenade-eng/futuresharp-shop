@@ -45,6 +45,7 @@ const {
   is_konsep_sleutel,
   skep_nommer,
   sleutel_na_nommer,
+  datum_dokument,
   skep_publieke_kode,
   voeg_geskiedenis_by,
 } = require("./_fakture");
@@ -555,7 +556,7 @@ async function stuur_proforma(rekord, sleutel, gratis) {
         `${en ? "Total due" : "Totaal verskuldig"}: <b>${bedrag}</b>` +
         (rekord.betaalbaar_teen
           ? `<br>${en ? "Payable by" : "Betaalbaar teen"}: ${ontsnap(
-              String(rekord.betaalbaar_teen).replace(/-/g, "/")
+              datum_dokument(rekord.betaalbaar_teen)
             )}`
           : ""),
     ];

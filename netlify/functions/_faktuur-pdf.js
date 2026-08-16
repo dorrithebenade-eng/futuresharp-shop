@@ -30,6 +30,7 @@
 const { PDFDocument, StandardFonts, PDFString, PDFName, rgb } = require("pdf-lib");
 const qrcode = require("../../public/js/qrcode.js");
 const { t_in, t_rand } = require("../../public/js/taal.js");
+const { datum_dokument } = require("./_fakture");
 
 // ── palet, uit styl.css se :root ──
 const TEAL = rgb(0x47 / 255, 0x9f / 255, 0x91 / 255);
@@ -73,9 +74,10 @@ function datum_kort(iso, taal) {
 }
 
 // 'n Datumveld word as JJJJ-MM-DD gestoor en so op die skerm gedruk.
+// Die omskakeling leef in _fakture.js, want stuur-faktuur.js se pos dra
+// dieselfde datum en het presies dieselfde fout gehad.
 function datum_veld(waarde) {
-  const teks = String(waarde || "").trim();
-  return teks ? teks.replace(/-/g, "/") : "";
+  return datum_dokument(waarde);
 }
 
 // Breek teks oor reëls binne 'n gegewe breedte. pdf-lib doen dit nie self
