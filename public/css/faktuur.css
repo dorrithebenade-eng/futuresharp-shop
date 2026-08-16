@@ -844,6 +844,37 @@
 
 .fu-keer-fout[hidden] { display: none; }
 
+/* Die rede by 'n kansellasie. Verplig, want 'n gaping in die nommerreeks
+   sonder 'n rede is presies wat 'n ouditeur vra. */
+.fu-etiket {
+  display: block;
+  margin: 0 0 5px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--grys-teks);
+}
+
+.fu-teksveld {
+  width: 100%;
+  font: inherit;
+  font-size: 14px;
+  padding: 9px 11px;
+  border: 1px solid #D8D3CB;
+  background: #fff;
+  resize: vertical;
+  margin-bottom: 4px;
+}
+
+/* KORAAL, NIE TEAL NIE. Reik uit is 'n handeling wat 'n mens WIL doen;
+   kanselleer maak iets dood. Dieselfde kleur vir albei nooi 'n verkeerde
+   klik op die enigste twee onomkeerbare knoppies in die module. */
+.fu-gevaar { background: var(--koraal); }
+.fu-gevaar:hover { background: #d44a26; }
+
+/* Die knoppie in die balk bly stil — hy staan langs Druk en moet nie om
+   aandag vra nie. Die gevaar sit in die BEVESTIGING, waar die besluit val. */
+.fv-kanselleer:hover { border-color: var(--koraal); color: var(--koraal); }
+
 .fu-fout {
   background: #FDE7E0;
   border-left: 3px solid var(--koraal);

@@ -46,6 +46,18 @@ function fu_wys(html) {
   const paneel = document.getElementById("fu-paneel");
   // Die Druk-knoppie. Geen inline onclick nie — daardie attribuut het die
   // Betaal-knoppie se klik vir dae stilweg gekanselleer.
+  // Kanselleer geld slegs 'n UITGEREIKTE faktuur. 'n Konsep het geen nommer,
+  // dus laat hy geen gaping in die reeks nie en word hy geskrap.
+  const kan = document.getElementById("fv-kanselleer");
+  if (kan) {
+    if (V.stand === "gestuur") {
+      kan.style.display = "";
+      kan.addEventListener("click", fu_vra_kanselleer);
+    } else {
+      kan.style.display = "none";
+    }
+  }
+
   const druk = document.getElementById("fv-druk");
   if (druk) druk.addEventListener("click", () => window.print());
 
@@ -58,6 +70,18 @@ function fu_wys(html) {
 function fu_toe() {
   // Die Druk-knoppie. Geen inline onclick nie — daardie attribuut het die
   // Betaal-knoppie se klik vir dae stilweg gekanselleer.
+  // Kanselleer geld slegs 'n UITGEREIKTE faktuur. 'n Konsep het geen nommer,
+  // dus laat hy geen gaping in die reeks nie en word hy geskrap.
+  const kan = document.getElementById("fv-kanselleer");
+  if (kan) {
+    if (V.stand === "gestuur") {
+      kan.style.display = "";
+      kan.addEventListener("click", fu_vra_kanselleer);
+    } else {
+      kan.style.display = "none";
+    }
+  }
+
   const druk = document.getElementById("fv-druk");
   if (druk) druk.addEventListener("click", () => window.print());
 
@@ -351,6 +375,98 @@ async function fu_doen() {
   }
 }
 
+/* ═══ kanselleer ═══
+
+   'n Uitgereikte faktuur word nie gewysig en nie uitgevee nie. Hy dra 'n
+   nommer in 'n deurlopende reeks, en die punt van daardie reeks is dat 'n
+   gaping SIGBAAR is. Wil 'n mens iets verander, word gekanselleer en 'n NUWE
+   uitgereik.
+
+   DIE REDE IS VERPLIG. Ses maande later is "waarom is FS/01957 gekanselleer?"
+   'n boekhoudkundige vraag, en 'n gaping sonder 'n rede is presies wat 'n
+   ouditeur vra. */
+function fu_vra_kanselleer() {
+  fu_wys(`
+    <h2>${fu_t("fk_vra_kop", "Kanselleer hierdie faktuur?")}</h2>
+    <p>${fu_t(
+      "fk_vra_teks",
+      "Die faktuur bly staan as rekord, met sy nommer, maar hy word dood gemerk. Wil jy iets verander, word 'n nuwe uitgereik."
+    )}</p>
+
+    <div class="fu-keer">
+      ${fu_t(
+        "fk_skakel_leef",
+        "Paystack se betaalskakel kan nie doodgemaak word nie — daar is geen manier om 'n begonne transaksie te herroep nie. Iemand met die ou skakel kan steeds betaal, en dan word dit uitgelig sodat julle daaroor kan besluit."
+      )}
+    </div>
+
+    <label class="fu-etiket" for="fk-rede">${fu_t("fk_rede", "Rede")}</label>
+    <textarea class="fu-teksveld" id="fk-rede" rows="2" maxlength="300"></textarea>
+    <p class="fu-keer-fout" id="fk-rede-fout" hidden></p>
+
+    <div class="fu-knoppe">
+      <button type="button" class="kaart-aksie fu-stil" id="fu-terug">${fu_t(
+        "fu_terug",
+        "Terug"
+      )}</button>
+      <button type="button" class="kaart-aksie fu-doen fu-gevaar" id="fk-doen">${fu_t(
+        "fk_bevestig",
+        "Kanselleer die faktuur"
+      )}</button>
+    </div>`);
+
+  document.getElementById("fu-terug").addEventListener("click", fu_toe);
+  document.getElementById("fk-doen").addEventListener("click", fu_kanselleer);
+  const veld = document.getElementById("fk-rede");
+  if (veld) veld.focus();
+}
+
+async function fu_kanselleer() {
+  const veld = document.getElementById("fk-rede");
+  const fout_el = document.getElementById("fk-rede-fout");
+  const knop = document.getElementById("fk-doen");
+  const rede = veld ? veld.value.trim() : "";
+
+  if (fout_el) fout_el.hidden = true;
+  if (rede.length < 3) {
+    if (fout_el) {
+      fout_el.textContent = fu_t("fk_rede_kort", "Gee 'n rede vir die kansellasie.");
+      fout_el.hidden = false;
+    }
+    if (veld) veld.focus();
+    return;
+  }
+
+  knop.disabled = true;
+  knop.textContent = fu_t("fu_besig", "Besig …");
+
+  try {
+    const resp = await fetch("/.netlify/functions/kanselleer-faktuur", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${SESSIE.access_token}`,
+      },
+      body: JSON.stringify({ sleutel: V.sleutel, rede }),
+    });
+    if (!resp.ok) throw new Error(await resp.text());
+
+    // Herlaai, sodat die hele skerm as gekanselleer teken sonder dat hierdie
+    // lêer weet hoe faktuur-vorm.js sy dokument bou.
+    window.location.reload();
+  } catch (fout) {
+    console.error("Kon nie die faktuur kanselleer nie:", fout);
+    knop.disabled = false;
+    knop.textContent = fu_t("fk_bevestig", "Kanselleer die faktuur");
+    if (fout_el) {
+      fout_el.textContent =
+        String(fout.message || "").trim() ||
+        fu_t("fk_fout", "Kon nie die faktuur kanselleer nie.");
+      fout_el.hidden = false;
+    }
+  }
+}
+
 /* ═══ die QR op die dokument ═══
 
    Die QR is NIE vir Dorrithé nie. 'n Mens skandeer nie sy eie skerm nie; die
@@ -497,6 +613,18 @@ function fu_teken_strook() {
 
   // Die Druk-knoppie. Geen inline onclick nie — daardie attribuut het die
   // Betaal-knoppie se klik vir dae stilweg gekanselleer.
+  // Kanselleer geld slegs 'n UITGEREIKTE faktuur. 'n Konsep het geen nommer,
+  // dus laat hy geen gaping in die reeks nie en word hy geskrap.
+  const kan = document.getElementById("fv-kanselleer");
+  if (kan) {
+    if (V.stand === "gestuur") {
+      kan.style.display = "";
+      kan.addEventListener("click", fu_vra_kanselleer);
+    } else {
+      kan.style.display = "none";
+    }
+  }
+
   const druk = document.getElementById("fv-druk");
   if (druk) druk.addEventListener("click", () => window.print());
 

@@ -81,6 +81,11 @@
                Die knoppie roep window.print(); die @media print-blok in
                faktuur.css doen die res. Hy verskyn ook by 'n konsep — 'n
                konsep aan iemand wys, is 'n geldige ding om te doen. -->
+          <!-- KANSELLEER verskyn slegs by 'n UITGEREIKTE faktuur. 'n Konsep
+               het geen nommer, dus laat hy geen gaping in die reeks nie en
+               word hy eenvoudig geskrap. faktuur-uitreik.js wys hom. -->
+          <button type="button" class="kaart-aksie fu-stil fv-kanselleer" id="fv-kanselleer"
+                  style="display:none;" data-i18n="fk_kanselleer">Kanselleer</button>
           <button type="button" class="kaart-aksie fu-stil" id="fv-druk" data-i18n="fv_druk">Druk</button>
           <button type="button" class="kaart-aksie fu-stil" id="fv-stoor" data-i18n="fk_stoor">Stoor</button>
 

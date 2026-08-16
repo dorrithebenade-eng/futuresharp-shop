@@ -404,6 +404,13 @@ function nuwe_faktuur(wie) {
     betaalbaar_teen: null,
     verval_op: null,
 
+    // Kansellasie. Die REDE is verplig: ses maande later is "waarom is
+    // FS/01957 gekanselleer?" 'n boekhoudkundige vraag, en 'n gaping in die
+    // nommerreeks sonder 'n rede is presies wat 'n ouditeur vra.
+    gekanselleer_op: null,
+    gekanselleer_deur: null,
+    kanselleer_rede: null,
+
     geskiedenis: [],
   };
 }

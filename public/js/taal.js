@@ -1583,6 +1583,38 @@ const WOORDEBOEK = {
   // stelsel; 'n skakel help hulle nie.
   fv_druk: { af: "Druk", en: "Print" },
 
+  // ── kanselleer ──────────────────────────────────────────────────────
+  //
+  // 'n Uitgereikte faktuur word nie gewysig en nie uitgevee nie. Hy dra 'n
+  // nommer in 'n deurlopende reeks, en die punt van daardie reeks is dat 'n
+  // gaping SIGBAAR is.
+  // fk_kanselleer bestaan reeds op reël 460 — die kliëntvorm gebruik hom, met
+  // presies dieselfde woord. Twee inskrywings vir een sleutel beteken die
+  // tweede wen stilweg, en dan verander 'n mens die een en wonder hoekom niks
+  // gebeur nie.
+  fk_vra_kop: { af: "Kanselleer hierdie faktuur?", en: "Cancel this invoice?" },
+  fk_vra_teks: {
+    af: "Die faktuur bly staan as rekord, met sy nommer, maar hy word dood gemerk. Wil jy iets verander, word 'n nuwe uitgereik.",
+    en: "The invoice remains on record, with its number, but is marked dead. If you want to change something, a new one is issued.",
+  },
+  // EERLIK WEES HIEROOR. Daar is geen API om 'n begonne Paystack-transaksie
+  // te herroep nie. Om te maak asof die skakel dood is, sou erger wees as om
+  // dit te sê.
+  fk_skakel_leef: {
+    af: "Paystack se betaalskakel kan nie doodgemaak word nie — daar is geen manier om 'n begonne transaksie te herroep nie. Iemand met die ou skakel kan steeds betaal, en dan word dit uitgelig sodat julle daaroor kan besluit.",
+    en: "Paystack's payment link cannot be killed — there is no way to revoke a transaction that has started. Someone with the old link can still pay, and that will be flagged so you can decide what to do.",
+  },
+  fk_rede: { af: "Rede", en: "Reason" },
+  fk_rede_kort: {
+    af: "Gee 'n rede vir die kansellasie.",
+    en: "Give a reason for the cancellation.",
+  },
+  fk_bevestig: { af: "Kanselleer die faktuur", en: "Cancel the invoice" },
+  fk_fout: {
+    af: "Kon nie die faktuur kanselleer nie.",
+    en: "The invoice could not be cancelled.",
+  },
+
   fu_reik_uit: { af: "Reik uit", en: "Issue" },
   fu_vra_kop: { af: "Reik hierdie faktuur uit?", en: "Issue this invoice?" },
   fu_vra_teks: {
