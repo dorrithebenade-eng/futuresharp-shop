@@ -548,3 +548,201 @@
    nie. Die merkie sit ONDER die ry, oor die volle breedte — 'n vyfde kolom
    sou die res saamdruk. */
 .vd-waarsku { margin: -3px 0 9px; }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   UITREIKING — faktuur-uitreik.js se eie klasse
+
+   Eie klasse, niks geleen nie. 'n Geleende klas dra sy eie aannames saam:
+   op 14 Augustus het .outeur-pil met 'n negatiewe marge aan 'n band gehang
+   wat op die faktuurpaneel nie bestaan nie.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* TEAL EN NIE KORAAL NIE. Koraal is Stoor, wat 'n mens twintig keer per
+   faktuur druk; hierdie een druk 'n mens EEN keer. Dieselfde kleur vir albei
+   nooi 'n verkeerde klik op die enigste onomkeerbare knoppie in die module. */
+.fv-uitreik { background: var(--teal); color: #fff; }
+.fv-uitreik:hover { background: #3d8b7f; }
+
+.fu-skerm {
+  position: fixed;
+  inset: 0;
+  background: rgba(23, 23, 23, .42);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  z-index: 40;
+}
+
+.fu-skerm[hidden] { display: none; }
+
+.fu-paneel {
+  background: #fff;
+  max-width: 460px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 26px;
+}
+
+.fu-paneel h2 {
+  font-family: var(--font-opskrif);
+  font-size: 21px;
+  line-height: 1.3;
+  margin: 0 0 8px;
+}
+
+.fu-paneel > p {
+  margin: 0 0 18px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--grys-teks);
+}
+
+.fu-lys { margin: 0 0 20px; }
+
+.fu-lys div {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 9px 0;
+  border-bottom: 1px solid #F1EFEB;
+  font-size: 14px;
+}
+
+.fu-lys div:last-child { border-bottom: 0; }
+.fu-lys dt { margin: 0; color: var(--grys-teks); }
+
+.fu-lys dd {
+  margin: 0;
+  text-align: right;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Die ry wat se hoeveel ontvangers MET DIE HAND betaal moet word. Dit is die
+   belangrikste reel op die skerm: dit is die oomblik waarop 'n mens sien dat
+   iemand nie 'n subrekening het nie, terwyl dit nog reggemaak kan word. */
+.fu-let-op dd { color: #8a6400; }
+
+.fu-knoppe {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.fu-doen { background: var(--teal); color: #fff; }
+.fu-doen:hover { background: #3d8b7f; }
+.fu-doen[disabled] { opacity: .6; cursor: default; }
+
+.fu-keer {
+  background: #FDF3DA;
+  border-left: 3px solid var(--amber);
+  padding: 14px 16px;
+  margin: 0 0 18px;
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+
+.fu-keer label {
+  display: block;
+  margin: 12px 0 5px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--grys-teks);
+}
+
+.fu-keer input {
+  width: 100%;
+  font: inherit;
+  font-size: 14px;
+  padding: 10px 12px;
+  border: 1px solid #D8D3CB;
+  background: #fff;
+}
+
+.fu-keer-fout {
+  margin: 8px 0 0;
+  font-size: 12.5px;
+  color: var(--koraal);
+  font-weight: 500;
+}
+
+.fu-keer-fout[hidden] { display: none; }
+
+.fu-fout {
+  background: #FDE7E0;
+  border-left: 3px solid var(--koraal);
+  padding: 14px 16px;
+  margin: 0 0 18px;
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+
+/* Die Function se eie boodskap. Sy se WAAROM — 'n verkeerde subrekening-kode
+   lees anders as 'n netwerkfout — en sonder haar raai 'n mens. */
+.fu-fout-rede {
+  margin: 10px 0 0;
+  font-size: 12.5px;
+  color: var(--grys-teks);
+}
+
+.fu-strook {
+  background: #fff;
+  border: 1px solid #E2DFD9;
+  padding: 18px 20px;
+  margin-bottom: 14px;
+}
+
+.fu-strook h4 {
+  font-family: var(--font-opskrif);
+  font-size: 13px;
+  margin: 0 0 10px;
+  text-transform: uppercase;
+  letter-spacing: .6px;
+  color: var(--grys-teks);
+}
+
+.fu-strook-teks {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--grys-teks);
+}
+
+.fu-skakel-ry {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.fu-skakel-ry code {
+  flex: 1 1 240px;
+  min-width: 0;
+  font-size: 12.5px;
+  background: var(--grys-lig);
+  padding: 10px 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fu-mini {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  background: #fff;
+  color: var(--swart);
+  border: 1px solid #D8D3CB;
+  padding: 9px 16px;
+  cursor: pointer;
+}
+
+.fu-mini:hover { border-color: var(--teal); color: var(--teal); }
+.fu-mini[hidden] { display: none; }
+
+@media (max-width: 560px) {
+  .fu-knoppe { flex-direction: column-reverse; }
+  .fu-knoppe button { width: 100%; }
+}

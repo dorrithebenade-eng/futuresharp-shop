@@ -74,9 +74,21 @@
           <!-- Die enigste manier waarop 'n mens WEET dit is gestoor. Hy sê
                dit ook eerlik wanneer dit misluk. -->
           <span class="fv-stoorstand" id="fv-stoorstand"></span>
-          <button type="button" class="kaart-aksie" id="fv-stoor" data-i18n="fk_stoor">Stoor</button>
+          <button type="button" class="kaart-aksie stil" id="fv-stoor" data-i18n="fk_stoor">Stoor</button>
+
+          <!-- TEAL EN NIE KORAAL NIE. Koraal is Stoor, wat 'n mens twintig
+               keer per faktuur druk; hierdie een druk 'n mens EEN keer. Hy
+               begin versteek en faktuur-uitreik.js wys hom slegs by 'n
+               konsep. -->
+          <button type="button" class="kaart-aksie fv-uitreik" id="fv-uitreik"
+                  style="display:none;" data-i18n="fu_reik_uit">Reik uit</button>
         </div>
       </div>
+
+      <!-- Die betaalskakel na uitreiking. 'n Strook MET 'n titel: sonder 'n
+           naam moet 'n mens elke keer die URL lees om te weet watter skakel
+           dit is. Leeg by 'n konsep. -->
+      <div id="fu-strook"></div>
 
       <!-- Twee dele, een getal tussen hulle. Links die faktuurblad soos hy
            druk; regs die backoffice. Die faktuurblad bepaal die totaal, die
@@ -272,11 +284,19 @@
     </div>
   </main>
 
+  <!-- Die bevestiging. 'n OORLEGSEL en nie 'n confirm() nie: uitreiking is
+       die enigste onomkeerbare handeling in die module, en die skerm moet se
+       WAT gaan gebeur. 'n confirm() dra geen inligting en word weggeklik. -->
+  <div class="fu-skerm" id="fu-skerm" hidden>
+    <div class="fu-paneel" id="fu-paneel"></div>
+  </div>
+
   <script src="js/taal.js"></script>
   <script src="js/identiteit.js"></script>
   <script src="js/sessie-verval.js"></script>
   <script src="js/faktuur-som.js"></script>
   <script src="js/faktuur-vorm.js"></script>
   <script src="js/faktuur-backoffice.js"></script>
+  <script src="js/faktuur-uitreik.js"></script>
 </body>
 </html>

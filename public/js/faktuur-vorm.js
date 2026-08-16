@@ -500,7 +500,7 @@ function sluit_toe() {
   document.querySelectorAll("#fv-dok input, #fv-dok textarea, #fv-dok select").forEach((el) => {
     el.setAttribute("disabled", "disabled");
   });
-  ["fv-voeg-reel", "fv-stoor"].forEach((id) => {
+  ["fv-voeg-reel", "fv-stoor", "fv-uitreik"].forEach((id) => {
     const el = document.getElementById(id);
     if (el) el.style.display = "none";
   });

@@ -1570,6 +1570,80 @@ const WOORDEBOEK = {
     en: "The invoice could not be deleted.",
   },
 
+  // ── uitreiking: die knoppie, die bevestiging, die betaalskakel ───────
+  //
+  // Die knoppie heet REIK UIT, nie Stuur nie. Op hierdie oomblik word niks
+  // gestuur nie: die nommer word getrek, die verdeling vries en die
+  // betaalskakel word geskep. Die proforma-e-pos kom later, en dan bly die
+  // woord steeds reg — uitreik is wat gebeur, en die pos is 'n gevolg.
+  fu_reik_uit: { af: "Reik uit", en: "Issue" },
+  fu_vra_kop: { af: "Reik hierdie faktuur uit?", en: "Issue this invoice?" },
+  fu_vra_teks: {
+    af: "Die volgende nommer word toegeken en die verdeling vries op wat nou op die skerm staan. Daarna kan die faktuur nie meer gewysig word nie — net gekanselleer.",
+    en: "The next number will be allocated and the split freezes on what is now on screen. After that the invoice can no longer be edited — only cancelled.",
+  },
+  fu_vra_teks_gratis: {
+    af: "'n Koepon het die bedrag tot niks verminder. Paystack word glad nie geroep nie en die faktuur gaan dadelik na Betaal. Daar is niks om te verdeel nie.",
+    en: "A coupon has reduced the amount to nothing. Paystack is not called at all and the invoice goes straight to Paid. There is nothing to split.",
+  },
+  fu_terug: { af: "Terug", en: "Back" },
+  fu_besig: { af: "Besig …", en: "Working …" },
+  fu_aan: { af: "Gefaktureer aan", en: "Billed to" },
+  fu_proforma_aan: { af: "Proforma gaan aan", en: "Proforma goes to" },
+  fu_totaal: { af: "Totaal verskuldig", en: "Total due" },
+  fu_deur_paystack: { af: "Uitbetaal deur Paystack", en: "Paid out by Paystack" },
+  // Die belangrikste reël op die skerm: 'n ontvanger sonder 'n subrekening
+  // kan nie deur Paystack betaal word nie, en sonder hierdie getal lyk dit of
+  // almal outomaties betaal word.
+  fu_met_hand: { af: "Met die hand oorbetaal", en: "Paid over by hand" },
+  fu_ontvanger_een: { af: "1 ontvanger", en: "1 recipient" },
+  fu_ontvangers: { af: "ontvangers", en: "recipients" },
+  fu_geen_skakel: {
+    af: "Geen — die faktuur is klaar betaal",
+    en: "None — the invoice is already paid",
+  },
+
+  fu_geen_epos_kop: {
+    af: "Hierdie kliënt het nog geen e-posadres nie",
+    en: "This client has no email address yet",
+  },
+  fu_geen_epos_teks: {
+    af: "Die proforma het dus nêrens om heen te gaan nie. Voeg dit hier by — die faktuur bly staan en die adres word by die kliënt se rekord gestoor.",
+    en: "The proforma therefore has nowhere to go. Add it here — the invoice stays as it is and the address is stored on the client's record.",
+  },
+  fu_epos_etiket: { af: "E-posadres", en: "Email address" },
+  fu_epos_ongeldig: {
+    af: "Dit lyk nie soos 'n e-posadres nie.",
+    en: "That does not look like an email address.",
+  },
+  fu_epos_stoor_fout: {
+    af: "Kon nie die adres stoor nie. Probeer weer.",
+    en: "The address could not be saved. Try again.",
+  },
+  fu_klient_weg: {
+    af: "Kon nie die kliënt se rekord vind nie.",
+    en: "The client's record could not be found.",
+  },
+  fu_stoor_gaan_voort: { af: "Stoor en gaan voort", en: "Save and continue" },
+
+  fu_fout_kop: { af: "Kon nie die faktuur uitreik nie", en: "The invoice could not be issued" },
+  fu_fout_konsep: { af: "Die faktuur bly 'n konsep.", en: "The invoice remains a draft." },
+  fu_fout_nommer: {
+    af: "Niks is verlore nie en die nommer is nie opgebruik nie — die volgende poging kry dieselfde een.",
+    en: "Nothing is lost and the number has not been used — the next attempt gets the same one.",
+  },
+  fu_probeer_weer: { af: "Probeer weer", en: "Try again" },
+
+  fu_betaalskakel: { af: "Betaalskakel", en: "Payment link" },
+  fu_betaal: { af: "betaal", en: "paid" },
+  fu_gratis_teks: {
+    af: "Die bedrag was nul, dus is Paystack nie geroep nie. Die faktuur is aangeteken as betaal en daar is niks om te verdeel nie.",
+    en: "The amount was zero, so Paystack was not called. The invoice is recorded as paid and there is nothing to split.",
+  },
+  fu_kopieer: { af: "Kopieer", en: "Copy" },
+  fu_gekopieer: { af: "Gekopieer", en: "Copied" },
+  fu_deel: { af: "Deel", en: "Share" },
+
 };
 
 /* ═══════════════════════════════════════════════════════════════════════
