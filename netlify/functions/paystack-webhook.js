@@ -8,6 +8,7 @@
 // af omdat dit direk van Paystack se bediener af kom.
 
 const crypto = require("crypto");
+const { hanteer_faktuur_betaling } = require("./_faktuur-betaling");
 const { kry_store } = require("./_blob-store");
 const { stuur_outeur_kennisgewings } = require("./_kennisgewing-outeur");
 
@@ -99,6 +100,16 @@ exports.handler = async (event) => {
   }
 
   const data = gebeurtenis.data;
+
+  // ── 'N FAKTUUR OF 'N BESTELLING? ────────────────────────────────────────
+  //
+  // Een webhook-adres by Paystack, twee soorte betaling. stuur-faktuur.js
+  // stuur `faktuur_sleutel` in die metadata saam; 'n winkelbestelling doen
+  // dit nooit. Die hele faktuurkant leef in _faktuur-betaling.js, sodat
+  // hierdie lêer nie hoef te weet hoe 'n faktuur werk nie.
+  if (data.metadata && data.metadata.faktuur_sleutel) {
+    return await hanteer_faktuur_betaling(data, new Date().toISOString());
+  }
 
   // DIE VERWYSING IS NIE DIE BESTELNOMMER NIE. Kanselleer 'n koper by
   // Paystack en probeer weer, dra die tweede transaksie 'n verwysing soos
