@@ -30,10 +30,14 @@
   text-align: center;
 }
 
+/* DIE FUTURE SHARP-LOGO IS STAANDE, nie liggend soos die winkel se woordmerk
+   nie. Begrens 'n mens hom op BREEDTE, bepaal daardie breedte sy hoogte en hy
+   vul die halwe bladsy. Die hoogte is dus die maat, en die breedte volg. */
 .bk-merk img {
   display: block;
-  max-width: 220px;
-  width: 100%;
+  max-height: 96px;
+  max-width: 100%;
+  width: auto;
   height: auto;
   margin: 0 auto;
 }

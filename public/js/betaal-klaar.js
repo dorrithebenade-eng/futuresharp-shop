@@ -71,7 +71,9 @@ function bk_teken(u) {
   // Staan die transaksieverwysing (FS-01957) langs die nommer (FS/01957) —
   // een karakter verskil — tik iemand die verkeerde een in sy betaling oor en
   // die versoening klop nie.
-  const syfers =
+  // GEEN NOMMER, GEEN BLOK. Sonder 'n faktuur is daar niks om te wys nie, en
+  // "Totaal verskuldig R0,00" is dan 'n stelling wat nie waar is nie.
+  const syfers = !u.nommer ? "" :
     '<dl class="bk-syfers">' +
     '<div class="bk-ry"><dt>' + t_in("bk_nommer", taal) + "</dt>" +
     "<dd>" + bk_ontsnap(u.nommer) + "</dd></div>" +
