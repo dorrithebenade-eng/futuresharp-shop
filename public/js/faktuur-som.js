@@ -195,11 +195,96 @@ function fs_basis_uit_rye(reel) {
   return pct < 100 ? vas / (1 - pct / 100) : vas;
 }
 
-// Node kan dit ook laai, sodat die som getoets kan word sonder 'n blaaier.
+// ---------------------------------------------------------------------------
+// VAN 'N FAKTUURREKORD NA DIE SOM SE INVOER
+//
+// Hierdie vertaling het tot 15 Augustus in faktuur-backoffice.js gewoon, waar
+// net die blaaier by hom kon kom. stuur-faktuur.js moet dieselfde som doen —
+// die bedrae mag NOOIT van die kliëntkant af aanvaar word nie — en 'n tweede
+// kopie daarvan sou beteken die skerm en die gevriesde verdeling kan met 'n
+// sent verskil sonder dat iemand dit sien.
+//
+// Hy bly SUIWER: hy lees geen veld, raak geen DOM, en vra niks van 'n store
+// nie. Wie 'n subrekening het, kom van buite af in as 'n toets — die blaaier
+// gee sy gelaaide begunstigde-lys, die bediener gee die store.
+//
+// WAT DIE SOM INGEVOER KRY: ÉÉN reël — die faktuur se reëls minus die afslag,
+// met elke verdelingsry plus Hosting daarop.
+//
+// DIE SKENKING KOM NIE HIER IN NIE, en dit is nie 'n vereenvoudiging nie. Gee
+// 'n mens haar as 'n tweede reël, versprei die som die fooi pro rata: die
+// faktuur se deel van die vaste R1,30 krimp, die basis groei, en elke
+// begunstigde kry 'n sent of twee MEER omdat iemand 'n skenking bygevoeg het.
+// Getoets: R1 000 het Eugene se bedrag met 2c verander. Die verdeling word dus
+// op die FAKTUUR ALLEEN bereken; die skenking word daarna bygetel, dra haar
+// eie deel van die werklike fooi, en die res val na die oorskot.
+//
+// faktuur      — die rekord se velde: reels, afslag_sent, koste, verdeling,
+//                hosting_pct. 'n Hele rekord of net daardie vyf velde.
+// het_subrekening(ontvanger) → true as Paystack daardie persoon self kan
+//                betaal. Gee dit niks terug nie, is niks 'n verdelingsry nie.
+function fs_invoer_uit_faktuur(faktuur, het_subrekening) {
+  const f = faktuur || {};
+  const kan_split =
+    typeof het_subrekening === "function" ? het_subrekening : () => false;
+
+  // Die reëls dra hoeveelheid × eenheidsprys; die bedrag word hier gereken en
+  // nooit van 'n gestoorde veld gelees nie — dieselfde reël as stoor-faktuur.js.
+  const reelsomSent = (f.reels || []).reduce(
+    (s, r) =>
+      s + Math.round((Number(r.hoeveelheid) || 0) * (Number(r.prys_pp_sent) || 0)),
+    0
+  );
+  const netto = Math.max(0, reelsomSent - (Number(f.afslag_sent) || 0)) / 100;
+
+  const rye = [];
+
+  // 1. Die begrote koste wat aan iemand met 'n subrekening gaan. 'n KOSTE IS
+  //    ALTYD 'N VASTE BEDRAG: loop dit op 'n persentasie, kry iemand 70% van
+  //    sy eie petrol terug — die winkel se harde kopie se slaggat presies.
+  //    Wat na die hoofrekening gaan, kom hier NIE in nie; dit word met die
+  //    hand betaal en staan nie in die transaksie se verdeling nie.
+  (f.koste || []).forEach((k) => {
+    if (!kan_split(k.ontvanger)) return;
+    rye.push({
+      ontvanger: k.ontvanger,
+      tipe: "vas",
+      waarde: (Number(k.bedrag_sent) || 0) / 100,
+    });
+  });
+
+  // 2. Die rye wat met die hand bygevoeg is: werk, nie koste nie. Hulle kom
+  //    ALMAL in, ook vir iemand sonder 'n subrekening — hy word met die hand
+  //    betaal, maar sy deel is steeds deel van die som.
+  (f.verdeling || []).forEach((v) => {
+    rye.push({
+      ontvanger: v.ontvanger,
+      tipe: v.tipe,
+      waarde: v.tipe === "vas" ? (Number(v.waarde) || 0) / 100 : Number(v.waarde) || 0,
+    });
+  });
+
+  // 3. Hosting kry 'n ry op die skerm maar word NOOIT uitbetaal nie — dit bly
+  //    in die hoofrekening. Word dit ooit 'n Paystack-verdelingsry, word dit
+  //    uitbetaal EN daar bly niks vir Paystack nie.
+  if (Number(f.hosting_pct) > 0) {
+    rye.push({ ontvanger: "Hosting", tipe: "pct", waarde: Number(f.hosting_pct) });
+  }
+
+  return {
+    rigting: "totaal",
+    rond: 0,
+    reels: [{ soort: "verkoop", beskrywing: "Faktuur", bedrag: netto, verdeling: rye }],
+  };
+}
+
+// Node kan dit ook laai, sodat die som getoets kan word sonder 'n blaaier —
+// en sodat stuur-faktuur.js DIESELFDE lêer gebruik as die skerm.
 if (typeof module !== "undefined" && module.exports) {
   module.exports = {
     fs_bereken,
     fs_basis_uit_rye,
+    fs_invoer_uit_faktuur,
     FS_PS_PCT,
     FS_PS_VAS,
     FS_BLY_IN_HOOFREKENING,

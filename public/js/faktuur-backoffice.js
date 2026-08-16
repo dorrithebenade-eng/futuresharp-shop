@@ -67,45 +67,19 @@ function bo_pad_et(pad) {
    daarna bygetel, dra haar eie deel van die werklike fooi, en die res val na
    die oorskot. Dit is Future Sharp se geld en dit word nooit verdeel nie.
    ═══════════════════════════════════════════════════════════════════════ */
+// DIE VERTALING SELF LEEF IN faktuur-som.js, nie hier nie.
+//
+// stuur-faktuur.js moet presies dieselfde som doen wanneer hy die verdeling
+// vries — die bedrae mag nooit van die kliëntkant af aanvaar word nie. Twee
+// kopieë van hierdie vertaling sou beteken die skerm en die gevriesde
+// verdeling kan met 'n sent verskil sonder dat iemand dit sien, en dan weier
+// Paystack die transaksie of iemand kry 'n sent te min.
+//
+// Wat hier oorbly, is die enigste stuk wat aan die BLAAIER behoort: wie 'n
+// subrekening het, kom uit die lys wat hierdie bladsy gelaai het. Die
+// bediener gee dieselfde antwoord uit die store.
 function bo_invoer() {
-  const reelsom = V.reels.reduce(
-    (s, r) => s + Math.round((Number(r.hoeveelheid) || 0) * (Number(r.prys_pp_sent) || 0)),
-    0
-  );
-  const netto = Math.max(0, reelsom - (V.afslag_sent || 0)) / 100;
-
-  const rye = [];
-
-  // 1. Die begrote koste wat aan iemand met 'n subrekening gaan.
-  //    'n KOSTE IS ALTYD 'N VASTE BEDRAG. Loop dit op 'n persentasie, kry
-  //    iemand 70% van sy eie petrol terug — die winkel se harde kopie se
-  //    slaggat presies.
-  V.koste.forEach((k) => {
-    if (bo_pad(k.ontvanger) !== "split") return;
-    rye.push({ ontvanger: k.ontvanger, tipe: "vas", waarde: (Number(k.bedrag_sent) || 0) / 100 });
-  });
-
-  // 2. Die rye wat jy self byvoeg: werk, nie koste nie.
-  V.verdeling.forEach((v) => {
-    rye.push({
-      ontvanger: v.ontvanger,
-      tipe: v.tipe,
-      waarde: v.tipe === "vas" ? (Number(v.waarde) || 0) / 100 : Number(v.waarde) || 0,
-    });
-  });
-
-  // 3. Hosting kry 'n ry op die skerm maar word NOOIT uitbetaal nie — dit
-  //    bly in die hoofrekening. Word dit ooit 'n Paystack-verdelingsry, word
-  //    dit uitbetaal EN daar bly niks vir Paystack nie.
-  if (Number(V.hosting_pct) > 0) {
-    rye.push({ ontvanger: "Hosting", tipe: "pct", waarde: Number(V.hosting_pct) });
-  }
-
-  return {
-    rigting: "totaal",
-    rond: 0,
-    reels: [{ soort: "verkoop", beskrywing: "Faktuur", bedrag: netto, verdeling: rye }],
-  };
+  return fs_invoer_uit_faktuur(V, (ontvanger) => bo_pad(ontvanger) === "split");
 }
 
 // Wat die begroting saam vra, per pad. Slegs die HOOFREKENING-deel word teen
