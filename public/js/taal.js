@@ -1572,6 +1572,35 @@ const WOORDEBOEK = {
 
 };
 
+/* ═══════════════════════════════════════════════════════════════════════
+   'N BEDRAG IS TAAL
+
+   Die desimaalteken verskil: in Afrikaans is dit 'n KOMMA — R20 000,00 — en
+   in Suid-Afrikaanse Engels 'n punt. Op 'n faktuur is dit nie 'n voorkeur nie;
+   dit is die konvensie waarteen 'n debiteureklerk lees. Daarom hoort dit hier
+   en nie in elke skerm apart nie.
+
+   GEEN SPASIE NA DIE R. Dan is die spasie binne die getal ondubbelsinnig 'n
+   duisendskeiding en niks anders nie.
+
+   Die duisendskeiding is 'n HARDE spasie (\u00A0), sodat 'n bedrag nooit oor
+   twee reels breek en soos twee getalle lyk nie.
+
+   Die sent kom in as 'n heelgetal, want dit is hoe bedrae in die stelsel leef.
+   Die taal word UITDRUKLIK deurgegee: die dokument gebruik die FAKTUUR se
+   taal, die skerm die platform s'n, en die begroting bly Afrikaans. Drie
+   bronne, een formateerder.
+   ═══════════════════════════════════════════════════════════════════════ */
+function t_rand(sent, taal) {
+  const n = Math.round(Number(sent) || 0);
+  const heel = Math.floor(Math.abs(n) / 100)
+    .toString()
+    .replace(/\B(?=(\d{3})+(?!\d))/g, "\u00A0");
+  const sente = String(Math.abs(n) % 100).padStart(2, "0");
+  const punt = taal === "en" ? "." : ",";
+  return (n < 0 ? "-" : "") + "R" + heel + punt + sente;
+}
+
 function kry_huidige_taal() {
   return localStorage.getItem(TAAL_SLEUTEL) || "af";
 }

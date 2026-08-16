@@ -78,11 +78,13 @@ function dt(sleutel, verstek) {
 }
 
 /* ═══ getalle en teks ═══ */
+// Die formateerder leef in taal.js — die desimaalteken is 'n taalsaak. Hier
+// geld die FAKTUUR se taal, dieselfde bron as dt(): dit is die klient se
+// dokument, nie jou skerm nie. In Engels word die komma 'n punt.
 function rand(sent) {
-  return "R " + (Number(sent || 0) / 100).toLocaleString("af-ZA", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
+  return window.t_rand
+    ? t_rand(sent, V.taal)
+    : "R" + (Number(sent || 0) / 100).toFixed(2);
 }
 
 // Rand-teks na sent. Die gebruiker tik "1 250,50" of "1250.5"; albei moet

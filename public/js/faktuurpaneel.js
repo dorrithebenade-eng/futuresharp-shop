@@ -33,11 +33,13 @@ function fp_wys_afdeling(naam) {
   });
 }
 
+// Die formateerder leef in taal.js — die desimaalteken is 'n taalsaak, en so
+// is daar EEN weergawe vir die dokument, die skerm en die begroting.
+// Hier geld die PLATFORM se taal: dit is jou skerm, nie die klient s'n nie.
 function fp_rand(sent) {
-  return "R " + (Number(sent || 0) / 100).toLocaleString("af-ZA", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
+  return window.t_rand
+    ? t_rand(sent, kry_huidige_taal())
+    : "R" + (Number(sent || 0) / 100).toFixed(2);
 }
 
 // Die maandafkortings kom uit fd_maande — een sleutel, twaalf afkortings, wat

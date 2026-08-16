@@ -14,22 +14,11 @@
 
 const BK_KONTAK = "admin@futuresharp.co.za";
 
-/* ═══════════════════════════════════════════════════════════════════════
-   DIE DESIMAALTEKEN VERSKIL PER TAAL
-
-   In Afrikaans is dit 'n KOMMA — R23 000,00 — en in Suid-Afrikaanse Engels
-   'n punt. Op 'n faktuur is dit nie 'n voorkeur nie; dit is die konvensie
-   waarteen 'n debiteureklerk lees.
-
-   Die duisendskeiding is 'n HARDE spasie (\u00A0), sodat 'n bedrag nooit oor
-   twee reëls breek en soos twee getalle lyk nie.
-   ═══════════════════════════════════════════════════════════════════════ */
+// Die formateerder leef in taal.js, saam met t_in() — die desimaalteken is 'n
+// taalsaak. Hier geld die FAKTUUR se taal, dieselfde bron as die res van die
+// bladsy.
 function bk_rand(sent, taal) {
-  const heel = Math.floor(Math.abs(sent) / 100)
-    .toString()
-    .replace(/\B(?=(\d{3})+(?!\d))/g, "\u00A0");
-  const sente = String(Math.abs(sent) % 100).padStart(2, "0");
-  return "R" + heel + (taal === "en" ? "." : ",") + sente;
+  return window.t_rand ? t_rand(sent, taal) : "R" + (Number(sent || 0) / 100).toFixed(2);
 }
 
 // Alles wat van buite af kom — die nommer, die betaalskakel — gaan hierdeur

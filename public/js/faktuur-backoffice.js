@@ -289,11 +289,13 @@ function bo_teken_verdeling(S) {
 }
 
 // Die som se getalle kom in RAND (fs_bereken werk so), nie in sent nie.
+//
+// Die formateerder leef in taal.js. Hier staan die taal VAS op Afrikaans: die
+// begroting en die verdeling is Future Sharp se eie werk en skakel nooit saam
+// met die dokument nie. Slegs die dokument skakel.
 function rand_uit(bedrag) {
-  return "R " + (Number(bedrag) || 0).toLocaleString("af-ZA", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
+  const sent = Math.round((Number(bedrag) || 0) * 100);
+  return window.t_rand ? t_rand(sent, "af") : "R" + (sent / 100).toFixed(2);
 }
 
 function bo_teken_somme(S) {
