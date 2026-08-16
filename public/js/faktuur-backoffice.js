@@ -167,7 +167,7 @@ function bo_teken_begroting() {
                  placeholder="${fv_t("bo_beskrywing", "Beskrywing")}">
           <select data-veld="ontvanger">${bo_ontvanger_opsies(k.ontvanger, true)}</select>
           <input class="n" data-veld="bedrag" inputmode="decimal"
-                 value="${veld_sent(k.bedrag_sent)}" placeholder="0,00">
+                 value="${veld_sent(k.bedrag_sent)}" placeholder="0.00">
           <button type="button" class="bo-vee" title="${fv_t("bo_verwyder", "Verwyder")}">&times;</button>
         </div>
         <div class="bt-onderste">
@@ -218,8 +218,24 @@ function bo_teken_verdeling(S) {
   // op die volle bedrag nie.
   const basis = S.u.perReel[0] ? S.u.perReel[0].basisSent / 100 : 0;
 
+  // 'N LEË RY VERSKYN NIE OP 'N UITGEREIKTE FAKTUUR NIE.
+  //
+  // Terwyl 'n mens werk, is 'n leë ry reg: jy voeg hom by en vul hom daarna.
+  // Maar 'n uitgereikte faktuur is 'n REKORD, en 'n ry sonder 'n ontvanger en
+  // sonder 'n bedrag lyk daar soos iets wat iemand vergeet het — terwyl hy
+  // niks doen nie. Die vries in stuur-faktuur.js laat sulke rye in elk geval
+  // uit, dus wys die skerm hier presies wat gevries is.
+  //
+  // DIE INDEKS BLY DIE EEN IN V.verdeling. Die rye se `data-ry` word deur die
+  // gebeurtenishanteerders gebruik om V.verdeling[ix] te wysig; filter 'n mens
+  // eers en nommer dan, wys 'n klik op die derde sigbare ry na die derde
+  // inskrywing in die volle lys — en dit is 'n ander een. Ons hou dus die
+  // oorspronklike indeks en slaan die res oor.
+  const konsep = V.stand === "konsep";
+
   plek.innerHTML = V.verdeling
     .map((v, ix) => {
+      if (!konsep && !String(v.ontvanger || "").trim() && !(Number(v.waarde) > 0)) return "";
       const rand =
         v.tipe === "pct" ? ((Number(v.waarde) || 0) / 100) * basis : (Number(v.waarde) || 0) / 100;
       const waarde = v.tipe === "pct" ? veld_getal(v.waarde) : veld_sent(v.waarde);
@@ -237,7 +253,7 @@ function bo_teken_verdeling(S) {
           <button type="button" data-tipe="vas" class="${v.tipe === "vas" ? "aan" : ""}">R</button>
         </div>
         <input class="n" data-veld="waarde" inputmode="decimal" value="${ontsnap(waarde)}"
-               placeholder="${v.tipe === "pct" ? "0" : "0,00"}">
+               placeholder="${v.tipe === "pct" ? "0" : "0.00"}">
         <div class="uit">${rand_uit(rand)}</div>
         <button type="button" class="bo-vee" title="${fv_t("bo_verwyder", "Verwyder")}">&times;</button>
       </div>${merk}`;
