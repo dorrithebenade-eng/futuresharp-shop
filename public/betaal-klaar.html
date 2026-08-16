@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="af">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Future Sharp</title>
+  <link rel="stylesheet" href="css/styl.css">
+  <link rel="stylesheet" href="css/betaal-klaar.css">
+</head>
+<body>
+
+  <!--
+    WAAR DIE KLIËNT LAND NADAT PAYSTACK HOM TERUGGESTUUR HET.
+
+    'n Publieke bladsy. Geen sessie, geen aanmelding, geen paneelkode — die
+    kliënt is 'n rekord, nie 'n rekening nie. taal.js laai omdat die bladsy in
+    die FAKTUUR se taal lees, met t_in(), nie in die blaaier se taal nie.
+
+    Die dokument wat die kliënt ontvang het, was in daardie taal; hierdie
+    bladsy is dieselfde gesprek.
+  -->
+
+  <div class="bk-blad">
+    <div class="bk-merk">
+      <img src="images/future-sharp-logo.png" alt="Future Sharp">
+    </div>
+    <div class="bk-kaart" id="bk-kaart">
+      <div class="bk-besig">
+        <div><span class="bk-stip"></span><span class="bk-stip"></span><span class="bk-stip"></span></div>
+        <p id="bk-besig-teks"></p>
+      </div>
+    </div>
+  </div>
+
+  <p class="bk-voet" id="bk-voet"></p>
+
+  <script src="js/taal.js"></script>
+  <script src="js/betaal-klaar.js"></script>
+</body>
+</html>

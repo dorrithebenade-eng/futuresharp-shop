@@ -1484,6 +1484,66 @@ const WOORDEBOEK = {
     en: "Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec",
   },
 
+  // ── betaal-klaar.html ────────────────────────────────────────────────
+  //
+  // Waar die klient land nadat Paystack hom teruggestuur het. Hy lees met
+  // t_in() uit die FAKTUUR se taalveld, nie met t() nie — dieselfde bron as
+  // die dokument wat hy ontvang het, want dit is dieselfde gesprek.
+  //
+  // VIER UITKOMSTE, NIE TWEE NIE. 'n Kansellasie kom by dieselfde URL uit as
+  // 'n geslaagde betaling, en 'n Instant EFT is asinkroon — die klient kan
+  // terug wees voordat sy bank bevestig het.
+  bk_besig: { af: "Besig om die transaksie te verifieer", en: "Verifying the transaction" },
+
+  bk_merk_betaal: { af: "Betaal", en: "Paid" },
+  bk_merk_loop: { af: "In verwerking", en: "Processing" },
+  bk_merk_oop: { af: "Onbetaal", en: "Outstanding" },
+  bk_merk_onbekend: { af: "Onbevestig", en: "Unconfirmed" },
+
+  bk_kop_betaal: { af: "Betaling ontvang", en: "Payment received" },
+  bk_teks_betaal: {
+    af: "Die betaling is teen hierdie faktuur toegewys. 'n Kwitansie volg per e-pos.",
+    en: "The payment has been allocated to this invoice. A receipt follows by email.",
+  },
+
+  bk_kop_loop: { af: "Betaling in verwerking", en: "Payment processing" },
+  // Die waarskuwing teen 'n tweede betaling is nie oorversigtig nie: 'n
+  // Instant EFT wat nog nie deur is nie, lyk vir 'n debiteureklerk soos 'n
+  // mislukte een, en 'n dubbele betaling verg 'n terugbetaling wat die
+  // module nie het nie.
+  bk_teks_loop: {
+    af: "Die transaksie is geïnisieer, maar die bank het dit nog nie bevestig nie. Moenie 'n tweede betaling deurgee nie — die kwitansie volg per e-pos sodra die transaksie deurgaan.",
+    en: "The transaction has been initiated, but the bank has not confirmed it yet. Do not submit a second payment — the receipt follows by email once the transaction clears.",
+  },
+
+  bk_kop_oop: { af: "Betaling nie voltooi nie", en: "Payment not completed" },
+  bk_teks_oop: {
+    af: "Geen debiet is teen jou rekening verwerk nie. Die faktuur bly onbetaal en die betaalskakel bly geldig.",
+    en: "No debit has been processed against your account. The invoice remains outstanding and the payment link remains valid.",
+  },
+
+  bk_kop_onbekend: { af: "Betalingstatus onbevestig", en: "Payment status unconfirmed" },
+  bk_teks_onbekend: {
+    af: "Die transaksie se status kon nie tans bevestig word nie. Die faktuur se rekord is onveranderd. Het die betaling deurgegaan, volg die kwitansie per e-pos.",
+    en: "The status of the transaction could not be confirmed at this time. The invoice record is unchanged. If the payment cleared, a receipt follows by email.",
+  },
+
+  bk_nommer: { af: "Faktuurnommer", en: "Invoice number" },
+  // TWEE ETIKETTE VIR EEN BEDRAG, want dit is twee verskillende feite. Wat
+  // ontvang is, is nie wat verskuldig is nie.
+  bk_verskuldig: { af: "Totaal verskuldig", en: "Total due" },
+  bk_ontvang: { af: "Bedrag ontvang", en: "Amount received" },
+
+  bk_hervat: { af: "Hervat die betaling", en: "Resume payment" },
+  bk_navrae: {
+    af: "Rig navrae oor hierdie faktuur aan",
+    en: "Direct any queries about this invoice to",
+  },
+  bk_voet: {
+    af: "Future Sharp NPC · Registrasienommer 2024/117444/08 · Posbus 11602, Queenswood, Pretoria, 0121",
+    en: "Future Sharp NPC · Registration number 2024/117444/08 · PO Box 11602, Queenswood, Pretoria, 0121",
+  },
+
 };
 
 function kry_huidige_taal() {

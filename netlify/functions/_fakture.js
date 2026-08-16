@@ -202,6 +202,29 @@ function is_konsep_sleutel(sleutel) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────
+// DIE PUBLIEKE KODE
+//
+// Die faktuurnommer is DEURLOPEND en dus tel-baar. Staan hy in 'n publieke
+// URL, kan enigiemand by FS-01957 begin en deur die reeks loop om vir elke
+// faktuur die bedrag en die betaalstatus te sien. Dit is ander mense se sake.
+//
+// Die kode los dit op sonder om die nommer te versteek: die callback-URL dra
+// ALBEI — die sleutel om die rekord direk te vind, en die kode as bewys dat
+// die persoon die skakel werklik ontvang het. Pas die kode nie, is die
+// antwoord 404, en 'n mens kan niks aflei deur te tel nie.
+//
+// Hy word by UITREIKING geskep, saam met die nommer. 'n Konsep het nog geen
+// skakel om te deel nie.
+//
+// Dieselfde kode dra later die publieke faktuurbladsy en die PDF-skakel; dit
+// is nie werk wat net vir een bladsy gedoen word nie.
+const crypto = require("crypto");
+
+function skep_publieke_kode() {
+  return crypto.randomBytes(16).toString("hex");
+}
+
+// ─────────────────────────────────────────────────────────────────────────
 
 // Elke handeling gaan hier in. Dit is wat later 'n vraag beantwoord oor wat
 // gebeur het en wie dit gedoen het.
@@ -311,6 +334,11 @@ function nuwe_faktuur(wie) {
     verdeling_gevries: null,
     paystack: { referensie: null, split_code: null, authorization_url: null },
 
+    // Die sleutel wat 'n publieke bladsy toelaat om HIERDIE faktuur te wys
+    // sonder dat 'n mens deur die nommerreeks kan tel. Word by uitreiking
+    // gestel; 'n konsep het nog geen skakel om te deel nie.
+    publieke_kode: null,
+
     // Hoe betaal is. Sien BETAALMETODES.
     betaling: {
       metode: null,
@@ -372,6 +400,7 @@ module.exports = {
   skep_nommer,
   skep_konsep_sleutel,
   is_konsep_sleutel,
+  skep_publieke_kode,
   voeg_geskiedenis_by,
   nuwe_faktuur,
   is_toe,

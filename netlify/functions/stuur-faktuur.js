@@ -45,6 +45,7 @@ const {
   is_konsep_sleutel,
   skep_nommer,
   sleutel_na_nommer,
+  skep_publieke_kode,
   voeg_geskiedenis_by,
 } = require("./_fakture");
 const { kry_maks_verdeling_sent } = require("./_paystack-koste.js");
@@ -269,6 +270,11 @@ exports.handler = async (event, context) => {
   }
   const nommer = sleutel_na_nommer(nuwe_sleutel);
 
+  // Die kode wat die publieke bladsy toelaat om hierdie faktuur te wys sonder
+  // dat 'n mens deur die nommerreeks kan tel. 'n Ou konsep wat reeds een dra,
+  // hou hom — die skakel mag nie onder iemand se voete verander nie.
+  const publieke_kode = teks(rekord.publieke_kode) || skep_publieke_kode();
+
   // ── Paystack ────────────────────────────────────────────────────────────
   //
   // Word niks geskryf voordat albei oproepe deur is nie. Misluk een, staan die
@@ -341,7 +347,12 @@ exports.handler = async (event, context) => {
         // Waar die kliënt land ná betaling — en ná 'n kansellasie. 'n
         // Bedankingsbladsy ná 'n kansellasie is 'n leuen, dus dra die bladsy
         // self albei uitkomste.
-        callback_url: `${process.env.URL || "http://localhost:8888"}/betaal-klaar.html?f=${nuwe_sleutel}`,
+        // ALBEI DELE IS NODIG. Die sleutel vind die rekord direk; die kode
+        // bewys dat die persoon die skakel werklik ontvang het. Sonder die
+        // kode sou 'n mens by FS-01957 kon begin en deur die reeks loop.
+        callback_url:
+          `${process.env.URL || "http://localhost:8888"}/betaal-klaar.html` +
+          `?f=${nuwe_sleutel}&k=${publieke_kode}`,
         metadata: {
           faktuur_sleutel: nuwe_sleutel,
           faktuur_nommer: nommer,
@@ -379,6 +390,7 @@ exports.handler = async (event, context) => {
   // ── Die rekord ──────────────────────────────────────────────────────────
 
   rekord.nommer = nommer;
+  rekord.publieke_kode = publieke_kode;
   rekord.uitgereik_op = nou;
   rekord.bygewerk_op = nou;
   rekord.totaal_sent = totaal_sent;

@@ -1,0 +1,191 @@
+/* public/css/betaal-klaar.css
+   ───────────────────────────────────────────────────────────────────────
+   betaal-klaar.html se eie klasse, almal met die voorvoegsel `bk-`.
+
+   NIKS WORD GELEEN NIE. 'n Geleende klas dra sy eie aannames saam: op
+   14 Augustus het `.outeur-pil` met 'n negatiewe marge aan 'n band gehang wat
+   op die faktuurpaneel nie bestaan nie, en `.veld-ry` is 'n tweekolom-rooster
+   wat 'n vorm skeef laat lyk het. Hierdie bladsy staan buite die winkel en
+   buite die paneel; sy het niks om te leen nie.
+
+   styl.css laai wel, vir die :root-palet en die twee lettertipes.
+   ─────────────────────────────────────────────────────────────────────── */
+
+.bk-blad {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 28px 18px 8px;
+}
+
+/* DIE WIT PANEEL AGTER DIE WOORDMERK. Die PNG is RGB met wit ingebak:
+   mix-blend-mode laat die wit verdwyn maar maak die geel vaal, en wegsny maak
+   die letters hol omdat die logo wit as 'n KLEUR gebruik. Die paneel maak die
+   wit doelbewus. Kom daar ooit 'n uitvoer met 'n deursigtige agtergrond, val
+   hierdie reël weg. */
+.bk-merk {
+  background: #fff;
+  border: 1px solid #E2DFD9;
+  border-bottom: none;
+  padding: 18px 22px;
+  text-align: center;
+}
+
+.bk-merk img {
+  display: block;
+  max-width: 220px;
+  width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+
+.bk-kaart {
+  background: #fff;
+  border: 1px solid #E2DFD9;
+  padding: 0 0 26px;
+}
+
+.bk-kop {
+  padding: 26px 26px 22px;
+  border-bottom: 1px solid #EFEDE9;
+}
+
+.bk-merkie {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 5px 11px;
+  margin-bottom: 14px;
+  color: #fff;
+  background: #8B8781;
+}
+
+/* Die vier uitkomste verskil in NIKS behalwe kleur en woorde nie. Een uitleg,
+   vier toestande — 'n aparte blok per uitkoms is vier plekke om reg te hou. */
+.bk-kaart.bk-t-betaal .bk-merkie { background: var(--teal); }
+.bk-kaart.bk-t-loop   .bk-merkie { background: var(--amber); color: #4A3708; }
+
+.bk-kop h1 {
+  font-family: var(--font-opskrif);
+  font-size: 25px;
+  line-height: 1.25;
+  font-weight: 700;
+  margin: 0 0 10px;
+}
+
+.bk-kop p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--grys-teks);
+}
+
+.bk-syfers {
+  margin: 0;
+  padding: 20px 26px 4px;
+}
+
+.bk-ry {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 9px 0;
+  border-bottom: 1px solid #F1EFEB;
+  font-size: 14px;
+}
+
+.bk-ry:last-child { border-bottom: none; }
+
+.bk-ry dt { margin: 0; color: var(--grys-teks); }
+
+/* tabular-nums hou die syfers in kolom; sonder dit dans 'n bedrag wanneer die
+   bladsy hom hertek. */
+.bk-ry dd {
+  margin: 0;
+  text-align: right;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.bk-ry.bk-groot dd {
+  font-size: 19px;
+  font-family: var(--font-opskrif);
+}
+
+.bk-aksie { padding: 16px 26px 0; }
+
+.bk-knop {
+  display: block;
+  width: 100%;
+  text-align: center;
+  text-decoration: none;
+  font-family: var(--font-liggaam);
+  font-size: 15px;
+  font-weight: 600;
+  padding: 14px 18px;
+  background: var(--koraal);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+.bk-nota {
+  padding: 18px 26px 0;
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--grys-teks);
+}
+
+.bk-nota a { color: var(--teal); }
+
+.bk-voet {
+  max-width: 560px;
+  margin: 16px auto 48px;
+  padding: 0 18px;
+  font-size: 12px;
+  line-height: 1.7;
+  color: #8B8781;
+  text-align: center;
+}
+
+.bk-besig {
+  padding: 40px 26px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--grys-teks);
+}
+
+.bk-besig p { margin: 14px 0 0; }
+
+.bk-stip {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--teal);
+  margin: 0 3px;
+  animation: bk-pols 1.1s infinite;
+}
+
+.bk-stip:nth-child(2) { animation-delay: .15s; }
+.bk-stip:nth-child(3) { animation-delay: .3s; }
+
+@keyframes bk-pols {
+  0%, 60%, 100% { opacity: .25; }
+  30%           { opacity: 1; }
+}
+
+/* Iemand wat 'n bewegende stippie nie wil sien nie, kry hom nie. */
+@media (prefers-reduced-motion: reduce) {
+  .bk-stip { animation: none; opacity: .55; }
+}
+
+@media (max-width: 480px) {
+  .bk-blad { padding: 16px 12px 8px; }
+  .bk-kop { padding: 22px 20px 18px; }
+  .bk-kop h1 { font-size: 22px; }
+  .bk-syfers,
+  .bk-aksie,
+  .bk-nota { padding-left: 20px; padding-right: 20px; }
+}
