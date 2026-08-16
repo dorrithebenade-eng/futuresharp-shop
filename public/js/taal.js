@@ -1597,13 +1597,6 @@ const WOORDEBOEK = {
     af: "Die faktuur bly staan as rekord, met sy nommer, maar hy word dood gemerk. Wil jy iets verander, word 'n nuwe uitgereik.",
     en: "The invoice remains on record, with its number, but is marked dead. If you want to change something, a new one is issued.",
   },
-  // EERLIK WEES HIEROOR. Daar is geen API om 'n begonne Paystack-transaksie
-  // te herroep nie. Om te maak asof die skakel dood is, sou erger wees as om
-  // dit te sê.
-  fk_skakel_leef: {
-    af: "Paystack se betaalskakel kan nie doodgemaak word nie — daar is geen manier om 'n begonne transaksie te herroep nie. Iemand met die ou skakel kan steeds betaal, en dan word dit uitgelig sodat julle daaroor kan besluit.",
-    en: "Paystack's payment link cannot be killed — there is no way to revoke a transaction that has started. Someone with the old link can still pay, and that will be flagged so you can decide what to do.",
-  },
   fk_rede: { af: "Rede", en: "Reason" },
   fk_rede_kort: {
     af: "Gee 'n rede vir die kansellasie.",

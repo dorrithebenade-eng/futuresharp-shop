@@ -393,13 +393,6 @@ function fu_vra_kanselleer() {
       "Die faktuur bly staan as rekord, met sy nommer, maar hy word dood gemerk. Wil jy iets verander, word 'n nuwe uitgereik."
     )}</p>
 
-    <div class="fu-keer">
-      ${fu_t(
-        "fk_skakel_leef",
-        "Paystack se betaalskakel kan nie doodgemaak word nie — daar is geen manier om 'n begonne transaksie te herroep nie. Iemand met die ou skakel kan steeds betaal, en dan word dit uitgelig sodat julle daaroor kan besluit."
-      )}
-    </div>
-
     <label class="fu-etiket" for="fk-rede">${fu_t("fk_rede", "Rede")}</label>
     <textarea class="fu-teksveld" id="fk-rede" rows="2" maxlength="300"></textarea>
     <p class="fu-keer-fout" id="fk-rede-fout" hidden></p>
