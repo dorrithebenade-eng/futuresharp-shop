@@ -295,7 +295,15 @@
   font-weight: 500;
   text-decoration: none;
 }
-.dok-skakel.dood { background: #D9D6D0; color: var(--grys-teks); cursor: default; }
+/* 'n Dooie skakel het geen href, dus is hy nie klikbaar nie. pointer-events
+   maak dit uitdruklik, sodat 'n muiswyser wat oor hom beweeg ook nie belowe
+   dat daar iets gaan gebeur nie. */
+.dok-skakel.dood {
+  background: #D9D6D0;
+  color: var(--grys-teks);
+  cursor: default;
+  pointer-events: none;
+}
 
 /* 'n Handeling BINNE die dokument. Sy is gereedskap, nie inhoud nie, en moet
    so lees: 'n koraal-knoppie tussen die reëls en die totaal trek die oog weg

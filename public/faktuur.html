@@ -199,7 +199,20 @@
           <div>
             <h3 id="d-eft">Onmiddellike EFT — deur die betaalskakel</h3>
             <p id="d-eft-lei">Kaart, Instant EFT of QR. Die betaling word dadelik bevestig.</p>
-            <a class="dok-skakel dood" href="#" id="d-betaal" onclick="return false">Betaal</a>
+            <!-- GEEN onclick="return false" NIE. Daardie attribuut was
+                 vasgespyker en het die klik ALTYD gekanselleer, ook nadat die
+                 JS die href gestel het: die knoppie het lewendig gelyk en niks
+                 gedoen. Dieselfde soort fout as `hidden` op 'n .oi-knoppie —
+                 die een laag klop die ander.
+
+                 'n <a> SONDER 'n href is in elk geval nie klikbaar nie, dus
+                 doen die afwesigheid van die attribuut die werk wat die
+                 onclick probeer doen het. faktuur-vorm.js stel die href net
+                 wanneer daar 'n betaalskakel is.
+
+                 target="_blank" sodat 'n mens nie die faktuur verloor wanneer
+                 die betaalbladsy oopmaak nie. -->
+            <a class="dok-skakel dood" id="d-betaal" target="_blank" rel="noopener">Betaal</a>
           </div>
           <div>
             <h3 id="d-bank">Bankoorbetaling</h3>
