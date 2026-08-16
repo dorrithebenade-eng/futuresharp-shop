@@ -930,20 +930,31 @@
    SVG en nie 'n canvas nie. 'n Canvas druk as 'n lae-resolusie prent; SVG
    druk skerp op enige drukker, en hierdie kode se hele rede vir bestaan is
    die gedrukte bladsy. */
-.dok-qr { margin-top: 14px; }
+/* FLEX, NIE MARGES NIE. Met 'n marge tussen die SVG en sy byskrif het die
+   twee by DRUK oormekaar geval: die drukker reken die SVG se hoogte anders as
+   die skerm, en 'n marge wat 96px veronderstel, veronderstel verkeerd. In 'n
+   flex-kolom kan hulle mekaar nie raak nie, ongeag wat die SVG doen. */
+.dok-qr {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  margin-top: 14px;
+}
 .dok-qr[hidden] { display: none; }
 
 .dok-qr svg {
   display: block;
   width: 96px;
   height: 96px;
+  flex: 0 0 auto;
 }
 
 /* GEEN max-width NIE. Die byskrif was aan die QR se 96px gebind en het op 'n
    smal kolom oor twee reëls gebreek — "Skandeer om / te betaal". Hy hoort by
    die kolom se breedte, nie by die kode s'n. */
 .dok-qr-teks {
-  margin-top: 6px;
+  margin: 0;
   font-size: 11px;
   line-height: 1.4;
   color: #9a958d;

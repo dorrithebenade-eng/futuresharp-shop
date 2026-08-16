@@ -346,6 +346,7 @@ function teken_dok_taal() {
   }
 
   teken_maatskappy();
+  teken_titel();
 
   document.querySelectorAll("#d-taal button").forEach((b) => {
     b.classList.toggle("aan", b.getAttribute("data-taal") === V.taal);
@@ -354,6 +355,24 @@ function teken_dok_taal() {
 
 // Die dokument se kop. Loop saam met teken_dok(), sodat 'n taalwissel of 'n
 // herteken hom nie leeg laat nie.
+/* DIE TITEL IS DIE PDF SE LEERNAAM.
+
+   Chrome se "Save as PDF" stel die leernaam uit <title>. Die bladsy het
+   "Faktuur — Future Shop" gedra: die verkeerde maatskappy — die winkel is nie
+   die uitreiker nie — en sonder 'n nommer, sodat drie fakture as
+   "Faktuur (1)", "(2)" en "(3)" in een gids beland.
+
+   DIE SKUINSSTREEP MOET UIT. FS/01957 is die nommer op die dokument, maar
+   Windows laat geen / in 'n leernaam toe nie; die sleutelvorm FS-01957 is
+   presies dieselfde nommer sonder daardie probleem. */
+function teken_titel() {
+  const naam = (MAATSKAPPY && MAATSKAPPY.naam) || "Future Sharp NPC";
+  const nommer = V.nommer
+    ? String(V.nommer).replace(/\//g, "-")
+    : dt("fd_stand_konsep", "Konsep");
+  document.title = nommer + " — " + naam;
+}
+
 function teken_maatskappy() {
   if (!MAATSKAPPY) return;
   const stel = (id, waarde) => {
