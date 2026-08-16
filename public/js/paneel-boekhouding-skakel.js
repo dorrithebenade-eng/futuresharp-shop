@@ -86,17 +86,38 @@
     return skakel;
   }
 
-  async function begin() {
-    let sessie = null;
-    try {
-      sessie = await identiteit_kry_huidige_sessie();
-    } catch {
-      sessie = null;
+  // DIE SESSIE BESTAAN NOG NIE BY DOMContentLoaded NIE.
+  //
+  // Die eerste weergawe het hier dadelik teruggekeer as daar geen sessie was
+  // nie — en op die aanmeldbladsy is daar nooit een op daardie oomblik nie.
+  // Die skrip het dus nooit sy waarnemer opgestel nie, en meld 'n mens daarna
+  // aan, was daar niks wat luister nie. Die skakel het eers ná 'n HERLAAI
+  // verskyn, wanneer die sessie reeds bestaan.
+  //
+  // identiteit_kry_huidige_sessie() lees uit die stoor en raak die netwerk
+  // slegs wanneer die token binne 30 sekondes verval, dus is 'n peiling
+  // goedkoop.
+  async function wag_vir_sessie() {
+    const einde = Date.now() + 30000;
+    while (Date.now() < einde) {
+      let sessie = null;
+      try {
+        sessie = await identiteit_kry_huidige_sessie();
+      } catch {
+        sessie = null;
+      }
+      if (sessie && identiteit_het_rol(sessie.gebruiker, BOEKHOUDING_ROL)) return sessie;
+      await new Promise((r) => setTimeout(r, 400));
     }
+    return null;
+  }
 
-    // Geen sessie, of nie die rol nie: geen skakel. 'n Ontbrekende skakel is
-    // 'n ongerief; 'n skakel wat op 'n weiering uitloop, is 'n fout.
-    if (!sessie || !identiteit_het_rol(sessie.gebruiker, BOEKHOUDING_ROL)) return;
+  async function begin() {
+    // Geen sessie ná 'n halfminuut, of nie die rol nie: geen skakel. 'n
+    // Ontbrekende skakel is 'n ongerief; 'n skakel wat op 'n weiering uitloop,
+    // is 'n fout.
+    const sessie = await wag_vir_sessie();
+    if (!sessie) return;
 
     if (bou_skakel()) return;
 
