@@ -1864,16 +1864,14 @@ const WOORDEBOEK = {
     af: "Een oorbetaling per begunstigde, met een bankverwysing.",
     en: "One transfer per beneficiary, with one bank reference.",
   },
-  st_werk_leeg: {
-    af: "Niks staan uit nie. Elke begunstigde het sy geld.",
-    en: "Nothing outstanding. Every beneficiary has been paid.",
-  },
+  st_werk_leeg: { af: "Niks staan uit nie.", en: "Nothing outstanding." },
   st_klaar_titel: {
     af: "Begunstigdes wat reeds betaling ontvang het",
     en: "Beneficiaries who have already been paid",
   },
   st_klaar_leeg: { af: "Nog niemand is uitbetaal nie.", en: "Nobody has been paid out yet." },
-  st_verwag_titel: { af: "Verwagte inkomste", en: "Expected income" },
+  st_klaar_hulp: { af: "Nuutste eerste.", en: "Most recent first." },
+  st_verwag_titel: { af: "Onbetaalde fakture", en: "Unpaid invoices" },
   st_verwag_hulp: {
     af: "Uitgereik en nog onbetaal. 'n Betaalskakel verval nie.",
     en: "Issued and still unpaid. A payment link does not expire.",
