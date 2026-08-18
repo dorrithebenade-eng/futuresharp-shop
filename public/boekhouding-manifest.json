@@ -1,0 +1,33 @@
+{
+  "id": "/faktuurpaneel.html",
+  "name": "Future Sharp Boekhouding",
+  "short_name": "Boekhouding",
+  "description": "Stel fakture op, hou die registers by, en sien wat uitstaande is.",
+  "start_url": "/faktuurpaneel.html",
+  "scope": "/faktuur",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#FFFFFF",
+  "theme_color": "#171717",
+  "lang": "af",
+  "icons": [
+    {
+      "src": "/icons/paneel-ikoon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/paneel-ikoon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/paneel-ikoon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
