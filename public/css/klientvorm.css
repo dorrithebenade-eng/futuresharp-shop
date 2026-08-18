@@ -1,0 +1,284 @@
+/* public/css/klientvorm.css
+   ───────────────────────────────────────────────────────────────────────
+   klientvorm.html se eie klasse, almal met die voorvoegsel `kv-`.
+
+   NIKS WORD GELEEN NIE. 'n Geleende klas dra sy eie aannames saam: op
+   14 Augustus het `.outeur-pil` met 'n negatiewe marge aan 'n band gehang wat
+   op die faktuurpaneel nie bestaan nie, en `.veld-ry` is 'n tweekolom-rooster
+   wat 'n vorm skeef laat lyk het.
+
+   Die maat is betaal-klaar.css: dieselfde wit paneel, dieselfde rand, geen
+   afgeronde hoeke. Dit is die twee bladsye wat dieselfde kliënt sien, en 'n
+   vorm wat anders lyk as die bevestiging lyk soos 'n ander maatskappy s'n.
+
+   styl.css laai wel, vir die :root-palet en die twee lettertipes.
+   ─────────────────────────────────────────────────────────────────────── */
+
+.kv-blad {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 28px 18px 8px;
+}
+
+/* DIE WIT PANEEL AGTER DIE WOORDMERK. Die PNG is RGB met wit ingebak:
+   mix-blend-mode laat die wit verdwyn maar maak die geel vaal, en wegsny maak
+   die letters hol omdat die logo wit as 'n KLEUR gebruik. Die paneel maak die
+   wit doelbewus. Kom daar ooit 'n uitvoer met 'n deursigtige agtergrond, val
+   hierdie reël weg. */
+.kv-merk {
+  background: #fff;
+  border: 1px solid #E2DFD9;
+  border-bottom: none;
+  padding: 18px 22px;
+  text-align: center;
+}
+
+/* Die Future Sharp-logo is STAANDE. Begrens 'n mens hom op breedte, bepaal
+   daardie breedte sy hoogte en hy vul die halwe bladsy. Die hoogte is die
+   maat; die breedte volg. */
+.kv-merk img {
+  display: block;
+  max-height: 96px;
+  max-width: 100%;
+  width: auto;
+  height: auto;
+  margin: 0 auto;
+}
+
+.kv-kaart {
+  background: #fff;
+  border: 1px solid #E2DFD9;
+  padding: 0 0 26px;
+}
+
+.kv-kop {
+  padding: 24px 26px 20px;
+  border-bottom: 1px solid #EFEDE9;
+}
+
+.kv-kop h1 {
+  font-family: var(--font-opskrif);
+  font-size: 25px;
+  line-height: 1.25;
+  font-weight: 700;
+  margin: 0 0 10px;
+}
+
+.kv-kop p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--grys-teks);
+}
+
+/* ── Die taalskakelaar ────────────────────────────────────────────────── */
+
+.kv-taal {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.kv-taal-knop {
+  font-family: var(--font-liggaam);
+  font-size: 12px;
+  line-height: 1;
+  padding: 7px 12px;
+  border: 1px solid #DCDAD5;
+  background: #fff;
+  color: var(--grys-teks);
+  cursor: pointer;
+}
+
+.kv-taal-knop:hover { border-color: var(--teal); color: var(--teal); }
+
+.kv-taal-knop.aan {
+  background: var(--teal);
+  border-color: var(--teal);
+  color: #fff;
+  font-weight: 600;
+}
+
+/* ── Die vorm ─────────────────────────────────────────────────────────── */
+
+.kv-vorm { padding: 22px 26px 0; }
+
+.kv-boodskap {
+  display: none;
+  margin: 0 0 18px;
+  padding: 11px 13px;
+  border-left: 3px solid var(--koraal);
+  background: #FDECE6;
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+
+.kv-boodskap.wys { display: block; }
+
+.kv-soort { display: flex; gap: 8px; }
+
+.kv-soort-knop {
+  flex: 1;
+  font-family: var(--font-liggaam);
+  font-size: 14px;
+  padding: 11px 8px;
+  border: 1px solid #DCDAD5;
+  background: #fff;
+  color: var(--grys-teks);
+  cursor: pointer;
+}
+
+.kv-soort-knop:hover { border-color: var(--teal); }
+
+.kv-soort-knop.aan {
+  border-color: var(--teal);
+  background: var(--teal);
+  color: #fff;
+  font-weight: 600;
+}
+
+.kv-soort-hulp {
+  margin: 9px 0 20px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--grys-teks);
+}
+
+.kv-ry { margin-bottom: 16px; }
+
+.kv-etiket {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.kv-opsioneel { color: var(--grys-teks); font-weight: 400; }
+
+.kv-invoer {
+  width: 100%;
+  font-family: var(--font-liggaam);
+  font-size: 15px;
+  padding: 11px 12px;
+  border: 1px solid #DCDAD5;
+  background: #fff;
+  color: var(--swart);
+  border-radius: 0;
+  -webkit-appearance: none;
+}
+
+.kv-invoer:focus {
+  outline: none;
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(71, 159, 145, .15);
+}
+
+.kv-invoer.fout { border-color: var(--koraal); }
+
+.kv-blok { min-height: 84px; resize: vertical; }
+
+.kv-hulp {
+  margin: 6px 0 0;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--grys-teks);
+}
+
+.kv-veldfout {
+  display: none;
+  margin: 6px 0 0;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--koraal);
+}
+
+.kv-veldfout.wys { display: block; }
+
+/* DIE HEUNINGPOT. position:absolute, nie display:none nie — 'n weggesteekte
+   veld word deur party outovul-enjins tog gevul, en dan word 'n werklike
+   kliënt as 'n bot afgewys. */
+.kv-pot {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.kv-stuur {
+  display: block;
+  width: 100%;
+  text-align: center;
+  font-family: var(--font-liggaam);
+  font-size: 15px;
+  font-weight: 600;
+  padding: 14px 18px;
+  margin-top: 6px;
+  background: var(--teal);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+.kv-stuur:hover { background: var(--teal-helder); }
+.kv-stuur:disabled { opacity: .55; cursor: default; }
+
+/* ── Dankie ───────────────────────────────────────────────────────────── */
+
+.kv-dankie {
+  display: none;
+  padding: 34px 26px 8px;
+  text-align: center;
+}
+
+.kv-dankie.wys { display: block; }
+
+.kv-vinkie {
+  width: 54px;
+  height: 54px;
+  line-height: 54px;
+  margin: 0 auto 18px;
+  border-radius: 50%;
+  background: var(--teal);
+  color: #fff;
+  font-size: 28px;
+}
+
+.kv-dankie h2 {
+  font-family: var(--font-opskrif);
+  font-size: 21px;
+  font-weight: 700;
+  margin: 0 0 10px;
+}
+
+.kv-dankie p {
+  margin: 0 auto;
+  max-width: 30em;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--grys-teks);
+}
+
+.kv-navrae { margin-top: 18px !important; font-size: 13px !important; }
+.kv-navrae a { color: var(--teal); }
+
+.kv-voet {
+  max-width: 560px;
+  margin: 16px auto 48px;
+  padding: 0 18px;
+  font-size: 12px;
+  line-height: 1.7;
+  color: #8B8781;
+  text-align: center;
+}
+
+/* Twee kolomme eers wanneer daar plek is. Op 'n foon staan alles onder
+   mekaar; die breekpunt volg styl.css se bestaande reeks. */
+@media (min-width: 560px) {
+  .kv-twee {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 16px;
+  }
+}

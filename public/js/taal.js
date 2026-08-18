@@ -1781,6 +1781,59 @@ const WOORDEBOEK = {
     en: "Changing the budget or the split requires a larger screen.",
   },
 
+  // ── Die publieke kliëntvorm (klientvorm.html) ───────────────────────────
+  // 'n Staande skakel wat aan enige kliënt gaan, dus dra die bladsy sy eie
+  // taalskakelaar. Sien klientvorm.js: hy herlaai NIE, want 'n herlaai
+  // halfpad deur 'n vorm gooi weg wat iemand reeds getik het.
+  kv_bladsy_titel: { af: "Future Sharp — Kliëntbesonderhede", en: "Future Sharp — Client details" },
+  kv_kop: { af: "Jou besonderhede", en: "Your details" },
+  kv_inleiding: {
+    af: "Voltooi die vorm sodat ons jou faktuur korrek kan opstel.",
+    en: "Complete the form so that we can make out your invoice correctly.",
+  },
+  kv_soort_instansie: { af: "Instansie", en: "Institution" },
+  kv_soort_privaat: { af: "Privaat", en: "Private" },
+  kv_soort_hulp_instansie: {
+    af: "'n Skool, departement of maatskappy wat in sy eie naam betaal.",
+    en: "A school, department or company paying in its own name.",
+  },
+  kv_soort_hulp_privaat: {
+    af: "Jy betaal in jou eie naam.",
+    en: "You are paying in your own name.",
+  },
+  kv_naam_instansie: { af: "Naam van die instansie", en: "Name of the institution" },
+  kv_naam_privaat: { af: "Naam en van", en: "Full name" },
+  kv_kontak: { af: "Kontakpersoon", en: "Contact person" },
+  kv_kontak_hulp: {
+    af: "Die persoon by wie ons navraag doen.",
+    en: "The person we contact with any queries.",
+  },
+  kv_epos: { af: "E-pos", en: "Email" },
+  kv_selfoon: { af: "Selfoon", en: "Mobile" },
+  kv_adres: { af: "Adres", en: "Address" },
+  kv_adres_hulp: {
+    af: "Verskyn op die faktuur presies soos dit hier staan.",
+    en: "Appears on the invoice exactly as entered here.",
+  },
+  kv_opsioneel: { af: "— opsioneel", en: "— optional" },
+  kv_pot_etiket: { af: "Laat hierdie veld leeg", en: "Leave this field empty" },
+  kv_stuur: { af: "Stuur besonderhede", en: "Send details" },
+  kv_stuur_besig: { af: "Stuur tans …", en: "Sending …" },
+  kv_fout_naam: { af: "Vul die naam in.", en: "Enter the name." },
+  kv_fout_epos: { af: "Vul 'n geldige e-posadres in.", en: "Enter a valid email address." },
+  kv_fout_stuur: { af: "Kon nie stuur nie. Probeer weer.", en: "Could not send. Please try again." },
+  kv_fout_baie: {
+    af: "Te veel indienings uit hierdie netwerk. Probeer later weer.",
+    en: "Too many submissions from this network. Please try again later.",
+  },
+  kv_dankie_kop: { af: "Dankie — ons het dit ontvang", en: "Thank you — we have received it" },
+  kv_dankie_teks: {
+    af: "Jou besonderhede is deurgestuur. Ons neem kontak op sodra die faktuur gereed is.",
+    en: "Your details have been sent. We will be in touch as soon as the invoice is ready.",
+  },
+  kv_navrae: { af: "Navrae", en: "Queries" },
+  kv_voet_reg: { af: "Reg. nr.", en: "Reg. no." },
+
 };
 
 /* ═══════════════════════════════════════════════════════════════════════

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="af">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Future Sharp</title>
+  <link rel="stylesheet" href="css/styl.css">
+  <link rel="stylesheet" href="css/klientvorm.css">
+</head>
+<body>
+
+  <!--
+    DIE PUBLIEKE KLIËNTVORM.
+
+    'n Staande skakel: dieselfde adres, altyd, aan enige kliënt. Hy dra geen
+    kode per kliënt, geen kliëntnommer, en hy verval nie. Die nommer word by
+    die INDIENING toegeken, nie by die skakel nie — een skakel wat aan veertig
+    skole gaan, sou andersins veertig nommers vooruit moes uitdeel.
+
+    Geen sessie, geen aanmelding. Die kliënt is 'n rekord, nie 'n rekening
+    nie. Dieselfde skulp as betaal-klaar.html, want dit is die twee bladsye
+    wat dieselfde mens sien.
+
+    NIKS WORD GELEEN NIE. Elke klas dra die voorvoegsel `kv-`. styl.css laai
+    wel, vir die :root-palet en die twee lettertipes.
+  -->
+
+  <div class="kv-blad">
+
+    <div class="kv-merk">
+      <img src="images/future-sharp-logo.png" alt="Future Sharp">
+    </div>
+
+    <div class="kv-kaart">
+
+      <div class="kv-kop">
+        <!-- DIE TAALSKAKELAAR HERLAAI NIE. taal.js se stel_taal() doen 'n
+             window.location.reload(), en 'n herlaai halfpad deur 'n vorm gooi
+             weg wat iemand reeds getik het. Hierdie twee knoppies is dus 'n
+             eie klas met eie hantering in klientvorm.js. -->
+        <div class="kv-taal">
+          <button type="button" class="kv-taal-knop" data-kv-taal="af">Afrikaans</button>
+          <button type="button" class="kv-taal-knop" data-kv-taal="en">English</button>
+        </div>
+        <h1 data-i18n="kv_kop">Jou besonderhede</h1>
+        <p data-i18n="kv_inleiding">Voltooi die vorm sodat ons jou faktuur korrek kan opstel.</p>
+      </div>
+
+      <div class="kv-vorm" id="kv-vorm">
+
+        <p class="kv-boodskap" id="kv-boodskap"></p>
+
+        <div class="kv-soort">
+          <button type="button" class="kv-soort-knop aan" data-soort="instansie" data-i18n="kv_soort_instansie">Instansie</button>
+          <button type="button" class="kv-soort-knop" data-soort="privaat" data-i18n="kv_soort_privaat">Privaat</button>
+        </div>
+        <p class="kv-soort-hulp" id="kv-soort-hulp"></p>
+
+        <div class="kv-ry">
+          <label class="kv-etiket" for="kv-naam" id="kv-naam-etiket">Naam van die instansie</label>
+          <input type="text" class="kv-invoer" id="kv-naam" maxlength="200" autocomplete="organization">
+          <p class="kv-veldfout" id="kv-naam-fout" data-i18n="kv_fout_naam">Vul die naam in.</p>
+        </div>
+
+        <div class="kv-ry" id="kv-kontak-ry">
+          <label class="kv-etiket" for="kv-kontak" data-i18n="kv_kontak">Kontakpersoon</label>
+          <input type="text" class="kv-invoer" id="kv-kontak" maxlength="200" autocomplete="name">
+          <p class="kv-hulp" data-i18n="kv_kontak_hulp">Die persoon by wie ons navraag doen.</p>
+        </div>
+
+        <div class="kv-twee">
+          <div class="kv-ry">
+            <label class="kv-etiket" for="kv-epos" data-i18n="kv_epos">E-pos</label>
+            <input type="email" class="kv-invoer" id="kv-epos" maxlength="200" inputmode="email" autocomplete="email">
+            <p class="kv-veldfout" id="kv-epos-fout" data-i18n="kv_fout_epos">Vul 'n geldige e-posadres in.</p>
+          </div>
+
+          <div class="kv-ry">
+            <label class="kv-etiket" for="kv-selfoon">
+              <span data-i18n="kv_selfoon">Selfoon</span>
+              <span class="kv-opsioneel" data-i18n="kv_opsioneel">— opsioneel</span>
+            </label>
+            <input type="tel" class="kv-invoer" id="kv-selfoon" maxlength="60" inputmode="tel" autocomplete="tel">
+          </div>
+        </div>
+
+        <div class="kv-ry">
+          <label class="kv-etiket" for="kv-adres">
+            <span data-i18n="kv_adres">Adres</span>
+            <span class="kv-opsioneel" data-i18n="kv_opsioneel">— opsioneel</span>
+          </label>
+          <textarea class="kv-invoer kv-blok" id="kv-adres" maxlength="600" autocomplete="street-address"></textarea>
+          <p class="kv-hulp" data-i18n="kv_adres_hulp">Verskyn op die faktuur presies soos dit hier staan.</p>
+        </div>
+
+        <!-- DIE HEUNINGPOT. Nie `hidden` en nie `display:none` nie — party
+             wagwoordbestuurders en outovul-enjins vul weggesteekte velde ook,
+             en dan word 'n werklike kliënt as 'n bot afgewys. Weggeskuif met
+             position:absolute, uit die tab-orde, en met 'n etiket wat sê wat
+             om te doen vir wie hom tog met 'n skermleser raakloop. -->
+        <div class="kv-pot" aria-hidden="true">
+          <label for="kv-webwerf" data-i18n="kv_pot_etiket">Laat hierdie veld leeg</label>
+          <input type="text" id="kv-webwerf" tabindex="-1" autocomplete="off">
+        </div>
+
+        <button type="button" class="kv-stuur" id="kv-stuur" data-i18n="kv_stuur">Stuur besonderhede</button>
+
+      </div>
+
+      <div class="kv-dankie" id="kv-dankie">
+        <div class="kv-vinkie">✓</div>
+        <h2 data-i18n="kv_dankie_kop">Dankie — ons het dit ontvang</h2>
+        <p data-i18n="kv_dankie_teks">Jou besonderhede is deurgestuur. Ons neem kontak op sodra die faktuur gereed is.</p>
+        <p class="kv-navrae">
+          <span data-i18n="kv_navrae">Navrae</span>:
+          <a href="mailto:admin@futuresharp.co.za">admin@futuresharp.co.za</a>
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+  <p class="kv-voet">
+    Future Sharp NPC · <span data-i18n="kv_voet_reg">Reg. nr.</span> 2024/117444/08<br>
+    Posbus 11602, Queenswood, Pretoria, 0121
+  </p>
+
+  <script src="js/taal.js"></script>
+  <script src="js/klientvorm.js"></script>
+</body>
+</html>
