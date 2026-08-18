@@ -163,7 +163,7 @@ function bo_teken_begroting() {
       return `
       <div class="bt-ry" data-koste="${ix}">
         <div class="bt-boonste">
-          <input data-veld="beskrywing" value="${ontsnap(k.beskrywing)}"
+          <input data-veld="beskrywing" list="bo-items" value="${ontsnap(k.beskrywing)}"
                  placeholder="${fv_t("bo_beskrywing", "Beskrywing")}">
           <select data-veld="ontvanger">${bo_ontvanger_opsies(k.ontvanger, true)}</select>
           <input class="n" data-veld="bedrag" inputmode="decimal"
