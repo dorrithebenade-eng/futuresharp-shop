@@ -101,55 +101,129 @@
 
       <section class="paneel-afdeling fp-afdeling" data-afdeling="registers">
 
-        <!-- Die staande kliëntvorm-skakel. Hy dra geen kode en verval nie —
-             een adres wat aan almal gaan. Die titel is nie versiering nie:
-             die betaalskakel kry later dieselfde strook, en sonder 'n naam
-             moet 'n mens elke keer die URL lees om te weet watter een dit is. -->
-        <div class="paneel-afdeling-kop">
-          <h2 class="paneel-afdeling-titel" data-i18n="fk_titel">Kliente</h2>
+        <!-- SUB-NAVIGASIE, EEN REGISTER OP 'N SLAG.
+             Met twee registers was onder mekaar reg. Met vyf — kliënte,
+             begunstigdes, werk en uitgawes, produkte, dienste — rol 'n mens
+             verby vier soekvelde wat almal eenders lyk om by die vyfde uit te
+             kom, en gryp dan die verkeerde een. -->
+        <div class="fk-sub" id="fr-sub">
+          <button type="button" class="fr-sub-knop aan" data-reg="kliente" data-i18n="fk_titel">Kliente</button>
+          <button type="button" class="fr-sub-knop" data-reg="begunstigdes" data-i18n="bg_titel">Begunstigdes</button>
+          <button type="button" class="fr-sub-knop" data-reg="werk" data-i18n="wi_titel">Werk en uitgawes</button>
         </div>
 
-        <div class="fk-skakel">
-          <h3 data-i18n="fk_skakel_titel">Kliëntvorm-skakel</h3>
-          <div class="fk-skakel-url" id="fk-skakel-url">futureshop.futuresharp.co.za/klientvorm.html</div>
-          <button type="button" class="kaart-aksie stil" id="fk-kopieer" data-i18n="fk_kopieer">Kopieer</button>
+        <!-- ═══ Kliënte ═══ -->
+        <div class="fk-reg wys" data-reg="kliente">
+
+          <!-- Die staande kliëntvorm-skakel. Hy dra geen kode en verval nie —
+               een adres wat aan almal gaan. Die titel is nie versiering nie:
+               die betaalskakel kry later dieselfde strook, en sonder 'n naam
+               moet 'n mens elke keer die URL lees om te weet watter een dit is. -->
+          <div class="fk-skakel">
+            <h3 data-i18n="fk_skakel_titel">Kliëntvorm-skakel</h3>
+            <div class="fk-skakel-url" id="fk-skakel-url">futureshop.futuresharp.co.za/klientvorm.html</div>
+            <button type="button" class="kaart-aksie stil" id="fk-kopieer" data-i18n="fk_kopieer">Kopieer</button>
+          </div>
+
+          <div id="fk-strook"></div>
+
+          <div class="fk-soekbalk">
+            <input type="text" class="veld-invoer" id="fk-soek"
+                   data-i18n-placeholder="fk_soek_plek"
+                   placeholder="Soek op nommer, naam, kontakpersoon, e-pos of selfoon">
+            <button type="button" class="kaart-aksie" id="fk-nuut" data-i18n="fk_nuwe_klient_knop">+ Nuwe kliënt</button>
+          </div>
+          <p class="fk-hulp" id="fk-hulp"></p>
+
+          <div id="fk-lys">
+            <p class="stelsel-boodskap" data-i18n="fp_laai">Word gelaai …</p>
+          </div>
         </div>
 
-        <div id="fk-strook"></div>
+        <!-- ═══ Begunstigdes ═══ -->
+        <div class="fk-reg" data-reg="begunstigdes">
+          <div class="fk-soekbalk">
+            <input type="text" class="veld-invoer" id="bg-soek"
+                   data-i18n-placeholder="bg_soek_plek"
+                   placeholder="Soek op naam, e-pos, selfoon of kode">
+            <button type="button" class="kaart-aksie" id="bg-nuut" data-i18n="bg_nuwe_knop">+ Nuwe begunstigde</button>
+          </div>
+          <p class="fk-hulp" id="bg-hulp"></p>
 
-        <div class="fk-soekbalk">
-          <input type="text" class="veld-invoer" id="fk-soek"
-                 data-i18n-placeholder="fk_soek_plek"
-                 placeholder="Soek op nommer, naam, kontakpersoon, e-pos of selfoon">
-          <button type="button" class="kaart-aksie" id="fk-nuut" data-i18n="fk_nuwe_klient_knop">+ Nuwe kliënt</button>
-        </div>
-        <p class="fk-hulp" id="fk-hulp"></p>
-
-        <div id="fk-lys">
-          <p class="stelsel-boodskap" data-i18n="fp_laai">Word gelaai …</p>
-        </div>
-
-        <!-- Die tweede register op dieselfde blad. Onder mekaar, elk met sy
-             eie kop; kom daar later 'n derde en vierde by, word dit
-             sub-navigasie. Twee regverdig dit nog nie. -->
-        <div class="fk-register-skei"></div>
-
-        <div class="paneel-afdeling-kop">
-          <h2 class="paneel-afdeling-titel" data-i18n="bg_titel">Begunstigdes</h2>
+          <div id="bg-lys">
+            <p class="stelsel-boodskap" data-i18n="fp_laai">Word gelaai …</p>
+          </div>
         </div>
 
-        <div class="fk-soekbalk">
-          <input type="text" class="veld-invoer" id="bg-soek"
-                 data-i18n-placeholder="bg_soek_plek"
-                 placeholder="Soek op naam, e-pos, selfoon of kode">
-          <button type="button" class="kaart-aksie" id="bg-nuut" data-i18n="bg_nuwe_knop">+ Nuwe begunstigde</button>
-        </div>
-        <p class="fk-hulp" id="bg-hulp"></p>
+        <!-- ═══ Werk en uitgawes ═══
+             TWEE SOORTE, EEN REGISTER. Die toets is of iemand geld UITGEHAAL
+             het: ja, dan is dit 'n uitgawe wat presies terugkom; nee, hy het
+             gewerk en die deel is sy inkomste. Die onderskeid doen werk — 'n
+             uitgawe mag nooit op 'n persentasie loop nie, anders kry iemand
+             70% van sy eie petrol terug.
 
-        <div id="bg-lys">
-          <p class="stelsel-boodskap" data-i18n="fp_laai">Word gelaai …</p>
+             Die item dra GEEN bedrag en GEEN ontvanger nie. Albei verskil per
+             faktuur, en 'n verstek wat gewoonlik verkeerd is, word oorgesien. -->
+        <div class="fk-reg" data-reg="werk">
+          <div class="fk-soekbalk">
+            <input type="text" class="veld-invoer" id="wi-soek"
+                   data-i18n-placeholder="wi_soek_plek"
+                   placeholder="Soek op naam of beskrywing">
+            <button type="button" class="kaart-aksie" id="wi-nuut" data-i18n="wi_nuwe_knop">+ Nuwe item</button>
+          </div>
+          <p class="fk-hulp" id="wi-hulp"></p>
+
+          <div id="wi-lys">
+            <p class="stelsel-boodskap" data-i18n="fp_laai">Word gelaai …</p>
+          </div>
         </div>
+
       </section>
+
+      <!-- Die vorm vir 'n werk- of uitgawe-item. Buite die afdeling, want 'n
+           oorlegsel hang aan die bladsy en nie aan die blad wat toevallig oop
+           is nie. -->
+      <div class="fk-oorlegsel" id="wi-vorm">
+        <div class="fk-venster">
+          <h2 id="wi-vorm-titel">Nuwe item</h2>
+          <p class="fk-lei" data-i18n="wi_lei">Die item sê wat gedoen is. Wie dit kry en hoeveel, word per faktuur gestel.</p>
+
+          <div class="fk-soort">
+            <button type="button" class="fk-soort-knop wi-soort-knop" data-wi-soort="werk" data-i18n="wi_soort_werk">Werk</button>
+            <button type="button" class="fk-soort-knop wi-soort-knop aan" data-wi-soort="uitgawe" data-i18n="wi_soort_uitgawe">Uitgawe</button>
+          </div>
+          <p class="fk-veldhulp" id="wi-soort-hulp"></p>
+
+          <div class="fk-veld">
+            <label class="veld-etiket" for="wi-naam" data-i18n="wi_veld_naam">Naam</label>
+            <input type="text" class="veld-invoer" id="wi-naam" maxlength="80">
+          </div>
+
+          <div class="fk-veld">
+            <label class="veld-etiket" for="wi-beskrywing">
+              <span data-i18n="wi_veld_beskrywing">Beskrywing</span>
+              <span class="veld-opsioneel" data-i18n="wi_opsioneel">— opsioneel</span>
+            </label>
+            <input type="text" class="veld-invoer" id="wi-beskrywing" maxlength="160">
+            <p class="fk-veldhulp" data-i18n="wi_beskrywing_hulp">Wys by die item wanneer 'n mens hom in 'n begroting kies.</p>
+          </div>
+
+          <div class="fk-veld" id="wi-aktief-ry">
+            <label class="wi-merk">
+              <input type="checkbox" id="wi-aktief" checked>
+              <span data-i18n="wi_aktief">Wys in die keuselys</span>
+            </label>
+            <p class="fk-veldhulp" data-i18n="wi_aktief_hulp">'n Item word afgeskakel, nooit uitgevee nie — ou fakture verwys daarna.</p>
+          </div>
+
+          <p class="fk-fout" id="wi-vorm-fout" style="display:none"></p>
+
+          <div class="fk-knoppies">
+            <button type="button" class="kaart-aksie wi-stil" id="wi-kanselleer" data-i18n="wi_kanselleer">Kanselleer</button>
+            <button type="button" class="kaart-aksie" id="wi-stoor" data-i18n="wi_stoor">Stoor</button>
+          </div>
+        </div>
+      </div>
 
       <!-- ═══ Die staat ═══
            DRIE SOORTE GELD, apart gehou omdat hulle drie verskillende dinge
@@ -410,5 +484,7 @@
   <script src="js/faktuurpaneel-begunstigdes.js"></script>
   <script src="js/faktuurpaneel-instellings.js"></script>
   <script src="js/faktuurpaneel-staat.js"></script>
+  <script src="js/faktuurpaneel-registers.js"></script>
+  <script src="js/faktuurpaneel-werk.js"></script>
 </body>
 </html>

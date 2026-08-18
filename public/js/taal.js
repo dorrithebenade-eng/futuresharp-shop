@@ -1905,6 +1905,57 @@ const WOORDEBOEK = {
   st_inskrywing: { af: "inskrywing", en: "entry" },
   st_inskrywings: { af: "inskrywings", en: "entries" },
 
+  // ── Die register van werk en uitgawes (faktuurpaneel-werk.js) ──────────
+  // Twee soorte, een register. Die toets is of iemand geld UITGEHAAL het:
+  // ja, dan is dit 'n uitgawe wat presies terugkom; nee, hy het gewerk.
+  wi_titel: { af: "Werk en uitgawes", en: "Work and expenses" },
+  wi_soek_plek: { af: "Soek op naam of beskrywing", en: "Search by name or description" },
+  wi_nuwe_knop: { af: "+ Nuwe item", en: "+ New item" },
+  wi_kop_werk: { af: "Werk wat betaal word", en: "Work that is paid for" },
+  wi_kop_uitgawe: { af: "Uitgawes wat teruggekry word", en: "Expenses that are reimbursed" },
+  wi_leeg: {
+    af: "Die register is nog leeg. Voeg die eerste item by.",
+    en: "The register is still empty. Add the first item.",
+  },
+  wi_geen_pas: { af: "Geen item pas nie.", en: "No item matches." },
+  wi_laai_fout: { af: "Kon nie die register laai nie.", en: "Could not load the register." },
+  wi_item: { af: "item", en: "item" },
+  wi_items: { af: "items", en: "items" },
+  wi_van: { af: "van", en: "of" },
+  wi_afgeskakel: { af: "Afgeskakel", en: "Switched off" },
+  wi_nuwe: { af: "Nuwe item", en: "New item" },
+  wi_wysig: { af: "Wysig item", en: "Edit item" },
+  wi_lei: {
+    af: "Die item sê wat gedoen is. Wie dit kry en hoeveel, word per faktuur gestel.",
+    en: "The item says what was done. Who receives it and how much is set per invoice.",
+  },
+  wi_soort_werk: { af: "Werk", en: "Work" },
+  wi_soort_uitgawe: { af: "Uitgawe", en: "Expense" },
+  wi_hulp_werk: {
+    af: "Arbeid wat betaal word. Die deel is inkomste, en dit mag 'n vaste bedrag of 'n persentasie wees.",
+    en: "Labour that is paid for. The share is income, and it may be a fixed amount or a percentage.",
+  },
+  wi_hulp_uitgawe: {
+    af: "Geld wat iemand uitgehaal het en presies moet terugkry. Altyd 'n vaste bedrag.",
+    en: "Money someone laid out and must get back exactly. Always a fixed amount.",
+  },
+  wi_veld_naam: { af: "Naam", en: "Name" },
+  wi_veld_beskrywing: { af: "Beskrywing", en: "Description" },
+  wi_opsioneel: { af: "— opsioneel", en: "— optional" },
+  wi_beskrywing_hulp: {
+    af: "Wys by die item wanneer 'n mens hom in 'n begroting kies.",
+    en: "Shows beside the item when it is chosen in a budget.",
+  },
+  wi_aktief: { af: "Wys in die keuselys", en: "Show in the picker" },
+  wi_aktief_hulp: {
+    af: "'n Item word afgeskakel, nooit uitgevee nie — ou fakture verwys daarna.",
+    en: "An item is switched off, never deleted — old invoices refer to it.",
+  },
+  wi_naam_verplig: { af: "Die naam is verplig.", en: "The name is required." },
+  wi_stoor_fout: { af: "Kon nie stoor nie. Probeer weer.", en: "Could not save. Please try again." },
+  wi_stoor: { af: "Stoor", en: "Save" },
+  wi_kanselleer: { af: "Kanselleer", en: "Cancel" },
+
 };
 
 /* ═══════════════════════════════════════════════════════════════════════

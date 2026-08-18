@@ -668,3 +668,102 @@ a.paneel-kieslys-item { text-decoration: none; }
 }
 
 .fp-let-op-knop:hover { border-color: var(--teal); color: var(--teal); }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   DIE SUB-NAVIGASIE OP DIE REGISTERS-BLAD, en die register van werk en
+   uitgawes.
+
+   Hierdie reëls staan HIER en nie in 'n eie lêer nie, want faktuurpaneel.html
+   is die enigste bladsy wat hulle nodig het en hy laai reeds hierdie lêer. Op
+   14 Augustus het 'n reël vir die Boekhouding-skakel in faktuurpaneel.css
+   beland terwyl paneelbord.html hom glad nie laai nie.
+
+   Die registerlyste self gebruik die bestaande fk-klasse — fk-soekbalk,
+   fk-ry, fk-oorlegsel, fk-venster. Dit is nie 'n geleende klas nie: dit is
+   dieselfde patroon op dieselfde blad, presies soos die begunstigderegister
+   hulle reeds gebruik.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.fk-sub {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 22px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #EDEBE6;
+}
+
+/* KLEINER EN PLATTER AS .fp-pil. Die hoofpille dra 'n skaduwee en 'n groter
+   letter; sou hierdie ry dieselfde lyk, sou 'n mens nie sien watter een die
+   blad kies en watter een die register nie. */
+.fr-sub-knop {
+  background: var(--wit);
+  color: var(--grys-teks);
+  border: 1px solid #E4E2DD;
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-family: var(--font-liggaam);
+  font-size: 13.5px;
+  cursor: pointer;
+}
+
+.fr-sub-knop:hover { border-color: var(--teal); color: var(--teal); }
+
+/* Teal, nie swart nie — die swart pil hierbo sê in watter blad 'n mens is. */
+.fr-sub-knop.aan {
+  background: var(--teal);
+  border-color: var(--teal);
+  color: var(--wit);
+  font-weight: 600;
+}
+
+/* Net die gekose register wys. Dieselfde meganisme as .fp-afdeling. */
+.fk-reg { display: none; }
+.fk-reg.wys { display: block; }
+
+/* --- die register van werk en uitgawes --- */
+
+.fk-subkop {
+  font-family: var(--font-opskrif);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .3px;
+  text-transform: uppercase;
+  color: var(--grys-teks);
+  margin: 24px 0 6px;
+}
+
+.fk-subkop:first-child { margin-top: 4px; }
+
+/* 'n Afgeskakelde item bly sigbaar in die register — hy verdwyn net uit die
+   keuselys. Sou hy hier ook verdwyn, kon 'n mens hom nooit weer aanskakel
+   nie. */
+.fk-ry.wi-af .fk-ry-naam,
+.fk-ry.wi-af .fk-ry-onder { opacity: .55; }
+
+/* KANSELLEER MAG NIE SOOS STOOR LYK NIE. `.stil` bestaan NÊRENS in styl.css
+   nie — dit leef net in die mockups, en `kaart-aksie stil` gee 'n vol
+   koraal-knoppie. Dieselfde les as .fu-stil op die faktuurskerm. */
+.kaart-aksie.wi-stil {
+  background: var(--wit);
+  color: var(--grys-teks);
+  border: 1px solid #DDD9D2;
+}
+
+.kaart-aksie.wi-stil:hover { background: var(--wit); border-color: var(--teal); color: var(--teal); }
+
+.wi-merk {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.wi-merk input[type="checkbox"] {
+  width: 17px;
+  height: 17px;
+  accent-color: var(--teal);
+  flex: none;
+  cursor: pointer;
+}
