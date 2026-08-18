@@ -75,7 +75,12 @@ function kry_fakture_store() {
 // stelsel 'n ander een was, verander nie die boeke nie — dit is dieselfde
 // besigheid en dieselfde reeks. 'n Reeks wat by 0001 begin, sou 'n bestaande
 // besigheid soos 'n nuwe een laat lyk.
-const BEGIN_NOMMER = 1957;
+// 1961, NIE 1957 NIE: FS/01957 tot FS/01960 is werklik uitgereik, en
+// PAYSTACK SE TRANSAKSIEVERWYSINGS IS PERMANENT. Hulle bly bestaan al word
+// ons rekord geskrap, en /transaction/initialize weier 'n verwysing wat al
+// gebruik is met "Duplicate Transaction Reference". Die toetsdata is op
+// 18 Augustus 2026 uit die store verwyder; die nommers bly opgebruik.
+const BEGIN_NOMMER = 1961;
 
 // Vyf syfers met voorste nulle, sodat die reeks sorteerbaar bly. padStart
 // vul aan tot MINSTENS vyf; 'n sesde syfer breek niks.
