@@ -1834,6 +1834,79 @@ const WOORDEBOEK = {
   kv_navrae: { af: "Navrae", en: "Queries" },
   kv_voet_reg: { af: "Reg. nr.", en: "Reg. no." },
 
+  // ── Die staat (faktuurpaneel-staat.js) ─────────────────────────────────
+  // Drie soorte geld, en die werklys wat PER BEGUNSTIGDE groepeer: 'n mens
+  // betaal 'n persoon, nie 'n faktuur nie.
+  st_kop_uitbetaal: { af: "Reeds uitbetaal", en: "Already paid out" },
+  st_nota_uitbetaal: {
+    af: "Deur Paystack by vereffening, of met die hand afgemerk.",
+    en: "By Paystack at settlement, or marked off by hand.",
+  },
+  st_kop_uitstaande: { af: "Moet nog uitbetaal word", en: "Still to be paid out" },
+  st_nota_uitstaande: {
+    af: "In die hoofrekening, met iemand anders se naam daarop.",
+    en: "In the main account, with someone else's name on it.",
+  },
+  st_kop_verwag: { af: "Verwagte inkomste", en: "Expected income" },
+  st_nota_verwag: {
+    af: "Uitgereik en nog nie betaal nie. Nog niemand se geld nie.",
+    en: "Issued and not yet paid. Nobody's money yet.",
+  },
+  st_verduidelik: {
+    af: "Elke syfer word by elke oopmaak uit die fakture herbereken en nooit gestoor nie. Die bedrae kom uit elke faktuur se gevriesde verdeling en word nooit oorgetik nie.",
+    en: "Every figure is recalculated from the invoices each time this page opens and is never stored. The amounts come from each invoice's frozen split and are never typed over.",
+  },
+  st_werk_titel: {
+    af: "Begunstigdes wat uit die hoofrekening betaal moet word",
+    en: "Beneficiaries to be paid from the main account",
+  },
+  st_werk_hulp: {
+    af: "Een oorbetaling per begunstigde, met een bankverwysing.",
+    en: "One transfer per beneficiary, with one bank reference.",
+  },
+  st_werk_leeg: {
+    af: "Niks staan uit nie. Elke begunstigde het sy geld.",
+    en: "Nothing outstanding. Every beneficiary has been paid.",
+  },
+  st_klaar_titel: {
+    af: "Begunstigdes wat reeds betaling ontvang het",
+    en: "Beneficiaries who have already been paid",
+  },
+  st_klaar_leeg: { af: "Nog niemand is uitbetaal nie.", en: "Nobody has been paid out yet." },
+  st_verwag_titel: { af: "Verwagte inkomste", en: "Expected income" },
+  st_verwag_hulp: {
+    af: "Uitgereik en nog onbetaal. 'n Betaalskakel verval nie.",
+    en: "Issued and still unpaid. A payment link does not expire.",
+  },
+  st_verwag_leeg: { af: "Geen onbetaalde faktuur nie.", en: "No unpaid invoices." },
+  st_merk_almal: { af: "Merk almal", en: "Select all" },
+  st_merk_geen: { af: "Merk niks", en: "Select none" },
+  st_datum: { af: "Datum van die oorbetaling", en: "Date of the transfer" },
+  st_verwysing: { af: "Bankverwysing", en: "Bank reference" },
+  st_verwysing_plek: { af: "Soos dit in die bankstaat staan", en: "As it appears on the bank statement" },
+  st_som_voor: { af: "Word afgemerk:", en: "Will be marked off:" },
+  st_niks_gekies: {
+    af: "Kies watter rye hierdie oorbetaling dek.",
+    en: "Select which rows this transfer covers.",
+  },
+  st_merk: { af: "Merk as betaal", en: "Mark as paid" },
+  st_fout_verwysing: { af: "Vul die bankverwysing in.", en: "Enter the bank reference." },
+  st_fout_merk: { af: "Kon nie afmerk nie. Probeer weer.", en: "Could not mark off. Please try again." },
+  st_laai_fout: { af: "Kon nie die staat laai nie.", en: "Could not load the statement." },
+  st_direk: { af: "Direk deur Paystack", en: "Directly by Paystack" },
+  st_met_hand: { af: "Met die hand", en: "By hand" },
+  st_uitgereik: { af: "uitgereik", en: "issued" },
+  st_betaalbaar: { af: "betaalbaar teen", en: "payable by" },
+  st_verw_kort: { af: "verwysing", en: "reference" },
+  st_begunstigde: { af: "begunstigde", en: "beneficiary" },
+  st_begunstigdes: { af: "begunstigdes", en: "beneficiaries" },
+  st_ry: { af: "ry", en: "row" },
+  st_rye: { af: "rye", en: "rows" },
+  st_faktuur: { af: "faktuur", en: "invoice" },
+  st_fakture: { af: "fakture", en: "invoices" },
+  st_inskrywing: { af: "inskrywing", en: "entry" },
+  st_inskrywings: { af: "inskrywings", en: "entries" },
+
 };
 
 /* ═══════════════════════════════════════════════════════════════════════
