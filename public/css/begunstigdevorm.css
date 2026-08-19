@@ -1,0 +1,216 @@
+/* public/css/begunstigdevorm.css
+ *
+ * Die publieke begunstigdevorm.
+ *
+ * NIKS WORD GELEEN NIE. Elke klas dra `bv-`. Die klientvorm se `kv-` klasse
+ * lyk byna identies en word DOELBEWUS nie hergebruik nie: die twee vorms gaan
+ * na verskillende soorte mense en 'n verandering aan die een mag nie die
+ * ander herstileer nie.
+ *
+ * styl.css laai wel, vir die :root-palet en die twee lettertipes.
+ */
+
+body {
+  margin: 0;
+  background: #F1EFE8;
+  font-family: var(--font-lyf, system-ui, sans-serif);
+  color: var(--swart, #171717);
+}
+
+.bv-blad {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 26px 16px 8px;
+}
+
+.bv-merk { margin-bottom: 16px; }
+.bv-merk img { height: 54px; width: auto; display: block; }
+
+.bv-kaart {
+  background: #fff;
+  border: 1px solid #E4E2DD;
+  border-radius: 10px;
+  padding: 22px 24px 24px;
+}
+
+.bv-kop { display: flex; justify-content: flex-end; margin-bottom: 14px; }
+
+.bv-taal { display: flex; }
+.bv-taal-knop {
+  font-size: 11.5px;
+  padding: 4px 11px;
+  border: 1px solid #E4E2DD;
+  background: #fff;
+  color: var(--grys-teks, #5B5B5B);
+  cursor: pointer;
+  font-family: inherit;
+}
+.bv-taal-knop:first-child { border-radius: 6px 0 0 6px; }
+.bv-taal-knop:last-child { border-radius: 0 6px 6px 0; border-left: none; }
+.bv-taal-knop.aan {
+  background: var(--teal, #479F91);
+  border-color: var(--teal, #479F91);
+  color: #fff;
+}
+
+.bv-titel {
+  font-family: var(--font-opskrif, sans-serif);
+  font-size: 19px;
+  font-weight: 500;
+  margin: 0 0 6px;
+}
+.bv-lei {
+  margin: 0 0 20px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--grys-teks, #5B5B5B);
+}
+
+.bv-ry { margin-bottom: 14px; }
+
+.bv-twee {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 13px;
+}
+
+.bv-etiket {
+  display: block;
+  font-size: 12px;
+  color: var(--grys-teks, #5B5B5B);
+  margin-bottom: 5px;
+}
+.bv-opsioneel { color: #9a958d; }
+
+.bv-invoer {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #D9D6D0;
+  border-radius: 6px;
+  padding: 10px 11px;
+  /* 16px keer iOS se outomatiese inzoem wanneer 'n veld fokus kry. Op 'n
+     bankrekeningnommer is daardie sprong die verskil tussen 'n vorm wat
+     voltooi word en een wat nie. */
+  font-size: 16px;
+  font-family: inherit;
+  color: var(--swart, #171717);
+  background: #fff;
+}
+.bv-invoer:focus { outline: none; border-color: var(--teal, #479F91); }
+.bv-blok { resize: vertical; min-height: 62px; line-height: 1.5; }
+
+.bv-hulp {
+  margin: 5px 0 0;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: #9a958d;
+}
+
+.bv-veldfout {
+  margin: 5px 0 0;
+  font-size: 11.5px;
+  color: var(--koraal, #EC5832);
+  display: none;
+}
+.bv-veldfout.wys { display: block; }
+
+.bv-bank {
+  border-top: 1px solid #E4E2DD;
+  margin-top: 20px;
+  padding-top: 18px;
+}
+.bv-bank-kop {
+  font-family: var(--font-opskrif, sans-serif);
+  font-size: 14px;
+  font-weight: 500;
+  margin: 0 0 4px;
+}
+.bv-bank-lei {
+  margin: 0 0 15px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--grys-teks, #5B5B5B);
+}
+
+/* Uit die tab-orde en van die skerm af weggeskuif — NIE display:none nie.
+   Sien die HTML se kommentaar by die heuningpot. */
+.bv-pot {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.bv-stuur {
+  margin-top: 20px;
+  width: 100%;
+  background: var(--teal, #479F91);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 13px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+}
+.bv-stuur:disabled { opacity: .6; cursor: default; }
+
+.bv-belofte {
+  margin: 12px 0 0;
+  font-size: 11.5px;
+  line-height: 1.6;
+  color: #9a958d;
+  text-align: center;
+}
+
+.bv-boodskap {
+  margin: 0 0 14px;
+  padding: 9px 12px;
+  border-radius: 6px;
+  background: #F1EFE8;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--grys-teks, #5B5B5B);
+  display: none;
+}
+.bv-boodskap.wys { display: block; }
+.bv-boodskap.fout { background: #FCEBEB; color: #A32D2D; }
+
+.bv-dankie { display: none; text-align: center; padding: 14px 0 6px; }
+.bv-dankie.wys { display: block; }
+.bv-vinkie {
+  font-size: 30px;
+  color: var(--teal, #479F91);
+  line-height: 1;
+  margin-bottom: 10px;
+}
+.bv-dankie h2 {
+  font-family: var(--font-opskrif, sans-serif);
+  font-size: 17px;
+  font-weight: 500;
+  margin: 0 0 8px;
+}
+.bv-dankie p {
+  margin: 0 0 8px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--grys-teks, #5B5B5B);
+}
+.bv-navrae a { color: var(--teal, #479F91); }
+
+.bv-voet {
+  max-width: 520px;
+  margin: 16px auto 30px;
+  padding: 0 16px;
+  font-size: 11px;
+  line-height: 1.6;
+  color: #9a958d;
+  text-align: center;
+}
+
+@media (max-width: 460px) {
+  .bv-twee { grid-template-columns: 1fr; gap: 0; }
+  .bv-kaart { padding: 18px 16px 20px; }
+}

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="af">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Future Sharp</title>
+  <link rel="stylesheet" href="css/styl.css">
+  <link rel="stylesheet" href="css/begunstigdevorm.css">
+</head>
+<body>
+
+  <!--
+    DIE PUBLIEKE BEGUNSTIGDEVORM.
+
+    'n Staande skakel, soos die kliëntvorm: dieselfde adres, altyd, aan enige
+    begunstigde. Geen kode per persoon, geen aanmelding.
+
+    DIT SKRYF NIE IN DIE REGISTER NIE. Die indiening lê in 'n WAGKAMER en
+    iemand met die boekhouding-rol dra dit daarna oor. Die rede staan in
+    dien-begunstigde-in.js: die `begunstigde_id` is 'n slak van die naam en
+    verander nooit weer, want 'n faktuur se gevriesde verdeling verwys daarna.
+
+    DIE WOORD "PAYSTACK" VERSKYN NERENS. Dit is 'n verskaffer se naam wat vir
+    die begunstigde niks beteken nie en volgende jaar kan verander. "Ons
+    betaaldiens" dra dieselfde betekenis en verouder nie.
+
+    NIKS WORD GELEEN NIE. Elke klas dra die voorvoegsel `bv-`. styl.css laai
+    wel, vir die :root-palet en die twee lettertipes. Die kliëntvorm se `kv-`
+    klasse LYK identies en word doelbewus nie gebruik nie: 'n verandering aan
+    daardie vorm mag hierdie een nie herstileer nie.
+  -->
+
+  <div class="bv-blad">
+
+    <div class="bv-merk">
+      <img src="images/future-sharp-logo.png" alt="Future Sharp">
+    </div>
+
+    <div class="bv-kaart">
+
+      <div class="bv-kop">
+        <!-- DIE TAALSKAKELAAR HERLAAI NIE. taal.js se stel_taal() doen 'n
+             window.location.reload(), en 'n herlaai halfpad deur 'n vorm gooi
+             weg wat iemand reeds getik het. Dieselfde hantering as
+             klientvorm.js. -->
+        <div class="bv-taal">
+          <button type="button" class="bv-taal-knop" data-bv-taal="af">Afrikaans</button>
+          <button type="button" class="bv-taal-knop" data-bv-taal="en">English</button>
+        </div>
+      </div>
+
+      <div class="bv-vorm" id="bv-vorm">
+
+        <h1 class="bv-titel" data-i18n="bv_titel">Jou besonderhede</h1>
+        <p class="bv-lei" data-i18n="bv_lei">Voltooi die vorm sodat ons jou kan betaal vir werk wat jy gedoen het of koste wat jy namens Future Sharp aangegaan het.</p>
+
+        <p class="bv-boodskap" id="bv-boodskap"></p>
+
+        <div class="bv-ry">
+          <label class="bv-etiket" for="bv-naam" data-i18n="bv_naam">Volle naam</label>
+          <input type="text" class="bv-invoer" id="bv-naam" maxlength="200" autocomplete="name">
+          <p class="bv-veldfout" id="bv-naam-fout" data-i18n="bv_fout_naam">Vul jou naam in.</p>
+        </div>
+
+        <div class="bv-twee">
+          <div class="bv-ry">
+            <label class="bv-etiket" for="bv-epos" data-i18n="bv_epos">E-pos</label>
+            <input type="email" class="bv-invoer" id="bv-epos" maxlength="200" inputmode="email" autocomplete="email">
+            <p class="bv-veldfout" id="bv-epos-fout" data-i18n="bv_fout_epos">Vul 'n geldige e-posadres in.</p>
+          </div>
+
+          <div class="bv-ry">
+            <label class="bv-etiket" for="bv-selfoon">
+              <span data-i18n="bv_selfoon">Selfoon</span>
+              <span class="bv-opsioneel" data-i18n="bv_opsioneel">— opsioneel</span>
+            </label>
+            <input type="tel" class="bv-invoer" id="bv-selfoon" maxlength="60" inputmode="tel" autocomplete="tel">
+          </div>
+        </div>
+
+        <div class="bv-ry">
+          <label class="bv-etiket" for="bv-adres">
+            <span data-i18n="bv_adres">Adres</span>
+            <span class="bv-opsioneel" data-i18n="bv_opsioneel">— opsioneel</span>
+          </label>
+          <textarea class="bv-invoer bv-blok" id="bv-adres" maxlength="600" autocomplete="street-address"></textarea>
+        </div>
+
+        <!-- DIE BANKBLOK.
+
+             ALLES HIER IS OPSIONEEL. Iemand wat sy takkode nie byderhand het
+             nie, moet die vorm kan indien eerder as om hom te laat vaar; ons
+             kontak hom dan. Dieselfde reël staan in dien-begunstigde-in.js.
+
+             DIE BELOFTE ONDERAAN IS NIE VERSIERING NIE. wysig-begunstigde.js
+             en dra-begunstigde-oor.js maak die bankvelde LEEG sodra daar 'n
+             subrekening-kode is. Verander daardie reël ooit, moet hierdie sin
+             saam verander. -->
+        <div class="bv-bank">
+          <h2 class="bv-bank-kop" data-i18n="bv_bank_kop">Bankbesonderhede</h2>
+          <p class="bv-bank-lei" data-i18n="bv_bank_lei">Hiermee word 'n betaalrekening by ons betaaldiens opgestel.</p>
+
+          <div class="bv-ry">
+            <label class="bv-etiket" for="bv-rekeninghouer">
+              <span data-i18n="bv_rekeninghouer">Rekeninghouer</span>
+              <span class="bv-opsioneel" data-i18n="bv_opsioneel">— opsioneel</span>
+            </label>
+            <input type="text" class="bv-invoer" id="bv-rekeninghouer" maxlength="200" autocomplete="off">
+            <p class="bv-hulp" data-i18n="bv_rekeninghouer_hulp">Soos dit op die bankrekening staan. Betaal jy in iemand anders se rekening, gee daardie naam.</p>
+          </div>
+
+          <div class="bv-twee">
+            <div class="bv-ry">
+              <label class="bv-etiket" for="bv-bank-naam">
+                <span data-i18n="bv_bank">Bank</span>
+                <span class="bv-opsioneel" data-i18n="bv_opsioneel">— opsioneel</span>
+              </label>
+              <input type="text" class="bv-invoer" id="bv-bank-naam" maxlength="120" autocomplete="off">
+            </div>
+
+            <div class="bv-ry">
+              <label class="bv-etiket" for="bv-tipe">
+                <span data-i18n="bv_tipe">Rekeningtipe</span>
+                <span class="bv-opsioneel" data-i18n="bv_opsioneel">— opsioneel</span>
+              </label>
+              <select class="bv-invoer" id="bv-tipe">
+                <option value=""></option>
+                <option value="tjek" data-i18n="bv_tipe_tjek">Tjekrekening</option>
+                <option value="spaar" data-i18n="bv_tipe_spaar">Spaarrekening</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="bv-twee">
+            <div class="bv-ry">
+              <label class="bv-etiket" for="bv-rekeningnommer">
+                <span data-i18n="bv_rekeningnommer">Rekeningnommer</span>
+                <span class="bv-opsioneel" data-i18n="bv_opsioneel">— opsioneel</span>
+              </label>
+              <input type="text" class="bv-invoer" id="bv-rekeningnommer" maxlength="40" inputmode="numeric" spellcheck="false" autocomplete="off">
+            </div>
+
+            <div class="bv-ry">
+              <label class="bv-etiket" for="bv-takkode">
+                <span data-i18n="bv_takkode">Takkode</span>
+                <span class="bv-opsioneel" data-i18n="bv_opsioneel">— opsioneel</span>
+              </label>
+              <input type="text" class="bv-invoer" id="bv-takkode" maxlength="20" inputmode="numeric" spellcheck="false" autocomplete="off">
+            </div>
+          </div>
+        </div>
+
+        <!-- DIE HEUNINGPOT. Nie `hidden` en nie `display:none` nie — party
+             wagwoordbestuurders vul weggesteekte velde ook, en dan word 'n
+             werklike mens as 'n bot afgewys. Weggeskuif met position:absolute,
+             uit die tab-orde, met 'n etiket vir wie hom met 'n skermleser
+             raakloop. -->
+        <div class="bv-pot" aria-hidden="true">
+          <label for="bv-webwerf" data-i18n="bv_pot_etiket">Laat hierdie veld leeg</label>
+          <input type="text" id="bv-webwerf" tabindex="-1" autocomplete="off">
+        </div>
+
+        <button type="button" class="bv-stuur" id="bv-stuur" data-i18n="bv_stuur">Stuur besonderhede</button>
+
+        <p class="bv-belofte" data-i18n="bv_belofte">Jou bankbesonderhede word gebruik om die betaalrekening op te stel en word nie by Future Sharp gehou nie.</p>
+
+      </div>
+
+      <div class="bv-dankie" id="bv-dankie">
+        <div class="bv-vinkie">&#10003;</div>
+        <h2 data-i18n="bv_dankie_kop">Dankie — ons het dit ontvang</h2>
+        <p data-i18n="bv_dankie_teks">Jou besonderhede is deurgestuur. Ons laat weet sodra die betaalrekening opgestel is.</p>
+        <p class="bv-navrae">
+          <span data-i18n="bv_navrae">Navrae</span>:
+          <a href="mailto:admin@futuresharp.co.za">admin@futuresharp.co.za</a>
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+  <p class="bv-voet">
+    Future Sharp NPC · <span data-i18n="bv_voet_reg">Reg. nr.</span> 2024/117444/08<br>
+    Posbus 11602, Queenswood, Pretoria, 0121
+  </p>
+
+  <script src="js/taal.js"></script>
+  <script src="js/begunstigdevorm.js"></script>
+</body>
+</html>

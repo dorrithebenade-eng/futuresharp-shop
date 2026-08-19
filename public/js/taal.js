@@ -1368,6 +1368,70 @@ const WOORDEBOEK = {
   // Die strook wat aanbied om \u0027n onbekende beskrywing by die register
   // te voeg. Sien faktuur-nuwe-koste-item.js. Sy KEER niks \u2014 die
   // faktuur werk klaar reg met \u0027n beskrywing wat nerens gestoor is nie.
+  // Die PUBLIEKE begunstigdevorm, 19 Augustus 2026. Sien
+  // begunstigdevorm.html. Die woord "Paystack" verskyn nerens op
+  // hierdie bladsy nie: dit is \u0027n verskaffer se naam wat vir die
+  // begunstigde niks beteken nie en wat kan verander.
+  bv_titel: { af: "Jou besonderhede", en: "Your details" },
+  bv_lei: {
+    af: "Voltooi die vorm sodat ons jou kan betaal vir werk wat jy gedoen het of koste wat jy namens Future Sharp aangegaan het.",
+    en: "Complete the form so we can pay you for work you have done or costs you have carried on behalf of Future Sharp.",
+  },
+  bv_naam: { af: "Volle naam", en: "Full name" },
+  bv_epos: { af: "E-pos", en: "Email" },
+  bv_selfoon: { af: "Selfoon", en: "Mobile" },
+  bv_adres: { af: "Adres", en: "Address" },
+  bv_opsioneel: { af: "\u2014 opsioneel", en: "\u2014 optional" },
+  bv_bank_kop: { af: "Bankbesonderhede", en: "Bank details" },
+  bv_bank_lei: {
+    af: "Hiermee word \u0027n betaalrekening by ons betaaldiens opgestel.",
+    en: "This is used to set up a payment account with our payment provider.",
+  },
+  bv_rekeninghouer: { af: "Rekeninghouer", en: "Account holder" },
+  bv_rekeninghouer_hulp: {
+    af: "Soos dit op die bankrekening staan. Betaal jy in iemand anders se rekening, gee daardie naam.",
+    en: "As it appears on the bank account. If you are paid into someone else\u0027s account, give that name.",
+  },
+  bv_bank: { af: "Bank", en: "Bank" },
+  bv_rekeningnommer: { af: "Rekeningnommer", en: "Account number" },
+  bv_takkode: { af: "Takkode", en: "Branch code" },
+  bv_tipe: { af: "Rekeningtipe", en: "Account type" },
+  bv_tipe_tjek: { af: "Tjekrekening", en: "Cheque account" },
+  bv_tipe_spaar: { af: "Spaarrekening", en: "Savings account" },
+  bv_pot_etiket: { af: "Laat hierdie veld leeg", en: "Leave this field empty" },
+  bv_stuur: { af: "Stuur besonderhede", en: "Send details" },
+  // HIERDIE SIN IS \u0027N BELOFTE WAT DIE KODE NAKOM. wysig-begunstigde.js
+  // en dra-begunstigde-oor.js maak die bankvelde LEEG sodra daar \u0027n
+  // subrekening-kode is. Verander daardie reel ooit, moet hierdie sin
+  // saam verander.
+  bv_belofte: {
+    af: "Jou bankbesonderhede word gebruik om die betaalrekening op te stel en word nie by Future Sharp gehou nie.",
+    en: "Your bank details are used to set up the payment account and are not kept by Future Sharp.",
+  },
+  bv_besig: { af: "Besig om te stuur\u2026", en: "Sending\u2026" },
+  bv_fout: {
+    af: "Kon nie stuur nie. Probeer asseblief weer.",
+    en: "Could not send. Please try again.",
+  },
+  bv_te_veel: {
+    af: "Te veel pogings. Probeer oor \u0027n uur weer.",
+    en: "Too many attempts. Please try again in an hour.",
+  },
+  bv_fout_naam: { af: "Vul jou naam in.", en: "Enter your name." },
+  bv_fout_epos: {
+    af: "Vul \u0027n geldige e-posadres in.",
+    en: "Enter a valid email address.",
+  },
+  bv_dankie_kop: {
+    af: "Dankie \u2014 ons het dit ontvang",
+    en: "Thank you \u2014 we have received it",
+  },
+  bv_dankie_teks: {
+    af: "Jou besonderhede is deurgestuur. Ons laat weet sodra die betaalrekening opgestel is.",
+    en: "Your details have been sent. We will let you know once the payment account is set up.",
+  },
+  bv_navrae: { af: "Navrae", en: "Enquiries" },
+  bv_voet_reg: { af: "Reg. nr.", en: "Reg. no." },
   nki_onbekend: {
     af: "is nog nie in die register nie.",
     en: "is not in the register yet.",
