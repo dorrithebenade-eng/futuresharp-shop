@@ -354,9 +354,20 @@ async function stuur_kennisgewing(rekord, maatskappy, was_gekanselleer) {
   }
 }
 
-// stuur_kwitansie en stuur_kennisgewing word UITGEVOER sodat stuur-faktuur.js
-// se R0-tak hulle kan aanroep. By R0 word Paystack glad nie geroep nie — geen
-// /split, geen transaksie, geen webhook — en alles wat die webhook sou doen,
-// moet dáár gebeur. Twee kopieë van hierdie poste sou beteken 'n mens verander
-// die een en wonder hoekom die ander anders lees.
-module.exports = { hanteer_faktuur_betaling, stuur_kwitansie, stuur_kennisgewing };
+// DIE DRIE POSTE WORD UITGEVOER sodat die ander twee paaie hulle kan aanroep.
+//
+//   stuur-faktuur.js se R0-tak — by R0 word Paystack glad nie geroep nie; geen
+//   /split, geen transaksie, geen webhook — en alles wat die webhook sou doen,
+//   moet dáár gebeur.
+//
+//   teken-betaling-aan.js — 'n bankoorbetaling wat met die hand aangeteken
+//   word. Ook daar het die webhook nooit gevuur nie.
+//
+// Twee kopieë van hierdie poste sou beteken 'n mens verander die een en wonder
+// hoekom die ander anders lees.
+module.exports = {
+  hanteer_faktuur_betaling,
+  stuur_kwitansie,
+  stuur_state,
+  stuur_kennisgewing,
+};
