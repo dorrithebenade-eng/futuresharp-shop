@@ -508,6 +508,25 @@ const WOORDEBOEK = {
   bg_veld_epos: { af: "E-pos", en: "Email" },
   bg_veld_selfoon: { af: "Selfoon", en: "Mobile" },
   bg_veld_adres: { af: "Adres", en: "Address" },
+  // Die bankbesonderhede op die begunstigde-vorm, 19 Augustus 2026. Die
+  // subrekening word STEEDS met die hand by Paystack opgestel; hierdie
+  // velde is die bron waaruit dit gedoen word.
+  bg_bank_kop: { af: "Bankbesonderhede", en: "Bank details" },
+  bg_bank_hulp: {
+    af: "Hieruit word die Paystack-subrekening met die hand opgestel. Niks hier skep self iets by Paystack nie.",
+    en: "The Paystack subaccount is set up by hand from these. Nothing here creates anything at Paystack.",
+  },
+  bg_veld_rekeninghouer: { af: "Rekeninghouer", en: "Account holder" },
+  bg_rekeninghouer_hulp: {
+    af: "Soos dit op die bankrekening staan \u2014 nie noodwendig dieselfde as die naam hierbo nie.",
+    en: "As it appears on the bank account \u2014 not necessarily the same as the name above.",
+  },
+  bg_veld_bank: { af: "Bank", en: "Bank" },
+  bg_veld_rekeningnommer: { af: "Rekeningnommer", en: "Account number" },
+  bg_veld_takkode: { af: "Takkode", en: "Branch code" },
+  bg_veld_tipe: { af: "Rekeningtipe", en: "Account type" },
+  bg_tipe_tjek: { af: "Tjekrekening", en: "Cheque account" },
+  bg_tipe_spaar: { af: "Spaarrekening", en: "Savings account" },
   bg_veld_kode: { af: "Paystack-subrekening", en: "Paystack subaccount" },
   bg_opsioneel: { af: "opsioneel", en: "optional" },
   bg_kode_hulp: {

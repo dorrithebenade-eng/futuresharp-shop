@@ -14,13 +14,26 @@
 //
 // DIE SUBREKENING-KODE WORD NIE GEDUPLISEER NIE. Is die persoon reeds 'n
 // outeur, word sy BESTAANDE ACCT_-kode hier ingeplak. Dan word daar nie
-// weer op Paystack se eerste-uitbetaling-goedkeuring gewag nie, en die
-// bankbesonderhede bly op een plek — by Paystack, waar hulle hoort.
+// weer op Paystack se eerste-uitbetaling-goedkeuring gewag nie.
 //
-// GEEN BANKVELDE HIER NIE. Die outeur se weergawe dra hulle omdat die
-// uitnodigingsvorm hulle insamel om die subrekening te skep. 'n
-// Begunstigde se subrekening word VOORAF met die hand by Paystack
-// opgestel, dus is die bankrekord daar en nie hier nie.
+// DIE BANKVELDE, BYGEVOEG 19 AUGUSTUS 2026.
+//
+// Hulle was aanvanklik hier UITGESLUIT op grond daarvan dat 'n begunstigde
+// se subrekening altyd vooraf met die hand by Paystack opgestel word — die
+// bankrekord is dus daar en nie hier nie.
+//
+// Daardie aanname val weg sodra ons 'n vorm aan die persoon self stuur. Hy
+// tik sy besonderhede in; iemand moet hulle kan SIEN om die subrekening te
+// maak. Sonder 'n plek om hulle te sit, beland hulle in 'n e-pos of 'n
+// WhatsApp, en dan is hulle op die slegste moontlike plek.
+//
+// Die kode skep NIE die subrekening nie. Dit bly 'n handmatige stap in
+// Paystack se paneel; hierdie velde is die bron waaruit 'n mens dit doen.
+//
+// REKENINGHOUER IS NIE DIESELFDE AS NAAM. Paystack vereis dat die
+// rekeninghouer se naam met die bankrekening klop, en 'n begunstigde betaal
+// dalk in sy vrou se rekening of 'n trust s'n. Dieselfde les as
+// skep-outeur.js.
 
 const { kry_store } = require("./_blob-store");
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
@@ -30,6 +43,17 @@ const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 const ROLLE = ["boekhouding"];
 
 const KONTAK_VELDE = ["epos", "selfoon", "adres"];
+
+// Die bankvelde leef in hul EIE voorwerp, nie in kontak_inligting nie. 'n
+// Bankrekening is nie 'n kontakbesonderheid, en die dag wanneer iemand
+// hulle apart moet kan wegsteek of skrap, is die skeiding reeds daar.
+const BANK_VELDE = [
+  "rekeninghouer",
+  "bank_naam",
+  "rekeningnommer",
+  "takkode",
+  "tipe",
+];
 
 function maak_slug(teks) {
   return teks
@@ -52,6 +76,24 @@ function skoon_kontak_inligting(kontak_inligting) {
       // Die e-pos word kleinletter gestoor, soos in _kliente.js. Twee
       // skryfwyses van dieselfde posbus is dieselfde posbus.
       if (veld === "epos") waarde = waarde.toLowerCase();
+      skoon[veld] = waarde;
+    }
+  }
+  return skoon;
+}
+
+// Dieselfde wit-lys-patroon. Die rekeningnommer en die takkode word van
+// spasies ontdoen — 'n mens tik "6309 2592 857" van 'n bankstaat af, en
+// Paystack wil syfers he. Die res bly presies soos ingetik.
+function skoon_bank(bank) {
+  if (!bank || typeof bank !== "object") return {};
+  const skoon = {};
+  for (const veld of BANK_VELDE) {
+    if (bank[veld]) {
+      let waarde = String(bank[veld]).trim().slice(0, 200);
+      if (veld === "rekeningnommer" || veld === "takkode") {
+        waarde = waarde.replace(/\s+/g, "");
+      }
       skoon[veld] = waarde;
     }
   }
@@ -98,13 +140,16 @@ exports.handler = async (event, context) => {
   }
 
   // Die status word AFGELEI, nooit ingestuur nie. Sonder 'n subrekening kan
-  // niemand uitbetaal word nie, en dan moet die skerm dit sê.
+  // niemand deur Paystack uitbetaal word nie, en dan moet die skerm dit sê.
+  // Dit KEER niks: die ry gaan na die hoofrekening en word met die hand
+  // oorbetaal, presies soos Future Sharp se eie ry.
   const inskrywing = {
     begunstigde_id,
     naam,
     subrekening_kode,
     status: subrekening_kode ? "aktief" : "wag_vir_subrekening",
     kontak_inligting: skoon_kontak_inligting(invoer.kontak_inligting),
+    bank: skoon_bank(invoer.bank),
     geskep_op: new Date().toISOString(),
     geskep_deur: gebruiker.email,
   };

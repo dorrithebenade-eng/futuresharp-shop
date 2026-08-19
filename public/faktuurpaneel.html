@@ -452,6 +452,54 @@
         <input type="text" class="veld-invoer" id="bg-adres" autocomplete="off">
       </div>
 
+      <p class="fk-bankkop" data-i18n="bg_bank_kop">Bankbesonderhede</p>
+      <p class="fk-veldhulp" data-i18n="bg_bank_hulp">Hieruit word die Paystack-subrekening met die hand opgestel. Niks hier skep self iets by Paystack nie.</p>
+
+      <div class="fk-veld">
+        <label class="veld-etiket" for="bg-bank-rekeninghouer">
+          <span data-i18n="bg_veld_rekeninghouer">Rekeninghouer</span>
+          <span class="veld-opsioneel" data-i18n="bg_opsioneel">opsioneel</span>
+        </label>
+        <input type="text" class="veld-invoer" id="bg-bank-rekeninghouer" autocomplete="off">
+        <p class="fk-veldhulp" data-i18n="bg_rekeninghouer_hulp">Soos dit op die bankrekening staan \u2014 nie noodwendig dieselfde as die naam hierbo nie.</p>
+      </div>
+
+      <div class="fk-veld">
+        <label class="veld-etiket" for="bg-bank-naam">
+          <span data-i18n="bg_veld_bank">Bank</span>
+          <span class="veld-opsioneel" data-i18n="bg_opsioneel">opsioneel</span>
+        </label>
+        <input type="text" class="veld-invoer" id="bg-bank-naam" autocomplete="off">
+      </div>
+
+      <div class="fk-veld">
+        <label class="veld-etiket" for="bg-bank-rekeningnommer">
+          <span data-i18n="bg_veld_rekeningnommer">Rekeningnommer</span>
+          <span class="veld-opsioneel" data-i18n="bg_opsioneel">opsioneel</span>
+        </label>
+        <input type="text" class="veld-invoer" id="bg-bank-rekeningnommer" inputmode="numeric" spellcheck="false" autocomplete="off">
+      </div>
+
+      <div class="fk-veld">
+        <label class="veld-etiket" for="bg-bank-takkode">
+          <span data-i18n="bg_veld_takkode">Takkode</span>
+          <span class="veld-opsioneel" data-i18n="bg_opsioneel">opsioneel</span>
+        </label>
+        <input type="text" class="veld-invoer" id="bg-bank-takkode" inputmode="numeric" spellcheck="false" autocomplete="off">
+      </div>
+
+      <div class="fk-veld">
+        <label class="veld-etiket" for="bg-bank-tipe">
+          <span data-i18n="bg_veld_tipe">Rekeningtipe</span>
+          <span class="veld-opsioneel" data-i18n="bg_opsioneel">opsioneel</span>
+        </label>
+        <select class="veld-invoer" id="bg-bank-tipe">
+          <option value=""></option>
+          <option value="tjek" data-i18n="bg_tipe_tjek">Tjekrekening</option>
+          <option value="spaar" data-i18n="bg_tipe_spaar">Spaarrekening</option>
+        </select>
+      </div>
+
       <div class="fk-veld">
         <label class="veld-etiket" for="bg-kode">
           <span data-i18n="bg_veld_kode">Paystack-subrekening</span>

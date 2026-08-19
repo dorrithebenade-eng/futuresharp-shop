@@ -1,7 +1,8 @@
 // netlify/functions/wysig-begunstigde.js
 //
 // Boekhouding-beskermd — wysig 'n bestaande inskrywing se naam,
-// subrekening-kode en kontakbesonderhede in die "begunstigdes"-store.
+// subrekening-kode, kontakbesonderhede en bankbesonderhede in die
+// "begunstigdes"-store.
 //
 // DIE ID VERANDER NIE MET DIE NAAM NIE. Die slug word by die skepping
 // vasgestel en bly staan, want 'n faktuur se gevriesde verdeling verwys
@@ -12,6 +13,11 @@
 // is — dieselfde patroon as wysig-outeur.js. Word dit weer leeg gemaak,
 // val die status terug na wag_vir_subrekening; die status word AFGELEI,
 // nooit ingestuur nie.
+//
+// DIE BANKVELDE, BYGEVOEG 19 AUGUSTUS 2026. Sien die kop van
+// skep-begunstigde.js vir waarom hulle nou hier is. Die twee wit-lyste moet
+// IDENTIES bly: 'n veld wat net op een plek bykom, word geskep en dan by
+// die eerste wysiging stil weggegooi.
 
 const { kry_store } = require("./_blob-store");
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
@@ -20,6 +26,14 @@ const ROLLE = ["boekhouding"];
 
 const KONTAK_VELDE = ["epos", "selfoon", "adres"];
 
+const BANK_VELDE = [
+  "rekeninghouer",
+  "bank_naam",
+  "rekeningnommer",
+  "takkode",
+  "tipe",
+];
+
 function skoon_kontak_inligting(kontak_inligting) {
   if (!kontak_inligting || typeof kontak_inligting !== "object") return {};
   const skoon = {};
@@ -27,6 +41,21 @@ function skoon_kontak_inligting(kontak_inligting) {
     if (kontak_inligting[veld]) {
       let waarde = String(kontak_inligting[veld]).trim().slice(0, 200);
       if (veld === "epos") waarde = waarde.toLowerCase();
+      skoon[veld] = waarde;
+    }
+  }
+  return skoon;
+}
+
+function skoon_bank(bank) {
+  if (!bank || typeof bank !== "object") return {};
+  const skoon = {};
+  for (const veld of BANK_VELDE) {
+    if (bank[veld]) {
+      let waarde = String(bank[veld]).trim().slice(0, 200);
+      if (veld === "rekeningnommer" || veld === "takkode") {
+        waarde = waarde.replace(/\s+/g, "");
+      }
       skoon[veld] = waarde;
     }
   }
@@ -71,6 +100,9 @@ exports.handler = async (event, context) => {
     return { statusCode: 404, body: `Geen inskrywing met ID "${begunstigde_id}" gevind nie` };
   }
 
+  // Die twee voorwerpe word SAAMGEVOEG, nie vervang nie. Word 'n rekord
+  // ooit deur 'n skerm gestoor wat net van party velde weet, mag die res
+  // nie verdwyn nie — dieselfde rede as by kontak_inligting.
   const bygewerk = {
     ...bestaande,
     naam,
@@ -79,6 +111,10 @@ exports.handler = async (event, context) => {
     kontak_inligting: {
       ...bestaande.kontak_inligting,
       ...skoon_kontak_inligting(invoer.kontak_inligting),
+    },
+    bank: {
+      ...bestaande.bank,
+      ...skoon_bank(invoer.bank),
     },
     gewysig_op: new Date().toISOString(),
     gewysig_deur: gebruiker.email,

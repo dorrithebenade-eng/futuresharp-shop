@@ -140,6 +140,16 @@ function bg_maak_vorm_oop(id) {
   document.getElementById("bg-epos").value = k.epos || "";
   document.getElementById("bg-selfoon").value = k.selfoon || "";
   document.getElementById("bg-adres").value = k.adres || "";
+
+  // Die bankvelde. `bank` kan op ou rekords heeltemal ontbreek, dus
+  // altyd deur `|| {}` \u2014 andersins gooi die vorm by die eerste
+  // begunstigde wat voor 19 Augustus geskep is.
+  const bk = b.bank || {};
+  document.getElementById("bg-bank-rekeninghouer").value = bk.rekeninghouer || "";
+  document.getElementById("bg-bank-naam").value = bk.bank_naam || "";
+  document.getElementById("bg-bank-rekeningnommer").value = bk.rekeningnommer || "";
+  document.getElementById("bg-bank-takkode").value = bk.takkode || "";
+  document.getElementById("bg-bank-tipe").value = bk.tipe || "";
   document.getElementById("bg-kode").value = b.subrekening_kode || "";
 
   // Is die persoon reeds 'n outeur MET 'n kode, en dra sy begunstigde-rekord
@@ -194,6 +204,13 @@ async function bg_stoor() {
       epos: document.getElementById("bg-epos").value.trim(),
       selfoon: document.getElementById("bg-selfoon").value.trim(),
       adres: document.getElementById("bg-adres").value.trim(),
+    },
+    bank: {
+      rekeninghouer: document.getElementById("bg-bank-rekeninghouer").value.trim(),
+      bank_naam: document.getElementById("bg-bank-naam").value.trim(),
+      rekeningnommer: document.getElementById("bg-bank-rekeningnommer").value.trim(),
+      takkode: document.getElementById("bg-bank-takkode").value.trim(),
+      tipe: document.getElementById("bg-bank-tipe").value,
     },
   };
   if (BG.wysig) liggaam.begunstigde_id = BG.wysig;
