@@ -1462,15 +1462,15 @@ const WOORDEBOEK = {
   fd_skenking: { af: "Skenking", en: "Donation" },
   fd_totaal_verskuldig: { af: "Totaal verskuldig", en: "Total due" },
   fd_aantekening: { af: "Aantekening", en: "Note" },
-  // Die em-dash staan as \u2014 sodat die blok suiwer ASCII bly en 'n
-  // ANSI-enkodering op Windows dit nie kan breek nie.
+  // GEEN METODELYS NIE. Watter metodes Paystack bied, verander DAAR en nie
+  // hier nie; die opskrif noem die pad, die betaler sien die metodes daar.
   fd_eft_kop: {
-    af: "Onmiddellike EFT \u2014 deur die betaalskakel",
-    en: "Instant EFT \u2014 via the payment link",
+    af: "Betaal deur die skakel",
+    en: "Pay via the link",
   },
   fd_eft_lei: {
-    af: "Kaart, Instant EFT of QR. Die betaling word dadelik bevestig.",
-    en: "Card, Instant EFT or QR. Payment is confirmed immediately.",
+    af: "Die betaling word dadelik bevestig.",
+    en: "Payment is confirmed immediately.",
   },
   fd_betaal_knop: { af: "Betaal", en: "Pay" },
   fd_bank_kop: { af: "Bankoorbetaling", en: "Bank transfer" },

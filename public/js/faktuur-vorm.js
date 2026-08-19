@@ -284,8 +284,8 @@ function teken_dok_taal() {
   stel("d-k-eenheid", "fd_kol_eenheidsprys", "Eenheidsprys");
   stel("d-k-bedrag", "fd_kol_bedrag", "Bedrag");
   stel("d-aantekening", "fd_aantekening", "Aantekening");
-  stel("d-eft", "fd_eft_kop", "Onmiddellike EFT — deur die betaalskakel");
-  stel("d-eft-lei", "fd_eft_lei", "Kaart, Instant EFT of QR. Die betaling word dadelik bevestig.");
+  stel("d-eft", "fd_eft_kop", "Betaal deur die skakel");
+  stel("d-eft-lei", "fd_eft_lei", "Die betaling word dadelik bevestig.");
   stel("d-bank", "fd_bank_kop", "Bankoorbetaling");
   // Die QR se byskrif is dokumentinhoud, dus die FAKTUUR se taal. Die kode
   // self verander nooit met taal nie — dit is 'n URL — dus word hy net een
