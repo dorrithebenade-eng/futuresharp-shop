@@ -13,6 +13,7 @@
   <meta name="apple-mobile-web-app-title" content="Boekhouding">
   <link rel="stylesheet" href="css/styl.css" />
   <link rel="stylesheet" href="css/faktuurpaneel.css" />
+  <link rel="stylesheet" href="css/faktuurpaneel-wagkamer.css" />
   <link rel="stylesheet" href="css/faktuurpaneel-staat.css" />
 </head>
 <body>
@@ -149,6 +150,19 @@
 
         <!-- ═══ Begunstigdes ═══ -->
         <div class="fk-reg" data-reg="begunstigdes">
+
+          <!-- Die staande begunstigdevorm-skakel. Dieselfde vorm as die
+               klientvorm s`n: geen kode per persoon, en hy verval nie. -->
+          <div class="fk-skakel">
+            <h3 data-i18n="wk_skakel_titel">Begunstigdevorm-skakel</h3>
+            <div class="fk-skakel-url" id="bg-skakel-url">futureshop.futuresharp.co.za/begunstigdevorm.html</div>
+            <button type="button" class="kaart-aksie stil" id="bg-kopieer" data-i18n="fk_kopieer">Kopieer</button>
+          </div>
+
+          <!-- DIE WAGKAMER STAAN BO DIE REGISTER. Werk wat wag, hoort
+               bo werk wat klaar is; \u0027n mens sien die indienings voordat
+               hy in die lys begin soek. Hy wys NIKS wanneer hy leeg is. -->
+          <div id="bg-wagkamer"></div>
           <div class="fk-soekbalk">
             <input type="text" class="veld-invoer" id="bg-soek"
                    data-i18n-placeholder="bg_soek_plek"
@@ -537,6 +551,7 @@
   <script src="js/faktuurpaneel.js"></script>
   <script src="js/faktuurpaneel-kliente.js"></script>
   <script src="js/faktuurpaneel-begunstigdes.js"></script>
+  <script src="js/faktuurpaneel-wagkamer.js"></script>
   <script src="js/faktuurpaneel-instellings.js"></script>
   <script src="js/faktuurpaneel-staat.js"></script>
   <script src="js/faktuurpaneel-registers.js"></script>

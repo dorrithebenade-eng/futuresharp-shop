@@ -1,0 +1,162 @@
+/* public/css/faktuurpaneel-wagkamer.css
+ *
+ * Die wagkamer bo die begunstigderegister.
+ *
+ * NIKS WORD GELEEN NIE, met een uitsondering: .kaart-aksie op die "Dra oor"-
+ * knoppie, want dit IS die paneel se primere handelingsknoppie en 'n eie
+ * weergawe daarvan sou by die volgende stylverandering agterbly. Al die
+ * ander klasse dra `wk-`.
+ *
+ * DIE BAND IS AMBER, NIE KORAAL NIE. Werk wat wag is nie 'n fout nie. Koraal
+ * beteken elders in hierdie stelsel dat iets stop of onomkeerbaar is.
+ */
+
+.wk-band {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 0 12px;
+  padding: 9px 13px;
+  border-radius: 6px;
+  background: #FAEEDA;
+}
+.wk-band h3 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: #854F0B;
+}
+.wk-tel {
+  background: #EF9F27;
+  color: #fff;
+  border-radius: 20px;
+  padding: 1px 9px;
+  font-size: 11.5px;
+  font-weight: 500;
+}
+
+.wk-kaart {
+  border: 1px solid #E4E2DD;
+  border-radius: 8px;
+  padding: 15px 17px;
+  margin-bottom: 11px;
+  background: #fff;
+}
+
+.wk-kop {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.wk-naam-wys {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--swart, #171717);
+}
+.wk-tyd {
+  margin: 2px 0 0;
+  font-size: 11.5px;
+  color: #9a958d;
+}
+
+.wk-merke { display: flex; gap: 6px; flex-wrap: wrap; }
+.wk-merk {
+  font-size: 11px;
+  padding: 3px 9px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+.wk-merk.rooi { background: #FCEBEB; color: #A32D2D; }
+.wk-merk.amber { background: #FAEEDA; color: #854F0B; }
+
+.wk-tabel {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+  margin-bottom: 13px;
+}
+.wk-tabel td { padding: 3px 0; vertical-align: top; }
+.wk-et { color: var(--grys-teks, #5B5B5B); width: 38%; padding-right: 10px; }
+.wk-afdeling {
+  padding-top: 9px !important;
+  font-size: 12px;
+  color: var(--swart, #171717);
+}
+.wk-geen {
+  padding-top: 9px !important;
+  font-size: 12px;
+  color: #9a958d;
+}
+
+.wk-velde {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 11px;
+  margin-bottom: 10px;
+}
+.wk-etiket {
+  display: block;
+  font-size: 12px;
+  color: var(--grys-teks, #5B5B5B);
+}
+.wk-invoer {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 4px;
+  border: 1px solid #D9D6D0;
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--swart, #171717);
+  background: #fff;
+}
+.wk-invoer:focus { outline: none; border-color: var(--teal, #479F91); }
+
+/* Die reel wat se wat gaan gebeur, VOORDAT dit gebeur. Dieselfde beginsel as
+   die uitreikbevestiging: se wat onomkeerbaar is, nie "is jy seker". */
+.wk-let {
+  margin: 0 0 11px;
+  padding: 8px 11px;
+  border-radius: 6px;
+  background: #F1EFE8;
+  font-size: 11.5px;
+  line-height: 1.55;
+  color: var(--grys-teks, #5B5B5B);
+}
+
+.wk-boodskap {
+  margin: 0 0 10px;
+  padding: 8px 11px;
+  border-radius: 6px;
+  background: #F1EFE8;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--grys-teks, #5B5B5B);
+  display: none;
+}
+.wk-boodskap.wys { display: block; }
+.wk-boodskap.fout { background: #FCEBEB; color: #A32D2D; }
+
+.wk-aksies { display: flex; align-items: center; gap: 10px; }
+
+.wk-vee {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: var(--koraal, #EC5832);
+  font-size: 12.5px;
+  font-family: inherit;
+  cursor: pointer;
+  padding: 6px 2px;
+}
+
+@media (max-width: 620px) {
+  .wk-velde { grid-template-columns: 1fr; }
+  .wk-et { width: 45%; }
+}

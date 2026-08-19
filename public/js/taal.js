@@ -1372,6 +1372,58 @@ const WOORDEBOEK = {
   // begunstigdevorm.html. Die woord "Paystack" verskyn nerens op
   // hierdie bladsy nie: dit is \u0027n verskaffer se naam wat vir die
   // begunstigde niks beteken nie en wat kan verander.
+  // Die WAGKAMER: indienings van die publieke begunstigdevorm wat nog
+  // nie oorgedra is nie. Sien faktuurpaneel-wagkamer.js. Die merkies
+  // KEER niks \u2014 hulle se net wat elders bestaan.
+  wk_skakel_titel: { af: "Begunstigdevorm-skakel", en: "Beneficiary form link" },
+  wk_titel: { af: "Indienings wat wag", en: "Submissions waiting" },
+  wk_ingedien: { af: "Ingedien", en: "Submitted" },
+  wk_in_register: {
+    af: "Staan reeds in die register",
+    en: "Already in the register",
+  },
+  wk_is_outeur: { af: "Ook \u0027n outeur", en: "Also an author" },
+  wk_epos: { af: "E-pos", en: "Email" },
+  wk_selfoon: { af: "Selfoon", en: "Mobile" },
+  wk_adres: { af: "Adres", en: "Address" },
+  wk_bank_kop: { af: "Bankbesonderhede", en: "Bank details" },
+  wk_geen_bank: {
+    af: "Geen bankbesonderhede ingevul nie.",
+    en: "No bank details were filled in.",
+  },
+  wk_rekeninghouer: { af: "Rekeninghouer", en: "Account holder" },
+  wk_bank: { af: "Bank", en: "Bank" },
+  wk_rekening: { af: "Rekening", en: "Account" },
+  wk_takkode: { af: "Takkode", en: "Branch code" },
+  wk_tipe: { af: "Rekeningtipe", en: "Account type" },
+  wk_naam: { af: "Naam vir die register", en: "Name for the register" },
+  wk_kode: { af: "Subrekening-kode", en: "Subaccount code" },
+  wk_let: {
+    af: "Die naam bepaal die rekord se sleutel en kan daarna nooit verander nie. Sonder \u0027n kode word die rekord Wag vir subrekening en die ry word met die hand betaal \u2014 dit keer niks.",
+    en: "The name determines the record`s key and can never change afterwards. Without a code the record becomes Awaiting subaccount and that row is paid by hand \u2014 it blocks nothing.",
+  },
+  wk_dra_oor: { af: "Dra oor", en: "Transfer" },
+  wk_vee: { af: "Vee weg", en: "Delete" },
+  wk_vee_seker: {
+    af: "Vee hierdie indiening weg? Dit kan nie ongedaan gemaak word nie en die persoon sal weer moet indien.",
+    en: "Delete this submission? This cannot be undone and the person will have to submit again.",
+  },
+  wk_besig: { af: "Besig \u2026", en: "Working \u2026" },
+  wk_fout_naam: { af: "Die naam is verplig.", en: "The name is required." },
+  wk_fout_kode: {
+    af: "Die kode moet met ACCT_ begin.",
+    en: "The code must start with ACCT_.",
+  },
+  wk_bestaan: {
+    af: "Daar is reeds \u0027n begunstigde met hierdie naam. Verander die naam, of vee die indiening weg as dit dieselfde persoon is.",
+    en: "There is already a beneficiary with this name. Change the name, or delete the submission if it is the same person.",
+  },
+  wk_half: {
+    af: "Die begunstigde is geskep, maar die indiening kon nie geskrap word nie. Vee hom met die hand weg.",
+    en: "The beneficiary was created, but the submission could not be deleted. Remove it by hand.",
+  },
+  wk_fout: { af: "Kon nie oordra nie. Probeer weer.", en: "Could not transfer. Try again." },
+  wk_fout_vee: { af: "Kon nie wegvee nie. Probeer weer.", en: "Could not delete. Try again." },
   bv_titel: { af: "Jou besonderhede", en: "Your details" },
   bv_lei: {
     af: "Voltooi die vorm sodat ons jou kan betaal vir werk wat jy gedoen het of koste wat jy namens Future Sharp aangegaan het.",
