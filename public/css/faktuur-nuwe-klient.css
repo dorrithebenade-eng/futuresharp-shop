@@ -1,0 +1,180 @@
+/* public/css/faktuur-nuwe-klient.css
+ *
+ * Die inline "+ Nuwe kliënt"-paneel in die faktuurvorm.
+ *
+ * NIKS WORD GELEEN NIE. Elke klas dra `nk-`. Drie klasse in styl.css lyk
+ * verleidelik en is verkeerd:
+ *
+ *     .veld-ry      is 'n TWEEKOLOM-ROOSTER, etiket links en veld regs
+ *     .kaart-aksie  gee 'n VOL koraal-knoppie, ook met `stil` daarby
+ *     .outeur-pil   hang met 'n negatiewe marge aan 'n band wat hier nie is
+ *
+ * Die knoppie is TEAL, nie koraal nie. Koraal is Kanselleer op die
+ * uitreikstrook; hierdie een skep iets en is onskadelik.
+ */
+
+.nk-skakel {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--teal);
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+}
+.nk-skakel:hover { text-decoration: underline; }
+.nk-skakel[hidden] { display: none; }
+
+.nk-paneel {
+  margin-top: 10px;
+  border: 1px solid var(--teal);
+  border-radius: 8px;
+  background: #FAFAF8;
+  padding: 14px 16px;
+}
+.nk-paneel[hidden] { display: none; }
+
+.nk-kop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.nk-titel { font-size: 13.5px; font-weight: 500; color: var(--swart); }
+
+.nk-sluit {
+  border: none;
+  background: none;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--grys-teks);
+  cursor: pointer;
+  padding: 0 2px;
+}
+
+.nk-soort { display: flex; margin-bottom: 12px; }
+.nk-soort-knop {
+  font-size: 12px;
+  padding: 6px 15px;
+  border: 1px solid var(--fv-lyn);
+  background: #fff;
+  color: var(--grys-teks);
+  cursor: pointer;
+  font-family: inherit;
+}
+.nk-soort-knop:first-child { border-radius: 6px 0 0 6px; }
+.nk-soort-knop:last-child { border-radius: 0 6px 6px 0; border-left: none; }
+.nk-soort-knop.aan {
+  background: var(--teal);
+  border-color: var(--teal);
+  color: #fff;
+}
+
+.nk-ry { margin-bottom: 11px; }
+.nk-ry[hidden] { display: none; }
+
+.nk-paar {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 11px;
+}
+
+.nk-etiket {
+  display: block;
+  font-size: 12px;
+  color: var(--grys-teks);
+  margin-bottom: 4px;
+}
+
+.nk-invoer {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #D9D6D0;
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--swart);
+  background: #fff;
+}
+.nk-invoer:focus {
+  outline: none;
+  border-color: var(--teal);
+}
+.nk-teksveld { resize: vertical; min-height: 44px; line-height: 1.5; }
+
+.nk-veldfout {
+  margin: 4px 0 0;
+  font-size: 11.5px;
+  color: var(--koraal);
+}
+.nk-veldfout[hidden] { display: none; }
+
+/* Die duplikaatstrook KEER NIE — hy laat 'n mens sien. Daarom amber en nie
+   koraal nie: koraal beteken elders in hierdie stelsel dat iets stop. */
+.nk-duplikaat {
+  margin: 0 0 11px;
+  padding: 8px 11px;
+  border-radius: 6px;
+  background: #FAEEDA;
+  color: #854F0B;
+  font-size: 12px;
+  line-height: 1.55;
+}
+.nk-duplikaat[hidden] { display: none; }
+
+.nk-boodskap {
+  margin: 0 0 10px;
+  font-size: 12px;
+  color: var(--grys-teks);
+}
+.nk-boodskap.fout { color: var(--koraal); }
+.nk-boodskap[hidden] { display: none; }
+
+.nk-aksies {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex-wrap: wrap;
+}
+
+.nk-stoor {
+  background: var(--teal);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 18px;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+}
+.nk-stoor:disabled { opacity: .6; cursor: default; }
+
+.nk-kanselleer {
+  background: none;
+  border: none;
+  color: var(--grys-teks);
+  font-size: 12.5px;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 8px 4px;
+}
+
+.nk-hulp {
+  margin-left: auto;
+  font-size: 11.5px;
+  color: #9a958d;
+}
+
+/* Onder 620px verdwyn die backoffice en die foonopsomming kom in sy plek —
+   die dokument bly. Die paneel gaan dus saam foon toe en die twee kolomme
+   val op mekaar. Die hulpreël se marge word gelos: sy sou andersins alleen
+   op 'n reël regs staan. */
+@media (max-width: 620px) {
+  .nk-paar { grid-template-columns: 1fr; }
+  .nk-hulp { margin-left: 0; width: 100%; }
+}

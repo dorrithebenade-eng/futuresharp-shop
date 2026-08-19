@@ -1472,6 +1472,36 @@ const WOORDEBOEK = {
     af: "Die betaling word dadelik bevestig.",
     en: "Payment is confirmed immediately.",
   },
+  // Die inline "+ Nuwe klient"-paneel in die faktuurvorm. Sien
+  // faktuur-nuwe-klient.js. Die paneel dra sy eie sleutels omdat sy
+  // etikette van die Registers-blad s`n kan verskil sonder dat een die
+  // ander sleep.
+  nk_nuwe_klient: { af: "+ Nuwe kli\u00ebnt", en: "+ New client" },
+  nk_kop: { af: "Nuwe kli\u00ebnt", en: "New client" },
+  nk_instansie: { af: "Instansie", en: "Institution" },
+  nk_privaat: { af: "Privaat", en: "Private" },
+  nk_naam_instansie: { af: "Naam van die instansie", en: "Name of the institution" },
+  nk_naam_privaat: { af: "Naam", en: "Name" },
+  nk_kontak: { af: "Kontakpersoon", en: "Contact person" },
+  nk_epos: { af: "E-pos", en: "Email" },
+  nk_selfoon: { af: "Selfoon", en: "Mobile" },
+  nk_adres: { af: "Adres", en: "Address" },
+  nk_stoor: { af: "Stoor en kies", en: "Save and select" },
+  nk_kanselleer: { af: "Kanselleer", en: "Cancel" },
+  nk_hulp: {
+    af: "Stoor met net \u0027n naam \u2014 die res kan later",
+    en: "Save with just a name \u2014 the rest can follow",
+  },
+  nk_naam_fout: { af: "Vul die naam in.", en: "Enter the name." },
+  nk_duplikaat: {
+    af: "Hierdie adres staan reeds by",
+    en: "This address is already used by",
+  },
+  nk_besig: { af: "Besig\u2026", en: "Saving\u2026" },
+  nk_fout: {
+    af: "Kon nie stoor nie. Probeer weer.",
+    en: "Couldn\u0027t save. Try again.",
+  },
   fd_betaal_knop: { af: "Betaal", en: "Pay" },
   fd_bank_kop: { af: "Bankoorbetaling", en: "Bank transfer" },
   fd_rekening: { af: "Rekening", en: "Account" },
