@@ -18,6 +18,9 @@
 // skep-begunstigde.js vir waarom hulle nou hier is. Die twee wit-lyste moet
 // IDENTIES bly: 'n veld wat net op een plek bykom, word geskep en dan by
 // die eerste wysiging stil weggegooi.
+//
+// LET OP: hierdie lêer is die enigste plek waar bankbesonderhede weer
+// VERDWYN. Sien die blok by `const bank` hieronder.
 
 const { kry_store } = require("./_blob-store");
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
@@ -103,6 +106,32 @@ exports.handler = async (event, context) => {
   // Die twee voorwerpe word SAAMGEVOEG, nie vervang nie. Word 'n rekord
   // ooit deur 'n skerm gestoor wat net van party velde weet, mag die res
   // nie verdwyn nie — dieselfde rede as by kontak_inligting.
+  const saamgevoegde_bank = {
+    ...bestaande.bank,
+    ...skoon_bank(invoer.bank),
+  };
+
+  // DIE BANKBESONDERHEDE VERDWYN SODRA DAAR 'N KODE IS.
+  //
+  // Hulle bestaan vir één doel: om die subrekening by Paystack met die hand
+  // op te stel. Is die kode hier, is daardie werk gedoen en is die kopie 'n
+  // afskrif van iets wat by Paystack lê — sy voeg niks by en sy is die
+  // sensitiefste ding in hierdie store.
+  //
+  // GEEN KNOPPIE NIE, 'N REËL. 'n Handmatige "vee uit"-knoppie word die
+  // eerste keer gedruk en die tiende keer nie, en dan lê daar bankrekeninge
+  // van drie mense wat almal reeds subrekeninge het. Dieselfde beginsel as
+  // die status, wat ook AFGELEI word en nooit ingestuur nie.
+  //
+  // Dit maak die belofte op die publieke vorm waar: die besonderhede word
+  // gebruik om die betaalrekening op te stel en nie by Future Sharp gehou
+  // nie. Hulle lê hoogstens 'n paar dae, tussen die vorm en die subrekening.
+  //
+  // WORD DIE KODE OOIT WEER LEEG GEMAAK — 'n subrekening wat gesluit is —
+  // kom die bankbesonderhede NIE terug nie en moet 'n mens weer vra. Dit is
+  // die regte kant om op te fouteer.
+  const bank = subrekening_kode ? {} : saamgevoegde_bank;
+
   const bygewerk = {
     ...bestaande,
     naam,
@@ -112,10 +141,7 @@ exports.handler = async (event, context) => {
       ...bestaande.kontak_inligting,
       ...skoon_kontak_inligting(invoer.kontak_inligting),
     },
-    bank: {
-      ...bestaande.bank,
-      ...skoon_bank(invoer.bank),
-    },
+    bank,
     gewysig_op: new Date().toISOString(),
     gewysig_deur: gebruiker.email,
   };
