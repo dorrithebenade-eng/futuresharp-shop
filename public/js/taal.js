@@ -1365,6 +1365,18 @@ const WOORDEBOEK = {
     af: "Inskrywing \u2014 bly by die faktuur, gaan nooit uit nie",
     en: "Entry \u2014 stays with the invoice, never goes out",
   },
+  // Die strook wat aanbied om \u0027n onbekende beskrywing by die register
+  // te voeg. Sien faktuur-nuwe-koste-item.js. Sy KEER niks \u2014 die
+  // faktuur werk klaar reg met \u0027n beskrywing wat nerens gestoor is nie.
+  nki_onbekend: {
+    af: "is nog nie in die register nie.",
+    en: "is not in the register yet.",
+  },
+  nki_voeg_werk: { af: "+ Werk", en: "+ Work" },
+  nki_voeg_uitgawe: { af: "+ Uitgawe", en: "+ Expense" },
+  nki_bygevoeg: { af: "By die register gevoeg.", en: "Added to the register." },
+  nki_bestaan: { af: "Staan reeds in die register.", en: "Already in the register." },
+  nki_fout: { af: "Kon nie byvoeg nie.", en: "Couldn\u0027t add it." },
   bo_voeg_koste: { af: "+ Voeg koste by", en: "+ Add a cost" },
   bo_verwyder: { af: "Verwyder", en: "Remove" },
 
