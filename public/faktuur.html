@@ -95,6 +95,12 @@
                word hy eenvoudig geskrap. faktuur-uitreik.js wys hom. -->
           <button type="button" class="kaart-aksie fu-stil fv-kanselleer" id="fv-kanselleer"
                   style="display:none;" data-i18n="fk_kanselleer">Kanselleer</button>
+          <!-- BETALING ONTVANG verskyn slegs by 'n UITGEREIKTE faktuur, en
+               slegs vir geld wat BUITE die betaalskakel om ingekom het. Die
+               webhook teken die skakel se betalings self aan.
+               faktuur-betaling-aan.js wys hom. -->
+          <button type="button" class="kaart-aksie fu-stil" id="fv-betaling"
+                  style="display:none;" data-i18n="fb_knop">Betaling ontvang</button>
           <button type="button" class="kaart-aksie fu-stil" id="fv-druk" data-i18n="fv_druk">Druk</button>
           <button type="button" class="kaart-aksie fu-stil" id="fv-stoor" data-i18n="fk_stoor">Stoor</button>
 
@@ -381,6 +387,7 @@
   <script src="js/faktuur-nuwe-klient.js"></script>
   <script src="js/faktuur-nuwe-koste-item.js"></script>
   <script src="js/faktuur-uitreik.js"></script>
+  <script src="js/faktuur-betaling-aan.js"></script>
   <!-- NA faktuur-backoffice.js, want hy wikkel bo_teken() en bo_teken_syfers()
        om saam met hulle te herteken. Voor hulle sou daar niks wees om te
        wikkel nie. -->

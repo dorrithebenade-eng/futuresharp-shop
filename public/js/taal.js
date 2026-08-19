@@ -1788,6 +1788,44 @@ const WOORDEBOEK = {
     en: "The invoice could not be cancelled.",
   },
 
+  /* -- die handmatige betaling --
+     Geld wat buite die betaalskakel om ontvang is. Sien
+     faktuur-betaling-aan.js en teken-betaling-aan.js. */
+  fb_knop: { af: "Betaling ontvang", en: "Payment received" },
+  fb_kop: { af: "Teken 'n betaling aan", en: "Record a payment" },
+  fb_teks: {
+    af: "Dit is vir geld wat buite die betaalskakel om ontvang is \u2014 'n bankoorbetaling direk in die rekening. Die faktuur gaan na Betaal en kan daarna nie meer verander word nie.",
+    en: "This is for money received outside the payment link \u2014 a bank transfer straight into the account. The invoice goes to Paid and can no longer be changed after that.",
+  },
+  fb_waarsku: {
+    af: "Paystack was nie hier nie, dus het niemand se verdeling gebeur nie. Elke ontvanger verskyn in die uitbetaal-werklys en moet met die hand oorbetaal word.",
+    en: "Paystack was not involved, so nobody's split happened. Every recipient appears in the payout worklist and must be paid over by hand.",
+  },
+  fb_bedrag: { af: "Bedrag ontvang", en: "Amount received" },
+  fb_datum: { af: "Datum ontvang", en: "Date received" },
+  fb_verwysing: { af: "Verwysing op die bankstaat", en: "Reference on the bank statement" },
+  fb_nota: { af: "Aantekening", en: "Note" },
+  fb_te_min: { af: "Dit is minder as die faktuur \u2014", en: "This is less than the invoice \u2014" },
+  fb_te_veel: { af: "Dit is meer as die faktuur \u2014", en: "This is more than the invoice \u2014" },
+  fb_verskil_lei: {
+    af: "Dit word aangeteken soos dit ontvang is. Die ontvangers kry steeds elkeen presies wat op die faktuur gevries is.",
+    en: "It is recorded as it was received. Each recipient still gets exactly what was frozen on the invoice.",
+  },
+  fb_bedrag_kort: { af: "Gee die bedrag wat ontvang is.", en: "Give the amount received." },
+  fb_datum_kort: {
+    af: "Gee die datum waarop die geld ontvang is.",
+    en: "Give the date the money was received.",
+  },
+  fb_verwysing_kort: {
+    af: "Gee die verwysing soos dit op die bankstaat lees.",
+    en: "Give the reference as it reads on the bank statement.",
+  },
+  fb_bevestig: { af: "Teken die betaling aan", en: "Record the payment" },
+  fb_fout: {
+    af: "Kon nie die betaling aanteken nie.",
+    en: "The payment could not be recorded.",
+  },
+
   fu_reik_uit: { af: "Reik uit", en: "Issue" },
   fu_vra_kop: { af: "Reik hierdie faktuur uit?", en: "Issue this invoice?" },
   fu_vra_teks: {
