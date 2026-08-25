@@ -1,0 +1,38 @@
+/* public/css/faktuurpaneel-skrap-klient.css
+
+   Die Skrap-knoppie in die klientvorm. Sien
+   faktuurpaneel-skrap-klient.js.
+
+   KORAAL, want dit is 'n stop-handeling en onomkeerbaar. In hierdie stelsel
+   beteken amber "daar wag werk" en koraal "dit kan nie teruggedraai word
+   nie". 'n Geskrapte klient kom nie terug nie.
+
+   HY BEGIN LEEG EN WORD EERS VOL BY DIE TWEEDE KLIK. Die eerste klik vra;
+   die tweede doen. So lyk die knoppie op die skerm nie soos die gevaarlikste
+   ding in die vorm nie, maar hy word dit sodra 'n mens hom gevra het. */
+
+.skl-skrap {
+  margin-right: auto;
+  border: 1px solid var(--koraal);
+  background: transparent;
+  color: var(--koraal);
+}
+
+.skl-skrap:hover {
+  background: #FDECE6;
+}
+
+.skl-skrap.skl-bevestig {
+  background: var(--koraal);
+  border-color: var(--koraal);
+  color: #fff;
+}
+
+.skl-skrap.skl-bevestig:hover {
+  background: #d44a26;
+}
+
+.skl-skrap[disabled] {
+  opacity: .6;
+  cursor: default;
+}

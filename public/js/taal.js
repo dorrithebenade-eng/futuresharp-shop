@@ -560,6 +560,13 @@ const WOORDEBOEK = {
     en: "This list has changed in the meantime.",
   },
   vf_herlaai: { af: "Herlaai", en: "Reload" },
+  skl_skrap: { af: "Skrap", en: "Delete" },
+  skl_bevestig: { af: "Skrap regtig?", en: "Really delete?" },
+  skl_besig: { af: "Besig \u2026", en: "Working \u2026" },
+  skl_fout: {
+    af: "Kon nie die kli\u00ebnt skrap nie.",
+    en: "The client could not be deleted.",
+  },
   fp_nav_fakture: { af: "Fakture", en: "Invoices" },
   fp_nav_registers: { af: "Registers", en: "Registers" },
   fp_nav_state: { af: "State", en: "Statements" },
