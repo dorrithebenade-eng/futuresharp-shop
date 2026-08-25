@@ -563,6 +563,10 @@ const WOORDEBOEK = {
   skl_skrap: { af: "Skrap", en: "Delete" },
   skl_bevestig: { af: "Skrap regtig?", en: "Really delete?" },
   skl_besig: { af: "Besig \u2026", en: "Working \u2026" },
+  sbg_fout: {
+    af: "Kon nie die begunstigde skrap nie.",
+    en: "The beneficiary could not be deleted.",
+  },
   skl_fout: {
     af: "Kon nie die kli\u00ebnt skrap nie.",
     en: "The client could not be deleted.",
