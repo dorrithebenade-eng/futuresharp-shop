@@ -116,12 +116,18 @@ function fb_vra() {
     <label class="fu-etiket" for="fb-datum">${fb_t("fb_datum", "Datum ontvang")}</label>
     <input class="fu-teksveld" type="date" id="fb-datum" value="${vandag}" max="${vandag}">
 
+    <!-- DIE FAKTUURNOMMER STAAN REEDS DAAR.
+         Dit is die verwysing wat op die faktuur gevra word, dus is dit die
+         een wat nege uit tien keer op die bankstaat verskyn \u2014 dan druk 'n
+         mens net deur. Staan daar iets anders, word dit oorgetik. Die veld
+         bly wat hy is: wat WERKLIK op die staat staan, nie wat gevra is nie.
+         Ses maande later soek Ignatius op daardie teks, nie op die nommer. -->
     <label class="fu-etiket" for="fb-verwysing">${fb_t(
       "fb_verwysing",
       "Verwysing op die bankstaat"
     )}</label>
     <input class="fu-teksveld" id="fb-verwysing" maxlength="100" autocomplete="off"
-           spellcheck="false">
+           spellcheck="false" value="${fb_ontsnap(V && V.nommer ? V.nommer : "")}">
 
     <label class="fu-etiket" for="fb-nota">${fb_t("fb_nota", "Aantekening")}</label>
     <textarea class="fu-teksveld" id="fb-nota" rows="2" maxlength="300"></textarea>
