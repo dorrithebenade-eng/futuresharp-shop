@@ -303,9 +303,27 @@ function nuwe_faktuur(wie) {
     },
     bestelnommer: "",           // die kliënt se PO; opsioneel, op die dokument
 
-    reels: [],                  // { soort: verkoop | koste, beskrywing,
-                                //   hoeveelheid, prys_pp_sent, bedrag_sent,
-                                //   op_faktuur, verdeling: [] }
+    // ELKE REEL DRA SY EIE VERDELING (25 Augustus 2026). Voor dit het die
+    // faktuur EEN verdeling gehad, en 'n faktuur met 'n aanbieding, 'n
+    // vraelys en 'n verslag -- elk met sy eie ontvangers -- kon nie bestaan
+    // nie. Sien Verdeling-Per-Lynitem-Ontwerp.md.
+    //
+    //   soort        verkoop | koste. Bepaal DRIE dinge tegelyk: dra die reel
+    //                hosting, het die reel 'n oorskot, en is 'n ontvanger
+    //                verplig. 'n Kostereel gee iemand sy geld terug; is daar
+    //                niemand nie, is dit nie 'n koste nie.
+    //   op_faktuur   of die reel GEDRUK word. Is dit af, word die reel saam
+    //                met die ander versteektes onder een beskrywing gevou.
+    //                Dit raak NIKS aan die som nie -- die verdeling loop op
+    //                die reels, nie op die dokument.
+    //   hosting_pct  per reel, nie meer per faktuur. 'n Kostereel kry nul:
+    //                trek 'n mens hosting van 'n terugbetaling af, kry die
+    //                persoon minder terug as wat hy uitgegee het.
+    //   verdeling    wie kry wat van HIERDIE reel. Die lewende een, teenoor
+    //                verdeling_gevries hieronder.
+    reels: [],                  // { soort, beskrywing, hoeveelheid,
+                                //   prys_pp_sent, bedrag_sent, op_faktuur,
+                                //   hosting_pct, verdeling: [] }
 
     // EEN oop teksblok onder die reëls — nie 'n subreël per item nie. Dit
     // dra die opleidingsdatum en die deelnemerslys, en dit is die enigste
@@ -316,7 +334,8 @@ function nuwe_faktuur(wie) {
     // ── DIE BACKOFFICE: twee lyste wat NIE op die dokument verskyn nie ──
     //
     // Hulle val maklik saam en mag nie. Die begroting beantwoord "wat kos
-    // dit?"; die verdeling beantwoord "wie kry wat?". Gooi 'n mens hulle in
+    // dit?"; die verdeling beantwoord "wie kry wat?" -- en sy leef nou op die
+    // reels hierbo. Gooi 'n mens hulle in
     // een lys, lyk 'n reiskostery wat die PRYS bepaal presies soos een wat
     // aan Eugene UITBETAAL word.
     //
@@ -336,16 +355,13 @@ function nuwe_faktuur(wie) {
     koste: [],                  // { beskrywing, ontvanger, bedrag_sent,
                                 //   inskrywing }
 
-    // Die LEWENDE verdeling, teenoor `verdeling_gevries` hieronder. Hierdie
-    // een word gewysig solank die faktuur 'n konsep is; daardie een word by
-    // uitreiking gekopieer en verander daarna nooit.
-    verdeling: [],              // { ontvanger, tipe: pct | vas, waarde }
-
-    // Future Sharp se aandeel vir die platform se koste. Dit kry 'n ry op die
-    // skerm maar word NOOIT uitbetaal nie — dit bly in die hoofrekening, soos
-    // die oorskot. Word dit ooit 'n Paystack-verdelingsry, word dit uitbetaal
-    // EN daar bly niks vir Paystack nie.
-    hosting_pct: 5,
+    // DIE FAKTUURVLAK `verdeling` EN `hosting_pct` IS WEG (25 Augustus 2026).
+    // Albei leef nou op elke reel hierbo. 'n Faktuurvlak-verdeling sou NAAS
+    // die reels s'n loop en dieselfde geld twee keer uitbetaal.
+    //
+    // Hosting kry 'n ry op die skerm maar word NOOIT uitbetaal nie -- dit bly
+    // in die hoofrekening, soos die oorskot. Word dit ooit 'n Paystack-
+    // verdelingsry, word dit uitbetaal EN daar bly niks vir Paystack nie.
 
     afslag_sent: 0,
     koepon_kode: null,

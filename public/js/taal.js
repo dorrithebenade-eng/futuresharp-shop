@@ -1512,6 +1512,29 @@ const WOORDEBOEK = {
   nki_fout: { af: "Kon nie byvoeg nie.", en: "Couldn\u0027t add it." },
   bo_voeg_koste: { af: "+ Voeg koste by", en: "+ Add a cost" },
   bo_verwyder: { af: "Verwyder", en: "Remove" },
+  bo_reel_naamloos: { af: "Naamloos", en: "Unnamed" },
+  bo_soort_inkomste: { af: "Inkomste", en: "Income" },
+  bo_soort_uitgawe: { af: "Uitgawe", en: "Expense" },
+  bo_voeg_ontvanger: { af: "+ Voeg 'n ontvanger by", en: "+ Add a recipient" },
+  bo_hosting_kort: { af: "Hosting", en: "Hosting" },
+  bo_oorskot_kort: { af: "Oorskot", en: "Surplus" },
+  bo_koste_reel: {
+    af: "Geen hosting \u2014 die ontvanger kry die volle bedrag terug.",
+    en: "No hosting \u2014 the recipient gets the full amount back.",
+  },
+  bo_koste_sonder_ontvanger: {
+    af: "'n Uitgawe moet iemand h\u00ea om aan terug te betaal. Kies 'n ontvanger, of maak die re\u00ebl 'n inkomste.",
+    en: "An expense needs someone to pay back. Choose a recipient, or make the line an income.",
+  },
+  bo_pct_bo_honderd: {
+    af: "Die persentasies tel op tot ",
+    en: "The percentages add up to ",
+  },
+  bo_reel_gedra: { af: "Hierdie re\u00ebl kort ", en: "This line is short by " },
+  bo_reel_gedra_end: {
+    af: ". Die ander re\u00ebls dra dit.",
+    en: ". The other lines carry it.",
+  },
 
   // Die pad is 'n GEVOLG van die ontvanger, nie 'n keuse nie. Die derde een
   // is die geval wat maklik misgekyk word: Paystack kan iemand sonder 'n

@@ -66,6 +66,15 @@ function datum(waarde) {
 
 // Die reëls van die dokument. Die hoeveelheid mag 'n desimaal wees — 'n halwe
 // dag se werk is 'n geldige reël — maar die bedrag land in sent.
+//
+// ELKE REEL DRA SY EIE VERDELING EN SY EIE HOSTING (25 Augustus 2026).
+// Tot hier het die faktuur EEN verdeling gehad, en 'n faktuur met 'n
+// aanbieding, 'n vraelys en 'n verslag — elk met sy eie ontvangers — kon nie
+// bestaan nie. Sien Verdeling-Per-Lynitem-Ontwerp.md.
+//
+// `op_faktuur` bepaal of die reël GEDRUK word. Is dit af, word die reël saam
+// met die ander versteektes onder een beskrywing gevou. Dit raak NIKS aan die
+// som nie — die verdeling loop op die reëls, nie op die dokument.
 function lees_reels(rou) {
   if (!Array.isArray(rou)) return [];
   return rou.slice(0, 40).map((r) => {
@@ -73,12 +82,23 @@ function lees_reels(rou) {
     const hoeveelheid = Number(item.hoeveelheid);
     const veilig = Number.isFinite(hoeveelheid) && hoeveelheid >= 0 ? hoeveelheid : 0;
     const prys_pp_sent = sent(item.prys_pp_sent);
+
+    // GEEN `|| 5`-TERUGVAL NIE. 'n Doelbewuste nul moet die rondreis oorleef:
+    // op 'n kostereël beteken nul dat hosting nie gehef word nie, en dit is 'n
+    // keuse, nie 'n weglating nie. Ontbreek die veld heeltemal — 'n reël wat
+    // van 'n ouer skerm af kom — is nul die veilige antwoord: hosting wat
+    // stilweg verskyn, vat geld by 'n begunstigde weg.
+    const hosting = Number(item.hosting_pct);
+
     return {
       soort: REEL_SOORTE.includes(item.soort) ? item.soort : "verkoop",
       beskrywing: teks(item.beskrywing, 300),
       hoeveelheid: veilig,
       prys_pp_sent,
       bedrag_sent: Math.round(veilig * prys_pp_sent),
+      op_faktuur: item.op_faktuur !== false,
+      hosting_pct: Number.isFinite(hosting) ? Math.min(100, Math.max(0, hosting)) : 0,
+      verdeling: lees_verdeling(item.verdeling),
     };
   });
 }
@@ -101,8 +121,8 @@ function lees_koste(rou) {
   });
 }
 
-// Die lewende verdeling. 'n Persentasie word op 0–100 gehou; 'n vaste bedrag
-// is sent.
+// Die lewende verdeling van EEN REEL. 'n Persentasie word op 0–100 gehou;
+// 'n vaste bedrag is sent.
 function lees_verdeling(rou) {
   if (!Array.isArray(rou)) return [];
   return rou.slice(0, 40).map((v) => {
@@ -220,13 +240,16 @@ exports.handler = async (event, context) => {
 
   // ── Die backoffice ──────────────────────────────────────────────────────
 
+  // Die begroting. 'n MAATSTAF, nie 'n verpligting: wat julle verwag om te
+  // bestee. Sy betaal niemand — 'n uitbetaling gebeur slegs deur 'n REEL met
+  // 'n verdeling, sodat elke betaling gekies is en nie uit 'n raming afgelei
+  // word nie.
   if (invoer.koste !== undefined) rekord.koste = lees_koste(invoer.koste);
-  if (invoer.verdeling !== undefined) rekord.verdeling = lees_verdeling(invoer.verdeling);
 
-  if (invoer.hosting_pct !== undefined) {
-    const pct = Number(invoer.hosting_pct);
-    rekord.hosting_pct = Number.isFinite(pct) ? Math.min(100, Math.max(0, pct)) : 0;
-  }
+  // DIE FAKTUURVLAK `verdeling` EN `hosting_pct` BESTAAN NIE MEER NIE.
+  // Albei leef nou op elke reël; sien lees_reels(). 'n Ouer skerm wat hulle
+  // nog stuur, word hier stilweg geignoreer — 'n faktuurvlak-verdeling sou
+  // NAAS die reëls s'n loop en dieselfde geld twee keer uitbetaal.
 
   if (invoer.afslag_sent !== undefined) rekord.afslag_sent = sent(invoer.afslag_sent);
   if (invoer.skenking_sent !== undefined) rekord.skenking_sent = sent(invoer.skenking_sent);

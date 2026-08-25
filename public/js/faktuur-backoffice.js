@@ -210,61 +210,186 @@ function bo_teken_begroting() {
   });
 }
 
+/* ═══════════════════════════════════════════════════════════════════════
+   DIE VERDELING — 'N BLOK PER REEL
+
+   Tot 25 Augustus 2026 was dit EEN plat lys: V.verdeling[ix], met
+   perReel[0] as die enigste basis. 'n Faktuur met 'n aanbieding, 'n
+   vraelys en 'n verslag — elk met sy eie ontvangers — kon nie bestaan
+   nie. Sien Verdeling-Per-Lynitem-Ontwerp.md.
+
+   DIE REELS EN DIE VERDELING IS EEN LYS. Wat hier geteken word, is
+   V.reels — dieselfde lys as die dokument links. Tik iemand 'n reël by,
+   kom die reël dadelik hier; skrap hy een, gaan die verdeling saam.
+
+   DRIE TOESTANDE PER REEL, en die onderskeid tussen die tweede en die
+   derde is die belangrikste ding in hierdie blok:
+
+     reg       — die reël dek homself
+     gedra     — amber. Die reël kort iets en die ander reëls dra dit.
+                 Dit WERK; die split geld oor die hele faktuur.
+     stukkend  — koraal. Kan nooit reg wees nie; die uitreiking keer.
+
+   'N VASTE BEDRAG WAT DIE REEL OORSKRY IS NIE STUKKEND NIE. Dit is in
+   die mockup getoets: 'n opgeloste reiskoste het met VYF SENT oorgeskiet
+   en is as 'n fout gemerk. 'n Stop oor vyf sent is presies hoe 'n mens
+   leer om stops te ignoreer. Net twee dinge is werklik stukkend:
+   persentasies wat saam bo 100% optel, en 'n kostereël sonder iemand om
+   aan terug te betaal.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+// Wat 'n reël se ontvangers saam vra, en of dit reg is.
+function bo_reel_toestand(reel, per) {
+  const rye = (reel && reel.verdeling) || [];
+  const pct = rye.reduce((s, v) => s + (v.tipe === "pct" ? Number(v.waarde) || 0 : 0), 0);
+  const koste = reel.soort === "koste";
+  const basis = per ? per.basisSent : 0;
+  const toegeken = per ? per.toegekenSent : 0;
+
+  const geen_ontvanger =
+    koste && !rye.some((v) => String(v.ontvanger || "").trim());
+
+  return {
+    koste,
+    pct,
+    basis,
+    oorskot: basis - toegeken,
+    stukkend: pct > 100 || geen_ontvanger,
+    geen_ontvanger,
+    te_veel_pct: pct > 100,
+  };
+}
+
 function bo_teken_verdeling(S) {
   const plek = document.getElementById("vd-lys");
   if (!plek) return;
 
-  // Die basis is wat ná Paystack oorbly. 'n Persentasie loop daarop, nooit
-  // op die volle bedrag nie.
-  const basis = S.u.perReel[0] ? S.u.perReel[0].basisSent / 100 : 0;
-
-  // 'N LEË RY VERSKYN NIE OP 'N UITGEREIKTE FAKTUUR NIE.
-  //
-  // Terwyl 'n mens werk, is 'n leë ry reg: jy voeg hom by en vul hom daarna.
-  // Maar 'n uitgereikte faktuur is 'n REKORD, en 'n ry sonder 'n ontvanger en
-  // sonder 'n bedrag lyk daar soos iets wat iemand vergeet het — terwyl hy
-  // niks doen nie. Die vries in stuur-faktuur.js laat sulke rye in elk geval
-  // uit, dus wys die skerm hier presies wat gevries is.
-  //
-  // DIE INDEKS BLY DIE EEN IN V.verdeling. Die rye se `data-ry` word deur die
-  // gebeurtenishanteerders gebruik om V.verdeling[ix] te wysig; filter 'n mens
-  // eers en nommer dan, wys 'n klik op die derde sigbare ry na die derde
-  // inskrywing in die volle lys — en dit is 'n ander een. Ons hou dus die
-  // oorspronklike indeks en slaan die res oor.
   const konsep = V.stand === "konsep";
 
-  plek.innerHTML = V.verdeling
-    .map((v, ix) => {
-      if (!konsep && !String(v.ontvanger || "").trim() && !(Number(v.waarde) > 0)) return "";
-      const rand =
-        v.tipe === "pct" ? ((Number(v.waarde) || 0) / 100) * basis : (Number(v.waarde) || 0) / 100;
-      const waarde = v.tipe === "pct" ? veld_getal(v.waarde) : veld_sent(v.waarde);
-      // Paystack kan iemand sonder 'n subrekening nie betaal nie. Sonder
-      // hierdie merkie lyk die ry soos elke ander een, en by uitreiking
-      // misluk die verdeling — of erger, dit lyk of hy betaal is.
-      const pad = bo_pad(v.ontvanger);
-      const merk = pad === "split" ? "" :
-        `<div class="vd-waarsku"><span class="bt-pad ${pad}">${bo_pad_et(pad)}</span></div>`;
+  plek.innerHTML = V.reels
+    .map((r, rx) => {
+      const per = S.u.perReel[rx];
+      const t = bo_reel_toestand(r, per);
+      const basis = t.basis / 100;
+
+      // 'N LEE RY VERSKYN NIE OP 'N UITGEREIKTE FAKTUUR NIE. Terwyl 'n mens
+      // werk, is 'n leë ry reg: jy voeg hom by en vul hom daarna. Maar 'n
+      // uitgereikte faktuur is 'n REKORD, en die vries in stuur-faktuur.js
+      // laat sulke rye in elk geval uit — die skerm wys dus wat gevries is.
+      const rye = (r.verdeling || [])
+        .map((v, ix) => {
+          if (!konsep && !String(v.ontvanger || "").trim() && !(Number(v.waarde) > 0)) return "";
+          const rand =
+            v.tipe === "pct"
+              ? ((Number(v.waarde) || 0) / 100) * basis
+              : (Number(v.waarde) || 0) / 100;
+          const waarde = v.tipe === "pct" ? veld_getal(v.waarde) : veld_sent(v.waarde);
+
+          // Paystack kan iemand sonder 'n subrekening nie betaal nie. Sonder
+          // hierdie merkie lyk die ry soos elke ander een, en by uitreiking
+          // misluk die verdeling — of erger, dit lyk of hy betaal is.
+          const pad = bo_pad(v.ontvanger);
+          const merk =
+            pad === "split"
+              ? ""
+              : `<div class="vd-waarsku"><span class="bt-pad ${pad}">${bo_pad_et(pad)}</span></div>`;
+
+          return `
+          <div class="vd-ry" data-reel="${rx}" data-ry="${ix}">
+            <select data-veld="ontvanger">${bo_ontvanger_opsies(v.ontvanger, false)}</select>
+            <div class="vd-tipe">
+              <button type="button" data-tipe="pct" class="${v.tipe === "pct" ? "aan" : ""}">%</button>
+              <button type="button" data-tipe="vas" class="${v.tipe === "vas" ? "aan" : ""}">R</button>
+            </div>
+            <input class="n" data-veld="waarde" inputmode="decimal" value="${ontsnap(waarde)}"
+                   placeholder="${v.tipe === "pct" ? "0" : "0.00"}">
+            <div class="uit">${rand_uit(rand)}</div>
+            <button type="button" class="bo-vee" title="${fv_t("bo_verwyder", "Verwyder")}">&times;</button>
+          </div>${merk}`;
+        })
+        .join("");
+
+      const naam = ontsnap(r.beskrywing || fv_t("bo_reel_naamloos", "Naamloos"));
+      const isk = r.soort === "koste";
+
+      // Die somreël onderaan elke reël. 'n Kostereël wys niks: sy dra geen
+      // hosting en het geen oorskot — die ontvanger kry die volle bedrag.
+      const som = isk
+        ? `<div class="vd-som">${fv_t(
+            "bo_koste_reel",
+            "Geen hosting — die ontvanger kry die volle bedrag terug."
+          )}</div>`
+        : `<div class="vd-som">
+             <span>${fv_t("bo_hosting_kort", "Hosting")}
+               <input class="n vd-host" data-reel="${rx}" data-veld="hosting"
+                      inputmode="decimal" value="${ontsnap(veld_getal(r.hosting_pct))}">%</span>
+             <span>${fv_t("bo_oorskot_kort", "Oorskot")}
+               <strong class="${t.oorskot < 0 ? "kort" : t.oorskot > 0 ? "oor" : ""}">${rand_uit(
+                 t.oorskot / 100
+               )}</strong></span>
+           </div>`;
+
+      let band = "";
+      if (t.stukkend) {
+        band = `<div class="vd-band stop">${
+          t.geen_ontvanger
+            ? fv_t(
+                "bo_koste_sonder_ontvanger",
+                "'n Uitgawe moet iemand hê om aan terug te betaal. Kies 'n ontvanger, of maak die reël 'n inkomste."
+              )
+            : fv_t("bo_pct_bo_honderd", "Die persentasies tel op tot ") + t.pct + "%."
+        }</div>`;
+      } else if (t.oorskot < 0) {
+        band = `<div class="vd-band">${fv_t(
+          "bo_reel_gedra",
+          "Hierdie reël kort "
+        )}${rand_uit(-t.oorskot / 100)}${fv_t(
+          "bo_reel_gedra_end",
+          ". Die ander reëls dra dit."
+        )}</div>`;
+      }
+
       return `
-      <div class="vd-ry" data-ry="${ix}">
-        <select data-veld="ontvanger">${bo_ontvanger_opsies(v.ontvanger, false)}</select>
-        <div class="vd-tipe">
-          <button type="button" data-tipe="pct" class="${v.tipe === "pct" ? "aan" : ""}">%</button>
-          <button type="button" data-tipe="vas" class="${v.tipe === "vas" ? "aan" : ""}">R</button>
+      <div class="vd-reel" data-reel="${rx}">
+        <div class="vd-reel-kop">
+          <span class="vd-nr">${rx + 1}</span>
+          <span class="vd-naam">${naam}</span>
+          <div class="vd-soort">
+            <button type="button" data-soort="verkoop" class="${isk ? "" : "aan"}">${fv_t(
+              "bo_soort_inkomste",
+              "Inkomste"
+            )}</button>
+            <button type="button" data-soort="koste" class="${isk ? "aan" : ""}">${fv_t(
+              "bo_soort_uitgawe",
+              "Uitgawe"
+            )}</button>
+          </div>
+          <span class="vd-bedrag">${rand_uit((Number(r.bedrag_sent) || 0) / 100)}</span>
         </div>
-        <input class="n" data-veld="waarde" inputmode="decimal" value="${ontsnap(waarde)}"
-               placeholder="${v.tipe === "pct" ? "0" : "0.00"}">
-        <div class="uit">${rand_uit(rand)}</div>
-        <button type="button" class="bo-vee" title="${fv_t("bo_verwyder", "Verwyder")}">&times;</button>
-      </div>${merk}`;
+        ${rye}
+        <button type="button" class="vd-voeg" data-reel="${rx}">${fv_t(
+          "bo_voeg_ontvanger",
+          "+ Voeg 'n ontvanger by"
+        )}</button>
+        ${som}
+        ${band}
+      </div>`;
     })
     .join("");
 
+  /* ═══ die hanteerders ═══
+     TWEE INDEKSE, NIE EEN NIE. `data-reel` sê watter reël, `data-ry` watter
+     ry binne daardie reël. Albei is die indeks in die VOLLE lys — filter 'n
+     mens eers en nommer dan, wys 'n klik op die derde sigbare ry na 'n ander
+     inskrywing. */
+
   plek.querySelectorAll(".vd-ry").forEach((ry) => {
+    const rx = Number(ry.getAttribute("data-reel"));
     const ix = Number(ry.getAttribute("data-ry"));
+    const lys = () => V.reels[rx].verdeling;
 
     ry.querySelector("select").addEventListener("change", (e) => {
-      V.verdeling[ix].ontvanger = e.target.value;
+      lys()[ix].ontvanger = e.target.value;
       bo_teken();
       merk_vuil();
     });
@@ -274,18 +399,24 @@ function bo_teken_verdeling(S) {
         // 'n Persentasie en 'n bedrag is nie dieselfde getal nie. Skakel 'n
         // mens van 55% na R, is "55" nie R55 nie — die waarde word skoongevee
         // eerder as om stilweg 'n verkeerde bedrag te word.
-        V.verdeling[ix].tipe = b.getAttribute("data-tipe");
-        V.verdeling[ix].waarde = 0;
+        lys()[ix].tipe = b.getAttribute("data-tipe");
+        lys()[ix].waarde = 0;
         bo_teken();
         merk_vuil();
       });
     });
 
     ry.querySelector('[data-veld="waarde"]').addEventListener("input", (e) => {
-      const v = V.verdeling[ix];
-      v.waarde = v.tipe === "pct" ? Number(String(e.target.value).replace(",", ".")) || 0 : na_sent(e.target.value);
+      const v = lys()[ix];
+      v.waarde =
+        v.tipe === "pct"
+          ? Number(String(e.target.value).replace(",", ".")) || 0
+          : na_sent(e.target.value);
+
+      // NET die syfers word bygewerk terwyl iemand tik — herbou 'n mens die
+      // ry, spring die wyser na die einde van die veld.
       const X = bo_som();
-      const b = X.u.perReel[0] ? X.u.perReel[0].basisSent / 100 : 0;
+      const b = X.u.perReel[rx] ? X.u.perReel[rx].basisSent / 100 : 0;
       const uit = ry.querySelector(".uit");
       if (uit) {
         uit.textContent = rand_uit(
@@ -297,8 +428,44 @@ function bo_teken_verdeling(S) {
     });
 
     ry.querySelector(".bo-vee").addEventListener("click", () => {
-      V.verdeling.splice(ix, 1);
+      lys().splice(ix, 1);
       bo_teken();
+      merk_vuil();
+    });
+  });
+
+  plek.querySelectorAll(".vd-voeg").forEach((knop) => {
+    knop.addEventListener("click", () => {
+      const rx = Number(knop.getAttribute("data-reel"));
+      if (!Array.isArray(V.reels[rx].verdeling)) V.reels[rx].verdeling = [];
+      V.reels[rx].verdeling.push({ ontvanger: "", tipe: "pct", waarde: 0 });
+      bo_teken();
+      merk_vuil();
+    });
+  });
+
+  plek.querySelectorAll(".vd-soort button").forEach((knop) => {
+    knop.addEventListener("click", () => {
+      const rx = Number(knop.closest(".vd-reel").getAttribute("data-reel"));
+      const soort = knop.getAttribute("data-soort");
+      if (V.reels[rx].soort === soort) return;
+      V.reels[rx].soort = soort;
+      // 'n Kostereël dra nooit hosting nie: trek 'n mens hosting van 'n
+      // terugbetaling af, kry die persoon minder terug as wat hy uitgegee het.
+      if (soort === "koste") V.reels[rx].hosting_pct = 0;
+      bo_teken();
+      merk_vuil();
+    });
+  });
+
+  plek.querySelectorAll(".vd-host").forEach((el) => {
+    el.addEventListener("input", () => {
+      const rx = Number(el.getAttribute("data-reel"));
+      const getal = Number(String(el.value).replace(",", "."));
+      V.reels[rx].hosting_pct = Number.isFinite(getal)
+        ? Math.min(100, Math.max(0, getal))
+        : 0;
+      bo_teken_somme(bo_som());
       merk_vuil();
     });
   });
@@ -469,8 +636,8 @@ function bo_vul_velde() {
   };
   stel("f-afslag", veld_sent(V.afslag_sent));
   stel("f-skenking", veld_sent(V.skenking_sent));
-  stel("f-hosting", String(V.hosting_pct));
   stel("f-koepon", V.koepon_kode || "");
+  // GEEN f-hosting MEER NIE. Hosting leef op elke reël, in die verdelingsblok.
 }
 
 function bo_teken() {
@@ -506,10 +673,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   bind("f-afslag", (w) => { V.afslag_sent = na_sent(w); });
   bind("f-skenking", (w) => { V.skenking_sent = na_sent(w); });
-  bind("f-hosting", (w) => {
-    const pct = Number(String(w).replace(",", "."));
-    V.hosting_pct = Number.isFinite(pct) ? Math.min(100, Math.max(0, pct)) : 0;
-  });
   bind("f-koepon", (w) => { V.koepon_kode = w.trim().toUpperCase() || null; });
 
   const voeg_koste = document.getElementById("bt-voeg");
@@ -521,19 +684,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  const voeg_ry = document.getElementById("vd-voeg");
-  if (voeg_ry) {
-    voeg_ry.addEventListener("click", () => {
-      // Kies iemand wat werklik betaal kan word; anders die eerste op die
-      // lys, met sy merkie wat sê wat kort.
-      const eerste =
-        BEGUNSTIGDES.find((b) => (b.subrekening_kode || "").trim()) || BEGUNSTIGDES[0];
-      if (!eerste) return;
-      V.verdeling.push({ ontvanger: eerste.naam, tipe: "vas", waarde: 0 });
-      bo_teken();
-      merk_vuil();
-    });
-  }
+  // GEEN ENKELE "voeg 'n ry by" MEER NIE. Elke reël het sy eie knoppie in
+  // die verdelingsblok — 'n ry moet weet aan WATTER reël hy hang.
 });
 
 // Die begunstigdes kom NÁ die sessie. faktuur-vorm.js se DOMContentLoaded

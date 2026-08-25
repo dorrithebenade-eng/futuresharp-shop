@@ -1,0 +1,127 @@
+/* public/css/faktuur-verdeling-reels.css
+
+   Die verdelingsblok in die backoffice, na die oorgang na 'n blok PER REEL
+   (25 Augustus 2026). Sien Verdeling-Per-Lynitem-Ontwerp.md.
+
+   'N EIE LEER, want faktuur.css dra reeds die dokument, die drukblad en die
+   res van die backoffice. Hierdie handvol reels hoort nie in daardie leer se
+   middel nie.
+
+   DIE KLEURE DRA BETEKENIS, en die onderskeid tussen die twee is die
+   belangrikste ding hierin:
+
+     amber   die reel kort iets en die ander reels dra dit. Dit WERK.
+     koraal  kan nooit reg wees nie; die uitreiking keer.
+     teal    'n oorskot wat oorbly. */
+
+.vd-reel {
+  border-top: 1px solid #E8E6E1;
+  padding: 12px 0 14px;
+}
+
+.vd-reel:first-child { border-top: 0; padding-top: 0; }
+
+.vd-reel-kop {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.vd-nr {
+  font-size: 11px;
+  color: var(--grys-teks);
+  min-width: 14px;
+}
+
+.vd-naam {
+  flex: 1;
+  min-width: 0;
+  font-weight: 500;
+  font-size: 13.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vd-bedrag {
+  font-size: 13.5px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Inkomste of Uitgawe. Voluit geskryf: "Ink / Uitg" spaar plek en kos
+   verstaan. */
+.vd-soort {
+  display: inline-flex;
+  border: 1px solid #DDD9D2;
+  border-radius: 7px;
+  overflow: hidden;
+}
+
+.vd-soort button {
+  border: 0;
+  background: #fff;
+  font-family: var(--font-liggaam);
+  font-size: 12px;
+  padding: 5px 10px;
+  cursor: pointer;
+  color: var(--grys-teks);
+}
+
+.vd-soort button.aan { background: var(--swart); color: #fff; }
+
+.vd-voeg {
+  background: none;
+  border: 0;
+  color: var(--teal);
+  font-family: var(--font-liggaam);
+  font-size: 12.5px;
+  cursor: pointer;
+  padding: 6px 0 6px 10px;
+}
+
+.vd-voeg:hover { text-decoration: underline; }
+
+.vd-som {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  padding: 8px 0 0 10px;
+  font-size: 12.5px;
+  color: var(--grys-teks);
+  font-variant-numeric: tabular-nums;
+}
+
+.vd-som strong { font-weight: 500; color: var(--swart); }
+.vd-som strong.oor { color: #2E7D6F; font-weight: 600; }
+.vd-som strong.kort { color: #8A6212; font-weight: 600; }
+
+.vd-som .vd-host {
+  width: 52px;
+  text-align: right;
+  border: 1px solid #E4E1DA;
+  border-radius: 6px;
+  background: #fff;
+  font-family: var(--font-liggaam);
+  font-size: 12.5px;
+  padding: 3px 6px;
+  color: var(--swart);
+}
+
+.vd-som .vd-host:focus { outline: 0; border-color: var(--teal); }
+
+.vd-band {
+  margin: 8px 0 0 10px;
+  padding: 7px 11px;
+  border-left: 3px solid var(--amber);
+  background: #FDF6E7;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--swart);
+}
+
+.vd-band.stop {
+  border-left-color: var(--koraal);
+  background: #FDECE6;
+}

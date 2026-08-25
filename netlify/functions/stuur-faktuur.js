@@ -209,13 +209,28 @@ exports.handler = async (event, context) => {
   // Die som gee 'n inskrywing per verdelingsry; 'n mens betaal 'n PERSOON, nie
   // 'n ry nie. Eugene met 'n kostery en 'n persentasie is één oorbetaling en
   // één split-inskrywing.
+  //
+  // ELKE REEL DRA SY EIE VERDELING (25 Augustus 2026), dus kan een persoon nou
+  // uit DRIE reels betaal word. Paystack se flat split weet niks van reels nie
+  // en hoef nie: Eugene met R8 105 uit die aanbieding en R1 447 uit die
+  // verslag is vir Paystack EEN ry van R9 552,86.
+  //
+  // Maar die HERKOMS word bewaar in `waarvoor`. Sonder dit sê Eugene se staat
+  // net 'n totaal, en dan kan niemand ooit weer antwoord waarvoor die geld is
+  // nie.
   const per_ontvanger = new Map();
   (u.ontvangers || []).forEach((o) => {
     const naam = teks(o.naam);
     if (!naam) return;
     const bestaande = per_ontvanger.get(naam) || { naam, bedrag_sent: 0, waarvoor: [] };
     bestaande.bedrag_sent += o.sent;
-    if (o.wat) bestaande.waarvoor.push(o.wat);
+    if (o.wat) {
+      bestaande.waarvoor.push({
+        reel: teks(o.wat, 300),
+        soort: o.soort || "",
+        bedrag_sent: o.sent,
+      });
+    }
     per_ontvanger.set(naam, bestaande);
   });
 
@@ -229,6 +244,9 @@ exports.handler = async (event, context) => {
       naam: r.naam,
       subrekening_kode: kode || null,
       bedrag_sent: r.bedrag_sent,
+      // Waaruit hierdie bedrag kom -- een inskrywing per reel. Die staat lees
+      // dit; Paystack sien net die totaal hierbo.
+      waarvoor: r.waarvoor,
       // 'n GEVOLG van die ontvanger, nie 'n keuse nie.
       pad: kode ? "split" : "hoof",
     };

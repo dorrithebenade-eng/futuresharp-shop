@@ -30,6 +30,26 @@
 // getal wat afgelei kan word, word nooit van hier af vertrou nie.
 
 /* ═══ die toestand ═══ */
+// Die hosting wat 'n NUWE inkomstereel begin met. 'n Verstek, nie 'n
+// afdwinging: elke reel se persentasie word daarna per reel gestel, en 'n
+// doelbewuste nul oorleef die rondreis.
+const HOSTING_VERSTEK = 5;
+
+// EEN plek waar 'n nuwe reel gemaak word. Was dit twee keer ingetik, kry die
+// eerste reel van 'n faktuur ander velde as die tweede -- en dan werk die
+// verdeling op die een en nie op die ander nie.
+function nuwe_reel() {
+  return {
+    soort: "verkoop",
+    beskrywing: "",
+    hoeveelheid: 1,
+    prys_pp_sent: 0,
+    op_faktuur: true,
+    hosting_pct: HOSTING_VERSTEK,
+    verdeling: [],
+  };
+}
+
 const V = {
   sleutel: null,          // null = nog nooit gestoor nie
   nommer: null,
@@ -38,7 +58,11 @@ const V = {
   klient_id: null,
   klient: { naam: "", kontakpersoon: "", epos: "", selfoon: "", adres: "" },
   bestelnommer: "",
-  reels: [],              // { beskrywing, hoeveelheid, prys_pp_sent }
+  // ELKE REEL DRA SY EIE VERDELING EN SY EIE HOSTING (25 Augustus 2026).
+  // Die reels en die verdeling is EEN lys: tik iemand 'n reel by, kom die
+  // reel dadelik in die backoffice se verdelingsblok.
+  reels: [],              // { soort, beskrywing, hoeveelheid, prys_pp_sent,
+                          //   op_faktuur, hosting_pct, verdeling: [] }
   dokument_nota: "",
   afslag_sent: 0,
   skenking_sent: 0,
@@ -46,8 +70,11 @@ const V = {
   // Die backoffice s'n. Hulle leef HIER, in een toestand, want die
   // faktuurtotaal en die verdeling is een som — nie twee skerms wat mekaar
   // se getalle raai nie.
+  // Die begroting BLY op faktuurvlak. Sy is 'n MAATSTAF -- wat julle verwag
+  // om te bestee -- en sy hang aan die werk, nie aan 'n bepaalde reel nie.
+  // Sy betaal ook niemand: 'n uitbetaling gebeur slegs deur 'n reel se
+  // verdeling, sodat elke betaling gekies is en nie uit 'n raming afgelei.
   koste: [],              // { beskrywing, ontvanger, bedrag_sent, inskrywing }
-  verdeling: [],          // { ontvanger, tipe: pct | vas, waarde }
   hosting_pct: 5,
   betaalbaar_teen: null,
   geskep_op: null,
@@ -487,16 +514,18 @@ function liggaam() {
     dokument_nota: V.dokument_nota,
     betaalbaar_teen: V.betaalbaar_teen || "",
     koste: V.koste,
-    verdeling: V.verdeling,
-    hosting_pct: V.hosting_pct,
     afslag_sent: V.afslag_sent,
     skenking_sent: V.skenking_sent,
     koepon_kode: V.koepon_kode || "",
     reels: V.reels.map((r) => ({
-      soort: "verkoop",
+      soort: r.soort === "koste" ? "koste" : "verkoop",
       beskrywing: r.beskrywing,
       hoeveelheid: Number(r.hoeveelheid) || 0,
       prys_pp_sent: Number(r.prys_pp_sent) || 0,
+      op_faktuur: r.op_faktuur !== false,
+      // Geen `|| 5`-terugval nie: 'n doelbewuste nul moet oorleef.
+      hosting_pct: Number.isFinite(Number(r.hosting_pct)) ? Number(r.hosting_pct) : 0,
+      verdeling: Array.isArray(r.verdeling) ? r.verdeling : [],
     })),
   };
 }
@@ -566,9 +595,16 @@ async function laai_faktuur(vraag) {
   V.bestelnommer = f.bestelnommer || "";
   V.reels = Array.isArray(f.reels)
     ? f.reels.map((r) => ({
+        soort: r.soort === "koste" ? "koste" : "verkoop",
         beskrywing: r.beskrywing || "",
         hoeveelheid: r.hoeveelheid || 0,
         prys_pp_sent: r.prys_pp_sent || 0,
+        op_faktuur: r.op_faktuur !== false,
+        // hosting_pct kan wettig 0 wees, dus nie || 5 nie -- dan sou iemand
+        // wat Hosting doelbewus afskakel, dit elke keer terugkry. Op 'n
+        // kostereel is nul die REGTE antwoord.
+        hosting_pct: Number.isFinite(Number(r.hosting_pct)) ? Number(r.hosting_pct) : 0,
+        verdeling: Array.isArray(r.verdeling) ? r.verdeling : [],
       }))
     : [];
   V.dokument_nota = f.dokument_nota || "";
@@ -576,10 +612,6 @@ async function laai_faktuur(vraag) {
   V.skenking_sent = f.skenking_sent || 0;
   V.koepon_kode = f.koepon_kode || null;
   V.koste = Array.isArray(f.koste) ? f.koste : [];
-  V.verdeling = Array.isArray(f.verdeling) ? f.verdeling : [];
-  // hosting_pct kan wettig 0 wees, dus nie || 5 nie — dan sou iemand wat
-  // Hosting doelbewus afskakel, dit elke keer terugkry.
-  V.hosting_pct = Number.isFinite(Number(f.hosting_pct)) ? Number(f.hosting_pct) : 5;
   V.betaalbaar_teen = f.betaalbaar_teen || null;
   V.geskep_op = f.geskep_op || null;
   V.betaalskakel = f.betaalskakel || null;
@@ -652,7 +684,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       // bladsy oopgemaak en van gedagte verander het. Die eerste stoor
       // gebeur wanneer daar iets is om te stoor.
       V.geskep_op = new Date().toISOString();
-      V.reels = [{ beskrywing: "", hoeveelheid: 1, prys_pp_sent: 0 }];
+      V.reels = [nuwe_reel()];
     }
   } catch (fout) {
     console.error("Kon nie die faktuur laai nie:", fout);
@@ -686,7 +718,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const voeg = document.getElementById("fv-voeg-reel");
   if (voeg) {
     voeg.addEventListener("click", () => {
-      V.reels.push({ beskrywing: "", hoeveelheid: 1, prys_pp_sent: 0 });
+      V.reels.push(nuwe_reel());
       teken_reels();
       teken_somme();
       merk_vuil();

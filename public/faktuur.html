@@ -19,6 +19,7 @@
   <link rel="stylesheet" href="css/faktuur-nuwe-klient.css" />
   <link rel="stylesheet" href="css/faktuur-nuwe-koste-item.css" />
   <link rel="stylesheet" href="css/faktuur-betaling-aan.css" />
+  <link rel="stylesheet" href="css/faktuur-verdeling-reels.css" />
 </head>
 <body>
 
@@ -295,9 +296,11 @@
             <b id="vd-fooi">—</b>
           </div>
 
+          <!-- EEN BLOK PER REEL, nie een plat lys nie. Elke reel kry sy eie
+               ontvangers, sy eie hosting en sy eie "voeg by"-knoppie; 'n ry
+               moet weet aan WATTER reel hy hang. faktuur-backoffice.js bou
+               alles hierin. -->
           <div id="vd-lys"></div>
-          <button type="button" class="fv-teks-knop" id="vd-voeg"
-                  data-i18n="bo_voeg_verdeling">+ Voeg 'n verdeling by</button>
 
           <div class="bo-som">
             <div class="hoof"><span data-i18n="bo_totaal">Faktuurtotaal</span><b id="s-totaal">—</b></div>
@@ -335,10 +338,9 @@
               <label class="veld-etiket" for="f-skenking" data-i18n="bo_skenking">Skenking (R)</label>
               <input class="veld-invoer" id="f-skenking" inputmode="decimal" placeholder="0.00">
             </div>
-            <div>
-              <label class="veld-etiket" for="f-hosting" data-i18n="bo_hosting_pct">Hosting (%)</label>
-              <input class="veld-invoer" id="f-hosting" inputmode="decimal" value="5">
-            </div>
+            <!-- HOSTING STAAN NIE MEER HIER NIE. Dit word per reel gestel, in
+                 die verdelingsblok hierbo: 'n aanbieding dra 5%, 'n reel wat
+                 iemand se petrol terugbetaal dra niks. -->
           </div>
           <p class="bo-lei" style="margin:10px 0 0" data-i18n="bo_afslag_lei">
             Afslag verminder die verdeelbare bedrag. Skenking bly buite die verdeling.

@@ -208,8 +208,45 @@ function fs_basis_uit_rye(reel) {
 // nie. Wie 'n subrekening het, kom van buite af in as 'n toets — die blaaier
 // gee sy gelaaide begunstigde-lys, die bediener gee die store.
 //
-// WAT DIE SOM INGEVOER KRY: ÉÉN reël — die faktuur se reëls minus die afslag,
-// met elke verdelingsry plus Hosting daarop.
+// WAT DIE SOM INGEVOER KRY: ELKE FAKTUURREEL AS SY EIE REEL, met sy eie
+// verdeling en sy eie Hosting daarop.
+//
+// TOT 25 AUGUSTUS 2026 HET HIERDIE VERTALER DIE HELE FAKTUUR PLAT GEVOU na
+// een reel met die naam "Faktuur", en al die verdelingsrye in daardie een
+// lys gegooi. Dit was reg solank die faktuur EEN verdeling gehad het.
+//
+// 'n Faktuur met 'n aanbieding, 'n vraelys en 'n verslag -- elk met sy eie
+// ontvangers -- kon toe nie bestaan nie; 'n mens moes drie fakture uitreik
+// en die skool moes drie keer betaal vir een stuk werk.
+//
+// fs_bereken() self het dit NOG ALTYD gekan. Dit neem reels[], gee elke reel
+// sy eie basis, en versprei die fooi na verhouding. Net die vertaler het dit
+// weggegooi. Sien Verdeling-Per-Lynitem-Ontwerp.md.
+//
+// DIE AFSLAG WORD NA VERHOUDING OOR DIE REELS VERSPREI.
+//
+// Dit is nie 'n nuwe besluit nie; dit hou die bestaande gedrag presies. Die
+// afslag het nog altyd van die netto afgetrek voordat die persentasies loop,
+// dus deel almal wat op 'n persentasie is die afslag, en 'n vaste bedrag word
+// nie geraak nie. 'n Afslag wat op EEN reel land, sou daardie reel se
+// ontvangers alleen laat betaal vir 'n toegewing wat vir die hele faktuur
+// gegee is.
+//
+// BEGROTE KOSTE WORD NIE MEER 'N VERDELINGSRY NIE.
+//
+// Tot 25 Augustus het 'n begrote koste aan iemand met 'n subrekening
+// outomaties 'n uitbetaling geword. Dit was 'n gerief toe daar EEN verdeling
+// was en daardie ry net een plek gehad het om heen te gaan; met verdeling per
+// reel bestaan daardie plek nie meer nie.
+//
+// En dit was in elk geval verkeerd: 'n begroting is 'n RAMING van wat julle
+// verwag om te bestee. Word dit outomaties 'n betaling, betaal 'n mens iemand
+// op grond van 'n skatting in plaas van op grond van 'n besluit. Wil 'n mens
+// iemand se koste terugbetaal, is dit 'n REEL op die faktuur -- soort
+// "koste", opgelos sodat die reel sy eie fooi dra -- en dan staan dit as 'n
+// keuse op die dokument. Die begroting bly suiwer 'n maatstaf: sy vergelyk
+// wat julle verwag het om te bestee met wat die faktuur inbring, en sy betaal
+// niemand.
 //
 // DIE SKENKING KOM NIE HIER IN NIE, en dit is nie 'n vereenvoudiging nie. Gee
 // 'n mens haar as 'n tweede reël, versprei die som die fooi pro rata: die
@@ -219,63 +256,76 @@ function fs_basis_uit_rye(reel) {
 // op die FAKTUUR ALLEEN bereken; die skenking word daarna bygetel, dra haar
 // eie deel van die werklike fooi, en die res val na die oorskot.
 //
-// faktuur      — die rekord se velde: reels, afslag_sent, koste, verdeling,
-//                hosting_pct. 'n Hele rekord of net daardie vyf velde.
-// het_subrekening(ontvanger) → true as Paystack daardie persoon self kan
-//                betaal. Gee dit niks terug nie, is niks 'n verdelingsry nie.
+// faktuur      — die rekord se velde: reels (elk met sy eie verdeling en
+//                hosting_pct), afslag_sent.
+// het_subrekening — bly in die handtekening sodat elke oproeper onveranderd
+//                bly. Hy word nie meer gebruik nie: die begrote koste was die
+//                enigste plek wat gevra het wie 'n subrekening het, en 'n
+//                verdelingsry kom nou altyd in, ook vir iemand wat met die
+//                hand betaal word.
 function fs_invoer_uit_faktuur(faktuur, het_subrekening) {
   const f = faktuur || {};
-  const kan_split =
-    typeof het_subrekening === "function" ? het_subrekening : () => false;
 
   // Die reëls dra hoeveelheid × eenheidsprys; die bedrag word hier gereken en
   // nooit van 'n gestoorde veld gelees nie — dieselfde reël as stoor-faktuur.js.
-  const reelsomSent = (f.reels || []).reduce(
-    (s, r) =>
-      s + Math.round((Number(r.hoeveelheid) || 0) * (Number(r.prys_pp_sent) || 0)),
-    0
+  const bedragSent = (r) =>
+    Math.round((Number(r.hoeveelheid) || 0) * (Number(r.prys_pp_sent) || 0));
+
+  const reelsomSent = (f.reels || []).reduce((s, r) => s + bedragSent(r), 0);
+
+  // Die afslag mag nooit 'n reël onder nul druk nie, en die afslag wat
+  // toegeken is, moet presies die afslag wees wat gegee is — die laaste reël
+  // kry die res, sodat 'n afronding nie 'n sent laat wegraak nie.
+  const afslagSent = Math.min(
+    Math.max(0, Number(f.afslag_sent) || 0),
+    reelsomSent
   );
-  const netto = Math.max(0, reelsomSent - (Number(f.afslag_sent) || 0)) / 100;
 
-  const rye = [];
+  let toegeken = 0;
+  const reels = (f.reels || []).map((r, ix, alles) => {
+    const bruto = bedragSent(r);
+    let deel;
+    if (ix === alles.length - 1) {
+      deel = afslagSent - toegeken;
+    } else {
+      deel = reelsomSent > 0 ? Math.round((afslagSent * bruto) / reelsomSent) : 0;
+      toegeken += deel;
+    }
 
-  // 1. Die begrote koste wat aan iemand met 'n subrekening gaan. 'n KOSTE IS
-  //    ALTYD 'N VASTE BEDRAG: loop dit op 'n persentasie, kry iemand 70% van
-  //    sy eie petrol terug — die winkel se harde kopie se slaggat presies.
-  //    Wat na die hoofrekening gaan, kom hier NIE in nie; dit word met die
-  //    hand betaal en staan nie in die transaksie se verdeling nie.
-  (f.koste || []).forEach((k) => {
-    if (!kan_split(k.ontvanger)) return;
-    rye.push({
-      ontvanger: k.ontvanger,
-      tipe: "vas",
-      waarde: (Number(k.bedrag_sent) || 0) / 100,
+    const rye = [];
+
+    // Elke verdelingsry kom in, ook vir iemand sonder 'n subrekening — hy
+    // word met die hand betaal, maar sy deel is steeds deel van die som.
+    (r.verdeling || []).forEach((v) => {
+      rye.push({
+        ontvanger: v.ontvanger,
+        tipe: v.tipe,
+        waarde:
+          v.tipe === "vas" ? (Number(v.waarde) || 0) / 100 : Number(v.waarde) || 0,
+      });
     });
+
+    // Hosting kry 'n ry op die skerm maar word NOOIT uitbetaal nie — dit bly
+    // in die hoofrekening. Word dit ooit 'n Paystack-verdelingsry, word dit
+    // uitbetaal EN daar bly niks vir Paystack nie.
+    //
+    // GEEN `|| 5`-TERUGVAL NIE. 'n Doelbewuste nul moet die rondreis oorleef:
+    // op 'n kostereël beteken nul dat hosting nie gehef word nie, en dit is 'n
+    // keuse, nie 'n weglating nie.
+    const hosting = Number(r.hosting_pct);
+    if (hosting > 0) {
+      rye.push({ ontvanger: "Hosting", tipe: "pct", waarde: hosting });
+    }
+
+    return {
+      soort: r.soort === "koste" ? "koste" : "verkoop",
+      beskrywing: r.beskrywing || "",
+      bedrag: Math.max(0, bruto - deel) / 100,
+      verdeling: rye,
+    };
   });
 
-  // 2. Die rye wat met die hand bygevoeg is: werk, nie koste nie. Hulle kom
-  //    ALMAL in, ook vir iemand sonder 'n subrekening — hy word met die hand
-  //    betaal, maar sy deel is steeds deel van die som.
-  (f.verdeling || []).forEach((v) => {
-    rye.push({
-      ontvanger: v.ontvanger,
-      tipe: v.tipe,
-      waarde: v.tipe === "vas" ? (Number(v.waarde) || 0) / 100 : Number(v.waarde) || 0,
-    });
-  });
-
-  // 3. Hosting kry 'n ry op die skerm maar word NOOIT uitbetaal nie — dit bly
-  //    in die hoofrekening. Word dit ooit 'n Paystack-verdelingsry, word dit
-  //    uitbetaal EN daar bly niks vir Paystack nie.
-  if (Number(f.hosting_pct) > 0) {
-    rye.push({ ontvanger: "Hosting", tipe: "pct", waarde: Number(f.hosting_pct) });
-  }
-
-  return {
-    rigting: "totaal",
-    rond: 0,
-    reels: [{ soort: "verkoop", beskrywing: "Faktuur", bedrag: netto, verdeling: rye }],
-  };
+  return { rigting: "totaal", rond: 0, reels };
 }
 
 // Node kan dit ook laai, sodat die som getoets kan word sonder 'n blaaier —
