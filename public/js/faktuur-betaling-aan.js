@@ -59,8 +59,23 @@ function fb_vandag() {
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
 }
 
+// DIE TOTAAL WORD GEREKEN, NIE GELEES NIE.
+//
+// V dra geen `totaal_sent` nie \u2014 faktuur-vorm.js bere die totaal nerens op die
+// vormrekord nie; die dokument teken hom elke keer uit die reels. Lees 'n mens
+// hom as 'n veld, kry hy nul, en dan begin die bedragveld op R0 terwyl die
+// faktuur R10 000 se.
+//
+// DIT IS PRESIES DIESELFDE FORMULE as fu_totaal_sent() in faktuur-uitreik.js
+// en as stoor-faktuur.js s'n: reelsom, minus die afslag maar nooit onder nul,
+// plus die skenking. Die skenking tel by die totaal en bly buite die verdeling.
 function fb_totaal_sent() {
-  return Number((typeof V !== "undefined" && V && V.totaal_sent) || 0);
+  if (typeof V === "undefined" || !V) return 0;
+  const reelsom = (V.reels || []).reduce(
+    (s, r) => s + Math.round((Number(r.hoeveelheid) || 0) * (Number(r.prys_pp_sent) || 0)),
+    0
+  );
+  return Math.max(0, reelsom - (V.afslag_sent || 0)) + (V.skenking_sent || 0);
 }
 
 /* ═══ die oorlegsel ═══ */
@@ -86,17 +101,17 @@ function fb_vra() {
     <h2>${fb_t("fb_kop", "Teken 'n betaling aan")}</h2>
     <p>${fb_t(
       "fb_teks",
-      "Dit is vir geld wat buite die betaalskakel om ontvang is — 'n bankoorbetaling direk in die rekening. Die faktuur gaan na Betaal en kan daarna nie meer verander word nie."
+      "Vir geld wat buite die betaalskakel om ontvang is. Die faktuur gaan na Betaal en kan daarna nie verander word nie."
     )}</p>
-    <p class="fu-keer-fout" style="position:static">${fb_t(
+    <div class="fb-band">${fb_t(
       "fb_waarsku",
-      "Paystack was nie hier nie, dus het niemand se verdeling gebeur nie. Elke ontvanger verskyn in die uitbetaal-werklys en moet met die hand oorbetaal word."
-    )}</p>
+      "Paystack was nie hier nie. Elke ontvanger verskyn in die uitbetaal-werklys en moet met die hand oorbetaal word."
+    )}</div>
 
     <label class="fu-etiket" for="fb-bedrag">${fb_t("fb_bedrag", "Bedrag ontvang")}</label>
     <input class="fu-teksveld" id="fb-bedrag" inputmode="decimal" autocomplete="off"
            value="${fb_ontsnap((totaal / 100).toFixed(2).replace(".", ","))}">
-    <p class="fu-keer-fout" id="fb-verskil" hidden style="position:static"></p>
+    <p class="fb-verskil" id="fb-verskil" hidden></p>
 
     <label class="fu-etiket" for="fb-datum">${fb_t("fb_datum", "Datum ontvang")}</label>
     <input class="fu-teksveld" type="date" id="fb-datum" value="${vandag}" max="${vandag}">

@@ -1794,12 +1794,12 @@ const WOORDEBOEK = {
   fb_knop: { af: "Betaling ontvang", en: "Payment received" },
   fb_kop: { af: "Teken 'n betaling aan", en: "Record a payment" },
   fb_teks: {
-    af: "Dit is vir geld wat buite die betaalskakel om ontvang is \u2014 'n bankoorbetaling direk in die rekening. Die faktuur gaan na Betaal en kan daarna nie meer verander word nie.",
-    en: "This is for money received outside the payment link \u2014 a bank transfer straight into the account. The invoice goes to Paid and can no longer be changed after that.",
+    af: "Vir geld wat buite die betaalskakel om ontvang is. Die faktuur gaan na Betaal en kan daarna nie verander word nie.",
+    en: "For money received outside the payment link. The invoice goes to Paid and cannot be changed after that.",
   },
   fb_waarsku: {
-    af: "Paystack was nie hier nie, dus het niemand se verdeling gebeur nie. Elke ontvanger verskyn in die uitbetaal-werklys en moet met die hand oorbetaal word.",
-    en: "Paystack was not involved, so nobody's split happened. Every recipient appears in the payout worklist and must be paid over by hand.",
+    af: "Paystack was nie hier nie. Elke ontvanger verskyn in die uitbetaal-werklys en moet met die hand oorbetaal word.",
+    en: "Paystack was not involved. Every recipient appears in the payout worklist and must be paid over by hand.",
   },
   fb_bedrag: { af: "Bedrag ontvang", en: "Amount received" },
   fb_datum: { af: "Datum ontvang", en: "Date received" },

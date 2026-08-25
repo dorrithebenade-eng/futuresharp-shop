@@ -1,0 +1,68 @@
+/* public/css/faktuur-betaling-aan.css
+
+   Die oorlegsel waarmee 'n handmatige betaling aangeteken word.
+
+   'N EIE LEER, want faktuur.css dra reeds die dokument, die backoffice en die
+   drukblad. Hierdie handvol reels hoort nie in daardie leer se middel nie.
+
+   ─────────────────────────────────────────────────────────────────────────
+   DIE EERSTE BLOK IS 'N REGSTELLING, NIE NUWE STYL NIE.
+
+   faktuur.css stel `.fu-paneel > p` op grys, 14px. Daardie keurder klop
+   swaarder as 'n blote klas, dus word ELKE <p> direk in die paneel grys —
+   ook een wat `fu-keer-fout` dra. Die kansellasie se foutreel ("Gee 'n rede")
+   het dus nog altyd soos gewone teks gelees; 'n mens sien dit net selde,
+   want 'n mens laat die rede selde leeg.
+
+   Die regstelling klop op dieselfde vlak en gee daardie reels hul koraal
+   terug. Sy raak niks anders in die paneel nie.
+   ───────────────────────────────────────────────────────────────────────── */
+
+.fu-paneel > p.fu-keer-fout {
+  margin: 8px 0 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--koraal);
+  font-weight: 500;
+}
+
+/* AMBER EN NIE KORAAL NIE.
+
+   Elders in hierdie stelsel beteken koraal dat iets stop of onomkeerbaar is,
+   en amber dat daar werk wag. Hierdie band is nie 'n fout nie: die betaling
+   is geldig, sy maak net handewerk. Koraal hier sou die egte foutreels
+   hieronder van hul betekenis stroop. */
+.fb-band {
+  margin: 0 0 18px;
+  padding: 11px 13px;
+  border-left: 3px solid var(--amber);
+  background: #FDF6E7;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--swart);
+}
+
+/* Die verskil tussen wat ontvang is en wat gefaktureer is. Ook amber: 'n
+   skool wat R50 te min betaal het, is nie 'n fout op die skerm nie — dit is
+   wat werklik gebeur het, en dit word so aangeteken. */
+.fu-paneel > p.fb-verskil {
+  margin: 6px 0 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: #8A6212;
+  font-weight: 500;
+}
+
+.fb-verskil[hidden] { display: none; }
+
+/* Die bedrag is die een veld waar 'n tikfout onomkeerbaar is. Hy lees groter
+   as die res, sodat 'n mens hom nie oorslaan nie. */
+#fb-bedrag {
+  font-size: 17px;
+  font-weight: 600;
+  padding: 11px;
+}
+
+/* Die datumveld se eie knoppie sit reeds in die blaaier; hy hoef nie ook nog
+   verticaal gerek te word nie. */
+#fb-datum { max-width: 220px; }
