@@ -488,7 +488,27 @@ function bo_teken_verdeling(S) {
       V.reels[rx].hosting_pct = Number.isFinite(getal)
         ? Math.min(100, Math.max(0, getal))
         : 0;
-      bo_teken_somme(bo_som());
+
+      // HOSTING RAAK MEER AS DIE TOTALE ONDERAAN. Dit verander die reel se
+      // eie oorskot, en 'n persentasie-ontvanger loop op wat NA hosting
+      // oorbly. bo_teken_somme() alleen sou net die blok onderaan bywerk en
+      // die reel se eie syfers laat staan -- en dan lyk dit of hosting niks
+      // doen nie.
+      //
+      // Die hele blok word dus herteken, en die fokus en die wyser word
+      // teruggesit: sonder dit kan 'n mens nie "15" tik nie, want die veld
+      // word na die "1" herbou en die "5" beland nerens.
+      const pos = el.selectionStart;
+      bo_teken();
+      const terug = document.querySelector(`.vd-host[data-reel="${rx}"]`);
+      if (terug) {
+        terug.focus();
+        try {
+          terug.setSelectionRange(pos, pos);
+        } catch (fout) {
+          /* 'n veld wat nie 'n seleksie dra nie */
+        }
+      }
       merk_vuil();
     });
   });
