@@ -145,3 +145,29 @@
   border-left-color: var(--koraal);
   background: #FDECE6;
 }
+
+/* -------------------------------------------------------------------------
+   DIE DOKUMENT SE TABEL LOOP BY SY KAART UIT
+
+   Dit is nie deel van die verdeling nie; dit is 'n fout wat vanaand raakgesien
+   is en wat lank daar was. faktuur.css gee die drie syferkolomme VASTE
+   breedtes -- 78px, 104px en 112px -- plus 'n skrapkolom. Saam met die
+   beskrywing pas dit net solank die kolom breed genoeg is. Krimp die kolom
+   (die venster tussen 1400px en 'n foon), kan die pixels nie kleiner word nie
+   en die tabel steek by die wit kaart se rand uit: die BEDRAG-syfers en die
+   skrapknoppies staan BUITE die kaart.
+
+   Persentasies pas altyd. Die beskrywing kry wat oorbly, en die syfers krimp
+   saam met die kolom in plaas van oor te loop.
+   ------------------------------------------------------------------------- */
+
+.dok-tabel { table-layout: fixed; }
+
+.dok-tabel th:nth-child(2) { width: 11%; }
+.dok-tabel th:nth-child(3) { width: 17%; }
+.dok-tabel th:nth-child(4) { width: 18%; }
+.dok-tabel th:nth-child(5) { width: 30px; }
+
+/* Die beskrywing se veld het sy houer nie gevul nie -- 'n smal kassie in 'n
+   bree kolom lyk soos iets wat halfpad gelaai het. */
+.dok-tabel td input.tel-invoer { width: 100%; min-width: 0; }
