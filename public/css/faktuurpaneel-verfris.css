@@ -1,0 +1,38 @@
+/* public/css/faktuurpaneel-verfris.css
+
+   Die reel wat verskyn wanneer 'n lys intussen verander het terwyl iemand
+   daarin besig was. Sien faktuurpaneel-verfris.js.
+
+   AMBER EN NIE KORAAL NIE: niks is stukkend nie en niks is verloor nie.
+   Daar wag net werk -- 'n herlaai wanneer die persoon klaar is. */
+
+.vf-melding {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 0 0 12px;
+  padding: 9px 13px;
+  border-left: 3px solid var(--amber);
+  background: #FDF6E7;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--swart);
+}
+
+.vf-melding-knop {
+  border: 1px solid var(--amber);
+  background: transparent;
+  border-radius: 999px;
+  padding: 4px 14px;
+  font-family: var(--font-liggaam);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #8A6212;
+  cursor: pointer;
+}
+
+.vf-melding-knop:hover {
+  background: var(--amber);
+  color: var(--swart);
+}

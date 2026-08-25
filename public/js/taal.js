@@ -555,6 +555,11 @@ const WOORDEBOEK = {
   fp_titel: { af: "Boekhouding", en: "Accounts" },
   fp_nav_paneelbord: { af: "Paneelbord", en: "Dashboard" },
   fp_terug: { af: "\u2190 Paneelbord", en: "\u2190 Dashboard" },
+  vf_verander: {
+    af: "Hierdie lys het intussen verander.",
+    en: "This list has changed in the meantime.",
+  },
+  vf_herlaai: { af: "Herlaai", en: "Reload" },
   fp_nav_fakture: { af: "Fakture", en: "Invoices" },
   fp_nav_registers: { af: "Registers", en: "Registers" },
   fp_nav_state: { af: "State", en: "Statements" },
