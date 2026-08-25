@@ -27,6 +27,18 @@ const VENNOOT_AFDELINGS = ["dokumente", "verdeling-rekenaar"];
 function paneel_vennoot_beperk() {
   document.body.classList.add("vennoot-modus");
 
+  // DIE TELLERS BLY, DIE HERSTEL-KNOPPIE GAAN.
+  //
+  // 'n Vennoot sien die vier winkeltellers — kry-statistieke.js laat hom
+  // toe. Maar die ↺ langs Totaal skryf, en herstel-statistiek.js bly
+  // personeel alleen. 'n Sigbare knoppie wat altyd 403 gee, lyk soos 'n
+  // stukkende stelsel.
+  //
+  // Verwyder en nie versteek nie, om dieselfde rede as die kieslys-items:
+  // die blok word een keer gebou en verander nie weer nie.
+  const herstel = document.getElementById("statistiek-herstel-totaal");
+  if (herstel) herstel.remove();
+
   // Verwyder die kieslys-items wat nie geld nie heeltemal uit die DOM.
   // CSS sou hulle net versteek; hier is dit skoner, want die kieslys word
   // een keer gebou en verander nie weer nie.

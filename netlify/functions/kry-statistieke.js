@@ -1,5 +1,13 @@
-// Personeel-beskermd — gee al 4 besoek-tellers terug vir vertoning in
-// die paneelbord. Gee altyd 0 terug (nie 'n fout nie) as 'n bepaalde
+// Personeel EN vennoot — gee al 4 besoek-tellers terug vir vertoning in
+// die paneelbord.
+//
+// 'N VENNOOT LEES DIE TELLERS, HY HERSTEL HULLE NIE. Hierdie Function
+// gee net terug; herstel-statistiek.js skryf, en die bly personeel
+// alleen. Die ↺-knoppie word in vennoot-modus versteek sodat niemand
+// 'n knoppie druk wat in elk geval 403 gee nie.
+//
+// Dieselfde paar as kry-dokumente.js (lees: personeel + vennoot) teenoor
+// skrap-dokument.js (skryf: personeel alleen). Gee altyd 0 terug (nie 'n fout nie) as 'n bepaalde
 // teller nog nooit geskep is nie (bv. splinternuwe werf, nog geen
 // besoeke getel nie).
 
@@ -11,9 +19,12 @@ exports.handler = async (event, context) => {
     return { statusCode: 405, body: "Metode nie toegelaat nie" };
   }
 
-  const gebruiker = await kry_gebruiker_en_kontroleer_rol(event, context, "personeel");
+  const gebruiker = await kry_gebruiker_en_kontroleer_rol(event, context, [
+    "personeel",
+    "vennoot",
+  ]);
   if (!gebruiker) {
-    return { statusCode: 403, body: "Geen toegang nie — personeel-rol vereis" };
+    return { statusCode: 403, body: "Geen toegang nie" };
   }
 
   const store = kry_store("statistieke");
