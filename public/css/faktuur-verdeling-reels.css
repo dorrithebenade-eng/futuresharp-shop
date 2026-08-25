@@ -16,16 +16,26 @@
 
 .vd-reel {
   border-top: 1px solid #E8E6E1;
-  padding: 12px 0 14px;
+  padding: 16px 0 18px;
 }
 
-.vd-reel:first-child { border-top: 0; padding-top: 0; }
+.vd-reel:first-child { border-top: 0; padding-top: 2px; }
 
+/* DIE KOP IS TWEE REELS, NIE EEN NIE.
+   Die backoffice se kolom is smal. Die naam, die Inkomste/Uitgawe-keuse en
+   die bedrag saam op een reel druk die naam tot "Aanbiedin..." en die
+   keuselys hieronder tot "Ignatiu...". Die naam en die bedrag kry dus die
+   volle breedte, en die keuse staan daaronder. */
 .vd-reel-kop {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   gap: 8px;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
+}
+
+.vd-reel-keuse {
+  padding-left: 22px;
+  margin-bottom: 10px;
 }
 
 .vd-nr {
@@ -71,6 +81,15 @@
 
 .vd-soort button.aan { background: var(--swart); color: #fff; }
 
+/* Die ry se rooster kom uit faktuur.css. Hier word net die vaste kolomme
+   effens ingekort sodat die NAAM meer plek kry -- 'n keuselys wat "Ignatiu..."
+   lees, laat 'n mens twyfel of jy die regte persoon gekies het. */
+.vd-reel .vd-ry {
+  grid-template-columns: minmax(0, 1fr) 58px 70px 84px 20px;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
 .vd-voeg {
   background: none;
   border: 0;
@@ -85,9 +104,10 @@
 
 .vd-som {
   display: flex;
-  gap: 18px;
+  align-items: center;
+  gap: 20px;
   flex-wrap: wrap;
-  padding: 8px 0 0 10px;
+  padding: 10px 0 0 10px;
   font-size: 12.5px;
   color: var(--grys-teks);
   font-variant-numeric: tabular-nums;
@@ -112,7 +132,7 @@
 .vd-som .vd-host:focus { outline: 0; border-color: var(--teal); }
 
 .vd-band {
-  margin: 8px 0 0 10px;
+  margin: 10px 0 0 10px;
   padding: 7px 11px;
   border-left: 3px solid var(--amber);
   background: #FDF6E7;

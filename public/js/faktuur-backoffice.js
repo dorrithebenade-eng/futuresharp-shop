@@ -359,6 +359,11 @@ function bo_teken_verdeling(S) {
         <div class="vd-reel-kop">
           <span class="vd-nr">${rx + 1}</span>
           <span class="vd-naam">${naam}</span>
+          <span class="vd-bedrag">${rand_uit(
+            Math.round((Number(r.hoeveelheid) || 0) * (Number(r.prys_pp_sent) || 0)) / 100
+          )}</span>
+        </div>
+        <div class="vd-reel-keuse">
           <div class="vd-soort">
             <button type="button" data-soort="verkoop" class="${isk ? "" : "aan"}">${fv_t(
               "bo_soort_inkomste",
@@ -369,9 +374,6 @@ function bo_teken_verdeling(S) {
               "Uitgawe"
             )}</button>
           </div>
-          <span class="vd-bedrag">${rand_uit(
-            Math.round((Number(r.hoeveelheid) || 0) * (Number(r.prys_pp_sent) || 0)) / 100
-          )}</span>
         </div>
         ${rye}
         <button type="button" class="vd-voeg" data-reel="${rx}">${fv_t(
