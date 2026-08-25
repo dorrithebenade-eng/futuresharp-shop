@@ -265,6 +265,11 @@ function bind_reels() {
         V.reels.splice(ix, 1);
         teken_reels();
         teken_somme();
+        // DIE VERDELING HANG AAN DIE REELS. Skrap 'n mens 'n reel en teken
+        // net die dokument oor, bly die reel se verdeling regs staan -- met
+        // sy bedrag steeds in die totaal. Die twee kolomme is dan uitmekaar
+        // en die faktuurtotaal onderaan lieg.
+        if (window.bo_teken) window.bo_teken();
         merk_vuil();
       });
     }
@@ -721,6 +726,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       V.reels.push(nuwe_reel());
       teken_reels();
       teken_somme();
+      // Die nuwe reel moet DADELIK regs verskyn, met sy eie ontvangers wat
+      // wag om gekies te word. Die reels en die verdeling is een lys.
+      if (window.bo_teken) window.bo_teken();
       merk_vuil();
     });
   }
