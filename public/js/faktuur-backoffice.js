@@ -254,10 +254,20 @@ function bo_reel_toestand(reel, per) {
   const geen_ontvanger =
     koste && !rye.some((v) => String(v.ontvanger || "").trim());
 
+  // GAAN ALLES NA DIE HOOFREKENING, BETEKEN 'N TEKORT NIKS.
+  //
+  // Die band waarsku dat 'n reel se deel van die transaksiefooi elders gedek
+  // word. Is die ontvanger Future Sharp self, kom daardie fooi uit dieselfde
+  // sak as waarheen die geld gaan -- die een sak betaal die ander een. 'n
+  // Waarskuwing daaroor leer 'n mens net om die band te ignoreer.
+  const almal_hoof =
+    rye.length > 0 && rye.every((v) => !v.ontvanger || v.ontvanger === HOOFREKENING);
+
   return {
     koste,
     pct,
     basis,
+    almal_hoof,
     oorskot: basis - toegeken,
     stukkend: pct > 100 || geen_ontvanger,
     geen_ontvanger,
@@ -328,7 +338,7 @@ function bo_teken_verdeling(S) {
              <span>${fv_t("bo_hosting_kort", "Hosting")}
                <input class="n vd-host" data-reel="${rx}" data-veld="hosting"
                       inputmode="decimal" value="${ontsnap(veld_getal(r.hosting_pct))}">%</span>
-             <span>${fv_t("bo_oorskot_kort", "Oorskot")}
+             <span>${fv_t("bo_oorskot_kort", "Na Future Sharp")}
                <strong class="${t.oorskot < 0 ? "kort" : t.oorskot > 0 ? "oor" : ""}">${rand_uit(
                  t.oorskot / 100
                )}</strong></span>
@@ -344,13 +354,17 @@ function bo_teken_verdeling(S) {
               )
             : fv_t("bo_pct_bo_honderd", "Die persentasies tel op tot ") + t.pct + "%."
         }</div>`;
-      } else if (t.oorskot < 0) {
+      } else if (t.oorskot < 0 && !t.almal_hoof) {
+        // "KORT" WAS DIE VERKEERDE WOORD. Daar ontbreek niks; die reel se
+        // deel van die transaksiefooi word net elders gedek. Die R17,62 op 'n
+        // reel van R500 is nie 'n ekstra bedrag nie -- dit is 'n deel van die
+        // R193,80 wat bo-aan staan.
         band = `<div class="vd-band">${fv_t(
           "bo_reel_gedra",
-          "Hierdie reël kort "
+          "Die ontvanger kry die volle bedrag, dus word hierdie reël se deel van die transaksiefooi — "
         )}${rand_uit(-t.oorskot / 100)}${fv_t(
           "bo_reel_gedra_end",
-          ". Die ander reëls dra dit."
+          " — uit Future Sharp se deel gedek."
         )}</div>`;
       }
 
@@ -581,7 +595,7 @@ function bo_teken_somme(S) {
   if (et) {
     et.textContent = tekort
       ? fv_t("bo_tekort", "Tekort")
-      : fv_t("bo_bly_oor", "Bly oor vir Future Sharp");
+      : fv_t("bo_bly_oor", "Na Future Sharp se rekening");
   }
   const bly = g("s-bly");
   if (bly) bly.classList.toggle("tekort", tekort);

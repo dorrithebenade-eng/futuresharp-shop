@@ -1517,7 +1517,7 @@ const WOORDEBOEK = {
   bo_soort_uitgawe: { af: "Uitgawe", en: "Expense" },
   bo_voeg_ontvanger: { af: "+ Voeg 'n ontvanger by", en: "+ Add a recipient" },
   bo_hosting_kort: { af: "Hosting", en: "Hosting" },
-  bo_oorskot_kort: { af: "Oorskot", en: "Surplus" },
+  bo_oorskot_kort: { af: "Na Future Sharp", en: "To Future Sharp" },
   bo_koste_reel: {
     af: "Geen hosting \u2014 die ontvanger kry die volle bedrag terug.",
     en: "No hosting \u2014 the recipient gets the full amount back.",
@@ -1530,10 +1530,13 @@ const WOORDEBOEK = {
     af: "Die persentasies tel op tot ",
     en: "The percentages add up to ",
   },
-  bo_reel_gedra: { af: "Hierdie re\u00ebl kort ", en: "This line is short by " },
+  bo_reel_gedra: {
+    af: "Die ontvanger kry die volle bedrag, dus word hierdie re\u00ebl se deel van die transaksiefooi \u2014 ",
+    en: "The recipient gets the full amount, so this line's share of the transaction fee \u2014 ",
+  },
   bo_reel_gedra_end: {
-    af: ". Die ander re\u00ebls dra dit.",
-    en: ". The other lines carry it.",
+    af: " \u2014 uit Future Sharp se deel gedek.",
+    en: " \u2014 is covered from Future Sharp's share.",
   },
 
   // Die pad is 'n GEVOLG van die ontvanger, nie 'n keuse nie. Die derde een
@@ -1564,9 +1567,9 @@ const WOORDEBOEK = {
     af: "Skenking, n\u00e1 haar deel van die fooi",
     en: "Donation, after its share of the fee",
   },
-  bo_oorskot: { af: "Oorskot", en: "Surplus" },
+  bo_oorskot: { af: "Na Future Sharp se rekening", en: "To the Future Sharp account" },
   bo_begroot_hoof: { af: "Begroot uit die hoofrekening", en: "Budgeted from the main account" },
-  bo_bly_oor: { af: "Bly oor vir Future Sharp", en: "Left for Future Sharp" },
+  bo_bly_oor: { af: "Na Future Sharp se rekening", en: "To the Future Sharp account" },
   bo_tekort: { af: "Tekort", en: "Shortfall" },
 
   bo_dek_nie: {
