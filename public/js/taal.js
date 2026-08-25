@@ -554,6 +554,7 @@ const WOORDEBOEK = {
   // ---------- Boekhouding (faktuurpaneel.html) ----------
   fp_titel: { af: "Boekhouding", en: "Accounts" },
   fp_nav_paneelbord: { af: "Paneelbord", en: "Dashboard" },
+  fp_terug: { af: "\u2190 Paneelbord", en: "\u2190 Dashboard" },
   fp_nav_fakture: { af: "Fakture", en: "Invoices" },
   fp_nav_registers: { af: "Registers", en: "Registers" },
   fp_nav_state: { af: "State", en: "Statements" },
