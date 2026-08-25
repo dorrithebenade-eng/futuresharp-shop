@@ -105,7 +105,7 @@ function fb_vra() {
     )}</p>
     <div class="fb-band">${fb_t(
       "fb_waarsku",
-      "Paystack was nie hier nie. Elke ontvanger verskyn in die uitbetaal-werklys en moet met die hand oorbetaal word."
+      "Die betaling is nie deur Paystack hanteer nie, dus het die outomatiese verdeling nie plaasgevind nie en sal handmatig hanteer moet word. Die ontvangers verskyn onder State, by die begunstigdes wat uit die hoofrekening betaal moet word."
     )}</div>
 
     <label class="fu-etiket" for="fb-bedrag">${fb_t("fb_bedrag", "Bedrag ontvang")}</label>

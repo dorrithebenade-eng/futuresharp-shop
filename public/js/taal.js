@@ -1798,8 +1798,8 @@ const WOORDEBOEK = {
     en: "For money received outside the payment link. The invoice goes to Paid and cannot be changed after that.",
   },
   fb_waarsku: {
-    af: "Paystack was nie hier nie. Elke ontvanger verskyn in die uitbetaal-werklys en moet met die hand oorbetaal word.",
-    en: "Paystack was not involved. Every recipient appears in the payout worklist and must be paid over by hand.",
+    af: "Die betaling is nie deur Paystack hanteer nie, dus het die outomatiese verdeling nie plaasgevind nie en sal handmatig hanteer moet word. Die ontvangers verskyn onder State, by die begunstigdes wat uit die hoofrekening betaal moet word.",
+    en: "This payment was not handled by Paystack, so the automatic split did not take place and will have to be handled manually. The recipients appear under Statements, among the beneficiaries to be paid from the main account.",
   },
   fb_bedrag: { af: "Bedrag ontvang", en: "Amount received" },
   fb_datum: { af: "Datum ontvang", en: "Date received" },
