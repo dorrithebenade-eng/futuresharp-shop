@@ -364,7 +364,9 @@ function bo_teken_verdeling(S) {
               "Uitgawe"
             )}</button>
           </div>
-          <span class="vd-bedrag">${rand_uit((Number(r.bedrag_sent) || 0) / 100)}</span>
+          <span class="vd-bedrag">${rand_uit(
+            Math.round((Number(r.hoeveelheid) || 0) * (Number(r.prys_pp_sent) || 0)) / 100
+          )}</span>
         </div>
         ${rye}
         <button type="button" class="vd-voeg" data-reel="${rx}">${fv_t(
@@ -651,6 +653,31 @@ function bo_teken() {
 // Net die syfers. Dit is wat loop terwyl iemand 'n bedrag tik.
 function bo_teken_syfers() {
   bo_teken_somme(bo_som());
+
+  // DIE NAAM EN DIE BEDRAG PER REEL WORD SAAM BYGEWERK.
+  //
+  // Verander 'n mens 'n reel se beskrywing in die dokument links, loop net
+  // hierdie funksie -- bo_teken() sou die hele verdelingsblok herbou en die
+  // wyser uit die veld ruk waarin iemand tik. Sonder hierdie stukkie het die
+  // verdeling steeds die OU naam gedra: 'n mens hernoem "Reiskoste" na
+  // "Pamflette" en regs staan Reiskoste nog.
+  //
+  // Net die TEKS word aangeraak, nooit die struktuur nie, dus is daar niks om
+  // te herbind nie.
+  V.reels.forEach((r, rx) => {
+    const blok = document.querySelector(`.vd-reel[data-reel="${rx}"]`);
+    if (!blok) return;
+
+    const naam = blok.querySelector(".vd-naam");
+    if (naam) naam.textContent = r.beskrywing || fv_t("bo_reel_naamloos", "Naamloos");
+
+    const bedrag = blok.querySelector(".vd-bedrag");
+    if (bedrag) {
+      bedrag.textContent = rand_uit(
+        Math.round((Number(r.hoeveelheid) || 0) * (Number(r.prys_pp_sent) || 0)) / 100
+      );
+    }
+  });
 }
 
 window.bo_teken = bo_teken;
