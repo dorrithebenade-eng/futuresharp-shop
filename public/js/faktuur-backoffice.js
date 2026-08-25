@@ -125,18 +125,23 @@ function bo_som() {
 
 /* ═══ teken ═══ */
 
-// Die twee lyste kry NIE dieselfde keuses nie.
+// ALBEI LYSTE KRY FUTURE SHARP (25 Augustus 2026).
 //
-//   die BEGROTING  — Future Sharp hoort daar. 'n Koste kan deur die
-//                    hoofrekening betaal word; dit is die hele punt van die
-//                    drie paaie.
-//   die VERDELING  — Future Sharp hoort NIE daar nie. Hy IS die
-//                    hoofrekening. 'n Ry vir hom verminder die oorskot
-//                    sonder om iemand te betaal: dit lyk soos 'n uitbetaling
-//                    en is nie een nie. Sy deel is wat OORBLY nadat almal
-//                    afgetrek is — presies dieselfde slaggat as die winkel
-//                    se oorskot, waar 'n ry daarvoor beteken die deel word
-//                    uitbetaal EN daar bly niks vir Paystack nie.
+// Tot hier is Future Sharp uit die VERDELING gehou, op grond daarvan dat 'n
+// ry vir hom soos 'n uitbetaling lyk terwyl dit nie een is nie. Die vrees was
+// die winkel se slaggat: 'n ry vir die oorskot beteken die deel word uitbetaal
+// EN daar bly niks vir Paystack nie.
+//
+// Die vrees is ongegrond, en die som keer dit self. fs_bereken() hou 'n lys
+// FS_BLY_IN_HOOFREKENING met "Hosting" en "Future Sharp" daarin: so 'n ry tel
+// wel by die TOEGEKENDE bedrag — dus krimp die reël se oorskot — maar dit word
+// nooit 'n ontvanger nie en beland nooit in 'n Paystack-verdeling nie.
+// bo_pad() gee boonop "hoof" vir Future Sharp, dus is daar geen subrekening om
+// heen te betaal nie.
+//
+// Wat dit koop, is 'n verdeling wat volledig LEES. 'n Reël met Eugene 70%,
+// Hosting 5% en Future Sharp 25% wys waar elke rand heen gaan; sonder daardie
+// derde ry moet 'n mens die oorskot self aflei.
 function bo_ontvanger_opsies(gekies, met_hoofrekening) {
   const uit = BEGUNSTIGDES.map(
     (b) => `<option ${b.naam === gekies ? "selected" : ""}>${ontsnap(b.naam)}</option>`
@@ -296,7 +301,7 @@ function bo_teken_verdeling(S) {
 
           return `
           <div class="vd-ry" data-reel="${rx}" data-ry="${ix}">
-            <select data-veld="ontvanger">${bo_ontvanger_opsies(v.ontvanger, false)}</select>
+            <select data-veld="ontvanger">${bo_ontvanger_opsies(v.ontvanger, true)}</select>
             <div class="vd-tipe">
               <button type="button" data-tipe="pct" class="${v.tipe === "pct" ? "aan" : ""}">%</button>
               <button type="button" data-tipe="vas" class="${v.tipe === "vas" ? "aan" : ""}">R</button>
@@ -440,7 +445,23 @@ function bo_teken_verdeling(S) {
     knop.addEventListener("click", () => {
       const rx = Number(knop.getAttribute("data-reel"));
       if (!Array.isArray(V.reels[rx].verdeling)) V.reels[rx].verdeling = [];
-      V.reels[rx].verdeling.push({ ontvanger: "", tipe: "pct", waarde: 0 });
+
+      // DIE RY BEGIN MET 'N WERKLIKE ONTVANGER, nie met 'n lee naam nie.
+      //
+      // 'n Keuselys wys sy eerste opsie sodra hy verskyn, maar `change` vuur
+      // eers wanneer iemand iets ANDERS kies. 'n Ry wat met "" begin, wys dus
+      // 'n naam op die skerm terwyl V nog niks dra -- en dan sê die koraalband
+      // dat 'n uitgawe geen ontvanger het nie terwyl daar duidelik een staan.
+      //
+      // Kies iemand wat werklik betaal kan word; anders die eerste op die lys,
+      // met sy merkie wat sê wat kort.
+      const eerste =
+        BEGUNSTIGDES.find((b) => (b.subrekening_kode || "").trim()) || BEGUNSTIGDES[0];
+      V.reels[rx].verdeling.push({
+        ontvanger: eerste ? eerste.naam : "",
+        tipe: "pct",
+        waarde: 0,
+      });
       bo_teken();
       merk_vuil();
     });
