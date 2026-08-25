@@ -147,6 +147,31 @@
 }
 
 /* -------------------------------------------------------------------------
+   DIE BLADSY WAS OP 900px VASGEPEN
+
+   .paneel-wrap in styl.css dra max-width: 900px. Dit is reg vir die
+   paneelbord en vir Boekhouding, waar EEN kolom loop. Die faktuurblad het
+   TWEE kolomme langs mekaar -- die dokument en die backoffice -- en moes
+   albei in daardie 900px pas. Die dokument het toe sowat 480px gekry terwyl
+   daar duisend pixels wit langsaan gele het.
+
+   Dit is die oorsaak van alles wat op 25 Augustus gesien is: die opskrifte
+   HOEVEELHEID / EENHEIDSPRYS / BEDRAG wat inmekaar loop, die tabel wat by die
+   wit kaart uitsteek, en 'n keuselys wat "Ignatiu..." lees.
+
+   Die perk word hier NET vir hierdie bladsy gelig. #fv-hoof is die
+   faktuurblad se eie id, dus bly elke ander .paneel-wrap onaangeraak.
+   ------------------------------------------------------------------------- */
+
+#fv-hoof.paneel-wrap {
+  max-width: 1600px;
+}
+
+/* Die dokument mag saamgroei. 900px was 'n perk wat by 'n enkelkolom-bladsy
+   gepas het; met die backoffice langsaan is dit 'n knyp. */
+#fv-hoof .dok { max-width: none; }
+
+/* -------------------------------------------------------------------------
    DIE DOKUMENT SE TABEL LOOP BY SY KAART UIT
 
    Dit is nie deel van die verdeling nie; dit is 'n fout wat vanaand raakgesien
@@ -163,10 +188,17 @@
 
 .dok-tabel { table-layout: fixed; }
 
-.dok-tabel th:nth-child(2) { width: 11%; }
-.dok-tabel th:nth-child(3) { width: 17%; }
-.dok-tabel th:nth-child(4) { width: 18%; }
+.dok-tabel th:nth-child(2) { width: 90px; }
+.dok-tabel th:nth-child(3) { width: 120px; }
+.dok-tabel th:nth-child(4) { width: 130px; }
 .dok-tabel th:nth-child(5) { width: 30px; }
+
+/* Op 'n nou venster krimp hulle wel, sodat die tabel steeds nie uitsteek nie. */
+@media (max-width: 1100px) {
+  .dok-tabel th:nth-child(2) { width: 11%; }
+  .dok-tabel th:nth-child(3) { width: 17%; }
+  .dok-tabel th:nth-child(4) { width: 18%; }
+}
 
 /* Die beskrywing se veld het sy houer nie gevul nie -- 'n smal kassie in 'n
    bree kolom lyk soos iets wat halfpad gelaai het. */
