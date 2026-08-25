@@ -422,17 +422,30 @@ function bo_teken_verdeling(S) {
           ? Number(String(e.target.value).replace(",", ".")) || 0
           : na_sent(e.target.value);
 
-      // NET die syfers word bygewerk terwyl iemand tik — herbou 'n mens die
-      // ry, spring die wyser na die einde van die veld.
-      const X = bo_som();
-      const b = X.u.perReel[rx] ? X.u.perReel[rx].basisSent / 100 : 0;
-      const uit = ry.querySelector(".uit");
-      if (uit) {
-        uit.textContent = rand_uit(
-          v.tipe === "pct" ? ((Number(v.waarde) || 0) / 100) * b : (Number(v.waarde) || 0) / 100
-        );
+      // 'N BEDRAG RAAK MEER AS SY EIE RY.
+      //
+      // Die eerste weergawe het net die ry se bedrag en die totale onderaan
+      // bygewerk. Die REEL se oorskot het toe die waarde gewys van voordat
+      // die bedrag ingetik is: 'n reel van R4 823,82 met R4 582,63 aan
+      // iemand het "Oorskot R4 582,63" gelees terwyl dit R0,00 moes wees.
+      // Dieselfde vir die amberband, wat 'n verouderde tekort genoem het.
+      //
+      // Alles word dus herteken, en die fokus en die wyser kom terug --
+      // sonder dit kan 'n mens nie 'n getal van meer as een syfer intik nie,
+      // want die veld word na die eerste syfer herbou.
+      const pos = e.target.selectionStart;
+      bo_teken();
+      const terug = document.querySelector(
+        `.vd-ry[data-reel="${rx}"][data-ry="${ix}"] [data-veld="waarde"]`
+      );
+      if (terug) {
+        terug.focus();
+        try {
+          terug.setSelectionRange(pos, pos);
+        } catch (fout) {
+          /* 'n veld wat nie 'n seleksie dra nie */
+        }
       }
-      bo_teken_somme(X);
       merk_vuil();
     });
 

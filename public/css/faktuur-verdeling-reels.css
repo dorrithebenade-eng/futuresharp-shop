@@ -167,6 +167,17 @@
   max-width: 1600px;
 }
 
+/* DIE BACKOFFICE MAG SAAMGROEI.
+   faktuur.css pen die regterkolom op 400px vas en gee die dokument alles wat
+   oorbly -- op 'n bree skerm dus alles. Die keuselys lees dan "Ignatiu..."
+   langs 'n dokument met ruimte oor. Die twee kolomme deel nou, met die
+   backoffice tussen 400px en 560px sodat dit nie belaglik breed word nie. */
+#fv-hoof .fv-blad {
+  grid-template-columns: minmax(0, 1fr) minmax(400px, 0.62fr);
+}
+
+#fv-hoof .bo-kaart { max-width: none; }
+
 /* Die dokument mag saamgroei. 900px was 'n perk wat by 'n enkelkolom-bladsy
    gepas het; met die backoffice langsaan is dit 'n knyp. */
 #fv-hoof .dok { max-width: none; }
