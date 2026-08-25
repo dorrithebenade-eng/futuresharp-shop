@@ -233,7 +233,7 @@ async function bg_stoor() {
 
     const ix = BG.lys.findIndex((x) => x.begunstigde_id === uit.begunstigde_id);
     if (ix >= 0) BG.lys[ix] = rekord; else BG.lys.push(rekord);
-    BG.lys.sort((a, b) => (a.naam || "").localeCompare(b.naam || "", "af"));
+    BG.lys.sort((a, b) => (a.naam || "").localeCompare(b.naam || "", "af-ZA"));
 
     bg_maak_vorm_toe();
     bg_teken_lys();
@@ -277,6 +277,11 @@ async function bg_laai() {
   try {
     const uit = await bg_vra("kry-begunstigdes");
     BG.lys = uit.begunstigdes || [];
+    // ALFABETIES BY DIE LAAI, nie net na 'n stoor nie. Die bediener gee die
+    // lys in sleutelvolgorde terug, en 'n sleutel is nie 'n naam nie. Sonder
+    // hierdie reel lyk die register reg sodra 'n mens iets gestoor het en
+    // weer verkeerd sodra 'n mens die bladsy herlaai.
+    BG.lys.sort((a, b) => (a.naam || "").localeCompare(b.naam || "", "af-ZA"));
     bg_teken_lys();
   } catch (f) {
     console.error("Kon nie die begunstigdes laai nie:", f);

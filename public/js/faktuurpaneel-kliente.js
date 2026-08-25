@@ -396,6 +396,11 @@ async function fk_laai() {
   try {
     const data = await fk_vra("kry-kliente");
     FK.kliente = data.kliente || [];
+    // ALFABETIES BY DIE LAAI, nie net na 'n stoor nie. Die bediener gee die
+    // lys in sleutelvolgorde terug, en 'n sleutel is nie 'n naam nie. Sonder
+    // hierdie reel lyk die register reg sodra 'n mens iets gestoor het en
+    // weer verkeerd sodra 'n mens die bladsy herlaai.
+    FK.kliente.sort((a, b) => (a.naam || "").localeCompare(b.naam || "", "af-ZA"));
     FK.duplikate = data.duplikate || [];
     const oop = FK.duplikate.map((p) => p.sleutel);
     FK.nagegaan = fk_alle_pare().map((p) => p.sleutel).filter((s) => !oop.includes(s));

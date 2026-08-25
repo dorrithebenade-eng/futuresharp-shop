@@ -1,0 +1,52 @@
+/* public/css/faktuurpaneel-gevaarsone.css
+
+   TYDELIK -- moet saam met faktuurpaneel-gevaarsone.js en
+   vee-fakture-uit.js verwyder word sodra die skoonmaak gedoen is. */
+
+.gz-blok {
+  margin: 40px 0 0;
+  padding: 20px 22px;
+  border: 1px solid var(--koraal);
+  border-radius: 12px;
+  background: #FDECE6;
+}
+
+.gz-kop {
+  margin: 0 0 10px;
+  font-family: var(--font-opskrif);
+  font-size: 16px;
+  color: var(--koraal);
+}
+
+.gz-teks {
+  margin: 0 0 12px;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--swart);
+}
+
+.gz-blok .veld-etiket { margin-top: 6px; }
+
+.gz-knop {
+  margin-top: 14px;
+  background: var(--koraal);
+  color: #fff;
+}
+
+.gz-knop:hover { background: #d44a26; }
+
+.gz-knop[disabled] {
+  opacity: .45;
+  cursor: default;
+}
+
+.gz-uitslag {
+  margin: 12px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+.gz-uitslag[hidden] { display: none; }
+.gz-fout { color: var(--koraal); }
+.gz-klaar { color: #1F6B5C; }

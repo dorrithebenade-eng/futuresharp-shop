@@ -215,6 +215,11 @@ async function wi_laai() {
   try {
     const data = await wi_vra("kry-werk-items");
     WI.items = data.items || [];
+    // ALFABETIES BY DIE LAAI, nie net na 'n stoor nie. Die bediener gee die
+    // lys in sleutelvolgorde terug, en 'n sleutel is nie 'n naam nie. Sonder
+    // hierdie reel lyk die register reg sodra 'n mens iets gestoor het en
+    // weer verkeerd sodra 'n mens die bladsy herlaai.
+    WI.items.sort((a, b) => (a.naam || "").localeCompare(b.naam || "", "af-ZA"));
     wi_teken_lys();
   } catch (f) {
     console.error("Kon nie die register laai nie:", f);
