@@ -82,6 +82,14 @@ function datum_na_iso(dag) {
   return `${dag}T12:00:00.000Z`;
 }
 
+// VANDAG SE DATUM IN ONS TYD, nie in UTC nie. Die bediener loop op UTC; om
+// 09:00 in Pretoria is dit dáár nog 07:00, maar dit is dieselfde dag. Waar
+// dit stukkend gaan, is die aand: om 01:00 SAST is dit in UTC nog gister,
+// en dan sou "vandag" as toekoms gelees word.
+function dag_vandag() {
+  return new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString().slice(0, 10);
+}
+
 exports.handler = async (event, context) => {
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: "Metode nie toegelaat nie" };
@@ -162,11 +170,17 @@ exports.handler = async (event, context) => {
     };
   }
 
+  // DAE WORD MET DAE VERGELYK, NOOIT MET TYE NIE.
+  //
+  // Die eerste weergawe het die ontvangs as middag UTC gestoor en dit teen
+  // `uitgereik_op` se volle tydstempel gemeet. 'n Faktuur wat ná 14:00 ons
+  // tyd uitgereik is, het toe elke betaling van daardie dag geweier — die
+  // middag was "voor" die uitreiking. Die dag is al wat hier saak maak.
   const dag_iso = datum_na_iso(dag);
-  if (new Date(dag_iso).getTime() > Date.now()) {
+  if (dag > dag_vandag()) {
     return { statusCode: 400, body: "Die datum lê in die toekoms." };
   }
-  if (rekord.uitgereik_op && dag_iso < rekord.uitgereik_op) {
+  if (rekord.uitgereik_op && dag < String(rekord.uitgereik_op).slice(0, 10)) {
     return {
       statusCode: 400,
       body: "Die datum lê voor die faktuur uitgereik is.",
