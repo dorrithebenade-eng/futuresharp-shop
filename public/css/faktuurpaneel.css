@@ -20,6 +20,19 @@
 
 .fp-kieslys::-webkit-scrollbar { display: none; }
 
+/* OP 'N FOON WIKKEL DIE PILLE. Vyf pille pas nie in 380px nie, en die
+   scrollbalk is weggesteek -- 'n mens sien dus nie dat Joernaal en
+   Instellings regs wag nie. 'n Vervaagstrook aan die rand sou 'n wenk
+   gee, maar hy vervaag ook die AKTIEWE pil wanneer 'n mens heel regs
+   gescroll het. Twee rye wys almal, altyd. */
+@media (max-width: 620px) {
+  .fp-kieslys {
+    flex-wrap: wrap;
+    overflow-x: visible;
+  }
+  .fp-pil { font-size: 13.5px; padding: 10px 17px; }
+}
+
 .fp-pil {
   flex: 0 0 auto;
   background: var(--wit);
@@ -283,8 +296,18 @@ a.paneel-kieslys-item { text-decoration: none; }
   margin-bottom: 2px;
 }
 
-.fk-soekbalk { display: flex; gap: 10px; margin-bottom: 6px; }
+.fk-soekbalk { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 6px; }
 .fk-soekbalk .veld-invoer { flex: 1; min-width: 0; }
+
+/* DIE KNOPPIE MAG NIE DIE SOEKVELD PLATDRUK NIE. `.kaart-aksie` dra
+   `flex-shrink: 0` en onder 560px ook `width: 100%`. In 'n flex-ry sonder
+   wrap beteken dit: die knoppie wil die hele breedte he en mag nie krimp
+   nie, dus word die soekveld tot 'n lee blokkie gedruk EN steek die
+   knoppie steeds by die rand uit. Die veld kry hier 'n hele reel; die
+   knoppie skuif dan vanself daaronder in. */
+@media (max-width: 560px) {
+  .fk-soekbalk .veld-invoer { flex: 1 1 100%; }
+}
 .fk-hulp { font-size: 12px; color: var(--grys-teks); margin: 0 0 14px; }
 
 .fk-ry {
@@ -751,6 +774,19 @@ a.paneel-kieslys-item { text-decoration: none; }
 }
 
 .kaart-aksie.wi-stil:hover { background: var(--wit); border-color: var(--teal); color: var(--teal); }
+
+/* `.stil` HET NOOIT BESTAAN NIE. Sewe knoppies op hierdie bladsy dra
+   `class="kaart-aksie stil"` -- albei Kopieer-knoppies, Herstel, Laai af,
+   Wys al, en die Kanselleer-knoppie van die klientvorm en die
+   begunstigdevorm. Sonder 'n reel val hulle almal terug op vol koraal,
+   en dan lyk Kanselleer soos Stoor. Dieselfde vorm as .wi-stil hierbo. */
+.kaart-aksie.stil {
+  background: var(--wit);
+  color: var(--grys-teks);
+  border: 1px solid #DDD9D2;
+}
+
+.kaart-aksie.stil:hover { background: var(--wit); border-color: var(--teal); color: var(--teal); }
 
 .wi-merk {
   display: flex;

@@ -610,7 +610,7 @@ const WOORDEBOEK = {
   jn_besig: { af: "Besig \u2026", en: "Working \u2026" },
   jn_herhaal: { af: "herhaal", en: "repeat" },
   jn_verwyder: { af: "Verwyder", en: "Remove" },
-  jn_uitvoer: { af: "Voer uit", en: "Export" },
+  jn_uitvoer: { af: "Laai af", en: "Download" },
   jn_van: { af: "Van", en: "From" },
   jn_tot: { af: "Tot", en: "To" },
   jn_soek: { af: "Beskrywing", en: "Description" },

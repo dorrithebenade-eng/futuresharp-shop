@@ -46,6 +46,21 @@
 
 .jn-filter .veld-invoer { margin: 0; }
 
+/* HERSTEL IS STIL, LAAI AF IS TEAL. Nie een van die twee is 'n stop of 'n
+   onomkeerbare handeling nie, dus is koraal vir albei verkeerd. Laai af is
+   die enigste een wat iets voortbring; Herstel sit net die tydperk terug. */
+#jn-uitvoer.kaart-aksie.stil {
+  background: var(--teal);
+  color: var(--wit);
+  border-color: var(--teal);
+}
+
+#jn-uitvoer.kaart-aksie.stil:hover {
+  background: #3C8B7F;
+  border-color: #3C8B7F;
+  color: var(--wit);
+}
+
 .jn-tydperk {
   margin: 0 0 20px;
   font-size: 12.5px;
@@ -375,17 +390,27 @@
    ------------------------------------------------------------------------- */
 
 @media (max-width: 620px) {
-  .jn-filter,
   .jn-nuwe {
     grid-template-columns: 1fr;
     gap: 12px;
   }
 
-  /* Die knoppies staan langs mekaar in plaas van onder mekaar -- twee
-     volbreedte-knoppies onder 'n vorm lyk soos twee aparte handelinge. */
+  /* DIE KNOPPIES STAAN LANGS MEKAAR, nie onder mekaar nie -- twee
+     volbreedte-knoppies onder 'n vorm lyk soos twee aparte handelinge.
+     Die drie velde vat elkeen 'n hele reel; die twee knoppies deel die
+     laaste een. */
+  .jn-filter {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .jn-filter > div { grid-column: 1 / -1; }
+
   .jn-filter #jn-herstel,
   .jn-filter #jn-uitvoer {
     width: 100%;
+    padding-left: 0;
+    padding-right: 0;
   }
 
   .jn-blokke { grid-template-columns: 1fr; }
