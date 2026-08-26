@@ -642,6 +642,19 @@ const WOORDEBOEK = {
   },
   bg_stoor_fout: { af: "Kon nie stoor nie. Probeer weer.", en: "Could not save. Please try again." },
   // ---------- Boekhouding (faktuurpaneel.html) ----------
+  // -- Wie is nou ook hier ------------------------------------------------
+  // Een reel tussen die titel en die pille, of niks. Sien
+  // faktuurpaneel-teenwoordigheid.js: een oproep elke twee minute, slegs
+  // terwyl die oortjie sigbaar is.
+  //
+  // "is aanlyn", nie "is nou aan die werk" nie -- die stelsel weet die een
+  // en nie die ander nie.
+  tw_een: { af: "{naam} is aanlyn", en: "{naam} is online" },
+  tw_twee: { af: "{a} en {b} is aanlyn", en: "{a} and {b} are online" },
+  // Kom in die praktyk nooit voor nie -- daar is twee direkteure. Die reel
+  // bestaan sodat sy nie breek as daar ooit 'n derde is nie.
+  tw_baie: { af: "{n} ander is aanlyn", en: "{n} others are online" },
+
   fp_titel: { af: "Boekhouding", en: "Accounts" },
   fp_nav_paneelbord: { af: "Paneelbord", en: "Dashboard" },
   fp_terug: { af: "\u2190 Paneelbord", en: "\u2190 Dashboard" },

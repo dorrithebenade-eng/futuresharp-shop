@@ -10,6 +10,32 @@
  * stilweg hierdie skerm nie.
  */
 
+/* WIE IS NOU OOK HIER.
+   Een reel tussen die titel en die pille, of niks. Sy verskyn en verdwyn
+   vanself -- 'n lee element sou 'n gaping los waar niks is nie.
+
+   TEAL, want dit is informatief. Klein en lig: dit is die MINSTE belangrike
+   ding op die skerm en mag nie die oog van die pille aftrek nie. */
+.fp-teenwoordig {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: -12px 0 18px;
+  font-family: var(--font-liggaam);
+  font-size: 12.5px;
+  color: var(--grys-teks);
+}
+
+/* Die stippel dra die betekenis; die woord dra die naam. Sonder hom lees die
+   reel soos 'n aantekening en nie soos 'n toestand nie. */
+.fp-teenwoordig-stip {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--teal);
+  flex-shrink: 0;
+}
+
 .fp-kieslys {
   display: flex;
   gap: 9px;
