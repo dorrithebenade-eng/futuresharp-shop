@@ -62,21 +62,6 @@
    albei paaie gelyktydig oop en spreek die bladsy homself teen. */
 .dankie-knoppie[hidden] { display: none; }
 
-/* EEN HOOFAKSIE PER UITKOMS. Drie vol-koraal knoppies langs mekaar se
-   dringendheid is oral dieselfde, en dan is nie een dringend nie. Die
-   hoofaksie bly koraal; "Terug na die winkel" is 'n uitgang en word stil. */
-#dankie-winkel-knoppie {
-  background: var(--wit);
-  color: var(--grys-teks);
-  border: 1px solid #DDD9D2;
-}
-
-#dankie-winkel-knoppie:hover {
-  background: var(--wit);
-  border-color: var(--teal);
-  color: var(--teal);
-}
-
 /* Die mandjiereel. Sy taak is om 'n verlies in 'n feit te verander: 'n koper
    wat sien sy mandjie is leeg, moet weet waarom. Klein, want dit is 'n
    voetnoot by die boodskap, nie 'n tweede boodskap nie. */
@@ -96,9 +81,11 @@
   font-weight: 500;
 }
 
-/* DRIE KNOPPIES PAS NIE LANGS MEKAAR OP 'N FOON NIE. Hoogstens twee is ooit
-   gelyk sigbaar -- die derde is altyd versteek -- maar twee vol-koraal
-   knoppies langs mekaar op 380px loop uit. Hulle stapel. */
+/* EEN KNOPPIE, ALTYD. Die twee in die HTML sluit mekaar uit -- My Boeke by 'n
+   betaalde uitkoms, die mandjie by 'n onbetaalde een -- en "Terug na die
+   winkel" is weg, want die merk in die kop gaan reeds daarheen. Op 'n foon
+   vat die een knoppie die volle breedte, soos .kaart-aksie onder 560px
+   in elk geval doen. */
 @media (max-width: 560px) {
   .dankie-knoppies { flex-direction: column; align-items: stretch; }
 }

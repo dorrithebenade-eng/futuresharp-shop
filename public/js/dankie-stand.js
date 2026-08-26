@@ -44,6 +44,8 @@ const DS_MANDJIE_SLEUTEL = "future_shop_mandjie";
 // mandjie leeg; alles anders laat hom staan.
 const DS_BY_DIE_BANK = ["betaal", "loop"];
 
+// Slegs vir die TELLING. Wat gekoop is, kom uit die bestelling -- sien
+// ds_teken. Die mandjie weet net wat nog wag.
 function ds_lees_mandjie() {
   try {
     const ruwe = localStorage.getItem(DS_MANDJIE_SLEUTEL);
@@ -72,33 +74,28 @@ function ds_wys_knoppie(id, wys) {
   if (el) el.hidden = !wys;
 }
 
-// Die opskrif en die teks per uitkoms. Die MANDJIE bepaal watter woord by
-// "betaal" gebruik word: 'n suiwer e-boekmandjie is 'n AANKOOP wat klaar is;
-// enigiets met 'n harde kopie is 'n BESTELLING waarop 'n druk- en
-// afleweringsproses volg. Daardie onderskeid het in die ou blok gestaan en
-// bly hier behoue.
-function ds_teken(stand, items) {
-  const bevat_harde_kopie = items.some((i) => i && i.formaat === "harde_kopie");
-  const bevat_eboek = items.some((i) => i && i.formaat === "eboek");
-
+// Die opskrif en die teks per uitkoms.
+//
+// DIE FORMATE KOM UIT DIE BESTELLING, NIE UIT DIE MANDJIE NIE. 'n Suiwer
+// e-boekbestelling is 'n AANKOOP wat klaar is; enigiets met 'n harde kopie is
+// 'n BESTELLING waarop 'n druk- en afleweringsproses volg. Die ou kode het die
+// mandjie gelees om dit te weet -- maar teen die tyd dat die koper hierdie
+// bladsy lees, is die mandjie leeg, en dan moes die bladsy raai. 'n Sin soos
+// "het jou bestelling e-boeke bevat" laat die koper ONS twyfel sien oor iets
+// wat hy pas gekoop het. kry-bestelstand.js antwoord dit nou.
+function ds_teken(stand, u) {
   const kaart = document.getElementById("dankie-kaart");
   if (kaart) kaart.className = "dankie-kaart ds-t-" + stand;
 
   ds_stel("dankie-merkie", t("ds_merk_" + stand));
 
   if (stand === "betaal") {
-    if (bevat_eboek && !bevat_harde_kopie) {
+    if (u.bevat_eboek && !u.bevat_harde_kopie) {
       ds_stel("dankie-titel", t("dankie_titel_aankoop"));
       ds_stel("dankie-teks", t("dankie_teks_eboek_alleen"));
-    } else if (bevat_harde_kopie) {
+    } else {
       ds_stel("dankie-titel", t("dankie_titel"));
       ds_stel("dankie-teks", t("dankie_teks_bevat_harde_kopie"));
-    } else {
-      // Die mandjie was reeds leeg toe die bladsy laai — 'n blaaier se
-      // terugknoppie, of 'n tweede besoek. Die betaling is steeds deur, dus
-      // is 'n generiese bevestiging korrek en 'n foutboodskap nie.
-      ds_stel("dankie-titel", t("dankie_titel"));
-      ds_stel("dankie-teks", t("ds_teks_betaal"));
     }
     ds_wys_knoppie("dankie-my-boeke-knoppie", true);
     ds_wys_knoppie("dankie-mandjie-knoppie", false);
@@ -116,15 +113,27 @@ function ds_teken(stand, items) {
   ds_wys_knoppie("dankie-mandjie-knoppie", !na_my_boeke);
 }
 
-// Die mandjiereël onder die knoppies. Sy taak is om 'n verlies in 'n feit te
-// verander: 'n koper wat sien sy mandjie is leeg, moet weet waarom.
+// Die mandjiereël onder die knoppies.
+//
+// SY STAAN NET WAAR DIE KOPER SELF DIE VRAAG SOU VRA. Ná 'n kansellasie wonder
+// hy of sy keuses weg is, en dan is die antwoord nuus. Ná 'n GESLAAGDE aankoop
+// dink niemand aan sy mandjie nie -- "Mandjie leeggemaak" is dan huishouding
+// wat ons oor onsself vertel, en dit laat hom boonop wonder of hy bekommerd
+// moes gewees het. Dieselfde by "loop": die waarskuwing teen 'n tweede
+// bestelling staan in die hoofteks, waar sy hoort.
 function ds_teken_mandjie(stand, aantal) {
   const el = document.getElementById("dankie-mandjie-nota");
   if (!el) return;
-  if (stand === "loop") el.textContent = t("ds_mandjie_loop");
-  else if (stand === "betaal") el.textContent = t("ds_mandjie_leeg");
-  else if (aantal > 0) el.textContent = t("ds_mandjie_behou").replace("{n}", aantal);
-  else el.textContent = "";
+  if (stand === "betaal" || stand === "loop" || aantal < 1) {
+    el.textContent = "";
+    return;
+  }
+  // Een item is nie "1 items" nie. Twee sleutels, want die reël is kort genoeg
+  // dat 'n mens die fout dadelik sien.
+  el.textContent =
+    aantal === 1
+      ? t("ds_mandjie_behou_een")
+      : t("ds_mandjie_behou").replace("{n}", aantal);
 }
 
 async function ds_begin() {
@@ -137,11 +146,15 @@ async function ds_begin() {
     bestelnommer ? `${t("bestelnommer_etiket")}: ${bestelnommer}` : ""
   );
 
-  // LEES DIE MANDJIE VOORDAT ENIGIETS HOM KAN LEEGMAAK. Die inhoud bepaal
-  // watter woorde gebruik word, en by "betaal" is hy 'n oomblik later weg.
-  const items = ds_lees_mandjie();
+  // Die MANDJIE se lengte, gelees voordat enigiets hom kan leegmaak. Dit is
+  // die enigste ding waarvoor die mandjie hier nog dien: hoeveel wag nog vir
+  // die koper ná 'n kansellasie. WAT gekoop is, kom uit die bestelling.
+  const in_mandjie = ds_lees_mandjie().length;
 
-  let stand = "onbekend";
+  // Die terugval as die oproep misluk of die sessie verval het. "onbekend"
+  // hou die mandjie, wat die veilige kant is: 'n leë mandjie op grond van 'n
+  // raaiskoot is die duurder fout.
+  let uitslag = { stand: "onbekend", bevat_eboek: false, bevat_harde_kopie: false };
 
   if (bestelnommer) {
     try {
@@ -157,8 +170,8 @@ async function ds_begin() {
           { headers: { Authorization: `Bearer ${sessie.access_token}` } }
         );
         if (resp.ok) {
-          const uitslag = await resp.json();
-          if (uitslag && uitslag.stand) stand = uitslag.stand;
+          const data = await resp.json();
+          if (data && data.stand) uitslag = data;
         }
       }
     } catch (fout) {
@@ -166,10 +179,10 @@ async function ds_begin() {
     }
   }
 
-  if (DS_BY_DIE_BANK.includes(stand)) ds_maak_leeg();
+  if (DS_BY_DIE_BANK.includes(uitslag.stand)) ds_maak_leeg();
 
-  ds_teken(stand, items);
-  ds_teken_mandjie(stand, DS_BY_DIE_BANK.includes(stand) ? 0 : items.length);
+  ds_teken(uitslag.stand, uitslag);
+  ds_teken_mandjie(uitslag.stand, in_mandjie);
 }
 
 document.addEventListener("DOMContentLoaded", ds_begin);

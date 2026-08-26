@@ -44,8 +44,19 @@
 //
 // WAT DIE ANTWOORD DRA — en wat nie
 //
-// Die bestelnommer, die bedrag en die stand. Geen items, geen adres, geen
-// verdeling, geen subrekeningkodes. Net wat op die bladsy verskyn.
+// Die bestelnommer, die stand, en TWEE VLAE: het die bestelling e-boeke
+// bevat, en het dit 'n harde kopie bevat.
+//
+// Daardie twee vlae bestaan omdat die bladsy anders sou moes RAAI. Die ou
+// kode het die mandjie gelees om te weet watter woorde om te gebruik -- 'n
+// suiwer e-boekbestelling is 'n AANKOOP wat klaar is; enigiets met 'n harde
+// kopie is 'n BESTELLING waarop 'n druk- en afleweringsproses volg. Maar teen
+// die tyd dat die koper hierdie bladsy lees, is die mandjie leeg. Die
+// bestelling weet dit; die mandjie nie. Dus vra ons die bestelling.
+//
+// Geen titels, geen bedrag, geen adres, geen verdeling, geen subrekeningkodes.
+// Twee ja-of-nee-vrae is genoeg om die regte sin te kies, en enigiets meer sou
+// klantdata deur 'n publieke eindpunt stuur vir geen wins nie.
 
 const { kry_store } = require("./_blob-store");
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
@@ -104,10 +115,15 @@ exports.handler = async (event, context) => {
     rekord.koper && rekord.koper.netlify_identity_id === gebruiker.id;
   if (!myne) return NIE_GEVIND;
 
+  const items = Array.isArray(rekord.items) ? rekord.items : [];
+
   const antwoord = {
     bestelnommer,
-    bedrag_sent: rekord.totaal_sent || 0,
-    items: Array.isArray(rekord.items) ? rekord.items.length : 0,
+    // Die aantal, nie die items self nie. Dit beantwoord "hoeveel wag nog vir
+    // my in die mandjie" ná 'n kansellasie, en niks verder nie.
+    items: items.length,
+    bevat_eboek: items.some((i) => i && i.formaat === "eboek"),
+    bevat_harde_kopie: items.some((i) => i && i.formaat === "harde_kopie"),
     stand: "onbekend",
   };
 

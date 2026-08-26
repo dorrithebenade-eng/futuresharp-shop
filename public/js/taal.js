@@ -437,14 +437,6 @@ const WOORDEBOEK = {
   ds_merk_oop: { af: "Onbetaal", en: "Outstanding" },
   ds_merk_onbekend: { af: "Onbevestig", en: "Unconfirmed" },
 
-  // Word slegs gebruik wanneer die mandjie reeds leeg was toe die bladsy
-  // laai -- 'n terugknoppie, of 'n tweede besoek. Die betaling is deur, dus
-  // is 'n bevestiging korrek en 'n foutboodskap nie.
-  ds_teks_betaal: {
-    af: 'Die betaling is ontvang. Enige e-boeke is nou in "My Boeke" beskikbaar.',
-    en: 'The payment has been received. Any e-books are now available in "My Books".',
-  },
-
   ds_kop_loop: { af: "Betaling in verwerking", en: "Payment processing" },
   // Die waarskuwing teen 'n tweede betaling is nie oorversigtig nie: 'n
   // Instant EFT wat nog nie deur is nie, lyk soos 'n mislukte een, en 'n
@@ -466,15 +458,15 @@ const WOORDEBOEK = {
     en: 'We could not confirm the status of the transaction right now. If the payment cleared, your books will appear in "My Books". Please contact us with the order number above.',
   },
 
-  // Die mandjiereël onder die knoppies. Sy taak is om 'n verlies in 'n feit
-  // te verander: 'n koper wat sien sy mandjie is leeg, moet weet waarom.
-  ds_mandjie_leeg: { af: "Mandjie leeggemaak", en: "Cart cleared" },
-  ds_mandjie_loop: {
-    af: "Mandjie leeggemaak — 'n transaksie is reeds by die bank ingedien",
-    en: "Cart cleared — a transaction has already been submitted to the bank",
-  },
+  // Die mandjiereël onder die knoppies. Sy staan NET by die onbetaalde
+  // uitkomste, waar die koper self wonder of sy keuses weg is. Ná 'n
+  // geslaagde aankoop dink niemand aan sy mandjie nie -- "Mandjie leeggemaak"
+  // is dan huishouding wat ons oor onsself vertel, en dit laat hom boonop
+  // wonder of hy bekommerd moes gewees het.
+  //
   // {n} is die aantal items. Die syfer staan hier en nie in die kode nie,
   // want die woordorde verskil tussen tale.
+  ds_mandjie_behou_een: { af: "Mandjie behou — 1 item", en: "Cart kept — 1 item" },
   ds_mandjie_behou: { af: "Mandjie behou — {n} items", en: "Cart kept — {n} items" },
 
   // Personeel-paneelbord
