@@ -1,0 +1,201 @@
+/* public/css/faktuurpaneel-joernaal.css
+
+   Die joernaal: inkomste en uitgawes wat NIE deur die faktuurmodule loop nie.
+
+   TEAL VIR IN, KORAAL VIR UIT. Elders in hierdie stelsel beteken teal
+   positief en koraal 'n stop; hier is die betekenis eenvoudiger -- geld in
+   en geld uit -- maar die kleure bly konsekwent sodat 'n mens nie 'n nuwe
+   stel moet leer nie. */
+
+.jn-wrap { max-width: 1000px; }
+
+.jn-lei {
+  margin: 0 0 22px;
+  padding-left: 18px;
+  color: var(--grys-teks);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.jn-lei li { margin-bottom: 2px; }
+
+.jn-jaar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.jn-jaar #jn-jaar { width: auto; min-width: 250px; }
+.jn-jaar .jn-rek { flex: 1; }
+.jn-tel { font-size: 12.5px; color: var(--grys-teks); }
+
+.jn-blokke {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+@media (max-width: 720px) {
+  .jn-blokke { grid-template-columns: 1fr; }
+}
+
+.jn-blok {
+  border-left: 3px solid #E8E6E1;
+  background: #FBFAF8;
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+
+.jn-blok.in { border-left-color: var(--teal); }
+.jn-blok.uit { border-left-color: var(--koraal); }
+
+.jn-et {
+  font-size: 10.5px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--grys-teks);
+}
+
+.jn-sy {
+  font-family: var(--font-opskrif);
+  font-size: 22px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  margin-top: 2px;
+}
+
+.jn-sy.kort { color: var(--koraal); }
+
+.jn-tabel {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.jn-tabel th {
+  text-align: left;
+  font-size: 10.5px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--grys-teks);
+  font-weight: 500;
+  padding: 0 8px 8px 0;
+  border-bottom: 1px solid #E8E6E1;
+}
+
+.jn-tabel th.n, .jn-tabel td.n { text-align: right; }
+
+.jn-tabel td {
+  padding: 9px 8px 9px 0;
+  border-bottom: 1px solid #F0EEE9;
+  vertical-align: middle;
+  font-variant-numeric: tabular-nums;
+  font-size: 13.5px;
+}
+
+.jn-w-dat { width: 110px; }
+.jn-w-bed { width: 120px; }
+.jn-w-aks { width: 104px; }
+.jn-aks { white-space: nowrap; }
+
+.jn-uit { color: var(--koraal); }
+
+/* Waar 'n inskrywing vandaan kom. 'n Faktuur en 'n uitbetaling word uit die
+   fakture gelees; hulle kan nie hier gewysig word nie, en die merkie sê dit
+   sonder om dit te verduidelik. */
+.jn-bron {
+  display: inline-block;
+  font-size: 10.5px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: #EFF5F3;
+  color: #2E7D6F;
+  margin-left: 6px;
+  vertical-align: 1px;
+}
+
+.jn-wie {
+  display: block;
+  font-size: 12px;
+  color: var(--grys-teks);
+}
+
+.jn-herhaal {
+  border: 0;
+  background: none;
+  color: var(--teal);
+  font-family: var(--font-liggaam);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 2px 6px;
+}
+
+.jn-herhaal:hover { text-decoration: underline; }
+
+.jn-vee {
+  border: 0;
+  background: none;
+  color: #C3BFB8;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 2px 5px;
+}
+
+.jn-vee:hover { color: var(--koraal); }
+
+.jn-leeg {
+  color: var(--grys-teks);
+  font-size: 13px;
+  padding: 18px 0;
+  text-align: center;
+}
+
+.jn-nuwe {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr) 170px 130px 150px;
+  gap: 10px;
+  align-items: end;
+  padding: 18px 0 0;
+  border-top: 1px solid #E8E6E1;
+  margin-top: 6px;
+}
+
+@media (max-width: 900px) {
+  .jn-nuwe { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+}
+
+.jn-rigting {
+  display: inline-flex;
+  border: 1px solid #DDD9D2;
+  border-radius: 8px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.jn-rigting button {
+  flex: 1;
+  border: 0;
+  background: #fff;
+  font-family: var(--font-liggaam);
+  font-size: 13px;
+  padding: 9px 6px;
+  cursor: pointer;
+  color: var(--grys-teks);
+}
+
+.jn-rigting button.aan-in { background: var(--teal); color: #fff; }
+.jn-rigting button.aan-uit { background: var(--koraal); color: #fff; }
+
+.jn-fout {
+  margin: 12px 0 0;
+  font-size: 12.5px;
+  color: var(--koraal);
+  font-weight: 500;
+}
+
+.jn-fout[hidden] { display: none; }
+
+#jn-voeg { margin-top: 16px; }

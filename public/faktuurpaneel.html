@@ -15,6 +15,7 @@
   <link rel="stylesheet" href="css/faktuurpaneel.css" />
   <link rel="stylesheet" href="css/faktuurpaneel-wagkamer.css" />
   <link rel="stylesheet" href="css/faktuurpaneel-staat.css" />
+  <link rel="stylesheet" href="css/faktuurpaneel-joernaal.css" />
   <link rel="stylesheet" href="css/faktuurpaneel-verfris.css" />
   <link rel="stylesheet" href="css/faktuurpaneel-skrap-klient.css" />
 </head>
@@ -80,6 +81,7 @@
         <button type="button" class="fp-pil aktief" data-gaan="fakture" data-i18n="fp_nav_fakture">Fakture</button>
         <button type="button" class="fp-pil" data-gaan="registers" data-i18n="fp_nav_registers">Registers</button>
         <button type="button" class="fp-pil" data-gaan="state" data-i18n="fp_nav_state">State</button>
+        <button type="button" class="fp-pil" data-gaan="joernaal" data-i18n="fp_nav_joernaal">Joernaal</button>
         <!-- 'n EIE PIL, nie 'n blok op die Registers-blad nie. Registers hou
              lyste van BAIE dinge; dit is EEN rekord. -->
         <button type="button" class="fp-pil" data-gaan="instellings" data-i18n="fp_nav_instellings">Instellings</button>
@@ -306,6 +308,85 @@
            Wat in die kop van elke faktuur staan, en die bankbesonderhede wat
            langs die betaalskakel druk. Hulle leef HIER en nie in die sjabloon
            nie — 'n adreswysiging gebeur op een plek. -->
+      <!-- DIE JOERNAAL: inkomste en uitgawes wat NIE deur die faktuurmodule
+           loop nie. Kontantbasis, per finansiele jaar (1 Maart tot 28 Feb).
+           Die fakture en die uitbetalings word deur kry-joernaal.js uit die
+           fakture gelees; net die res word hier ingetik. -->
+      <section class="paneel-afdeling fp-afdeling" data-afdeling="joernaal">
+        <div class="jn-wrap">
+          <ul class="jn-lei">
+            <li data-i18n="jn_lei_1">Inkomste en Uitgawes vir 'n finansiële jaar.</li>
+            <li data-i18n="jn_lei_2">Betalings deur Paystack word outomaties versprei as inkomste en geallokeer waar uitgawes van belang is.</li>
+            <li data-i18n="jn_lei_3">Betalings wat nie deur Paystack vloei nie moet steeds handmatig ingevoer word.</li>
+          </ul>
+
+          <div class="jn-jaar">
+            <select class="veld-invoer" id="jn-jaar"></select>
+            <span class="jn-tel" id="jn-tel"></span>
+            <span class="jn-rek"></span>
+            <button type="button" class="kaart-aksie stil" id="jn-uitvoer"
+                    data-i18n="jn_uitvoer">Voer uit</button>
+          </div>
+
+          <div class="jn-blokke">
+            <div class="jn-blok in">
+              <div class="jn-et" data-i18n="jn_inkomste">Inkomste</div>
+              <div class="jn-sy" id="jn-s-in">—</div>
+            </div>
+            <div class="jn-blok uit">
+              <div class="jn-et" data-i18n="jn_uitgawes">Uitgawes</div>
+              <div class="jn-sy" id="jn-s-uit">—</div>
+            </div>
+            <div class="jn-blok">
+              <div class="jn-et" data-i18n="jn_verskil">Verskil</div>
+              <div class="jn-sy" id="jn-s-net">—</div>
+            </div>
+          </div>
+
+          <table class="jn-tabel">
+            <thead>
+              <tr>
+                <th class="jn-w-dat" data-i18n="jn_datum">Datum</th>
+                <th data-i18n="jn_beskrywing">Beskrywing</th>
+                <th class="n jn-w-bed" data-i18n="jn_bedrag">Bedrag</th>
+                <th class="jn-w-aks"></th>
+              </tr>
+            </thead>
+            <tbody id="jn-lys"></tbody>
+          </table>
+          <p class="jn-leeg" id="jn-leeg" hidden data-i18n="jn_leeg">Geen inskrywings vir hierdie jaar nie.</p>
+
+          <div class="jn-nuwe">
+            <div>
+              <label class="veld-etiket" for="jn-datum" data-i18n="jn_datum">Datum</label>
+              <input class="veld-invoer" type="date" id="jn-datum">
+            </div>
+            <div>
+              <label class="veld-etiket" for="jn-besk" data-i18n="jn_beskrywing">Beskrywing</label>
+              <input class="veld-invoer" id="jn-besk" maxlength="300" placeholder="Afrihost — domein en e-pos">
+            </div>
+            <div>
+              <label class="veld-etiket" for="jn-wie" data-i18n="jn_wie">Betaal deur</label>
+              <input class="veld-invoer" id="jn-wie" maxlength="120">
+            </div>
+            <div>
+              <label class="veld-etiket" for="jn-bedrag" data-i18n="jn_bedrag">Bedrag</label>
+              <input class="veld-invoer n" id="jn-bedrag" inputmode="decimal" placeholder="0.00">
+            </div>
+            <div>
+              <label class="veld-etiket" data-i18n="jn_rigting">Rigting</label>
+              <div class="jn-rigting">
+                <button type="button" id="jn-r-in" data-i18n="jn_in">In</button>
+                <button type="button" id="jn-r-uit" class="aan-uit" data-i18n="jn_uit">Uit</button>
+              </div>
+            </div>
+          </div>
+          <p class="jn-fout" id="jn-fout" hidden></p>
+          <button type="button" class="kaart-aksie" id="jn-voeg" disabled
+                  data-i18n="jn_teken_aan">Teken aan</button>
+        </div>
+      </section>
+
       <section class="paneel-afdeling fp-afdeling" data-afdeling="instellings">
         <div class="in-wrap">
 
@@ -565,6 +646,7 @@
   <script src="js/faktuurpaneel-wagkamer.js"></script>
   <script src="js/faktuurpaneel-instellings.js"></script>
   <script src="js/faktuurpaneel-staat.js"></script>
+  <script src="js/faktuurpaneel-joernaal.js"></script>
   <!-- LAASTE, want hy roep die ander se laaifunksies aan en moet dus na
        hulle laai. Hy wysig niks; hy verfris net wat hulle teken. -->
   <script src="js/faktuurpaneel-verfris.js"></script>

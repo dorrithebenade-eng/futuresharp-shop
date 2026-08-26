@@ -555,6 +555,54 @@ const WOORDEBOEK = {
   fp_titel: { af: "Boekhouding", en: "Accounts" },
   fp_nav_paneelbord: { af: "Paneelbord", en: "Dashboard" },
   fp_terug: { af: "\u2190 Paneelbord", en: "\u2190 Dashboard" },
+
+  /* -- die joernaal --
+     Inkomste en uitgawes wat NIE deur die faktuurmodule loop nie.
+     Kontantbasis, per finansiele jaar (1 Maart tot 28 Februarie). */
+  fp_nav_joernaal: { af: "Joernaal", en: "Journal" },
+  jn_lei_1: {
+    af: "Inkomste en Uitgawes vir \u2019n finansi\u00eble jaar.",
+    en: "Income and expenses for a financial year.",
+  },
+  jn_lei_2: {
+    af: "Betalings deur Paystack word outomaties versprei as inkomste en geallokeer waar uitgawes van belang is.",
+    en: "Payments through Paystack are distributed automatically as income and allocated where expenses matter.",
+  },
+  jn_lei_3: {
+    af: "Betalings wat nie deur Paystack vloei nie moet steeds handmatig ingevoer word.",
+    en: "Payments that do not flow through Paystack must still be entered by hand.",
+  },
+  jn_inkomste: { af: "Inkomste", en: "Income" },
+  jn_uitgawes: { af: "Uitgawes", en: "Expenses" },
+  jn_verskil: { af: "Verskil", en: "Difference" },
+  jn_datum: { af: "Datum", en: "Date" },
+  jn_beskrywing: { af: "Beskrywing", en: "Description" },
+  jn_bedrag: { af: "Bedrag", en: "Amount" },
+  jn_wie: { af: "Betaal deur", en: "Paid by" },
+  jn_rigting: { af: "Rigting", en: "Direction" },
+  jn_in: { af: "In", en: "In" },
+  jn_uit: { af: "Uit", en: "Out" },
+  jn_teken_aan: { af: "Teken aan", en: "Record" },
+  jn_besig: { af: "Besig \u2026", en: "Working \u2026" },
+  jn_herhaal: { af: "herhaal", en: "repeat" },
+  jn_verwyder: { af: "Verwyder", en: "Remove" },
+  jn_uitvoer: { af: "Voer uit", en: "Export" },
+  jn_leeg: {
+    af: "Geen inskrywings vir hierdie jaar nie.",
+    en: "No entries for this year.",
+  },
+  jn_inskrywing: { af: "inskrywing", en: "entry" },
+  jn_inskrywings: { af: "inskrywings", en: "entries" },
+  jn_bron_faktuur: { af: "faktuur", en: "invoice" },
+  jn_bron_uitbetaling: { af: "uitbetaling", en: "payout" },
+  jn_fout: {
+    af: "Kon nie die inskrywing stoor nie.",
+    en: "The entry could not be saved.",
+  },
+  jn_laai_fout: {
+    af: "Kon nie die joernaal laai nie.",
+    en: "The journal could not be loaded.",
+  },
   vf_verander: {
     af: "Hierdie lys het intussen verander.",
     en: "This list has changed in the meantime.",
