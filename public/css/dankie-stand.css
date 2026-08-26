@@ -1,0 +1,81 @@
+/* public/css/dankie-stand.css
+ *
+ * Die dankie-bladsy se vier uitkomste. styl.css dra reeds .dankie-wrap,
+ * .dankie-teks, .dankie-knoppies en .kaart-aksie -- hier staan net wat nie
+ * elders bestaan nie.
+ *
+ * DIE KLEUR IS DIE EERSTE DING WAT GELEES WORD. 'n Koper wat op hierdie
+ * bladsy land, weet nog nie of sy geld weg is nie. Die rand en die merkie
+ * antwoord dit voordat hy 'n woord gelees het.
+ *
+ *   teal    betaal      klaar
+ *   amber   loop        werk hangend, moenie weer betaal nie
+ *   koraal  oop         'n stop -- die transaksie is verby en niks het gebeur
+ *   grys    onbekend    ons weet nie, en ons ken geen kleur toe nie
+ */
+
+/* GEEN LINKERRAND. .dankie-wrap is text-align: center, en 'n gesentreerde
+   kolom met 'n gekleurde rand aan EEN kant lyk soos 'n ongeluk. Die kleur
+   sit dus in die merkie en in 'n dun streep BO die kaart -- albei simmetries,
+   albei ewe leesbaar as die eerste ding op die bladsy. */
+.dankie-kaart {
+  border-top: 3px solid #B4B2A9;
+  border-radius: 0;
+  padding: 26px 0 4px;
+}
+
+.dankie-kaart.ds-t-betaal   { border-top-color: var(--teal); }
+.dankie-kaart.ds-t-loop     { border-top-color: var(--amber); }
+.dankie-kaart.ds-t-oop      { border-top-color: var(--koraal); }
+.dankie-kaart.ds-t-onbekend { border-top-color: #B4B2A9; }
+
+/* Die merkie is leeg tot die antwoord terug is. display:inline-block op 'n
+   lee span sou 'n gaping los waar niks is nie -- :empty vou hom weg. */
+.dankie-merkie {
+  display: inline-block;
+  background: #B4B2A9;
+  color: var(--wit);
+  font-family: var(--font-liggaam);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 999px;
+  margin-bottom: 12px;
+}
+
+.dankie-merkie:empty { display: none; }
+
+.ds-t-betaal   .dankie-merkie { background: var(--teal); color: var(--wit); }
+/* Amber met wit teks val onder die kontrasdrempel. Die donkerste stop uit
+   dieselfde familie lees teen die geel. */
+.ds-t-loop     .dankie-merkie { background: var(--amber); color: #412402; }
+.ds-t-oop      .dankie-merkie { background: var(--koraal); color: var(--wit); }
+.ds-t-onbekend .dankie-merkie { background: #F1EFE8; color: #2C2C2A; }
+
+/* Die mandjiereel. Sy taak is om 'n verlies in 'n feit te verander: 'n koper
+   wat sien sy mandjie is leeg, moet weet waarom. Klein, want dit is 'n
+   voetnoot by die boodskap, nie 'n tweede boodskap nie. */
+.dankie-mandjie-nota {
+  margin: 14px 0 0;
+  font-size: 12.5px;
+  color: var(--grys-teks);
+}
+
+.dankie-mandjie-nota:empty { display: none; }
+
+/* By 'n kansellasie is die mandjie nog vol en dit is die enigste goeie nuus
+   op die bladsy -- dus teal, nie grys nie. */
+.ds-t-oop .dankie-mandjie-nota,
+.ds-t-onbekend .dankie-mandjie-nota {
+  color: #0F6E56;
+  font-weight: 500;
+}
+
+/* DRIE KNOPPIES PAS NIE LANGS MEKAAR OP 'N FOON NIE. Hoogstens twee is ooit
+   gelyk sigbaar -- die derde is altyd versteek -- maar twee vol-koraal
+   knoppies langs mekaar op 380px loop uit. Hulle stapel. */
+@media (max-width: 560px) {
+  .dankie-knoppies { flex-direction: column; align-items: stretch; }
+}

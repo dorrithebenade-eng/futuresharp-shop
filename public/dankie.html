@@ -18,6 +18,7 @@
   </script>
   <title>Dankie — Future Shop</title>
   <link rel="stylesheet" href="css/styl.css">
+  <link rel="stylesheet" href="css/dankie-stand.css">
 </head>
 <body>
   <header class="mini-kop">
@@ -46,67 +47,36 @@
    </div>
   </header>
   <main class="dankie-wrap">
-    <h1 class="mandjie-titel" id="dankie-titel" data-i18n="dankie_titel">Dankie vir jou bestelling!</h1>
-    <p class="dankie-teks" id="dankie-bestelnommer"></p>
-    <p class="dankie-teks" id="dankie-teks" data-i18n="dankie_teks">
-      Ons bevestig jou betaling tans bediener-kant. Sodra dit voltooi is,
-      sal jou e-boeke onmiddellik in
-      <strong>"My Boeke"</strong> beskikbaar wees, en jy sal die status van
-      enige harde-kopie-items daar kan volg.
-    </p>
-    <div class="dankie-knoppies">
-      <a class="kaart-aksie dankie-knoppie" id="dankie-my-boeke-knoppie" href="my-boeke.html" data-i18n="gaan_na_my_boeke" hidden>Gaan na My Boeke</a>
-      <a class="kaart-aksie dankie-knoppie" href="index.html" data-i18n="terug_winkel">Terug na die winkel</a>
+    <!-- DIE BLADSY WEET NOG NIKS. 'n Kansellasie op Paystack se betaalbladsy
+         kom by DIESELFDE callback-URL uit as 'n geslaagde betaling, en
+         Paystack stuur die verwysing terug, nie die uitslag nie. Die opskrif
+         en die teks staan dus leeg tot kry-bestelstand.js geantwoord het --
+         'n verstek van "Dankie vir jou bestelling" sou vir 'n oomblik lieg
+         teenoor iemand wat pas gekanselleer het. Sien dankie-stand.js. -->
+    <div class="dankie-kaart" id="dankie-kaart">
+      <span class="dankie-merkie" id="dankie-merkie"></span>
+      <h1 class="mandjie-titel" id="dankie-titel"></h1>
+      <p class="dankie-teks" id="dankie-bestelnommer"></p>
+      <p class="dankie-teks" id="dankie-teks"></p>
+      <div class="dankie-knoppies">
+        <a class="kaart-aksie dankie-knoppie" id="dankie-my-boeke-knoppie" href="my-boeke.html" data-i18n="gaan_na_my_boeke" hidden>Gaan na My Boeke</a>
+        <!-- By 'n kansellasie is die mandjie nog vol en is DIT waarheen die
+             koper moet gaan -- nie na die katalogus nie, waar hy sy keuses
+             van voor af sou moes soek. -->
+        <a class="kaart-aksie dankie-knoppie" id="dankie-mandjie-knoppie" href="mandjie.html" data-i18n="terug_mandjie" hidden>Terug na die mandjie</a>
+        <a class="kaart-aksie dankie-knoppie" href="index.html" data-i18n="terug_winkel">Terug na die winkel</a>
+      </div>
+      <p class="dankie-mandjie-nota" id="dankie-mandjie-nota"></p>
     </div>
   </main>
   <script src="js/taal.js"></script>
   <script src="js/identiteit.js"></script>
   <script src="js/mandjie.js"></script>
   <script src="js/nav-rekening.js"></script>
-  <script>
-    // Lees EERS wat in die mandjie was (om te bepaal watter tipe
-    // bestelling dit was), voordat ons dit leegmaak.
-    let mandjie_items = [];
-    try {
-      const ruwe = localStorage.getItem("future_shop_mandjie");
-      mandjie_items = ruwe ? JSON.parse(ruwe) : [];
-    } catch {
-      mandjie_items = [];
-    }
-    const bevat_harde_kopie = mandjie_items.some((i) => i.formaat === "harde_kopie");
-    const bevat_eboek = mandjie_items.some((i) => i.formaat === "eboek");
-
-    // Maak seker die mandjie leeg is ná suksesvolle betaling — die
-    // koper se bestelling leef nou permanent in die bestelling-rekord,
-    // nie meer in die klant-kant mandjie nie.
-    localStorage.removeItem("future_shop_mandjie");
-    sessionStorage.removeItem("future_shop_bestelnommer_konsep");
-
-    const params = new URLSearchParams(window.location.search);
-    const bestelnommer = params.get("bestelnommer") || params.get("reference");
-    const wrap = document.getElementById("dankie-bestelnommer");
-    wrap.textContent = bestelnommer
-      ? `${t("bestelnommer_etiket")}: ${bestelnommer}`
-      : "";
-
-    // Suiwer e-boek-mandjie: "aankoop" is korrek, geen fisiese proses
-    // volg nie — wys 'n direkte knoppie na "My Boeke".
-    if (bevat_eboek && !bevat_harde_kopie) {
-      document.getElementById("dankie-titel").textContent = t("dankie_titel_aankoop");
-      document.getElementById("dankie-teks").textContent = t("dankie_teks_eboek_alleen");
-      document.getElementById("dankie-my-boeke-knoppie").hidden = false;
-    } else if (bevat_harde_kopie) {
-      // Bevat 'n harde kopie (met of sonder e-boek saam): "bestelling"
-      // bly korrek — daar volg 'n regte druk-en-afleweringsproses.
-      document.getElementById("dankie-titel").textContent = t("dankie_titel");
-      document.getElementById("dankie-teks").textContent = t("dankie_teks_bevat_harde_kopie");
-      if (bevat_eboek) {
-        document.getElementById("dankie-my-boeke-knoppie").hidden = false;
-      }
-    }
-    // As die mandjie om een of ander rede reeds leeg was toe hierdie
-    // bladsy laai (bv. blaaier-terugknoppie ná 'n vorige besoek), bly
-    // die verstek-teks uit die HTML staan — veilige, generiese fallback.
-  </script>
+  <!-- DIE OU BLOK IS WEG. Hy het by ELKE uitkoms "Dankie vir jou bestelling"
+       gese en die mandjie leeggemaak -- ook wanneer die koper op Paystack se
+       bladsy gekanselleer het. Hy het dan niks betaal, niks gekoop, en sy
+       mandjie was weg. dankie-stand.js vra eers wat gebeur het. -->
+  <script src="js/dankie-stand.js"></script>
 </body>
 </html>

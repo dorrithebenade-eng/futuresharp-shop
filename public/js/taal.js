@@ -411,6 +411,61 @@ const WOORDEBOEK = {
   },
   gaan_na_my_boeke: { af: "Gaan na My Boeke", en: "Go to My Books" },
   terug_winkel: { af: "Terug na die winkel", en: "Back to the shop" },
+  terug_mandjie: { af: "Terug na die mandjie", en: "Back to the cart" },
+
+  // -- Die dankie-bladsy se VIER UITKOMSTE --------------------------------
+  // 'n Kansellasie op Paystack se betaalbladsy kom by DIESELFDE callback-URL
+  // uit as 'n geslaagde betaling. Die bladsy kan niks uit die URL aflei nie
+  // en moet vra -- sien kry-bestelstand.js. Sonder hierdie sleutels het elke
+  // uitkoms "Dankie vir jou bestelling" gelees, ook 'n kansellasie.
+  //
+  // Die woorde is DIESELFDE as die faktuurmodule se bk_-sleutels waar die
+  // feit dieselfde is. Twee module wat dieselfde ding anders stel, laat 'n
+  // mens wonder of hulle dieselfde ding bedoel.
+  ds_merk_betaal: { af: "Betaal", en: "Paid" },
+  ds_merk_loop: { af: "In verwerking", en: "Processing" },
+  ds_merk_oop: { af: "Onbetaal", en: "Outstanding" },
+  ds_merk_onbekend: { af: "Onbevestig", en: "Unconfirmed" },
+
+  // Word slegs gebruik wanneer die mandjie reeds leeg was toe die bladsy
+  // laai -- 'n terugknoppie, of 'n tweede besoek. Die betaling is deur, dus
+  // is 'n bevestiging korrek en 'n foutboodskap nie.
+  ds_teks_betaal: {
+    af: 'Die betaling is ontvang. Enige e-boeke is nou in "My Boeke" beskikbaar.',
+    en: 'The payment has been received. Any e-books are now available in "My Books".',
+  },
+
+  ds_kop_loop: { af: "Betaling in verwerking", en: "Payment processing" },
+  // Die waarskuwing teen 'n tweede betaling is nie oorversigtig nie: 'n
+  // Instant EFT wat nog nie deur is nie, lyk soos 'n mislukte een, en 'n
+  // dubbele betaling verg 'n terugbetaling wat die winkel nie het nie.
+  ds_teks_loop: {
+    af: 'Die transaksie is geïnisieer, maar die bank het dit nog nie bevestig nie. Moenie weer bestel nie — jou boeke verskyn in "My Boeke" sodra dit deurgaan.',
+    en: 'The transaction has been initiated, but the bank has not confirmed it yet. Do not order again — your books will appear in "My Books" once it clears.',
+  },
+
+  ds_kop_oop: { af: "Betaling nie voltooi nie", en: "Payment not completed" },
+  ds_teks_oop: {
+    af: "Geen debiet is teen jou rekening verwerk nie. Jou mandjie is nog presies soos jy hom gelos het.",
+    en: "No debit has been processed against your account. Your cart is exactly as you left it.",
+  },
+
+  ds_kop_onbekend: { af: "Betalingstatus onbevestig", en: "Payment status unconfirmed" },
+  ds_teks_onbekend: {
+    af: 'Ons kon die transaksie se status nie nou bevestig nie. Het die betaling deurgegaan, verskyn jou boeke in "My Boeke". Kontak ons gerus met die bestelnommer hierbo.',
+    en: 'We could not confirm the status of the transaction right now. If the payment cleared, your books will appear in "My Books". Please contact us with the order number above.',
+  },
+
+  // Die mandjiereël onder die knoppies. Sy taak is om 'n verlies in 'n feit
+  // te verander: 'n koper wat sien sy mandjie is leeg, moet weet waarom.
+  ds_mandjie_leeg: { af: "Mandjie leeggemaak", en: "Cart cleared" },
+  ds_mandjie_loop: {
+    af: "Mandjie leeggemaak — 'n transaksie is reeds by die bank ingedien",
+    en: "Cart cleared — a transaction has already been submitted to the bank",
+  },
+  // {n} is die aantal items. Die syfer staan hier en nie in die kode nie,
+  // want die woordorde verskil tussen tale.
+  ds_mandjie_behou: { af: "Mandjie behou — {n} items", en: "Cart kept — {n} items" },
 
   // Personeel-paneelbord
   paneel_titel: { af: "Admin-paneelbord", en: "Admin dashboard" },
@@ -610,7 +665,7 @@ const WOORDEBOEK = {
   jn_besig: { af: "Besig \u2026", en: "Working \u2026" },
   jn_herhaal: { af: "herhaal", en: "repeat" },
   jn_verwyder: { af: "Verwyder", en: "Remove" },
-  jn_uitvoer: { af: "Laai af", en: "Download" },
+  jn_uitvoer: { af: "Voer uit", en: "Export" },
   jn_van: { af: "Van", en: "From" },
   jn_tot: { af: "Tot", en: "To" },
   jn_soek: { af: "Beskrywing", en: "Description" },
