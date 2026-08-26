@@ -11,6 +11,7 @@ const crypto = require("crypto");
 const { hanteer_faktuur_betaling } = require("./_faktuur-betaling");
 const { kry_store } = require("./_blob-store");
 const { stuur_outeur_kennisgewings } = require("./_kennisgewing-outeur");
+const { stuur_koper_bevestiging } = require("./_kennisgewing-koper");
 
 // Dieselfde patroon as skep-koepon.js — leesbaar-genoeg om oor die
 // telefoon deur te gee, sonder dubbelsinnige karakters (0/O, 1/I/L).
@@ -252,6 +253,19 @@ exports.handler = async (event) => {
     await stuur_outeur_kennisgewings(bygewerkte_bestelling);
   } catch (fout) {
     console.error(`Webhook: kon nie outeur-kennisgewings stuur nie vir ${bestelnommer}:`, fout);
+  }
+
+  // En laat die KOPER weet wat hy gekoop het.
+  //
+  // Die outeur het nog altyd 'n pos gekry; die koper niks -- net Paystack se
+  // eie kwitansie, wat sê dat geld beweeg het maar nie WAT hy gekry het nie.
+  // Sien _kennisgewing-koper.js. Dieselfde try/catch as die stappe hierbo:
+  // die betaling is bevestig en gestoor, en 'n pos wat misluk mag dit nooit
+  // ongedaan maak nie.
+  try {
+    await stuur_koper_bevestiging(bygewerkte_bestelling);
+  } catch (fout) {
+    console.error(`Webhook: kon nie die koper-bevestiging stuur nie vir ${bestelnommer}:`, fout);
   }
 
   // E-boek-ontsluiting (Fase 4) sal hierdie status = "Nuut" +

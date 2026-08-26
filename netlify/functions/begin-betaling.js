@@ -43,6 +43,7 @@ const { kry_store } = require("./_blob-store");
 const { kry_gebruiker_en_rol_uitslag } = require("./_rol-kontrole");
 const { kry_maks_verdeling_sent } = require("./_paystack-koste.js");
 const { stuur_outeur_kennisgewings } = require("./_kennisgewing-outeur");
+const { stuur_koper_bevestiging } = require("./_kennisgewing-koper");
 
 // Rol_tipe → watter Blobs-store die entiteit se subrekening-kode in is.
 const ROL_TIPE_STORES = {
@@ -406,6 +407,16 @@ exports.handler = async (event, context) => {
       await stuur_outeur_kennisgewings(gratis_bestelling);
     } catch (fout) {
       console.error(`Kon nie outeur-kennisgewings stuur nie vir gratis-bestelling ${bestelnommer}:`, fout);
+    }
+
+    // En die koper se bevestiging. HIER IS DIT BELANGRIKER AS OP DIE GEWONE
+    // PAD: by 'n R0-bestelling word Paystack nooit geroep nie, dus kom sy
+    // kwitansie ook nie. Sonder hierdie pos kry die koper NIKS -- geen
+    // kwitansie, geen bevestiging, geen rekord van wat hy ontvang het.
+    try {
+      await stuur_koper_bevestiging(gratis_bestelling);
+    } catch (fout) {
+      console.error(`Kon nie die koper-bevestiging stuur nie vir gratis-bestelling ${bestelnommer}:`, fout);
     }
 
     return {
