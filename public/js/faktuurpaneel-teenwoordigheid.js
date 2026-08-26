@@ -10,15 +10,19 @@
 //
 // DIE KOSTE, EN WAAROM DIT KLEIN IS
 //
-// Een oproep elke twee minute, en slegs terwyl die oortjie SIGBAAR is. 'n
-// Vergete oortjie oor 'n naweek pols nie. Twee mense, twee uur per dag elk,
-// is sowat 120 oproepe per dag -- onder 4 000 per maand teen 'n perk van
-// 125 000.
+// Een oproep elke halfminuut, en slegs terwyl die oortjie SIGBAAR is. Netlify
+// roep niks uit sy eie nie -- die pols leef in die blaaier, dus is daar geen
+// oproepe wanneer die bladsy toe is nie, en `visibilitychange` stop hom ook
+// wanneer die oortjie bloot versteek is. 'n Vergete venster oor 'n naweek
+// pols nie.
 //
-// Twee minute is doelbewus ruim. Teenwoordigheid hoef nie sekondes-akkuraat
-// te wees nie: die vraag is "is Ignatius nou ook hier", nie "was hy dertig
-// sekondes gelede hier". 'n Halfminuut-pols sou die koste verviervoudig vir
-// geen wins nie.
+// Twee mense, twee uur per dag elk, is sowat 16 000 oproepe per maand teen 'n
+// perk van 125 000.
+//
+// 'N VROEeR WEERGAWE HET ELKE TWEE MINUTE GEPOLS. Dit is verander omdat die
+// argument daarvoor nie gehou het nie: dit het geoptimaliseer vir 'n koste
+// wat nie bestaan nie, en daarvoor betaal met 'n vertraging wat 'n mens wel
+// merk. Twee direkteure gaan nie tot 'n vlak groei waar die verskil tel nie.
 //
 // EEN OPROEP DOEN ALBEI DINGE -- dit skryf jou eie merk EN lees die ander
 // s'n terug. Sien teenwoordigheid.js.
@@ -28,7 +32,7 @@
 // Geen slot, geen "Ignatius het hierdie faktuur oop". Dit is 'n bewustheid,
 // nie 'n beskerming nie.
 
-const TW_MS = 2 * 60 * 1000;
+const TW_MS = 30 * 1000;
 
 let TW_TIK = null;
 // Onthou wat laas gewys is. Sonder dit herteken die reël elke twee minute

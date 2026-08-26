@@ -17,10 +17,10 @@
 //
 // DIE KOSTE
 //
-// Pols elke twee minute, en slegs terwyl 'n oortjie sigbaar is. Twee mense,
-// twee uur per dag elk, is sowat 120 oproepe per dag -- onder 4 000 per maand
-// teen 'n perk van 125 000. Teenwoordigheid hoef nie sekondes-akkuraat te
-// wees nie; 'n halfminuut-pols sou dit verviervoudig vir geen wins nie.
+// Pols elke halfminuut, en slegs terwyl 'n oortjie SIGBAAR is. Die pols leef
+// in die blaaier -- Netlify roep niks uit sy eie nie -- dus is daar geen
+// oproepe wanneer die bladsy toe of versteek is nie. Twee mense, twee uur per
+// dag elk, is sowat 16 000 oproepe per maand teen 'n perk van 125 000.
 //
 // GEEN SKOONMAAK NODIG NIE
 //
@@ -38,9 +38,12 @@
 const { kry_store } = require("./_blob-store");
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 
-// Ná hoe lank word iemand as weg beskou. Ruim meer as die pols van twee
-// minute: 'n enkele gemiste pols -- 'n stadige netwerk, 'n rekenaar wat 'n
-// oomblik slaap -- mag nie iemand laat verdwyn wat wel daar is nie.
+// Ná hoe lank word iemand as weg beskou.
+//
+// TIEN KEER DIE POLS. 'n Enkele gemiste klop -- 'n stadige netwerk, 'n
+// rekenaar wat 'n oomblik slaap, 'n oortjie wat kortliks agter 'n ander een
+// verdwyn -- mag nie iemand laat verdwyn wat wel daar is nie. Vyf minute is
+// ook ongeveer hoe lank 'n mens van 'n skerm af wegkyk sonder om weg te wees.
 const VERVAL_MS = 5 * 60 * 1000;
 
 // Die sleutel is die Identity-id, nie die e-pos nie: 'n adres kan verander,
