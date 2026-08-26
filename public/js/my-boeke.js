@@ -113,6 +113,24 @@ function bou_boek_kaart(boek) {
     el.appendChild(outeur_el);
   }
 
+  // DIE FORMAAT, want een titel kan meer as een keer op die rak staan. Koop 'n
+  // mens dieselfde boek as e-boek EN as gedrukte kopie, staan twee kaarte met
+  // dieselfde omslag, dieselfde titel en dieselfde outeur langs mekaar. Die
+  // e-boek is klikbaar en die harde kopie nie -- maar dit bly onsigbaar tot 'n
+  // mens probeer, en 'n kaart wat nie reageer nie lyk stukkend.
+  const formaat_woord = boek.is_harde_kopie
+    ? window.t && window.t("mb_formaat_harde_kopie")
+    : boek.is_leen
+      ? window.t && window.t("mb_formaat_leen")
+      : window.t && window.t("mb_formaat_eboek");
+
+  if (formaat_woord) {
+    const formaat_el = document.createElement("p");
+    formaat_el.className = "my-boek-formaat";
+    formaat_el.textContent = formaat_woord;
+    el.appendChild(formaat_el);
+  }
+
   // DIE STATUSREEL VIR 'N HARDE KOPIE. Dit is die hele punt van die kaart:
   // die koper het betaal vir 'n boek wat per pos kom en het tot nou toe nêrens
   // gehad om te kyk nie. Die datum en die spoornommer lê reeds in die rekord --

@@ -438,6 +438,35 @@
   margin-top: 14px;
 }
 
+/* `.knoppie-primer` HET NOOIT BESTAAN NIE. outeur-bestellings.js gebruik hom
+   op TWEE plekke -- "Merk as gestuur" en "Bevestig" -- en hy is nerens in
+   outeur.css of styl.css geskryf nie. Sonder 'n reel val albei terug op die
+   blaaier se verstek-knoppie: 'n grys blokkie met 'n dun rand, midde-in 'n
+   bladsy waar alles anders in die huisstyl is.
+   (Dieselfde soort fout as `.stil` op die Boekhouding-paneel.)
+
+   TEAL, NIE KORAAL NIE. Die outeursband is teal en die aksie is positief --
+   'n boek is gepos. Koraal is vir 'n stop, en dit is wat .outeur-terugtrek
+   hieronder wel is. */
+.knoppie-primer {
+  background: var(--teal);
+  color: var(--wit);
+  border: none;
+  border-radius: 999px;
+  padding: 10px 22px;
+  font-family: var(--font-liggaam);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.knoppie-primer:hover { background: #3C8B7F; }
+.knoppie-primer:focus-visible {
+  outline: 3px solid var(--swart);
+  outline-offset: 2px;
+}
+
 .outeur-knoppie-teks {
   background: none;
   border: none;

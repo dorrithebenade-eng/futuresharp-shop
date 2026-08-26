@@ -45,6 +45,18 @@
   color: var(--wit);
 }
 
+/* Die formaat, onder die outeursnaam. Kleiner en ligter as die outeur -- dit
+   is 'n etiket, nie 'n feit oor die boek nie. Hoofletters op die eerste letter
+   alleen ("E-boek", nie "E-BOEK"), want die pil op die omslag dra reeds die
+   kapitale en twee kapitale blokke op een kaart veg met mekaar. */
+.my-boek-formaat {
+  font-family: var(--font-liggaam);
+  font-size: 11px;
+  color: var(--grys-teks);
+  opacity: .8;
+  margin: 2px 0 0;
+}
+
 /* Die statusreël onder die titel. Dieselfde plek en gewig as die
    leen-statusreël, want dit beantwoord dieselfde soort vraag: wat gebeur nou
    met hierdie eksemplaar. */

@@ -429,6 +429,15 @@ const WOORDEBOEK = {
   //
   // Die merkie op die omslag, want dit is die eerste ding wat 'n oog vang op
   // 'n rak vol kaarte.
+  // Die formaat onder die outeursnaam. EEN TITEL KAN MEER AS EEN KEER OP DIE
+  // RAK STAAN: koop 'n mens dieselfde boek as e-boek en as gedrukte kopie,
+  // staan twee kaarte met dieselfde omslag, titel en outeur langs mekaar.
+  // "harde_kopie" is 'n sleutel in die stelsel; "Gedrukte boek" is wat 'n mens
+  // ontvang.
+  mb_formaat_eboek: { af: "E-boek", en: "E-book" },
+  mb_formaat_leen: { af: "Leen", en: "Loan" },
+  mb_formaat_harde_kopie: { af: "Gedrukte boek", en: "Printed book" },
+
   hk_merk_bestel: { af: "Bestel", en: "Ordered" },
   hk_merk_gestuur: { af: "Gestuur", en: "Shipped" },
 
