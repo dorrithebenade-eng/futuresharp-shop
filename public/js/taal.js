@@ -957,7 +957,10 @@ const WOORDEBOEK = {
 
   // My Boeke
   my_boeke_titel: { af: "My Boeke", en: "My Books" },
-  my_boeke_subtitel: { af: "Al jou gekoopte e-boeke, gereed om te lees.", en: "All your purchased e-books, ready to read." },
+  // NIE MEER NET E-BOEKE NIE. 'n Harde kopie staan nou ook op hierdie rak,
+  // met 'n bestel- of gestuur-pil. "Al jou gekoopte e-boeke" was 'n leuen
+  // sodra die eerste gedrukte boek verskyn het.
+  my_boeke_subtitel: { af: "Al jou boeke — gereed om te lees, of op pad.", en: "All your books — ready to read, or on the way." },
   lees_aanlyn: { af: "Lees aanlyn", en: "Read online" },
   leser_lisensie_nota: {
     af: "Hierdie eksemplaar is aan %epos% gekoppel — nie vir herverspreiding nie.",

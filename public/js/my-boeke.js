@@ -134,12 +134,19 @@ function bou_boek_kaart(boek) {
       // kaart wat 'n mens oortik of kopieer.
       if (boek.spoornommer) {
         status_el.appendChild(document.createElement("br"));
+
+        // DIE ETIKET IS GEWONE TEKS; NET DIE NOMMER IS MONOSPASIE. Die
+        // monospasie is daar sodat 'n 0 van 'n O onderskeibaar is wanneer 'n
+        // mens die nommer oortik -- die WOORD "Spoornommer" hoef niemand oor
+        // te tik nie, en in monospasie lyk hy soos kode.
+        const etiket = document.createTextNode(
+          (window.t ? window.t("hk_spoornommer") : "Spoornommer") + " "
+        );
+        status_el.appendChild(etiket);
+
         const spoor = document.createElement("span");
         spoor.className = "my-boek-hk-spoor";
-        spoor.textContent =
-          (window.t ? window.t("hk_spoornommer") : "Spoornommer") +
-          " " +
-          boek.spoornommer;
+        spoor.textContent = boek.spoornommer;
         status_el.appendChild(spoor);
       }
     } else {

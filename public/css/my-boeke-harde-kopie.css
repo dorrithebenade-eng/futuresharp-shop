@@ -56,8 +56,10 @@
   margin: 6px 0 0;
 }
 
-/* Die spoornommer is die enigste ding op die kaart wat 'n mens oortik of in 'n
-   koerier se soekveld plak. Monospasie maak 'n 0 van 'n O onderskeibaar. */
+/* NET DIE NOMMER, NIE DIE ETIKET NIE. Die spoornommer is die enigste ding op
+   die kaart wat 'n mens oortik of in 'n koerier se soekveld plak, en
+   monospasie maak 'n 0 van 'n O onderskeibaar. Die woord "Spoornommer" hoef
+   niemand oor te tik nie -- in monospasie lyk hy soos kode. */
 .my-boek-hk-spoor {
   font-family: ui-monospace, Menlo, Consolas, monospace;
   font-size: 11px;
