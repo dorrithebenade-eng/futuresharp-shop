@@ -163,6 +163,24 @@ async function identiteit_kry_gebruiker(access_token) {
 }
 
 // --- Verfris 'n verlope sessie met die refresh_token ---
+//
+// 'N REFRESH_TOKEN IS EENMALIG. GoTrue draai hom om sodra hy gebruik word:
+// die ou een is dood en 'n nuwe kom saam met die nuwe sessie terug.
+//
+// Dit is 'n slaggat sodra iemand MEER AS EEN OORTJIE oop het, en dit is die
+// gewone geval hier -- 'n faktuur in die een, Boekhouding in die ander.
+// Albei kom naby die verval, albei stuur DIESELFDE token. Die eerste kry 'n
+// nuwe sessie; die tweede kry 'n 401 op 'n token wat 'n oomblik gelede nog
+// geldig was.
+//
+// Die eerste weergawe het by daardie 401 net identiteit_verwyder_sessie()
+// geroep. Die stoor is GEDEEL, dus is die vars sessie wat die ander oortjie
+// pas geskryf het, saam uitgevee -- en albei oortjies wys skielik "Meld by
+// die paneelbord aan" terwyl niks verkeerd is nie.
+//
+// Daarom: misluk die verfrissing, kyk EERS weer in die stoor. Het 'n ander
+// oortjie intussen 'n geldige sessie geskryf, gebruik ons dit. Net wanneer
+// daardie een ook weg of verlope is, word werklik afgemeld.
 async function identiteit_ververs_sessie() {
   const huidige = identiteit_kry_sessie();
   if (!huidige || !huidige.refresh_token) return null;
@@ -176,10 +194,22 @@ async function identiteit_ververs_sessie() {
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: liggaam.toString(),
   });
+
   if (!resp.ok) {
+    // 'n Ander oortjie kon die token 'n oomblik gelede omgedraai het.
+    const nuwer = identiteit_kry_sessie();
+    if (
+      nuwer &&
+      nuwer.refresh_token &&
+      nuwer.refresh_token !== huidige.refresh_token &&
+      Date.now() < nuwer.geskep_op + nuwer.expires_in * 1000 - 30000
+    ) {
+      return nuwer;
+    }
     identiteit_verwyder_sessie();
     return null;
   }
+
   const token_data = await resp.json();
   const gebruiker = await identiteit_kry_gebruiker(token_data.access_token);
   const sessie = { ...token_data, gebruiker, geskep_op: Date.now() };
@@ -189,6 +219,14 @@ async function identiteit_ververs_sessie() {
 
 // --- Huidige aangemelde gebruiker (of null) — verfris outomaties as
 // die access_token reeds verval het (expires_in is in sekondes) ---
+// EEN VERFRISSING OP 'N SLAG PER OORTJIE.
+//
+// Die paneel roep hierdie funksie by elke laai, elke verfrissing en elke
+// Function-oproep aan. Kom drie oproepe saam terwyl die token verval, stuur
+// hulle drie keer dieselfde eenmalige refresh_token en twee van hulle kry 'n
+// 401. Die belofte word gedeel, dus wag die tweede en derde op die eerste.
+let IDENTITEIT_VERVERS_BESIG = null;
+
 async function identiteit_kry_huidige_sessie() {
   const sessie = identiteit_kry_sessie();
   if (!sessie) return null;
@@ -196,7 +234,12 @@ async function identiteit_kry_huidige_sessie() {
   const verval_op = sessie.geskep_op + sessie.expires_in * 1000;
   if (Date.now() < verval_op - 30000) return sessie; // nog 30s+ geldig
 
-  return identiteit_ververs_sessie();
+  if (!IDENTITEIT_VERVERS_BESIG) {
+    IDENTITEIT_VERVERS_BESIG = identiteit_ververs_sessie().finally(() => {
+      IDENTITEIT_VERVERS_BESIG = null;
+    });
+  }
+  return IDENTITEIT_VERVERS_BESIG;
 }
 
 function identiteit_meld_af() {
