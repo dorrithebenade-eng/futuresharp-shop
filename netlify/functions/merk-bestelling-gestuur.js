@@ -23,10 +23,18 @@
 // WIE MAG: die aangemelde gebruiker moet 'n outeur wees van 'n boek waarvan
 // 'n harde kopie IN HIERDIE BESTELLING is. Andersins 403. Dit keer dat 'n
 // outeur iemand anders se bestelling merk.
+//
+// DIE KOPER WORD IN KENNIS GESTEL. Hierdie funksie het van die begin af die
+// datum, die wyse, die verskaffer en die spoornommer gestoor -- en toe gestop.
+// Die koper het betaal vir 'n boek wat per pos kom en niks meer gehoor nie,
+// terwyl die spoornommer in die rekord gele het. Sien
+// _kennisgewing-versending.js. Die pos gaan uit NA die skryf, slegs by 'n NUWE
+// merk, en 'n mislukking maak die merk nooit ongedaan nie.
 
 const { kry_store } = require("./_blob-store");
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 const { outeur_by_produk_betrokke } = require("./_outeur-aandeel");
+const { stuur_versending_kennisgewing } = require("./_kennisgewing-versending");
 
 function normaliseer_epos(epos) {
   return String(epos || "").trim().toLowerCase();
@@ -179,6 +187,30 @@ exports.handler = async (event, context) => {
   };
 
   await store.setJSON(bestelnommer, bygewerk);
+
+  // --- Laat die koper weet ---
+  //
+  // NA DIE SKRYF, EN NOOIT VOOR NIE. Die versending is nou 'n feit in die
+  // rekord; 'n pos wat misluk, mag dit nie ongedaan maak nie. Daarom die
+  // try/catch en geen invloed op die antwoord.
+  //
+  // SLEGS BY 'N NUWE MERK. Trek die outeur die versending terug (gestuur ===
+  // false), is daar niks om aan te kondig nie. En het hy bloot 'n spoornommer
+  // reggemaak wat reeds gestuur was, sou 'n tweede pos die koper laat dink 'n
+  // tweede pakkie is op pad. `vorige.gestuur` is die toets: was dit reeds
+  // gestuur, is hierdie 'n wysiging en nie 'n aankondiging nie.
+  const is_nuwe_versending = gestuur === true && vorige.gestuur !== true;
+
+  if (is_nuwe_versending) {
+    try {
+      await stuur_versending_kennisgewing(bygewerk);
+    } catch (fout) {
+      console.error(
+        `Kon nie die versending-kennisgewing stuur nie vir ${bestelnommer}:`,
+        fout
+      );
+    }
+  }
 
   return {
     statusCode: 200,
