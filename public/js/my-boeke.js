@@ -118,11 +118,20 @@ function bou_boek_kaart(boek) {
   // dieselfde omslag, dieselfde titel en dieselfde outeur langs mekaar. Die
   // e-boek is klikbaar en die harde kopie nie -- maar dit bly onsigbaar tot 'n
   // mens probeer, en 'n kaart wat nie reageer nie lyk stukkend.
+  //
+  // DIESELFDE SLEUTELS AS DIE MANDJIE EN DIE UITTEKEN. Die koper het "Harde
+  // kopie" gekies en "Harde kopie" betaal; hy moet nie hier "Gedrukte boek"
+  // lees nie. Drie sleutels wat dieselfde ding beteken, is drie plekke waar
+  // hulle uitmekaar kan dryf.
+  //
+  // LEEN IS DIE UITSONDERING. leen_etiket se Engels is "Borrow" -- 'n
+  // werkwoord, wat op 'n knoppie reg lees maar as etiket onder 'n boektitel
+  // soos 'n opdrag klink. Daarvoor is daar 'n eie sleutel met "Loan".
   const formaat_woord = boek.is_harde_kopie
-    ? window.t && window.t("mb_formaat_harde_kopie")
+    ? window.t && window.t("hardekopie_etiket")
     : boek.is_leen
       ? window.t && window.t("mb_formaat_leen")
-      : window.t && window.t("mb_formaat_eboek");
+      : window.t && window.t("eboek_etiket");
 
   if (formaat_woord) {
     const formaat_el = document.createElement("p");
