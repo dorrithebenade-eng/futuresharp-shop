@@ -73,8 +73,19 @@ function jn_fin_jaar(datum) {
   return m >= 3 ? j : j - 1;
 }
 
-function jn_jaar_naam(jaar) {
-  return `1 Maart ${jaar} \u2013 28 Februarie ${jaar + 1}`;
+// Die eerste boekjaar waarvoor daar data KAN wees. Future Sharp is in 2024
+// geregistreer, maar die stelsel se eerste faktuur is Augustus 2026. 'n
+// Keuselys wat 2022 aanbied, bied jare aan wat nie kan bestaan nie.
+//
+// Dit is 'n VERSTEK, nie 'n grens nie: 'n mens kan 'n vroeere datum intik as
+// daar ooit 'n rede is. 'n Grens wat keer, keer ook wanneer iemand 'n rede
+// het wat die kode nie ken nie.
+const JN_EERSTE_JAAR = 2026;
+
+// 1 Maart van die boekjaar waarin 'n datum val.
+function jn_jaar_begin(datum) {
+  const j = jn_fin_jaar(datum);
+  return j === null ? "" : `${j}-03-01`;
 }
 
 async function jn_vra(pad, opsies) {
@@ -163,6 +174,18 @@ function jn_teken() {
   document.getElementById("jn-s-deb").textContent = jn_rand(JN_DATA.debiteure_sent);
   document.getElementById("jn-s-kred").textContent = jn_rand(JN_DATA.krediteure_sent);
   jn_teken_wag();
+
+  const tydperk = document.getElementById("jn-tydperk");
+  if (tydperk) {
+    const aantal =
+      alles.length +
+      " " +
+      (alles.length === 1
+        ? jn_t("jn_inskrywing", "inskrywing")
+        : jn_t("jn_inskrywings", "inskrywings"));
+    tydperk.textContent =
+      jn_datum_af(JN_DATA.van) + " \u2013 " + jn_datum_af(JN_DATA.tot) + " \u00B7 " + aantal;
+  }
 
   jn_koppel_lys();
 }
@@ -305,15 +328,13 @@ async function jn_teken_aan() {
     document.getElementById("jn-wie").value = "";
     document.getElementById("jn-bedrag").value = "";
 
-    // DIE JAAR SPRING SAAM. Teken 'n mens iets van 'n ander finansiele jaar
-    // aan, sou dit andersins verdwyn -- die lys wys net die gekose jaar, en
-    // dan lyk dit of die inskrywing nie gestoor is nie.
-    const jaar = jn_fin_jaar(datum);
-    const keuse = document.getElementById("jn-jaar");
-    if (keuse && Number(keuse.value) !== jaar) {
-      jn_vul_jare(jaar);
-      keuse.value = String(jaar);
-    }
+    // DIE TYDPERK REK OM DIE NUWE INSKRYWING IN TE SLUIT. Teken 'n mens iets
+    // van buite die gekose tydperk aan, sou dit andersins verdwyn -- en dan
+    // lyk dit of dit nie gestoor is nie.
+    const van = document.getElementById("jn-van");
+    const tot = document.getElementById("jn-tot");
+    if (datum < van.value) van.value = jn_jaar_begin(datum);
+    if (datum > tot.value) tot.value = datum;
 
     await jn_laai();
     document.getElementById("jn-besk").focus();
@@ -369,36 +390,46 @@ function jn_voer_uit() {
   });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = `joernaal-${JN_DATA.jaar}-${JN_DATA.jaar + 1}.csv`;
+  // Die lêernaam dra die tydperk, want die uitvoer volg die filter: wat op
+  // die skerm is, is wat in die lêer beland.
+  a.download = `joernaal-${JN_DATA.van}-tot-${JN_DATA.tot}.csv`;
   a.click();
   URL.revokeObjectURL(a.href);
 }
 
 /* ═══ laai ═══ */
 
-function jn_vul_jare(insluit) {
-  const keuse = document.getElementById("jn-jaar");
-  if (!keuse) return;
+function jn_stel_tydperk(van, tot) {
+  document.getElementById("jn-van").value = van;
+  document.getElementById("jn-tot").value = tot;
+}
 
-  const huidig = jn_fin_jaar(jn_vandag());
-  const jare = [];
-  for (let j = huidig; j >= huidig - 4; j -= 1) jare.push(j);
-  if (Number.isFinite(insluit) && !jare.includes(insluit)) {
-    jare.push(insluit);
-    jare.sort((a, b) => b - a);
-  }
-
-  const gekies = keuse.value;
-  keuse.innerHTML = jare
-    .map((j) => `<option value="${j}">${jn_jaar_naam(j)}</option>`)
-    .join("");
-  if (gekies && jare.includes(Number(gekies))) keuse.value = gekies;
+// HERSTEL sit die tydperk terug op die HUIDIGE boekjaar en laai dadelik.
+// 'n Herstel wat 'n tweede klik verg, is nie 'n herstel nie.
+function jn_herstel() {
+  const vandag = jn_vandag();
+  const begin = jn_jaar_begin(vandag);
+  jn_stel_tydperk(begin < `${JN_EERSTE_JAAR}-03-01` ? `${JN_EERSTE_JAAR}-03-01` : begin, vandag);
+  document.getElementById("jn-soek").value = "";
+  jn_laai();
 }
 
 async function jn_laai() {
-  const jaar = Number(document.getElementById("jn-jaar").value) || jn_fin_jaar(jn_vandag());
+  const van = document.getElementById("jn-van").value;
+  const tot = document.getElementById("jn-tot").value;
+  const soek = document.getElementById("jn-soek").value.trim();
+
+  if (!van || !tot || van > tot) {
+    jn_wys_fout(jn_t("jn_tydperk_fout", "Die \u2018van\u2019-datum moet voor die \u2018tot\u2019-datum wees."));
+    return;
+  }
+  jn_wys_fout("");
+
   try {
-    JN_DATA = await jn_vra(`kry-joernaal?jaar=${jaar}`);
+    JN_DATA = await jn_vra(
+      `kry-joernaal?van=${van}&tot=${tot}&soek=${encodeURIComponent(soek)}`
+    );
+    JN_ALMAL = false;
     jn_teken();
   } catch (fout) {
     console.error("Kon nie die joernaal laai nie:", fout);
@@ -420,7 +451,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
   if (!JN_SESSIE) return;
 
-  jn_vul_jare();
   document.getElementById("jn-datum").value = jn_vandag();
   document.getElementById("jn-datum").max = jn_vandag();
   jn_stel_rigting("uit");
@@ -429,9 +459,17 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("jn-r-uit").addEventListener("click", () => jn_stel_rigting("uit"));
   document.getElementById("jn-voeg").addEventListener("click", jn_teken_aan);
   document.getElementById("jn-uitvoer").addEventListener("click", jn_voer_uit);
-  document.getElementById("jn-jaar").addEventListener("change", () => {
-    JN_ALMAL = false;
-    jn_laai();
+  document.getElementById("jn-herstel").addEventListener("click", jn_herstel);
+  ["jn-van", "jn-tot"].forEach((id) => {
+    document.getElementById(id).addEventListener("change", jn_laai);
+  });
+
+  // Die soekwoord loop deur die bediener, dus wag ons tot iemand ophou tik.
+  // 'n Oproep per toetsaanslag sou vyf keer soek vir "Afrihost".
+  let tik = null;
+  document.getElementById("jn-soek").addEventListener("input", () => {
+    clearTimeout(tik);
+    tik = setTimeout(jn_laai, 350);
   });
 
   document.getElementById("jn-wys-al").addEventListener("click", () => {
@@ -451,6 +489,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   ["jn-datum", "jn-besk", "jn-bedrag"].forEach((id) => {
     document.getElementById(id).addEventListener("input", jn_kyk_gereed);
   });
+
+  jn_stel_tydperk(
+    (() => {
+      const b = jn_jaar_begin(jn_vandag());
+      return b < `${JN_EERSTE_JAAR}-03-01` ? `${JN_EERSTE_JAAR}-03-01` : b;
+    })(),
+    jn_vandag()
+  );
 
   // Eers laai wanneer iemand werklik na die joernaal toe gaan. Die Function
   // lees ELKE faktuur om die ontvangste en die uitbetalings te vind; dit hoef
