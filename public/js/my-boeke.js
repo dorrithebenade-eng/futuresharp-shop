@@ -9,11 +9,36 @@ function wys_status(teks) {
   if (status_el) status_el.textContent = teks;
 }
 
+// Die rekord dra JJJJ-MM-DD (sien merk-bestelling-gestuur.js: 'n DATUM, nie
+// 'n tydstip nie -- die outeur weet op watter DAG hy gepos het). "24 Aug 2026"
+// lees op 'n kaart beter as "2026-08-24", en die maandnaam volg die bladsy se
+// taal.
+function formateer_datum(iso) {
+  const d = new Date(String(iso).slice(0, 10) + "T00:00:00");
+  if (Number.isNaN(d.getTime())) return String(iso);
+  const taal =
+    (window.kry_huidige_taal && window.kry_huidige_taal()) === "en"
+      ? "en-ZA"
+      : "af-ZA";
+  return d.toLocaleDateString(taal, {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+}
+
 function bou_boek_kaart(boek) {
   // 'n Boek is oopmaakbaar as dit beskikbaar is EN (nie 'n leen is NIE, OF
   // die leen nog aktief is — 'n verval-de leen word soos 'n
   // nie-beskikbare boek behandel: nie-klikbaar, met 'n duidelike merker).
-  const kan_oopmaak = boek.beskikbaar_nou && (!boek.is_leen || boek.leen_aktief !== false);
+  //
+  // 'N HARDE KOPIE IS NOOIT OOPMAAKBAAR NIE. Daar is geen leser vir 'n
+  // gedrukte boek nie, en 'n kaart wat na leser.html lei vir 'n boek wat per
+  // pos kom, is 'n skakel na 'n leë bladsy.
+  const kan_oopmaak =
+    !boek.is_harde_kopie &&
+    boek.beskikbaar_nou &&
+    (!boek.is_leen || boek.leen_aktief !== false);
 
   const el = document.createElement(kan_oopmaak ? "a" : "div");
   el.className = "my-boek-kaart";
@@ -42,7 +67,25 @@ function bou_boek_kaart(boek) {
     omslag_wrap.appendChild(plek_el);
   }
 
-  if (!boek.beskikbaar_nou) {
+  // DIE HARDE-KOPIE-MERKER KOM EERSTE. 'n Gedrukte boek het geen
+  // vrystellingsdatum en geen leen nie, dus kan hy nooit met die twee gevalle
+  // hieronder bots -- maar die volgorde maak die bedoeling leesbaar: die
+  // merker sê wat MET HIERDIE EKSEMPLAAR gebeur, nie of die titel beskikbaar
+  // is nie.
+  if (boek.is_harde_kopie) {
+    const merker = document.createElement("span");
+    // 'N PIL, NIE 'N MERKER NIE. .my-boek-merker is 'n VOLLE OORLEG (inset: 0)
+    // wat die omslag met 'n donker sluier bedek -- korrek vir 'n boek wat nog
+    // nie beskikbaar is nie, want dan is die omslag 'n belofte en nie 'n besit.
+    // 'n Harde kopie is GEKOOP en op pad; sy omslag moet sigbaar bly.
+    merker.className = boek.gestuur
+      ? "my-boek-pil my-boek-pil--gestuur"
+      : "my-boek-pil my-boek-pil--bestel";
+    merker.textContent = boek.gestuur
+      ? (window.t ? window.t("hk_merk_gestuur") : "Gestuur")
+      : (window.t ? window.t("hk_merk_bestel") : "Bestel");
+    omslag_wrap.appendChild(merker);
+  } else if (!boek.beskikbaar_nou) {
     const merker = document.createElement("span");
     merker.className = "my-boek-merker";
     merker.textContent = boek.vrystelling_datum
@@ -68,6 +111,44 @@ function bou_boek_kaart(boek) {
     outeur_el.className = "my-boek-outeur";
     outeur_el.textContent = boek.outeur;
     el.appendChild(outeur_el);
+  }
+
+  // DIE STATUSREEL VIR 'N HARDE KOPIE. Dit is die hele punt van die kaart:
+  // die koper het betaal vir 'n boek wat per pos kom en het tot nou toe nêrens
+  // gehad om te kyk nie. Die datum en die spoornommer lê reeds in die rekord --
+  // merk-bestelling-gestuur.js skryf hulle wanneer die outeur pos.
+  if (boek.is_harde_kopie) {
+    const status_el = document.createElement("p");
+    status_el.className = "my-boek-hk-status";
+
+    if (boek.gestuur) {
+      const datum = boek.gestuur_op
+        ? ` ${formateer_datum(boek.gestuur_op)}`
+        : "";
+      const reel = document.createElement("span");
+      reel.textContent =
+        (window.t ? window.t("hk_gestuur_op") : "Gestuur op") + datum;
+      status_el.appendChild(reel);
+
+      // Die spoornommer op sy eie reël, want dit is die enigste ding op die
+      // kaart wat 'n mens oortik of kopieer.
+      if (boek.spoornommer) {
+        status_el.appendChild(document.createElement("br"));
+        const spoor = document.createElement("span");
+        spoor.className = "my-boek-hk-spoor";
+        spoor.textContent =
+          (window.t ? window.t("hk_spoornommer") : "Spoornommer") +
+          " " +
+          boek.spoornommer;
+        status_el.appendChild(spoor);
+      }
+    } else {
+      status_el.textContent = window.t
+        ? window.t("hk_wag_teks")
+        : "Jou bestelling is geplaas. Ons laat weet sodra dit gestuur is.";
+    }
+
+    el.appendChild(status_el);
   }
 
   // Leen-status-reël — net vir aktiewe leen-items, wys hoeveel dae oor is.

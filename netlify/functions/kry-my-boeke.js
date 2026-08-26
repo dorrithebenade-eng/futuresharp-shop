@@ -86,9 +86,23 @@ exports.handler = async (event, context) => {
       const items = Array.isArray(bestelling.items) ? bestelling.items : [];
 
       for (const boek_item of items) {
-        // "My Boeke" wys e-boeke wat gekoop OF geleen is — harde kopieë
-        // loop deur die drukker/POD-vloei, nie hier nie.
-        if (boek_item.formaat !== "eboek" && boek_item.formaat !== "leen") continue;
+        // "My Boeke" wys e-boeke wat gekoop of geleen is, EN harde kopieë.
+        //
+        // 'N HARDE KOPIE HET HIER GEHOORT VAN DIE BEGIN AF. Hy is oorgeslaan
+        // omdat hy "deur die drukker/POD-vloei loop" -- maar dit is wat ONS
+        // met hom doen, nie wat die KOPER van hom sien nie. Hy het betaal en
+        // dan het hy nêrens gehad om te kyk nie: geen status, geen datum, geen
+        // spoornommer, terwyl merk-bestelling-gestuur.js al drie noukeurig in
+        // die rekord stoor. Die dankie-bladsy het hom boonop hierheen gestuur
+        // met die belofte dat hy die status hier kan volg.
+        const is_harde_kopie = boek_item.formaat === "harde_kopie";
+        if (
+          boek_item.formaat !== "eboek" &&
+          boek_item.formaat !== "leen" &&
+          !is_harde_kopie
+        ) {
+          continue;
+        }
 
         const is_leen = boek_item.formaat === "leen";
 
@@ -145,6 +159,13 @@ exports.handler = async (event, context) => {
           }
         }
 
+        // Die versendingstoestand, en NIKS MEER NIE. merk-bestelling-gestuur.js
+        // stoor ook die wyse, die verskaffer en 'n volle geskiedenis van elke
+        // wysiging -- dit is werksdata vir 'n latere navraag, nie iets wat die
+        // koper op 'n kaart nodig het nie. Hy wil weet: is dit weg, wanneer, en
+        // waarmee kan ek dit naspoor.
+        const versending = (is_harde_kopie && bestelling.versending) || null;
+
         my_boeke.push({
           bestelnommer: bestelling.bestelnommer,
           produk_slug: boek_item.produk_slug,
@@ -154,6 +175,10 @@ exports.handler = async (event, context) => {
           vrystelling_datum,
           beskikbaar_nou,
           is_leen,
+          is_harde_kopie,
+          gestuur: versending ? versending.gestuur === true : false,
+          gestuur_op: versending ? versending.gestuur_op || null : null,
+          spoornommer: versending ? versending.spoornommer || "" : "",
           verval_op: is_leen ? boek_item.verval_op || null : null,
           leen_aktief,
           dae_oor,

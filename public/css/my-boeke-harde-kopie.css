@@ -1,0 +1,67 @@
+/* public/css/my-boeke-harde-kopie.css
+ *
+ * 'n Harde kopie in "My Boeke". styl.css dra reeds die kaart, die omslag en
+ * die leen-statusreël -- hier staan net wat 'n GEDRUKTE boek nodig het.
+ *
+ * WAAROM 'N EIE KLAS EN NIE .my-boek-merker NIE
+ *
+ * .my-boek-merker is 'n VOLLE OORLEG: `inset: 0` met 'n donker sluier oor die
+ * hele omslag. Dit is korrek waar hy gebruik word -- 'n boek wat nog nie
+ * vrygestel is nie, of 'n leen wat verval het. In albei gevalle is die omslag
+ * 'n belofte en nie 'n besitting nie, en die sluier sê presies dit.
+ *
+ * 'n Harde kopie is die teenoorgestelde: hy IS gekoop en hy IS op pad. Sy
+ * omslag moet sigbaar bly. Die pil sit dus BO-OP die hoek en bedek niks.
+ */
+
+.my-boek-pil {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  font-family: var(--font-liggaam);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 999px;
+  /* Die omslag kan enige kleur wees. 'n Dun wit rand hou die pil leesbaar op
+     'n donker sowel as 'n bleek omslag, sonder 'n skaduwee. */
+  border: 1px solid rgba(255, 255, 255, .55);
+}
+
+/* AMBER IS WERK WAT HANGEND IS, nie 'n waarskuwing nie: die bestelling is
+   geplaas en iemand moet nog pos. Wit teks val onder die kontrasdrempel teen
+   geel, dus die donkerste stop uit dieselfde familie. */
+.my-boek-pil--bestel {
+  background: var(--amber);
+  color: #412402;
+}
+
+/* TEAL IS DIE POSITIEWE UITKOMS. Koraal sou hier verkeerd wees -- daar is
+   niks om te stop nie. */
+.my-boek-pil--gestuur {
+  background: var(--teal);
+  color: var(--wit);
+}
+
+/* Die statusreël onder die titel. Dieselfde plek en gewig as die
+   leen-statusreël, want dit beantwoord dieselfde soort vraag: wat gebeur nou
+   met hierdie eksemplaar. */
+.my-boek-hk-status {
+  font-family: var(--font-liggaam);
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--grys-teks);
+  margin: 6px 0 0;
+}
+
+/* Die spoornommer is die enigste ding op die kaart wat 'n mens oortik of in 'n
+   koerier se soekveld plak. Monospasie maak 'n 0 van 'n O onderskeibaar. */
+.my-boek-hk-spoor {
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 11px;
+  color: var(--swart);
+  /* Lang spoornommers breek eerder as om die kaart te verbreed. */
+  word-break: break-all;
+}

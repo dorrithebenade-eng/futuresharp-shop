@@ -420,6 +420,26 @@ const WOORDEBOEK = {
     en: 'We\'re confirming your payment server-side. Once that\'s done, any e-books will immediately be available in "My Books", and you\'ll be able to track the status of your hard-copy item(s) there.',
   },
   gaan_na_my_boeke: { af: "Gaan na My Boeke", en: "Go to My Books" },
+
+  // -- 'n Harde kopie in "My Boeke" ---------------------------------------
+  // 'n Gedrukte boek het nog altyd deur die drukker- en afleweringsvloei
+  // geloop en NERENS vir die koper gewys nie. Hy het betaal en toe niks meer
+  // gehoor nie, terwyl merk-bestelling-gestuur.js die datum, die verskaffer
+  // en die spoornommer al die tyd in die rekord gestoor het.
+  //
+  // Die merkie op die omslag, want dit is die eerste ding wat 'n oog vang op
+  // 'n rak vol kaarte.
+  hk_merk_bestel: { af: "Bestel", en: "Ordered" },
+  hk_merk_gestuur: { af: "Gestuur", en: "Shipped" },
+
+  // GEEN DATUM BELOOF NIE. Ons weet nie wanneer die outeur gaan pos nie, en
+  // 'n geraamde aankomsdatum wat mis, is erger as geen datum.
+  hk_wag_teks: {
+    af: "Jou bestelling is geplaas. Ons laat weet sodra dit gestuur is.",
+    en: "Your order has been placed. We'll let you know once it ships.",
+  },
+  hk_gestuur_op: { af: "Gestuur op", en: "Shipped on" },
+  hk_spoornommer: { af: "Spoornommer", en: "Tracking number" },
   terug_winkel: { af: "Terug na die winkel", en: "Back to the shop" },
   terug_mandjie: { af: "Terug na die mandjie", en: "Back to the cart" },
 
