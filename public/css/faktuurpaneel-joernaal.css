@@ -7,16 +7,17 @@
    en geld uit -- maar die kleure bly konsekwent sodat 'n mens nie 'n nuwe
    stel moet leer nie. */
 
-/* DIE JOERNAAL GEBRUIK DIE SKERM.
-   .paneel-wrap in styl.css dra max-width: 900px -- reg vir 'n bladsy met een
-   kolom teks, verkeerd vir 'n tabel en 'n vyf-veld-strook. Die beskrywing kry
-   dan 'n derde van wat dit nodig het en "Afrihost -- domein en e-pos" word
+/* BOEKHOUDING GEBRUIK DIE SKERM -- HEELTEMAL, NIE NET DIE JOERNAAL NIE.
+   .paneel-wrap in styl.css dra max-width: 900px. Dit is reg vir 'n bladsy met
+   een kolom teks, verkeerd vir 'n tabel en 'n vyf-veld-strook: die beskrywing
+   kry 'n derde van wat dit nodig het en "Afrihost -- domein en e-pos" word
    afgekap terwyl daar honderde pixels wit langsaan le.
 
-   Dieselfde regstelling as die faktuurblad s'n, en net so eng gerig: hierdie
-   reel geld slegs wanneer die joernaal-afdeling gewys word, dus bly elke
-   ander pil onaangeraak. */
-#fp-hoof.paneel-wrap:has(.fp-afdeling[data-afdeling="joernaal"].wys) {
+   DIE EERSTE WEERGAWE HET DIT NET OP DIE JOERNAAL GESIT, en toe SPRING die
+   blad: Fakture 900px, Joernaal 1500px, Instellings weer 900px. Die pille
+   self skuif dan onder 'n mens se muis uit. Een breedte vir die hele
+   afdeling, en niks beweeg nie. */
+#fp-hoof.paneel-wrap {
   max-width: 1500px;
 }
 

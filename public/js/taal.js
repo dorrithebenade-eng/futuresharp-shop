@@ -611,6 +611,14 @@ const WOORDEBOEK = {
   jn_herhaal: { af: "herhaal", en: "repeat" },
   jn_verwyder: { af: "Verwyder", en: "Remove" },
   jn_uitvoer: { af: "Voer uit", en: "Export" },
+  jn_van: { af: "Van", en: "From" },
+  jn_tot: { af: "Tot", en: "To" },
+  jn_soek: { af: "Beskrywing", en: "Description" },
+  jn_herstel: { af: "Herstel", en: "Reset" },
+  jn_tydperk_fout: {
+    af: "Die \u2018van\u2019-datum moet voor die \u2018tot\u2019-datum wees.",
+    en: "The \u2018from\u2019 date must come before the \u2018to\u2019 date.",
+  },
   jn_leeg: {
     af: "Geen inskrywings vir hierdie jaar nie.",
     en: "No entries for this year.",

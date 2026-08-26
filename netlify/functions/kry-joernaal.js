@@ -42,8 +42,39 @@ exports.handler = async (event, context) => {
     return { statusCode: 403, body: "Geen toegang tot Boekhouding nie" };
   }
 
-  const gevra = Number((event.queryStringParameters || {}).jaar);
-  const jaar = Number.isFinite(gevra) ? gevra : finansiele_jaar(new Date().toISOString());
+  // 'N TYDPERK, NIE 'N JAAR NIE.
+  //
+  // Die eerste weergawe het net `jaar` geneem. 'n Filter met 'n datum VAN en
+  // 'n datum TOT doen dieselfde werk -- 1 Maart tot 28 Februarie is 'n
+  // tydperk soos enige ander -- en dit kan boonop oor jaargrense heen loop.
+  // Twee maniere om die tydperk te kies, langs mekaar, sou beteken 'n mens
+  // weet nie watter een geld nie.
+  const vraag = event.queryStringParameters || {};
+  const dag_van = /^\d{4}-\d{2}-\d{2}$/.test(vraag.van || "") ? vraag.van : null;
+  const dag_tot = /^\d{4}-\d{2}-\d{2}$/.test(vraag.tot || "") ? vraag.tot : null;
+
+  if (!dag_van || !dag_tot || dag_van > dag_tot) {
+    return { statusCode: 400, body: "Gee 'n geldige tydperk." };
+  }
+
+  // Die soekwoord loop oor die beskrywing en oor "Betaal deur" -- die twee
+  // velde wat woorde dra. Kleinletter aan albei kante, want niemand tik 'n
+  // soekwoord met dieselfde hoofletters as die inskrywing nie.
+  const soek = String(vraag.soek || "").trim().toLowerCase();
+  const pas = (r) =>
+    !soek ||
+    String(r.beskrywing || "").toLowerCase().includes(soek) ||
+    String(r.wie || "").toLowerCase().includes(soek);
+
+  const in_tydperk = (d) => Boolean(d) && d >= dag_van && d <= dag_tot;
+
+  // Watter finansiele jare die tydperk raak. Die jaar staan in die Blob-
+  // sleutel, dus lees ons net daardie jare se prefikse in plaas van die hele
+  // store.
+  const jare = [];
+  for (let j = finansiele_jaar(dag_van); j <= finansiele_jaar(dag_tot); j += 1) {
+    jare.push(j);
+  }
 
   const inskrywings = [];
 
@@ -67,11 +98,16 @@ exports.handler = async (event, context) => {
   // om elke ander jaar se inskrywings oop te maak.
   try {
     const store = kry_joernaal_store();
-    const lys = await store.list({ prefix: jaar_voorvoegsel(jaar) });
+    const blobs = [];
+    for (const j of jare) {
+      const lys = await store.list({ prefix: jaar_voorvoegsel(j) });
+      (lys.blobs || []).forEach((b) => blobs.push(b));
+    }
     const rekords = await Promise.all(
-      (lys.blobs || []).map((b) => store.get(b.key, { type: "json" }))
+      blobs.map((b) => store.get(b.key, { type: "json" }))
     );
     rekords.filter(Boolean).forEach((r) => {
+      if (!in_tydperk(r.datum) || !pas(r)) return;
       inskrywings.push({
         sleutel: r.sleutel,
         datum: r.datum,
@@ -104,7 +140,7 @@ exports.handler = async (event, context) => {
       // Uitgereik en nog nie betaal nie.
       if (f.stand === "gestuur") {
         const uitgereik = dag(f.uitgereik_op);
-        if (uitgereik && finansiele_jaar(uitgereik) === jaar) {
+        if (in_tydperk(uitgereik)) {
           debiteure.push({
             datum: uitgereik,
             nommer,
@@ -117,11 +153,12 @@ exports.handler = async (event, context) => {
 
       // Die faktuur se ontvangs
       const ontvang_op = dag(f.betaling && f.betaling.ontvang_op);
-      if (ontvang_op && finansiele_jaar(ontvang_op) === jaar) {
+      const ontvang_besk = `${nommer}${klient ? " \u2014 " + klient : ""}`;
+      if (in_tydperk(ontvang_op) && pas({ beskrywing: ontvang_besk })) {
         inskrywings.push({
           sleutel: null,
           datum: ontvang_op,
-          beskrywing: `${nommer}${klient ? " \u2014 " + klient : ""}`,
+          beskrywing: ontvang_besk,
           wie: "",
           nota: "",
           bedrag_sent: Number(f.betaling.ontvang_sent) || 0,
@@ -139,7 +176,7 @@ exports.handler = async (event, context) => {
         if (!betaal_op) {
           // Nog uitstaande. Die skuld het ontstaan toe die faktuur betaal is.
           const ontvang = dag(f.betaling && f.betaling.ontvang_op);
-          if (ontvang && finansiele_jaar(ontvang) === jaar) {
+          if (in_tydperk(ontvang)) {
             krediteure.push({
               datum: ontvang,
               nommer,
@@ -150,7 +187,7 @@ exports.handler = async (event, context) => {
           return;
         }
 
-        if (finansiele_jaar(betaal_op) !== jaar) return;
+        if (!in_tydperk(betaal_op)) return;
 
         // WAARVOOR die persoon betaal is, uit die faktuur se reels. Sonder dit
         // lees die boekhouer net 'n naam en 'n bedrag, en dan moet hy vra.
@@ -159,11 +196,14 @@ exports.handler = async (event, context) => {
           .map((w) => w.reel)
           .join(", ");
 
+        const uit_besk =
+          `${ry.ontvanger || ""} \u2014 ${nommer}` + (dele ? ` (${dele})` : "");
+        if (!pas({ beskrywing: uit_besk })) return;
+
         inskrywings.push({
           sleutel: null,
           datum: betaal_op,
-          beskrywing:
-            `${ry.ontvanger || ""} \u2014 ${nommer}` + (dele ? ` (${dele})` : ""),
+          beskrywing: uit_besk,
           wie: "",
           nota: "",
           bedrag_sent: sent,
@@ -193,7 +233,9 @@ exports.handler = async (event, context) => {
     statusCode: 200,
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      jaar,
+      van: dag_van,
+      tot: dag_tot,
+      soek,
       inskrywings,
       in_sent,
       uit_sent,
