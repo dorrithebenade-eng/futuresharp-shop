@@ -330,7 +330,7 @@ const WOORDEBOEK = {
   produk_nie_gevind: { af: "Hierdie produk kon nie gevind word nie.", en: "This product could not be found." },
 
   // Mandjie-bladsy
-  bly_aan_koop: { af: "← Bly aan koop", en: "← Continue shopping" },
+  bly_aan_koop: { af: "← Terug na katalogus", en: "← Back to catalogue" },
   jou_mandjie: { af: "Jou mandjie", en: "Your cart" },
   mandjie_laai: { af: "Mandjie word gelaai …", en: "Loading cart …" },
   mandjie_leeg: { af: "Jou mandjie is leeg.", en: "Your cart is empty." },

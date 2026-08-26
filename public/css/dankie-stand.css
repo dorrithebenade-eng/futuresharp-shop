@@ -54,6 +54,29 @@
 .ds-t-oop      .dankie-merkie { background: var(--koraal); color: var(--wit); }
 .ds-t-onbekend .dankie-merkie { background: #F1EFE8; color: #2C2C2A; }
 
+/* DIE `hidden`-ATTRIBUUT MOET WERK. styl.css se .dankie-knoppie stel
+   `display: inline-block`, en 'n CSS-display oorheers die HTML-attribuut --
+   'n knoppie met `hidden` het dus nog ALTYD op hierdie bladsy gewys. Dit het
+   niemand gepla toe "Gaan na My Boeke" die enigste sodanige knoppie was en
+   by elke uitkoms toepaslik was; met "Terug na die mandjie" daarby staan
+   albei paaie gelyktydig oop en spreek die bladsy homself teen. */
+.dankie-knoppie[hidden] { display: none; }
+
+/* EEN HOOFAKSIE PER UITKOMS. Drie vol-koraal knoppies langs mekaar se
+   dringendheid is oral dieselfde, en dan is nie een dringend nie. Die
+   hoofaksie bly koraal; "Terug na die winkel" is 'n uitgang en word stil. */
+#dankie-winkel-knoppie {
+  background: var(--wit);
+  color: var(--grys-teks);
+  border: 1px solid #DDD9D2;
+}
+
+#dankie-winkel-knoppie:hover {
+  background: var(--wit);
+  border-color: var(--teal);
+  color: var(--teal);
+}
+
 /* Die mandjiereel. Sy taak is om 'n verlies in 'n feit te verander: 'n koper
    wat sien sy mandjie is leeg, moet weet waarom. Klein, want dit is 'n
    voetnoot by die boodskap, nie 'n tweede boodskap nie. */
