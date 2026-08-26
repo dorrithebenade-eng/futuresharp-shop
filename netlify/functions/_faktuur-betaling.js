@@ -118,6 +118,11 @@ async function hanteer_faktuur_betaling(data, nou) {
     ontvanger: r.naam,
     begunstigde_id: r.begunstigde_id || null,
     bedrag_sent: r.bedrag_sent,
+    // WAARVOOR die persoon betaal word, een inskrywing per faktuurreel.
+    // stuur-faktuur.js bewaar dit op die gevriesde ry; sonder hierdie reel
+    // gooi ons dit hier weg en dan sê 'n staat net 'n totaal. Iemand wat vra
+    // waarvoor sy R9 552 is, kan dan nie geantwoord word nie.
+    waarvoor: Array.isArray(r.waarvoor) ? r.waarvoor : [],
     stand: r.pad === "split" ? "direk_uitbetaal" : "uitstaande",
     betaal_op: r.pad === "split" ? nou : null,
     verwysing: r.pad === "split" ? String(data.reference || "") : "",
@@ -252,6 +257,21 @@ async function stuur_state(rekord) {
 
         const direk = ry.stand === "direk_uitbetaal";
 
+        // WAARVOOR die bedrag is, een reel per faktuurreel.
+        //
+        // Een persoon kan uit DRIE reels van dieselfde faktuur betaal word --
+        // 'n aanbieding, 'n vraelys en 'n verslag -- en stuur-faktuur.js vou
+        // hulle vir Paystack saam tot een bedrag. 'n Pos wat net "Jou deel:
+        // R9 552,86" sê, laat die persoon self raai waarvoor dit is.
+        //
+        // Ouer fakture dra dit nie, en dan bly die pos presies soos hy was.
+        const dele = (ry.waarvoor || [])
+          .filter((w) => w && w.reel)
+          .map(
+            (w) =>
+              `&nbsp;&nbsp;${ontsnap(w.reel)} \u2014 <b>${rand(w.bedrag_sent)}</b>`
+          );
+
         await stuur_epos({
           merk: "faktuur",
           aan,
@@ -260,6 +280,7 @@ async function stuur_state(rekord) {
           reels: [
             `Faktuur <b>${ontsnap(nommer)}</b> is betaal.`,
             `Jou deel: <b>${rand(ry.bedrag_sent)}</b>`,
+            ...(dele.length > 1 ? ["Waarvoor:", ...dele] : []),
             direk
               ? "Die bedrag is direk deur die betalingsdiens aan jou uitbetaal en behoort binne twee werksdae in jou rekening te wees."
               : "Die bedrag word met die hand aan jou oorbetaal.",

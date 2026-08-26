@@ -213,6 +213,11 @@ exports.handler = async (event, context) => {
     ontvanger: r.naam,
     begunstigde_id: r.begunstigde_id || null,
     bedrag_sent: r.bedrag_sent,
+    // WAARVOOR die persoon betaal word, een inskrywing per faktuurreel.
+    // stuur-faktuur.js bewaar dit op die gevriesde ry; sonder hierdie reel
+    // gooi ons dit hier weg en dan sê 'n staat net 'n totaal. Iemand wat vra
+    // waarvoor sy R9 552 is, kan dan nie geantwoord word nie.
+    waarvoor: Array.isArray(r.waarvoor) ? r.waarvoor : [],
     stand: "uitstaande",
     betaal_op: null,
     verwysing: "",

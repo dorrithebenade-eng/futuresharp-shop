@@ -104,6 +104,28 @@ function st_groep_gekies(groep) {
   return groep.rye.filter((r) => ST.gekies[st_ry_sleutel(r)]);
 }
 
+// WAARVOOR die persoon betaal word, uit die faktuur se reels.
+//
+// Een persoon kan uit DRIE reels van dieselfde faktuur betaal word -- 'n
+// aanbieding, 'n vraelys en 'n verslag -- en stuur-faktuur.js vou hulle vir
+// Paystack saam tot een ry. Die staat wys die dele weer uitmekaar, want die
+// vraag wat 'n begunstigde werklik vra, is nie "hoeveel" nie maar "waarvoor".
+//
+// Ouer fakture -- uitgereik voor 25 Augustus 2026 -- dra dit nie, en dan
+// verskyn daar eenvoudig niks. Geen terugval nie: 'n geraaide beskrywing is
+// erger as geen beskrywing.
+function st_waarvoor(rye) {
+  if (!Array.isArray(rye) || !rye.length) return "";
+  return rye
+    .filter((w) => w && w.reel)
+    .map(
+      (w) =>
+        st_ontsnap(w.reel) +
+        (Number(w.bedrag_sent) > 0 ? " " + st_rand(w.bedrag_sent) : "")
+    )
+    .join(" \u00B7 ");
+}
+
 function st_teken_werklys() {
   const plek = document.getElementById("st-werk");
   if (!plek) return;
@@ -152,6 +174,10 @@ function st_teken_werklys() {
                 <input type="checkbox" data-kies="${st_ontsnap(sl)}"${ST.gekies[sl] ? " checked" : ""}>
                 <span class="st-ry-wat">${st_ontsnap(r.nommer)}
                   <small>${st_ontsnap(r.klient)}</small>
+                  ${(() => {
+                    const w = st_waarvoor(r.waarvoor);
+                    return w ? `<small class="st-waarvoor">${w}</small>` : "";
+                  })()}
                 </span>
                 <span class="st-ry-bedrag">${st_rand(r.bedrag_sent)}</span>
               </label>`;
@@ -369,7 +395,10 @@ function st_teken_klaar() {
     ].filter(Boolean).join(" \u00B7 ");
     return `
       <div class="st-lys-ry">
-        <span class="st-ry-wat">${st_ontsnap(r.naam)}<small>${onder}</small></span>
+        <span class="st-ry-wat">${st_ontsnap(r.naam)}<small>${onder}</small>${(() => {
+          const w = st_waarvoor(r.waarvoor);
+          return w ? `<small class="st-waarvoor">${w}</small>` : "";
+        })()}</span>
         <span class="st-merkie${direk ? " st-merkie-direk" : ""}">${
           direk ? st_t("st_direk", "Direk deur Paystack") : st_t("st_met_hand", "Met die hand")}</span>
         <span class="st-ry-bedrag">${st_rand(r.bedrag_sent)}</span>

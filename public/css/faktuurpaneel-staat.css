@@ -149,6 +149,15 @@
   color: var(--grys-teks);
 }
 
+/* WAARVOOR die persoon betaal word -- die faktuur se reels, uitmekaar.
+   Ligter as die klient se naam daarbo, want dit is 'n derde vlak: die
+   begunstigde, dan die faktuur, dan waaruit die bedrag kom. */
+.st-ry-wat small.st-waarvoor {
+  margin-top: 1px;
+  font-size: 12px;
+  color: #8B8780;
+}
+
 .st-groep-bedrag {
   font-family: var(--font-opskrif);
   font-size: 19px;

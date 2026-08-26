@@ -122,6 +122,7 @@ exports.handler = async (event, context) => {
           naam: ry.ontvanger || "",
           nommer,
           bedrag_sent: sent,
+          waarvoor: Array.isArray(ry.waarvoor) ? ry.waarvoor : [],
           stand: ry.stand,
           betaal_op: ry.betaal_op || null,
           verwysing: ry.verwysing || "",
@@ -154,6 +155,12 @@ exports.handler = async (event, context) => {
         nommer,
         klient,
         bedrag_sent: sent,
+        // WAARVOOR die persoon betaal word, een inskrywing per faktuurreel.
+        // Een persoon kan uit drie reels van dieselfde faktuur betaal word --
+        // 'n aanbieding, 'n vraelys en 'n verslag -- en stuur-faktuur.js vou
+        // hulle vir Paystack saam tot een ry. Sonder hierdie veld sien 'n mens
+        // net die totaal en kan niemand vra waarvoor dit is nie.
+        waarvoor: Array.isArray(ry.waarvoor) ? ry.waarvoor : [],
       });
     });
   });
