@@ -11,9 +11,16 @@
 // lees hulle uit die fakture en gee hulle saam terug; hulle dra 'n merkie en
 // kan nie geskrap word nie.
 
+// Hoeveel inskrywings altyd sigbaar is. Die vraag wat 'n mens onmiddellik na
+// 'n inskrywing het, is of dit werklik daar is -- 'n lys agter 'n knoppie
+// beantwoord dit nie. Oor 'n jaar staan daar honderde reels, en dan is 'n
+// mens se blad vol van 'n lys wat hy selde lees.
+const JN_WYS = 5;
+
 let JN_SESSIE = null;
 let JN_DATA = null;
 let JN_RIGTING = "uit";
+let JN_ALMAL = false;
 
 function jn_t(sleutel, verstek) {
   const uit = window.t ? window.t(sleutel) : null;
@@ -89,10 +96,15 @@ function jn_teken() {
   const plek = document.getElementById("jn-lys");
   if (!plek || !JN_DATA) return;
 
-  const lys = JN_DATA.inskrywings || [];
+  const alles = JN_DATA.inskrywings || [];
+  const lys = JN_ALMAL ? alles : alles.slice(0, JN_WYS);
 
+  // Die INDEKS IN DIE VOLLE LYS, nie in die afgesnyde nie. Sonder dit
+  // kopieer "herhaal" die verkeerde inskrywing sodra 'n mens verby die vyfde
+  // kom -- en dit sou stilweg gebeur, met 'n bedrag wat amper reg lyk.
   plek.innerHTML = lys
-    .map((r, ix) => {
+    .map((r) => {
+      const ix = alles.indexOf(r);
       const uit = r.rigting === "uit";
       const merk =
         r.bron === "hand"
@@ -132,28 +144,25 @@ function jn_teken() {
     .join("");
 
   const leeg = document.getElementById("jn-leeg");
-  if (leeg) leeg.hidden = lys.length > 0;
+  if (leeg) leeg.hidden = alles.length > 0;
+
+  const wys_al = document.getElementById("jn-wys-al");
+  if (wys_al) {
+    wys_al.hidden = alles.length <= JN_WYS;
+    wys_al.textContent = JN_ALMAL
+      ? jn_t("jn_wys_minder", "Wys minder")
+      : jn_t("jn_wys_al", "Wys al") + " " + alles.length;
+  }
 
   document.getElementById("jn-s-in").textContent = jn_rand(JN_DATA.in_sent);
   document.getElementById("jn-s-uit").textContent = "\u2212 " + jn_rand(JN_DATA.uit_sent);
   const netto = document.getElementById("jn-s-net");
   netto.textContent = (JN_DATA.netto_sent < 0 ? "\u2212 " : "") + jn_rand(JN_DATA.netto_sent);
-  netto.className = "jn-sy" + (JN_DATA.netto_sent < 0 ? " kort" : "");
+  netto.className = JN_DATA.netto_sent < 0 ? "kort" : "";
 
   document.getElementById("jn-s-deb").textContent = jn_rand(JN_DATA.debiteure_sent);
   document.getElementById("jn-s-kred").textContent = jn_rand(JN_DATA.krediteure_sent);
   jn_teken_wag();
-
-  const tel = document.getElementById("jn-tel");
-  if (tel) {
-    tel.textContent = lys.length
-      ? lys.length +
-        " " +
-        (lys.length === 1
-          ? jn_t("jn_inskrywing", "inskrywing")
-          : jn_t("jn_inskrywings", "inskrywings"))
-      : "";
-  }
 
   jn_koppel_lys();
 }
@@ -420,7 +429,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("jn-r-uit").addEventListener("click", () => jn_stel_rigting("uit"));
   document.getElementById("jn-voeg").addEventListener("click", jn_teken_aan);
   document.getElementById("jn-uitvoer").addEventListener("click", jn_voer_uit);
-  document.getElementById("jn-jaar").addEventListener("change", jn_laai);
+  document.getElementById("jn-jaar").addEventListener("change", () => {
+    JN_ALMAL = false;
+    jn_laai();
+  });
+
+  document.getElementById("jn-wys-al").addEventListener("click", () => {
+    JN_ALMAL = !JN_ALMAL;
+    jn_teken();
+  });
 
   document.getElementById("jn-w-deb").addEventListener("click", () => {
     JN_WAG_OOP = JN_WAG_OOP === "deb" ? null : "deb";

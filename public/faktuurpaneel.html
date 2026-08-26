@@ -314,20 +314,16 @@
            fakture gelees; net die res word hier ingetik. -->
       <section class="paneel-afdeling fp-afdeling" data-afdeling="joernaal">
         <div class="jn-wrap">
-          <ul class="jn-lei">
-            <li data-i18n="jn_lei_1">Inkomste en Uitgawes vir 'n finansiële jaar.</li>
-            <li data-i18n="jn_lei_2">Betalings deur Paystack word outomaties versprei as inkomste en geallokeer waar uitgawes van belang is.</li>
-            <li data-i18n="jn_lei_3">Betalings wat nie deur Paystack vloei nie moet steeds handmatig ingevoer word.</li>
-          </ul>
-
           <div class="jn-jaar">
             <select class="veld-invoer" id="jn-jaar"></select>
-            <span class="jn-tel" id="jn-tel"></span>
             <span class="jn-rek"></span>
             <button type="button" class="kaart-aksie stil" id="jn-uitvoer"
                     data-i18n="jn_uitvoer">Voer uit</button>
           </div>
 
+          <!-- TWEE GROOT SYFERS, NIE DRIE NIE. Verskil is 'n AFLEIDING --
+               inkomste min uitgawes -- nie 'n syfer waarop iemand handel.
+               Drie gelyke blokke laat 'n mens dink al drie is ewe belangrik. -->
           <div class="jn-blokke">
             <div class="jn-blok in">
               <div class="jn-et" data-i18n="jn_inkomste">Inkomste</div>
@@ -337,18 +333,19 @@
               <div class="jn-et" data-i18n="jn_uitgawes">Uitgawes</div>
               <div class="jn-sy" id="jn-s-uit">—</div>
             </div>
-            <div class="jn-blok">
-              <div class="jn-et" data-i18n="jn_verskil">Verskil</div>
-              <div class="jn-sy" id="jn-s-net">—</div>
-            </div>
           </div>
 
-          <!-- DEBITEURE EN KREDITEURE TEL NIE IN DIE SOMME HIERBO NIE.
-               Op kontantbasis is 'n onbetaalde faktuur nie inkomste nie en 'n
-               uitstaande uitbetaling nie 'n uitgawe nie -- die geld het nie
-               beweeg nie. Hulle staan hier omdat 'n mens hulle by jaareinde
-               wil sien, en hulle staan APART sodat niemand hulle by die
-               totale optel nie. -->
+          <div class="jn-verskil">
+            <span data-i18n="jn_verskil">Verskil</span>
+            <strong id="jn-s-net">—</strong>
+          </div>
+
+          <!-- DEBITEURE EN KREDITEURE IS 'N EIE JOERNAAL, nie 'n voetnoot by
+               die syfers hierbo nie. Op kontantbasis het hierdie geld nog nie
+               beweeg nie: 'n onbetaalde faktuur is nie inkomste nie en 'n
+               uitstaande uitbetaling nie 'n uitgawe nie.
+               Die opskrif doen die skeiding; geen verduideliking nodig. -->
+          <h3 class="jn-kop" data-i18n="jn_deb_kred_kop">Debiteure en krediteure</h3>
           <div class="jn-wag">
             <button type="button" class="jn-wag-blok" id="jn-w-deb" aria-expanded="false">
               <span class="jn-et" data-i18n="jn_debiteure">Debiteure</span>
@@ -361,50 +358,52 @@
               <span class="jn-wag-lei" data-i18n="jn_krediteure_lei">Ontvang, nog nie uitbetaal nie</span>
             </button>
           </div>
-          <p class="jn-wag-nota" data-i18n="jn_wag_nota">Tel nie in die syfers hierbo nie.</p>
           <div class="jn-wag-lys" id="jn-wag-lys" hidden></div>
 
-          <table class="jn-tabel">
-            <thead>
-              <tr>
-                <th class="jn-w-dat" data-i18n="jn_datum">Datum</th>
-                <th data-i18n="jn_beskrywing">Beskrywing</th>
-                <th class="n jn-w-bed" data-i18n="jn_bedrag">Bedrag</th>
-                <th class="jn-w-aks"></th>
-              </tr>
-            </thead>
-            <tbody id="jn-lys"></tbody>
-          </table>
-          <p class="jn-leeg" id="jn-leeg" hidden data-i18n="jn_leeg">Geen inskrywings vir hierdie jaar nie.</p>
+          <!-- DIE LAASTE VYF IS ALTYD SIGBAAR. Die vraag wat 'n mens
+               onmiddellik na 'n inskrywing het, is of dit werklik daar is --
+               en 'n lys agter 'n knoppie beantwoord dit nie. Die res kom met
+               "Wys al ..." -->
+          <div class="jn-lys-blok">
+            <h3 class="jn-kop" data-i18n="jn_laaste">Laaste inskrywings</h3>
+            <table class="jn-tabel">
+              <tbody id="jn-lys"></tbody>
+            </table>
+            <p class="jn-leeg" id="jn-leeg" hidden data-i18n="jn_leeg">Geen inskrywings vir hierdie jaar nie.</p>
+            <button type="button" class="kaart-aksie stil" id="jn-wys-al" hidden></button>
+          </div>
 
-          <div class="jn-nuwe">
-            <div>
-              <label class="veld-etiket" for="jn-datum" data-i18n="jn_datum">Datum</label>
-              <input class="veld-invoer" type="date" id="jn-datum">
-            </div>
-            <div>
-              <label class="veld-etiket" for="jn-besk" data-i18n="jn_beskrywing">Beskrywing</label>
-              <input class="veld-invoer" id="jn-besk" maxlength="300" placeholder="Afrihost — domein en e-pos">
-            </div>
-            <div>
-              <label class="veld-etiket" for="jn-wie" data-i18n="jn_wie">Betaal deur</label>
-              <input class="veld-invoer" id="jn-wie" maxlength="120">
-            </div>
-            <div>
-              <label class="veld-etiket" for="jn-bedrag" data-i18n="jn_bedrag">Bedrag</label>
-              <input class="veld-invoer n" id="jn-bedrag" inputmode="decimal" placeholder="0.00">
-            </div>
-            <div>
-              <label class="veld-etiket" data-i18n="jn_rigting">Soort</label>
-              <div class="jn-rigting">
-                <button type="button" id="jn-r-in" data-i18n="jn_in">Inkomste</button>
-                <button type="button" id="jn-r-uit" class="aan-uit" data-i18n="jn_uit">Uitgawe</button>
+          <div class="jn-nuwe-blok">
+            <h3 class="jn-kop" data-i18n="jn_teken_inskrywing">Teken 'n inskrywing aan</h3>
+            <div class="jn-nuwe">
+              <div>
+                <label class="veld-etiket" for="jn-datum" data-i18n="jn_datum">Datum</label>
+                <input class="veld-invoer" type="date" id="jn-datum">
+              </div>
+              <div>
+                <label class="veld-etiket" for="jn-besk" data-i18n="jn_beskrywing">Beskrywing</label>
+                <input class="veld-invoer" id="jn-besk" maxlength="300" placeholder="Afrihost — domein en e-pos">
+              </div>
+              <div>
+                <label class="veld-etiket" for="jn-wie" data-i18n="jn_wie">Betaal deur</label>
+                <input class="veld-invoer" id="jn-wie" maxlength="120">
+              </div>
+              <div>
+                <label class="veld-etiket" for="jn-bedrag" data-i18n="jn_bedrag">Bedrag</label>
+                <input class="veld-invoer n" id="jn-bedrag" inputmode="decimal" placeholder="0.00">
+              </div>
+              <div>
+                <label class="veld-etiket" data-i18n="jn_rigting">Soort</label>
+                <div class="jn-rigting">
+                  <button type="button" id="jn-r-in" data-i18n="jn_in">Inkomste</button>
+                  <button type="button" id="jn-r-uit" class="aan-uit" data-i18n="jn_uit">Uitgawe</button>
+                </div>
               </div>
             </div>
+            <p class="jn-fout" id="jn-fout" hidden></p>
+            <button type="button" class="kaart-aksie" id="jn-voeg" disabled
+                    data-i18n="jn_teken_aan">Teken aan</button>
           </div>
-          <p class="jn-fout" id="jn-fout" hidden></p>
-          <button type="button" class="kaart-aksie" id="jn-voeg" disabled
-                  data-i18n="jn_teken_aan">Teken aan</button>
         </div>
       </section>
 
