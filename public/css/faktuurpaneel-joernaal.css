@@ -182,12 +182,25 @@
   text-align: center;
 }
 
+/* DIE ETIKET HOORT AAN SY VELD, nie tussen die velde in nie.
+   veld-etiket in styl.css dra 'n marge wat vir 'n stapelvorm bedoel is; in
+   'n strook laat dit die etiket sweef en die kolomme lyk soos vyf aparte
+   dinge in plaas van een ry. */
 .jn-nuwe {
   display: grid;
-  grid-template-columns: 150px minmax(0, 1fr) 170px 130px 190px;
-  gap: 10px;
+  grid-template-columns: 140px minmax(0, 1fr) 150px 120px 180px;
+  gap: 14px;
   align-items: end;
 }
+
+.jn-nuwe .veld-etiket {
+  display: block;
+  margin: 0 0 5px;
+  font-size: 11.5px;
+  line-height: 1.3;
+}
+
+.jn-nuwe .veld-invoer { margin: 0; }
 
 @media (max-width: 900px) {
   .jn-nuwe { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
@@ -224,7 +237,7 @@
 
 .jn-fout[hidden] { display: none; }
 
-#jn-voeg { margin-top: 16px; }
+#jn-voeg { margin-top: 22px; }
 
 /* -------------------------------------------------------------------------
    DEBITEURE EN KREDITEURE
