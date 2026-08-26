@@ -575,13 +575,29 @@ const WOORDEBOEK = {
   jn_inkomste: { af: "Inkomste", en: "Income" },
   jn_uitgawes: { af: "Uitgawes", en: "Expenses" },
   jn_verskil: { af: "Verskil", en: "Difference" },
+
+  /* Debiteure en krediteure TEL NIE in die drie syfers hierbo nie. Op
+     kontantbasis het die geld nie beweeg nie; hulle staan hier omdat 'n mens
+     hulle by jaareinde wil sien. */
+  jn_debiteure: { af: "Debiteure", en: "Debtors" },
+  jn_debiteure_lei: { af: "Uitgereik, nog onbetaal", en: "Issued, not yet paid" },
+  jn_krediteure: { af: "Krediteure", en: "Creditors" },
+  jn_krediteure_lei: {
+    af: "Ontvang, nog nie uitbetaal nie",
+    en: "Received, not yet paid out",
+  },
+  jn_wag_nota: {
+    af: "Tel nie in die syfers hierbo nie.",
+    en: "Not included in the figures above.",
+  },
+  jn_wag_leeg: { af: "Niks staan uit nie.", en: "Nothing outstanding." },
   jn_datum: { af: "Datum", en: "Date" },
   jn_beskrywing: { af: "Beskrywing", en: "Description" },
   jn_bedrag: { af: "Bedrag", en: "Amount" },
   jn_wie: { af: "Betaal deur", en: "Paid by" },
-  jn_rigting: { af: "Rigting", en: "Direction" },
-  jn_in: { af: "In", en: "In" },
-  jn_uit: { af: "Uit", en: "Out" },
+  jn_rigting: { af: "Soort", en: "Type" },
+  jn_in: { af: "Inkomste", en: "Income" },
+  jn_uit: { af: "Uitgawe", en: "Expense" },
   jn_teken_aan: { af: "Teken aan", en: "Record" },
   jn_besig: { af: "Besig \u2026", en: "Working \u2026" },
   jn_herhaal: { af: "herhaal", en: "repeat" },

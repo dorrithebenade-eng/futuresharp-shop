@@ -343,6 +343,27 @@
             </div>
           </div>
 
+          <!-- DEBITEURE EN KREDITEURE TEL NIE IN DIE SOMME HIERBO NIE.
+               Op kontantbasis is 'n onbetaalde faktuur nie inkomste nie en 'n
+               uitstaande uitbetaling nie 'n uitgawe nie -- die geld het nie
+               beweeg nie. Hulle staan hier omdat 'n mens hulle by jaareinde
+               wil sien, en hulle staan APART sodat niemand hulle by die
+               totale optel nie. -->
+          <div class="jn-wag">
+            <button type="button" class="jn-wag-blok" id="jn-w-deb" aria-expanded="false">
+              <span class="jn-et" data-i18n="jn_debiteure">Debiteure</span>
+              <span class="jn-wag-sy" id="jn-s-deb">—</span>
+              <span class="jn-wag-lei" data-i18n="jn_debiteure_lei">Uitgereik, nog onbetaal</span>
+            </button>
+            <button type="button" class="jn-wag-blok" id="jn-w-kred" aria-expanded="false">
+              <span class="jn-et" data-i18n="jn_krediteure">Krediteure</span>
+              <span class="jn-wag-sy" id="jn-s-kred">—</span>
+              <span class="jn-wag-lei" data-i18n="jn_krediteure_lei">Ontvang, nog nie uitbetaal nie</span>
+            </button>
+          </div>
+          <p class="jn-wag-nota" data-i18n="jn_wag_nota">Tel nie in die syfers hierbo nie.</p>
+          <div class="jn-wag-lys" id="jn-wag-lys" hidden></div>
+
           <table class="jn-tabel">
             <thead>
               <tr>
@@ -374,10 +395,10 @@
               <input class="veld-invoer n" id="jn-bedrag" inputmode="decimal" placeholder="0.00">
             </div>
             <div>
-              <label class="veld-etiket" data-i18n="jn_rigting">Rigting</label>
+              <label class="veld-etiket" data-i18n="jn_rigting">Soort</label>
               <div class="jn-rigting">
-                <button type="button" id="jn-r-in" data-i18n="jn_in">In</button>
-                <button type="button" id="jn-r-uit" class="aan-uit" data-i18n="jn_uit">Uit</button>
+                <button type="button" id="jn-r-in" data-i18n="jn_in">Inkomste</button>
+                <button type="button" id="jn-r-uit" class="aan-uit" data-i18n="jn_uit">Uitgawe</button>
               </div>
             </div>
           </div>

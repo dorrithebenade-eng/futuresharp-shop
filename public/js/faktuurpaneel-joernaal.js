@@ -140,6 +140,10 @@ function jn_teken() {
   netto.textContent = (JN_DATA.netto_sent < 0 ? "\u2212 " : "") + jn_rand(JN_DATA.netto_sent);
   netto.className = "jn-sy" + (JN_DATA.netto_sent < 0 ? " kort" : "");
 
+  document.getElementById("jn-s-deb").textContent = jn_rand(JN_DATA.debiteure_sent);
+  document.getElementById("jn-s-kred").textContent = jn_rand(JN_DATA.krediteure_sent);
+  jn_teken_wag();
+
   const tel = document.getElementById("jn-tel");
   if (tel) {
     tel.textContent = lys.length
@@ -152,6 +156,54 @@ function jn_teken() {
   }
 
   jn_koppel_lys();
+}
+
+// DIE OOP BLOK, of niks. Debiteure en krediteure is aparte lyste; die een
+// vervang die ander sodat daar nooit twee lang lyste onder mekaar staan nie.
+let JN_WAG_OOP = null;
+
+function jn_teken_wag() {
+  const plek = document.getElementById("jn-wag-lys");
+  if (!plek || !JN_DATA) return;
+
+  const deb = document.getElementById("jn-w-deb");
+  const kred = document.getElementById("jn-w-kred");
+  if (deb) deb.setAttribute("aria-expanded", String(JN_WAG_OOP === "deb"));
+  if (kred) kred.setAttribute("aria-expanded", String(JN_WAG_OOP === "kred"));
+  if (deb) deb.classList.toggle("oop", JN_WAG_OOP === "deb");
+  if (kred) kred.classList.toggle("oop", JN_WAG_OOP === "kred");
+
+  if (!JN_WAG_OOP) {
+    plek.hidden = true;
+    plek.innerHTML = "";
+    return;
+  }
+
+  const lys =
+    JN_WAG_OOP === "deb" ? JN_DATA.debiteure || [] : JN_DATA.krediteure || [];
+
+  if (!lys.length) {
+    plek.hidden = false;
+    plek.innerHTML = `<p class="jn-leeg">${jn_t(
+      "jn_wag_leeg",
+      "Niks staan uit nie."
+    )}</p>`;
+    return;
+  }
+
+  plek.hidden = false;
+  plek.innerHTML = lys
+    .map(
+      (r) => `
+      <div class="jn-wag-ry">
+        <span class="jn-wag-dat">${jn_ontsnap(jn_datum_af(r.datum))}</span>
+        <span class="jn-wag-wat">${jn_ontsnap(r.nommer)}<small>${jn_ontsnap(
+        JN_WAG_OOP === "deb" ? r.klient || "" : r.ontvanger || ""
+      )}</small></span>
+        <span class="jn-wag-bed">${jn_rand(r.bedrag_sent)}</span>
+      </div>`
+    )
+    .join("");
 }
 
 function jn_koppel_lys() {
@@ -369,6 +421,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("jn-voeg").addEventListener("click", jn_teken_aan);
   document.getElementById("jn-uitvoer").addEventListener("click", jn_voer_uit);
   document.getElementById("jn-jaar").addEventListener("change", jn_laai);
+
+  document.getElementById("jn-w-deb").addEventListener("click", () => {
+    JN_WAG_OOP = JN_WAG_OOP === "deb" ? null : "deb";
+    jn_teken_wag();
+  });
+  document.getElementById("jn-w-kred").addEventListener("click", () => {
+    JN_WAG_OOP = JN_WAG_OOP === "kred" ? null : "kred";
+    jn_teken_wag();
+  });
 
   ["jn-datum", "jn-besk", "jn-bedrag"].forEach((id) => {
     document.getElementById(id).addEventListener("input", jn_kyk_gereed);

@@ -47,6 +47,20 @@ exports.handler = async (event, context) => {
 
   const inskrywings = [];
 
+  // DEBITEURE EN KREDITEURE TEL NIE IN DIE SOMME NIE.
+  //
+  // Op kontantbasis bestaan hulle nie as transaksies nie -- die geld het nie
+  // beweeg nie. Hulle word saamgegee omdat 'n mens hulle by jaareinde WIL
+  // SIEN, maar hulle bly buite in_sent en uit_sent. Sou hulle daarin tel, is
+  // die syfer wat die boekhouer kry verkeerd.
+  //
+  //   debiteur   'n uitgereikte faktuur wat nog nie betaal is nie. Val in die
+  //              jaar van UITREIKING -- die enigste datum wat bestaan.
+  //   krediteur  'n uitbetaalry wat nog uitstaan. Val in die jaar waarin die
+  //              faktuur BETAAL is, want dit is wanneer die skuld ontstaan het.
+  const debiteure = [];
+  const krediteure = [];
+
   // ── 1. Wat met die hand aangeteken is ────────────────────────────────
   //
   // Die jaar staan in die sleutel, dus lees een prefix die hele jaar sonder
@@ -87,6 +101,20 @@ exports.handler = async (event, context) => {
       const nommer = f.nommer || sleutel_na_nommer(b.key) || b.key;
       const klient = (f.klient && f.klient.naam) || "";
 
+      // Uitgereik en nog nie betaal nie.
+      if (f.stand === "gestuur") {
+        const uitgereik = dag(f.uitgereik_op);
+        if (uitgereik && finansiele_jaar(uitgereik) === jaar) {
+          debiteure.push({
+            datum: uitgereik,
+            nommer,
+            klient,
+            bedrag_sent: Number(f.totaal_sent) || 0,
+            betaalbaar_teen: f.betaalbaar_teen || null,
+          });
+        }
+      }
+
       // Die faktuur se ontvangs
       const ontvang_op = dag(f.betaling && f.betaling.ontvang_op);
       if (ontvang_op && finansiele_jaar(ontvang_op) === jaar) {
@@ -107,7 +135,22 @@ exports.handler = async (event, context) => {
         const sent = Number(ry.bedrag_sent) || 0;
         if (sent <= 0) return;
         const betaal_op = dag(ry.betaal_op);
-        if (!betaal_op || finansiele_jaar(betaal_op) !== jaar) return;
+
+        if (!betaal_op) {
+          // Nog uitstaande. Die skuld het ontstaan toe die faktuur betaal is.
+          const ontvang = dag(f.betaling && f.betaling.ontvang_op);
+          if (ontvang && finansiele_jaar(ontvang) === jaar) {
+            krediteure.push({
+              datum: ontvang,
+              nommer,
+              ontvanger: ry.ontvanger || "",
+              bedrag_sent: sent,
+            });
+          }
+          return;
+        }
+
+        if (finansiele_jaar(betaal_op) !== jaar) return;
 
         // WAARVOOR die persoon betaal is, uit die faktuur se reels. Sonder dit
         // lees die boekhouer net 'n naam en 'n bedrag, en dan moet hy vra.
@@ -136,6 +179,8 @@ exports.handler = async (event, context) => {
 
   // Nuutste eerste.
   inskrywings.sort((a, b) => String(b.datum).localeCompare(String(a.datum)));
+  debiteure.sort((a, b) => String(a.datum).localeCompare(String(b.datum)));
+  krediteure.sort((a, b) => String(a.datum).localeCompare(String(b.datum)));
 
   let in_sent = 0;
   let uit_sent = 0;
@@ -153,6 +198,10 @@ exports.handler = async (event, context) => {
       in_sent,
       uit_sent,
       netto_sent: in_sent - uit_sent,
+      debiteure,
+      krediteure,
+      debiteure_sent: debiteure.reduce((s, r) => s + r.bedrag_sent, 0),
+      krediteure_sent: krediteure.reduce((s, r) => s + r.bedrag_sent, 0),
     }),
   };
 };
