@@ -915,6 +915,35 @@
   color: var(--grys-teks);
 }
 
+/* DIE PROFORMA HET NIE UITGEGAAN NIE.
+   Amber, nie koraal: die faktuur IS uitgereik, die nommer is opgebruik en die
+   betaalskakel leef -- daar is niks om te stop nie. Wat oorbly, is werk: die
+   skakel moet met die hand aangestuur word. */
+.fu-strook-wag {
+  background: #FDF3DA;
+  border-color: #EFE3C4;
+  border-left: 4px solid var(--amber);
+  /* Geen ronde hoeke by 'n enkelkantige rand -- .fu-strook het in elk geval
+     geen radius nie, en die reel staan hier sodat 'n latere radius op
+     .fu-strook nie stilweg hierdie rand laat sweef nie. */
+  border-radius: 0;
+}
+
+.fu-strook-wag h4 { color: #6B4E06; }
+.fu-strook-wag .fu-strook-teks { color: #4A3708; }
+
+/* Die SMTP-bediener se eie woorde. Hulle is Engels en tegnies -- nuttig
+   wanneer 'n mens moet uitvind wat fout is, maar dit is nie die boodskap nie.
+   Kleiner, en op sy eie reel. */
+.fu-strook-rede {
+  display: block;
+  margin-top: 6px;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 12px;
+  color: var(--grys-teks);
+  word-break: break-word;
+}
+
 .fu-skakel-ry {
   display: flex;
   gap: 10px;

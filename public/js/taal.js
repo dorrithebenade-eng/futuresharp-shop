@@ -2048,11 +2048,33 @@ const WOORDEBOEK = {
     af: "Die volgende nommer word toegeken en die verdeling vries op wat nou op die skerm staan. Daarna kan die faktuur nie meer gewysig word nie — net gekanselleer.",
     en: "The next number will be allocated and the split freezes on what is now on screen. After that the invoice can no longer be edited — only cancelled.",
   },
+  // GEEN OORSAAK GENOEM NIE. Die teks het "'n Koepon" gese ongeag hoe die
+  // totaal op nul gekom het -- 'n koepon, die Afslag-veld, of 'n ry van R0.
+  // Wat volg, is in al drie gevalle presies dieselfde, en die syfer self is
+  // die enigste feit wat saak maak.
   fu_vra_teks_gratis: {
-    af: "'n Koepon het die bedrag tot niks verminder. Paystack word glad nie geroep nie en die faktuur gaan dadelik na Betaal. Daar is niks om te verdeel nie.",
-    en: "A coupon has reduced the amount to nothing. Paystack is not called at all and the invoice goes straight to Paid. There is nothing to split.",
+    af: "Die totaal is R0. Paystack word glad nie geroep nie en die faktuur gaan dadelik na Betaal. Daar is niks om te verdeel nie.",
+    en: "The total is R0. Paystack is not called at all and the invoice goes straight to Paid. There is nothing to split.",
   },
   fu_terug: { af: "Terug", en: "Back" },
+
+  // -- Die proforma het nie uitgegaan nie -------------------------------
+  // stuur-faktuur.js gee `pos_gestuur` en `pos_fout` terug met 'n kommentaar
+  // wat se die skerm moet eerlik wees oor of die pos uitgegaan het. Tot nou
+  // toe het faktuur-uitreik.js albei weggegooi: 'n mens het 'n faktuur
+  // uitgereik terwyl SMTP af was en niks gesien nie.
+  //
+  // AMBER, NIE KORAAL NIE. Die faktuur IS uitgereik, die nommer is opgebruik
+  // en die betaalskakel leef -- daar is niks om te stop nie. Wat oorbly, is
+  // werk: die skakel moet met die hand aangestuur word.
+  fu_pos_kop: {
+    af: "Die proforma het nie uitgegaan nie",
+    en: "The proforma did not go out",
+  },
+  fu_pos_teks: {
+    af: "Die faktuur is uitgereik en die betaalskakel werk. Stuur die skakel hieronder self aan die kli\u00ebnt.",
+    en: "The invoice has been issued and the payment link works. Send the link below to the client yourself.",
+  },
   fu_besig: { af: "Besig …", en: "Working …" },
   fu_aan: { af: "Gefaktureer aan", en: "Billed to" },
   fu_proforma_aan: { af: "Proforma gaan aan", en: "Proforma goes to" },

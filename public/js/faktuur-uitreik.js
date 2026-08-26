@@ -23,6 +23,10 @@
 
 const FU_KOPIEER_TYD = 1800;
 
+// Die posstatus moet die herlaai ná uitreiking oorleef -- sien die nota by die
+// herlaai self.
+const FU_POS_SLEUTEL = "future_shop_faktuur_pos_fout";
+
 function fu_t(sleutel, verstek) {
   const uit = window.t ? window.t(sleutel) : null;
   return uit && uit !== sleutel ? uit : verstek;
@@ -342,6 +346,27 @@ async function fu_doen() {
     // URL wat na 'n verdwene sleutel wys, is 'n bladsy wat 'n mens nie kan
     // herlaai nie. Die herlaai teken ook die hele skerm as toe, sonder dat
     // hierdie lêer weet hoe faktuur-vorm.js sy dokument bou.
+    // DIE POSSTATUS MOET DIE HERLAAI OORLEEF. stuur-faktuur.js gee
+    // `pos_gestuur` en `pos_fout` terug met 'n kommentaar wat sê die skerm moet
+    // eerlik wees oor of die pos uitgegaan het -- en tot nou toe het hierdie
+    // lêer albei weggegooi deur te herlaai. Reik 'n mens 'n faktuur uit terwyl
+    // SMTP af is, het die skerm niks gesê nie en 'n mens neem aan die kliënt
+    // het sy faktuur.
+    //
+    // sessionStorage, nie die URL nie: 'n mislukte pos is nie deel van die
+    // faktuur se adres nie, en 'n mens moet dit nie per ongeluk kan aanstuur.
+    // Dit word gelees en DADELIK verwyder -- 'n tweede herlaai wys dit nie
+    // weer nie, want dan is dit ou nuus.
+    try {
+      if (data.pos_gestuur === false) {
+        sessionStorage.setItem(FU_POS_SLEUTEL, String(data.pos_fout || ""));
+      } else {
+        sessionStorage.removeItem(FU_POS_SLEUTEL);
+      }
+    } catch {
+      // 'n Blaaier wat sessionStorage weier, mag nie die uitreiking keer nie.
+    }
+
     const url = new URL(window.location.href);
     url.searchParams.delete("sleutel");
     url.searchParams.set("nommer", data.nommer);
@@ -510,6 +535,23 @@ function fu_teken_qr() {
    Die skakel is die authorization_url wat Paystack reeds by uitreiking
    teruggegee het. Die QR is daardie selfde string, kliëntkant gerender — dit
    kom in die volgende stap, saam met die print-uitleg. */
+// Het die proforma uitgegaan? Word EEN KEER gelees en dadelik verwyder.
+//
+// Dit gee 'n string terug wanneer die pos MISLUK het (moontlik leeg as die
+// Function geen rede gegee het nie), en null wanneer alles reg was. Die
+// onderskeid tussen "" en null is die hele punt: "" beteken "misluk, rede
+// onbekend", nie "niks gebeur nie".
+function fu_neem_pos_fout() {
+  try {
+    const waarde = sessionStorage.getItem(FU_POS_SLEUTEL);
+    if (waarde === null) return null;
+    sessionStorage.removeItem(FU_POS_SLEUTEL);
+    return waarde;
+  } catch {
+    return null;
+  }
+}
+
 function fu_teken_strook() {
   const plek = document.getElementById("fu-strook");
   if (!plek) return;
@@ -521,11 +563,30 @@ function fu_teken_strook() {
 
   const nommer = fu_ontsnap(V.nommer || "");
 
+  // DIE PROFORMA HET NIE UITGEGAAN NIE. Amber, nie koraal: die faktuur IS
+  // uitgereik, die nommer is opgebruik en die betaalskakel leef -- daar is
+  // niks om te stop nie. Wat oorbly, is werk: die skakel moet met die hand
+  // aangestuur word.
+  //
+  // Die strook staan BO die betaalskakel, want dit sê presies wat 'n mens met
+  // daardie skakel moet doen.
+  const pos_fout = fu_neem_pos_fout();
+  let waarsku = "";
+  if (pos_fout !== null) {
+    waarsku = `<div class="fu-strook fu-strook-wag">
+      <h4>${fu_t("fu_pos_kop", "Die proforma het nie uitgegaan nie")}</h4>
+      <p class="fu-strook-teks">${fu_t(
+        "fu_pos_teks",
+        "Die faktuur is uitgereik en die betaalskakel werk. Stuur die skakel hieronder self aan die kli\u00ebnt."
+      )}${pos_fout ? ` <span class="fu-strook-rede">${fu_ontsnap(pos_fout)}</span>` : ""}</p>
+    </div>`;
+  }
+
   if (!V.betaalskakel) {
     // 'n R0-faktuur, of een wat gekanselleer is. Geen skakel om te wys nie,
     // en 'n leë strook sou soos 'n fout lyk.
     if (V.stand === "betaal") {
-      plek.innerHTML = `<div class="fu-strook">
+      plek.innerHTML = waarsku + `<div class="fu-strook">
         <h4>${nommer} — ${fu_t("fu_betaal", "betaal")}</h4>
         <p class="fu-strook-teks">${fu_t(
           "fu_gratis_teks",
@@ -534,11 +595,14 @@ function fu_teken_strook() {
       </div>`;
       return;
     }
-    plek.innerHTML = "";
+    // Geen skakel en nie betaal nie -- 'n gekanselleerde faktuur. Die
+    // waarskuwing bly steeds staan as sy daar is: die proforma het nie
+    // uitgegaan nie, en dit is 'n feit oor hierdie faktuur ongeag sy stand.
+    plek.innerHTML = waarsku;
     return;
   }
 
-  plek.innerHTML = `<div class="fu-strook">
+  plek.innerHTML = waarsku + `<div class="fu-strook">
     <h4>${nommer} — ${fu_t("fu_betaalskakel", "Betaalskakel")}</h4>
     <div class="fu-skakel-ry">
       <code id="fu-skakel">${fu_ontsnap(V.betaalskakel)}</code>
