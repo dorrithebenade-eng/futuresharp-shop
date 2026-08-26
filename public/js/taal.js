@@ -331,6 +331,16 @@ const WOORDEBOEK = {
 
   // Mandjie-bladsy
   bly_aan_koop: { af: "← Terug na katalogus", en: "← Back to catalogue" },
+
+  // 403, NIE 401 NIE. Die rekening is aangemeld en die token is geldig -- dit
+  // het net nie die "koper"-rol nie. Aanmeld gaan niks verander nie, dus mag
+  // hierdie boodskap nie na aanmelding wys nie. Die e-posadres staan hier en
+  // nie as 'n skakel nie: die persoon sit reeds vas en 'n verdere klik help
+  // hom nie.
+  geen_koperprofiel: {
+    af: "Hierdie rekening kan nie aankope doen nie. Meld af en meld weer aan met die rekening waarmee jy koop, of skryf aan admin@futuresharp.co.za.",
+    en: "This account cannot make purchases. Sign out and sign in again with the account you buy with, or write to admin@futuresharp.co.za.",
+  },
   jou_mandjie: { af: "Jou mandjie", en: "Your cart" },
   mandjie_laai: { af: "Mandjie word gelaai …", en: "Loading cart …" },
   mandjie_leeg: { af: "Jou mandjie is leeg.", en: "Your cart is empty." },

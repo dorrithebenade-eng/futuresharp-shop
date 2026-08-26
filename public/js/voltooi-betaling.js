@@ -203,6 +203,17 @@ async function stuur_na_betaling(bestelling, toegangs_token) {
       return;
     }
 
+    // 403 IS NIE 401 NIE. Die token is geldig; die rekening het net nie die
+    // "koper"-rol nie. Aanmeld gaan niks verander nie — aanmeld.html sien 'n
+    // geldige sessie en stuur die gebruiker dadelik hierheen terug, en dan
+    // klik hy weer, en weer. Se dus wat fout is en los hom op die bladsy.
+    if (resp.status === 403) {
+      wys_foute([t("geen_koperprofiel")]);
+      knoppie.disabled = false;
+      knoppie.textContent = t("gaan_na_betaling");
+      return;
+    }
+
     if (!resp.ok) throw new Error(`Status ${resp.status}`);
 
     const data = await resp.json();

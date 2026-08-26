@@ -40,7 +40,7 @@
 // uitbetaal, is binne 'n sent van die gestelde vaste bedrag).
 
 const { kry_store } = require("./_blob-store");
-const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
+const { kry_gebruiker_en_rol_uitslag } = require("./_rol-kontrole");
 const { kry_maks_verdeling_sent } = require("./_paystack-koste.js");
 const { stuur_outeur_kennisgewings } = require("./_kennisgewing-outeur");
 
@@ -63,9 +63,25 @@ exports.handler = async (event, context) => {
   // — dit voorkom ook dat 'n bestelling aan die verkeerde koper gekoppel
   // word, aangesien ons NOOIT die kliënt se eie voorstel van wie hulle is
   // vertrou nie.
-  const gebruiker = await kry_gebruiker_en_kontroleer_rol(event, context, "koper");
-  if (!gebruiker) {
+  //
+  // TWEE MISLUKKINGS, TWEE KODES. 'n Ontbrekende of verlope token is 401 --
+  // meld aan. 'n GELDIGE token sonder die "koper"-rol is 403 -- ons weet wie
+  // jy is, en aanmeld gaan niks verander nie. Stuur 'n mens 401 vir albei,
+  // stuur die front-end die gebruiker na aanmeld.html, sien daardie bladsy 'n
+  // geldige sessie, en stuur hom terug. 'n Lus sonder 'n woord oor wat fout is.
+  const { gebruiker, rede } = await kry_gebruiker_en_rol_uitslag(
+    event,
+    context,
+    "koper"
+  );
+  if (rede === "geen_token") {
     return { statusCode: 401, body: "Meld eers aan om te koop" };
+  }
+  if (rede !== "ok") {
+    return {
+      statusCode: 403,
+      body: "Hierdie rekening het nie 'n koperprofiel nie",
+    };
   }
 
   let invoer;

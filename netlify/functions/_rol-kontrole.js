@@ -207,6 +207,44 @@ async function kry_gebruiker_en_kontroleer_rol(event, context, vereiste_rol) {
   return gebruiker;
 }
 
+/**
+ * Soos kry_gebruiker_en_kontroleer_rol, maar dit SE WAAROM dit misluk het.
+ *
+ * WAAROM DIT BESTAAN
+ *
+ * Die funksie hierbo gee `null` vir TWEE heeltemal verskillende toestande:
+ * 'n ongeldige of ontbrekende token, en 'n GELDIGE token waarvan die
+ * gebruiker net nie die rol het nie. 'n Function wat net `null` sien, kan
+ * hulle nie uitmekaar hou nie en stuur 401 vir albei.
+ *
+ * Vir die tweede geval is 401 verkeerd, en die skade is konkreet: die
+ * front-end lees 401 as "die sessie het verval", stuur die gebruiker na
+ * aanmeld.html, daardie bladsy sien 'n heeltemal geldige sessie en stuur hom
+ * terug. Hy klik weer, en weer. 'n Lus sonder 'n enkele woord oor wat fout is.
+ *
+ * 403 is die regte kode: ONS WEET WIE JY IS, en jy mag nie.
+ *
+ * DIE OU FUNKSIE BLY PRESIES SOOS HY IS. Baie Functions gebruik hom en hulle
+ * hoef nie almal te verander nie -- 'n paneel wat net personeel toelaat, se
+ * gebruiker is reeds op die regte bladsy en beleef nooit die lus nie. Hierdie
+ * een is vir waar die onderskeid saak maak.
+ *
+ * Gee terug: { gebruiker, rede } waar rede een van
+ *   "ok"          -- geverifieer en het die rol
+ *   "geen_token"  -- geen, ongeldige of verlope token  -> 401
+ *   "geen_rol"    -- geldige token, maar sonder die rol -> 403
+ */
+async function kry_gebruiker_en_rol_uitslag(event, context, vereiste_rol) {
+  const token = kry_bearer_token(event);
+  const gebruiker = await kry_gebruiker_vanaf_token(token);
+  if (!gebruiker) return { gebruiker: null, rede: "geen_token" };
+  if (!kontroleer_rol(gebruiker, vereiste_rol)) {
+    return { gebruiker, rede: "geen_rol" };
+  }
+  return { gebruiker, rede: "ok" };
+}
+
 module.exports = {
   kry_gebruiker_en_kontroleer_rol,
+  kry_gebruiker_en_rol_uitslag,
 };
