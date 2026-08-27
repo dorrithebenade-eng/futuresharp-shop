@@ -1,0 +1,375 @@
+/* public/css/kwotasie.css
+ *
+ * Die kwotasie soos die klient haar sien, met die knoppie wat haar aanvaar.
+ *
+ * 'n PUBLIEKE BLADSY. Sy leen niks van faktuurpaneel.css of faktuur.css nie --
+ * daardie twee dien 'n paneel wat agter 'n rol sit, en 'n klient wat hier land,
+ * het niks daarvan gelaai nie. Slegs styl.css se palet.
+ *
+ * DIESELFDE VORM AS betaal-klaar.css: 'n merk bo, 'n kaart, 'n voet. Wat daar
+ * 'n betaling is, is hier 'n aanbod.
+ */
+
+.kw-blad {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 34px 20px 24px;
+}
+
+.kw-merk {
+  text-align: center;
+  margin-bottom: 26px;
+}
+
+.kw-merk img {
+  height: 74px;
+  width: auto;
+}
+
+.kw-kaart {
+  background: var(--wit);
+  border: 1px solid #E4E2DD;
+  border-radius: 12px;
+  padding: 26px 30px;
+  margin-top: 18px;
+  box-shadow: 0 2px 14px rgba(23, 23, 23, .05);
+}
+
+@media (max-width: 620px) {
+  .kw-blad { padding: 24px 14px 20px; }
+  .kw-kaart { padding: 20px 18px; }
+}
+
+/* ── Die besig-toestand ──
+   Drie stippe, want die antwoord kom van 'n Function af en dit vat 'n sekonde
+   of twee. 'n Lee bladsy in daardie sekonde lyk soos 'n stukkende skakel. */
+.kw-besig {
+  text-align: center;
+  color: var(--grys-teks);
+}
+
+.kw-stip {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin: 0 3px;
+  border-radius: 50%;
+  background: var(--teal);
+  animation: kw-wip 1.2s infinite ease-in-out;
+}
+
+.kw-stip:nth-child(2) { animation-delay: .15s; }
+.kw-stip:nth-child(3) { animation-delay: .3s; }
+
+@keyframes kw-wip {
+  0%, 60%, 100% { opacity: .25; transform: translateY(0); }
+  30% { opacity: 1; transform: translateY(-4px); }
+}
+
+.kw-besig p { margin: 12px 0 0; font-size: 13.5px; }
+
+/* ═══ DIE DOKUMENT ═══
+   Dieselfde vorm as die faktuur s'n. Die klient het 'n dokument in sy pos
+   gekry; hierdie bladsy moet soos daardie dokument lyk. */
+
+.kw-dok {
+  background: var(--wit);
+  border: 1px solid #E4E2DD;
+  border-radius: 12px;
+  padding: 30px 32px 34px;
+  box-shadow: 0 2px 14px rgba(23, 23, 23, .05);
+}
+
+@media (max-width: 620px) {
+  .kw-dok { padding: 22px 18px 26px; }
+}
+
+.kw-dok-kop {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  border-bottom: 3px solid var(--teal);
+  padding-bottom: 16px;
+  margin-bottom: 20px;
+}
+
+.kw-dok-merk {
+  font-family: var(--font-opskrif);
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--teal);
+}
+
+.kw-dok-fyn {
+  font-size: 11.5px;
+  color: var(--grys-teks);
+  line-height: 1.6;
+  margin-top: 5px;
+}
+
+.kw-dok-nr { text-align: right; }
+
+.kw-dok-nr .et {
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: .09em;
+  color: var(--grys-teks);
+}
+
+.kw-dok-nr .nr {
+  font-family: var(--font-opskrif);
+  font-size: 23px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.kw-dok-party {
+  display: grid;
+  grid-template-columns: 1fr 250px;
+  gap: 24px;
+  margin-bottom: 22px;
+}
+
+@media (max-width: 620px) {
+  .kw-dok-party { grid-template-columns: 1fr; gap: 16px; }
+}
+
+.kw-et {
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: .09em;
+  color: var(--grys-teks);
+  margin: 0 0 5px;
+}
+
+.kw-klient { font-size: 13.5px; line-height: 1.6; }
+.kw-klient strong { font-size: 14.5px; }
+
+.kw-datums div {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 12.5px;
+  padding: 2px 0;
+}
+
+.kw-datums span { color: var(--grys-teks); white-space: nowrap; }
+.kw-datums b { font-variant-numeric: tabular-nums; }
+
+.kw-tabel { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+
+.kw-tabel th {
+  font-family: var(--font-opskrif);
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--grys-teks);
+  text-align: left;
+  padding: 0 0 7px;
+  border-bottom: 1px solid #E4E2DD;
+}
+
+.kw-tabel th.n, .kw-tabel td.n {
+  text-align: right;
+  white-space: nowrap;
+  padding-left: 14px;
+}
+
+.kw-tabel td {
+  padding: 9px 0;
+  border-bottom: 1px solid #EDEBE6;
+  vertical-align: top;
+}
+
+.kw-tabel td.n { font-variant-numeric: tabular-nums; }
+.kw-tabel td.n.sterk { font-weight: 600; }
+
+@media (max-width: 620px) {
+  .kw-tabel th { font-size: 9.5px; letter-spacing: .03em; }
+  .kw-tabel th.n, .kw-tabel td.n { padding-left: 8px; }
+}
+
+.kw-somme { display: flex; justify-content: flex-end; margin-top: 12px; }
+.kw-somme table { border-collapse: collapse; min-width: 260px; }
+.kw-somme td { padding: 5px 0; font-size: 13px; }
+.kw-somme td.n { text-align: right; font-variant-numeric: tabular-nums; }
+
+.kw-somme tr.tot td {
+  border-top: 2px solid var(--swart);
+  padding-top: 10px;
+  font-family: var(--font-opskrif);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.kw-nota {
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1px solid #E4E2DD;
+  font-size: 12.5px;
+  line-height: 1.7;
+  color: var(--grys-teks);
+}
+
+/* ═══ DIE AANVAARBLOK ═══ */
+
+.kw-aanvaar h2 {
+  font-family: var(--font-opskrif);
+  font-size: 17px;
+  margin: 0 0 6px;
+}
+
+.kw-aanvaar > p {
+  margin: 0 0 20px;
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: var(--grys-teks);
+}
+
+.kw-velde {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.kw-velde-een { grid-template-columns: 1fr 1fr; }
+.kw-velde-een > div:only-child { grid-column: 1; }
+
+@media (max-width: 620px) {
+  .kw-velde, .kw-velde-een { grid-template-columns: 1fr; }
+}
+
+.kw-velde label {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+
+/* 16px, nie kleiner nie. Onder 16px zoem iOS die hele bladsy in sodra 'n mens
+   'n veld raak, en dan sit die klient met 'n dokument wat nie meer op die
+   skerm pas nie. Dieselfde reel as op begunstigdevorm.html. */
+.kw-velde input {
+  width: 100%;
+  border: 1px solid #E4E2DD;
+  border-radius: 9px;
+  padding: 11px 13px;
+  font-family: var(--font-liggaam);
+  font-size: 16px;
+  background: var(--wit);
+  color: var(--swart);
+}
+
+.kw-velde input:focus {
+  outline: 2px solid var(--teal);
+  outline-offset: -1px;
+}
+
+.kw-aksies { margin-top: 18px; }
+
+.kw-knop {
+  border: 0;
+  border-radius: 999px;
+  background: var(--teal);
+  color: var(--wit);
+  font-family: var(--font-liggaam);
+  font-size: 15px;
+  font-weight: 500;
+  padding: 13px 28px;
+  cursor: pointer;
+}
+
+.kw-knop:hover { background: var(--teal-diep, #2f6b60); }
+.kw-knop:disabled { opacity: .55; cursor: default; }
+
+.kw-fout {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--koraal);
+}
+
+.kw-fout[hidden] { display: none; }
+
+/* DIE KONTAKREEL. Geen wysigingsvorm nie -- 'n aanpassing is 'n gesprek, en
+   wat 'n klient in 'n veld sou tik, is nooit 'n instruksie wat uitgevoer kan
+   word nie. */
+.kw-kontak {
+  margin: 18px 0 0;
+  font-size: 12.5px;
+  line-height: 1.7;
+  color: var(--grys-teks);
+}
+
+.kw-kontak a { color: var(--teal); }
+
+/* ═══ DIE TOESTANDE ═══
+   Verval, reeds aanvaar, of iets anders wat nie oop is nie. Die kleur dra die
+   betekenis: teal is klaar, grys is verby, koraal is nee. */
+
+.kw-merkie {
+  display: inline-block;
+  font-family: var(--font-opskrif);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  border-radius: 999px;
+  padding: 4px 11px;
+  margin-bottom: 12px;
+}
+
+.kw-kaart h2 {
+  font-family: var(--font-opskrif);
+  font-size: 19px;
+  margin: 0 0 8px;
+}
+
+.kw-kaart > p {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.7;
+}
+
+.kw-nommer {
+  margin-top: 14px !important;
+  font-size: 13.5px;
+}
+
+.kw-nommer b {
+  font-family: var(--font-opskrif);
+  font-variant-numeric: tabular-nums;
+}
+
+.kw-t-aanvaar { border-left: 3px solid var(--teal); }
+.kw-t-aanvaar .kw-merkie { background: #E8F3F0; color: #2f6b60; }
+
+.kw-t-verval { border-left: 3px solid #C9C6C0; }
+.kw-t-verval .kw-merkie { background: #EFEDE9; color: #7a756d; }
+
+.kw-t-verwerp { border-left: 3px solid var(--koraal); }
+.kw-t-verwerp .kw-merkie { background: #FDE7E0; color: #a8351a; }
+
+.kw-voet {
+  max-width: 820px;
+  margin: 22px auto 40px;
+  padding: 0 20px;
+  text-align: center;
+  font-size: 11.5px;
+  color: var(--grys-teks);
+  line-height: 1.6;
+}
+
+/* Op papier is daar geen knoppie en geen kontakreel nie -- dit is 'n dokument,
+   nie 'n bladsy nie. */
+@media print {
+  body { background: #fff; }
+  .kw-merk,
+  .kw-aanvaar,
+  .kw-kaart,
+  .kw-voet { display: none !important; }
+  .kw-dok { border: 0; border-radius: 0; padding: 0; box-shadow: none; }
+  .kw-blad { max-width: none; padding: 0; }
+}

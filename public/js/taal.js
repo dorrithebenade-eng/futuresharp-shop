@@ -2306,6 +2306,16 @@ const WOORDEBOEK = {
   // op 'n kwotasie gaan die kwotasie self aan -- daar is geen proforma nie.
   fu_kw_gaan_aan: { af: "Kwotasie gaan aan", en: "Quotation goes to" },
 
+  // Die woord voor die registrasienommer op 'n dokument. Die faktuur se PDF
+  // druk hom saam met die adres; die publieke kwotasiebladsy het hom nodig as
+  // 'n eie sleutel omdat sy die kop self bou.
+  fd_reg_nr: { af: "Registrasienommer", en: "Registration number" },
+
+  // Die twee velde op die publieke aanvaarblok. Kort en sonder verwyt: 'n
+  // klient wat 'n veld oorslaan, het nie 'n fout gemaak nie.
+  kw_naam_kort: { af: "Gee die naam van die persoon wat aanvaar.", en: "Enter the name of the person accepting." },
+  kw_epos_kort: { af: "Gee 'n geldige e-posadres.", en: "Enter a valid email address." },
+
   fd_kw_geldig_kop: {
     af: "Hierdie kwotasie is geldig tot",
     en: "This quotation is valid until",

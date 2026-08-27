@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="af">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Future Sharp</title>
+  <link rel="stylesheet" href="css/styl.css">
+  <link rel="stylesheet" href="css/kwotasie.css">
+</head>
+<body>
+  <!--
+    DIE KWOTASIE SOOS DIE KLIENT HAAR SIEN, met die knoppie wat haar aanvaar.
+
+    'n PUBLIEKE BLADSY. Geen sessie, geen aanmelding, geen paneelkode -- die
+    klient is 'n rekord, nie 'n rekening nie. Die bewys is die sleutel plus die
+    publieke kode in die skakel; sonder albei is die antwoord 404.
+
+    taal.js laai omdat die bladsy in die KWOTASIE se taal lees, met t_in(), nie
+    in die blaaier se taal nie. Die dokument wat die klient ontvang het, was in
+    daardie taal; hierdie bladsy is dieselfde gesprek.
+
+    GEEN WYSIGINGSVORM EN GEEN VERWERP-KNOPPIE. Wat 'n klient in 'n
+    wysigingsveld sou tik, is nooit 'n instruksie wat uitgevoer kan word nie --
+    dit is die begin van 'n gesprek wat in elk geval gevoer moet word. En 'n
+    verwerp-knoppie sou 'n klient wat wil onderhandel 'n knoppie wys wat die
+    gesprek toemaak, en hy klik hom omdat dit die naaste is aan "nee, nie so
+    nie". Antwoord hy eenvoudig nie, doen Verval die werk.
+  -->
+  <div class="kw-blad">
+    <div class="kw-merk">
+      <img src="images/future-sharp-logo.png" alt="Future Sharp">
+    </div>
+
+    <div id="kw-inhoud">
+      <div class="kw-kaart kw-besig">
+        <div><span class="kw-stip"></span><span class="kw-stip"></span><span class="kw-stip"></span></div>
+        <p id="kw-besig-teks"></p>
+      </div>
+    </div>
+  </div>
+
+  <p class="kw-voet" id="kw-voet"></p>
+
+  <script src="js/taal.js"></script>
+  <script src="js/kwotasie.js"></script>
+</body>
+</html>
