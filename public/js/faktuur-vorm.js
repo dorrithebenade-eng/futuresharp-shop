@@ -1190,6 +1190,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     else ontdoen_doen();
   });
 
+  /* Die balk kry sy lyn eers wanneer hy werklik oor die dokument le.
+     `position: sticky` gee geen gebeurtenis nie, dus meet ons sy plek: staan
+     hy op 0 terwyl die blad gerol is, klou hy vas.
+
+     Sonder dit is daar 'n streep onder 'n balk wat aan niks raak nie. */
+  const balk = document.querySelector(".fv-balk");
+  if (balk) {
+    const kyk = () => balk.classList.toggle("fv-balk-vas", window.scrollY > 4);
+    window.addEventListener("scroll", kyk, { passive: true });
+    kyk();
+  }
+
   const knop = document.getElementById("fv-stoor");
   if (knop) knop.addEventListener("click", () => stoor());
 

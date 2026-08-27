@@ -23,6 +23,15 @@
 /* ── Die balk bo die dokument ─────────────────────────────────────────────
    Die stand, die stoor-aanwyser en die pad terug. Nie deel van die dokument
    nie: dit is die vorm se eie gereedskap en dit druk nêrens. */
+/* DIE BALK BLY BO-AAN TERWYL 'N MENS ROL.
+
+   Stoor, Reik uit, Druk en die twee ontdoen-pyltjies is die knoppies wat 'n
+   mens juis nodig het NADAT 'n mens iets aan die reels gedoen het -- en dit
+   is presies wanneer 'n mens afgerol het. Die pyltjies het op y = -69 gestaan,
+   buite die venster, terwyl hulle aktief was.
+
+   `.mini-kop` is nie sticky nie, dus is 0 die regte top. Die z-index le onder
+   syne (35) sodat die swart kop bo-oor die balk skuif eerder as andersom. */
 .fv-balk {
   display: flex;
   align-items: center;
@@ -30,7 +39,26 @@
   gap: 14px;
   flex-wrap: wrap;
   margin-bottom: 16px;
+
+  position: sticky;
+  top: 0;
+  z-index: 30;
+
+  /* Sonder 'n agtergrond skyn die dokument onder die knoppies deur. Die
+     opvulling en die negatiewe marge laat hom van rand tot rand loop sodat
+     daar geen strepie dokument langs hom verbyskuif nie. */
+  background: #FAFAF8;
+  padding: 12px 0 10px;
+  margin-left: -4px;
+  margin-right: -4px;
+  padding-left: 4px;
+  padding-right: 4px;
+  border-bottom: 1px solid transparent;
 }
+
+/* Die lyn verskyn eers wanneer die balk werklik oor iets le -- andersins is
+   daar 'n streep onder 'n balk wat aan niks raak nie. */
+.fv-balk.fv-balk-vas { border-bottom-color: var(--fv-lyn); }
 .fv-balk-links,
 .fv-balk-regs {
   display: flex;
