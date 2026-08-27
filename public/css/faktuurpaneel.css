@@ -155,6 +155,50 @@ a.paneel-kieslys-item { text-decoration: none; }
 .fp-stand-betaal { background: #E8F3F0; color: #2f6b60; }
 .fp-stand-gekanselleer { background: #FDE7E0; color: #a8351a; }
 
+/* DIE KWOTASIE SE STANDE. Eie woorde, nie die faktuur s'n nie — sien
+   _kwotasies.js: kry-staat.js en kry-joernaal.js filtreer albei op
+   `stand === "gestuur"`, dus mag 'n kwotasie daardie woord nooit dra nie.
+
+   Die KLEURE volg wel die faktuur s'n, want hulle beteken dieselfde ding:
+   amber is "wag op iemand anders", teal is "klaar", koraal is "nee". */
+.fp-stand-uitgereik { background: #FDF3DA; color: #8a6400; }
+.fp-stand-aanvaar { background: #E8F3F0; color: #2f6b60; }
+.fp-stand-verwerp { background: #FDE7E0; color: #a8351a; }
+/* Verval is nie 'n stand op die rekord nie — hy word by die lees bereken uit
+   geldig_tot. Grys: niemand het iets gedoen nie, die tyd het bloot verbygegaan. */
+.fp-stand-verval { background: #EFEDE9; color: #9a958d; }
+
+/* DIE WERKSYFER bo die kwotasielys: wat Future Sharp aangebied het en waaraan
+   dit nog gebonde is. Dorrithé en Ignatius gebruik albei hierdie blad.
+
+   DIT IS NIE VERWAGTE INKOMSTE NIE en mag nooit so lyk nie — vandaar grys en
+   nie teal nie. 'n Aanbod bind die kliënt aan niks; dit staan eers op die
+   staat wanneer 'n faktuur uitgereik is. */
+.fp-blootstelling {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 14px;
+  flex-wrap: wrap;
+  background: var(--grys-lig, #F5F4F1);
+  border-radius: 10px;
+  padding: 13px 16px;
+  margin-bottom: 12px;
+}
+
+.fp-blootstelling-et { font-size: 13px; color: var(--grys-teks); }
+
+.fp-blootstelling-syfer {
+  font-family: var(--font-opskrif, inherit);
+  font-size: 17px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Leeg wanneer daar niks uitstaande is nie. Nul is 'n antwoord, maar 'n blok
+   wat R0,00 aankondig, is ruis. */
+.fp-blootstelling[hidden] { display: none; }
+
 /* --- Die ry maak oop, en die ry kan geskrap word --- */
 
 /* DIE RY IS 'N <button>, nie 'n <div> met 'n klik nie: dan werk Tab en Enter

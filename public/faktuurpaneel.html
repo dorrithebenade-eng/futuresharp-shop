@@ -79,6 +79,11 @@
 
       <nav class="fp-kieslys" id="fp-kieslys">
         <button type="button" class="fp-pil aktief" data-gaan="fakture" data-i18n="fp_nav_fakture">Fakture</button>
+        <!-- 'n EIE PIL, nie 'n filter binne Fakture nie. Die twee registers
+             beantwoord verskillende vrae: "wat is aan ons verskuldig?" teenoor
+             "wat het ons aangebied?". Meng 'n mens hulle, hou die telling bo
+             die lys op om een ding te beteken. -->
+        <button type="button" class="fp-pil" data-gaan="kwotasies" data-i18n="fp_nav_kwotasies">Kwotasies</button>
         <button type="button" class="fp-pil" data-gaan="registers" data-i18n="fp_nav_registers">Registers</button>
         <button type="button" class="fp-pil" data-gaan="state" data-i18n="fp_nav_state">State</button>
         <button type="button" class="fp-pil" data-gaan="joernaal" data-i18n="fp_nav_joernaal">Joernaal</button>
@@ -114,6 +119,35 @@
         </div>
 
         <div id="fp-fakture-lys">
+          <p class="stelsel-boodskap" data-i18n="fp_laai">Word gelaai …</p>
+        </div>
+      </section>
+
+      <section class="paneel-afdeling fp-afdeling" data-afdeling="kwotasies">
+
+        <!-- DIE WERKSYFER. Wat Future Sharp aangebied het en waaraan dit nog
+             gebonde is — nie verwagte inkomste nie. 'n Aanbod bind die klient
+             aan niks; dit staan eers op die staat wanneer 'n faktuur uitgereik
+             is. Versteek wanneer daar niks uitstaande is nie: nul is 'n
+             antwoord, maar 'n blok wat R0,00 aankondig, is ruis. -->
+        <div class="fp-blootstelling" id="kw-blootstelling" hidden>
+          <span class="fp-blootstelling-et">
+            <span data-i18n="fp_kw_blootstelling">Uitgereik en nog geldig</span>
+            <span id="kw-blootstelling-tel"></span>
+          </span>
+          <span class="fp-blootstelling-syfer" id="kw-blootstelling-syfer"></span>
+        </div>
+
+        <!-- Geen parameter agter faktuur.html nie, net soort=kwotasie: dit is
+             'n vars konsep. Die nommer word by UITREIKING toegeken, anders le
+             daar gate in die reeks van kwotasies wat nooit uitgegaan het nie. -->
+        <div class="fp-lys-kop">
+          <button type="button" class="kaart-aksie" id="kw-nuwe"
+                  data-i18n="fp_nuwe_kwotasie">+ Nuwe kwotasie</button>
+          <span class="fp-tel" id="kw-tel"></span>
+        </div>
+
+        <div id="kw-lys">
           <p class="stelsel-boodskap" data-i18n="fp_laai">Word gelaai …</p>
         </div>
       </section>
@@ -677,6 +711,9 @@
   <script src="js/identiteit.js"></script>
   <script src="js/sessie-verval.js"></script>
   <script src="js/faktuurpaneel.js"></script>
+    <!-- NA faktuurpaneel.js. Hy voeg sy eie luisteraar by die Kwotasies-pil;
+         luisteraars stapel, hulle vervang mekaar nie. -->
+    <script src="js/kwotasiepaneel.js" defer></script>
   <script src="js/faktuurpaneel-kliente.js"></script>
   <script src="js/faktuurpaneel-skrap-klient.js"></script>
   <script src="js/faktuurpaneel-skrap-begunstigde.js"></script>
