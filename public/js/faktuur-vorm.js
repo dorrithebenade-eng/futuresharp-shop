@@ -38,6 +38,53 @@ const HOSTING_VERSTEK = 5;
 // EEN plek waar 'n nuwe reel gemaak word. Was dit twee keer ingetik, kry die
 // eerste reel van 'n faktuur ander velde as die tweede -- en dan werk die
 // verdeling op die een en nie op die ander nie.
+/* ═══ EEN VORM, TWEE DOKUMENTE ═══════════════════════════════════════════
+
+   `?soort=kwotasie` maak van hierdie bladsy 'n kwotasievorm. Alles anders bly
+   presies dieselfde: die reels, die invou, die verdeling, die begroting, die
+   som, die ontdoen, die foonaansig.
+
+   WAAROM NIE 'N TWEEDE VORM NIE: die kwotasie en die faktuur deel die reels,
+   die verdeling en `faktuur-som.js`. Twee vorms sou binne 'n maand uitmekaar
+   loop, en dit sou STIL gebeur -- die een sou 'n regstelling kry en die ander
+   nie.
+
+   WAT VERSKIL, en dit is alles:
+
+     die drie eindpunte        stoor-, kry-, uitreik-
+     die opskrif               KWOTASIE teenoor PROFORMA-FAKTUUR
+     "Gekwoteer aan"           teenoor "Gefaktureer aan"
+     "Totaal"                  teenoor "Totaal verskuldig"
+     "Kwotasietotaal"          teenoor "Faktuurtotaal" in die backoffice
+     "Geldig tot"              teenoor "Betaalbaar teen" -- ANDER VELDE, nie
+                               net ander woorde: geldig_tot KEER aanvaarding,
+                               betaalbaar_teen keer niks
+     die betaalblok            val weg. 'n Kwotasie is nie betaalbaar nie.
+     die pad terug             na die Kwotasies-pil
+
+   DIE SOORT KOM UIT DIE URL EN VERANDER NOOIT. Hy word een keer gelees en
+   daarna nêrens weer nie -- 'n bladsy wat halfpad van dokument verwissel, is
+   'n bladsy wat 'n kwotasie na stoor-faktuur.js kan stuur. */
+const SOORT =
+  new URLSearchParams(window.location.search).get("soort") === "kwotasie"
+    ? "kwotasie"
+    : "faktuur";
+
+const IS_KW = SOORT === "kwotasie";
+
+// Die drie eindpunte. Hulle staan HIER en nêrens anders nie: 'n fetch met 'n
+// hardgekodeerde naam iewers in die lêer is presies hoe die kwotasie stilweg
+// by die faktuur se store beland.
+const EIND = IS_KW
+  ? { stoor: "stoor-kwotasie", kry: "kry-kwotasie", veld: "kwotasie" }
+  : { stoor: "stoor-faktuur", kry: "kry-faktuur", veld: "faktuur" };
+
+// Die sleutel wat die skerm se woord kies. Die DOKUMENT se woorde loop deur
+// dt() met die dokument se eie taal; hierdie een is vir die skerm.
+function soort_t(kw_sleutel, f_sleutel, verstek) {
+  return fv_t(IS_KW ? kw_sleutel : f_sleutel, verstek);
+}
+
 function nuwe_reel() {
   return {
     soort: "verkoop",
@@ -85,6 +132,11 @@ const V = {
   koste: [],              // { beskrywing, ontvanger, bedrag_sent, inskrywing }
   hosting_pct: 5,
   betaalbaar_teen: null,
+
+  // SLEGS OP 'N KWOTASIE. Hulle bly leeg op 'n faktuur en gaan nooit na
+  // stoor-faktuur.js nie -- liggaam() stuur hulle net wanneer IS_KW.
+  geldig_tot: null,
+  hersiening: 1,
   geskep_op: null,
   betaalskakel: null,
 };
@@ -604,7 +656,9 @@ function teken_somme() {
     rye.push(`<div><span>${dt("fd_skenking", "Skenking")}</span><b>${rand(V.skenking_sent)}</b></div>`);
   }
   rye.push(
-    `<div class="tot"><span>${dt("fd_totaal_verskuldig", "Totaal verskuldig")}</span><b>${rand(totaal())}</b></div>`
+    `<div class="tot"><span>${
+      IS_KW ? dt("fd_totaal", "Totaal") : dt("fd_totaal_verskuldig", "Totaal verskuldig")
+    }</span><b>${rand(totaal())}</b></div>`
   );
   plek.innerHTML = rye.join("");
 }
@@ -617,11 +671,26 @@ function teken_dok_taal() {
     if (el) el.textContent = dt(sleutel, verstek);
   };
 
-  stel("d-soort", "fd_proforma", "Proforma-faktuur");
-  stel("d-aan", "fd_gefaktureer_aan", "Gefaktureer aan");
+  // DIE VIER WOORDE WAT DIE DOKUMENT SE SOORT DRA.
+  //
+  // "Totaal" en nie "Totaal verskuldig" nie: niks is verskuldig voordat 'n
+  // kwotasie aanvaar is nie, en die faktuur wat daaruit kom, dra wel die ander
+  // woord.
+  //
+  // "Geldig tot" en nie "Betaalbaar teen" nie, en dit is nie 'n
+  // woordverskil nie: geldig_tot KEER die aanvaarding, betaalbaar_teen keer
+  // niks. Twee velde met twee betekenisse.
+  if (IS_KW) {
+    stel("d-soort", "fd_kwotasie", "Kwotasie");
+    stel("d-aan", "fd_gekwoteer_aan", "Gekwoteer aan");
+    stel("d-betaalbaar", "fd_geldig_tot", "Geldig tot");
+  } else {
+    stel("d-soort", "fd_proforma", "Proforma-faktuur");
+    stel("d-aan", "fd_gefaktureer_aan", "Gefaktureer aan");
+    stel("d-betaalbaar", "fd_betaalbaar_teen", "Betaalbaar teen");
+  }
   stel("d-besonderhede", "fd_besonderhede", "Besonderhede");
   stel("d-datum", "fd_datum", "Datum");
-  stel("d-betaalbaar", "fd_betaalbaar_teen", "Betaalbaar teen");
   stel("d-bestelnr", "fd_bestelnommer", "Bestelnommer");
   stel("d-k-beskrywing", "fd_kol_beskrywing", "Beskrywing");
   stel("d-k-hoeveelheid", "fd_kol_hoeveelheid", "Hoeveelheid");
@@ -747,14 +816,75 @@ async function laai_maatskappy() {
 function teken_stand() {
   const el = document.getElementById("fv-stand");
   if (!el) return;
-  const name = {
-    konsep: fv_t("fv_stand_konsep", "Konsep"),
-    gestuur: fv_t("fv_stand_gestuur", "Gestuur"),
-    betaal: fv_t("fv_stand_betaal", "Betaal"),
-    gekanselleer: fv_t("fv_stand_gekanselleer", "Gekanselleer"),
-  };
+  // DIE KWOTASIE SE STANDE IS EIE WOORDE, nie die faktuur s'n nie. Sien
+  // _kwotasies.js: kry-staat.js en kry-joernaal.js filtreer albei op
+  // `stand === "gestuur"`, dus mag 'n kwotasie daardie woord nooit dra nie.
+  const name = IS_KW
+    ? {
+        konsep: fv_t("fp_kw_stand_konsep", "Konsep"),
+        uitgereik: fv_t("fp_kw_stand_uitgereik", "Uitgereik"),
+        aanvaar: fv_t("fp_kw_stand_aanvaar", "Aanvaar"),
+        verwerp: fv_t("fp_kw_stand_verwerp", "Verwerp"),
+        verval: fv_t("fp_kw_stand_verval", "Verval"),
+      }
+    : {
+        konsep: fv_t("fv_stand_konsep", "Konsep"),
+        gestuur: fv_t("fv_stand_gestuur", "Gestuur"),
+        betaal: fv_t("fv_stand_betaal", "Betaal"),
+        gekanselleer: fv_t("fv_stand_gekanselleer", "Gekanselleer"),
+      };
   el.textContent = name[V.stand] || V.stand;
   el.className = "fv-stand fv-stand-" + V.stand;
+}
+
+/* WAT 'N KWOTASIE NIE HET NIE.
+
+   Die betaalblok val weg: 'n kwotasie is nie betaalbaar nie, en 'n bankrekening
+   op 'n aanbod nooi 'n betaling uit vir iets wat nog nie gefaktureer is nie --
+   dan land geld in die hoofrekening sonder 'n faktuur om dit teen af te skryf.
+
+   In sy plek kom die geldigheidsblok, wat sê wat by aanvaarding gebeur.
+
+   Die pad terug wys na die Kwotasies-pil, nie na Fakture nie. Dit loop een
+   keer, by die begin -- niks hiervan verander terwyl 'n mens werk nie. */
+/* DIE GELDIGHEIDSBLOK op die kwotasie se dokument, waar die faktuur haar
+   betaalblok het.
+
+   Hy dra die datum EN wat by aanvaarding gebeur. Sonder die tweede sin lyk
+   "geldig tot 3 Oktober" soos 'n dreigement in plaas van 'n aanbod. */
+function teken_geldig() {
+  const blok = document.getElementById("fv-geldig");
+  if (!blok) return;
+  if (!IS_KW) {
+    blok.hidden = true;
+    return;
+  }
+  blok.hidden = false;
+  const datum = dok_datum(V.geldig_tot);
+  blok.innerHTML =
+    "<b>" +
+    ontsnap(
+      dt("fd_kw_geldig_kop", "Hierdie kwotasie is geldig tot") + " " + (datum || "—")
+    ) +
+    "</b><br>" +
+    ontsnap(
+      dt(
+        "fd_kw_geldig_lei",
+        "By aanvaarding word 'n faktuur uitgereik en die betaalopsies verskyn onmiddellik."
+      )
+    );
+}
+
+function teken_soort() {
+  if (!IS_KW) return;
+
+  document.body.classList.add("fv-kwotasie");
+
+  const terug = document.querySelector(".terug-skakel");
+  if (terug) terug.setAttribute("href", "faktuurpaneel.html#kwotasies");
+
+  const titel = fv_t("fp_kwotasies_titel", "Kwotasies");
+  if (document.title) document.title = titel + " · Future Sharp";
 }
 
 function teken_alles() {
@@ -763,6 +893,7 @@ function teken_alles() {
   teken_somme();
   teken_dok_taal();
   teken_stand();
+  teken_geldig();
   ontdoen_teken();
   // faktuur-backoffice.js haak hier in. Die wag is nie versiering nie: die
   // dokument moet werk al is die backoffice nie gelaai nie.
@@ -950,7 +1081,12 @@ function liggaam() {
     klient_id: V.klient_id || "",
     bestelnommer: V.bestelnommer,
     dokument_nota: V.dokument_nota,
-    betaalbaar_teen: V.betaalbaar_teen || "",
+    // Elke dokument stuur SLEGS sy eie datumveld. stoor-kwotasie.js ken
+    // `betaalbaar_teen` glad nie, en stoor-faktuur.js ken `geldig_tot` nie --
+    // 'n veld wat deurgaan na 'n Function wat hom nie ken nie, val stil weg.
+    ...(IS_KW
+      ? { geldig_tot: V.geldig_tot || "" }
+      : { betaalbaar_teen: V.betaalbaar_teen || "" }),
     koste: V.koste,
     afslag_sent: V.afslag_sent,
     skenking_sent: V.skenking_sent,
@@ -974,7 +1110,7 @@ async function stoor() {
   BESIG = true;
 
   try {
-    const resp = await fetch("/.netlify/functions/stoor-faktuur", {
+    const resp = await fetch("/.netlify/functions/" + EIND.stoor, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -1017,12 +1153,12 @@ async function stoor() {
 
 /* ═══ laai ═══ */
 async function laai_faktuur(vraag) {
-  const resp = await fetch("/.netlify/functions/kry-faktuur?" + vraag, {
+  const resp = await fetch("/.netlify/functions/" + EIND.kry + "?" + vraag, {
     headers: { Authorization: `Bearer ${SESSIE.access_token}` },
   });
   if (!resp.ok) throw new Error(`Status ${resp.status}`);
   const data = await resp.json();
-  const f = data.faktuur || {};
+  const f = data[EIND.veld] || {};
 
   V.sleutel = f.sleutel || null;
   V.nommer = f.nommer || null;
@@ -1051,6 +1187,8 @@ async function laai_faktuur(vraag) {
   V.koepon_kode = f.koepon_kode || null;
   V.koste = Array.isArray(f.koste) ? f.koste : [];
   V.betaalbaar_teen = f.betaalbaar_teen || null;
+  V.geldig_tot = f.geldig_tot || null;
+  V.hersiening = Number(f.hersiening) || 1;
   V.geskep_op = f.geskep_op || null;
   V.betaalskakel = f.betaalskakel || null;
 }
@@ -1107,6 +1245,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const vorm = document.getElementById("fv-vorm");
   if (vorm) vorm.style.display = "";
+  teken_soort();
   wys();
 
   const params = new URLSearchParams(window.location.search);
@@ -1144,11 +1283,21 @@ document.addEventListener("DOMContentLoaded", async () => {
     bestelnr.addEventListener("input", () => { V.bestelnommer = bestelnr.value; merk_vuil(); });
   }
 
+  /* DIESELFDE VELD, TWEE BETEKENISSE.
+
+     Op 'n faktuur is dit `betaalbaar_teen`: 'n datum op die dokument wat NIKS
+     keer nie. Op 'n kwotasie is dit `geldig_tot`, en dié KEER: ná daardie dag
+     weier aanvaar-kwotasie.js met 410.
+
+     Hulle deel een invoerveld omdat hulle op dieselfde plek op die dokument
+     staan, maar hulle land op verskillende velde van die rekord -- en
+     stoor-kwotasie.js ken `betaalbaar_teen` glad nie. */
   const betaalbaar = document.getElementById("fv-betaalbaar");
   if (betaalbaar) {
-    betaalbaar.value = invoer_datum(V.betaalbaar_teen);
+    betaalbaar.value = invoer_datum(IS_KW ? V.geldig_tot : V.betaalbaar_teen);
     betaalbaar.addEventListener("change", () => {
-      V.betaalbaar_teen = betaalbaar.value || null;
+      if (IS_KW) V.geldig_tot = betaalbaar.value || null;
+      else V.betaalbaar_teen = betaalbaar.value || null;
       merk_vuil();
     });
   }

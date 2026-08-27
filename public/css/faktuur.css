@@ -80,6 +80,33 @@
 
 /* Die stoor-aanwyser is die enigste manier waarop 'n mens WEET dit is
    gestoor. Hy sê dit ook eerlik wanneer dit misluk. */
+/* ═══ DIE KWOTASIE ═══
+
+   `body.fv-kwotasie` word deur teken_soort() gestel wanneer ?soort=kwotasie in
+   die URL staan. Een klas, en die dokument verander van 'n faktuur na 'n
+   kwotasie.
+
+   DIE BETAALBLOK VAL WEG. 'n Kwotasie is nie betaalbaar nie, en 'n
+   bankrekening op 'n aanbod nooi 'n betaling uit vir iets wat nog nie
+   gefaktureer is nie. In sy plek kom .dok-geldig. */
+body.fv-kwotasie .dok-betaal { display: none !important; }
+
+/* Die geldigheidsblok staan WAAR die betaalblok staan -- dieselfde plek op die
+   dokument, dieselfde vraag: wat gebeur volgende. Amber, want dit is 'n datum
+   wat verstryk, nie 'n handeling nie. */
+.dok-geldig {
+  margin-top: 22px;
+  background: #FDF6E7;
+  border-radius: 8px;
+  padding: 13px 16px;
+  font-size: 12.5px;
+  line-height: 1.65;
+  color: #8a6400;
+}
+
+.dok-geldig[hidden] { display: none; }
+.dok-geldig b { font-family: var(--font-opskrif); }
+
 /* ═══ ONTDOEN EN HERDOEN ═══
 
    IN DIE BALK, nie in 'n ry nie, en met 'n ander vorm as die skuifpyltjies:

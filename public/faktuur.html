@@ -271,6 +271,11 @@
           <textarea id="fv-nota" rows="3" maxlength="3000"></textarea>
         </div>
 
+        <!-- DIE GELDIGHEIDSBLOK. Slegs op 'n kwotasie; sien teken_geldig() in
+             faktuur-vorm.js. Hy staan WAAR die betaalblok staan, want dit is
+             dieselfde plek op die dokument: wat volgende gebeur. -->
+        <div class="dok-geldig" id="fv-geldig" hidden></div>
+
         <div class="dok-betaal">
           <div>
             <h3 id="d-eft">Betaal deur die skakel</h3>

@@ -2300,6 +2300,12 @@ const WOORDEBOEK = {
   // aanvaar is nie, en die faktuur wat daaruit kom, dra wél die ander woord.
   fd_totaal: { af: "Totaal", en: "Total" },
   fd_kw_hersiening: { af: "Hersiening", en: "Revision" },
+  // Die geldigheidsblok se twee reels. Die DATUM word in faktuur-vorm.js
+  // aangeplak, want sy formatering hang van die dokument se taal af.
+  fd_kw_geldig_kop: {
+    af: "Hierdie kwotasie is geldig tot",
+    en: "This quotation is valid until",
+  },
   fd_kw_geldig_lei: {
     af: "By aanvaarding word 'n faktuur uitgereik en die betaalopsies verskyn onmiddellik.",
     en: "On acceptance an invoice is issued and the payment options appear immediately.",
