@@ -1827,6 +1827,15 @@ const WOORDEBOEK = {
   // Sien Reels-Invou-En-Volgorde-Ontwerp.md.
 
   // Die ↳-knoppie se titel wissel met die stand van die reël.
+  // ── Ontdoen en herdoen ──
+  //
+  // Hulle dek wat die VORM doen, nie die uitreiking nie: daardie handeling het
+  // buite die blad gebeur -- 'n nommer toegeken, 'n split geskep, 'n pos
+  // gestuur -- en 'n knoppie wat "ontdoen" sê maar die pos nie kan terughaal
+  // nie, is erger as geen knoppie.
+  fv_ontdoen: { af: "Ontdoen", en: "Undo" },
+  fv_herdoen: { af: "Herdoen", en: "Redo" },
+
   fv_vou_in: { af: "Vou in by die reël bo", en: "Fold into the line above" },
   fv_vou_uit: { af: "Staan op haar eie", en: "Show as its own line" },
 

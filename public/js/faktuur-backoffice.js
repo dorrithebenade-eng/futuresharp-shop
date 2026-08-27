@@ -473,6 +473,9 @@ function bo_teken_verdeling(S) {
   plek.querySelectorAll(".vd-voeg").forEach((knop) => {
     knop.addEventListener("click", () => {
       const rx = Number(knop.getAttribute("data-reel"));
+      // Sonder hierdie haak sou ontdoen net die dokumentkolom dek, en 'n
+      // verdelingsry wat per ongeluk geskrap is, sou onherstelbaar wees.
+      if (window.fv_ontdoen_merk) window.fv_ontdoen_merk();
       if (!Array.isArray(V.reels[rx].verdeling)) V.reels[rx].verdeling = [];
 
       // DIE RY BEGIN MET 'N WERKLIKE ONTVANGER, nie met 'n lee naam nie.
@@ -501,6 +504,7 @@ function bo_teken_verdeling(S) {
       const rx = Number(knop.closest(".vd-reel").getAttribute("data-reel"));
       const soort = knop.getAttribute("data-soort");
       if (V.reels[rx].soort === soort) return;
+      if (window.fv_ontdoen_merk) window.fv_ontdoen_merk();
       V.reels[rx].soort = soort;
       // 'n Kostereël dra nooit hosting nie: trek 'n mens hosting van 'n
       // terugbetaling af, kry die persoon minder terug as wat hy uitgegee het.

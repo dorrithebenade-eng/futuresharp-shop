@@ -52,6 +52,36 @@
 
 /* Die stoor-aanwyser is die enigste manier waarop 'n mens WEET dit is
    gestoor. Hy sê dit ook eerlik wanneer dit misluk. */
+/* ═══ ONTDOEN EN HERDOEN ═══
+
+   IN DIE BALK, nie in 'n ry nie, en met 'n ander vorm as die skuifpyltjies:
+   die is ↑ ↓ binne 'n reel, hierdie is ↶ ↷ bo-aan. Vier pyltjies op een skerm
+   wat verskillende dinge doen, moet uitmekaar te ken wees.
+
+   'n Knoppie wat aan lyk maar niks doen nie, is erger as een wat af is --
+   dieselfde reel as by die skuifpyltjies. */
+.fv-ontdoen-groep {
+  display: inline-flex;
+  gap: 2px;
+  margin-right: 4px;
+}
+
+.fv-ontdoen {
+  border: 0;
+  background: none;
+  color: var(--grys-teks);
+  cursor: pointer;
+  font-size: 17px;
+  line-height: 1;
+  padding: 5px 7px;
+  border-radius: 7px;
+}
+
+.fv-ontdoen:hover { background: var(--grys-lig, #F5F4F1); color: var(--swart); }
+.fv-ontdoen:focus-visible { outline: 2px solid var(--teal); outline-offset: -2px; }
+.fv-ontdoen:disabled { opacity: .25; cursor: default; background: none; }
+.fv-ontdoen:disabled:hover { background: none; color: var(--grys-teks); }
+
 .fv-stoorstand {
   font-size: 12px;
   color: var(--grys-teks);
@@ -1194,6 +1224,7 @@
   .fv-klient-kies,
   .fv-teks-knop,
   .fv-voorskou,
+  .fv-ontdoen-groep,
   .dok-vee { display: none !important; }
 
   /* ── DIE REELS RUIL VIR DIE GROEPE ──

@@ -274,6 +274,7 @@ function kan_af(i) {
    'n Kind skuif alleen, en net BINNE haar eie blok: sy mag nie bo haar
    dra-reël uitkom nie en nie by die volgende groep inloop nie. */
 function skuif_reel(i, rigting) {
+  ontdoen_merk();
   const r = V.reels[i];
 
   if (r.vou_in) {
@@ -309,6 +310,7 @@ function skuif_reel(i, rigting) {
    Sy erf die soort en die hosting van die reël waaronder sy kom: 'n reiskoste
    onder 'n reiskoste is 'n uitgawe. */
 function voeg_reel_in(i) {
+  ontdoen_merk();
   const bo = V.reels[i];
   const nuut = nuwe_reel();
   nuut.vou_in = true;
@@ -326,6 +328,7 @@ function voeg_reel_in(i) {
    verlies is groter: 'n naam is een woord; die groepering is die werk van
    drie merkers. */
 function skrap_reel(i) {
+  ontdoen_merk();
   const was_dra = !V.reels[i].vou_in;
   V.reels.splice(i, 1);
   if (was_dra && V.reels[i] && V.reels[i].vou_in) V.reels[i].vou_in = false;
@@ -525,6 +528,7 @@ function bind_reels() {
     tr.querySelectorAll("[data-veld]").forEach((el) => {
       el.addEventListener("input", () => {
         const veld = el.getAttribute("data-veld");
+        ontdoen_merk_tik(`reel-${ix}-${veld}`);
         if (veld === "beskrywing") {
           V.reels[ix].beskrywing = el.value;
         } else if (veld === "hoeveelheid") {
@@ -573,6 +577,7 @@ function bind_reels() {
     };
 
     aksie("[data-vou]", () => {
+      ontdoen_merk();
       V.reels[ix].vou_in = !V.reels[ix].vou_in;
       na_reelverandering();
     });
@@ -758,6 +763,7 @@ function teken_alles() {
   teken_somme();
   teken_dok_taal();
   teken_stand();
+  ontdoen_teken();
   // faktuur-backoffice.js haak hier in. Die wag is nie versiering nie: die
   // dokument moet werk al is die backoffice nie gelaai nie.
   if (window.bo_teken) window.bo_teken();
@@ -802,6 +808,126 @@ async function laai_kliente() {
  * ons vra nie eens: die dokument is by die kliënt en die verdeling is
  * gevries.
  */
+/* ═══ ONTDOEN EN HERDOEN ══════════════════════════════════════════════════
+
+   Voor elke wysiging word 'n kopie van V op 'n stapel gestoor. Ontdoen haal
+   die vorige af en teken oor.
+
+   WAT DIT DEK: alles wat die VORM doen -- 'n reel geskrap, 'n verdelingsry
+   weg, 'n groep verkeerd geskuif, 'n bedrag oorgetik, 'n dra-reel geskrap wat
+   'n kind bevorder het. Dit is presies die handelinge waar hierdie ontwerp 'n
+   mens kan laat struikel.
+
+   WAT DIT NIE DEK NIE: die uitreiking, 'n aanvaarding, 'n kansellasie.
+   Daardie handelinge het BUITE die blad gebeur -- 'n nommer is toegeken, 'n
+   split by Paystack geskep, 'n pos gestuur. 'n Knoppie wat "ontdoen" se maar
+   die pos nie kan terughaal nie, is erger as geen knoppie. Vandaar die toets
+   op `V.stand === "konsep"`.
+
+   DIT VERDWYN BY 'N HERLAAI. Die stapel leef in geheue, nie in die rekord nie.
+   Dit is die eerlike beperking en dit is aanvaarbaar: die outomatiese stoor
+   beteken die rekord is veilig; die stapel is vir die laaste paar minute se
+   tikwerk.
+
+   DIE STOOR WORD NIE ONTDOEN NIE. Ontdoen verander V en merk die vorm vuil;
+   twee sekondes later stoor hy vanself. 'n Ontdoen wat nie gestoor word nie,
+   sou by die volgende herlaai terugkom. */
+
+const ONTDOEN_DIEP = 20;
+const ONTDOEN = [];
+const HERDOEN = [];
+
+// 'n Volle kopie, want V se reels en hul verdelings is geneste voorwerpe. 'n
+// vlak kopie sou die stapel aan die lewende V bind en elke stap sou dieselfde
+// wees.
+function ontdoen_kopie() {
+  return JSON.parse(JSON.stringify(V));
+}
+
+/* Roep dit VOOR die wysiging, nie daarna nie. Wat gestoor word, is die
+   toestand waarheen 'n mens wil terugkeer.
+
+   'n NUWE HANDELING GOOI DIE HERDOEN-STAPEL WEG. 'n Mens ontdoen drie stappe,
+   tik dan iets nuuts, en herdoen sou 'n toekoms herstel wat nie meer bestaan
+   nie. */
+function ontdoen_merk() {
+  if (V.stand !== "konsep") return;
+  ONTDOEN.push(ontdoen_kopie());
+  if (ONTDOEN.length > ONTDOEN_DIEP) ONTDOEN.shift();
+  HERDOEN.length = 0;
+  ontdoen_teken();
+}
+
+/* TIK IS 'N VLAAG, NIE 'N REEKS STAPPE NIE.
+
+   Sou elke aanslag 'n stap wees, sou "Aanbieding" tien van die twintig plekke
+   vul en ontdoen sou letter vir letter terugloop -- en die stap wat 'n mens
+   werklik soek, die geskrapte reel, sou lankal uitgeskuif wees.
+
+   Een stap per vlaag: die eerste aanslag ná 'n stilte van 900ms merk; die res
+   van die woord nie. Dieselfde gedrag as 'n teksverwerker.
+
+   DIE VELD WORD OOK ONTHOU. Twee vlae in verskillende velde is twee stappe,
+   ook wanneer hulle vinnig op mekaar volg -- van 'n bedrag na 'n beskrywing
+   spring, is 'n nuwe gedagte. */
+const TIK_STILTE = 900;
+let TIK_LAAS = 0;
+let TIK_VELD = null;
+
+function ontdoen_merk_tik(kenmerk) {
+  const nou = Date.now();
+  if (kenmerk !== TIK_VELD || nou - TIK_LAAS > TIK_STILTE) ontdoen_merk();
+  TIK_LAAS = nou;
+  TIK_VELD = kenmerk;
+}
+
+function ontdoen_teken() {
+  const o = document.getElementById("fv-ontdoen");
+  const h = document.getElementById("fv-herdoen");
+  const kan = V.stand === "konsep";
+  if (o) {
+    o.disabled = !kan || !ONTDOEN.length;
+    o.title = fv_t("fv_ontdoen", "Ontdoen");
+  }
+  if (h) {
+    h.disabled = !kan || !HERDOEN.length;
+    h.title = fv_t("fv_herdoen", "Herdoen");
+  }
+}
+
+/* Die veldname word EEN VIR EEN teruggesit, nie met 'n spread nie.
+
+   `V` is 'n const en 'n mens kan hom nie vervang nie -- maar dit is nie die
+   rede nie. faktuur-backoffice.js hou 'n verwysing na dieselfde voorwerp;
+   sou ons V vervang, sou die backoffice na 'n dooie kopie wys en die twee
+   kolomme sou stilweg uitmekaar loop. */
+function ontdoen_herstel(toestand) {
+  Object.keys(V).forEach((sleutel) => {
+    if (toestand[sleutel] !== undefined) V[sleutel] = toestand[sleutel];
+  });
+  teken_alles();
+  ontdoen_teken();
+  merk_vuil();
+}
+
+function ontdoen_doen() {
+  if (V.stand !== "konsep" || !ONTDOEN.length) return;
+  HERDOEN.push(ontdoen_kopie());
+  if (HERDOEN.length > ONTDOEN_DIEP) HERDOEN.shift();
+  ontdoen_herstel(ONTDOEN.pop());
+}
+
+function herdoen_doen() {
+  if (V.stand !== "konsep" || !HERDOEN.length) return;
+  ONTDOEN.push(ontdoen_kopie());
+  if (ONTDOEN.length > ONTDOEN_DIEP) ONTDOEN.shift();
+  ontdoen_herstel(HERDOEN.pop());
+}
+
+// Die backoffice roep dit aan voordat sy 'n verdelingsry byvoeg, skrap of
+// verander. Sonder hierdie haak sou ontdoen net die dokumentkolom dek.
+window.fv_ontdoen_merk = ontdoen_merk;
+
 function merk_vuil() {
   if (V.stand !== "konsep") return;
   VUIL = true;
@@ -1035,10 +1161,34 @@ document.addEventListener("DOMContentLoaded", async () => {
       //
       // Die nuwe reel moet DADELIK regs verskyn, met sy eie ontvangers wat
       // wag om gekies te word. Die reels en die verdeling is een lys.
+      ontdoen_merk();
       V.reels.push(nuwe_reel());
       na_reelverandering(V.reels.length - 1);
     });
   }
+
+  const ontdoen_knop = document.getElementById("fv-ontdoen");
+  if (ontdoen_knop) ontdoen_knop.addEventListener("click", ontdoen_doen);
+  const herdoen_knop = document.getElementById("fv-herdoen");
+  if (herdoen_knop) herdoen_knop.addEventListener("click", herdoen_doen);
+
+  /* Ctrl+Z en Ctrl+Shift+Z, soos oral elders.
+
+     BINNE 'N VELD DOEN ONS NIKS. Die blaaier se eie ontdoen werk daar, en 'n
+     mens verwag dat Ctrl+Z 'n woord terugvat en nie 'n hele reel nie. Buite
+     'n veld -- ná 'n skrap, 'n skuif of 'n klik -- is ons stapel die enigste
+     een wat iets weet. */
+  document.addEventListener("keydown", (e) => {
+    if (!(e.ctrlKey || e.metaKey) || e.key.toLowerCase() !== "z") return;
+    const in_veld = document.activeElement && (
+      document.activeElement.tagName === "INPUT" ||
+      document.activeElement.tagName === "TEXTAREA"
+    );
+    if (in_veld) return;
+    e.preventDefault();
+    if (e.shiftKey) herdoen_doen();
+    else ontdoen_doen();
+  });
 
   const knop = document.getElementById("fv-stoor");
   if (knop) knop.addEventListener("click", () => stoor());
