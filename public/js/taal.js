@@ -2302,6 +2302,10 @@ const WOORDEBOEK = {
   fd_kw_hersiening: { af: "Hersiening", en: "Revision" },
   // Die geldigheidsblok se twee reels. Die DATUM word in faktuur-vorm.js
   // aangeplak, want sy formatering hang van die dokument se taal af.
+  // Die bevestigingsblok voor uitreiking. Op 'n faktuur gaan die PROFORMA aan;
+  // op 'n kwotasie gaan die kwotasie self aan -- daar is geen proforma nie.
+  fu_kw_gaan_aan: { af: "Kwotasie gaan aan", en: "Quotation goes to" },
+
   fd_kw_geldig_kop: {
     af: "Hierdie kwotasie is geldig tot",
     en: "This quotation is valid until",

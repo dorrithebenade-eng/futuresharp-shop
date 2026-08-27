@@ -885,6 +885,14 @@ function teken_soort() {
 
   const titel = fv_t("fp_kwotasies_titel", "Kwotasies");
   if (document.title) document.title = titel + " · Future Sharp";
+
+  // Die backoffice se twee opskrifte. Hulle staan in die HTML met die faktuur
+  // se woorde en data-i18n, dus moet hulle NA taal.js se vertaling geruil word
+  // -- andersins skryf die vertaler hulle weer om.
+  const kop = document.getElementById("bo-verdeling-kop");
+  if (kop) kop.textContent = fv_t("fv_kw_verdeling_kop", "Verdeling van die kwotasietotaal");
+  const tot = document.getElementById("bo-totaal-et");
+  if (tot) tot.textContent = fv_t("fv_kw_totaal", "Kwotasietotaal");
 }
 
 function teken_alles() {
@@ -1298,6 +1306,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     betaalbaar.addEventListener("change", () => {
       if (IS_KW) V.geldig_tot = betaalbaar.value || null;
       else V.betaalbaar_teen = betaalbaar.value || null;
+      // Die geldigheidsblok dra die datum. Sonder hierdie reël staan daar
+      // "geldig tot —" tot die volgende volle hertekening.
+      teken_geldig();
       merk_vuil();
     });
   }

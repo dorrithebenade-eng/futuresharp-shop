@@ -334,7 +334,9 @@
 
         <div class="bo-kaart">
           <div class="bo-kop">
-            <div class="bo-titel" data-i18n="bo_verdeling">Verdeling van die faktuurtotaal</div>
+            <!-- Op 'n kwotasie lees dit "Verdeling van die kwotasietotaal".
+                 teken_soort() in faktuur-vorm.js ruil albei. -->
+            <div class="bo-titel" id="bo-verdeling-kop" data-i18n="bo_verdeling">Verdeling van die faktuurtotaal</div>
           </div>
 
           <!-- Paystack is NIE 'n ontvanger nie. Hy is 'n geslote, berekende
@@ -351,7 +353,7 @@
           <div id="vd-lys"></div>
 
           <div class="bo-som">
-            <div class="hoof"><span data-i18n="bo_totaal">Faktuurtotaal</span><b id="s-totaal">—</b></div>
+            <div class="hoof"><span id="bo-totaal-et" data-i18n="bo_totaal">Faktuurtotaal</span><b id="s-totaal">—</b></div>
             <div><span data-i18n="bo_fooi">Transaksiefooi</span><b id="s-fooi">—</b></div>
             <div><span data-i18n="bo_verdeelbaar">Verdeelbaar</span><b id="s-verdeelbaar">—</b></div>
             <div class="bo-kopreel" data-i18n="bo_word_uitbetaal">Word uitbetaal</div>

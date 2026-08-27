@@ -47,6 +47,23 @@ function kw_datum(iso) {
   return `${d.getDate()} ${maande[d.getMonth()]} ${d.getFullYear()}`;
 }
 
+/* Die deel voor die @ , met die eerste letter groot en punte as spasies:
+   `dorrithe@futuresharp.co.za` word `Dorrithe`, `ignatius.gous@x.co.za` word
+   `Ignatius Gous`.
+
+   Geen naamregister nie -- die bediener stoor die e-posadres omdat dit is wat
+   die sessie dra, en 'n tweede register net vir vertoonname sou uitmekaar loop
+   met Identity s'n. */
+function kw_naam_uit_epos(waarde) {
+  const voor = String(waarde || "").split("@")[0];
+  if (!voor) return "";
+  return voor
+    .split(/[._-]+/)
+    .filter(Boolean)
+    .map((d) => d.charAt(0).toUpperCase() + d.slice(1))
+    .join(" ");
+}
+
 function kw_ontsnap(waarde) {
   return String(waarde == null ? "" : waarde)
     .replace(/&/g, "&amp;")
@@ -108,7 +125,12 @@ function kw_onderreel(k) {
     // 'n KONSEP WYS WIE HOM GEMAAK HET. Albei direkteure stel kwotasies op, en
     // 'n konsep dra geen nommer — twee konsepte vir dieselfde skool is
     // andersins nie uitmekaar te ken nie.
-    dele.push(kw_ontsnap(k.geskep_deur));
+    //
+    // DIE NAAM, NIE DIE VOLLE ADRES NIE. `geskep_deur` is 'n e-posadres, want
+    // dit is wat die bediener van die sessie af weet. Op 'n skerm wat twee
+    // mense deel, is die naam genoeg om te weet wie dit is, en die volle adres
+    // vat die reël vol.
+    dele.push(kw_ontsnap(kw_naam_uit_epos(k.geskep_deur)));
   }
 
   return dele.join(" · ");

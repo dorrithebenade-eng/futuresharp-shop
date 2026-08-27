@@ -27,6 +27,21 @@ const FU_KOPIEER_TYD = 1800;
 // herlaai self.
 const FU_POS_SLEUTEL = "future_shop_faktuur_pos_fout";
 
+/* EEN BLADSY, TWEE DOKUMENTE. Sien die kop van faktuur-vorm.js.
+
+   `?soort=kwotasie` stuur die uitreiking na uitreik-kwotasie.js in plaas van
+   stuur-faktuur.js. Alles anders bly dieselfde: die bevestiging, die
+   ontvangerstelling, die stukkend-kontrole, die posstatus wat die herlaai
+   oorleef.
+
+   DIE EINDPUNT STAAN HIER EN NERENS ANDERS NIE. 'n fetch met 'n
+   hardgekodeerde naam iewers in die lêer is presies hoe 'n kwotasie by
+   stuur-faktuur.js beland en 'n FS-nommer opgebruik. */
+const FU_IS_KW =
+  new URLSearchParams(window.location.search).get("soort") === "kwotasie";
+
+const FU_UITREIK_EIND = FU_IS_KW ? "uitreik-kwotasie" : "stuur-faktuur";
+
 function fu_t(sleutel, verstek) {
   const uit = window.t ? window.t(sleutel) : null;
   return uit && uit !== sleutel ? uit : verstek;
@@ -146,9 +161,17 @@ function fu_vra() {
   const tel = gratis ? { split: 0, hoof: 0 } : fu_tel_ontvangers();
 
   const rye = [
-    `<div><dt>${fu_t("fu_aan", "Gefaktureer aan")}</dt><dd>${fu_ontsnap(V.klient.naam)}</dd></div>`,
-    `<div><dt>${fu_t("fu_proforma_aan", "Proforma gaan aan")}</dt><dd>${fu_ontsnap(V.klient.epos)}</dd></div>`,
-    `<div><dt>${fu_t("fu_totaal", "Totaal verskuldig")}</dt><dd>${fu_rand(totaal)}</dd></div>`,
+    `<div><dt>${
+      FU_IS_KW ? fu_t("fd_gekwoteer_aan", "Gekwoteer aan") : fu_t("fu_aan", "Gefaktureer aan")
+    }</dt><dd>${fu_ontsnap(V.klient.naam)}</dd></div>`,
+    `<div><dt>${
+      FU_IS_KW
+        ? fu_t("fu_kw_gaan_aan", "Kwotasie gaan aan")
+        : fu_t("fu_proforma_aan", "Proforma gaan aan")
+    }</dt><dd>${fu_ontsnap(V.klient.epos)}</dd></div>`,
+    `<div><dt>${
+      FU_IS_KW ? fu_t("fd_totaal", "Totaal") : fu_t("fu_totaal", "Totaal verskuldig")
+    }</dt><dd>${fu_rand(totaal)}</dd></div>`,
   ];
 
   if (gratis) {
@@ -329,7 +352,7 @@ async function fu_doen() {
   if (terug) terug.disabled = true;
 
   try {
-    const resp = await fetch("/.netlify/functions/stuur-faktuur", {
+    const resp = await fetch("/.netlify/functions/" + FU_UITREIK_EIND, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
