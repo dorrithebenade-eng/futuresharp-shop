@@ -34,6 +34,7 @@ const {
   is_konsep_sleutel,
   sleutel_na_nommer,
 } = require("./_fakture");
+const { is_kwotasie_sleutel } = require("./_kwotasies");
 
 // Die drie stande wat 'n uitbetaalry kan dra. `direk_uitbetaal` en
 // `betaal_met_hand` beteken albei "hy het sy geld"; hulle bly APART omdat die
@@ -63,7 +64,19 @@ exports.handler = async (event, context) => {
   let sleutels = [];
   try {
     const lys = await store.list();
-    sleutels = (lys.blobs || []).map((b) => b.key).filter((s) => !is_konsep_sleutel(s));
+    // TWEE DINGE WORD UITGELAAT, EN OM VERSKILLENDE REDES.
+    //
+    //   'n KONSEP is 'n faktuur wat nog nie bestaan nie — geen nommer, nooit
+    //   uitgereik, dus niks om te verwag nie.
+    //
+    //   'n KWOTASIE is glad nie 'n faktuur nie. Hy leef in dieselfde store met
+    //   'n ander voorvoegsel, en 'n AANBOD mag nooit as verwagte inkomste tel
+    //   nie. Sy stand is boonop "uitgereik" en nooit "gestuur", dus sou die
+    //   toets hieronder hom in elk geval mis — maar 'n leser mag nie op EEN
+    //   slot staatmaak nie.
+    sleutels = (lys.blobs || [])
+      .map((b) => b.key)
+      .filter((s) => !is_konsep_sleutel(s) && !is_kwotasie_sleutel(s));
   } catch (fout) {
     console.error("Kon nie die fakture lys nie:", fout);
     return { statusCode: 500, body: "Kon nie die staat bereken nie" };

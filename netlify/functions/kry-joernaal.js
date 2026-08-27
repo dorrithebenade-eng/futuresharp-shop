@@ -26,6 +26,7 @@
 
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 const { kry_fakture_store, is_konsep_sleutel, sleutel_na_nommer } = require("./_fakture");
+const { is_kwotasie_sleutel } = require("./_kwotasies");
 const {
   kry_joernaal_store,
   finansiele_jaar,
@@ -130,7 +131,12 @@ exports.handler = async (event, context) => {
     const lys = await store.list();
 
     for (const b of lys.blobs || []) {
-      if (is_konsep_sleutel(b.key)) continue;
+      // 'n KWOTASIE IS GEEN INSKRYWING NIE. Hy leef in dieselfde store met 'n
+      // ander voorvoegsel, en 'n aanbod is nie inkomste nie — dit begin by die
+      // faktuur. Die toets loop op die SLEUTEL, dus word 'n kwotasie nooit
+      // gelees nie: hierdie lus lees elke rekord in die store, en die filter
+      // maak hom ligter, nie swaarder nie.
+      if (is_konsep_sleutel(b.key) || is_kwotasie_sleutel(b.key)) continue;
       const f = await store.get(b.key, { type: "json" });
       if (!f) continue;
 

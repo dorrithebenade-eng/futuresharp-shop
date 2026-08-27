@@ -16,6 +16,7 @@
 
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 const { kry_fakture_store } = require("./_fakture");
+const { is_kwotasie_sleutel } = require("./_kwotasies");
 
 exports.handler = async (event, context) => {
   if (event.httpMethod !== "GET") {
@@ -32,7 +33,11 @@ exports.handler = async (event, context) => {
   let sleutels = [];
   try {
     const lys = await store.list();
-    sleutels = (lys.blobs || []).map((b) => b.key);
+    // DIE KWOTASIES LEEF IN DIESELFDE STORE, met 'n ander voorvoegsel. Hierdie
+    // list() is KAAL, dus sou hulle sonder die filter in die faktuurregister
+    // verskyn — en 'n aanbod is nie 'n faktuur nie. Die filter loop op die
+    // SLEUTEL, dus voor die get(): 'n kwotasie word nooit eers gelees nie.
+    sleutels = (lys.blobs || []).map((b) => b.key).filter((s) => !is_kwotasie_sleutel(s));
   } catch (fout) {
     console.error("Kon nie die fakture lys nie:", fout);
     return { statusCode: 500, body: "Kon nie die fakture laai nie" };
