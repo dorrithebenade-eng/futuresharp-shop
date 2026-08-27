@@ -834,6 +834,70 @@ a.paneel-kieslys-item { text-decoration: none; }
 .fk-ry.wi-af .fk-ry-naam,
 .fk-ry.wi-af .fk-ry-onder { opacity: .55; }
 
+/* ═══ SKRAP IN DIE REGISTER VAN WERK EN UITGAWES ═══
+
+   Die ry was 'n <div> met 'n klik-luisteraar. Sy word nou 'n RY MET TWEE DELE:
+   'n <button> wat die vorm oopmaak, en 'n rand wat die skrapknoppie dra.
+
+   WAAROM 'N <button> EN NIE DIE OU <div> NIE: Tab en Enter werk vanself, en 'n
+   skrapknoppie BINNE 'n klikbare div beteken 'n klik op Skrap maak ook die
+   vorm oop. Dieselfde vorm as .fp-ry-knop in die faktuurregister.
+
+   'N EIE KLAS EN NIE :has() NIE. `:has()` sou die ou rye onaangeraak laat,
+   maar hy is nog nie oral betroubaar nie, en 'n uitleg wat op 'n selektor
+   steun wat dalk nie vuur nie, gee 'n ry wat stilweg verkeerd staan. */
+.fk-ry-twee {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: default;
+  padding: 0;
+}
+
+.fk-ry-oop {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  background: none;
+  border: 0;
+  padding: 13px 0;
+  font-family: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.fk-ry-oop:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: -2px;
+}
+
+/* Die skrapknoppie se plek. Hy bly staan sodat die rye se regterkant in lyn
+   is, ook wanneer die bevestiging langer is as die knoppie. */
+.fk-ry-rand {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+/* DIE SYFER IN DIE BEVESTIGING: "Skrap? Staan op 3 fakture · Ja · Nee".
+
+   Gedemp, want dit is 'n FEIT en nie 'n waarskuwing nie. 'n Werk-item word met
+   teks aan 'n faktuur gekoppel, nie met 'n verwysing nie — die skrap breek
+   niks. Koraal hier sou 'n gevaar aandui wat nie bestaan nie.
+
+   Ontbreek die syfer heeltemal, het die telling omgeval en staan daar net
+   "Skrap?". 'n Nul wat eintlik "ek weet nie" beteken, word nooit gewys nie. */
+.wi-tel {
+  color: var(--grys-teks);
+  font-weight: 400;
+  white-space: nowrap;
+}
+
 /* KANSELLEER MAG NIE SOOS STOOR LYK NIE. `.stil` bestaan NÊRENS in styl.css
    nie — dit leef net in die mockups, en `kaart-aksie stil` gee 'n vol
    koraal-knoppie. Dieselfde les as .fu-stil op die faktuurskerm. */

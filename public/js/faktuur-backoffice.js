@@ -595,7 +595,12 @@ function bo_teken_somme(S) {
   if (et) {
     et.textContent = tekort
       ? fv_t("bo_tekort", "Tekort")
-      : fv_t("bo_bly_oor", "Na Future Sharp se rekening");
+      // NIE "Na Future Sharp se rekening" NIE — dit is bo_oorskot, twee reels
+      // hoer. Hierdie een is wat OORBLY nadat die begrote koste afgetrek is.
+      // Albei terugvalle het tot 27 Augustus 2026 dieselfde gelees, en taal.js
+      // s'n ook, dus het die twee reels dieselfde etiket EN dieselfde syfer
+      // gedra met die begroting tussenin.
+      : fv_t("bo_bly_oor", "Bly oor vir Future Sharp");
   }
   const bly = g("s-bly");
   if (bly) bly.classList.toggle("tekort", tekort);

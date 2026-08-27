@@ -1765,7 +1765,16 @@ const WOORDEBOEK = {
   },
   bo_oorskot: { af: "Na Future Sharp se rekening", en: "To the Future Sharp account" },
   bo_begroot_hoof: { af: "Begroot uit die hoofrekening", en: "Budgeted from the main account" },
-  bo_bly_oor: { af: "Na Future Sharp se rekening", en: "To the Future Sharp account" },
+  // NIE DIESELFDE AS bo_oorskot NIE, en tot 27 Augustus 2026 het albei
+  // "Na Future Sharp se rekening" gelees. Die twee reels het dieselfde etiket
+  // en dieselfde syfer gedra, met "Begroot uit die hoofrekening" tussenin —
+  // en dan lyk die begroting of sy niks doen nie.
+  //
+  //   bo_oorskot  — wat uit die verdeling INKOM
+  //   bo_bly_oor  — wat OORBLY nadat die begrote koste afgetrek is
+  //
+  // Die HTML se terugval was al die tyd reg; die vertaling het hom oorskryf.
+  bo_bly_oor: { af: "Bly oor vir Future Sharp", en: "Left for Future Sharp" },
   bo_tekort: { af: "Tekort", en: "Shortfall" },
 
   bo_dek_nie: {
@@ -2522,6 +2531,26 @@ const WOORDEBOEK = {
     en: "The register is still empty. Add the first item.",
   },
   wi_geen_pas: { af: "Geen item pas nie.", en: "No item matches." },
+  // ── Skrap in die register van werk en uitgawes ──
+  //
+  // DIT WEIER NIKS, en dit is 'n besluit. 'n Kliënt en 'n begunstigde word met
+  // 'n VERWYSING aan 'n faktuur gekoppel; 'n werk-item met TEKS. Skrap 'n mens
+  // die item, bly elke bestaande faktuur presies soos sy was — net die
+  // voorstellys verloor die woord.
+  //
+  // Die syfer staan dus IN die vraag, nie in 'n weiering nie. Sou dit weier,
+  // kon 'n tikfout wat een keer op een faktuur beland het, nooit weer uit die
+  // voorstellys nie — en dit is juis die tikfoute wat 'n mens wil verwyder.
+  wi_skrap: { af: "Skrap", en: "Delete" },
+  wi_skrap_vra: { af: "Skrap?", en: "Delete?" },
+  wi_staan_op: { af: "Staan op", en: "Used on" },
+  wi_faktuur: { af: "faktuur", en: "invoice" },
+  wi_fakture: { af: "fakture", en: "invoices" },
+  wi_konsep: { af: "konsep", en: "draft" },
+  wi_konsepte: { af: "konsepte", en: "drafts" },
+  wi_en: { af: "en", en: "and" },
+  wi_ongebruik: { af: "Nog nêrens gebruik nie", en: "Not used anywhere yet" },
+  wi_skrap_fout: { af: "Kon nie die item skrap nie.", en: "The item could not be deleted." },
   wi_laai_fout: { af: "Kon nie die register laai nie.", en: "Could not load the register." },
   wi_item: { af: "item", en: "item" },
   wi_items: { af: "items", en: "items" },

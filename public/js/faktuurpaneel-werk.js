@@ -23,6 +23,24 @@ const WI = {
   soort: "uitgawe",
 };
 
+/* DIE TELKAART: hoeveel fakture elke beskrywing dra.
+
+   Sy kom uit tel-werk-items.js, EEN OPROEP vir die hele register — nie een
+   per item nie. Twaalf items sou twaalf volle deurlope van die fakture
+   beteken, en kry-joernaal.js, wat presies dit doen, staan reeds as 'n
+   prestasiekwessie op die lys.
+
+   `null` beteken NOG NIE GEVRA of DIE OPROEP HET OMGEVAL. Dit is nie
+   dieselfde as 'n leë kaart nie: 'n leë kaart beteken niks word gebruik, en
+   dan skrap iemand 'n item wat op twintig fakture staan. Die knoppie wys dan
+   GEEN syfer nie, eerder as 'n verkeerde een. */
+let WI_TEL = null;
+let WI_TEL_BESIG = false;
+
+function wi_normaliseer(waarde) {
+  return String(waarde == null ? "" : waarde).trim().toLowerCase();
+}
+
 function wi_t(sleutel, verstek) {
   const uit = window.t ? window.t(sleutel) : null;
   return uit && uit !== sleutel ? uit : verstek;
@@ -94,10 +112,16 @@ function wi_teken_lys() {
     const lys = pas.filter((i) => i.soort === soort);
     if (!lys.length) return "";
     return `<p class="fk-subkop">${kop}</p>` + lys.map((i) => `
-      <div class="fk-ry${i.aktief ? "" : " wi-af"}" data-item="${wi_ontsnap(i.item_id)}">
-        <div class="fk-ry-naam">${wi_ontsnap(i.naam)}${
-          i.aktief ? "" : ` <span class="fk-merkie">${wi_t("wi_afgeskakel", "Afgeskakel")}</span>`}</div>
-        ${i.beskrywing ? `<div class="fk-ry-onder">${wi_ontsnap(i.beskrywing)}</div>` : ""}
+      <div class="fk-ry fk-ry-twee${i.aktief ? "" : " wi-af"}">
+        <button type="button" class="fk-ry-oop" data-item="${wi_ontsnap(i.item_id)}">
+          <span class="fk-ry-naam">${wi_ontsnap(i.naam)}${
+            i.aktief ? "" : ` <span class="fk-merkie">${wi_t("wi_afgeskakel", "Afgeskakel")}</span>`}</span>
+          ${i.beskrywing ? `<span class="fk-ry-onder">${wi_ontsnap(i.beskrywing)}</span>` : ""}
+        </button>
+        <span class="fk-ry-rand" data-wi-rand="${wi_ontsnap(i.item_id)}">
+          <button type="button" class="fp-skrap" data-wi-skrap="${wi_ontsnap(i.item_id)}"
+                  >${wi_t("wi_skrap", "Skrap")}</button>
+        </span>
       </div>`).join("");
   };
 
@@ -105,8 +129,123 @@ function wi_teken_lys() {
     groep("werk", wi_t("wi_kop_werk", "Werk wat betaal word")) +
     groep("uitgawe", wi_t("wi_kop_uitgawe", "Uitgawes wat teruggekry word"));
 
+  // Die ry is 'n <button> sodat Tab en Enter vanself werk. Die skrapknoppie sit
+  // BUITE hom: binne-in sou 'n klik op Skrap ook die vorm oopmaak.
   plek.querySelectorAll("[data-item]").forEach((el) =>
     el.addEventListener("click", () => wi_maak_vorm_oop(el.getAttribute("data-item"))));
+
+  plek.querySelectorAll("[data-wi-skrap]").forEach((el) =>
+    el.addEventListener("click", () => wi_vra_bevestiging(el.getAttribute("data-wi-skrap"))));
+}
+
+/* DIE BEVESTIGING DRA DIE SYFER.
+
+   "Skrap? Staan op 3 fakture · Ja · Nee". Die vraag en die feit staan saam,
+   in die ry self — nie 'n confirm() nie: dié blokkeer die bladsy, word
+   weggeklik sonder om gelees te word, en sê nie WATTER item nie.
+
+   DIT WEIER NIKS. 'n Werk-item word met TEKS aan 'n faktuur gekoppel, nie met
+   'n verwysing nie, dus bly elke bestaande faktuur onaangeraak. Sou dit weier,
+   kon 'n tikfout wat een keer op een faktuur beland het, nooit weer uit die
+   voorstellys nie — en dit is juis die tikfoute wat 'n mens wil verwyder.
+
+   GEEN SYFER WANNEER DIE TELLING ONBEKEND IS NIE. `WI_TEL === null` beteken
+   die oproep het omgeval; dan staan daar net "Skrap?". 'n Nul wat eintlik
+   "ek weet nie" beteken, is die gevaarlikste soort fout. */
+function wi_vra_bevestiging(item_id) {
+  const plek = document.querySelector(`[data-wi-rand="${item_id}"]`);
+  const item = WI.items.find((x) => x.item_id === item_id);
+  if (!plek || !item) return;
+
+  let feit = "";
+  if (WI_TEL) {
+    const tel = WI_TEL[wi_normaliseer(item.naam)] || { fakture: 0, konsepte: 0 };
+    const dele = [];
+    if (tel.fakture) {
+      dele.push(
+        `${tel.fakture} ${wi_t(tel.fakture === 1 ? "wi_faktuur" : "wi_fakture",
+          tel.fakture === 1 ? "faktuur" : "fakture")}`
+      );
+    }
+    if (tel.konsepte) {
+      dele.push(
+        `${tel.konsepte} ${wi_t(tel.konsepte === 1 ? "wi_konsep" : "wi_konsepte",
+          tel.konsepte === 1 ? "konsep" : "konsepte")}`
+      );
+    }
+    const voeg = ` ${wi_t("wi_en", "en")} `;
+    feit = dele.length
+      ? ` <span class="wi-tel">${wi_t("wi_staan_op", "Staan op")} ${dele.join(voeg)}</span>`
+      : ` <span class="wi-tel">${wi_t("wi_ongebruik", "Nog nêrens gebruik nie")}</span>`;
+  }
+
+  plek.innerHTML = `<span class="fp-bevestig">${wi_t("wi_skrap_vra", "Skrap?")}${feit}
+    <button type="button" class="fp-bevestig-ja">${wi_t("fp_ja", "Ja")}</button>
+    <button type="button" class="fp-bevestig-nee">${wi_t("fp_nee", "Nee")}</button></span>`;
+
+  plek.querySelector(".fp-bevestig-nee").addEventListener("click", wi_teken_lys);
+  plek.querySelector(".fp-bevestig-ja").addEventListener("click", () => wi_skrap(item_id, plek));
+}
+
+async function wi_skrap(item_id, plek) {
+  plek.innerHTML = `<span class="fp-bevestig">${wi_t("fp_laai", "Word gelaai …")}</span>`;
+  try {
+    await wi_vra("skrap-werk-item", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ item_id }),
+    });
+
+    // PLAASLIK uit die lys, nie weer gevra nie. Blobs se list() loop sowat
+    // vier sekondes agter en die geskrapte item sou weer verskyn — dan lyk dit
+    // of die skrap misluk het terwyl hy geslaag het.
+    WI.items = WI.items.filter((x) => x.item_id !== item_id);
+
+    // Die datalist op die faktuurvorm leef in 'n ander bladsy, dus is daar
+    // niks om hier by te werk nie. Sy word by die volgende laai reg.
+    wi_teken_lys();
+  } catch (f) {
+    console.error("Kon nie die item skrap nie:", f);
+    wi_teken_lys();
+    const lys = document.getElementById("wi-lys");
+    if (lys) {
+      const boodskap = document.createElement("p");
+      boodskap.className = "stelsel-boodskap";
+      // Die Function se eie boodskap, want sy sê WAAROM — 'n stukkende
+      // faktuurtelling is 'n ander rede as 'n item wat nie bestaan nie.
+      boodskap.textContent =
+        String(f.message || "").trim() ||
+        wi_t("wi_skrap_fout", "Kon nie die item skrap nie.");
+      lys.prepend(boodskap);
+    }
+  }
+}
+
+/* DIE TELLING WORD EEN KEER GEVRA, en sy hou die lys nie op nie.
+
+   wi_laai() teken die register klaar; hierdie oproep loop DAARNA en herteken
+   slegs wanneer sy iets bygevoeg het. Sou die register op die telling wag, sou
+   'n mens by elke opening na 'n leë blad kyk terwyl elke faktuur gelees word. */
+async function wi_laai_telling() {
+  if (WI_TEL_BESIG || WI_TEL) return;
+  WI_TEL_BESIG = true;
+  try {
+    const data = await wi_vra("tel-werk-items");
+    WI_TEL = data.kaart || {};
+    if (data.volledig === false) {
+      // Die syfers is 'n ondergrens: 'n faktuur het omgeval. Aangeteken en nie
+      // vir die gebruiker gewys nie — die syfer bly bruikbaar, hy is net dalk
+      // te laag, en dit is die veilige rigting.
+      console.warn("tel-werk-items: nie elke faktuur kon gelees word nie; die syfers is 'n ondergrens.");
+    }
+  } catch (f) {
+    // WI_TEL BLY null. Die knoppie wys dan geen syfer nie, eerder as 'n nul
+    // wat "ongebruik" beteken.
+    console.error("Kon nie die faktuurtelling laai nie:", f);
+    WI_TEL = null;
+  } finally {
+    WI_TEL_BESIG = false;
+  }
 }
 
 // ── Die vorm ────────────────────────────────────────────────────────────
@@ -221,6 +360,9 @@ async function wi_laai() {
     // weer verkeerd sodra 'n mens die bladsy herlaai.
     WI.items.sort((a, b) => (a.naam || "").localeCompare(b.naam || "", "af-ZA"));
     wi_teken_lys();
+    // NA die hertekening, sonder await: die register is klaar bruikbaar en die
+    // telling is slegs vir die bevestigingsvraag nodig.
+    wi_laai_telling();
   } catch (f) {
     console.error("Kon nie die register laai nie:", f);
     if (plek) {
