@@ -1320,12 +1320,46 @@ body.fv-kwotasie .dok-betaal { display: none !important; }
   #fv-reels { display: none !important; }
   .fv-net-druk { display: table-row-group !important; }
 
-  /* Die knoppiekolom bestaan nie op papier nie -- ook nie haar kop nie. Sy
-     staan nog as 'n lee <td> in elke drukry sodat die kolomme tel; sonder die
-     kop sou die tabel 'n kolom kort en die breedtes verskuif. */
+  /* DIE KNOPPIEKOLOM KRY BREEDTE NUL; sy word NIE display:none nie.
+
+     `display: none` op 'n tabelsel haal haar uit die ry uit, en dan skuif elke
+     kolom daarna een plek op. Met `table-layout: fixed` beteken dit die
+     breedtes wat vir kolom 2, 3 en 4 bedoel is, land op die verkeerde kolomme
+     -- en dan het HOEVEELHEID en EENHEIDSPRYS teen mekaar gestamp en as
+     HOEVEELHEIDEENHEIDSPRYS gelees.
+
+     Nul breedte met versteekte oorloop laat die kolom staan en die res van die
+     tabel onaangeraak. */
+  .dok-tabel th:nth-child(5) {
+    width: 0 !important;
+    padding: 0 !important;
+    overflow: hidden;
+  }
   .fv-aksies,
-  .dok-tabel th:nth-child(5) { display: none !important; }
-  .fv-net-druk td:last-child { display: none !important; }
+  .fv-net-druk td:last-child {
+    width: 0 !important;
+    padding: 0 !important;
+    overflow: hidden;
+    font-size: 0 !important;
+  }
+  .fv-aksies * { display: none !important; }
+
+  /* DIE OPSKRIFTE KRY HUL RUIMTE TERUG.
+
+     Die 720px-navraag wat op 'n smal skerm die letters laat krimp, vuur NIE by
+     druk nie: 'n A4-bladsy is sowat 794px breed. Die opskrifte het dus op hul
+     volle 10.5px met 0.07em spasiering gedruk, in kolomme wat op papier smaller
+     is as op die skerm.
+
+     Minder spasiering en 'n kleiner grootte, nie korter woorde nie: die
+     dokument se woorde is vasgestel -- "Eenheidsprys" lees by elke soort reel,
+     waar "Prys p.p." vals is by 'n verslag. */
+  .dok-tabel th {
+    font-size: 9px;
+    letter-spacing: .02em;
+  }
+  .dok-tabel th + th { padding-left: 8px; }
+  .dok-tabel td.n { padding-left: 8px; }
 
   /* Die merkie en die inkeping is skermhulp. Die klient sien nie dat iets
      saamgevou is nie -- hy sien 'n reel met 'n naam en 'n bedrag. */
