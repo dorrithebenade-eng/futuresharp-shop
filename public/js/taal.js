@@ -1818,6 +1818,42 @@ const WOORDEBOEK = {
   fv_kies_klient: { af: "Kies 'n kli\u00ebnt \u2026", en: "Choose a client \u2026" },
   fv_geen_klient: { af: "Nog geen kli\u00ebnt gekies nie", en: "No client chosen yet" },
   fv_voeg_reel: { af: "Voeg re\u00ebl by", en: "Add line" },
+  // ═══ DIE INVOU ═══════════════════════════════════════════════════════
+  //
+  // 'n Reël se bedrag tel by die reël BO HAAR wanneer die dokument druk. Die
+  // VOLGORDE is die groepering — geen tweede naamveld nie, want die naam wat
+  // die kliënt sien, is 'n gewone reël wat reeds getik word.
+  //
+  // Sien Reels-Invou-En-Volgorde-Ontwerp.md.
+
+  // Die ↳-knoppie se titel wissel met die stand van die reël.
+  fv_vou_in: { af: "Vou in by die reël bo", en: "Fold into the line above" },
+  fv_vou_uit: { af: "Staan op haar eie", en: "Show as its own line" },
+
+  // 'n DRA-REEL SKUIF MET HAAR KINDERS; 'n kind skuif net binne haar eie
+  // groep. Die titels sê dit, want die pyltjie lyk in albei gevalle dieselfde.
+  fv_skuif_op: { af: "Skuif die groep op", en: "Move the group up" },
+  fv_skuif_af: { af: "Skuif die groep af", en: "Move the group down" },
+  fv_skuif_op_groep: { af: "Skuif op binne die groep", en: "Move up within the group" },
+  fv_skuif_af_groep: { af: "Skuif af binne die groep", en: "Move down within the group" },
+
+  // Die + sit op ELKE reël, nie net onderaan nie.
+  fv_voeg_onder: { af: "Voeg 'n reël hieronder in", en: "Insert a line below" },
+
+  // Die merkie onder 'n dra-reël se beskrywing. Twee vorme, want "1 reëls" is
+  // 'n fout wat 'n mens by elke enkele groep sien.
+  fv_reel_vou_in: { af: "reël vou hieronder in", en: "line folds in below" },
+  fv_reels_vou_in: { af: "reëls vou hieronder in", en: "lines fold in below" },
+
+  // WAT DIE KLIENT SIEN. Die tabel wys al die reëls, ingekeep; die gedrukte
+  // dokument groepeer. Sonder hierdie strook kan 'n mens die groepering nie
+  // nagaan voordat die dokument uitgaan nie.
+  fv_voorskou: {
+    af: "Wat die kliënt op die dokument sien",
+    en: "What the client sees on the document",
+  },
+  fv_naamloos: { af: "naamloos", en: "unnamed" },
+
   fv_verwyder_reel: { af: "Verwyder re\u00ebl", en: "Remove line" },
   fv_gestoor: { af: "Gestoor", en: "Saved" },
   fv_nie_gestoor: { af: "Nog nie gestoor nie", en: "Not saved yet" },

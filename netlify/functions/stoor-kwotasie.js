@@ -100,7 +100,11 @@ function lees_reels(rou) {
       hoeveelheid: veilig,
       prys_pp_sent,
       bedrag_sent: Math.round(veilig * prys_pp_sent),
-      op_faktuur: item.op_faktuur !== false,
+      // GEEN `!== false`-TERUGVAL NIE, andersom as by op_faktuur. Ontbreek die
+      // veld, staan die reel OP HAAR EIE -- die veilige rigting. 'n Reel wat
+      // vanself invou, verdwyn van die dokument sonder dat iemand dit gevra
+      // het, en die klient sien 'n bedrag by 'n naam wat nie syne is nie.
+      vou_in: item.vou_in === true,
       hosting_pct: Number.isFinite(hosting) ? Math.min(100, Math.max(0, hosting)) : 0,
       verdeling: lees_verdeling(item.verdeling),
     };
@@ -243,6 +247,15 @@ exports.handler = async (event, context) => {
   // Reëls minus afslag, plus skenking. Presies dieselfde som as
   // stoor-faktuur.js, en dit moet so bly: die kliënt aanvaar hierdie bedrag
   // en die faktuur moet dieselfde een dra.
+  // DIE EERSTE REEL VOU NOOIT IN NIE. Daar is niks bo haar om by in te vou
+  // nie, en 'n weeskind sou haar bedrag stilweg uit die gedrukte reels laat
+  // val terwyl sy in die totaal bly -- 'n dokument waarvan die bedrae nie tot
+  // die totaal tel nie.
+  //
+  // DIT MAG NIE NET IN DIE BLAAIER STAAN NIE. Die vorm dwing dit ook af, maar
+  // die vorm is nie die poort nie.
+  if (rekord.reels.length) rekord.reels[0].vou_in = false;
+
   const reelsom = rekord.reels.reduce((s, r) => s + (r.bedrag_sent || 0), 0);
   const netto = Math.max(0, reelsom - (rekord.afslag_sent || 0));
   rekord.totaal_sent = netto + (rekord.skenking_sent || 0);

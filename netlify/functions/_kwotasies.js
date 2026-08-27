@@ -350,8 +350,14 @@ function nuwe_kwotasie(wie) {
     // faktuur-som.js, insluitend die stukkend-kontrole: 'n prys wat nie sy
     // eie verdeling kan dra nie, word HIER gekeer, waar dit nog kan verander.
     reels: [],                  // { soort, beskrywing, hoeveelheid,
-                                //   prys_pp_sent, bedrag_sent, op_faktuur,
+                                //   prys_pp_sent, bedrag_sent, vou_in,
                                 //   hosting_pct, verdeling: [] }
+                                //
+                                // `vou_in` bepaal of hierdie reel se bedrag by
+                                // die reel BO HAAR tel wanneer die dokument
+                                // druk. Sien _fakture.js en
+                                // Reels-Invou-En-Volgorde-Ontwerp.md. Dit raak
+                                // niks aan die som nie.
 
     dokument_nota: "",
 

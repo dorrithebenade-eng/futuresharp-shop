@@ -103,7 +103,7 @@ exports.handler = async (event, context) => {
     },
     bestelnommer: rekord.bestelnommer || "",
 
-    // ELKE REEL DRA SY EIE VERDELING, SY EIE HOSTING EN SY EIE `op_faktuur`.
+    // ELKE REEL DRA SY EIE VERDELING, SY EIE HOSTING EN SY EIE `vou_in`.
     // Sien die waarskuwing bo-aan hierdie lêer.
     reels: Array.isArray(rekord.reels)
       ? rekord.reels.map((r) => ({
@@ -112,7 +112,9 @@ exports.handler = async (event, context) => {
           hoeveelheid: r.hoeveelheid || 0,
           prys_pp_sent: r.prys_pp_sent || 0,
           bedrag_sent: r.bedrag_sent || 0,
-          op_faktuur: r.op_faktuur !== false,
+          // Ontbreek die veld, staan die reel op haar eie -- die veilige
+          // rigting. Sien stoor-faktuur.js.
+          vou_in: r.vou_in === true,
 
           // GEEN `|| 5`-TERUGVAL NIE. 'n Doelbewuste nul moet die rondreis
           // oorleef: op 'n kostereël beteken nul dat hosting nie gehef word

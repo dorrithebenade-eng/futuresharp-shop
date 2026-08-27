@@ -210,13 +210,24 @@
               <th id="d-k-hoeveelheid">Hoeveelheid</th>
               <th id="d-k-eenheid">Eenheidsprys</th>
               <th id="d-k-bedrag">Bedrag</th>
-              <th style="width:24px"></th>
+              <!-- Vyf knoppies: vou in, op, af, +, skrap. Die breedte staan
+                   in faktuur.css sodat sy op 'n smal skerm kan krimp. -->
+              <th class="k-aksies"></th>
             </tr>
           </thead>
           <tbody id="fv-reels"></tbody>
         </table>
         <button type="button" class="fv-teks-knop" id="fv-voeg-reel"
                 data-i18n="fv_voeg_reel">Voeg reël by</button>
+
+        <!-- WAT DIE KLIENT SIEN. Die tabel hierbo wys AL die reels, ingekeep,
+             want elkeen moet gewysig kan word. Die GEDRUKTE dokument groepeer.
+             Sonder hierdie strook kan 'n mens die groepering nie nagaan
+             voordat die dokument uitgaan nie.
+
+             Versteek wanneer niks invou nie -- dan sou sy 'n tweede kopie van
+             die tabel hierbo wees. -->
+        <div class="fv-voorskou" id="fv-voorskou" hidden></div>
 
         <div class="dok-somme" id="fv-somme"></div>
 

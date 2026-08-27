@@ -72,9 +72,10 @@ function datum(waarde) {
 // aanbieding, 'n vraelys en 'n verslag — elk met sy eie ontvangers — kon nie
 // bestaan nie. Sien Verdeling-Per-Lynitem-Ontwerp.md.
 //
-// `op_faktuur` bepaal of die reël GEDRUK word. Is dit af, word die reël saam
-// met die ander versteektes onder een beskrywing gevou. Dit raak NIKS aan die
-// som nie — die verdeling loop op die reëls, nie op die dokument.
+// `vou_in` bepaal of die reël se bedrag by die reël BO HAAR tel wanneer die
+// dokument druk. Die VOLGORDE is dus die groepering. Dit raak niks aan die som
+// nie; sien Reels-Invou-En-Volgorde-Ontwerp.md. Dit vervang die ou veld wat by
+// EEN blok onderaan ingevou het en nooit twee groepe kon dra nie.
 function lees_reels(rou) {
   if (!Array.isArray(rou)) return [];
   return rou.slice(0, 40).map((r) => {
@@ -96,7 +97,11 @@ function lees_reels(rou) {
       hoeveelheid: veilig,
       prys_pp_sent,
       bedrag_sent: Math.round(veilig * prys_pp_sent),
-      op_faktuur: item.op_faktuur !== false,
+      // GEEN `!== false`-TERUGVAL NIE, andersom as by op_faktuur. Ontbreek die
+      // veld, staan die reel OP HAAR EIE -- die veilige rigting. 'n Reel wat
+      // vanself invou, verdwyn van die dokument sonder dat iemand dit gevra
+      // het, en die klient sien 'n bedrag by 'n naam wat nie syne is nie.
+      vou_in: item.vou_in === true,
       hosting_pct: Number.isFinite(hosting) ? Math.min(100, Math.max(0, hosting)) : 0,
       verdeling: lees_verdeling(item.verdeling),
     };
@@ -265,6 +270,15 @@ exports.handler = async (event, context) => {
   //
   // Die afslag kan nie onder nul druk nie: 'n koepon wat meer aftrek as wat
   // die faktuur is, gee R0, nie 'n krediet nie.
+  // DIE EERSTE REEL VOU NOOIT IN NIE. Daar is niks bo haar om by in te vou
+  // nie, en 'n weeskind sou haar bedrag stilweg uit die gedrukte reels laat
+  // val terwyl sy in die totaal bly -- 'n dokument waarvan die bedrae nie tot
+  // die totaal tel nie.
+  //
+  // DIT MAG NIE NET IN DIE BLAAIER STAAN NIE. Die vorm dwing dit ook af, maar
+  // die vorm is nie die poort nie.
+  if (rekord.reels.length) rekord.reels[0].vou_in = false;
+
   const reelsom = rekord.reels.reduce((s, r) => s + (r.bedrag_sent || 0), 0);
   const netto = Math.max(0, reelsom - (rekord.afslag_sent || 0));
   rekord.totaal_sent = netto + (rekord.skenking_sent || 0);

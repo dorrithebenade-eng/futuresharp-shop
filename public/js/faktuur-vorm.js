@@ -44,7 +44,9 @@ function nuwe_reel() {
     beskrywing: "",
     hoeveelheid: 1,
     prys_pp_sent: 0,
-    op_faktuur: true,
+    // 'n Nuwe reël staan op haar eie. Die `+` op 'n bestaande reël stel
+    // `vou_in` self — sien voeg_reel_in().
+    vou_in: false,
     hosting_pct: HOSTING_VERSTEK,
     verdeling: [],
   };
@@ -62,7 +64,13 @@ const V = {
   // Die reels en die verdeling is EEN lys: tik iemand 'n reel by, kom die
   // reel dadelik in die backoffice se verdelingsblok.
   reels: [],              // { soort, beskrywing, hoeveelheid, prys_pp_sent,
-                          //   op_faktuur, hosting_pct, verdeling: [] }
+                          //   vou_in, hosting_pct, verdeling: [] }
+                          //
+                          // `vou_in` beteken: hierdie reël se bedrag tel by
+                          // die reël BO HAAR wanneer die dokument druk. Die
+                          // VOLGORDE is dus die groepering — geen tweede
+                          // naamveld nie. Sien
+                          // Reels-Invou-En-Volgorde-Ontwerp.md.
   dokument_nota: "",
   afslag_sent: 0,
   skenking_sent: 0,
@@ -208,15 +216,218 @@ function teken_klient() {
   plek.innerHTML = reels.join("<br>");
 }
 
+/* ═══ DIE INVOU ═══════════════════════════════════════════════════════════
+
+   'n Reël met `vou_in` se bedrag tel by die reël BO HAAR wanneer die dokument
+   druk. Die VOLGORDE is dus die groepering: geen tweede naamveld nie, want die
+   naam wat die kliënt sien, is 'n gewone reël wat reeds getik word.
+
+   Dit raak NIKS aan die som nie. Die verdeling, die fooi, die hosting, die
+   gevriesde verdeling, die staat en die joernaal loop almal op die REELS.
+   Slegs die drukwerk groepeer.
+
+   EEN VLAK, NOOIT MEER. 'n Groep binne 'n groep is 'n boom, en dan vra 'n mens
+   wie die fooi dra en wat op die dokument staan.
+
+   Sien Reels-Invou-En-Volgorde-Ontwerp.md. */
+
+// DIE EERSTE REEL VOU NOOIT IN NIE — daar is niks bo haar nie. Elke plek wat
+// `vou_in` verander of 'n reël skuif, loop hierdeur. stoor-faktuur.js dwing
+// dit ook af; die vorm is nie die poort nie.
+function herstel_reels() {
+  if (V.reels.length) V.reels[0].vou_in = false;
+}
+
+// Die begin van die blok waarin reël `i` lê, en die eerste reël daarna.
+function blok_van(i) {
+  let begin = i;
+  while (begin > 0 && V.reels[begin].vou_in) begin -= 1;
+  let einde = begin + 1;
+  while (einde < V.reels.length && V.reels[einde].vou_in) einde += 1;
+  return { begin, einde };
+}
+
+// Hoeveel reëls onder hierdie een invou. Nul beteken sy is nie 'n dra-reël nie.
+function kinders_van(i) {
+  if (V.reels[i].vou_in) return 0;
+  return blok_van(i).einde - i - 1;
+}
+
+/* Wanneer 'n pyltjie werklik iets kan doen. 'n Pyltjie wat aan lyk maar niks
+   doen nie, is erger as een wat af is. */
+function kan_op(i) {
+  if (!V.reels[i].vou_in) return blok_van(i).begin > 0;
+  return i - 1 > blok_van(i).begin;
+}
+function kan_af(i) {
+  if (!V.reels[i].vou_in) return blok_van(i).einde < V.reels.length;
+  return i + 1 < blok_van(i).einde;
+}
+
+/* 'N DRA-REEL NEEM HAAR KINDERS SAAM.
+
+   Sou die pyltjie een reël skuif, kon 'n mens "Aanbieding" bo "Skoolprojek"
+   uitskuif — en dan is Aanbieding die dra-reël en Skoolprojek haar kind.
+   Korrek volgens die reël en verkeerd volgens die bedoeling, en 'n mens sien
+   dit eers op die gedrukte dokument.
+
+   'n Kind skuif alleen, en net BINNE haar eie blok: sy mag nie bo haar
+   dra-reël uitkom nie en nie by die volgende groep inloop nie. */
+function skuif_reel(i, rigting) {
+  const r = V.reels[i];
+
+  if (r.vou_in) {
+    const { begin, einde } = blok_van(i);
+    const j = i + rigting;
+    if (j <= begin || j >= einde) return;
+    [V.reels[i], V.reels[j]] = [V.reels[j], V.reels[i]];
+  } else {
+    const { begin, einde } = blok_van(i);
+    const blok = V.reels.slice(begin, einde);
+    if (rigting < 0) {
+      if (begin === 0) return;
+      const vorige = blok_van(begin - 1);
+      V.reels.splice(begin, blok.length);
+      V.reels.splice(vorige.begin, 0, ...blok);
+    } else {
+      if (einde >= V.reels.length) return;
+      const volgende = blok_van(einde);
+      const na = V.reels.slice(volgende.begin, volgende.einde);
+      V.reels.splice(begin, blok.length + na.length, ...na, ...blok);
+    }
+  }
+  na_reelverandering();
+}
+
+/* DIE + VOEG DIREK ONDER HIERDIE REEL IN, nie onderaan nie.
+
+   Die nuwe reël is by verstek 'n KIND, want dit is die algemene geval: 'n mens
+   klik die + op "Reiskoste" omdat 'n mens nog 'n reiskoste wil byvoeg. Klik
+   'n mens hom op 'n reël wat self invou, kom die nuwe reël as SUSTER by — een
+   vlak, nooit twee.
+
+   Sy erf die soort en die hosting van die reël waaronder sy kom: 'n reiskoste
+   onder 'n reiskoste is 'n uitgawe. */
+function voeg_reel_in(i) {
+  const bo = V.reels[i];
+  const nuut = nuwe_reel();
+  nuut.vou_in = true;
+  nuut.soort = bo.soort === "koste" ? "koste" : "verkoop";
+  nuut.hosting_pct = Number.isFinite(Number(bo.hosting_pct)) ? Number(bo.hosting_pct) : 0;
+  V.reels.splice(i + 1, 0, nuut);
+  na_reelverandering(i + 1);
+}
+
+/* SKRAP JY 'N DRA-REEL, WORD HAAR EERSTE KIND DIE NUWE DRA-REEL.
+
+   Die dokument behou sy vorm — twee reëls bly twee reëls — en net die naam is
+   verkeerd, wat 'n mens dadelik sien en oortik. Sou almal los val, verander
+   die kliënt se aanhaling van vorm omdat 'n mens een naam wou regmaak, en die
+   verlies is groter: 'n naam is een woord; die groepering is die werk van
+   drie merkers. */
+function skrap_reel(i) {
+  const was_dra = !V.reels[i].vou_in;
+  V.reels.splice(i, 1);
+  if (was_dra && V.reels[i] && V.reels[i].vou_in) V.reels[i].vou_in = false;
+  na_reelverandering();
+}
+
+/* Alles wat ná 'n reëlverandering moet gebeur, op EEN plek.
+
+   DIE VERDELING HANG AAN DIE REELS. Teken 'n mens net die dokument oor, bly
+   'n geskrapte reël se verdeling regs staan — met haar bedrag steeds in die
+   totaal — en die twee kolomme is uitmekaar. */
+function na_reelverandering(fokus) {
+  herstel_reels();
+  teken_reels();
+  teken_somme();
+  if (window.bo_teken) window.bo_teken();
+  merk_vuil();
+  if (fokus !== undefined) {
+    const el = document.querySelector(
+      `#fv-reels tr[data-reel="${fokus}"] [data-veld="beskrywing"]`
+    );
+    if (el) el.focus();
+  }
+}
+
+/* WAT DIE KLIENT SIEN.
+
+   Die reëltabel wys al die reëls, ingekeep, want elkeen moet gewysig kan word.
+   Die GEDRUKTE dokument groepeer. Sonder hierdie strook kan 'n mens die
+   groepering nie nagaan voordat die dokument uitgaan nie.
+
+   Elke reël hoort aan presies EEN groep, dus tel die gedrukte bedrae altyd tot
+   die totaal — en dít mag nooit op 'n dokument breek nie. */
+function groepeer_vir_druk() {
+  const uit = [];
+  V.reels.forEach((r) => {
+    const bedrag = Math.round((Number(r.hoeveelheid) || 0) * (Number(r.prys_pp_sent) || 0));
+    if (!r.vou_in || !uit.length) {
+      uit.push({
+        beskrywing: r.beskrywing,
+        hoeveelheid: r.hoeveelheid,
+        prys_pp_sent: r.prys_pp_sent,
+        bedrag,
+        lede: 0,
+      });
+    } else {
+      const g = uit[uit.length - 1];
+      g.bedrag += bedrag;
+      g.lede += 1;
+    }
+  });
+  return uit;
+}
+
+function teken_druk_voorskou() {
+  const plek = document.getElementById("fv-voorskou");
+  if (!plek) return;
+  const groepe = groepeer_vir_druk();
+
+  // Vou niks in nie, is die voorskou 'n tweede kopie van die tabel hierbo.
+  if (!groepe.some((g) => g.lede)) {
+    plek.hidden = true;
+    return;
+  }
+
+  plek.hidden = false;
+  plek.innerHTML =
+    `<p class="fv-voorskou-et">${fv_t("fv_voorskou", "Wat die kliënt op die dokument sien")}</p>` +
+    groepe
+      .map(
+        (g) => `<div class="fv-voorskou-ry">
+          <span>${ontsnap(g.beskrywing) || `<i>${fv_t("fv_naamloos", "naamloos")}</i>`}</span>
+          <b>${rand(g.bedrag)}</b>
+        </div>`
+      )
+      .join("");
+}
+
 function teken_reels() {
   const plek = document.getElementById("fv-reels");
   if (!plek) return;
 
+  // Voor die tekening, want kan_op(), kan_af() en kinders_van() lees die
+  // volgorde: 'n eerste reël wat invou, sou 'n weeskind wees.
+  herstel_reels();
+
   plek.innerHTML = V.reels
     .map((r, ix) => {
       const bedrag = Math.round((Number(r.hoeveelheid) || 0) * (Number(r.prys_pp_sent) || 0));
+      // Die laaste kind van HAAR groep — nie die laaste ry van die tabel nie.
+      // `:last-of-type` sou beteken "die laaste <tr>", en dan loop die
+      // inkepingstreep by die laaste kind af tot in die volgende groep se ry.
+      const kinders = kinders_van(ix);
+      const laaste_kind =
+        r.vou_in && (ix + 1 >= V.reels.length || !V.reels[ix + 1].vou_in);
+      const klasse = r.vou_in
+        ? "fv-kind" + (laaste_kind ? " fv-laaste" : "")
+        : kinders
+          ? "fv-dra"
+          : "";
       return `
-      <tr data-reel="${ix}">
+      <tr data-reel="${ix}"${klasse ? ` class="${klasse}"` : ""}>
         <!-- list="bo-items" — DIESELFDE datalist as die begroting s'n. Hy is
              tot 27 Augustus 2026 hier oorgeslaan: faktuur-koste-items.js het
              die lys gebou, faktuur-backoffice.js het hom aan die BEGROTING se
@@ -229,16 +440,49 @@ function teken_reels() {
 
              Die datalist self leef teen die einde van die bladsy, buite
              fv-reels, want hierdie ry word by elke wysiging herteken. -->
-        <td><input class="tel-invoer" data-veld="beskrywing" list="bo-items" value="${ontsnap(r.beskrywing)}"></td>
+        <td class="fv-besk"><input class="tel-invoer" data-veld="beskrywing" list="bo-items" value="${ontsnap(r.beskrywing)}">${
+          kinders
+            ? `<span class="fv-dra-merk">${kinders} ${
+                kinders === 1
+                  ? fv_t("fv_reel_vou_in", "reël vou hieronder in")
+                  : fv_t("fv_reels_vou_in", "reëls vou hieronder in")
+              }</span>`
+            : ""
+        }</td>
         <td class="n"><input class="tel-invoer n" data-veld="hoeveelheid" inputmode="decimal" value="${ontsnap(r.hoeveelheid)}"></td>
         <td class="n"><input class="tel-invoer n" data-veld="prys" inputmode="decimal" value="${veld_sent(r.prys_pp_sent)}" placeholder="0,00"></td>
         <td class="n sterk">${rand(bedrag)}</td>
-        <td class="n"><button type="button" class="dok-vee" title="${fv_t("fv_verwyder_reel", "Verwyder reël")}">&times;</button></td>
+        <td class="fv-aksies">
+          <button type="button" class="fv-a fv-vou${r.vou_in ? " aan" : ""}" data-vou
+            ${ix > 0 ? "" : "disabled"}
+            title="${
+              r.vou_in
+                ? fv_t("fv_vou_uit", "Staan op haar eie")
+                : fv_t("fv_vou_in", "Vou in by die reël bo")
+            }">&#8627;</button>
+          <button type="button" class="fv-a" data-op ${kan_op(ix) ? "" : "disabled"}
+            title="${
+              r.vou_in
+                ? fv_t("fv_skuif_op_groep", "Skuif op binne die groep")
+                : fv_t("fv_skuif_op", "Skuif die groep op")
+            }">&#8593;</button>
+          <button type="button" class="fv-a" data-af ${kan_af(ix) ? "" : "disabled"}
+            title="${
+              r.vou_in
+                ? fv_t("fv_skuif_af_groep", "Skuif af binne die groep")
+                : fv_t("fv_skuif_af", "Skuif die groep af")
+            }">&#8595;</button>
+          <button type="button" class="fv-a fv-plus" data-plus
+            title="${fv_t("fv_voeg_onder", "Voeg 'n reël hieronder in")}">+</button>
+          <button type="button" class="fv-a dok-vee"
+            title="${fv_t("fv_verwyder_reel", "Verwyder reël")}">&times;</button>
+        </td>
       </tr>`;
     })
     .join("");
 
   bind_reels();
+  teken_druk_voorskou();
 }
 
 // Terwyl iemand tik, mag die veld nie onder sy vinger herbou word nie — dan
@@ -271,20 +515,22 @@ function bind_reels() {
       });
     });
 
-    const vee = tr.querySelector(".dok-vee");
-    if (vee) {
-      vee.addEventListener("click", () => {
-        V.reels.splice(ix, 1);
-        teken_reels();
-        teken_somme();
-        // DIE VERDELING HANG AAN DIE REELS. Skrap 'n mens 'n reel en teken
-        // net die dokument oor, bly die reel se verdeling regs staan -- met
-        // sy bedrag steeds in die totaal. Die twee kolomme is dan uitmekaar
-        // en die faktuurtotaal onderaan lieg.
-        if (window.bo_teken) window.bo_teken();
-        merk_vuil();
-      });
-    }
+    // Die vyf knoppies. Elkeen loop deur sy eie funksie hierbo, en almal
+    // eindig by na_reelverandering() — sien daar waarom die verdeling saam
+    // oorgeteken moet word.
+    const aksie = (kies, doen) => {
+      const el = tr.querySelector(kies);
+      if (el) el.addEventListener("click", () => doen());
+    };
+
+    aksie("[data-vou]", () => {
+      V.reels[ix].vou_in = !V.reels[ix].vou_in;
+      na_reelverandering();
+    });
+    aksie("[data-op]", () => skuif_reel(ix, -1));
+    aksie("[data-af]", () => skuif_reel(ix, 1));
+    aksie("[data-plus]", () => voeg_reel_in(ix));
+    aksie(".dok-vee", () => skrap_reel(ix));
   });
 }
 
@@ -539,7 +785,7 @@ function liggaam() {
       beskrywing: r.beskrywing,
       hoeveelheid: Number(r.hoeveelheid) || 0,
       prys_pp_sent: Number(r.prys_pp_sent) || 0,
-      op_faktuur: r.op_faktuur !== false,
+      vou_in: r.vou_in === true,
       // Geen `|| 5`-terugval nie: 'n doelbewuste nul moet oorleef.
       hosting_pct: Number.isFinite(Number(r.hosting_pct)) ? Number(r.hosting_pct) : 0,
       verdeling: Array.isArray(r.verdeling) ? r.verdeling : [],
@@ -616,7 +862,7 @@ async function laai_faktuur(vraag) {
         beskrywing: r.beskrywing || "",
         hoeveelheid: r.hoeveelheid || 0,
         prys_pp_sent: r.prys_pp_sent || 0,
-        op_faktuur: r.op_faktuur !== false,
+        vou_in: r.vou_in === true,
         // hosting_pct kan wettig 0 wees, dus nie || 5 nie -- dan sou iemand
         // wat Hosting doelbewus afskakel, dit elke keer terugkry. Op 'n
         // kostereel is nul die REGTE antwoord.
@@ -735,13 +981,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   const voeg = document.getElementById("fv-voeg-reel");
   if (voeg) {
     voeg.addEventListener("click", () => {
-      V.reels.push(nuwe_reel());
-      teken_reels();
-      teken_somme();
+      // Onderaan, en op HAAR EIE — nie ingevou nie. Wie 'n reël binne 'n groep
+      // wil hê, gebruik die + op daardie groep se reël.
+      //
       // Die nuwe reel moet DADELIK regs verskyn, met sy eie ontvangers wat
       // wag om gekies te word. Die reels en die verdeling is een lys.
-      if (window.bo_teken) window.bo_teken();
-      merk_vuil();
+      V.reels.push(nuwe_reel());
+      na_reelverandering(V.reels.length - 1);
     });
   }
 

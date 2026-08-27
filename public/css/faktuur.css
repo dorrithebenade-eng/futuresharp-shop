@@ -263,6 +263,140 @@
 }
 .dok-vee:hover { color: var(--koraal); }
 
+
+/* ═══ DIE INVOU ══════════════════════════════════════════════════════════
+
+   'n Reel met `vou_in` se bedrag tel by die reel BO HAAR wanneer die dokument
+   druk. Die VOLGORDE is die groepering. Sien
+   Reels-Invou-En-Volgorde-Ontwerp.md.
+
+   Die tabel wys AL die reels, ingekeep, want elkeen moet gewysig kan word.
+   Die groepering is dus 'n skermding; die gedrukte dokument vou werklik in. */
+
+.dok-tabel th.k-aksies { width: 118px; }
+
+.fv-besk { position: relative; }
+
+/* DIE INKEPING. Een vlak, nooit meer -- 'n groep binne 'n groep is 'n boom,
+   en dan vra 'n mens wie die fooi dra. */
+.fv-kind .fv-besk { padding-left: 26px; }
+
+.fv-kind .fv-besk::before {
+  content: "";
+  position: absolute;
+  left: 9px;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: #DAD6CE;
+}
+
+.fv-kind .fv-besk::after {
+  content: "";
+  position: absolute;
+  left: 9px;
+  top: 17px;
+  width: 9px;
+  height: 1px;
+  background: #DAD6CE;
+}
+
+/* Die streep stop halfpad by die LAASTE kind van HAAR groep. Die klas word in
+   JS gestel: `:last-of-type` sou "die laaste <tr> in die tabel" beteken, en
+   dan loop die streep by een groep se laaste kind af tot in die volgende
+   groep se ry -- en die twee lyk of hulle aan mekaar hang. */
+.fv-kind.fv-laaste .fv-besk::before { bottom: auto; height: 18px; }
+
+.fv-dra { background: #FBFAF7; }
+
+.fv-dra-merk {
+  display: block;
+  font-size: 10.5px;
+  color: var(--teal-diep, #2f6b60);
+  margin-top: 1px;
+  padding-left: 5px;
+}
+
+/* DIE VYF KNOPPIES leef in 'n eie kolom, altyd sigbaar. Verskyn hulle eers by
+   aanraking, kan 'n mens hulle nie op 'n tablet vind nie. */
+.fv-aksies {
+  white-space: nowrap;
+  text-align: right;
+  padding-left: 6px;
+}
+
+.fv-a {
+  border: 0;
+  background: none;
+  color: #BDB9B1;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  padding: 3px 4px;
+  border-radius: 5px;
+}
+
+.fv-a:hover { background: var(--grys-lig, #F5F4F1); color: var(--swart); }
+.fv-a:focus-visible { outline: 2px solid var(--teal); outline-offset: -2px; }
+
+/* 'n Pyltjie wat aan lyk maar niks doen nie, is erger as een wat af is. */
+.fv-a:disabled { opacity: .25; cursor: default; background: none; }
+.fv-a:disabled:hover { background: none; color: #BDB9B1; }
+
+.fv-vou.aan { color: var(--teal); }
+.fv-plus:hover { color: var(--teal); }
+.fv-aksies .dok-vee { padding: 3px 4px; font-size: 14px; }
+
+@media (max-width: 720px) {
+  .dok-tabel th.k-aksies { width: 100px; }
+  .fv-a { font-size: 13px; padding: 3px 2px; }
+  .fv-aksies .dok-vee { padding: 3px 2px; font-size: 13px; }
+}
+
+/* ═══ WAT DIE KLIENT SIEN ════════════════════════════════════════════════
+
+   Die tabel hierbo wys al die reels; die gedrukte dokument groepeer. Sonder
+   hierdie strook kan 'n mens die groepering nie nagaan voordat die dokument
+   uitgaan nie.
+
+   GEDEMP EN GESTREEP, want sy is nie deel van die dokument nie. Sy verdwyn
+   wanneer niks invou nie -- dan sou sy 'n tweede kopie van die tabel wees. */
+.fv-voorskou {
+  margin-top: 16px;
+  border: 1px dashed var(--fv-lyn);
+  border-radius: 8px;
+  padding: 12px 14px;
+  background: #FDFDFC;
+}
+
+.fv-voorskou[hidden] { display: none; }
+
+.fv-voorskou-et {
+  font-family: var(--font-opskrif);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--grys-teks);
+  margin: 0 0 8px;
+}
+
+.fv-voorskou-ry {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  font-size: 13px;
+  padding: 4px 0;
+}
+
+.fv-voorskou-ry b { font-variant-numeric: tabular-nums; }
+
+/* Op papier bestaan die strook nie. Sy is 'n hulp vir wie die dokument
+   opstel. */
+@media print {
+  .fv-voorskou { display: none !important; }
+}
+
 .dok-somme { margin-left: auto; width: 290px; margin-top: 12px; }
 .dok-somme div {
   display: flex;

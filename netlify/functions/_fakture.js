@@ -312,17 +312,34 @@ function nuwe_faktuur(wie) {
     //                hosting, het die reel 'n oorskot, en is 'n ontvanger
     //                verplig. 'n Kostereel gee iemand sy geld terug; is daar
     //                niemand nie, is dit nie 'n koste nie.
-    //   op_faktuur   of die reel GEDRUK word. Is dit af, word die reel saam
-    //                met die ander versteektes onder een beskrywing gevou.
-    //                Dit raak NIKS aan die som nie -- die verdeling loop op
-    //                die reels, nie op die dokument.
+    //   vou_in       of hierdie reel se bedrag by die reel BO HAAR tel wanneer
+    //                die dokument druk. Die VOLGORDE is dus die groepering:
+    //                geen tweede naamveld nie, want die naam wat die klient
+    //                sien, is 'n gewone reel wat reeds getik word.
+    //
+    //                Dit raak NIKS aan die som nie. Die verdeling, die fooi,
+    //                die hosting, die gevriesde verdeling, die staat en die
+    //                joernaal loop almal op die REELS. Slegs die drukwerk
+    //                groepeer. Sien Reels-Invou-En-Volgorde-Ontwerp.md.
+    //
+    //                DIE EERSTE REEL VOU NOOIT IN NIE -- daar is niks bo haar
+    //                nie -- en dit word in stoor-faktuur.js afgedwing, nie net
+    //                in die blaaier nie.
+    //
+    //                Dit VERVANG `op_faktuur` (26 Augustus 2026), wat 'n ander
+    //                betekenis gedra het: vou in by EEN blok onderaan. Daardie
+    //                veld kon nooit twee groepe dra nie -- reiskoste EN
+    //                skoolprojek gelyktydig -- en hy is nooit deur 'n skerm
+    //                gebruik nie. Hy is verwyder, nie hernoem nie: dieselfde
+    //                veld met twee betekenisse is hoe 'n mens later 'n rekord
+    //                verkeerd lees.
     //   hosting_pct  per reel, nie meer per faktuur. 'n Kostereel kry nul:
     //                trek 'n mens hosting van 'n terugbetaling af, kry die
     //                persoon minder terug as wat hy uitgegee het.
     //   verdeling    wie kry wat van HIERDIE reel. Die lewende een, teenoor
     //                verdeling_gevries hieronder.
     reels: [],                  // { soort, beskrywing, hoeveelheid,
-                                //   prys_pp_sent, bedrag_sent, op_faktuur,
+                                //   prys_pp_sent, bedrag_sent, vou_in,
                                 //   hosting_pct, verdeling: [] }
 
     // EEN oop teksblok onder die reëls — nie 'n subreël per item nie. Dit

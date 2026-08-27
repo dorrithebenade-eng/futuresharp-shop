@@ -90,7 +90,7 @@ exports.handler = async (event, context) => {
     },
     bestelnommer: rekord.bestelnommer || "",
 
-    // ELKE REEL DRA SY EIE VERDELING, SY EIE HOSTING EN SY EIE `op_faktuur`
+    // ELKE REEL DRA SY EIE VERDELING, SY EIE HOSTING EN SY EIE `vou_in`
     // (25 Augustus 2026). Sien Verdeling-Per-Lynitem-Ontwerp.md.
     //
     // DIE DRIE HET TOT 27 AUGUSTUS 2026 HIER UITGEVAL. Toe die verdeling na
@@ -118,7 +118,9 @@ exports.handler = async (event, context) => {
 
           // Of die reel GEDRUK word. Slegs 'n uitdruklike `false` steek hom
           // weg; 'n ouer rekord sonder die veld word gedruk.
-          op_faktuur: r.op_faktuur !== false,
+          // Ontbreek die veld, staan die reel op haar eie -- die veilige
+          // rigting. Sien stoor-faktuur.js.
+          vou_in: r.vou_in === true,
 
           // GEEN `|| 5`-TERUGVAL NIE. 'n Doelbewuste nul moet die rondreis
           // oorleef: op 'n kostereel beteken nul dat hosting nie gehef word
