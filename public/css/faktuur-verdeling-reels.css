@@ -199,9 +199,13 @@
 
 .dok-tabel { table-layout: fixed; }
 
-.dok-tabel th:nth-child(2) { width: 84px; }
-.dok-tabel th:nth-child(3) { width: 112px; }
-.dok-tabel th:nth-child(4) { width: 118px; }
+/* "Hoeveelheid" is die langste opskrif en bepaal hierdie kolom se minimum.
+   Op 84px het hy teen "Eenheidsprys" gestamp en die twee woorde het as
+   HOEVEELHEIDEENHEIDSPRYS gelees -- die letters is 10.5px met 0.07em
+   spasiëring, en `th + th` gee net 14px tussenin. */
+.dok-tabel th:nth-child(2) { width: 96px; }
+.dok-tabel th:nth-child(3) { width: 116px; }
+.dok-tabel th:nth-child(4) { width: 120px; }
 
 /* DIE AKSIEKOLOM: vyf knoppies, nie een nie.
 
@@ -213,7 +217,7 @@
    het dieselfde vier selektors gedra, maar hierdie een laai NA hom en het
    gewen -- dus het elke verstelling aan faktuur.css niks gedoen nie. Die
    duplikate is daar uitgehaal. */
-.dok-tabel th:nth-child(5) { width: 124px; }
+.dok-tabel th:nth-child(5) { width: 108px; }
 
 /* Op 'n nou venster krimp hulle wel, sodat die tabel steeds nie uitsteek nie.
    Die knoppies krimp saam -- sien faktuur.css se .fv-a onder dieselfde
