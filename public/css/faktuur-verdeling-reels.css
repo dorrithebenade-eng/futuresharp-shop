@@ -199,16 +199,30 @@
 
 .dok-tabel { table-layout: fixed; }
 
-.dok-tabel th:nth-child(2) { width: 90px; }
-.dok-tabel th:nth-child(3) { width: 120px; }
-.dok-tabel th:nth-child(4) { width: 130px; }
-.dok-tabel th:nth-child(5) { width: 30px; }
+.dok-tabel th:nth-child(2) { width: 84px; }
+.dok-tabel th:nth-child(3) { width: 112px; }
+.dok-tabel th:nth-child(4) { width: 118px; }
 
-/* Op 'n nou venster krimp hulle wel, sodat die tabel steeds nie uitsteek nie. */
+/* DIE AKSIEKOLOM: vyf knoppies, nie een nie.
+
+   Sy was 30px -- genoeg vir die enkele skrapknoppie. Op 27 Augustus 2026 het
+   die reel `vou_in` gekry en die kolom dra nou vyf knoppies: vou in, op, af,
+   plus, skrap. Sien Reels-Invou-En-Volgorde-Ontwerp.md.
+
+   HIERDIE LEER IS DIE ENIGSTE PLEK WAAR DIE KOLOMBREEDTES LEEF. faktuur.css
+   het dieselfde vier selektors gedra, maar hierdie een laai NA hom en het
+   gewen -- dus het elke verstelling aan faktuur.css niks gedoen nie. Die
+   duplikate is daar uitgehaal. */
+.dok-tabel th:nth-child(5) { width: 124px; }
+
+/* Op 'n nou venster krimp hulle wel, sodat die tabel steeds nie uitsteek nie.
+   Die knoppies krimp saam -- sien faktuur.css se .fv-a onder dieselfde
+   drumpel -- maar hulle bly vyf, dus is die persentasie hoer as die ander. */
 @media (max-width: 1100px) {
-  .dok-tabel th:nth-child(2) { width: 11%; }
-  .dok-tabel th:nth-child(3) { width: 17%; }
-  .dok-tabel th:nth-child(4) { width: 18%; }
+  .dok-tabel th:nth-child(2) { width: 10%; }
+  .dok-tabel th:nth-child(3) { width: 14%; }
+  .dok-tabel th:nth-child(4) { width: 15%; }
+  .dok-tabel th:nth-child(5) { width: 15%; }
 }
 
 /* Die beskrywing se veld het sy houer nie gevul nie -- 'n smal kassie in 'n

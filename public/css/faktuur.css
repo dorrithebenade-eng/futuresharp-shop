@@ -179,20 +179,7 @@
 
 /* Die tabel. Drie kolomme plus die beskrywing:
    Hoeveelheid x Eenheidsprys = Bedrag. */
-/* `table-layout: fixed` — sonder dit is elke `width` op 'n <th> net 'n WENK.
-   Die blaaier bereken die kolomme uit die inhoud, en die beskrywingskolom (wat
-   geen breedte dra nie) vat alles wat oorbly. Die aksiekolom is so tot 30px
-   saamgedruk terwyl haar min-width 104px was — 'n min-width op 'n <td> het in
-   'n outomatiese tabeluitleg geen krag nie.
-
-   Met `fixed` geld elke breedte presies. Niks gaan verlore nie: elke sel dra
-   'n <input>, wat in elk geval een reël is, dus is daar niks om te wikkel. */
-.dok-tabel {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 4px;
-  table-layout: fixed;
-}
+.dok-tabel { width: 100%; border-collapse: collapse; margin-bottom: 4px; }
 .dok-tabel th {
   font-family: var(--font-opskrif);
   font-size: 10.5px;
@@ -216,25 +203,14 @@
    Die kop moet dieselfde ruimte kry as die sel daaronder. */
 .dok-tabel th + th { padding-left: 14px; }
 
-/* Die syferkolomme se breedtes het as `style="width:82px"` op die <th> gestaan.
-   'n Inline styl kan nie deur CSS oorheers word nie, dus kon hulle nooit op 'n
-   smal kolom krimp nie. Hulle staan nou hier, waar 'n media-navraag by hulle
-   kan kom. */
-.dok-tabel th:nth-child(2) { width: 78px; }
-.dok-tabel th:nth-child(3) { width: 104px; }
-.dok-tabel th:nth-child(4) { width: 112px; }
+/* DIE KOLOMBREEDTES STAAN IN faktuur-verdeling-reels.css, NIE HIER NIE.
 
-/* Die aksiekolom hoort by hierdie stel, nie op 'n eie klas nie. 'n Breedte op
-   `th.k-aksies` alleen het NIKS gedoen nie: die beskrywingskolom dra geen
-   breedte en vat alles wat oorbly, dus is die vyfde kolom tot 30px saamgedruk
-   en die laaste twee knoppies afgesny. Die <td> kry ook 'n min-width, want 'n
-   sel met white-space:nowrap word saamgedruk voordat die beskrywing wyk. */
-.dok-tabel th:nth-child(5) { width: 124px; }
+   Hulle het lank in albei lêers gestaan. Daardie een laai NA hierdie een en
+   het dus gewen — met die gevolg dat elke verstelling hier niks gedoen het
+   nie. Op 27 Augustus 2026 het dit 'n uur gekos: die aksiekolom is van 30px
+   na 124px gestel, drie keer, en die knoppies het aangehou afsny.
 
-/* Met `fixed` vat 'n kolom sonder breedte wat oorbly — presies wat die
-   beskrywing moet doen. Sy kry `width: auto` uitdruklik sodat dit gelees kan
-   word as 'n keuse en nie as 'n weglating nie. */
-.dok-tabel th:first-child { width: auto; }
+   Een plek, en dit is daardie lêer. */
 
 @media (max-width: 720px) {
   /* Minder letterspasiëring en 'n kleiner grootte gee die beskrywing sy
@@ -243,9 +219,9 @@
      is by 'n verslag — dus krimp die letters, nie die taal nie. */
   .dok-tabel th { font-size: 9.5px; letter-spacing: .03em; }
   .dok-tabel th + th { padding-left: 10px; }
-  .dok-tabel th:nth-child(2) { width: 58px; }
-  .dok-tabel th:nth-child(3) { width: 86px; }
-  .dok-tabel th:nth-child(4) { width: 94px; }
+  /* Die BREEDTES staan in faktuur-verdeling-reels.css — hulle het hier ook
+     gestaan en is doodgewoon nooit gebruik nie, want daardie lêer laai ná
+     hierdie een. Hier bly net wat hy nie stel nie. */
   .dok-tabel td.n { padding-left: 10px; }
 }
 .dok-tabel td {
@@ -346,7 +322,6 @@
   white-space: nowrap;
   text-align: right;
   padding-left: 6px;
-  min-width: 124px;
 }
 
 .fv-a {
@@ -371,11 +346,12 @@
 .fv-plus:hover { color: var(--teal); }
 .fv-aksies .dok-vee { padding: 3px 4px; font-size: 14px; }
 
-@media (max-width: 980px) {
-  .dok-tabel th:nth-child(5) { width: 104px; }
-  .fv-aksies { min-width: 104px; padding-left: 4px; }
-  .fv-a { font-size: 13px; padding: 3px 2px; }
-  .fv-aksies .dok-vee { padding: 3px 2px; font-size: 13px; }
+/* Die kolom se persentasie staan in faktuur-verdeling-reels.css onder
+   dieselfde drumpel; hier krimp net die knoppies. */
+@media (max-width: 1100px) {
+  .fv-aksies { padding-left: 2px; }
+  .fv-a { font-size: 13px; padding: 3px 1px; }
+  .fv-aksies .dok-vee { padding: 3px 1px; font-size: 13px; }
 }
 
 /* ═══ WAT DIE KLIENT SIEN ════════════════════════════════════════════════
