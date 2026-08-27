@@ -53,7 +53,11 @@ function kw_reels_na_html(u) {
       (r) => `<tr>
         <td>${kw_ontsnap(r.beskrywing) || "&nbsp;"}</td>
         <td class="n">${r.is_groep ? "" : kw_ontsnap(r.hoeveelheid)}</td>
-        <td class="n">${r.is_groep ? "" : kw_rand(r.prys_pp_sent, u.taal)}</td>
+        <!-- Die eenheidsprys sonder die R, soos op die faktuurdokument: die
+             BEDRAG-kolom dra die geldeenheid, die eenheidsprys nie. -->
+        <td class="n">${
+          r.is_groep ? "" : kw_ontsnap(kw_rand(r.prys_pp_sent, u.taal).replace(/^R\s*/, ""))
+        }</td>
         <td class="n sterk">${kw_rand(r.bedrag_sent, u.taal)}</td>
       </tr>`
     )
@@ -89,11 +93,16 @@ function kw_dokument(u) {
       <div class="kw-dok-nr">
         <div class="et">${kw_ontsnap(t_in("fd_kwotasie", u.taal))}</div>
         <div class="nr">${kw_ontsnap(u.nommer)}</div>
-        <div class="kw-dok-fyn">${
+        <!-- GEEN DATUM HIER NIE. Sy staan in die besonderhede, soos op die
+             faktuur. Twee keer op een dokument laat 'n mens wonder of hulle
+             dieselfde ding beteken. -->
+        ${
           u.hersiening > 1
-            ? kw_ontsnap(t_in("fd_kw_hersiening", u.taal) + " " + u.hersiening) + " · "
+            ? `<div class="kw-dok-fyn">${kw_ontsnap(
+                t_in("fd_kw_hersiening", u.taal) + " " + u.hersiening
+              )}</div>`
             : ""
-        }${kw_ontsnap(kw_datum(u.uitgereik_op, u.taal))}</div>
+        }
       </div>
     </div>
 
@@ -145,6 +154,25 @@ function kw_dokument(u) {
         ? `<div class="kw-nota">${kw_ontsnap(u.dokument_nota).replace(/\n/g, "<br>")}</div>`
         : ""
     }
+
+    <!-- WAT DIE DATUM BETEKEN.
+
+         "Geldig tot 29 Aug 2026" alleen lees soos 'n sperdatum met 'n gevolg
+         wat niemand genoem het nie. Die tweede sin sê wat by aanvaarding
+         gebeur, en dieselfde blok staan op die vorm sodat 'n mens sien wat die
+         klient gaan lees.
+
+         By 'n reeds aanvaarde of verlope kwotasie val hy weg -- dan is dit nie
+         meer 'n aanbod nie. -->
+    ${
+      u.kan_aanvaar
+        ? `<div class="kw-geldig">
+             <b>${kw_ontsnap(
+               t_in("fd_kw_geldig_kop", u.taal) + " " + kw_datum(u.geldig_tot, u.taal)
+             )}</b><br>${kw_ontsnap(t_in("fd_kw_geldig_lei", u.taal))}
+           </div>`
+        : ""
+    }
   </div>`;
 }
 
@@ -177,7 +205,13 @@ function kw_aanvaarblok(u) {
     <div class="kw-velde kw-velde-een">
       <div>
         <label for="kw-po">${kw_ontsnap(t_in("fd_bestelnommer", u.taal))}</label>
+        <!-- VOORGEVUL WANNEER DIE KWOTASIE HOM REEDS DRA.
+
+             Staan hy op die dokument hierbo en wys die veld leeg, tik iemand
+             hom oor of laat hom leeg -- en dan gaan die faktuur sonder die PO
+             uit, wat presies is wat 'n finansiële afdeling laat terugstuur. -->
         <input id="kw-po" type="text" maxlength="100"
+               value="${kw_ontsnap(u.bestelnommer || "")}"
                placeholder="${kw_ontsnap(t_in("kw_bestelnommer_plek", u.taal))}">
       </div>
     </div>
@@ -187,6 +221,12 @@ function kw_aanvaarblok(u) {
     <div class="kw-aksies">
       <button type="button" class="kw-knop" id="kw-aanvaar-knop">${kw_ontsnap(
         t_in("kw_aanvaar_knop", u.taal)
+      )}</button>
+      <!-- 'n Skool se finansiële afdeling laai 'n dokument in haar eie stelsel;
+           'n skakel help haar nie. window.print() plus die @media print-blok in
+           kwotasie.css gee 'n PDF wat net die dokument dra. -->
+      <button type="button" class="kw-knop kw-knop-stil" id="kw-druk">${kw_ontsnap(
+        t_in("kw_laai_af", u.taal)
       )}</button>
     </div>
 
@@ -254,6 +294,9 @@ function kw_teken(u) {
 
   const knop = document.getElementById("kw-aanvaar-knop");
   if (knop) knop.addEventListener("click", kw_aanvaar);
+
+  const druk = document.getElementById("kw-druk");
+  if (druk) druk.addEventListener("click", () => window.print());
 
   const voet = document.getElementById("kw-voet");
   if (voet) {

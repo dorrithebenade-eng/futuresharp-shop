@@ -186,6 +186,22 @@
 .kw-tabel td.n { font-variant-numeric: tabular-nums; }
 .kw-tabel td.n.sterk { font-weight: 600; }
 
+/* DIE DRIE SYFERKOLOMME KRY BREEDTES, soos op die faktuurdokument. Sonder
+   hulle versprei die tabel die ruimte gelyk en Hoeveelheid staan in die middel
+   met wit aan albei kante -- die beskrywing moet die oorskot kry, nie hulle
+   nie. */
+.kw-tabel { table-layout: fixed; }
+.kw-tabel th:first-child { width: auto; }
+.kw-tabel th:nth-child(2) { width: 96px; }
+.kw-tabel th:nth-child(3) { width: 116px; }
+.kw-tabel th:nth-child(4) { width: 120px; }
+
+@media (max-width: 620px) {
+  .kw-tabel th:nth-child(2) { width: 62px; }
+  .kw-tabel th:nth-child(3) { width: 84px; }
+  .kw-tabel th:nth-child(4) { width: 92px; }
+}
+
 @media (max-width: 620px) {
   .kw-tabel th { font-size: 9.5px; letter-spacing: .03em; }
   .kw-tabel th.n, .kw-tabel td.n { padding-left: 8px; }
@@ -212,6 +228,23 @@
   line-height: 1.7;
   color: var(--grys-teks);
 }
+
+/* WAT DIE DATUM BETEKEN. Sy staan waar die faktuur haar betaalblok het --
+   dieselfde plek op die dokument, dieselfde vraag: wat gebeur volgende.
+
+   Sy sluit die dokument ook af. Sonder haar eindig die kaart 12px onder die
+   totaal en die bladsy lyk of sy afgesny is. */
+.kw-geldig {
+  margin-top: 22px;
+  background: #FDF6E7;
+  border-radius: 8px;
+  padding: 14px 17px;
+  font-size: 12.5px;
+  line-height: 1.65;
+  color: #8a6400;
+}
+
+.kw-geldig b { font-family: var(--font-opskrif); }
 
 /* ═══ DIE AANVAARBLOK ═══ */
 
@@ -268,7 +301,12 @@
   outline-offset: -1px;
 }
 
-.kw-aksies { margin-top: 18px; }
+.kw-aksies {
+  margin-top: 18px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
 
 .kw-knop {
   border: 0;
@@ -284,6 +322,21 @@
 
 .kw-knop:hover { background: var(--teal-diep, #2f6b60); }
 .kw-knop:disabled { opacity: .55; cursor: default; }
+
+/* LAAI AF MAG NIE SOOS AANVAAR LYK NIE. Die een gee 'n lêer; die ander een
+   skep 'n faktuur en 'n verpligting. Twee vol knoppies langs mekaar sou hulle
+   as gelyke keuses aanbied. */
+.kw-knop-stil {
+  background: var(--wit);
+  color: var(--swart);
+  border: 1px solid #E4E2DD;
+}
+
+.kw-knop-stil:hover {
+  background: var(--wit);
+  border-color: var(--teal);
+  color: var(--teal);
+}
 
 .kw-fout {
   margin: 4px 0 0;
@@ -366,6 +419,8 @@
    nie 'n bladsy nie. */
 @media print {
   body { background: #fff; }
+  /* Die geldigheidsblok DRUK saam -- sy is deel van die dokument, nie van die
+     bladsy nie. Sy staan binne .kw-dok, dus raak hierdie reël haar nie. */
   .kw-merk,
   .kw-aanvaar,
   .kw-kaart,
