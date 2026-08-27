@@ -400,6 +400,18 @@ function nuwe_faktuur(wie) {
     // gestel; 'n konsep het nog geen skakel om te deel nie.
     publieke_kode: null,
 
+    // WAARUIT DIE FAKTUUR KOM, wanneer sy uit 'n aanvaarde kwotasie gebou is.
+    //
+    // aanvaar-kwotasie.js stel albei; 'n faktuur wat 'n mens self opstel, laat
+    // hulle leeg. Sonder hulle kan niemand ses maande later antwoord waarvoor
+    // hierdie R25 072 gefaktureer is nie -- die kwotasie dra die verwysing
+    // vorentoe, maar 'n mens lees die FAKTUUR eerste.
+    //
+    // Die HERSIENING gaan saam, want KW/01964 het dalk drie weergawes gehad en
+    // die klient het presies een van hulle aanvaar.
+    uit_kwotasie: null,
+    uit_kwotasie_hersiening: null,
+
     // Sien is_toetsfase() hierbo. Word by die SKEPPING gestel en verander
     // daarna nooit — 'n faktuur wat as toetsdata begin het, bly dit.
     toets: is_toetsfase(),

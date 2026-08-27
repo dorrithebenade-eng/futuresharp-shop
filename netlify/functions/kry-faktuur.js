@@ -194,6 +194,13 @@ exports.handler = async (event, context) => {
 
     uitbetalings: Array.isArray(rekord.uitbetalings) ? rekord.uitbetalings : [],
 
+    // Waaruit die faktuur kom, wanneer sy uit 'n aanvaarde kwotasie gebou is.
+    // Sien die waarskuwing bo-aan hierdie lêer: 'n nuwe veld kom NIE vanself
+    // deur nie -- dit is presies die fout wat op 27 Augustus 2026 met
+    // op_faktuur, hosting_pct en verdeling gevind is.
+    uit_kwotasie: rekord.uit_kwotasie || null,
+    uit_kwotasie_hersiening: rekord.uit_kwotasie_hersiening || null,
+
     lewering: {
       gestuur_op: lewering.gestuur_op || null,
       nota: lewering.nota || "",
