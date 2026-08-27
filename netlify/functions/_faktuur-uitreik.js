@@ -303,45 +303,34 @@ async function reik_faktuur_uit(store, sleutel, rekord, wie) {
   if (!gratis) {
     /* DIE PAYSTACK-VERWYSING IS NIE DIE FAKTUURNOMMER NIE.
 
-       Paystack weier 'n transaksie met 'n verwysing wat reeds bestaan. Die ou
-       kommentaar hier het gesê 'n agtervoegsel is onnodig omdat 'n uitgereikte
-       faktuur nooit weer gestuur word nie -- en dit is waar, maar dit mis die
-       geval wat werklik gebeur:
+       Paystack weier 'n transaksie met 'n verwysing wat reeds bestaan, en sy
+       register is PERMANENT: 'n verwysing wat een keer geregistreer is, is
+       vir altyd opgebruik -- ook wanneer daardie poging misluk het, ook
+       wanneer die konsep sedertdien geskrap is.
 
-         'n POGING WAT MISLUK, STOOR NIKS. Die nommer word toegeken VOOR
-         Paystack geroep word, en misluk die oproep, staan die konsep nog daar.
-         Die volgende poging kry dus DIESELFDE nommer, stuur dieselfde
-         verwysing, en Paystack weier weer. Die faktuur is permanent vasgevang.
+       DIE FAKTUURNOMMER KAN DUS NIE DIE VERWYSING WEES NIE. Die nommer word
+       toegeken voor Paystack geroep word, en 'n poging wat misluk, stoor niks
+       -- dus kry die volgende poging dieselfde nommer en dieselfde verwysing,
+       en Paystack weier weer. Die faktuur is permanent vasgevang.
+
+       'N TELLING OP DIE KONSEP LOS DIT NIE OP NIE, en dit was my eerste
+       poging vanaand. Sy oorleef nie 'n geskrapte konsep nie en sy weet niks
+       van pogings wat voor haar bestaan het nie. FS-01961 en FS-01962 was albei
+       reeds by Paystack geregistreer deur vroeere pogings waarvan geen konsep
+       meer bestaan nie.
+
+       DIE TYDSTEMPEL LOS DIT WEL OP. Hy is uniek sonder om iets te stoor,
+       oorleef enige geskrapte rekord, en weet niks van vorige pogings nie --
+       hy hoef nie.
+
+       DIE VERWYSING DRA GEEN BETEKENIS NIE, en dit is die punt. Die betekenis
+       leef in `metadata.faktuur_sleutel`, wat paystack-webhook.js gebruik om
+       die faktuur te vind. Die nommer bly FS/01962 op die dokument, op die
+       bankstaat en in die staat.
 
        Waargeneem op 27 Augustus 2026: `Duplicate Transaction Reference` op
-       FS-01961, met `Probeer weer` wat in dieselfde muur vasgeloop het.
-
-       Die winkel het dit op 14 Augustus opgelos en die patroon is dieselfde:
-       die NOMMER bly wat hy is -- FS/01961 op die dokument, op die bankstaat
-       en in die staat -- en net die VERWYSING kry 'n telling.
-
-       DIE WEBHOOK BREEK NIE. paystack-webhook.js soek 'n faktuur op
-       `metadata.faktuur_sleutel`, nie op `data.reference` nie, en daardie
-       metadata gaan hieronder saam. */
-    const vorige = Number(rekord.paystack && rekord.paystack.poging) || 0;
-    const poging = vorige + 1;
-    referensie = poging === 1 ? nuwe_sleutel : `${nuwe_sleutel}-${poging}`;
-
-    /* DIE TELLING WORD OP DIE KONSEP GESTOOR, VOOR DIE OPROEP.
-
-       Dit breek nie die reel "niks word geskryf voordat Paystack deur is nie":
-       daardie reel gaan oor die FAKTUUR. Die konsep bestaan reeds; ons skep
-       niks en ons ken niks toe nie. Sonder hierdie skryf weet die volgende
-       poging nie waar sy is nie en stuur dieselfde verwysing weer.
-
-       Misluk die skryf, gaan ons voort. Die oproep kan slaag, en 'n telling
-       wat verlore gaan, kos hoogstens een mislukte poging later. */
-    try {
-      rekord.paystack = { ...(rekord.paystack || {}), poging };
-      await store.setJSON(sleutel, rekord);
-    } catch (fout) {
-      console.error(`Kon nie die poging-telling op ${sleutel} stoor nie:`, fout);
-    }
+       FS-01961 en weer op FS-01962. */
+    referensie = `${nuwe_sleutel}-${Date.now()}`;
 
     if (split_rye.length) {
       try {
@@ -442,11 +431,10 @@ async function reik_faktuur_uit(store, sleutel, rekord, wie) {
   rekord.paystack = {
     referensie,
     split_code,
+    // Die VOLLE verwysing, want dit is waarmee 'n mens by Paystack navraag
+    // doen -- FS-01962-1756315665 en nie FS/01962 nie. Sonder dit moet 'n mens
+    // in die logboek gaan soek.
     authorization_url,
-    // Hoeveelste poging geslaag het. By 'n navraag met Paystack is die
-    // verwysing FS-01961-2 en nie FS-01961 nie; sonder hierdie getal moet 'n
-    // mens raai.
-    poging: Number(rekord.paystack && rekord.paystack.poging) || 1,
   };
 
   if (gratis) {
