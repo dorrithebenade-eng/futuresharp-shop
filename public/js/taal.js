@@ -1691,6 +1691,16 @@ const WOORDEBOEK = {
     af: "is nog nie in die register nie.",
     en: "is not in the register yet.",
   },
+  // DIE STROOK VRA EERS OF IETS NABY PAS. Sien faktuur-nuwe-koste-item.js:
+  // die strook het op 27 Augustus 2026 duplikate uitgenooi omdat hy net twee
+  // toestande geken het — presies bekend, of onbekend. "Bedoel jy" is die
+  // derde, en die algemeenste.
+  //
+  // GEEN VRAAGTEKEN NIE: die items self volg as knoppies. "Bedoel jy
+  // Studievaardigheid?" met die vraagteken IN die sleutel sou beteken die
+  // teken staan voor die knoppie in plaas van agter die woord.
+  nki_bedoel_jy: { af: "Bedoel jy", en: "Did you mean" },
+  nki_of_nuut: { af: "of skep", en: "or create" },
   nki_voeg_werk: { af: "+ Werk", en: "+ Work" },
   nki_voeg_uitgawe: { af: "+ Uitgawe", en: "+ Expense" },
   nki_bygevoeg: { af: "By die register gevoeg.", en: "Added to the register." },

@@ -217,7 +217,19 @@ function teken_reels() {
       const bedrag = Math.round((Number(r.hoeveelheid) || 0) * (Number(r.prys_pp_sent) || 0));
       return `
       <tr data-reel="${ix}">
-        <td><input class="tel-invoer" data-veld="beskrywing" value="${ontsnap(r.beskrywing)}"></td>
+        <!-- list="bo-items" — DIESELFDE datalist as die begroting s'n. Hy is
+             tot 27 Augustus 2026 hier oorgeslaan: faktuur-koste-items.js het
+             die lys gebou, faktuur-backoffice.js het hom aan die BEGROTING se
+             veld gehaak, en hierdie veld het niks gekry nie. Maar
+             faktuur-nuwe-koste-item.js luister op ALBEI velde, want albei dra
+             data-veld="beskrywing". Die gevolg: 'n mens tik "Studievaardig",
+             die strook se "nog nie in die register nie" kom op, en niks het
+             ooit "Studievaardigheid" aangebied nie — die strook nooi 'n
+             duplikaat uit waar die register klaar 'n antwoord gehad het.
+
+             Die datalist self leef teen die einde van die bladsy, buite
+             fv-reels, want hierdie ry word by elke wysiging herteken. -->
+        <td><input class="tel-invoer" data-veld="beskrywing" list="bo-items" value="${ontsnap(r.beskrywing)}"></td>
         <td class="n"><input class="tel-invoer n" data-veld="hoeveelheid" inputmode="decimal" value="${ontsnap(r.hoeveelheid)}"></td>
         <td class="n"><input class="tel-invoer n" data-veld="prys" inputmode="decimal" value="${veld_sent(r.prys_pp_sent)}" placeholder="0,00"></td>
         <td class="n sterk">${rand(bedrag)}</td>

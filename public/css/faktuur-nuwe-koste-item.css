@@ -50,3 +50,26 @@
 @media (max-width: 900px) {
   .nki-teks { flex: 1 1 100%; }
 }
+
+/* DIE VOORSTEL-KNOPPIE. Wit met 'n rand, nie amber soos "+ Werk" nie: die een
+   STEL 'N VELD REG, die ander SKEP 'N REKORD. Twee heel verskillende gewigte,
+   en 'n mens moet hulle uitmekaar sien voordat 'n mens klik. */
+.nki-knop.nki-kies {
+  background: var(--wit, #fff);
+  border: 1px solid #E4E2DD;
+  color: var(--swart, #171717);
+  font-weight: 500;
+}
+
+.nki-knop.nki-kies:hover {
+  background: var(--wit, #fff);
+  border-color: var(--teal, #479F91);
+  color: var(--teal, #479F91);
+}
+
+/* Die skeiding tussen "Bedoel jy X" en "of skep + Werk". Sonder dit lyk die
+   ses knoppies soos een lys van gelyke keuses. */
+.nki-of {
+  opacity: .7;
+  margin-left: 4px;
+}
