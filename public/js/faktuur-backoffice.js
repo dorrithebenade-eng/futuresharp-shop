@@ -743,6 +743,9 @@ function bo_teken_syfers() {
   //
   // Net die TEKS word aangeraak, nooit die struktuur nie, dus is daar niks om
   // te herbind nie.
+  // DIE HELE SOM WORD EEN KEER GELOOP, nie een keer per reel nie.
+  const S = bo_som();
+
   V.reels.forEach((r, rx) => {
     const blok = document.querySelector(`.vd-reel[data-reel="${rx}"]`);
     if (!blok) return;
@@ -755,6 +758,44 @@ function bo_teken_syfers() {
       bedrag.textContent = rand_uit(
         Math.round((Number(r.hoeveelheid) || 0) * (Number(r.prys_pp_sent) || 0)) / 100
       );
+    }
+
+    /* ── DIE SYFERS BINNE DIE REEL ──
+       Hulle het tot 27 Augustus 2026 hier ontbreek. Tik 'n mens 'n prys links,
+       is die reel se naam en bedrag bygewerk en die somblok onderaan ook -- maar
+       elke ONTVANGER se rand, die hosting en `Na Future Sharp` het op hul ou
+       waarde bly staan. Verhoog 'n mens die aanbieding van R2 000 na R2 400,
+       staan daar nog steeds die R183,32 wat by R2 000 gehoor het.
+
+       Erger as 'n leë skerm: die syfers is daar, hulle lyk reg, en hulle is
+       verkeerd. 'n Mens sou 'n faktuur uitreik op 'n oorskot wat nie bestaan
+       nie.
+
+       bo_teken() sou dit ook regmaak, maar hy herbou die hele blok en ruk die
+       wyser uit die veld waarin iemand tik. Hier word NET teks aangeraak,
+       nooit die struktuur nie, dus is daar niks om te herbind nie. */
+    const per = S.u.perReel[rx];
+    if (!per) return;
+    const t = bo_reel_toestand(r, per);
+    const basis = t.basis / 100;
+
+    (r.verdeling || []).forEach((v, ix) => {
+      const sel = blok.querySelector(`.vd-ry[data-ry="${ix}"] .uit`);
+      if (!sel) return;
+      const bedrag_ry =
+        v.tipe === "pct"
+          ? ((Number(v.waarde) || 0) / 100) * basis
+          : (Number(v.waarde) || 0) / 100;
+      sel.textContent = rand_uit(bedrag_ry);
+    });
+
+    // 'n Kostereel se somreel dra geen syfer nie -- net die sin oor die volle
+    // bedrag terug -- dus is daar niks om by te werk nie.
+    const oor = blok.querySelector(".vd-som strong");
+    if (oor) {
+      oor.textContent = rand_uit(t.oorskot / 100);
+      oor.classList.toggle("kort", t.oorskot < 0);
+      oor.classList.toggle("oor", t.oorskot > 0);
     }
   });
 }
