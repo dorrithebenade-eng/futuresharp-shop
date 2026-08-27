@@ -211,6 +211,13 @@
 .dok-tabel th:nth-child(3) { width: 104px; }
 .dok-tabel th:nth-child(4) { width: 112px; }
 
+/* Die aksiekolom hoort by hierdie stel, nie op 'n eie klas nie. 'n Breedte op
+   `th.k-aksies` alleen het NIKS gedoen nie: die beskrywingskolom dra geen
+   breedte en vat alles wat oorbly, dus is die vyfde kolom tot 30px saamgedruk
+   en die laaste twee knoppies afgesny. Die <td> kry ook 'n min-width, want 'n
+   sel met white-space:nowrap word saamgedruk voordat die beskrywing wyk. */
+.dok-tabel th:nth-child(5) { width: 124px; }
+
 @media (max-width: 720px) {
   /* Minder letterspasiëring en 'n kleiner grootte gee die beskrywing sy
      ruimte terug sonder om die woorde te verkort. Die dokument se woorde is
@@ -273,8 +280,6 @@
    Die tabel wys AL die reels, ingekeep, want elkeen moet gewysig kan word.
    Die groepering is dus 'n skermding; die gedrukte dokument vou werklik in. */
 
-.dok-tabel th.k-aksies { width: 118px; }
-
 .fv-besk { position: relative; }
 
 /* DIE INKEPING. Een vlak, nooit meer -- 'n groep binne 'n groep is 'n boom,
@@ -323,6 +328,7 @@
   white-space: nowrap;
   text-align: right;
   padding-left: 6px;
+  min-width: 124px;
 }
 
 .fv-a {
@@ -348,7 +354,8 @@
 .fv-aksies .dok-vee { padding: 3px 4px; font-size: 14px; }
 
 @media (max-width: 720px) {
-  .dok-tabel th.k-aksies { width: 100px; }
+  .dok-tabel th:nth-child(5) { width: 104px; }
+  .fv-aksies { min-width: 104px; padding-left: 4px; }
   .fv-a { font-size: 13px; padding: 3px 2px; }
   .fv-aksies .dok-vee { padding: 3px 2px; font-size: 13px; }
 }
