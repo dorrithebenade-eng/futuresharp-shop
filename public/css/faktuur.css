@@ -179,7 +179,20 @@
 
 /* Die tabel. Drie kolomme plus die beskrywing:
    Hoeveelheid x Eenheidsprys = Bedrag. */
-.dok-tabel { width: 100%; border-collapse: collapse; margin-bottom: 4px; }
+/* `table-layout: fixed` — sonder dit is elke `width` op 'n <th> net 'n WENK.
+   Die blaaier bereken die kolomme uit die inhoud, en die beskrywingskolom (wat
+   geen breedte dra nie) vat alles wat oorbly. Die aksiekolom is so tot 30px
+   saamgedruk terwyl haar min-width 104px was — 'n min-width op 'n <td> het in
+   'n outomatiese tabeluitleg geen krag nie.
+
+   Met `fixed` geld elke breedte presies. Niks gaan verlore nie: elke sel dra
+   'n <input>, wat in elk geval een reël is, dus is daar niks om te wikkel. */
+.dok-tabel {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 4px;
+  table-layout: fixed;
+}
 .dok-tabel th {
   font-family: var(--font-opskrif);
   font-size: 10.5px;
@@ -217,6 +230,11 @@
    en die laaste twee knoppies afgesny. Die <td> kry ook 'n min-width, want 'n
    sel met white-space:nowrap word saamgedruk voordat die beskrywing wyk. */
 .dok-tabel th:nth-child(5) { width: 124px; }
+
+/* Met `fixed` vat 'n kolom sonder breedte wat oorbly — presies wat die
+   beskrywing moet doen. Sy kry `width: auto` uitdruklik sodat dit gelees kan
+   word as 'n keuse en nie as 'n weglating nie. */
+.dok-tabel th:first-child { width: auto; }
 
 @media (max-width: 720px) {
   /* Minder letterspasiëring en 'n kleiner grootte gee die beskrywing sy
@@ -353,7 +371,7 @@
 .fv-plus:hover { color: var(--teal); }
 .fv-aksies .dok-vee { padding: 3px 4px; font-size: 14px; }
 
-@media (max-width: 720px) {
+@media (max-width: 980px) {
   .dok-tabel th:nth-child(5) { width: 104px; }
   .fv-aksies { min-width: 104px; padding-left: 4px; }
   .fv-a { font-size: 13px; padding: 3px 2px; }
