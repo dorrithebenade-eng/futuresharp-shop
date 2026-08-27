@@ -541,6 +541,24 @@ function bind_reels() {
           );
         }
         teken_somme();
+
+        // DIE TWEE DRUKBLOKKE MOET BY ELKE TIKSLAG BYGEWERK WORD.
+        //
+        // Hierdie luisteraar teken die ry DOELBEWUS nie oor nie -- die veld sou
+        // onder die vinger herbou word en die wyser na die einde spring -- dus
+        // loop teken_reels() hier nie, en daarmee ook nie die twee blokke wat
+        // binne hom sit nie.
+        //
+        // Die gevolg was dat 'n reel wat na die laaste hertekening ingetik is,
+        // op die skerm reg gelyk het maar as "naamloos R0,00" in die voorskou
+        // gestaan het -- en presies so gedruk het. Die skerm en die dokument
+        // het uitmekaar geloop sonder dat iets verkeerd gelyk het.
+        //
+        // Hulle bou uit V.reels, nie uit die DOM nie, dus raak hulle die veld
+        // waarin getik word glad nie.
+        teken_druk_voorskou();
+        teken_druk_reels();
+
         if (window.bo_teken_syfers) window.bo_teken_syfers();
         merk_vuil();
       });
