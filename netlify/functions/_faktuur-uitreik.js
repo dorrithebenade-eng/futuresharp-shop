@@ -301,11 +301,47 @@ async function reik_faktuur_uit(store, sleutel, rekord, wie) {
   const gratis = totaal_sent === 0;
 
   if (!gratis) {
-    // Die verwysing is die faktuurnommer in sy sleutelvorm. Dit hoef nie 'n
-    // agtervoegsel per poging te kry soos in die winkel nie: 'n uitgereikte
-    // faktuur word nooit weer gestuur nie (409 hierbo), en 'n regstelling gaan
-    // deur kanselleer plus 'n NUWE nommer.
-    referensie = nuwe_sleutel;
+    /* DIE PAYSTACK-VERWYSING IS NIE DIE FAKTUURNOMMER NIE.
+
+       Paystack weier 'n transaksie met 'n verwysing wat reeds bestaan. Die ou
+       kommentaar hier het gesê 'n agtervoegsel is onnodig omdat 'n uitgereikte
+       faktuur nooit weer gestuur word nie -- en dit is waar, maar dit mis die
+       geval wat werklik gebeur:
+
+         'n POGING WAT MISLUK, STOOR NIKS. Die nommer word toegeken VOOR
+         Paystack geroep word, en misluk die oproep, staan die konsep nog daar.
+         Die volgende poging kry dus DIESELFDE nommer, stuur dieselfde
+         verwysing, en Paystack weier weer. Die faktuur is permanent vasgevang.
+
+       Waargeneem op 27 Augustus 2026: `Duplicate Transaction Reference` op
+       FS-01961, met `Probeer weer` wat in dieselfde muur vasgeloop het.
+
+       Die winkel het dit op 14 Augustus opgelos en die patroon is dieselfde:
+       die NOMMER bly wat hy is -- FS/01961 op die dokument, op die bankstaat
+       en in die staat -- en net die VERWYSING kry 'n telling.
+
+       DIE WEBHOOK BREEK NIE. paystack-webhook.js soek 'n faktuur op
+       `metadata.faktuur_sleutel`, nie op `data.reference` nie, en daardie
+       metadata gaan hieronder saam. */
+    const vorige = Number(rekord.paystack && rekord.paystack.poging) || 0;
+    const poging = vorige + 1;
+    referensie = poging === 1 ? nuwe_sleutel : `${nuwe_sleutel}-${poging}`;
+
+    /* DIE TELLING WORD OP DIE KONSEP GESTOOR, VOOR DIE OPROEP.
+
+       Dit breek nie die reel "niks word geskryf voordat Paystack deur is nie":
+       daardie reel gaan oor die FAKTUUR. Die konsep bestaan reeds; ons skep
+       niks en ons ken niks toe nie. Sonder hierdie skryf weet die volgende
+       poging nie waar sy is nie en stuur dieselfde verwysing weer.
+
+       Misluk die skryf, gaan ons voort. Die oproep kan slaag, en 'n telling
+       wat verlore gaan, kos hoogstens een mislukte poging later. */
+    try {
+      rekord.paystack = { ...(rekord.paystack || {}), poging };
+      await store.setJSON(sleutel, rekord);
+    } catch (fout) {
+      console.error(`Kon nie die poging-telling op ${sleutel} stoor nie:`, fout);
+    }
 
     if (split_rye.length) {
       try {
@@ -407,6 +443,10 @@ async function reik_faktuur_uit(store, sleutel, rekord, wie) {
     referensie,
     split_code,
     authorization_url,
+    // Hoeveelste poging geslaag het. By 'n navraag met Paystack is die
+    // verwysing FS-01961-2 en nie FS-01961 nie; sonder hierdie getal moet 'n
+    // mens raai.
+    poging: Number(rekord.paystack && rekord.paystack.poging) || 1,
   };
 
   if (gratis) {
