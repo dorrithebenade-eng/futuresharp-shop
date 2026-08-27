@@ -90,6 +90,24 @@ exports.handler = async (event, context) => {
     },
     bestelnommer: rekord.bestelnommer || "",
 
+    // ELKE REEL DRA SY EIE VERDELING, SY EIE HOSTING EN SY EIE `op_faktuur`
+    // (25 Augustus 2026). Sien Verdeling-Per-Lynitem-Ontwerp.md.
+    //
+    // DIE DRIE HET TOT 27 AUGUSTUS 2026 HIER UITGEVAL. Toe die verdeling na
+    // die reels geskuif het, is _fakture.js, stoor-faktuur.js en
+    // faktuur-vorm.js bygewerk en HIERDIE LESER NIE. Dit is presies die
+    // slaggat wat bo-aan hierdie lêer beskryf staan — dieselfde as `leers`
+    // in kry-indienings.js op 8 Augustus.
+    //
+    // Die gevolg was nie 'n leë skerm nie, wat 'n mens sou sien: dit was
+    // STIL DATAVERLIES. faktuur-vorm.js lees al drie velde en val terug op
+    // `[]`, `0` en `true`; die outomatiese stoor stuur daardie terugvalle
+    // dan TERUG. 'n Konsep wat toegemaak en weer oopgemaak is, het sy
+    // verdeling verloor — en die vorm het reg gelyk terwyl dit gebeur het.
+    //
+    // Die simptoom is op 26 Augustus in die konsole gesien (`vd: []`, `h: 0`)
+    // en aan ou data toegeskryf. Die ou data was werklik oud, maar dit was
+    // nie die enigste oorsaak nie.
     reels: Array.isArray(rekord.reels)
       ? rekord.reels.map((r) => ({
           soort: r.soort || "verkoop",
@@ -97,6 +115,25 @@ exports.handler = async (event, context) => {
           hoeveelheid: r.hoeveelheid || 0,
           prys_pp_sent: r.prys_pp_sent || 0,
           bedrag_sent: r.bedrag_sent || 0,
+
+          // Of die reel GEDRUK word. Slegs 'n uitdruklike `false` steek hom
+          // weg; 'n ouer rekord sonder die veld word gedruk.
+          op_faktuur: r.op_faktuur !== false,
+
+          // GEEN `|| 5`-TERUGVAL NIE. 'n Doelbewuste nul moet die rondreis
+          // oorleef: op 'n kostereel beteken nul dat hosting nie gehef word
+          // nie, en dit is 'n keuse. Ontbreek die veld heeltemal — 'n rekord
+          // van voor 25 Augustus — is nul die veilige antwoord: hosting wat
+          // stilweg verskyn, vat geld by 'n begunstigde weg.
+          hosting_pct: Number.isFinite(Number(r.hosting_pct)) ? Number(r.hosting_pct) : 0,
+
+          verdeling: Array.isArray(r.verdeling)
+            ? r.verdeling.map((v) => ({
+                ontvanger: v.ontvanger || "",
+                tipe: v.tipe || "pct",
+                waarde: v.waarde || 0,
+              }))
+            : [],
         }))
       : [],
 
@@ -113,17 +150,13 @@ exports.handler = async (event, context) => {
         }))
       : [],
 
-    verdeling: Array.isArray(rekord.verdeling)
-      ? rekord.verdeling.map((v) => ({
-          ontvanger: v.ontvanger || "",
-          tipe: v.tipe || "pct",
-          waarde: v.waarde || 0,
-        }))
-      : [],
-
-    // hosting_pct kan wettig 0 wees, dus mag dit nie deur || 5 loop nie —
-    // dan sou iemand wat Hosting doelbewus afskakel, dit elke keer terugkry.
-    hosting_pct: Number.isFinite(Number(rekord.hosting_pct)) ? Number(rekord.hosting_pct) : 5,
+    // DIE FAKTUURVLAK `verdeling` EN `hosting_pct` KOM HIER NIE MEER DEUR
+    // NIE. Albei leef sedert 25 Augustus 2026 op elke reel hierbo. Hulle het
+    // tot 27 Augustus nog uitgegaan, en 'n leser wat hulle vind, sou 'n
+    // verdeling teken wat NAAS die reels s'n loop.
+    //
+    // Ouer rekords dra die velde nog. Hulle word doelbewus geignoreer: die
+    // reels is die enigste bron.
 
     afslag_sent: rekord.afslag_sent || 0,
     koepon_kode: rekord.koepon_kode || null,
