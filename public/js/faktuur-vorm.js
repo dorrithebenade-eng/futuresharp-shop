@@ -380,6 +380,36 @@ function groepeer_vir_druk() {
   return uit;
 }
 
+/* DIE RYE WAT WERKLIK DRUK.
+
+   Die gewone tbody dra die reels met hul invoervelde en hul vyf knoppies. Op
+   papier moet daar GROEPE staan, en CSS kan dit nie doen nie: sy kan 'n ry
+   versteek, maar sy kan nie 'n dra-reel se bedrag na die groep se som
+   verander nie.
+
+   Hierdie tbody staan langs die ander in dieselfde tabel en ruil met haar in
+   @media print, sodat die kolombreedtes en die lyne presies dieselfde bly.
+
+   'n GROEP DRA GEEN HOEVEELHEID EN GEEN EENHEIDSPRYS NIE -- sien
+   groepeer_vir_druk(). Dieselfde som as _faktuur-pdf.js, en dit MOET dieselfde
+   bly: wat 'n mens voor die uitreiking sien en wat die klient kry, is een
+   ding. */
+function teken_druk_reels() {
+  const plek = document.getElementById("fv-druk-reels");
+  if (!plek) return;
+  plek.innerHTML = groepeer_vir_druk()
+    .map(
+      (g) => `<tr>
+        <td>${ontsnap(g.beskrywing)}</td>
+        <td class="n">${g.lede ? "" : ontsnap(g.hoeveelheid)}</td>
+        <td class="n">${g.lede ? "" : veld_sent(g.prys_pp_sent)}</td>
+        <td class="n sterk">${rand(g.bedrag)}</td>
+        <td></td>
+      </tr>`
+    )
+    .join("");
+}
+
 function teken_druk_voorskou() {
   const plek = document.getElementById("fv-voorskou");
   if (!plek) return;
@@ -483,6 +513,7 @@ function teken_reels() {
 
   bind_reels();
   teken_druk_voorskou();
+  teken_druk_reels();
 }
 
 // Terwyl iemand tik, mag die veld nie onder sy vinger herbou word nie — dan

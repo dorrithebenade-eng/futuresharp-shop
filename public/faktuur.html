@@ -216,6 +216,16 @@
             </tr>
           </thead>
           <tbody id="fv-reels"></tbody>
+
+          <!-- WAT DRUK. Die tbody hierbo IS die reels -- elkeen met haar
+               invoervelde en haar vyf knoppies -- en CSS kan hulle wel
+               versteek, maar dit kan nie 'n dra-reel se bedrag na die GROEP se
+               som verander nie: dit is teks.
+
+               Hierdie tweede tbody dra dieselfde groepe as die voorskou onder
+               die tabel, en ruil met die eerste in @media print. Sien
+               teken_druk_reels() in faktuur-vorm.js. -->
+          <tbody id="fv-druk-reels" class="fv-net-druk"></tbody>
         </table>
         <button type="button" class="fv-teks-knop" id="fv-voeg-reel"
                 data-i18n="fv_voeg_reel">Voeg reël by</button>

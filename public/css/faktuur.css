@@ -372,6 +372,9 @@
 
 .fv-voorskou[hidden] { display: none; }
 
+/* Die tbody wat NET druk. Op die skerm bestaan sy nie. */
+.fv-net-druk { display: none; }
+
 .fv-voorskou-et {
   font-family: var(--font-opskrif);
   font-size: 9.5px;
@@ -1190,7 +1193,27 @@
   .dok-taal,
   .fv-klient-kies,
   .fv-teks-knop,
+  .fv-voorskou,
   .dok-vee { display: none !important; }
+
+  /* ── DIE REELS RUIL VIR DIE GROEPE ──
+     #fv-reels dra die reels met hul invoervelde en hul vyf knoppies. Op papier
+     staan die GROEPE, en CSS kan dit nie self doen nie: sy kan 'n ry versteek,
+     maar sy kan nie 'n dra-reel se bedrag na die groep se som verander nie.
+     Sien teken_druk_reels() in faktuur-vorm.js. */
+  #fv-reels { display: none !important; }
+  .fv-net-druk { display: table-row-group !important; }
+
+  /* Die knoppiekolom bestaan nie op papier nie -- ook nie haar kop nie. Sy
+     staan nog as 'n lee <td> in elke drukry sodat die kolomme tel; sonder die
+     kop sou die tabel 'n kolom kort en die breedtes verskuif. */
+  .fv-aksies,
+  .dok-tabel th:nth-child(5) { display: none !important; }
+  .fv-net-druk td:last-child { display: none !important; }
+
+  /* Die merkie en die inkeping is skermhulp. Die klient sien nie dat iets
+     saamgevou is nie -- hy sien 'n reel met 'n naam en 'n bedrag. */
+  .fv-dra-merk { display: none !important; }
 
   /* Die dokument is die bladsy. Geen raam, geen skaduwee, geen marge wat die
      drukker se eie marge herhaal. */
