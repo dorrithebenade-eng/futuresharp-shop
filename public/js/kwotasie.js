@@ -372,19 +372,30 @@ async function kw_aanvaar() {
     if (!resp.ok) throw new Error(await resp.text());
     const data = await resp.json();
 
-    /* NA DIE FAKTUUR SE EIE BLADSY, met die betaalskakel daarop.
+    /* DIE BEVESTIGING WORD HIER GETEKEN. Geen herleiding, geen herlaai.
 
-       Nie hier bly en 'n boodskap wys nie: die kliënt het pas aanvaar en die
-       volgende ding wat hy wil doen, is betaal of die faktuur aanstuur.
-       betaal-klaar.html dra reeds albei paaie en al vier toestande. */
-    if (data.betaalskakel) {
-      window.location.href = data.betaalskakel;
-      return;
-    }
+       DIE KLIENT WORD NIE NA PAYSTACK GESTUUR NIE. Hy het pas 'n kwotasie
+       aanvaar; hy het nie gesê hy wil nou betaal nie. 'n Kaartveld wat
+       onmiddellik verskyn, is 'n tweede besluit wat niemand gevra het nie -- en
+       'n skool se finansiële afdeling betaal in elk geval teen 30 dae.
 
-    // Geen skakel — 'n R0-kwotasie, of die faktuur was reeds uitgereik. Herlaai
-    // sodat die bladsy die aanvaarde toestand teken.
-    window.location.reload();
+       DIE EPOS DRA ALLES: die proforma as 'n PDF, die betaalskakel en die
+       bankbesonderhede. Daar is niks wat hierdie bladsy kan byvoeg nie.
+
+       EN 'N HERLAAI IS NIE 'N BEVESTIGING NIE. Tot 27 Augustus 2026 het
+       hierdie tak herlei of herlaai, en toe albei stil misluk, het die knoppie
+       op "Faktuur word uitgereik ..." bly staan terwyl die faktuur AL LANK
+       uitgereik was en die proforma in die klient se pos. Presies die winkel se
+       Besig-fout van 14 Augustus, op 'n nuwe plek.
+
+       Wat hier geteken word, is die toestand wat die bladsy in elk geval sou
+       wys as 'n mens haar herlaai -- dieselfde blok, dieselfde woorde. */
+    KW.faktuur_nommer = data.faktuur_nommer || KW.faktuur_nommer;
+    KW.kan_aanvaar = false;
+    KW.stand = "aanvaar";
+    kw_teken(KW);
+    window.scrollTo(0, 0);
+    return;
   } catch (f) {
     console.error("Kon nie die kwotasie aanvaar nie:", f);
     KW_BESIG = false;
