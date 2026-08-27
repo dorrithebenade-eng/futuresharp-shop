@@ -240,17 +240,50 @@ async function bou_faktuur_pdf(rekord, maatskappy) {
   bl.drawRectangle({ x: KANT, y, width: REGS - KANT, height: 0.7, color: LYN });
   y -= 18;
 
+  /* DIE REELS WORD GEGROEPEER VOORDAT HULLE DRUK.
+
+     'n Reel met `vou_in` se bedrag tel by die reel BO HAAR. Die VOLGORDE is
+     dus die groepering: geen tweede naamveld nie, want die naam wat die klient
+     sien, is 'n gewone reel wat reeds getik word. Sien
+     Reels-Invou-En-Volgorde-Ontwerp.md.
+
+     DIT IS DIESELFDE SOM AS groepeer_vir_druk() IN faktuur-vorm.js, en dit
+     MOET dieselfde bly: die skerm se voorskou en hierdie dokument moet
+     identies wees, anders sien 'n mens een ding voor die uitreiking en die
+     klient 'n ander daarna.
+
+     ELKE REEL HOORT AAN PRESIES EEN GROEP, dus tel die gedrukte bedrae altyd
+     tot die totaal. Dit mag nooit op 'n dokument breek nie.
+
+     'n GROEP DRA GEEN HOEVEELHEID EN GEEN EENHEIDSPRYS NIE. Drie items met
+     verskillende eenhede het nie een eenheidsprys nie, en 'n "1" daar sou se
+     die groep is een ding wat een keer gekoop is. */
+  const gedruk = [];
   (rekord.reels || []).forEach((r) => {
     const hoev = Number(r.hoeveelheid) || 0;
     const prys = Number(r.prys_pp_sent) || 0;
     const bedrag = Math.round(hoev * prys);
 
-    const reels = breek(r.beskrywing || "", gewoon, 10, k_hoev - KANT - 30);
+    // Die EERSTE reel vou nooit in nie -- daar is niks bo haar nie.
+    // stoor-faktuur.js dwing dit ook af; hierdie toets is die tweede slot.
+    if (r.vou_in !== true || !gedruk.length) {
+      gedruk.push({ beskrywing: r.beskrywing || "", hoev, prys, bedrag, lede: 0 });
+    } else {
+      const g = gedruk[gedruk.length - 1];
+      g.bedrag += bedrag;
+      g.lede += 1;
+    }
+  });
+
+  gedruk.forEach((g) => {
+    const reels = breek(g.beskrywing, gewoon, 10, k_hoev - KANT - 30);
     reels.forEach((teks, i) => skryf(teks, KANT, y - i * 13, { grootte: 10 }));
 
-    regs_skryf(String(hoev), k_hoev, y, { grootte: 10 });
-    regs_skryf(t_rand(prys, taal).replace(/^R/, ""), k_prys, y, { grootte: 10 });
-    regs_skryf(t_rand(bedrag, taal), k_bedr, y, { grootte: 10, vet: true });
+    if (!g.lede) {
+      regs_skryf(String(g.hoev), k_hoev, y, { grootte: 10 });
+      regs_skryf(t_rand(g.prys, taal).replace(/^R/, ""), k_prys, y, { grootte: 10 });
+    }
+    regs_skryf(t_rand(g.bedrag, taal), k_bedr, y, { grootte: 10, vet: true });
 
     y -= Math.max(1, reels.length) * 13 + 7;
     bl.drawRectangle({ x: KANT, y: y + 6, width: REGS - KANT, height: 0.7, color: LYN });
