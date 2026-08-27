@@ -2152,6 +2152,134 @@ const WOORDEBOEK = {
   // twee plekke, vasgespyker, en 'n adreswysiging sou een van hulle mis.
   fp_nav_instellings: { af: "Instellings", en: "Settings" },
 
+  // ═══ DIE KWOTASIE ═══════════════════════════════════════════════════════
+  //
+  // 'n Kwotasie is 'n AANBOD, nie 'n faktuur nie. Die woorde hieronder moet
+  // dit dra: nooit "verskuldig", nooit "betaalbaar", nooit "verwagte
+  // inkomste". Niks is verskuldig voordat dit aanvaar is nie.
+  //
+  // DIE STANDE IS EIE WOORDE, NIE DIE FAKTUUR S'N NIE. Sien _kwotasies.js:
+  // kry-staat.js en kry-joernaal.js filtreer albei op `stand === "gestuur"`,
+  // dus mag 'n kwotasie daardie woord nooit dra nie. "Uitgereik" is die
+  // kwotasie s'n; "Gestuur" bly die faktuur s'n.
+
+  // ── Die register ──
+  fp_nav_kwotasies: { af: "Kwotasies", en: "Quotations" },
+  fp_kwotasies_titel: { af: "Kwotasies", en: "Quotations" },
+  fp_nuwe_kwotasie: { af: "+ Nuwe kwotasie", en: "+ New quotation" },
+  fp_geen_kwotasies: { af: "Daar is nog geen kwotasies nie.", en: "There are no quotations yet." },
+  fp_kwotasies_laai_fout: {
+    af: "Kon nie die kwotasies laai nie. Probeer weer.",
+    en: "The quotations could not be loaded. Please try again.",
+  },
+  fp_kwotasie_een: { af: "kwotasie", en: "quotation" },
+  fp_kwotasie_baie: { af: "kwotasies", en: "quotations" },
+
+  // DIE WERKSYFER. Wat Future Sharp aangebied het en waaraan dit nog gebonde
+  // is. NIE "verwagte inkomste" NIE — dit staan eers op die staat wanneer 'n
+  // faktuur uitgereik is, en 'n aanbod bind die kliënt aan niks.
+  fp_kw_blootstelling: { af: "Uitgereik en nog geldig", en: "Issued and still valid" },
+
+  fp_kw_stand_konsep: { af: "Konsep", en: "Draft" },
+  fp_kw_stand_uitgereik: { af: "Uitgereik", en: "Issued" },
+  fp_kw_stand_aanvaar: { af: "Aanvaar", en: "Accepted" },
+  fp_kw_stand_verwerp: { af: "Verwerp", en: "Declined" },
+  // Word BEREKEN uit geldig_tot en nooit gestoor nie. Sien is_verval().
+  fp_kw_stand_verval: { af: "Verval", en: "Expired" },
+
+  fp_kw_geldig_tot: { af: "geldig tot", en: "valid until" },
+  fp_kw_verval_op: { af: "verval", en: "expired" },
+  fp_kw_aanvaar_op: { af: "aanvaar", en: "accepted" },
+  fp_kw_verwerp_op: { af: "verwerp", en: "declined" },
+  fp_kw_hersiening: { af: "hersiening", en: "revision" },
+  fp_kw_skrap_fout: { af: "Kon nie die kwotasie skrap nie.", en: "The quotation could not be deleted." },
+
+  // ── Die vorm ──
+  fv_kw_uitreik: { af: "Reik kwotasie uit", en: "Issue quotation" },
+  fv_kw_hersien: { af: "Hersien", en: "Revise" },
+  fv_kw_stuur_weer: { af: "Stuur weer", en: "Send again" },
+  fv_kw_geldigheid: { af: "Geldigheid", en: "Validity" },
+  fv_kw_geldig_tot: { af: "Geldig tot", en: "Valid until" },
+  fv_kw_geldig_wenk: {
+    af: "Verstek 30 dae vanaf die huidige hersiening. Ná hierdie datum weier die aanvaarknoppie.",
+    en: "Defaults to 30 days from the current revision. After this date the accept button refuses.",
+  },
+  fv_kw_hersienings: { af: "Hersienings", en: "Revisions" },
+  fv_kw_hersienings_lei: { af: "dieselfde nommer, dieselfde skakel", en: "same number, same link" },
+  fv_kw_huidig: { af: "huidig", en: "current" },
+  fv_kw_vervang: { af: "vervang", en: "replaced" },
+  fv_kw_hersien_wenk: {
+    af: "Die skakel wys altyd die huidige hersiening. 'n Vervangde aanbod kan nie aanvaar word nie.",
+    en: "The link always shows the current revision. A replaced offer cannot be accepted.",
+  },
+  fv_kw_verdeling_kop: { af: "Verdeling van die kwotasietotaal", en: "Distribution of the quotation total" },
+  fv_kw_totaal: { af: "Kwotasietotaal", en: "Quotation total" },
+  fv_kw_skakel: { af: "Skakel vir die kliënt", en: "Link for the client" },
+  fv_kw_skakel_kopieer: { af: "Kopieer skakel", en: "Copy link" },
+  fv_kw_verwerp: { af: "Merk as verwerp", en: "Mark as declined" },
+  fv_kw_verwerp_rede: { af: "Rede (opsioneel)", en: "Reason (optional)" },
+  fv_kw_uitgereik_ok: { af: "Kwotasie uitgereik en gestuur.", en: "Quotation issued and sent." },
+  fv_kw_hersien_ok: { af: "Hersiening uitgereik en gestuur.", en: "Revision issued and sent." },
+  fv_kw_geen_epos: {
+    af: "Hierdie kliënt het nog geen e-posadres nie, en die kwotasie het dus nêrens om heen te gaan nie.",
+    en: "This client has no email address yet, so the quotation has nowhere to go.",
+  },
+
+  // ── Die dokument ──
+  //
+  // Die kliënt se woorde. Hulle loop deur t_in(sleutel, kwotasie.taal) — die
+  // KWOTASIE se eie taal, nooit die platform s'n.
+  fd_kwotasie: { af: "Kwotasie", en: "Quotation" },
+  fd_gekwoteer_aan: { af: "Gekwoteer aan", en: "Quoted to" },
+  fd_geldig_tot: { af: "Geldig tot", en: "Valid until" },
+  // NIE "Totaal verskuldig" NIE. Niks is verskuldig voordat die kwotasie
+  // aanvaar is nie, en die faktuur wat daaruit kom, dra wél die ander woord.
+  fd_totaal: { af: "Totaal", en: "Total" },
+  fd_kw_hersiening: { af: "Hersiening", en: "Revision" },
+  fd_kw_geldig_lei: {
+    af: "By aanvaarding word 'n faktuur uitgereik en die betaalopsies verskyn onmiddellik.",
+    en: "On acceptance an invoice is issued and the payment options appear immediately.",
+  },
+  fd_kw_uit_kwotasie: { af: "Uit kwotasie", en: "From quotation" },
+
+  // ── Die publieke bladsy ──
+  kw_aanvaar_kop: { af: "Aanvaar hierdie kwotasie", en: "Accept this quotation" },
+  kw_aanvaar_lei: {
+    af: "Voltooi die besonderhede hieronder. 'n Faktuur word onmiddellik uitgereik en per e-pos gestuur, met albei betaalopsies daarop.",
+    en: "Complete the details below. An invoice is issued immediately and emailed to you, with both payment options on it.",
+  },
+  kw_naam: { af: "Naam en van", en: "Full name" },
+  kw_naam_plek: { af: "Wie aanvaar hierdie kwotasie", en: "Who is accepting this quotation" },
+  kw_epos: { af: "E-posadres", en: "Email address" },
+  kw_epos_plek: { af: "Waarheen die faktuur gestuur word", en: "Where the invoice will be sent" },
+  kw_bestelnommer_plek: { af: "Kan later verskaf word", en: "Can be provided later" },
+  kw_aanvaar_knop: { af: "Aanvaar kwotasie", en: "Accept quotation" },
+  kw_aanvaar_besig: { af: "Faktuur word uitgereik ...", en: "Issuing the invoice ..." },
+  kw_laai_af: { af: "Laai af as PDF", en: "Download as PDF" },
+
+  // DIE AANPASSING GAAN BUITE DIE STELSEL. Geen wysigingsvorm op die publieke
+  // bladsy: wat 'n kliënt daarin sou tik, is nooit 'n instruksie wat
+  // uitgevoer kan word nie — dit is die begin van 'n gesprek wat in elk geval
+  // gevoer moet word. En geen verwerp-knoppie: 'n kliënt wat wil onderhandel,
+  // sou 'n knoppie sien wat die gesprek toemaak, en hom klik omdat dit die
+  // naaste is aan "nee, nie so nie".
+  kw_kontak_lei: { af: "Vrae of 'n aanpassing? Skakel ons by", en: "Questions or an adjustment? Contact us at" },
+
+  kw_verval_kop: { af: "Hierdie kwotasie het verval", en: "This quotation has expired" },
+  kw_verval_lei: {
+    af: "Die geldigheidsdatum is verby. Skakel ons en ons stuur 'n bygewerkte kwotasie.",
+    en: "The validity date has passed. Contact us and we will send an updated quotation.",
+  },
+  kw_aanvaar_klaar_kop: { af: "Hierdie kwotasie is aanvaar", en: "This quotation has been accepted" },
+  kw_aanvaar_klaar_lei: {
+    af: "'n Faktuur is uitgereik en per e-pos gestuur.",
+    en: "An invoice has been issued and emailed.",
+  },
+  kw_aanvaar_fout: {
+    af: "Die kwotasie kon nie aanvaar word nie. Skakel ons en ons help dadelik.",
+    en: "The quotation could not be accepted. Contact us and we will help right away.",
+  },
+
   // DIE TERM WAT 'N REKENMEESTER VERWAG, NIE 'N BESKRYWING VAN DIE VELD NIE.
   //
   // Die toets: sou hierdie woord op 'n bankstaat, 'n grootboek of 'n staat
