@@ -1753,7 +1753,19 @@ const WOORDEBOEK = {
   bo_soort_uitgawe: { af: "Uitgawe", en: "Expense" },
   bo_voeg_ontvanger: { af: "+ Voeg 'n ontvanger by", en: "+ Add a recipient" },
   bo_hosting_kort: { af: "Hosting", en: "Hosting" },
-  bo_oorskot_kort: { af: "Na Future Sharp", en: "To Future Sharp" },
+  // NIE 'n BESTEMMING NIE. Hierdie veld is wat EEN REEL nog nie toegedeel het
+  // nie. Dit het "Na Future Sharp" gelees, terwyl bo_oorskot hieronder
+  // dieselfde woorde vir die HELE faktuur dra -- en die twee wys verskillende
+  // getalle sodra daar 'n uitgawereel is.
+  //
+  // Die identiteit wat wel geld:
+  //   som(elke reel se onverdeelde bedrag)
+  //     = die uitgawes se deel van die fooi + wat vir Future Sharp oorbly
+  //
+  // Die reels tel dus wel op -- net na 'n ander totaal as die een wat die ou
+  // etiket genoem het. Per reel het die bedrag geen bestemming nie, net 'n
+  // toestand: hierdie reel is nog nie klaar toegedeel nie.
+  bo_oorskot_kort: { af: "Onverdeeld", en: "Unallocated" },
   bo_koste_reel: {
     af: "Geen hosting \u2014 die ontvanger kry die volle bedrag terug.",
     en: "No hosting \u2014 the recipient gets the full amount back.",
