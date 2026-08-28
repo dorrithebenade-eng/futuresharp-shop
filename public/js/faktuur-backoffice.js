@@ -307,6 +307,9 @@ function bo_reel_toestand(reel, per) {
    Sy staan in 'n eie funksie sodat bo_teken() EN bo_teken_syfers() dieselfde
    HTML bou. Twee kopiee sou uitmekaar loop, en dit sou stil gebeur -- die een
    sou 'n nuwe waarskuwing kry en die ander nie. */
+/* Onder hierdie grens se die band niks. Sien die aantekening by die band self. */
+const VD_RUIS_SENT = 5;
+
 function bo_band_html(t) {
   if (t.stukkend) {
     return `<div class="vd-band stop">${
@@ -319,7 +322,19 @@ function bo_band_html(t) {
     }</div>`;
   }
 
-  if (t.oorskot < 0 && !t.almal_hoof) {
+  /* DIE BAND HET 'n ONDERGRENS.
+
+     Sy het op ELKE tekort gevuur, ook een van twee sent. Dan staan daar 'n
+     volsin met 'n bedrag in -- hierdie reel se deel van die transaksiefooi,
+     R0,02, word uit Future Sharp se deel gedek -- oor twee sent. 'n Mens leer
+     om so 'n band te ignoreer, en dan is hy weg op die dag wat hy saak maak.
+
+     VYF SENT, dieselfde getal as hierbo: 'n oorskryding van vyf sent is nie
+     stukkend nie, en 'n tekort van vyf sent is nie 'n paragraaf werd nie.
+
+     DIE GELD BEWEEG PRESIES SOOS TEVORE. Die band verduidelik; hy reken nie.
+     Die split loop klaar oor die hele faktuur en die kop wys elke sent. */
+  if (t.oorskot < -VD_RUIS_SENT && !t.almal_hoof) {
     // "KORT" WAS DIE VERKEERDE WOORD. Daar ontbreek niks; die reel se deel van
     // die transaksiefooi word net elders gedek.
     return `<div class="vd-band">${fv_t(
