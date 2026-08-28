@@ -115,9 +115,28 @@ function breek(teks, font, grootte, maks) {
  * @param {object} maatskappy  uit _instellings.js
  * @returns {Promise<Uint8Array>}
  */
-async function bou_faktuur_pdf(rekord, maatskappy) {
+/* EEN LEER, TWEE DOKUMENTE.
+
+   'n Kwotasie is dieselfde uitleg met ander woorde en EEN BLOK MINDER. Twee
+   lers sou beteken 'n regstelling aan die een word later op die ander vergeet
+   -- en albei gaan na 'n klient se finansiele afdeling.
+
+   WAT VERSKIL:
+     die etiket bo die nommer      Kwotasie      i.p.v. Proforma-faktuur
+     wie dit ontvang               Gekwoteer aan i.p.v. Gefaktureer aan
+     die datumveld                 Geldig tot    i.p.v. Betaalbaar teen
+     die slotsom                   Totaal        i.p.v. Totaal verskuldig
+     die hersieningsmerk           slegs vanaf hersiening 2
+     die betaalblok                VAL WEG
+
+   DIE BETAALBLOK VAL WEG, en dit is die belangrikste een. 'n Kwotasie is nie
+   betaalbaar nie. 'n Bankrekening op 'n aanbod nooi 'n betaling uit vir iets
+   wat nog nie gefaktureer is nie, en dan land geld in die hoofrekening sonder
+   'n faktuur om dit teen af te skryf. In sy plek staan die geldigheidsband. */
+async function bou_faktuur_pdf(rekord, maatskappy, opsies) {
   const taal = rekord.taal === "en" ? "en" : "af";
   const m = maatskappy || {};
+  const IS_KW = Boolean(opsies && opsies.soort === "kwotasie");
 
   const pdf = await PDFDocument.create();
   const bl = pdf.addPage([BREEDTE, HOOGTE]);
@@ -174,14 +193,30 @@ async function bou_faktuur_pdf(rekord, maatskappy) {
     });
   });
 
-  regs_skryf(t_in("fd_proforma", taal).toUpperCase(), REGS, y - 10, {
-    grootte: 7.5,
-    kleur: GRYS,
-  });
+  regs_skryf(
+    t_in(IS_KW ? "fd_kwotasie" : "fd_proforma", taal).toUpperCase(),
+    REGS,
+    y - 10,
+    { grootte: 7.5, kleur: GRYS }
+  );
   regs_skryf(rekord.nommer || t_in("fd_stand_konsep", taal), REGS, y - 30, {
     grootte: 20,
     vet: true,
   });
+
+  /* DIE HERSIENINGSMERK. Die nommer bly deur die hele onderhandeling dieselfde,
+     dus kan die klient twee uitdrukke met KW/01962 op sy lessenaar he en twee
+     verskillende totale. Eers vanaf hersiening 2: 'n eerste aanbod wat
+     "Hersiening 1" lees, laat 'n mens wonder wat jy gemis het. */
+  const hersiening = Number(rekord.hersiening) || 1;
+  if (IS_KW && hersiening > 1) {
+    regs_skryf(
+      `${t_in("fd_kw_hersiening", taal).toUpperCase()} ${hersiening}`,
+      REGS,
+      y - 44,
+      { grootte: 7.5, kleur: GRYS }
+    );
+  }
 
   y = Math.min(ky, y - 62) - 12;
 
@@ -192,7 +227,7 @@ async function bou_faktuur_pdf(rekord, maatskappy) {
   // ── gefaktureer aan / besonderhede ─────────────────────────────────────
   const mid = KANT + (REGS - KANT) * 0.55;
 
-  skryf(t_in("fd_gefaktureer_aan", taal).toUpperCase(), KANT, y, {
+  skryf(t_in(IS_KW ? "fd_gekwoteer_aan" : "fd_gefaktureer_aan", taal).toUpperCase(), KANT, y, {
     grootte: 7.5,
     kleur: GRYS,
   });
@@ -222,7 +257,10 @@ async function bou_faktuur_pdf(rekord, maatskappy) {
     ry -= 15;
   };
   besonderheid(t_in("fd_datum", taal), datum_kort(rekord.uitgereik_op || rekord.geskep_op, taal));
-  besonderheid(t_in("fd_betaalbaar_teen", taal), datum_veld(rekord.betaalbaar_teen));
+  // ELKE DOKUMENT SE EIE DATUMVELD. `geldig_tot` KEER die aanvaarding;
+  // `betaalbaar_teen` keer niks. Twee velde met twee betekenisse.
+  if (IS_KW) besonderheid(t_in("fd_geldig_tot", taal), datum_veld(rekord.geldig_tot));
+  else besonderheid(t_in("fd_betaalbaar_teen", taal), datum_veld(rekord.betaalbaar_teen));
   besonderheid(t_in("fd_bestelnommer", taal), rekord.bestelnommer);
 
   y = Math.min(ly, ry) - 14;
@@ -314,7 +352,11 @@ async function bou_faktuur_pdf(rekord, maatskappy) {
 
   bl.drawRectangle({ x: t_links, y: y + 12, width: REGS - t_links, height: 1.2, color: SWART });
   y -= 6;
-  som(t_in("fd_totaal_verskuldig", taal), Number(rekord.totaal_sent) || 0, true);
+  som(
+    t_in(IS_KW ? "fd_totaal" : "fd_totaal_verskuldig", taal),
+    Number(rekord.totaal_sent) || 0,
+    true
+  );
   y -= 12;
 
   // ── die aantekening ────────────────────────────────────────────────────
@@ -326,6 +368,40 @@ async function bou_faktuur_pdf(rekord, maatskappy) {
       y -= 13;
     });
     y -= 12;
+  }
+
+  /* ══ DIE GELDIGHEIDSBAND — SLEGS OP 'N KWOTASIE ══════════════════
+
+     In die plek van die betaalblok. Sy se twee dinge: tot wanneer die aanbod
+     staan, en wat gebeur as die klient hom aanvaar. Geen bankrekening, geen
+     QR, geen betaalknoppie -- 'n kwotasie is nie betaalbaar nie. */
+  if (IS_KW) {
+    const kop = `${t_in("fd_kw_geldig_kop", taal)} ${
+      datum_veld(rekord.geldig_tot) || "\u2014"
+    }`;
+    const lei = breek(t_in("fd_kw_geldig_lei", taal), gewoon, 9, REGS - KANT - 32);
+    const hoog = 20 + 15 + lei.length * 12;
+    const bo = y;
+    const onder = bo - hoog;
+
+    bl.drawRectangle({
+      x: KANT,
+      y: onder,
+      width: REGS - KANT,
+      height: hoog,
+      color: LIG,
+    });
+    bl.drawRectangle({ x: KANT, y: onder, width: 2.5, height: hoog, color: TEAL });
+
+    let gy = bo - 20;
+    skryf(kop, KANT + 16, gy, { grootte: 9.5, vet: true });
+    gy -= 15;
+    lei.forEach((r) => {
+      skryf(r, KANT + 16, gy, { grootte: 9, kleur: GRYS });
+      gy -= 12;
+    });
+
+    return pdf.save();
   }
 
   // ── die betaalblok ─────────────────────────────────────────────────────

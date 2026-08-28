@@ -40,6 +40,7 @@ const {
 const { datum_dokument } = require("./_fakture");
 const { kry_maatskappy } = require("./_instellings");
 const { stuur_epos, ontsnap } = require("./_stuur-epos");
+const { bou_faktuur_pdf } = require("./_faktuur-pdf");
 // t_rand alleen. `fd_kwotasie` BESTAAN NIE in taal.js nie, en t_in() gee die
 // SLEUTEL terug wanneer hy hom nie ken nie — dan sou "fd_kwotasie" as die
 // opskrif van 'n kliënt se e-pos staan. Dit het op 6 Augustus gebeur. Die
@@ -249,12 +250,13 @@ exports.handler = async (event, context) => {
    nie gefaktureer is nie — dan land geld in die hoofrekening sonder 'n
    faktuur om dit teen af te skryf.
 
-   GEEN PDF-AANHEGSEL NIE, nog nie. _faktuur-pdf.js is heeltemal
-   faktuur-gevorm: `fd_proforma`, `fd_gefaktureer_aan`, `fd_betaalbaar_teen`,
-   `fd_totaal_verskuldig` en 'n betaalblok met QR. Om hom albei dokumente te
-   laat dra, is 'n verandering aan 'n werkende lêer wat kliëntdokumente
-   produseer, en dit is sy eie stuk werk. Die skakel dra intussen die
-   dokument. */
+   DIE PDF GAAN SAAM, by elke uitreiking EN by elke hersiening. 'n Skool se
+   finansiële afdeling liasseer 'n dokument; 'n skakel help hulle nie.
+
+   _faktuur-pdf.js dra albei dokumente sedert 28 Augustus 2026 —
+   `bou_faktuur_pdf(rekord, maatskappy, { soort: "kwotasie" })`. Die betaalblok
+   val weg en 'n geldigheidsband kom in sy plek: 'n bankrekening op 'n aanbod
+   sou 'n betaling uitnooi vir iets wat nog nie gefaktureer is nie. */
 async function stuur_kwotasie_pos(rekord, sleutel, kode) {
   try {
     const aan = teks(rekord.klient && rekord.klient.epos);
@@ -303,13 +305,31 @@ async function stuur_kwotasie_pos(rekord, sleutel, kode) {
       // tik, is nooit 'n instruksie wat uitgevoer kan word nie, dit is die
       // begin van 'n gesprek wat in elk geval gevoer moet word.
       en
-        ? `Questions or an adjustment? Email us at ${ontsnap(teks((maatskappy && maatskappy.epos) || "admin@futuresharp.co.za"))}.`
-        : `Vrae of 'n aanpassing? E-pos ons by ${ontsnap(teks((maatskappy && maatskappy.epos) || "admin@futuresharp.co.za"))}.`,
+        ? `Questions or an adjustment? Contact us at ${ontsnap(teks((maatskappy && maatskappy.epos) || "admin@futuresharp.co.za"))}.`
+        : `Vrae of 'n aanpassing? Skakel ons by ${ontsnap(teks((maatskappy && maatskappy.epos) || "admin@futuresharp.co.za"))}.`,
     ];
+
+    /* DIE PDF MAG MISLUK SONDER OM DIE POS TE KEER. 'n Kwotasie met die syfers
+       en die skakel is bruikbaar; sonder die pos is daar niks. Dieselfde
+       hantering as by die proforma in _faktuur-uitreik.js. */
+    let aanhegsels = [];
+    try {
+      const grepe = await bou_faktuur_pdf(rekord, maatskappy, { soort: "kwotasie" });
+      aanhegsels = [
+        {
+          filename: `${String(nommer).replace(/\//g, "-")}.pdf`,
+          content: Buffer.from(grepe),
+          contentType: "application/pdf",
+        },
+      ];
+    } catch (fout) {
+      console.error(`Kwotasie: kon nie die PDF bou vir ${sleutel} nie:`, fout);
+    }
 
     return await stuur_epos({
       merk: "faktuur",
       aan,
+      aanhegsels,
       onderwerp: en ? `Quotation ${nommer}` : `Kwotasie ${nommer}`,
       opskrif: en ? "Quotation" : "Kwotasie",
       reels,
