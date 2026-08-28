@@ -114,19 +114,48 @@ function fs_bereken(invoer) {
   const perReel = [];
   let hostingSent = 0;
 
+  /* DIE FOOI SE DELE MOET PRESIES TOT DIE FOOI TEL.
+
+     Elke reël se deel is `Math.round(paystackSent × verhouding)`, en drie
+     afrondings tel dalk een of twee sent langs die fooi. Die OORSKOT onderaan
+     gebruik intussen die presiese `paystackSent`.
+
+     Die gevolg was 'n stille teenstrydigheid op die skerm: op 28 Augustus 2026
+     het drie reëls se "Na Future Sharp" −R0,02, +R0,01 en R0,00 gelees — saam
+     −R0,01 — terwyl die somblok R0,00 gewys het. Twee paaie na dieselfde getal,
+     met afrondings op verskillende plekke.
+
+     Die LAASTE reël vang die verskil op. Dit is dieselfde beginsel as die
+     oorskot self, wat reeds die afronding van die totaal dra: die verskil moet
+     iewers land, en die laaste plek is die minste verrassende.
+
+     Slegs die per-reël-syfers verander. Die totaal, die fooi, wat uitbetaal
+     word en die oorskot bly presies wat hulle was. */
+  const fooiDele = reels.map((rl, ix) => {
+    if (terugwaarts) {
+      const deel = bydraeSom > 0 ? bydraes[ix] / bydraeSom : 0;
+      return Math.round(paystackSent * deel);
+    }
+    const deel = totaalSent > 0 ? bydraes[ix] / totaalSent : 0;
+    return Math.round(paystackSent * deel);
+  });
+
+  if (fooiDele.length) {
+    const som = fooiDele.reduce((a, b) => a + b, 0);
+    fooiDele[fooiDele.length - 1] += paystackSent - som;
+  }
+
   reels.forEach((rl, ix) => {
     let bedragSent, basisSent;
     if (terugwaarts) {
       // Die basis staan vas; die reël se bedrag is die basis plus sy deel
       // van die fooi.
       basisSent = bydraes[ix];
-      const deel = bydraeSom > 0 ? basisSent / bydraeSom : 0;
-      bedragSent = basisSent + Math.round(paystackSent * deel);
+      bedragSent = basisSent + fooiDele[ix];
     } else {
       // Die bedrag staan vas; die basis is wat ná die fooi oorbly.
       bedragSent = bydraes[ix];
-      const deel = totaalSent > 0 ? bedragSent / totaalSent : 0;
-      basisSent = Math.max(0, bedragSent - Math.round(paystackSent * deel));
+      basisSent = Math.max(0, bedragSent - fooiDele[ix]);
     }
 
     let toegekenSent = 0;
