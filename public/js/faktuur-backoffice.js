@@ -635,9 +635,11 @@ function bo_teken_verdeling(S) {
       if (V.reels[rx].soort === soort) return;
       if (window.fv_ontdoen_merk) window.fv_ontdoen_merk();
       V.reels[rx].soort = soort;
-      // 'n Kostereël dra nooit hosting nie: trek 'n mens hosting van 'n
-      // terugbetaling af, kry die persoon minder terug as wat hy uitgegee het.
-      if (soort === "koste") V.reels[rx].hosting_pct = 0;
+      // DIE HOSTING WORD NIE MEER UITGEVEE NIE. 'n Kostereel dra nooit
+      // hosting nie -- trek 'n mens hosting van 'n terugbetaling af, kry die
+      // persoon minder terug as wat hy uitgegee het -- maar daardie reel leef
+      // nou in faktuur-som.js. Die getik getal bly staan en kom terug sodra
+      // die reel weer Inkomste word.
       bo_teken();
       merk_vuil();
     });

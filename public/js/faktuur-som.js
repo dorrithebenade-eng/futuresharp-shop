@@ -341,7 +341,14 @@ function fs_invoer_uit_faktuur(faktuur, het_subrekening) {
     // GEEN `|| 5`-TERUGVAL NIE. 'n Doelbewuste nul moet die rondreis oorleef:
     // op 'n kostereël beteken nul dat hosting nie gehef word nie, en dit is 'n
     // keuse, nie 'n weglating nie.
-    const hosting = Number(r.hosting_pct);
+    // GEEN HOSTING OP 'N KOSTEREEL, EN DIE REEL STAAN HIER.
+    //
+    // Die skerm het hosting_pct op nul gesit sodra 'n reel na Uitgawe geskuif
+    // is. Dit het gewerk, maar die getal was dan WEG: skuif 'n mens die reel
+    // terug na Inkomste, staan die veld leeg en niks se dat die 5% verdwyn
+    // het nie. Die model onthou nou wat getik is; hierdie funksie besluit of
+    // dit tel.
+    const hosting = r.soort === "koste" ? 0 : Number(r.hosting_pct);
     if (hosting > 0) {
       rye.push({ ontvanger: "Hosting", tipe: "pct", waarde: hosting });
     }
