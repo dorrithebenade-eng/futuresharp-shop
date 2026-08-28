@@ -713,6 +713,17 @@ function teken_dok_taal() {
   const nr = document.getElementById("d-nommer");
   if (nr) nr.textContent = V.nommer || dt("fd_stand_konsep", "Konsep");
 
+  // DIE HERSIENINGSMERK. Die nommer bly deur die hele onderhandeling dieselfde,
+  // dus kan die klient twee uitdrukke met dieselfde nommer en twee verskillende
+  // totale he. Eers vanaf hersiening 2: 'n eerste aanbod wat "Hersiening 1"
+  // lees, laat 'n mens wonder wat jy gemis het.
+  const hers = document.getElementById("d-hersiening");
+  if (hers) {
+    const n = Number(V.hersiening) || 1;
+    hers.textContent = n > 1 ? dt("fd_kw_hersiening", "Hersiening") + " " + n : "";
+    hers.style.display = n > 1 ? "" : "none";
+  }
+
   // Die betaalknoppie dra die nommer; hy is dood tot die faktuur uitgereik is.
   const knop = document.getElementById("d-betaal");
   if (knop) {
@@ -1331,7 +1342,141 @@ function sluit_toe() {
   });
   const kies = document.getElementById("fv-klient-kies");
   if (kies) kies.style.display = "none";
+
+  /* DIE BACKOFFICE OOK, EN DIT MOET 'N HERTEKEN OORLEEF.
+
+     Die dokument se velde hou hul `disabled`, want niks teken hulle oor solank
+     niemand kan tik nie. Die backoffice word by ELKE berekening oorgeteken, en
+     'n attribuut op 'n element wat pas vervang is, is weg. Tot hier kon 'n mens
+     dus die verdeling van 'n uitgereikte kwotasie tik: dit het nerens heen
+     geskryf nie, en dit het gelyk of dit iets doen.
+
+     Die klas sit op <body>, nie op die elemente nie. Sien faktuur.css. */
+  document.body.classList.add("fv-toe");
+
   wys_stoorstand(fv_t("fv_toe", "Uitgereik — word nie meer gewysig nie"), false);
+  hersien_wys();
+}
+
+/* ═══ DIE HERSIENING ════════════════════════════════════
+
+   'n Klient vra 'n aanpassing. Die uitkoms is 'n nuwe aanbod onder DIESELFDE
+   nommer en DIESELFDE skakel; die hersieningsnommer tel op.
+
+   NIKS WORD GESTOOR TERWYL 'N MENS TIK NIE. Die klient se skakel wys altyd die
+   lewende rekord, dus sou 'n outomatiese stoor beteken hy kan 'n halfgewysigde
+   aanbod aanvaar. Die nuwe reels gaan in EEN oproep saam met die hersiening.
+   stoor-kwotasie.js weier in elk geval op enigiets wat nie 'n konsep is nie.
+
+   DIE UITREIKING KAN NIE ONTDOEN WORD NIE -- sy stuur 'n pos en maak die vorige
+   aanbod dood. Die knoppie vra dus eers om bevestiging, in sy eie plek, soos
+   die skrapknoppie in die register. */
+let HERSIEN = false;
+
+function hersien_wys() {
+  if (!IS_KW) return;
+  const knop = document.getElementById("fv-hersien");
+  if (!knop) return;
+  // Ook 'n verlope kwotasie. Dit is juis wat 'n mens doen wanneer 'n skool
+  // eers na ses weke antwoord; hersien-kwotasie.js laat dit uitdruklik toe.
+  knop.style.display = V.stand === "uitgereik" ? "" : "none";
+}
+
+function hersien_begin() {
+  if (!IS_KW || HERSIEN || V.stand !== "uitgereik") return;
+  HERSIEN = true;
+
+  document.body.classList.remove("fv-toe");
+  document
+    .querySelectorAll("#fv-dok input, #fv-dok textarea, #fv-dok select")
+    .forEach((el) => el.removeAttribute("disabled"));
+
+  const wys = (id, aan) => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = aan ? "" : "none";
+  };
+  wys("fv-voeg-reel", true);
+  wys("fv-klient-kies", true);
+  wys("fv-hersien", false);
+  wys("fv-hersien-uit", true);
+  wys("fv-hersien-vaar", true);
+
+  // STOOR EN REIK UIT BLY WEG. 'n Hersiening is nie 'n stoor nie, en die
+  // kwotasie is reeds uitgereik.
+  wys("fv-stoor", false);
+  wys("fv-uitreik", false);
+
+  hersien_band();
+  teken_alles();
+}
+
+function hersien_band() {
+  const nuut = (Number(V.hersiening) || 1) + 1;
+  const oud = Number(V.hersiening) || 1;
+  wys_stoorstand(
+    fv_t(
+      "fv_kw_hersien_band",
+      "Hersiening {nuut} in wording — die kliënt sien nog hersiening {oud}"
+    )
+      .replace("{nuut}", String(nuut))
+      .replace("{oud}", String(oud)),
+    false
+  );
+}
+
+function hersien_vaar() {
+  window.location.reload();
+}
+
+// Twee klikke, nie 'n confirm() nie. Die eerste ruil die knoppie se woorde;
+// die tweede stuur. 'n Klik langs enigiets anders stel hom terug.
+let HERSIEN_GEVRA = false;
+
+function hersien_klik() {
+  const knop = document.getElementById("fv-hersien-uit");
+  if (!knop) return;
+  if (!HERSIEN_GEVRA) {
+    HERSIEN_GEVRA = true;
+    knop.textContent = fv_t(
+      "fv_kw_hersien_bevestig",
+      "Bevestig — stuur aan die kliënt"
+    );
+    return;
+  }
+  hersien_stuur();
+}
+
+async function hersien_stuur() {
+  if (!HERSIEN || BESIG || !SESSIE) return;
+  const knop = document.getElementById("fv-hersien-uit");
+  BESIG = true;
+  if (knop) knop.disabled = true;
+
+  try {
+    const resp = await fetch("/.netlify/functions/hersien-kwotasie", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${SESSIE.access_token}`,
+      },
+      body: JSON.stringify(liggaam()),
+    });
+    if (!resp.ok) throw new Error(await resp.text());
+
+    // 'n HERLAAI, NIE 'n PLAASLIKE BYWERKING NIE. Die Function het die
+    // momentopname geneem, die nommer opgetel, die geldigheid gestel en die pos
+    // gestuur. Die rekord is die waarheid; die skerm moet hom gaan haal.
+    window.location.reload();
+  } catch (fout) {
+    console.error("Kon nie die hersiening uitreik nie:", fout);
+    wys_stoorstand(String((fout && fout.message) || fout), true);
+    HERSIEN_GEVRA = false;
+    if (knop) {
+      knop.disabled = false;
+      knop.textContent = fv_t("fv_kw_hersien_uit", "Reik hersiening uit");
+    }
+    BESIG = false;
+  }
 }
 
 function geen_toegang(teks) {
@@ -1498,6 +1643,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const knop = document.getElementById("fv-stoor");
   if (knop) knop.addEventListener("click", () => stoor());
+
+  const h_begin = document.getElementById("fv-hersien");
+  if (h_begin) h_begin.addEventListener("click", hersien_begin);
+  const h_uit = document.getElementById("fv-hersien-uit");
+  if (h_uit) h_uit.addEventListener("click", hersien_klik);
+  const h_vaar = document.getElementById("fv-hersien-vaar");
+  if (h_vaar) h_vaar.addEventListener("click", hersien_vaar);
 
   document.getElementById("d-taal").addEventListener("click", (e) => {
     const b = e.target.closest("button");

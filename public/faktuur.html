@@ -126,6 +126,22 @@
           <button type="button" class="kaart-aksie fu-stil" id="fv-betaling"
                   style="display:none;" data-i18n="fb_knop">Betaling ontvang</button>
           <button type="button" class="kaart-aksie fu-stil" id="fv-druk" data-i18n="fv_druk">Druk</button>
+
+          <!-- HERSIEN. Slegs op 'n UITGEREIKTE kwotasie, ook een wat verval
+               het -- 'n skool wat eers na ses weke antwoord, is juis die geval
+               waarvoor 'n hersiening bestaan.
+
+               DIE DRIE KNOPPIES IS EEN MEGANISME. Hersien maak die vorm oop;
+               Reik hersiening uit stuur alles in EEN oproep; Laat vaar herlaai.
+               Niks word gestoor terwyl 'n mens tik nie, want die kliens skakel
+               wys altyd die lewende rekord -- 'n halfgewysigde aanbod mag nooit
+               daar staan nie. Sien faktuur-vorm.js. -->
+          <button type="button" class="kaart-aksie fu-stil" id="fv-hersien"
+                  style="display:none;" data-i18n="fv_kw_hersien">Hersien</button>
+          <button type="button" class="kaart-aksie fu-stil" id="fv-hersien-vaar"
+                  style="display:none;" data-i18n="fv_kw_hersien_vaar">Laat vaar</button>
+          <button type="button" class="kaart-aksie fv-uitreik" id="fv-hersien-uit"
+                  style="display:none;" data-i18n="fv_kw_hersien_uit">Reik hersiening uit</button>
           <button type="button" class="kaart-aksie fu-stil" id="fv-stoor" data-i18n="fk_stoor">Stoor</button>
 
           <!-- TEAL EN NIE KORAAL NIE. Koraal is Stoor, wat 'n mens twintig
@@ -187,6 +203,15 @@
           <div class="dok-nr">
             <div class="et" id="d-soort">Proforma-faktuur</div>
             <div class="nr" id="d-nommer">Konsep</div>
+
+            <!-- DIE HERSIENINGSMERK. Die nommer bly dieselfde deur die hele
+                 onderhandeling, dus kan die klient twee uitdrukke met KW/01962
+                 op sy lessenaar he en twee verskillende totale. Sonder hierdie
+                 reel se die papier nie watter een geld nie.
+
+                 EERS VANAF HERSIENING 2. 'n Eerste aanbod wat "Hersiening 1"
+                 lees, laat 'n mens wonder wat jy gemis het. -->
+            <div class="dok-hersiening" id="d-hersiening" style="display:none;"></div>
             <div class="dok-fyn">
               <span class="dok-taal" id="d-taal">
                 <button type="button" data-taal="af" class="aan">AF</button>

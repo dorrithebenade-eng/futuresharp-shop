@@ -2313,6 +2313,20 @@ const WOORDEBOEK = {
   // ── Die vorm ──
   fv_kw_uitreik: { af: "Reik kwotasie uit", en: "Issue quotation" },
   fv_kw_hersien: { af: "Hersien", en: "Revise" },
+
+  // DIE HERSIENINGSMODUS. Die band se twee getalle word in faktuur-vorm.js
+  // ingevul: {nuut} is die aanbod wat gemaak word, {oud} is die een wat die
+  // klient op hierdie oomblik nog sien.
+  fv_kw_hersien_band: {
+    af: "Hersiening {nuut} in wording \u2014 die kli\u00ebnt sien nog hersiening {oud}",
+    en: "Revision {nuut} in progress \u2014 the client still sees revision {oud}",
+  },
+  fv_kw_hersien_uit: { af: "Reik hersiening uit", en: "Issue revision" },
+  fv_kw_hersien_bevestig: {
+    af: "Bevestig \u2014 stuur aan die kli\u00ebnt",
+    en: "Confirm \u2014 send to the client",
+  },
+  fv_kw_hersien_vaar: { af: "Laat vaar", en: "Discard" },
   fv_kw_stuur_weer: { af: "Stuur weer", en: "Send again" },
   fv_kw_geldigheid: { af: "Geldigheid", en: "Validity" },
   fv_kw_geldig_tot: { af: "Geldig tot", en: "Valid until" },

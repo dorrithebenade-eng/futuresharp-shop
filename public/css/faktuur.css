@@ -862,6 +862,41 @@ body.fv-sleep * {
   .fv-blad { grid-template-columns: 1fr; }
   .fv-greep { display: none; }
 }
+/* DIE HERSIENINGSMERK ONDER DIE NOMMER. Fyn, in dieselfde register as die
+   "KWOTASIE"-etiket daarbo -- dit is 'n identifikasie, nie 'n aankondiging. */
+.dok-hersiening {
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--grys-teks);
+  margin: 4px 0 6px;
+}
+
+/* DIE SLOT MOET 'N HERTEKEN OORLEEF.
+
+   sluit_toe() sit `disabled` op die DOKUMENT se velde, en dit hou, want niks
+   teken die dokument oor solank niemand kan tik nie. Die backoffice is anders:
+   hy word by elke berekening oorgeteken, en 'n attribuut wat op 'n element sit
+   wat pas vervang is, is weg.
+
+   Dus 'n klas op <body>. Sy oorleef elke herteken, want sy sit nie op die
+   elemente nie.
+
+   NIE `pointer-events: none` OP DIE HELE KOLOM NIE: die kolom rol self, en 'n
+   houer wat geen wyser vang nie, rol ook nie. Slegs die velde en die knoppies
+   wat iets VERANDER gaan toe. "wys waaruit" bly werk -- hy wys net. */
+body.fv-toe #fv-bo input,
+body.fv-toe #fv-bo select,
+body.fv-toe #fv-bo textarea,
+body.fv-toe #fv-bo .vd-tipe button,
+body.fv-toe #fv-bo .vd-soort button,
+body.fv-toe #fv-bo .vd-voeg,
+body.fv-toe #fv-bo .vd-regstel,
+body.fv-toe #fv-bo .bo-vee {
+  pointer-events: none;
+  opacity: .72;
+}
+
 .bo-kaart {
   background: #fff;
   border: 1px solid var(--fv-lyn);
