@@ -99,7 +99,18 @@ function lees_reels(rou) {
       hoeveelheid: veilig,
       prys_pp_sent,
       bedrag_sent: Math.round(veilig * prys_pp_sent),
-      op_faktuur: item.op_faktuur !== false,
+      // GEEN `!== false`-TERUGVAL NIE, andersom as by die ou op_faktuur.
+      // Ontbreek die veld, staan die reel OP HAAR EIE -- die veilige rigting.
+      // 'n Reel wat vanself invou, verdwyn van die dokument sonder dat iemand
+      // dit gevra het, en die klient sien 'n bedrag by 'n naam wat nie syne is
+      // nie.
+      //
+      // HIERDIE LEER HET OP `op_faktuur` BLY STAAN toe stoor-kwotasie.js en
+      // kry-kwotasie.js na `vou_in` oorgeskakel het. 'n Hersiening sou dus elke
+      // reel se groepering uitgevee het: die bedrae bly reg, maar die klient
+      // kry 'n ander dokument as die een wat hy gesien het. Dit het nog nooit
+      // gebeur nie -- daar is geen skerm wat hierdie Function roep nie.
+      vou_in: item.vou_in === true,
       hosting_pct: Number.isFinite(hosting) ? Math.min(100, Math.max(0, hosting)) : 0,
       verdeling: lees_verdeling(item.verdeling),
     };
@@ -185,6 +196,16 @@ exports.handler = async (event, context) => {
   // hersien en dan wysig, kon die kliënt 'n halfgewysigde aanbod aanvaar
   // terwyl iemand nog tik.
   if (invoer.reels !== undefined) rekord.reels = lees_reels(invoer.reels);
+
+  // DIE EERSTE REEL VOU NOOIT IN NIE. Daar is niks bo haar om by in te vou
+  // nie, en 'n weeskind sou haar bedrag stilweg uit die gedrukte reels laat
+  // val terwyl sy in die totaal bly.
+  //
+  // Dieselfde afdwinging as in stoor-kwotasie.js, en om dieselfde rede: die
+  // vorm dwing dit ook af, maar die vorm is nie die poort nie.
+  if (Array.isArray(rekord.reels) && rekord.reels.length) {
+    rekord.reels[0].vou_in = false;
+  }
   if (invoer.koste !== undefined) rekord.koste = lees_koste(invoer.koste);
   if (invoer.dokument_nota !== undefined) rekord.dokument_nota = teks(invoer.dokument_nota, 3000);
   if (invoer.bestelnommer !== undefined) rekord.bestelnommer = teks(invoer.bestelnommer, 100);
