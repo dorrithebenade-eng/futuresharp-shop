@@ -346,19 +346,26 @@
         </div>
 
         <div class="bo-kaart">
-          <div class="bo-kop">
-            <!-- Op 'n kwotasie lees dit "Verdeling van die kwotasietotaal".
-                 teken_soort() in faktuur-vorm.js ruil albei. -->
-            <div class="bo-titel" id="bo-verdeling-kop" data-i18n="bo_verdeling">Verdeling van die faktuurtotaal</div>
-          </div>
 
           <!-- DIE KOP BLY BO-AAN TERWYL 'N MENS IN DIE REELS WERK.
 
                Die verdeling loop laag af op 'n faktuur met vyf reels, en dan is
                die enigste getal wat die skaal wys, boaan die skerm uit. Die
                fooi en die beskikbare bedrag hoort bymekaar: die fooi is die
-               eerste aftrekking, die beskikbare bedrag is wat daarna oorbly. -->
+               eerste aftrekking, die beskikbare bedrag is wat daarna oorbly.
+
+               DIE TITEL STAAN BINNE HIERDIE BLOK, nie daarbo nie. Hy het
+               buite gestaan, en toe die blok vasklou het sy wit agtergrond oor
+               die titel se boonste helfte geskuif -- 'n opskrif wat halfpad
+               afgesny lyk sodra 'n mens die kolom 'n sentimeter rol. Een
+               sticky blok, een agtergrond, niks om oor te skuif nie. -->
           <div class="vd-kop" id="vd-kop">
+
+            <div class="bo-kop">
+              <!-- Op 'n kwotasie lees dit "Verdeling van die kwotasietotaal".
+                   teken_soort() in faktuur-vorm.js ruil albei. -->
+              <div class="bo-titel" id="bo-verdeling-kop" data-i18n="bo_verdeling">Verdeling van die faktuurtotaal</div>
+            </div>
 
             <!-- Paystack is NIE 'n ontvanger nie. Hy is 'n geslote, berekende
                  ry — nie 'n besluit nie, dus nie 'n keuse nie. -->
