@@ -385,18 +385,29 @@ body.fv-kwotasie .dok-betaal { display: none !important; }
    Die fooi en die beskikbare bedrag, wat bo-aan bly terwyl 'n mens laer in die
    reels werk. Die verdeling loop laag af op 'n faktuur met vyf reels, en dan is
    die enigste getal wat die skaal wys, boaan die skerm uit. */
-.bo-kop {
+/* `.vd-kop`, NIE `.bo-kop` NIE.
+
+   `.bo-kop` bestaan reeds: dit is elke kaart se TITELBALK, met `display: flex`
+   en `justify-content: space-between`. My reel het daaroor gebots en toe het
+   die fooi en die beskikbare bedrag LANGS mekaar beland, elk in 'n helfte, met
+   die etiket wat oor sewe reels breek.
+
+   Twee reels met dieselfde naam vir twee verskillende dinge -- presies die
+   soort botsing wat 'n mens eers op die skerm sien. */
+.vd-kop {
   position: sticky;
   top: 0;
   z-index: 5;
-  background: var(--wit);
-  margin: 0 -18px 12px;
-  padding: 2px 18px 0;
+  background: #fff;
+  /* Van rand tot rand van die kaart, sodat daar geen strepie verdeling langs
+     hom verbyskuif nie. Die waardes pas by .bo-kaart se padding. */
+  margin: -16px -17px 12px;
+  padding: 16px 17px 0;
 }
 
 /* Die skaduwee verskyn eers wanneer hy werklik oor iets le. 'n Skaduwee onder
    'n blok wat aan niks raak nie, is ruis. */
-.bo-kop.vas { box-shadow: 0 6px 16px rgba(23, 23, 23, .10); }
+.vd-kop.vas { box-shadow: 0 6px 16px rgba(23, 23, 23, .10); }
 
 /* ── Die fooi se afbreek ── */
 .vd-slot-ry {
@@ -490,7 +501,7 @@ body.fv-kwotasie .dok-betaal { display: none !important; }
 
 /* Op papier bestaan die kop nie. */
 @media print {
-  .bo-kop { display: none !important; }
+  .vd-kop { display: none !important; }
 }
 
 /* ═══ DIE INVOU ══════════════════════════════════════════════════════════
@@ -766,7 +777,38 @@ body.fv-kwotasie .dok-betaal { display: none !important; }
   gap: 20px;
   align-items: start;
 }
-.bo { position: sticky; top: 20px; }
+/* DIE BACKOFFICE-KOLOM ROL SELF.
+
+   Sy was `position: sticky; top: 20px`. Dit werk vir 'n kort kolom, maar op 'n
+   faktuur met vyf reels is die verdeling hoer as die venster -- en dan rol die
+   HELE bladsy verby en die kolom se bokant gaan bo uit.
+
+   Erger: 'n sticky element BINNE 'n sticky element kan nerens gly nie. Die kop
+   met die beskikbare bedrag het by `top: 0` geklou, maar aan die kolom se
+   bokant, en daardie bokant was self boaan die skerm uit. Die enigste getal wat
+   die skaal wys, was onsigbaar sodra 'n mens by die derde reel kom.
+
+   Nou: die kolom kry 'n eie hoogte en rol binne haarself. Die kop klou dan
+   binne 'n houer wat werklik hoogte het.
+
+   `--kop` is die swart mini-kop plus die faktuurbalk. */
+.bo {
+  position: sticky;
+  top: 20px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* Op 'n smal skerm val die twee kolomme onder mekaar en 'n kolom wat self rol,
+   is dan 'n venster binne 'n venster. Sy rol saam met die bladsy. */
+@media (max-width: 980px) {
+  .bo {
+    position: static;
+    max-height: none;
+    overflow-y: visible;
+  }
+}
 .bo-kaart {
   background: #fff;
   border: 1px solid var(--fv-lyn);

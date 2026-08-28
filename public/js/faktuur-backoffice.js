@@ -1023,7 +1023,7 @@ document.addEventListener("DOMContentLoaded", () => {
 function bo_bind_kop() {
   /* Sticky gee geen gebeurtenis nie, dus meet ons sy plek: raak sy bokant die
      kolom se bokant, klou hy vas en kry sy skaduwee. */
-  const kop = document.getElementById("bo-kop");
+  const kop = document.getElementById("vd-kop");
   if (kop) {
     const kyk = () => kop.classList.toggle("vas", kop.getBoundingClientRect().top <= 1);
     window.addEventListener("scroll", kyk, { passive: true });
