@@ -493,8 +493,35 @@ function bo_teken_verdeling(S) {
         // 'n Persentasie en 'n bedrag is nie dieselfde getal nie. Skakel 'n
         // mens van 55% na R, is "55" nie R55 nie — die waarde word skoongevee
         // eerder as om stilweg 'n verkeerde bedrag te word.
-        lys()[ix].tipe = b.getAttribute("data-tipe");
-        lys()[ix].waarde = 0;
+        const nuwe = b.getAttribute("data-tipe");
+        const huidig = lys()[ix].tipe;
+
+        // DIESELFDE KNOPPIE WEER DRUK IS GEEN KEUSE NIE. Dit het die veld
+        // skoongevee: 'n mens raak sy bedrag kwyt deur op R te druk terwyl
+        // die ry reeds R is.
+        if (nuwe === huidig) return;
+
+        /* VAN % NA R DRA DIE BEDRAG OOR.
+
+           Die waarde het na 0 geval, met die redenasie dat "55" nie R55 is
+           nie. Dit bly waar vir die GETIKTE getal, maar die bedrag wat
+           hierdie ry op hierdie oomblik uitbetaal, is nie 'n raaiskoot nie --
+           hy staan in die uit-kolom langsaan. Hom oordra verander niks aan
+           die geld nie; dit VRIES hom net, en dit is presies wat 'n mens met
+           R bedoel.
+
+           Van R na % bly die skoonveeg staan. 'n Bedrag deel nie altyd op in
+           'n persentasie wat tot dieselfde sent teruglei nie, en 'n
+           persentasie loop weer saam met die reel se bedrag. */
+        if (nuwe === "vas" && huidig === "pct") {
+          const per = bo_som().u.perReel[rx];
+          const pct = Number(lys()[ix].waarde) || 0;
+          lys()[ix].waarde = per ? Math.round((pct / 100) * per.basisSent) : 0;
+        } else {
+          lys()[ix].waarde = 0;
+        }
+
+        lys()[ix].tipe = nuwe;
         bo_teken();
         merk_vuil();
       });
