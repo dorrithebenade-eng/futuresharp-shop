@@ -1708,6 +1708,41 @@ const WOORDEBOEK = {
   nki_fout: { af: "Kon nie byvoeg nie.", en: "Couldn\u0027t add it." },
   bo_voeg_koste: { af: "+ Voeg koste by", en: "+ Add a cost" },
   bo_verwyder: { af: "Verwyder", en: "Remove" },
+  // ═══ DIE KOP VAN DIE VERDELING ═══════════════════════════════════════
+  //
+  // Die vraag wat 'n mens werklik vra terwyl 'n mens 'n verdeling opstel, is
+  // EEN vraag: hoeveel kan ek nog toeken? Dit was tot 28 Augustus 2026 nêrens
+  // op die skerm nie -- 'n mens het 'n bedrag getik, na "Na Future Sharp"
+  // gekyk, en weer aangepas.
+
+  // DIE ETIKET DRA DIE FEIT, nie een naam vir albei toestande nie. "Nog
+  // beskikbaar om toe te ken: −R106,49" is 'n leuen: daar is niks beskikbaar
+  // nie, daar is 'n oorbesteding.
+  bo_nog_beskikbaar: { af: "Nog beskikbaar om toe te ken", en: "Still available to allocate" },
+  bo_oorbestee_met: { af: "Oorbestee met", en: "Over-allocated by" },
+
+  // 'n KEUSE. Jy het dit getik en jy kan dit verander.
+  bo_reeds_toegeken: { af: "reeds toegeken", en: "already allocated" },
+
+  // 'n GEVOLG. Dit volg uit die uitgawes en jy kan dit nie raak nie.
+  //
+  // 'n Uitgawereël gee sy ontvanger sy VOLLE bedrag terug — R500 brandstof is
+  // R500 — maar bring net R482,37 in ná sy deel van die fooi. Daardie R17,63
+  // het geen marge om uit betaal te word nie, en die faktuur se enigste marge
+  // is die werkdeel.
+  bo_uitgawes_fooi: {
+    af: "gaan na die uitgawes se deel van die fooi",
+    en: "goes to the expenses' share of the fee",
+  },
+
+  // Die afbreek van die fooi: watter reël dra hoeveel.
+  bo_fooi_wys: { af: "wys waaruit", en: "show the breakdown" },
+  bo_uitgawe: { af: "uitgawe", en: "expense" },
+
+  bo_fooi_weg: { af: "steek weg", en: "hide" },
+  bo_gekopieer: { af: "gekopieer", en: "copied" },
+  bo_kopieer: { af: "Klik om te kopieer", en: "Click to copy" },
+
   bo_reel_naamloos: { af: "Naamloos", en: "Unnamed" },
   bo_soort_inkomste: { af: "Inkomste", en: "Income" },
   bo_soort_uitgawe: { af: "Uitgawe", en: "Expense" },

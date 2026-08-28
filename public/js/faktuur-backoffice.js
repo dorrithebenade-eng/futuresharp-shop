@@ -111,6 +111,29 @@ function bo_som() {
   const oorskot = Math.round((u.oorskot + skenking - skenkingFooi) * 100) / 100;
   const bg = bo_begroting();
 
+  /* ═══ WAT DIE KOP WYS ═══════════════════════════════════════════════════
+
+     Die vraag wat 'n mens werklik vra terwyl 'n mens 'n verdeling opstel, is
+     EEN vraag: hoeveel kan ek nog toeken?
+
+     Dit was tot 28 Augustus 2026 nerens op die skerm nie. 'n Mens het 'n bedrag
+     getik, na "Na Future Sharp" gekyk, en weer aangepas -- 'n getal gesoek deur
+     te raai, met 'n sakrekenaar langsaan.
+
+     WAT DIE UITGAWES KORTKOM. 'n Uitgawereel gee sy ontvanger sy VOLLE bedrag
+     terug -- R500 brandstof is R500 -- maar bring net R482,37 in ná sy deel van
+     die fooi. Daardie R17,63 het geen marge om uit betaal te word nie, en die
+     faktuur se enigste marge is die werkdeel.
+
+     Dit is nie 'n randgeval nie; dit is die struktuur. Hoe meer uitgawes, hoe
+     meer van die fooi moet die werk dra. */
+  let uitgawe_tekort = 0;
+  (V.reels || []).forEach((r, ix) => {
+    if (r.soort !== "koste") return;
+    const p = u.perReel[ix];
+    if (p) uitgawe_tekort += Math.max(0, p.toegekenSent - p.basisSent);
+  });
+
   return {
     u,
     betaal,
@@ -120,6 +143,10 @@ function bo_som() {
     oorskot,
     begroot: bg,
     bly: Math.round((oorskot - bg.hoof) * 100) / 100,
+
+    // In SENT, want die kop wys hulle direk. `oorskot` hierbo is in rand.
+    uitgawe_tekort,
+    nog_beskikbaar: Math.round(oorskot * 100),
   };
 }
 
@@ -460,9 +487,15 @@ function bo_teken_verdeling(S) {
 
          bo_teken_syfers() werk elke syfer EN elke band by sonder om 'n
          invoerveld te raak. */
+      /* DIE PERSENTASIE-TAK LEES SOOS na_sent(): spasies, R en komma uit.
+
+         na_sent() doen dit reeds vir 'n vaste bedrag, maar die persentasie het
+         die rou teks gelees. Plak 'n mens "R1 726,53" in 'n %-veld -- wat
+         gebeur wanneer 'n mens die verkeerde skakelaar aan het -- was die
+         antwoord 1, nie 1726.53 nie. */
       v.waarde =
         v.tipe === "pct"
-          ? Number(String(e.target.value).replace(",", ".")) || 0
+          ? na_pct(e.target.value)
           : na_sent(e.target.value);
 
       // 'N BEDRAG RAAK MEER AS SY EIE RY: die reel se oorskot, sy band, en die
@@ -525,10 +558,7 @@ function bo_teken_verdeling(S) {
   plek.querySelectorAll(".vd-host").forEach((el) => {
     el.addEventListener("input", () => {
       const rx = Number(el.getAttribute("data-reel"));
-      const getal = Number(String(el.value).replace(",", "."));
-      V.reels[rx].hosting_pct = Number.isFinite(getal)
-        ? Math.min(100, Math.max(0, getal))
-        : 0;
+      V.reels[rx].hosting_pct = Math.min(100, na_pct(el.value));
 
       /* DIESELFDE AS DIE WAARDE-VELD: nie herbou nie, bywerk.
 
@@ -553,11 +583,107 @@ function bo_teken_verdeling(S) {
 // met die DOKUMENT nie — nie dat sy vasgespyker is. Sy is jou skerm. Spyker 'n
 // mens die getalle vas terwyl die etiket op t() loop, lees daar "Invoice total
 // R22 000,00": Engelse etiket, Afrikaanse getal.
+/* 'n Persentasie uit 'n veld: spasies, R en komma uit, soos na_sent(). Geen
+   bo-grens hier -- die som keer 'n verdeling bo 100% met sy eie band, en 'n
+   veld wat stilweg afkap terwyl 'n mens tik, is erger. */
+function na_pct(teks) {
+  const skoon = String(teks == null ? "" : teks)
+    .replace(/[\s\u00a0Rr]/g, "")
+    .replace(",", ".");
+  const getal = Number(skoon);
+  return Number.isFinite(getal) && getal >= 0 ? getal : 0;
+}
+
 function rand_uit(bedrag) {
   const sent = Math.round((Number(bedrag) || 0) * 100);
   return window.t_rand
     ? t_rand(sent, kry_huidige_taal())
     : "R" + (sent / 100).toFixed(2);
+}
+
+/* ═══ DIE KOP ═══════════════════════════════════════════════════════════════
+
+   Die fooi se afbreek, en die een getal wat 'n mens werklik soek.
+
+   Hy word deur bo_teken() EN bo_teken_syfers() geroep -- elke syfer op die
+   skerm moet by ELKE verandering bywerk. Twee getalle wat mekaar weerspreek,
+   is die fout wat op 27 en 28 Augustus 2026 vier keer opgeduik het: 'n mens
+   verander hosting en die een getal spring terwyl die ander bly staan. */
+function bo_teken_kop(S) {
+  const u = S.u;
+
+  // ── Die fooi se afbreek ──
+  const uit = document.getElementById("vd-fooi-uit");
+  if (uit) {
+    uit.innerHTML = (V.reels || [])
+      .map((r, ix) => {
+        const p = u.perReel[ix];
+        const deel = p ? Math.round((p.bedragSent - p.basisSent)) : 0;
+        const koste = r.soort === "koste";
+        return `<div class="${koste ? "kos" : ""}">
+          <span class="naam">${ontsnap(r.beskrywing) ||
+            fv_t("bo_reel_naamloos", "Naamloos")}${
+              koste ? " · " + fv_t("bo_uitgawe", "uitgawe") : ""
+            }</span>
+          <b>${rand_uit(deel / 100)}</b>
+        </div>`;
+      })
+      .join("");
+    /* Die dele tel dalk een sent langs die fooi: elke reel word afsonderlik
+       afgerond. Die totaal bo-aan is die waarheid. */
+  }
+
+  // ── Die beskikbare bedrag ──
+  const blok = document.getElementById("bo-beskik");
+  const et = document.getElementById("bo-beskik-et");
+  const syfer = document.getElementById("bo-beskik-b");
+  if (!blok || !et || !syfer) return;
+
+  const oor = Number(S.nog_beskikbaar) || 0;
+  const oorbestee = oor < 0;
+
+  blok.classList.toggle("op", oorbestee);
+
+  /* DIE GETAL DRA GEEN MINUS WANNEER DIE ETIKET REEDS "OORBESTEE" SE NIE --
+     "Oorbestee met −R106,49" lees soos 'n dubbele ontkenning. */
+  syfer.textContent = rand_uit(Math.abs(oor) / 100);
+  syfer.title = fv_t("bo_kopieer", "Klik om te kopieer");
+
+  /* DIE TWEE FYN REELS IS NIE VAN DIESELFDE SOORT NIE.
+
+     "R1 724,96 reeds toegeken" is 'n KEUSE -- jy het dit getik en jy kan dit
+     verander. "R106,49 gaan na die uitgawes se deel van die fooi" is 'n GEVOLG
+     -- dit volg uit die uitgawes en jy kan dit nie raak nie. Die gevolg staan
+     gedemp en op sy eie reel. */
+  let toegeken = 0;
+  (V.reels || []).forEach((r, ix) => {
+    if (r.soort === "koste") return;
+    const p = u.perReel[ix];
+    if (p) toegeken += p.toegekenSent;
+  });
+
+  const fyn = [];
+  if (toegeken > 0) {
+    fyn.push(
+      `<span class="bo-beskik-fyn">${rand_uit(toegeken / 100)} ${fv_t(
+        "bo_reeds_toegeken",
+        "reeds toegeken"
+      )}</span>`
+    );
+  }
+  if (S.uitgawe_tekort > 0) {
+    fyn.push(
+      `<span class="bo-beskik-fyn bo-beskik-gevolg">${rand_uit(
+        S.uitgawe_tekort / 100
+      )} ${fv_t("bo_uitgawes_fooi", "gaan na die uitgawes se deel van die fooi")}</span>`
+    );
+  }
+
+  et.innerHTML =
+    (oorbestee
+      ? fv_t("bo_oorbestee_met", "Oorbestee met")
+      : fv_t("bo_nog_beskikbaar", "Nog beskikbaar om toe te ken")) +
+    (fyn.length ? "<br>" + fyn.join("<br>") : "");
 }
 
 function bo_teken_somme(S) {
@@ -724,12 +850,11 @@ function bo_teken() {
   bo_teken_begroting();
   bo_teken_verdeling(S);
   bo_teken_somme(S);
+  bo_teken_kop(S);
 }
 
 // Net die syfers. Dit is wat loop terwyl iemand 'n bedrag tik.
 function bo_teken_syfers() {
-  bo_teken_somme(bo_som());
-
   // DIE NAAM EN DIE BEDRAG PER REEL WORD SAAM BYGEWERK.
   //
   // Verander 'n mens 'n reel se beskrywing in die dokument links, loop net
@@ -742,6 +867,12 @@ function bo_teken_syfers() {
   // te herbind nie.
   // DIE HELE SOM WORD EEN KEER GELOOP, nie een keer per reel nie.
   const S = bo_som();
+  bo_teken_somme(S);
+
+  /* DIE KOP OOK. Hy dra die enigste getal wat 'n mens werklik soek, en 'n kop
+     wat 'n verouderde bedrag wys, is erger as geen kop nie -- dit is die getal
+     wat 'n mens sonder om te dink klik. */
+  bo_teken_kop(S);
 
   V.reels.forEach((r, rx) => {
     const blok = document.querySelector(`.vd-reel[data-reel="${rx}"]`);
@@ -880,4 +1011,61 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   bo_teken();
+  bo_bind_kop();
 })();
+
+/* ═══ DIE KOP SE LUISTERAARS ═══
+
+   Hulle word EEN KEER gebind, want die kop se struktuur word nooit herbou nie
+   -- slegs sy teks verander. Sou hulle in bo_teken_kop() gebind word, sou elke
+   tikslag 'n nuwe luisteraar byvoeg en die kopieerklik sou na 'n minuut se werk
+   tien keer vuur. */
+function bo_bind_kop() {
+  /* Sticky gee geen gebeurtenis nie, dus meet ons sy plek: raak sy bokant die
+     kolom se bokant, klou hy vas en kry sy skaduwee. */
+  const kop = document.getElementById("bo-kop");
+  if (kop) {
+    const kyk = () => kop.classList.toggle("vas", kop.getBoundingClientRect().top <= 1);
+    window.addEventListener("scroll", kyk, { passive: true });
+    kyk();
+  }
+
+  const vou = document.getElementById("vd-fooi-vou");
+  const uit = document.getElementById("vd-fooi-uit");
+  if (vou && uit) {
+    vou.addEventListener("click", () => {
+      uit.hidden = !uit.hidden;
+      vou.textContent = uit.hidden
+        ? fv_t("bo_fooi_wys", "wys waaruit")
+        : fv_t("bo_fooi_weg", "steek weg");
+    });
+  }
+
+  /* KLIK OP DIE SYFER OM HOM TE KOPIEER, kaal: 1726.53, nie "R1 726,53" nie.
+
+     Die hele punt van hierdie blok is dat 'n mens die getal in 'n veld kry.
+     na_sent() en na_pct() verstaan albei vorme -- hulle sny die R en die
+     spasies uit -- maar 'n mens sien graag wat hy plak. */
+  const syfer = document.getElementById("bo-beskik-b");
+  if (syfer) {
+    syfer.addEventListener("click", async () => {
+      const kaal = syfer.textContent
+        .replace(/[\s\u00a0Rr]/g, "")
+        .replace(",", ".");
+      try {
+        await navigator.clipboard.writeText(kaal);
+        const was = syfer.textContent;
+        syfer.textContent = fv_t("bo_gekopieer", "gekopieer");
+        setTimeout(() => {
+          // Slegs herstel as niks intussen verander het nie -- bo_teken_kop()
+          // skryf hom in elk geval oor by die volgende verandering.
+          if (syfer.textContent === fv_t("bo_gekopieer", "gekopieer")) {
+            syfer.textContent = was;
+          }
+        }, 1200);
+      } catch (fout) {
+        /* 'n blaaier wat die knipbord weier -- dan tik 'n mens hom oor */
+      }
+    });
+  }
+}

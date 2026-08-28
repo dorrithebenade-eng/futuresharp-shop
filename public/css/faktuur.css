@@ -380,6 +380,119 @@ body.fv-kwotasie .dok-betaal { display: none !important; }
 .dok-vee:hover { color: var(--koraal); }
 
 
+/* ═══ DIE KOP VAN DIE VERDELING ═══════════════════════════════════════════
+
+   Die fooi en die beskikbare bedrag, wat bo-aan bly terwyl 'n mens laer in die
+   reels werk. Die verdeling loop laag af op 'n faktuur met vyf reels, en dan is
+   die enigste getal wat die skaal wys, boaan die skerm uit. */
+.bo-kop {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: var(--wit);
+  margin: 0 -18px 12px;
+  padding: 2px 18px 0;
+}
+
+/* Die skaduwee verskyn eers wanneer hy werklik oor iets le. 'n Skaduwee onder
+   'n blok wat aan niks raak nie, is ruis. */
+.bo-kop.vas { box-shadow: 0 6px 16px rgba(23, 23, 23, .10); }
+
+/* ── Die fooi se afbreek ── */
+.vd-slot-ry {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.vd-slot-uit {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px dashed #DDD9D2;
+  display: grid;
+  gap: 2px;
+}
+
+.vd-slot-uit[hidden] { display: none; }
+
+.vd-slot-uit div {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 11.5px;
+}
+
+.vd-slot-uit .naam {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Die uitgawes in amber: hulle is die rede waarom daar minder vir werk oorbly
+   as wat 'n mens sou dink. */
+.vd-slot-uit .kos { color: #8a6400; }
+
+.vd-slot-vou {
+  background: none;
+  border: 0;
+  color: var(--grys-teks);
+  font-family: var(--font-liggaam);
+  font-size: 11px;
+  cursor: pointer;
+  padding: 4px 0 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* ── Die een getal ── */
+.bo-beskik {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  background: #EEF6F4;
+  border: 1px solid #CDE6E0;
+  border-radius: 9px;
+  padding: 11px 13px;
+}
+
+.bo-beskik span { font-size: 12.5px; color: var(--teal-diep); }
+
+.bo-beskik b {
+  font-family: var(--font-opskrif);
+  font-size: 16px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--teal-diep);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.bo-beskik b:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+/* OORBESTEE IS 'N ANDER TOESTAND, nie 'n rooi weergawe van dieselfde een nie.
+   Die etiket se dit ook: "Oorbestee met" teenoor "Nog beskikbaar om toe te
+   ken". Een naam vir albei is 'n leuen sodra die getal negatief is. */
+.bo-beskik.op { background: #FDECE6; border-color: #F5CFC2; }
+.bo-beskik.op span, .bo-beskik.op b { color: #a8351a; }
+
+.bo-beskik-fyn {
+  display: inline-block;
+  margin-top: 3px;
+  font-size: 11.5px;
+  opacity: .9;
+}
+
+/* 'n GEVOLG, nie 'n keuse nie. "R106,49 gaan na die uitgawes se deel van die
+   fooi" volg uit die uitgawes; 'n mens kan dit nie raak nie. Gedemp sodat die
+   twee reels nie soos twee dinge lyk wat 'n mens kan verander nie. */
+.bo-beskik-gevolg { opacity: .65; font-style: italic; }
+
+/* Op papier bestaan die kop nie. */
+@media print {
+  .bo-kop { display: none !important; }
+}
+
 /* ═══ DIE INVOU ══════════════════════════════════════════════════════════
 
    'n Reel met `vou_in` se bedrag tel by die reel BO HAAR wanneer die dokument

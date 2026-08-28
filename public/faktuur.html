@@ -339,11 +339,44 @@
             <div class="bo-titel" id="bo-verdeling-kop" data-i18n="bo_verdeling">Verdeling van die faktuurtotaal</div>
           </div>
 
-          <!-- Paystack is NIE 'n ontvanger nie. Hy is 'n geslote, berekende
-               ry — nie 'n besluit nie, dus nie 'n keuse nie. -->
-          <div class="vd-slot">
-            <div data-i18n="bo_fooi_lei">Transaksiefooi — voorsiening 3,5% + R1,30</div>
-            <b id="vd-fooi">—</b>
+          <!-- DIE KOP BLY BO-AAN TERWYL 'N MENS IN DIE REELS WERK.
+
+               Die verdeling loop laag af op 'n faktuur met vyf reels, en dan is
+               die enigste getal wat die skaal wys, boaan die skerm uit. Die
+               fooi en die beskikbare bedrag hoort bymekaar: die fooi is die
+               eerste aftrekking, die beskikbare bedrag is wat daarna oorbly. -->
+          <div class="bo-kop" id="bo-kop">
+
+            <!-- Paystack is NIE 'n ontvanger nie. Hy is 'n geslote, berekende
+                 ry — nie 'n besluit nie, dus nie 'n keuse nie. -->
+            <div class="vd-slot">
+              <div class="vd-slot-ry">
+                <div data-i18n="bo_fooi_lei">Transaksiefooi — voorsiening 3,5% + R1,30</div>
+                <b id="vd-fooi">—</b>
+              </div>
+
+              <!-- WAARUIT DIE FOOI KOM. Elke reel dra 'n deel na verhouding van
+                   sy bedrag, en dit is die enigste plek waar 'n mens KAN sien
+                   waarom die uitgawes se deel by die werk beland: 'n
+                   terugbetaling het geen marge om sy eie fooi uit te betaal
+                   nie.
+
+                   Toe, want 'n vaste lys van vyf reels bo-aan die rekenaar is
+                   ruis wanneer alles klop. -->
+              <div class="vd-slot-uit" id="vd-fooi-uit" hidden></div>
+              <button type="button" class="vd-slot-vou" id="vd-fooi-vou"
+                      data-i18n="bo_fooi_wys">wys waaruit</button>
+            </div>
+
+            <!-- DIE EEN VRAAG: hoeveel kan ek nog toeken.
+
+                 Die etiket dra die FEIT -- "Nog beskikbaar om toe te ken" of
+                 "Oorbestee met" -- want een naam vir albei toestande is 'n
+                 leuen sodra die getal negatief is. -->
+            <div class="bo-beskik" id="bo-beskik">
+              <span id="bo-beskik-et"></span>
+              <b id="bo-beskik-b" title="" data-i18n-titel="bo_kopieer">—</b>
+            </div>
           </div>
 
           <!-- EEN BLOK PER REEL, nie een plat lys nie. Elke reel kry sy eie
