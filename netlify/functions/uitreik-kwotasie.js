@@ -303,8 +303,8 @@ async function stuur_kwotasie_pos(rekord, sleutel, kode) {
       // tik, is nooit 'n instruksie wat uitgevoer kan word nie, dit is die
       // begin van 'n gesprek wat in elk geval gevoer moet word.
       en
-        ? `Questions or an adjustment? Contact us at ${ontsnap(teks((maatskappy && maatskappy.epos) || "admin@futuresharp.co.za"))}.`
-        : `Vrae of 'n aanpassing? Skakel ons by ${ontsnap(teks((maatskappy && maatskappy.epos) || "admin@futuresharp.co.za"))}.`,
+        ? `Questions or an adjustment? Email us at ${ontsnap(teks((maatskappy && maatskappy.epos) || "admin@futuresharp.co.za"))}.`
+        : `Vrae of 'n aanpassing? E-pos ons by ${ontsnap(teks((maatskappy && maatskappy.epos) || "admin@futuresharp.co.za"))}.`,
     ];
 
     return await stuur_epos({
