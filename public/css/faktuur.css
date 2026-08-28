@@ -413,6 +413,7 @@ body.fv-kwotasie .dok-betaal { display: none !important; }
 .vd-slot-ry {
   display: flex;
   justify-content: space-between;
+  align-items: baseline;
   gap: 10px;
 }
 
@@ -878,10 +879,13 @@ body.fv-kwotasie .dok-betaal { display: none !important; }
    Paystack staan bo-aan as 'n GESLOTE ry: die fooi word van bo af
    weggeneem en die res verdeel. Dit kan nie gekies of getik word nie, want
    dit is nie 'n besluit nie. */
+/* DIE SLOT WAS 'N ENKELE FLEX-RY: die etiket links, die bedrag regs. Toe die
+   afbreek bygekom het, het sy 'n TWEEDE kolom in daardie ry geword en langs die
+   fooi gaan staan in plaas van onder.
+
+   Nou is die slot 'n kolom, en die etiket-en-bedrag is 'n ry daarbinne. */
 .vd-slot {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
+  display: block;
   background: #F1EFEA;
   border: 1px dashed var(--fv-lyn);
   border-radius: 6px;
