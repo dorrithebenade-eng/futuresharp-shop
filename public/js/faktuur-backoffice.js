@@ -275,6 +275,38 @@ function bo_reel_toestand(reel, per) {
   };
 }
 
+/* DIE BAND ONDER 'N REEL: stukkend, of gedra, of niks.
+
+   Sy staan in 'n eie funksie sodat bo_teken() EN bo_teken_syfers() dieselfde
+   HTML bou. Twee kopiee sou uitmekaar loop, en dit sou stil gebeur -- die een
+   sou 'n nuwe waarskuwing kry en die ander nie. */
+function bo_band_html(t) {
+  if (t.stukkend) {
+    return `<div class="vd-band stop">${
+      t.geen_ontvanger
+        ? fv_t(
+            "bo_koste_sonder_ontvanger",
+            "'n Uitgawe moet iemand hê om aan terug te betaal. Kies 'n ontvanger, of maak die reël 'n inkomste."
+          )
+        : fv_t("bo_pct_bo_honderd", "Die persentasies tel op tot ") + t.pct + "%."
+    }</div>`;
+  }
+
+  if (t.oorskot < 0 && !t.almal_hoof) {
+    // "KORT" WAS DIE VERKEERDE WOORD. Daar ontbreek niks; die reel se deel van
+    // die transaksiefooi word net elders gedek.
+    return `<div class="vd-band">${fv_t(
+      "bo_reel_gedra",
+      "Die ontvanger kry die volle bedrag, dus word hierdie reël se deel van die transaksiefooi — "
+    )}${rand_uit(-t.oorskot / 100)}${fv_t(
+      "bo_reel_gedra_end",
+      " — uit Future Sharp se deel gedek."
+    )}</div>`;
+  }
+
+  return "";
+}
+
 function bo_teken_verdeling(S) {
   const plek = document.getElementById("vd-lys");
   if (!plek) return;
@@ -344,29 +376,7 @@ function bo_teken_verdeling(S) {
                )}</strong></span>
            </div>`;
 
-      let band = "";
-      if (t.stukkend) {
-        band = `<div class="vd-band stop">${
-          t.geen_ontvanger
-            ? fv_t(
-                "bo_koste_sonder_ontvanger",
-                "'n Uitgawe moet iemand hê om aan terug te betaal. Kies 'n ontvanger, of maak die reël 'n inkomste."
-              )
-            : fv_t("bo_pct_bo_honderd", "Die persentasies tel op tot ") + t.pct + "%."
-        }</div>`;
-      } else if (t.oorskot < 0 && !t.almal_hoof) {
-        // "KORT" WAS DIE VERKEERDE WOORD. Daar ontbreek niks; die reel se
-        // deel van die transaksiefooi word net elders gedek. Die R17,62 op 'n
-        // reel van R500 is nie 'n ekstra bedrag nie -- dit is 'n deel van die
-        // R193,80 wat bo-aan staan.
-        band = `<div class="vd-band">${fv_t(
-          "bo_reel_gedra",
-          "Die ontvanger kry die volle bedrag, dus word hierdie reël se deel van die transaksiefooi — "
-        )}${rand_uit(-t.oorskot / 100)}${fv_t(
-          "bo_reel_gedra_end",
-          " — uit Future Sharp se deel gedek."
-        )}</div>`;
-      }
+      const band = bo_band_html(t);
 
       return `
       <div class="vd-reel" data-reel="${rx}">
@@ -431,35 +441,33 @@ function bo_teken_verdeling(S) {
 
     ry.querySelector('[data-veld="waarde"]').addEventListener("input", (e) => {
       const v = lys()[ix];
+
+      /* DIE VELD WORD NIE HERBOU TERWYL IEMAND DAARIN TIK NIE.
+
+         Tot 28 Augustus 2026 het hierdie hanteerder bo_teken() geroep, wat die
+         HELE blok uit die model herbou. Die gevolg: 'n mens tik "47.", die
+         model kry Number("47.") = 47, die veld word herteken as "47", en die
+         volgende aanslag maak "475". Die punt kon NOOIT ingetik word nie.
+
+         Dit het soos 'n verdelingsfout gelyk: 475% in plaas van 47,5% gee 'n
+         tekort van R3 704,64 en 'n koraalband wat se die persentasies tel op
+         tot 950%. Die verdeling was heeltyd reg; sy het net verkeerde getalle
+         gekry.
+
+         Die fokus-en-wyser-herstel wat hier gestaan het, was 'n pleister oor
+         dieselfde wond: 'n mens moes die wyser terugsit OMDAT die veld herbou
+         is. Nou word hy nie herbou nie, en die pleister is weg.
+
+         bo_teken_syfers() werk elke syfer EN elke band by sonder om 'n
+         invoerveld te raak. */
       v.waarde =
         v.tipe === "pct"
           ? Number(String(e.target.value).replace(",", ".")) || 0
           : na_sent(e.target.value);
 
-      // 'N BEDRAG RAAK MEER AS SY EIE RY.
-      //
-      // Die eerste weergawe het net die ry se bedrag en die totale onderaan
-      // bygewerk. Die REEL se oorskot het toe die waarde gewys van voordat
-      // die bedrag ingetik is: 'n reel van R4 823,82 met R4 582,63 aan
-      // iemand het "Oorskot R4 582,63" gelees terwyl dit R0,00 moes wees.
-      // Dieselfde vir die amberband, wat 'n verouderde tekort genoem het.
-      //
-      // Alles word dus herteken, en die fokus en die wyser kom terug --
-      // sonder dit kan 'n mens nie 'n getal van meer as een syfer intik nie,
-      // want die veld word na die eerste syfer herbou.
-      const pos = e.target.selectionStart;
-      bo_teken();
-      const terug = document.querySelector(
-        `.vd-ry[data-reel="${rx}"][data-ry="${ix}"] [data-veld="waarde"]`
-      );
-      if (terug) {
-        terug.focus();
-        try {
-          terug.setSelectionRange(pos, pos);
-        } catch (fout) {
-          /* 'n veld wat nie 'n seleksie dra nie */
-        }
-      }
+      // 'N BEDRAG RAAK MEER AS SY EIE RY: die reel se oorskot, sy band, en die
+      // totale onderaan. Almal word bygewerk; niks word herbou nie.
+      bo_teken_syfers();
       merk_vuil();
     });
 
@@ -522,26 +530,15 @@ function bo_teken_verdeling(S) {
         ? Math.min(100, Math.max(0, getal))
         : 0;
 
-      // HOSTING RAAK MEER AS DIE TOTALE ONDERAAN. Dit verander die reel se
-      // eie oorskot, en 'n persentasie-ontvanger loop op wat NA hosting
-      // oorbly. bo_teken_somme() alleen sou net die blok onderaan bywerk en
-      // die reel se eie syfers laat staan -- en dan lyk dit of hosting niks
-      // doen nie.
-      //
-      // Die hele blok word dus herteken, en die fokus en die wyser word
-      // teruggesit: sonder dit kan 'n mens nie "15" tik nie, want die veld
-      // word na die "1" herbou en die "5" beland nerens.
-      const pos = el.selectionStart;
-      bo_teken();
-      const terug = document.querySelector(`.vd-host[data-reel="${rx}"]`);
-      if (terug) {
-        terug.focus();
-        try {
-          terug.setSelectionRange(pos, pos);
-        } catch (fout) {
-          /* 'n veld wat nie 'n seleksie dra nie */
-        }
-      }
+      /* DIESELFDE AS DIE WAARDE-VELD: nie herbou nie, bywerk.
+
+         Hosting raak meer as die totale onderaan -- dit verander die reel se
+         eie oorskot, en 'n persentasie-ontvanger loop op wat NA hosting
+         oorbly. bo_teken_syfers() werk albei by.
+
+         "4.5" kon voorheen nie ingetik word nie, om presies dieselfde rede as
+         by die waarde-veld: die veld is na die punt herbou. */
+      bo_teken_syfers();
       merk_vuil();
     });
   });
@@ -796,6 +793,27 @@ function bo_teken_syfers() {
       oor.textContent = rand_uit(t.oorskot / 100);
       oor.classList.toggle("kort", t.oorskot < 0);
       oor.classList.toggle("oor", t.oorskot > 0);
+    }
+
+    /* DIE BAND OOK.
+
+       Sy is nie 'n syfer wat verander nie -- sy is 'n element wat daar is of
+       nie. Dit is presies waarom die tikhanteerder bo_teken() geroep het, en
+       dit is wat die punt gesluk het.
+
+       Sy word nou hier gebou en vervang. Die INVOERVELDE bly onaangeraak. */
+    const nuwe_band = bo_band_html(t);
+    const ou_band = blok.querySelector(".vd-band");
+    const som = blok.querySelector(".vd-som");
+
+    if (!nuwe_band) {
+      if (ou_band) ou_band.remove();
+    } else if (ou_band) {
+      // outerHTML VERVANG haar. insertAdjacentHTML sou 'n tweede band byvoeg,
+      // en dan staan daar twee waarskuwings vir een reel.
+      ou_band.outerHTML = nuwe_band;
+    } else if (som) {
+      som.insertAdjacentHTML("afterend", nuwe_band);
     }
   });
 }
