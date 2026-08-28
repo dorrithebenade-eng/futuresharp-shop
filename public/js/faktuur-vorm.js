@@ -1479,6 +1479,21 @@ document.addEventListener("DOMContentLoaded", async () => {
     const kyk = () => balk.classList.toggle("fv-balk-vas", window.scrollY > 4);
     window.addEventListener("scroll", kyk, { passive: true });
     kyk();
+
+    /* DIE BALK SE HOOGTE IS 'n MAAT, NIE 'n KONSTANTE NIE.
+
+       faktuur.css laat die backoffice-kolom onder hierdie balk klou. Op 'n nou
+       venster loop die balk om en word twee reels hoog, en 'n vaste getal in
+       die CSS sou die kolom dan weer agter hom laat inskuif. Ons meet hom. */
+    const meet = () => {
+      document.documentElement.style.setProperty(
+        "--fv-balk-h",
+        Math.round(balk.getBoundingClientRect().height) + "px"
+      );
+    };
+    meet();
+    if (window.ResizeObserver) new ResizeObserver(meet).observe(balk);
+    else window.addEventListener("resize", meet, { passive: true });
   }
 
   const knop = document.getElementById("fv-stoor");
