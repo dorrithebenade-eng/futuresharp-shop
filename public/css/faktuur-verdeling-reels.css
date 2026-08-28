@@ -131,6 +131,39 @@
 
 .vd-som .vd-host:focus { outline: 0; border-color: var(--teal); }
 
+/* DIE REGSTELLING: wat die veld moet wees sodat die faktuur klop.
+
+   Sy verskyn SLEGS by oorbesteding en verdwyn sodra dit reg is -- sy is 'n
+   antwoord op 'n fout, nie 'n permanente riglyn nie. 'n Riglyn wat altyd daar
+   is, is op 28 Augustus 2026 probeer en weer weggehaal: twee getalle op een ry
+   wat verskillende dinge se -- die een wat DAARDIE REEL oorhou, die ander wat
+   DIE FAKTUUR oorhou. */
+.vd-regstel {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  padding: 4px 0 0 10px;
+  font-size: 12px;
+}
+
+.vd-regstel-knop {
+  border: 1px solid #F5CFC2;
+  background: #FDECE6;
+  color: #a8351a;
+  border-radius: 999px;
+  padding: 2px 11px;
+  font-family: var(--font-liggaam);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+
+.vd-regstel-knop:hover { background: #FBDDD2; }
+.vd-regstel-knop:focus-visible { outline: 2px solid var(--teal); outline-offset: 1px; }
+.vd-regstel span { color: var(--grys-teks); }
+
+@media print { .vd-regstel { display: none !important; } }
+
 .vd-band {
   margin: 10px 0 0 10px;
   padding: 7px 11px;

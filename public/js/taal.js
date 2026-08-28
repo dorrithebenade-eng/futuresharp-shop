@@ -1741,6 +1741,11 @@ const WOORDEBOEK = {
 
   bo_fooi_weg: { af: "steek weg", en: "hide" },
   bo_gekopieer: { af: "gekopieer", en: "copied" },
+  // Die regstelling by 'n veld: wat hy moet wees sodat die faktuur klop.
+  // Slegs by oorbesteding, en slegs wanneer die antwoord ondubbelsinnig is.
+  bo_sou_klop: { af: "sou klop", en: "would balance" },
+  bo_regstel_titel: { af: "Klik om in te vul", en: "Click to fill in" },
+
   bo_kopieer: { af: "Klik om te kopieer", en: "Click to copy" },
 
   bo_reel_naamloos: { af: "Naamloos", en: "Unnamed" },

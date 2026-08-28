@@ -335,6 +335,17 @@ function bo_band_html(t) {
 }
 
 function bo_teken_verdeling(S) {
+  /* WAT DIE VELD MOET WEES SODAT DIE FAKTUUR KLOP.
+
+     Slegs by oorbesteding, en slegs wanneer die antwoord ondubbelsinnig is --
+     sien bo_regstel_kandidaat(). Hy verdwyn sodra dit reg is: hy is 'n antwoord
+     op 'n fout, nie 'n permanente riglyn nie.
+
+     'n RIGLYN WAT ALTYD DAAR IS, langs "Na Future Sharp", is op 28 Augustus
+     2026 probeer en weer weggehaal: twee getalle op een ry wat verskillende
+     dinge se -- die een wat DAARDIE REEL oorhou, die ander wat DIE FAKTUUR
+     oorhou -- en hulle stem nooit ooreen nie. */
+  const kand = bo_regstel_kandidaat(S);
   const plek = document.getElementById("vd-lys");
   if (!plek) return;
 
@@ -379,7 +390,16 @@ function bo_teken_verdeling(S) {
                    placeholder="${v.tipe === "pct" ? "0" : "0.00"}">
             <div class="uit">${rand_uit(rand)}</div>
             <button type="button" class="bo-vee" title="${fv_t("bo_verwyder", "Verwyder")}">&times;</button>
-          </div>${merk}`;
+          </div>${merk}${
+            kand && kand.reel === rx && kand.ry === ix && S.oorskot < 0
+              ? `<div class="vd-regstel">
+                   <button type="button" class="vd-regstel-knop"
+                           title="${fv_t("bo_regstel_titel", "Klik om in te vul")}"
+                   >${rand_uit(kand.moet / 100)}</button>
+                   <span>${fv_t("bo_sou_klop", "sou klop")}</span>
+                 </div>`
+              : ""
+          }`;
         })
         .join("");
 
@@ -442,6 +462,20 @@ function bo_teken_verdeling(S) {
      ry binne daardie reël. Albei is die indeks in die VOLLE lys — filter 'n
      mens eers en nommer dan, wys 'n klik op die derde sigbare ry na 'n ander
      inskrywing. */
+
+  /* Die knoppie vul die veld in. Nie kopieer nie -- 'n mens wil hom in elk
+     geval daar he, en 'n kopieer wat 'n mens nog moet plak, is 'n halwe stap. */
+  plek.querySelectorAll(".vd-regstel-knop").forEach((knop) => {
+    knop.addEventListener("click", () => {
+      const k = bo_regstel_kandidaat(bo_som());
+      if (!k) return;
+      const rye = V.reels[k.reel].verdeling || [];
+      if (!rye[k.ry]) return;
+      rye[k.ry].waarde = k.moet;
+      bo_teken();
+      merk_vuil();
+    });
+  });
 
   plek.querySelectorAll(".vd-ry").forEach((ry) => {
     const rx = Number(ry.getAttribute("data-reel"));
@@ -609,6 +643,47 @@ function rand_uit(bedrag) {
    skerm moet by ELKE verandering bywerk. Twee getalle wat mekaar weerspreek,
    is die fout wat op 27 en 28 Augustus 2026 vier keer opgeduik het: 'n mens
    verander hosting en die een getal spring terwyl die ander bly staan. */
+/* WATTER VELD KAN DIE TEKORT OPVANG?
+
+   Slegs wanneer die antwoord ONDUBBELSINNIG is: presies EEN inkomstereel, met
+   presies EEN ontvanger, op 'n VASTE bedrag.
+
+   Waar daar twee ontvangers of twee inkomstereels is, is dit 'n besluit oor WIE
+   minder kry -- nie 'n rekensom nie -- en dan wys ons niks. 'n Getal wat raai
+   watter een dit is, sal soms verkeerd wees, en 'n mens sal hom klik.
+
+   'n PERSENTASIERY kry ook niks: die antwoord sou 'n persentasie wees, en die
+   basis waarop hy loop, verander sodra 'n mens hom tik.
+
+   HOSTING TEL NIE AS 'N ONTVANGER NIE. Hy is 'n verdelingsry in faktuur-som.js,
+   maar op die skerm is hy 'n eie veld -- 'n mens sien een ontvanger en die
+   stelsel moet dieselfde sien. */
+function bo_regstel_kandidaat(S) {
+  const inkomste = [];
+  (V.reels || []).forEach((r, ix) => {
+    if (r.soort !== "koste") inkomste.push(ix);
+  });
+  if (inkomste.length !== 1) return null;
+
+  const rx = inkomste[0];
+  const rye = V.reels[rx].verdeling || [];
+  if (rye.length !== 1 || rye[0].tipe !== "vas") return null;
+
+  const per = S.u.perReel[rx];
+  if (!per) return null;
+
+  const basis = per.basisSent;
+  const hosting_pct = Number(V.reels[rx].hosting_pct) || 0;
+  const hosting = Math.round((basis * hosting_pct) / 100);
+
+  // Wat hierdie ry moet wees sodat die faktuur klop: die reel se basis, min
+  // hosting, min die uitgawes se deel van die fooi.
+  const moet = basis - hosting - S.uitgawe_tekort;
+  if (moet < 0) return null;
+
+  return { reel: rx, ry: 0, moet };
+}
+
 function bo_teken_kop(S) {
   const u = S.u;
 
@@ -867,6 +942,7 @@ function bo_teken_syfers() {
   // te herbind nie.
   // DIE HELE SOM WORD EEN KEER GELOOP, nie een keer per reel nie.
   const S = bo_som();
+  const kand = bo_regstel_kandidaat(S);
   bo_teken_somme(S);
 
   /* DIE KOP OOK. Hy dra die enigste getal wat 'n mens werklik soek, en 'n kop
@@ -933,6 +1009,24 @@ function bo_teken_syfers() {
        dit is wat die punt gesluk het.
 
        Sy word nou hier gebou en vervang. Die INVOERVELDE bly onaangeraak. */
+    /* DIE REGSTELKNOPPIE WORD OOK BYGEWERK.
+
+       Hy is in bo_teken_verdeling() gebou. Sonder hierdie stukkie dra hy 'n
+       VEROUDERDE antwoord: 'n mens verander hosting van 5% na 4% en hy staan
+       nog op die ou bedrag.
+
+       Dit is die gevaarlikste soort verouderde syfer, want dit is die een wat
+       'n mens sonder om te dink klik. */
+    const kn = blok.querySelector(".vd-regstel");
+    if (kn) {
+      if (!kand || kand.reel !== rx || S.oorskot >= 0) {
+        kn.remove();
+      } else {
+        const b = kn.querySelector(".vd-regstel-knop");
+        if (b) b.textContent = rand_uit(kand.moet / 100);
+      }
+    }
+
     const nuwe_band = bo_band_html(t);
     const ou_band = blok.querySelector(".vd-band");
     const som = blok.querySelector(".vd-som");
