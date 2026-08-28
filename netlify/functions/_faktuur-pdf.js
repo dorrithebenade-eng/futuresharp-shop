@@ -359,11 +359,21 @@ async function bou_faktuur_pdf(rekord, maatskappy, opsies) {
   );
   y -= 12;
 
-  // ── die aantekening ────────────────────────────────────────────────────
-  if (String(rekord.nota || "").trim()) {
+  /* ── die aantekening ───────────────────────────────────────────────────
+
+     `dokument_nota`, NIE `nota` NIE. Albei rekords — die faktuur en die
+     kwotasie — stoor die dokument se aantekening as `dokument_nota`. Hierdie
+     blok het `rekord.nota` gelees, wat op geen van die twee bestaan nie, dus
+     het die aantekening nog NOOIT op enige PDF verskyn nie. Op die skerm het sy
+     altyd reg gewys, want die vorm lees die regte veld.
+
+     `nota` bly as terugval staan vir 'n ou rekord wat dit dalk dra; die skoon
+     lees hieronder keer dat 'n leefwit waarde 'n leë opskrif druk. */
+  const aantekening = String(rekord.dokument_nota || rekord.nota || "").trim();
+  if (aantekening) {
     skryf(t_in("fd_aantekening", taal).toUpperCase(), KANT, y, { grootte: 7.5, kleur: GRYS });
     y -= 15;
-    breek(rekord.nota, gewoon, 9.5, REGS - KANT).forEach((r) => {
+    breek(aantekening, gewoon, 9.5, REGS - KANT).forEach((r) => {
       skryf(r, KANT, y, { grootte: 9.5 });
       y -= 13;
     });
