@@ -875,6 +875,124 @@ function teken_geldig() {
     );
 }
 
+/* ═══ DIE KOLOMME KAN GESKUIF WORD ═══════════════════════════════════════
+
+   Die rekenaar se 400px is 'n keuse, nie 'n wet nie: 'n verdeling met vier
+   ontvangers per reel is styf daarin, en 'n dokument met lang beskrywings vra
+   die ruimte terug.
+
+   DIE KEUSE WORD ONTHOU, in localStorage. Sy is 'n voorkeur oor hierdie skerm
+   op hierdie masjien -- nie iets wat by die faktuur hoort nie, en nie iets wat
+   Ignatius se skerm moet volg nie.
+
+   KOLOMME IS VIR REKENAARS. Onder 980px val die backoffice onder die dokument
+   in en die handvatsel verdwyn; sien faktuur.css.
+
+   DIE GRENSE. Onder 320px breek die verdeling se rye -- die keuselys, die
+   %/R-skakelaar, die veld en die bedrag pas nie langs mekaar nie. Bo 720px word
+   die dokument nouer as die bladsy wat hy voorstel. */
+const FV_GREEP_SLEUTEL = "future_shop_faktuur_bo_breedte";
+const FV_GREEP_MIN = 320;
+const FV_GREEP_MAX = 720;
+const FV_GREEP_VERSTEK = 400;
+
+function greep_stel(px) {
+  const breedte = Math.min(FV_GREEP_MAX, Math.max(FV_GREEP_MIN, Math.round(px)));
+  document.documentElement.style.setProperty("--bo-breedte", breedte + "px");
+  const greep = document.getElementById("fv-greep");
+  if (greep) greep.setAttribute("aria-valuenow", String(breedte));
+  return breedte;
+}
+
+function greep_bind() {
+  const greep = document.getElementById("fv-greep");
+  const blad = document.querySelector(".fv-blad");
+  if (!greep || !blad) return;
+
+  // Die onthoude breedte, of die verstek. 'n Stukkende waarde word geignoreer
+  // eerder as om die uitleg te breek.
+  let gestoor = 0;
+  try {
+    gestoor = Number(localStorage.getItem(FV_GREEP_SLEUTEL)) || 0;
+  } catch (fout) {
+    /* privaat venster, of localStorage af */
+  }
+  greep_stel(gestoor || FV_GREEP_VERSTEK);
+
+  let sleep = false;
+
+  function na(x) {
+    // Die rekenaar is die REGTER kolom, dus is sy breedte die afstand van die
+    // wyser tot die blad se regterrand.
+    const boks = blad.getBoundingClientRect();
+    return greep_stel(boks.right - x);
+  }
+
+  function bewaar(breedte) {
+    try {
+      localStorage.setItem(FV_GREEP_SLEUTEL, String(breedte));
+    } catch (fout) {
+      /* niks om aan te doen nie */
+    }
+  }
+
+  greep.addEventListener("pointerdown", (e) => {
+    sleep = true;
+    greep.classList.add("sleep");
+    document.body.classList.add("fv-sleep");
+    // Die wyser bly aan die handvatsel geheg, ook wanneer hy oor 'n invoerveld
+    // beweeg -- andersins verloor die sleep sy grip halfpad.
+    greep.setPointerCapture(e.pointerId);
+    e.preventDefault();
+  });
+
+  greep.addEventListener("pointermove", (e) => {
+    if (!sleep) return;
+    na(e.clientX);
+  });
+
+  const los = (e) => {
+    if (!sleep) return;
+    sleep = false;
+    greep.classList.remove("sleep");
+    document.body.classList.remove("fv-sleep");
+    try {
+      greep.releasePointerCapture(e.pointerId);
+    } catch (fout) {
+      /* die wyser was reeds los */
+    }
+    bewaar(na(e.clientX));
+  };
+
+  greep.addEventListener("pointerup", los);
+  greep.addEventListener("pointercancel", los);
+
+  /* MET DIE SLEUTELBORD OOK. Tab tot by die handvatsel, dan links en regs.
+     'n Handvatsel wat net met die muis werk, is 'n handvatsel wat sommige mense
+     nie het nie. Shift gee groter stappe. */
+  greep.addEventListener("keydown", (e) => {
+    const stap = e.shiftKey ? 40 : 10;
+    let nuut = null;
+    if (e.key === "ArrowLeft") nuut = greep_nou() + stap;
+    else if (e.key === "ArrowRight") nuut = greep_nou() - stap;
+    else if (e.key === "Home") nuut = FV_GREEP_VERSTEK;
+    if (nuut === null) return;
+    e.preventDefault();
+    bewaar(greep_stel(nuut));
+  });
+
+  // 'n Dubbelklik stel hom terug -- die vinnigste pad terug uit 'n sleep wat
+  // verkeerd geloop het.
+  greep.addEventListener("dblclick", () => {
+    bewaar(greep_stel(FV_GREEP_VERSTEK));
+  });
+}
+
+function greep_nou() {
+  const w = getComputedStyle(document.documentElement).getPropertyValue("--bo-breedte");
+  return Number(String(w).replace("px", "").trim()) || FV_GREEP_VERSTEK;
+}
+
 function teken_soort() {
   if (!IS_KW) return;
 
@@ -1254,6 +1372,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const vorm = document.getElementById("fv-vorm");
   if (vorm) vorm.style.display = "";
   teken_soort();
+  greep_bind();
   wys();
 
   const params = new URLSearchParams(window.location.search);

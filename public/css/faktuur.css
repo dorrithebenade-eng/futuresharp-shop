@@ -772,11 +772,57 @@ body.fv-kwotasie .dok-betaal { display: none !important; }
    betekenisse vir een voorvoegsel is waar dit later verkeerd loop.
    ════════════════════════════════════════════════════════════════════════ */
 
+/* DIE TWEE KOLOMME KAN GESKUIF WORD.
+
+   Die rekenaar se 400px is 'n keuse, nie 'n wet nie: 'n verdeling met vier
+   ontvangers per reel is styf daarin, en 'n dokument met lang beskrywings vra
+   die ruimte terug. Die handvatsel tussen hulle laat 'n mens die verhouding
+   kies, en die keuse word onthou.
+
+   `--bo-breedte` word deur faktuur-vorm.js gestel en uit localStorage gelees.
+   Die verstek bly 400px, dus lyk niks anders vir wie nooit sleep nie. */
 .fv-blad {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 400px;
-  gap: 20px;
+  grid-template-columns: minmax(0, 1fr) 6px var(--bo-breedte, 400px);
+  gap: 14px;
   align-items: start;
+}
+
+/* DIE HANDVATSEL. Sy is 6px breed en het 'n groter treffarea deur 'n ::before
+   wat oorhang -- 6px is te min om te tref, en 'n breer handvatsel vat ruimte
+   van albei kante. */
+.fv-greep {
+  position: relative;
+  align-self: stretch;
+  min-height: 200px;
+  cursor: col-resize;
+  border-radius: 3px;
+  background: transparent;
+  transition: background .12s;
+}
+
+.fv-greep::before {
+  content: "";
+  position: absolute;
+  inset: 0 -7px;
+}
+
+/* Die streep verskyn eers by aanraking. 'n Permanente lyn tussen die twee
+   kolomme sou 'n rand voorstel wat nie daar is nie. */
+.fv-greep:hover,
+.fv-greep:focus-visible,
+.fv-greep.sleep {
+  background: var(--teal);
+}
+
+.fv-greep:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px; }
+
+/* Terwyl 'n mens sleep, moet die wyser oral col-resize bly en niks mag gekies
+   word nie -- andersins verf die sleep die dokument se teks blou. */
+body.fv-sleep,
+body.fv-sleep * {
+  cursor: col-resize !important;
+  user-select: none !important;
 }
 /* DIE BACKOFFICE-KOLOM ROL SELF.
 
@@ -809,6 +855,12 @@ body.fv-kwotasie .dok-betaal { display: none !important; }
     max-height: none;
     overflow-y: visible;
   }
+
+  /* KOLOMME IS VIR REKENAARS. Op 'n foon val die backoffice onder die dokument
+     in, en dan is daar niks om te skuif nie -- 'n handvatsel tussen twee dinge
+     wat onder mekaar staan, is 'n knoppie wat niks doen nie. */
+  .fv-blad { grid-template-columns: 1fr; }
+  .fv-greep { display: none; }
 }
 .bo-kaart {
   background: #fff;

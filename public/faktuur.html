@@ -318,6 +318,19 @@
 
       </div>
 
+      <!-- DIE HANDVATSEL tussen die twee kolomme. Sleep om die verhouding te
+           verander; die keuse word onthou.
+
+           `role="separator"` met die drie aria-waardes maak hom bruikbaar met
+           die sleutelbord: Tab tot hier, dan links en regs. 'n Handvatsel wat
+           net met die muis werk, is 'n handvatsel wat sommige mense nie het
+           nie.
+
+           Op 'n foon val die twee kolomme onder mekaar en hy verdwyn. -->
+      <div class="fv-greep" id="fv-greep" role="separator" tabindex="0"
+           aria-orientation="vertical" aria-valuemin="320" aria-valuemax="720"
+           aria-valuenow="400" title="Sleep om die kolomme te skuif"></div>
+
       <!-- ═══ die backoffice ═══
            Niks hierbinne verskyn op die dokument nie. -->
       <aside class="bo" id="fv-bo">
