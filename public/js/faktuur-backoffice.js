@@ -349,6 +349,35 @@ function bo_band_html(t) {
   return "";
 }
 
+/* DIE REGSTELKNOPPIE SE HTML EN SY KLIK, ALBEI OP EEN PLEK.
+
+   Hy word op TWEE plekke gebou: bo_teken_verdeling() bou hom saam met die
+   hele blok, en bo_teken_syfers() sit hom by terwyl 'n mens tik. Twee kopiee
+   van dieselfde HTML sou uitmekaar loop -- presies die rede waarom die band
+   ook 'n eie funksie het. */
+function bo_regstel_html(kand) {
+  return `<div class="vd-regstel">
+            <button type="button" class="vd-regstel-knop"
+                    title="${fv_t("bo_regstel_titel", "Klik om in te vul")}"
+            >${rand_uit(kand.moet / 100)}</button>
+            <span>${fv_t("bo_sou_klop", "sou klop")}</span>
+          </div>`;
+}
+
+/* Die knoppie vul die veld in. Nie kopieer nie -- 'n mens wil hom in elk
+   geval daar he, en 'n kopieer wat 'n mens nog moet plak, is 'n halwe stap. */
+function bo_regstel_bind(knop) {
+  knop.addEventListener("click", () => {
+    const k = bo_regstel_kandidaat(bo_som());
+    if (!k) return;
+    const rye = V.reels[k.reel].verdeling || [];
+    if (!rye[k.ry]) return;
+    rye[k.ry].waarde = k.moet;
+    bo_teken();
+    merk_vuil();
+  });
+}
+
 function bo_teken_verdeling(S) {
   /* WAT DIE VELD MOET WEES SODAT DIE FAKTUUR KLOP.
 
@@ -407,12 +436,7 @@ function bo_teken_verdeling(S) {
             <button type="button" class="bo-vee" title="${fv_t("bo_verwyder", "Verwyder")}">&times;</button>
           </div>${merk}${
             kand && kand.reel === rx && kand.ry === ix && S.oorskot < 0
-              ? `<div class="vd-regstel">
-                   <button type="button" class="vd-regstel-knop"
-                           title="${fv_t("bo_regstel_titel", "Klik om in te vul")}"
-                   >${rand_uit(kand.moet / 100)}</button>
-                   <span>${fv_t("bo_sou_klop", "sou klop")}</span>
-                 </div>`
+              ? bo_regstel_html(kand)
               : ""
           }`;
         })
@@ -478,19 +502,7 @@ function bo_teken_verdeling(S) {
      mens eers en nommer dan, wys 'n klik op die derde sigbare ry na 'n ander
      inskrywing. */
 
-  /* Die knoppie vul die veld in. Nie kopieer nie -- 'n mens wil hom in elk
-     geval daar he, en 'n kopieer wat 'n mens nog moet plak, is 'n halwe stap. */
-  plek.querySelectorAll(".vd-regstel-knop").forEach((knop) => {
-    knop.addEventListener("click", () => {
-      const k = bo_regstel_kandidaat(bo_som());
-      if (!k) return;
-      const rye = V.reels[k.reel].verdeling || [];
-      if (!rye[k.ry]) return;
-      rye[k.ry].waarde = k.moet;
-      bo_teken();
-      merk_vuil();
-    });
-  });
+  plek.querySelectorAll(".vd-regstel-knop").forEach(bo_regstel_bind);
 
   plek.querySelectorAll(".vd-ry").forEach((ry) => {
     const rx = Number(ry.getAttribute("data-reel"));
@@ -1059,13 +1071,35 @@ function bo_teken_syfers() {
 
        Dit is die gevaarlikste soort verouderde syfer, want dit is die een wat
        'n mens sonder om te dink klik. */
+    /* HY MOET OOK BYGESIT KAN WORD.
+
+       Hierdie tak het net VERWYDER en BYGEWERK. Bestaan die knoppie nog nie,
+       gebeur niks -- en dan kan hy slegs by 'n volledige herteken verskyn.
+       Maar 'n mens maak 'n tekort deur te TIK, en tik loop hierlangs. Die
+       knoppie het dus feitlik nooit verskyn nie, en dit het gelyk of die
+       kandidaat-vereiste te streng is.
+
+       Die band hieronder het al drie takke gehad. Nou het hy ook. */
     const kn = blok.querySelector(".vd-regstel");
-    if (kn) {
-      if (!kand || kand.reel !== rx || S.oorskot >= 0) {
-        kn.remove();
-      } else {
-        const b = kn.querySelector(".vd-regstel-knop");
-        if (b) b.textContent = rand_uit(kand.moet / 100);
+    const wys = kand && kand.reel === rx && S.oorskot < 0;
+
+    if (kn && !wys) {
+      kn.remove();
+    } else if (kn) {
+      const b = kn.querySelector(".vd-regstel-knop");
+      if (b) b.textContent = rand_uit(kand.moet / 100);
+    } else if (wys) {
+      // Die merkie oor 'n ontvanger sonder subrekening staan TUSSEN die ry en
+      // die knoppie. Sit 'n mens die knoppie direk na die ry, spring hy bo die
+      // merkie in en die twee ruil plekke.
+      const ry_el = blok.querySelector(`.vd-ry[data-ry="${kand.ry}"]`);
+      if (ry_el) {
+        const volg = ry_el.nextElementSibling;
+        const anker =
+          volg && volg.classList.contains("vd-waarsku") ? volg : ry_el;
+        anker.insertAdjacentHTML("afterend", bo_regstel_html(kand));
+        const nuut = anker.nextElementSibling.querySelector(".vd-regstel-knop");
+        if (nuut) bo_regstel_bind(nuut);
       }
     }
 
