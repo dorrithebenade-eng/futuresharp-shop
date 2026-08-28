@@ -2399,7 +2399,7 @@ const WOORDEBOEK = {
   // gevoer moet word. En geen verwerp-knoppie: 'n kliënt wat wil onderhandel,
   // sou 'n knoppie sien wat die gesprek toemaak, en hom klik omdat dit die
   // naaste is aan "nee, nie so nie".
-  kw_kontak_lei: { af: "Vrae of 'n aanpassing? Skakel ons by", en: "Questions or an adjustment? Contact us at" },
+  kw_kontak_lei: { af: "Vrae of 'n aanpassing? E-pos ons by", en: "Questions or an adjustment? Email us at" },
 
   kw_verval_kop: { af: "Hierdie kwotasie het verval", en: "This quotation has expired" },
   kw_verval_lei: {
