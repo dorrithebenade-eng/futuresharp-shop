@@ -200,14 +200,20 @@
   max-width: 1600px;
 }
 
-/* DIE BACKOFFICE MAG SAAMGROEI.
-   faktuur.css pen die regterkolom op 400px vas en gee die dokument alles wat
-   oorbly -- op 'n bree skerm dus alles. Die keuselys lees dan "Ignatiu..."
-   langs 'n dokument met ruimte oor. Die twee kolomme deel nou, met die
-   backoffice tussen 400px en 560px sodat dit nie belaglik breed word nie. */
-#fv-hoof .fv-blad {
-  grid-template-columns: minmax(0, 1fr) minmax(400px, 0.62fr);
-}
+/* DIE BACKOFFICE SE BREEDTE STAAN NIE MEER HIER NIE.
+
+   Hierdie leer het `#fv-hoof .fv-blad` twee kolomme gegee -- minmax(0, 1fr)
+   en minmax(400px, 0.62fr) -- om die keuselys se "Ignatiu..." op te los.
+
+   Op 28 Augustus 2026 kry die blad 'n DERDE spoor: die handvatsel van 6px
+   tussen die dokument en die backoffice, met die regterkolom op
+   `var(--bo-breedte, 400px)`. Twee spore teenoor drie kinders het die
+   backoffice op 'n tweede ry laat val en die handvatsel 400px breed gemaak.
+   Hierdie leer laai NA faktuur.css en dra 'n id, dus het hy gewen, en die
+   media-navraag by 1400px het saam met hom verloor.
+
+   Die breedte leef nou op EEN plek: faktuur.css se .fv-blad, gevoed deur
+   faktuur-vorm.js se greep_stel(). Hier niks. */
 
 #fv-hoof .bo-kaart { max-width: none; }
 
