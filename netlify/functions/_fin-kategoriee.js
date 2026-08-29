@@ -59,6 +59,17 @@ const { kry_store } = require("./_blob-store");
 const STORE_NAAM = "fin-kategoriee";
 const RIGTINGS = ["in", "uit"];
 
+// DIESELFDE TOETSSTEMPEL AS DIE FAKTURE S'N. Terwyl TOETSFASE aan is, kry elke
+// nuwe kategorie `toets: true`, en dit verander daarna nooit. Verwyder 'n mens
+// die veranderlike, dra nuwe kategoriee geen stempel en is hulle permanent.
+//
+// Die boekhoustelsel word nog uitgevind. 'n Boom wat vandag gebou word om die
+// skerm te toets, moet weer kan weggaan; 'n boom wat oor 'n jaar 'n staat dra,
+// moet nie.
+function is_toetsfase() {
+  return String(process.env.TOETSFASE || "").trim().toLowerCase() === "aan";
+}
+
 // Die twee wat die stelsel self skryf. Hul id's is vas, want kry-joernaal.js
 // en die staat verwys direk daarna.
 const VAS = {
@@ -91,6 +102,7 @@ function nuwe_kategorie() {
     rigting: "uit",
     gedek_deur_hosting: false,
     vas: false,             // deur die stelsel geskryf; naam en rigting is vas
+    toets: is_toetsfase(),  // mag uitgevee word; sien skrap-fin-kategorie.js
     nota: "",               // vir die boekhouer
     geskep_op: nou,
     geskep_deur: "",
@@ -202,6 +214,7 @@ module.exports = {
   STORE_NAAM,
   RIGTINGS,
   VAS,
+  is_toetsfase,
   kry_fin_kategoriee_store,
   maak_slug,
   nuwe_kategorie,
