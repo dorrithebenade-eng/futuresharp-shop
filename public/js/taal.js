@@ -732,6 +732,7 @@ const WOORDEBOEK = {
   jn_inskrywings: { af: "inskrywings", en: "entries" },
   jn_bron_faktuur: { af: "faktuur", en: "invoice" },
   jn_bron_uitbetaling: { af: "uitbetaling", en: "payout" },
+  jn_bron_winkel: { af: "winkel", en: "shop" },
   jn_fout: {
     af: "Kon nie die inskrywing stoor nie.",
     en: "The entry could not be saved.",

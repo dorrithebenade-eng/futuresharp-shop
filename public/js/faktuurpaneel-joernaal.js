@@ -130,14 +130,20 @@ function jn_teken() {
     .map((r) => {
       const ix = alles.indexOf(r);
       const uit = r.rigting === "uit";
+      // DIE MERKIE PER BRON. Die if-else-ketting het net twee uitkomste gehad,
+      // en toe die winkel as 'n derde bron bykom, het sy inskrywings
+      // "uitbetaling" gelees -- die verkeerde woord op 'n reel wat inkomste is.
+      //
+      // 'n Kaart, sodat 'n vierde bron nie stilweg 'n bestaande naam erf nie.
+      const BRON_NAAM = {
+        faktuur: jn_t("jn_bron_faktuur", "faktuur"),
+        uitbetaling: jn_t("jn_bron_uitbetaling", "uitbetaling"),
+        winkel: jn_t("jn_bron_winkel", "winkel"),
+      };
       const merk =
         r.bron === "hand"
           ? ""
-          : `<span class="jn-bron">${jn_ontsnap(
-              r.bron === "faktuur"
-                ? jn_t("jn_bron_faktuur", "faktuur")
-                : jn_t("jn_bron_uitbetaling", "uitbetaling")
-            )}</span>`;
+          : `<span class="jn-bron">${jn_ontsnap(BRON_NAAM[r.bron] || r.bron)}</span>`;
 
       // Net 'n handinskrywing kan herhaal of geskrap word. 'n Faktuur se
       // ontvangs en 'n uitbetaling kom uit die fakture; hulle bestaan nie in
