@@ -7,6 +7,29 @@
 //   faktuur      'n betaalde faktuur se totaal -- INKOMSTE
 //   uitbetaling  'n uitbetaalry wat afgemerk is -- UITGAWE
 //   hand         alles wat nie deur Paystack vloei nie -- albei rigtings
+//   winkel       wat 'n bestelling in die HOOFREKENING laat -- albei rigtings
+//
+// DIE WINKEL WORD NETTO GEBOEK, EN DIT IS NIE 'N VEREENVOUDIGING NIE.
+//
+// Paystack verdeel 'n bestelling by vereffening: die outeur, die drukker en
+// die ontwerper se dele gaan REGSTREEKS na hul eie subrekeninge. Daardie geld
+// raak nooit Future Sharp se bank nie. Op 'n kontantbasis is dit dus nie
+// inkomste nie en nie uitgawe nie -- dit boek beteken 'n staat wat nie meer
+// teen die bankstaat klop nie.
+//
+// Wat WEL die bank raak, is twee bedrae:
+//
+//   die behoue deel   totaal min die subrekeninge se dele -- INKOMSTE
+//   Paystack se fooi  kom uit die hoofrekening            -- UITGAWE
+//
+// Die behoue deel is hoofsaaklik die hosting: die heffing wat Future Sharp se
+// bedryfskoste dra -- subskripsies, data, LearnWorlds, KI. Die fooi word
+// herbereken uit die totaal, want Paystack se werklike heffing staan nie op
+// die bestelling nie.
+//
+// 'n R0-BESTELLING (100%-koepon) VERSKYN NERENS. Daar was nooit 'n Paystack-
+// transaksie nie, dus was daar ook nooit 'n fooi of 'n vereffening nie, en
+// niks het beweeg nie.
 //
 // Die eerste twee word UIT DIE FAKTURE gelees en nooit gestoor nie. Sou 'n
 // mens hulle by die joernaal se store afskryf, staan dieselfde bedrag op twee
@@ -32,6 +55,8 @@ const {
   finansiele_jaar,
   jaar_voorvoegsel,
 } = require("./_joernaal");
+const { kry_store } = require("./_blob-store");
+const { kry_paystack_fooi_sent } = require("./_paystack-koste");
 
 function dag(iso) {
   return String(iso || "").slice(0, 10);
@@ -221,6 +246,72 @@ exports.handler = async (event, context) => {
   } catch (fout) {
     console.error("Kon nie die fakture vir die joernaal lees nie:", fout);
     return { statusCode: 500, body: "Kon nie die fakture laai nie" };
+  }
+
+  // ── 3. Wat uit die winkel kom ────────────────────────────────────────
+  try {
+    const store = kry_store("bestellings");
+    const lys = await store.list();
+
+    for (const b of lys.blobs || []) {
+      const o = await store.get(b.key, { type: "json" });
+      if (!o || !o.paystack || o.paystack.geverifieer !== true) continue;
+
+      // Geen Paystack-transaksie, geen beweging.
+      if (o.paystack.gratis_via_koepon === true) continue;
+
+      const totaal = Number(o.totaal_sent) || 0;
+      if (totaal <= 0) continue;
+
+      // Die dag van VEREFFENING, nie die dag van bestelling nie. Dieselfde
+      // kontantbasis as die faktuur s'n.
+      const datum = dag(o.paystack.geverifieer_op || o.bygewerk_op);
+      if (!in_tydperk(datum)) continue;
+
+      // Wat na die subrekeninge gegaan het. `verdeling` is 'n voorwerp met
+      // die subrekening se kode as sleutel; hy is null waar daar geen
+      // verdeling was nie -- dan bly die volle bedrag in die hoofrekening.
+      const verdeel = o.verdeling && typeof o.verdeling === "object"
+        ? Object.values(o.verdeling).reduce((a, v) => a + (Number(v) || 0), 0)
+        : 0;
+
+      const behou = Math.max(0, totaal - verdeel);
+      const fooi = kry_paystack_fooi_sent(totaal);
+      const nommer = o.bestelnommer || b.key;
+
+      const in_besk = `Winkel \u2014 ${nommer}`;
+      if (behou > 0 && pas({ beskrywing: in_besk })) {
+        inskrywings.push({
+          sleutel: null,
+          datum,
+          beskrywing: in_besk,
+          wie: "",
+          nota: "",
+          bedrag_sent: behou,
+          rigting: "in",
+          bron: "winkel",
+        });
+      }
+
+      const uit_besk = `Paystack se fooi \u2014 ${nommer}`;
+      if (fooi > 0 && pas({ beskrywing: uit_besk })) {
+        inskrywings.push({
+          sleutel: null,
+          datum,
+          beskrywing: uit_besk,
+          wie: "",
+          nota: "",
+          bedrag_sent: fooi,
+          rigting: "uit",
+          bron: "winkel",
+        });
+      }
+    }
+  } catch (fout) {
+    // DIE WINKEL MAG NIE DIE JOERNAAL LAAT VAL NIE. Die fakture en die hand-
+    // inskrywings is reeds gelees; 'n leesfout hier moet die res nie wegvat
+    // nie. Die syfer is dan onvolledig, en dit staan in die log.
+    console.error("Kon nie die bestellings vir die joernaal lees nie:", fout);
   }
 
   // Nuutste eerste.
