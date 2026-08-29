@@ -2628,6 +2628,27 @@ const WOORDEBOEK = {
     af: "Uitgawes wat as \u201cgedek deur hosting\u201d gemerk is, teenoor wat hosting ingebring het. Uitgawes wat iemand uit sy eie sak gedra het sonder om te eis, is nie hierin nie.",
     en: "Expenses marked \u201ccovered by hosting\u201d, against what hosting brought in. Expenses someone carried out of pocket without claiming are not included.",
   },
+  fs_bank_kop: { af: "Klop dit teen die bank?", en: "Does it match the bank?" },
+  fs_bank_leeg: {
+    af: "Tik die bankbalans op twee dae in \u2014 die dag voor die tydperk begin, en die laaste dag. Dan wys hierdie blok of die staat volledig is.",
+    en: "Enter the bank balance on two days \u2014 the day before the period starts, and the last day. Then this block shows whether the statement is complete.",
+  },
+  fs_bank_datum: { af: "Datum", en: "Date" },
+  fs_bank_bedrag: { af: "Bankbalans op daardie dag", en: "Bank balance on that day" },
+  fs_bank_stoor: { af: "Teken aan", en: "Record" },
+  fs_bank_open: { af: "Bankbalans op", en: "Bank balance on" },
+  fs_bank_sluit: { af: "Bankbalans op", en: "Bank balance on" },
+  fs_bank_beweeg: { af: "Inkomste min uitgawes", en: "Income less expenses" },
+  fs_bank_verwag: { af: "Behoort te wees", en: "Should be" },
+  fs_bank_verskil: { af: "Verskil", en: "Difference" },
+  fs_bank_klop: {
+    af: "Die tydperk is volledig \u2014 elke sent in die bank het 'n inskrywing.",
+    en: "The period is complete \u2014 every cent in the bank has an entry.",
+  },
+  fs_bank_verskil_hulp: {
+    af: "Daar ontbreek inskrywings vir hierdie verskil, of 'n vereffening val buite die tydperk. Paystack vereffen in bondels.",
+    en: "Entries are missing for this difference, or a settlement falls outside the period. Paystack settles in batches.",
+  },
   fs_wag_kop: { af: "Wag vir 'n kategorie", en: "Waiting for a category" },
   fs_wag_hulp: {
     af: "Beskrywings wat nie by 'n item in die register pas nie. Die bedrae staan hierbo as Ongekategoriseer \u2014 hulle verdwyn nooit.",

@@ -48,6 +48,7 @@ const FS = {
   inskrywings: [],
   boom: [],          // {kategorie, eie_sent, totaal_sent}
   ongekat: { in: 0, uit: 0, dele: [] },
+  bank: { opening: null, sluiting: null },
 };
 
 function fs_t(sleutel, verstek) {
@@ -261,6 +262,8 @@ function fs_teken() {
         </table>
       </div>` : ""}
 
+    ${fs_rekonsiliasie(inkomste, uitgawes)}
+
     ${FS.ongekat.dele.length ? `
       <div class="fs-wag">
         <h4 class="fs-blok-kop">${fs_t("fs_wag_kop", "Wag vir 'n kategorie")}</h4>
@@ -277,6 +280,116 @@ function fs_teken() {
           </tbody>
         </table>
       </div>` : ""}`;
+}
+
+/* ═══ die bankrekonsiliasie ═══ */
+
+/* DIE ENIGSTE REEL WAT SE OF DIE TYDPERK VOLLEDIG IS.
+
+       openingsbalans + inkomste - uitgawes = sluitingsbalans
+
+   Die staat kan se wat sy WEET; sy kan nie se of sy alles weet nie. Die bank
+   kan. Klop dit tot die sent, is die tydperk volledig; klop dit nie, ontbreek
+   daar 'n inskrywing -- en dan se die stelsel dit nou in plaas van by
+   jaareinde.
+
+   DIE DATUM VAN ELKE METING WORD GEWYS, nie net die bedrag nie. Niemand tik 'n
+   balans vir elke dag in nie, dus is die "sluiting" die naaste meting op of
+   voor die einddatum. Wys 'n mens net "sluitingsbalans", lyk 'n meting van drie
+   maande gelede soos vandag s'n.
+
+   'N VERSKIL IS NIE NOODWENDIG 'N FOUT NIE. Paystack vereffen in bondels, dus
+   kan 'n bestelling van die 31ste eers op die 2de in die bank wees. Die
+   boodskap se dus wat die verskil IS, nie wat dit beteken nie. */
+function fs_rekonsiliasie(inkomste, uitgawes) {
+  const o = FS.bank.opening;
+  const s = FS.bank.sluiting;
+
+  const vorm = `
+    <div class="fs-bank-vorm">
+      <div>
+        <label class="veld-etiket" for="fs-bank-datum">${
+          fs_t("fs_bank_datum", "Datum")}</label>
+        <input class="veld-invoer" type="date" id="fs-bank-datum">
+      </div>
+      <div>
+        <label class="veld-etiket" for="fs-bank-bedrag">${
+          fs_t("fs_bank_bedrag", "Bankbalans op daardie dag")}</label>
+        <input class="veld-invoer" id="fs-bank-bedrag" inputmode="decimal" placeholder="0.00">
+      </div>
+      <button type="button" class="kaart-aksie" id="fs-bank-stoor">${
+        fs_t("fs_bank_stoor", "Teken aan")}</button>
+    </div>`;
+
+  if (!o || !s || o.datum === s.datum) {
+    return `
+      <div class="fs-bank">
+        <h4 class="fs-blok-kop">${fs_t("fs_bank_kop", "Klop dit teen die bank?")}</h4>
+        <p class="fs-hulp">${fs_t("fs_bank_leeg",
+          "Tik die bankbalans op twee dae in \u2014 die dag voor die tydperk begin, en die laaste dag. Dan wys hierdie blok of die staat volledig is.")}</p>
+        ${vorm}
+      </div>`;
+  }
+
+  const beweeg = inkomste - uitgawes;
+  const verwag = o.balans_sent + beweeg;
+  const verskil = s.balans_sent - verwag;
+
+  return `
+    <div class="fs-bank">
+      <h4 class="fs-blok-kop">${fs_t("fs_bank_kop", "Klop dit teen die bank?")}</h4>
+      <table class="fs-tabel">
+        <tbody>
+          <tr><td class="fs-naam">${fs_t("fs_bank_open", "Bankbalans op")} ${
+            fs_ontsnap(o.datum)}</td>
+              <td class="fs-tot">${fs_rand(o.balans_sent)}</td></tr>
+          <tr><td class="fs-naam">${fs_t("fs_bank_beweeg", "Inkomste min uitgawes")}</td>
+              <td class="fs-tot">${(beweeg < 0 ? "\u2212 " : "") + fs_rand(beweeg)}</td></tr>
+          <tr class="fs-som"><td class="fs-naam">${
+            fs_t("fs_bank_verwag", "Behoort te wees")}</td>
+              <td class="fs-tot">${(verwag < 0 ? "\u2212 " : "") + fs_rand(verwag)}</td></tr>
+          <tr><td class="fs-naam">${fs_t("fs_bank_sluit", "Bankbalans op")} ${
+            fs_ontsnap(s.datum)}</td>
+              <td class="fs-tot">${(s.balans_sent < 0 ? "\u2212 " : "") + fs_rand(s.balans_sent)}</td></tr>
+          <tr class="fs-som ${verskil ? "fs-ongekat" : ""}">
+              <td class="fs-naam">${fs_t("fs_bank_verskil", "Verskil")}</td>
+              <td class="fs-tot">${(verskil < 0 ? "\u2212 " : "") + fs_rand(verskil)}</td></tr>
+        </tbody>
+      </table>
+      <p class="fs-hulp">${
+        verskil === 0
+          ? fs_t("fs_bank_klop", "Die tydperk is volledig \u2014 elke sent in die bank het 'n inskrywing.")
+          : fs_t("fs_bank_verskil_hulp", "Daar ontbreek inskrywings vir hierdie verskil, of 'n vereffening val buite die tydperk. Paystack vereffen in bondels.")
+      }</p>
+      ${vorm}
+    </div>`;
+}
+
+async function fs_bank_stoor() {
+  const datum = document.getElementById("fs-bank-datum").value;
+  const rou = document.getElementById("fs-bank-bedrag").value.trim().replace(",", ".");
+  if (!datum || rou === "") return;
+
+  const sent = Math.round(Number(rou) * 100);
+  if (!Number.isFinite(sent)) return;
+
+  const knop = document.getElementById("fs-bank-stoor");
+  knop.disabled = true;
+  try {
+    const resp = await fetch("/.netlify/functions/stoor-fin-bank", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${FS.sessie.access_token}`,
+      },
+      body: JSON.stringify({ datum, balans_sent: sent }),
+    });
+    if (!resp.ok) throw new Error(await resp.text());
+    await fs_laai();
+  } catch (fout) {
+    console.error("Kon nie die bankbalans stoor nie:", fout);
+    knop.disabled = false;
+  }
 }
 
 /* ═══ die uitvoer ═══ */
@@ -367,14 +480,16 @@ async function fs_laai() {
   plek.innerHTML = `<p class="stelsel-boodskap">${fs_t("fp_laai", "Word gelaai \u2026")}</p>`;
 
   try {
-    const [jn, kat, wi] = await Promise.all([
+    const [jn, kat, wi, bank] = await Promise.all([
       fs_vra("kry-joernaal", `van=${FS.van}&tot=${FS.tot}`),
       fs_vra("kry-fin-kategoriee"),
       fs_vra("kry-werk-items"),
+      fs_vra("kry-fin-bank", `van=${FS.van}&tot=${FS.tot}`),
     ]);
     FS.inskrywings = Array.isArray(jn.inskrywings) ? jn.inskrywings : [];
     FS.kategoriee = Array.isArray(kat.kategoriee) ? kat.kategoriee : [];
     FS.werk_items = Array.isArray(wi.items) ? wi.items : [];
+    FS.bank = { opening: bank.opening || null, sluiting: bank.sluiting || null };
   } catch (fout) {
     console.error("Kon nie die staat laai nie:", fout);
     plek.innerHTML = `<p class="stelsel-boodskap">${
@@ -384,6 +499,11 @@ async function fs_laai() {
 
   fs_tel_op();
   fs_teken();
+
+  // NA fs_teken(), want die knoppie word saam met die blok herteken en 'n
+  // luisteraar op 'n vervangde element bestaan nie meer nie.
+  const bknop = document.getElementById("fs-bank-stoor");
+  if (bknop) bknop.addEventListener("click", fs_bank_stoor);
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
