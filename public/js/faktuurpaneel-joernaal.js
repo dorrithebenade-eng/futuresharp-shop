@@ -360,6 +360,16 @@ function jn_teken_kategoriee() {
   const leeg = `<option value="">${jn_t("jn_kat_geen", "\u2014 geen kategorie \u2014")}</option>`;
 
   kies.innerHTML = leeg + JN_KATEGORIEE
+    // DIE VASTE KATEGORIEE STAAN NIE IN HIERDIE LYS NIE.
+    //
+    // Diensinkomste en Paystack se transaksiefooi word deur die stelsel self
+    // op elke afgeleide inskrywing gesit. Kies iemand een van hulle met die
+    // hand, staan daardie bedrag TWEE KEER op die staat -- een keer afgelei en
+    // een keer getik -- en niks op die skerm sou dit wys nie.
+    //
+    // Hulle bly wel in die REGISTER sigbaar: 'n mens moet kan sien waarheen
+    // die stelsel skryf, en 'n mens moet hulle onder 'n ander een kan sit.
+    .filter((k) => !k.vas)
     .filter((k) => k.rigting === JN_RIGTING)
     .map((k) => `<option value="${jn_ontsnap(k.id)}">${jn_ontsnap(k.pad || k.naam)}</option>`)
     .join("");

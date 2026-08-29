@@ -434,6 +434,17 @@ a.paneel-kieslys-item { text-decoration: none; }
 .kt-ry { border-left: 2px solid transparent; }
 .kt-ry:hover { border-left-color: var(--teal); }
 .fk-merkie.kt-hosting { background: #FDF3E3; color: #8a5a1a; }
+
+/* DIE JOERNAAL SE KATEGORIEKEUSELYS.
+
+   Sy erf `.veld-invoer` se breedte, en 'n kategorie dra haar volle pad --
+   "Bedryfskoste / Netlify" -- dus loop die naam by die rand uit en 'n mens
+   sien "geen kat...". Die roosterkolom is te nou vir die inhoud, nie die
+   inhoud te lank vir die kolom nie. */
+#jn-kategorie {
+  min-width: 210px;
+  max-width: 100%;
+}
 .fk-merkie-dup { background: #FDE7E0; color: #a8351a; }
 
 /* --- die twee oorlegsels --- */
