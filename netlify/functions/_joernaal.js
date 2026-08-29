@@ -75,6 +75,19 @@ function nuwe_inskrywing() {
     bedrag_sent: 0,         // altyd positief; `rigting` dra die teken
     rigting: "uit",
     nota: "",
+
+    // DIE KATEGORIE, as 'n VERWYSING na _fin-kategoriee.js se id.
+    //
+    // Nie die naam nie. Hernoem 'n mens "Reiskoste" na "Reis en verblyf", bly
+    // die id `reiskoste` en elke bestaande inskrywing hou. 'n Naam wat
+    // gekopieer word, dryf uitmekaar.
+    //
+    // LEEG IS GELDIG, en dit is doelbewus. 'n Inskrywing wat gou getik moet
+    // word, mag nie op 'n kategorie wag nie -- sy verskyn dan as
+    // "Ongekategoriseer" op die staat, sigbaar en met haar eie totaal. 'n
+    // Bedrag wat stil weggelaat word, is erger as een wat apart staan: dan
+    // tel die staat nie meer tot die bank nie.
+    kategorie_id: "",
     geskep_op: nou,
     geskep_deur: "",
     bygewerk_op: nou,

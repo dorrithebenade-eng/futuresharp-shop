@@ -142,6 +142,7 @@ exports.handler = async (event, context) => {
         nota: r.nota || "",
         bedrag_sent: Number(r.bedrag_sent) || 0,
         rigting: r.rigting === "in" ? "in" : "uit",
+        kategorie_id: r.kategorie_id || "",
         bron: "hand",
       });
     });
@@ -194,6 +195,7 @@ exports.handler = async (event, context) => {
           nota: "",
           bedrag_sent: Number(f.betaling.ontvang_sent) || 0,
           rigting: "in",
+          kategorie_id: "diensinkomste",
           bron: "faktuur",
         });
       }
@@ -239,6 +241,9 @@ exports.handler = async (event, context) => {
           nota: "",
           bedrag_sent: sent,
           rigting: "uit",
+          // Die uitbetaling se kategorie kom uit die begunstigde se
+          // reel op die faktuur; sy word deur die staat toegeken, nie hier nie.
+          kategorie_id: "",
           bron: "uitbetaling",
         });
       });
@@ -289,6 +294,9 @@ exports.handler = async (event, context) => {
           nota: "",
           bedrag_sent: behou,
           rigting: "in",
+          // Die winkel se behoue deel is hoofsaaklik hosting; hy val onder
+          // dieselfde vaste kategorie as die faktuur se totaal.
+          kategorie_id: "diensinkomste",
           bron: "winkel",
         });
       }
@@ -303,6 +311,7 @@ exports.handler = async (event, context) => {
           nota: "",
           bedrag_sent: fooi,
           rigting: "uit",
+          kategorie_id: "paystack-transaksiefooi",
           bron: "winkel",
         });
       }

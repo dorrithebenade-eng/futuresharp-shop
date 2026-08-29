@@ -96,6 +96,18 @@ exports.handler = async (event, context) => {
   rekord.nota = teks(invoer.nota, NOTA_MAKS);
   rekord.bedrag_sent = bedrag_sent;
   rekord.rigting = rigting;
+
+  // GEEN KONTROLE DAT DIE KATEGORIE BESTAAN NIE, en dit is 'n keuse.
+  //
+  // 'n Lees van die kategorieregister by elke stoor sou hierdie Function op 'n
+  // tweede store laat wag om 'n fout te keer wat die skerm reeds keer -- die
+  // keuselys bied slegs bestaande kategoriee aan.
+  //
+  // En 'n kategorie word nooit uitgevee terwyl sy gebruik word nie: dit is
+  // presies wat skrap-fin-kategorie.js se poorte doen. 'n Verwysing na iets
+  // wat nie bestaan nie, kan dus nie deur normale gebruik ontstaan nie.
+  rekord.kategorie_id = teks(invoer.kategorie_id, 120);
+
   rekord.bygewerk_op = nou;
 
   // DIE JAAR STAAN IN DIE SLEUTEL, dus moet die sleutel verander wanneer 'n
