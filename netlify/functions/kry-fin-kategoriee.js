@@ -74,6 +74,10 @@ exports.handler = async (event, context) => {
       naam: VAS[id].naam,
       rigting: VAS[id].rigting,
       vas: true,
+      // GEEN TOETSSTEMPEL NIE. nuwe_kategorie() sit hom op terwyl TOETSFASE
+      // aan is, en dan lees hierdie twee as toetsdata terwyl hulle nooit
+      // uitgevee kan word nie. Die merkie op die skerm sou 'n leuen wees.
+      toets: false,
       nota: "Deur die stelsel geskryf.",
     });
   });
