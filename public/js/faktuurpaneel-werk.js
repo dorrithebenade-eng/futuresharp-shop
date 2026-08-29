@@ -248,6 +248,46 @@ async function wi_laai_telling() {
   }
 }
 
+/* DIE KATEGORIEE, een keer gelaai.
+
+   Misluk die lees, bly hierdie register werk: die keuselys dra dan net die leë
+   keuse en 'n item gaan sonder 'n kategorie deur. Die staat wys sy bedrag dan
+   as "Ongekategoriseer" -- sigbaar, met sy eie totaal. 'n Register wat weier
+   om te werk omdat 'n ander register stukkend is, is die slegter ruil. */
+let WI_KATEGORIEE = [];
+
+async function wi_laai_kategoriee() {
+  try {
+    const data = await wi_vra("kry-fin-kategoriee", { method: "GET" });
+    WI_KATEGORIEE = Array.isArray(data.kategoriee) ? data.kategoriee : [];
+  } catch (fout) {
+    console.error("Kon nie die kategoriee laai nie:", fout);
+    WI_KATEGORIEE = [];
+  }
+}
+
+/* SLEGS UITGAWE-KATEGORIEE, en slegs die wat 'n mens self mag kies.
+
+   'n Werk-item se deel en 'n uitgawe se terugbetaling is albei geld wat UIT
+   Future Sharp se rekening gaan; 'n inkomstekategorie sou die bedrag aan die
+   verkeerde kant van die staat sit.
+
+   Die vaste twee val ook weg: die stelsel skryf self daarheen, en 'n item wat
+   met die hand na Paystack se transaksiefooi wys, sou daardie bedrag twee keer
+   op die staat sit. */
+function wi_teken_kategoriee(gekies) {
+  const kies = document.getElementById("wi-kategorie");
+  if (!kies) return;
+
+  const leeg = `<option value="">${wi_t("wi_kat_geen", "\u2014 geen kategorie \u2014")}</option>`;
+  kies.innerHTML = leeg + WI_KATEGORIEE
+    .filter((k) => !k.vas && k.rigting === "uit")
+    .map((k) => `<option value="${wi_ontsnap(k.id)}">${wi_ontsnap(k.pad || k.naam)}</option>`)
+    .join("");
+
+  kies.value = Array.from(kies.options).some((o) => o.value === gekies) ? gekies : "";
+}
+
 // ── Die vorm ────────────────────────────────────────────────────────────
 
 function wi_stel_soort(nuwe) {
@@ -278,6 +318,7 @@ function wi_maak_vorm_oop(item_id) {
   document.getElementById("wi-naam").value = i.naam || "";
   document.getElementById("wi-beskrywing").value = i.beskrywing || "";
   document.getElementById("wi-aktief").checked = i.aktief !== false;
+  wi_teken_kategoriee(i.kategorie_id || "");
 
   // Die aktief-blokkie is sinneloos by 'n nuwe item — hy is per definisie aan.
   document.getElementById("wi-aktief-ry").style.display = item_id ? "" : "none";
@@ -309,6 +350,7 @@ async function wi_stoor() {
     naam,
     beskrywing: document.getElementById("wi-beskrywing").value.trim(),
     aktief: document.getElementById("wi-aktief").checked,
+    kategorie_id: (document.getElementById("wi-kategorie") || {}).value || "",
   };
 
   try {
@@ -381,6 +423,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     WI.sessie = null;
   }
   if (!WI.sessie || !identiteit_het_rol(WI.sessie.gebruiker, "boekhouding")) return;
+
+  await wi_laai_kategoriee();
 
   document.getElementById("wi-soek").addEventListener("input", wi_teken_lys);
   document.getElementById("wi-nuut").addEventListener("click", () => wi_maak_vorm_oop(null));

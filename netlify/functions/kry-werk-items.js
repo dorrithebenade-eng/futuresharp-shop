@@ -51,6 +51,9 @@ exports.handler = async (event, context) => {
     naam: r.naam || "",
     beskrywing: r.beskrywing || "",
     aktief: r.aktief !== false,
+    // Die staat lees die kategorie hier; sonder haar in die antwoord sou die
+    // skerm haar nie kon wys nie en sou 'n wysiging haar stilweg uitvee.
+    kategorie_id: r.kategorie_id || "",
     geskep_op: r.geskep_op || null,
   }));
 

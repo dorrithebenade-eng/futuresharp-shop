@@ -69,6 +69,10 @@ exports.handler = async (event, context) => {
     rekord.naam = naam;
     rekord.beskrywing = beskrywing;
     rekord.aktief = invoer.aktief !== false;
+    // Geen kontrole dat die kategorie bestaan nie: die keuselys bied slegs
+    // bestaandes aan, en skrap-fin-kategorie.js weier om een uit te vee wat
+    // gebruik word. Dieselfde redenasie as by stoor-joernaal.js.
+    rekord.kategorie_id = String(invoer.kategorie_id || "").trim().slice(0, 120);
     rekord.bygewerk_op = new Date().toISOString();
 
     voeg_geskiedenis_by(rekord, rekord.aktief ? "gewysig" : "afgeskakel", wie, "");
@@ -106,6 +110,9 @@ exports.handler = async (event, context) => {
   }
 
   const rekord = nuwe_item(soort, naam, beskrywing);
+  // Ook op die SKEP-pad. nuwe_item() gee 'n leë kategorie; sonder hierdie reel
+  // sou 'n mens 'n item skep, die kategorie kies, en dan is sy weg.
+  rekord.kategorie_id = String(invoer.kategorie_id || "").trim().slice(0, 120);
   voeg_geskiedenis_by(rekord, "geskep", wie, "");
 
   try {

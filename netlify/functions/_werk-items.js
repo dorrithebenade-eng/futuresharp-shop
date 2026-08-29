@@ -67,6 +67,18 @@ function nuwe_item(soort, naam, beskrywing) {
     // verwys na hierdie ID; verdwyn die rekord, wys daardie ry na niks. Wat
     // afgeskakel is, verdwyn uit die keuselys maar bly in die register.
     aktief: true,
+
+    // DIE KATEGORIE, as 'n verwysing na _fin-kategoriee.js se id.
+    //
+    // HIER, EN NIE OP DIE FAKTUUR NIE. Die faktuur se reel dra 'n vrye teks met
+    // hierdie register as datalist; sou elke reel sy eie kategorie kies, moes
+    // 'n mens dit by elke faktuur weer kies en dan sou "Drukwerk" op twee
+    // fakture onder twee kategoriee kon val.
+    //
+    // Die staat pas die reel se BESKRYWING teen 'n item se naam en lees die
+    // kategorie hier. Pas niks, staan die bedrag as "Ongekategoriseer" -- nie
+    // weggelaat nie, want dan tel die staat nie meer tot die bank nie.
+    kategorie_id: "",
     geskep_op: nou,
     bygewerk_op: nou,
     geskiedenis: [],

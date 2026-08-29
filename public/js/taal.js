@@ -2656,6 +2656,12 @@ const WOORDEBOEK = {
   // Twee soorte, een register. Die toets is of iemand geld UITGEHAAL het:
   // ja, dan is dit 'n uitgawe wat presies terugkom; nee, hy het gewerk.
   wi_titel: { af: "Werk en uitgawes", en: "Work and expenses" },
+  wi_kategorie: { af: "Kategorie", en: "Category" },
+  wi_kategorie_hulp: {
+    af: "Waaronder hierdie item op die staat val. Die staat pas 'n faktuur se re\u00eblbeskrywing teen hierdie naam.",
+    en: "Where this item falls on the statement. The statement matches an invoice line's description against this name.",
+  },
+  wi_kat_geen: { af: "\u2014 geen kategorie \u2014", en: "\u2014 no category \u2014" },
 
   // ── Die register van finansiele kategoriee ──
   //
