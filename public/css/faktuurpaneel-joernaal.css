@@ -232,9 +232,20 @@
    veld-etiket in styl.css dra 'n marge wat vir 'n stapelvorm bedoel is; in
    'n strook laat dit die etiket sweef en die kolomme lyk soos vyf aparte
    dinge in plaas van een ry. */
+/* SES KOLOMME, NIE VYF NIE.
+
+   Die rooster het vyf kolomme gehad vir vyf velde. Toe Kategorie tussen
+   "Betaal deur" en "Bedrag" inkom, was daar 'n sesde kind en geen sesde spoor
+   -- die laaste veld het op 'n nuwe ry geval en die res het skeef gelees.
+
+   Dieselfde soort fout as die faktuurblad se handvatsel: 'n kind bygevoeg,
+   die rooster nie saam nie. Tel die velde wanneer 'n veld bykom.
+
+   Beskrywing se minimum gaan van 320px na 240px af om vir Kategorie plek te
+   maak; sy vat steeds die hele oorskot met haar 1fr. */
 .jn-nuwe {
   display: grid;
-  grid-template-columns: 150px minmax(320px, 1fr) 200px 130px 190px;
+  grid-template-columns: 150px minmax(240px, 1fr) 170px 200px 120px 170px;
   gap: 14px;
   align-items: end;
 }
