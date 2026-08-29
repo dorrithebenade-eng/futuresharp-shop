@@ -313,7 +313,10 @@ function fs_voer_uit() {
   ["in", "uit"].forEach((rigting) => {
     if (!FS.ongekat[rigting]) return;
     reels.push([
-      1,
+      // GEEN VLAK NIE. Ongekategoriseer is nie 'n kategorie nie -- sy is die
+      // bedrag wat by geen een pas nie. 'n 1 daar sou haar soos 'n
+      // hoofkategorie laat lees en 'n mens sou haar in die boom gaan soek.
+      "",
       "Ongekategoriseer",
       "",
       rigting === "in" ? "Inkomste" : "Uitgawe",
@@ -328,10 +331,16 @@ function fs_voer_uit() {
       .filter((b) => b.kategorie.rigting === rigting && !b.kategorie.onder)
       .reduce((a, b) => a + b.totaal_sent, 0) + FS.ongekat[rigting];
 
+  // DIE TOTALE LOOP DEUR DIESELFDE `veilig` AS DIE RES. Die leë velde het as
+  // kaal kommas geskryf -- Excel lees dit reg, maar 'n reel wat anders lyk as
+  // die res is 'n reel wat 'n mens later verkeerd tel.
   reels.push("");
-  reels.push([veilig("Totale inkomste"), "", "", "", "", "", veilig(rand(som_van("in")).toFixed(2))].join(","));
-  reels.push([veilig("Totale uitgawes"), "", "", "", "", "", veilig(rand(som_van("uit")).toFixed(2))].join(","));
-  reels.push([veilig("Oorskot"), "", "", "", "", "", veilig(rand(som_van("in") - som_van("uit")).toFixed(2))].join(","));
+  const slot = (naam, sent) =>
+    reels.push(["", naam, "", "", "", "", rand(sent).toFixed(2)].map(veilig).join(","));
+
+  slot("Totale inkomste", som_van("in"));
+  slot("Totale uitgawes", som_van("uit"));
+  slot("Oorskot", som_van("in") - som_van("uit"));
 
   const blob = new Blob(["\uFEFF" + reels.join("\r\n")], {
     type: "text/csv;charset=utf-8;",
