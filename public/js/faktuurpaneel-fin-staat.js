@@ -314,7 +314,7 @@ function fs_rekonsiliasie(inkomste, uitgawes) {
       </div>
       <div>
         <label class="veld-etiket" for="fs-bank-bedrag">${
-          fs_t("fs_bank_bedrag", "Bankbalans op daardie dag")}</label>
+          fs_t("fs_bank_bedrag", "Balans")}</label>
         <input class="veld-invoer" id="fs-bank-bedrag" inputmode="decimal" placeholder="0.00">
       </div>
       <button type="button" class="kaart-aksie" id="fs-bank-stoor">${
@@ -324,9 +324,9 @@ function fs_rekonsiliasie(inkomste, uitgawes) {
   if (!o || !s || o.datum === s.datum) {
     return `
       <div class="fs-bank">
-        <h4 class="fs-blok-kop">${fs_t("fs_bank_kop", "Klop dit teen die bank?")}</h4>
+        <h4 class="fs-blok-kop">${fs_t("fs_bank_kop", "Bankrekonsiliasie")}</h4>
         <p class="fs-hulp">${fs_t("fs_bank_leeg",
-          "Tik die bankbalans op twee dae in \u2014 die dag voor die tydperk begin, en die laaste dag. Dan wys hierdie blok of die staat volledig is.")}</p>
+          "Teken die balans aan op die dag voor die tydperk en op die laaste dag.")}</p>
         ${vorm}
       </div>`;
   }
@@ -337,18 +337,18 @@ function fs_rekonsiliasie(inkomste, uitgawes) {
 
   return `
     <div class="fs-bank">
-      <h4 class="fs-blok-kop">${fs_t("fs_bank_kop", "Klop dit teen die bank?")}</h4>
+      <h4 class="fs-blok-kop">${fs_t("fs_bank_kop", "Bankrekonsiliasie")}</h4>
       <table class="fs-tabel">
         <tbody>
-          <tr><td class="fs-naam">${fs_t("fs_bank_open", "Bankbalans op")} ${
+          <tr><td class="fs-naam">${fs_t("fs_bank_open", "Balans op")} ${
             fs_ontsnap(o.datum)}</td>
               <td class="fs-tot">${fs_rand(o.balans_sent)}</td></tr>
-          <tr><td class="fs-naam">${fs_t("fs_bank_beweeg", "Inkomste min uitgawes")}</td>
+          <tr><td class="fs-naam">${fs_t("fs_bank_beweeg", "Beweging")}</td>
               <td class="fs-tot">${(beweeg < 0 ? "\u2212 " : "") + fs_rand(beweeg)}</td></tr>
           <tr class="fs-som"><td class="fs-naam">${
-            fs_t("fs_bank_verwag", "Behoort te wees")}</td>
+            fs_t("fs_bank_verwag", "Berekende balans")}</td>
               <td class="fs-tot">${(verwag < 0 ? "\u2212 " : "") + fs_rand(verwag)}</td></tr>
-          <tr><td class="fs-naam">${fs_t("fs_bank_sluit", "Bankbalans op")} ${
+          <tr><td class="fs-naam">${fs_t("fs_bank_sluit", "Balans op")} ${
             fs_ontsnap(s.datum)}</td>
               <td class="fs-tot">${(s.balans_sent < 0 ? "\u2212 " : "") + fs_rand(s.balans_sent)}</td></tr>
           <tr class="fs-som ${verskil ? "fs-ongekat" : ""}">
@@ -358,8 +358,8 @@ function fs_rekonsiliasie(inkomste, uitgawes) {
       </table>
       <p class="fs-hulp">${
         verskil === 0
-          ? fs_t("fs_bank_klop", "Die tydperk is volledig \u2014 elke sent in die bank het 'n inskrywing.")
-          : fs_t("fs_bank_verskil_hulp", "Daar ontbreek inskrywings vir hierdie verskil, of 'n vereffening val buite die tydperk. Paystack vereffen in bondels.")
+          ? fs_t("fs_bank_klop", "Gerekonsilieer.")
+          : fs_t("fs_bank_verskil_hulp", "Onverklaard. Vereffenings kan oor die tydperkgrens val.")
       }</p>
       ${vorm}
     </div>`;
