@@ -250,11 +250,11 @@
              produkkategorieë nie; dié leef in skep-kategorie.js. -->
         <div class="fk-reg" data-reg="kategoriee">
           <div class="fk-soekbalk">
-            <p class="fk-hulp" id="fk-kat-hulp"></p>
-            <button type="button" class="kaart-aksie" id="fk-kat-nuut" data-i18n="kt_nuwe_knop">+ Nuwe kategorie</button>
+            <p class="fk-hulp" id="kt-hulp"></p>
+            <button type="button" class="kaart-aksie" id="kt-nuut" data-i18n="kt_nuwe_knop">+ Nuwe kategorie</button>
           </div>
 
-          <div id="fk-kat-lys">
+          <div id="kt-lys">
             <p class="stelsel-boodskap" data-i18n="fp_laai">Word gelaai …</p>
           </div>
         </div>
@@ -264,9 +264,9 @@
       <!-- Die vorm vir 'n kategorie. Buite die afdeling, soos die werk-item
            s'n: 'n oorlegsel hang aan die bladsy, nie aan die blad wat
            toevallig oop is nie. -->
-      <div class="fk-oorlegsel" id="fk-kat-vorm">
+      <div class="fk-oorlegsel" id="kt-vorm">
         <div class="fk-venster">
-          <h2 id="fk-kat-vorm-titel">Nuwe kategorie</h2>
+          <h2 id="kt-vorm-titel">Nuwe kategorie</h2>
           <p class="fk-lei" data-i18n="kt_lei">'n Kategorie word nooit uitgevee nie. Is sy verkeerd, word sy onder die regte een gesit — dan bly 'n ou staat lees soos hy gelees het.</p>
 
           <div class="fk-soort">
@@ -276,40 +276,40 @@
           <p class="fk-veldhulp" data-i18n="kt_rigting_hulp">Bankkoste is nooit inkomste nie. Die rigting keer dat 'n bedrag aan die verkeerde kant van die staat beland.</p>
 
           <div class="fk-veld">
-            <label class="veld-etiket" for="fk-kat-naam" data-i18n="kt_veld_naam">Naam</label>
-            <input type="text" class="veld-invoer" id="fk-kat-naam" maxlength="120">
+            <label class="veld-etiket" for="kt-naam" data-i18n="kt_veld_naam">Naam</label>
+            <input type="text" class="veld-invoer" id="kt-naam" maxlength="120">
           </div>
 
           <div class="fk-veld">
-            <label class="veld-etiket" for="fk-kat-onder" data-i18n="kt_veld_onder">Val onder</label>
-            <select class="veld-invoer" id="fk-kat-onder"></select>
+            <label class="veld-etiket" for="kt-onder" data-i18n="kt_veld_onder">Val onder</label>
+            <select class="veld-invoer" id="kt-onder"></select>
             <p class="fk-veldhulp" data-i18n="kt_onder_hulp">Laat leeg vir 'n hoofkategorie. 'n Kategorie mag self inskrywings dra én subkategorieë hê.</p>
           </div>
 
           <div class="fk-veld">
             <label class="wi-merk">
-              <input type="checkbox" id="fk-kat-hosting">
+              <input type="checkbox" id="kt-hosting">
               <span data-i18n="kt_hosting">Word deur hosting gedek</span>
             </label>
             <p class="fk-veldhulp" data-i18n="kt_hosting_hulp">Die staat tel op wat hier gemerk is en vergelyk dit met die hosting wat ingesamel is. So sien 'n mens of die persentasie reg is.</p>
           </div>
 
           <div class="fk-veld">
-            <label class="veld-etiket" for="fk-kat-nota">
+            <label class="veld-etiket" for="kt-nota">
               <span data-i18n="kt_veld_nota">Aantekening</span>
               <span class="veld-opsioneel" data-i18n="kt_opsioneel">— opsioneel</span>
             </label>
-            <input type="text" class="veld-invoer" id="fk-kat-nota" maxlength="500">
+            <input type="text" class="veld-invoer" id="kt-nota" maxlength="500">
             <p class="fk-veldhulp" data-i18n="kt_nota_hulp">Vir die boekhouer. Verskyn langs die kategorie in die register.</p>
           </div>
 
-          <p class="fk-veldhulp" id="fk-kat-vas-hulp" style="display:none" data-i18n="kt_vas_hulp">Hierdie kategorie word deur die stelsel geskryf. Haar naam en rigting bly; sy mag wel onder 'n ander een gesit word.</p>
+          <p class="fk-veldhulp" id="kt-vas-hulp" style="display:none" data-i18n="kt_vas_hulp">Hierdie kategorie word deur die stelsel geskryf. Haar naam en rigting bly; sy mag wel onder 'n ander een gesit word.</p>
 
-          <p class="fk-fout" id="fk-kat-vorm-fout" style="display:none"></p>
+          <p class="fk-fout" id="kt-vorm-fout" style="display:none"></p>
 
           <div class="fk-knoppies">
-            <button type="button" class="kaart-aksie wi-stil" id="fk-kat-kanselleer" data-i18n="kt_kanselleer">Kanselleer</button>
-            <button type="button" class="kaart-aksie" id="fk-kat-stoor" data-i18n="kt_stoor">Stoor</button>
+            <button type="button" class="kaart-aksie wi-stil" id="kt-kanselleer" data-i18n="kt_kanselleer">Kanselleer</button>
+            <button type="button" class="kaart-aksie" id="kt-stoor" data-i18n="kt_stoor">Stoor</button>
           </div>
         </div>
       </div>
