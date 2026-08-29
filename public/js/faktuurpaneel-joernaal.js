@@ -19,6 +19,19 @@ const JN_WYS = 5;
 
 let JN_SESSIE = null;
 let JN_DATA = null;
+
+/* DIE KATEGORIEE WORD EEN KEER GELAAI, nie by elke inskrywing nie.
+
+   Die lys verander selde en die joernaal is 'n plek waar 'n mens vinnig agter
+   mekaar tik. 'n Oproep per inskrywing sou die tweede een laat wag op iets wat
+   nie verander het nie.
+
+   MISLUK DIE LEES, BLY DIE JOERNAAL WERK. Die keuselys dra dan net die leë
+   keuse, en die inskrywing gaan deur sonder 'n kategorie -- sy verskyn as
+   "Ongekategoriseer" op die staat, sigbaar en met haar eie totaal. Die
+   alternatief is 'n joernaal wat nie werk omdat 'n ander register stukkend is
+   nie, en dit is die slegter ruil. */
+let JN_KATEGORIEE = [];
 let JN_RIGTING = "uit";
 let JN_ALMAL = false;
 
@@ -251,6 +264,10 @@ function jn_koppel_lys() {
       if (!r) return;
       document.getElementById("jn-besk").value = r.beskrywing;
       document.getElementById("jn-wie").value = r.wie || "";
+      const kies = document.getElementById("jn-kategorie");
+      // NA jn_stel_rigting(), want die lys word daar herteken -- 'n waarde wat
+      // voor die herteken gestel word, val weg.
+      if (kies) setTimeout(() => { kies.value = r.kategorie_id || ""; }, 0);
       document.getElementById("jn-bedrag").value = (r.bedrag_sent / 100)
         .toFixed(2)
         .replace(".", ",");
@@ -283,6 +300,9 @@ function jn_koppel_lys() {
 
 function jn_stel_rigting(rigting) {
   JN_RIGTING = rigting === "in" ? "in" : "uit";
+  // Die keuselys wys slegs kategoriee van hierdie rigting; sien
+  // jn_teken_kategoriee().
+  jn_teken_kategoriee();
   const i = document.getElementById("jn-r-in");
   const u = document.getElementById("jn-r-uit");
   if (i) i.className = JN_RIGTING === "in" ? "aan-in" : "";
@@ -304,6 +324,44 @@ function jn_wys_fout(teks) {
   p.hidden = !teks;
 }
 
+async function jn_laai_kategoriee() {
+  const kies = document.getElementById("jn-kategorie");
+  if (!kies) return;
+
+  try {
+    const data = await jn_vra("kry-fin-kategoriee", { method: "GET" });
+    JN_KATEGORIEE = Array.isArray(data.kategoriee) ? data.kategoriee : [];
+  } catch (fout) {
+    console.error("Kon nie die kategoriee laai nie:", fout);
+    JN_KATEGORIEE = [];
+  }
+
+  jn_teken_kategoriee();
+}
+
+/* DIE KEUSELYS WYS SLEGS DIE RIGTING WAT GEKIES IS.
+
+   'n Uitgawe onder "Diensinkomste" verskyn WEL op die staat, net aan die
+   verkeerde kant, en dan is die totale stil verkeerd. Die skerm hoef dit nie
+   moontlik te maak nie.
+
+   Vandaar dat hierdie funksie ook loop wanneer 'n mens die rigting wissel. */
+function jn_teken_kategoriee() {
+  const kies = document.getElementById("jn-kategorie");
+  if (!kies) return;
+
+  const gekies = kies.value;
+  const leeg = `<option value="">${jn_t("jn_kat_geen", "\u2014 geen kategorie \u2014")}</option>`;
+
+  kies.innerHTML = leeg + JN_KATEGORIEE
+    .filter((k) => k.rigting === JN_RIGTING)
+    .map((k) => `<option value="${jn_ontsnap(k.id)}">${jn_ontsnap(k.pad || k.naam)}</option>`)
+    .join("");
+
+  // Hou die keuse as sy nog in die nuwe lys is; andersins val sy terug na leeg.
+  kies.value = Array.from(kies.options).some((o) => o.value === gekies) ? gekies : "";
+}
+
 async function jn_teken_aan() {
   const knop = document.getElementById("jn-voeg");
   const datum = document.getElementById("jn-datum").value;
@@ -321,6 +379,7 @@ async function jn_teken_aan() {
         wie: document.getElementById("jn-wie").value.trim(),
         bedrag_sent: jn_sent(document.getElementById("jn-bedrag").value),
         rigting: JN_RIGTING,
+        kategorie_id: (document.getElementById("jn-kategorie") || {}).value || "",
       }),
     });
 
@@ -352,6 +411,19 @@ async function jn_teken_aan() {
 
 /* ═══ uitvoer ═══ */
 
+// Die UITVOER dra die NAAM, nie die id nie. Die boekhouer lees "Bedryfskoste /
+// Netlify", nie `netlify`. Die volle pad, want 'n plat CSV wys nie 'n boom nie.
+//
+// Ken die stelsel die id nie -- 'n ou inskrywing na 'n kategorie wat weg is --
+// staan die id self daar. Dit is lelik en dit is die bedoeling: 'n mens moet
+// dit sien en kan gaan soek.
+function jn_kategorie_naam(id) {
+  if (!id) return "";
+  const k = JN_KATEGORIEE.find((x) => x.id === id);
+  return k ? k.pad || k.naam : id;
+}
+
+
 // 'n CSV, nie 'n Excel-lêer nie. Die boekhouer maak dit in Excel oop en die
 // kolomme is skoon; 'n xlsx sou 'n biblioteek verg vir presies dieselfde
 // uitkoms. Kommas word deur aanhalingstekens gedra.
@@ -360,7 +432,7 @@ function jn_voer_uit() {
   const veilig = (w) => '"' + String(w == null ? "" : w).replace(/"/g, '""') + '"';
 
   const reels = [
-    ["Datum", "Beskrywing", "Betaal deur", "Bron", "In", "Uit"].map(veilig).join(","),
+    ["Datum", "Beskrywing", "Betaal deur", "Kategorie", "Bron", "In", "Uit"].map(veilig).join(","),
   ];
 
   (JN_DATA.inskrywings || []).forEach((r) => {
@@ -370,6 +442,7 @@ function jn_voer_uit() {
         r.datum,
         r.beskrywing,
         r.wie || "",
+        jn_kategorie_naam(r.kategorie_id),
         r.bron,
         r.rigting === "in" ? bedrag : "",
         r.rigting === "uit" ? bedrag : "",
@@ -380,9 +453,11 @@ function jn_voer_uit() {
   });
 
   reels.push("");
-  reels.push([veilig("Totaal in"), "", "", "", veilig((JN_DATA.in_sent / 100).toFixed(2)), ""].join(","));
-  reels.push([veilig("Totaal uit"), "", "", "", "", veilig((JN_DATA.uit_sent / 100).toFixed(2))].join(","));
-  reels.push([veilig("Verskil"), "", "", "", veilig((JN_DATA.netto_sent / 100).toFixed(2)), ""].join(","));
+  // DIE LEE KOLOMME TEL. Kom daar 'n kolom by, moet hierdie drie reels saam
+  // skuif, anders staan die totale onder die verkeerde kop.
+  reels.push([veilig("Totaal in"), "", "", "", "", veilig((JN_DATA.in_sent / 100).toFixed(2)), ""].join(","));
+  reels.push([veilig("Totaal uit"), "", "", "", "", "", veilig((JN_DATA.uit_sent / 100).toFixed(2))].join(","));
+  reels.push([veilig("Verskil"), "", "", "", "", veilig((JN_DATA.netto_sent / 100).toFixed(2)), ""].join(","));
 
   // \uFEFF sodat Excel die lêer as UTF-8 lees; sonder dit word ë en é onleesbaar.
   const blob = new Blob(["\uFEFF" + reels.join("\r\n")], {
@@ -506,6 +581,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (afd.classList.contains("wys") && !gelaai) {
       gelaai = true;
       jn_laai();
+      jn_laai_kategoriee();
     }
   });
   waarnemer.observe(afd, { attributes: true, attributeFilter: ["class"] });
@@ -513,5 +589,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (afd.classList.contains("wys")) {
     gelaai = true;
     jn_laai();
+    jn_laai_kategoriee();
   }
 });

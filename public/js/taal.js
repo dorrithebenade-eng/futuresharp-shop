@@ -704,6 +704,8 @@ const WOORDEBOEK = {
   },
   jn_datum: { af: "Datum", en: "Date" },
   jn_beskrywing: { af: "Beskrywing", en: "Description" },
+  jn_kategorie: { af: "Kategorie", en: "Category" },
+  jn_kat_geen: { af: "\u2014 geen kategorie \u2014", en: "\u2014 no category \u2014" },
   jn_bedrag: { af: "Bedrag", en: "Amount" },
   jn_wie: { af: "Betaal deur", en: "Paid by" },
   jn_rigting: { af: "Soort", en: "Type" },
