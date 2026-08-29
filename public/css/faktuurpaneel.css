@@ -425,6 +425,15 @@ a.paneel-kieslys-item { text-decoration: none; }
   color: #8a6400;
 }
 .fk-merkie-nuut { background: #E8F3F0; color: #2f6b60; }
+
+/* DIE FINANSIELE KATEGORIEE.
+
+   Die inkeping kom uit `vlak` as 'n inline padding-left, want die diepte is
+   onbeperk en 'n klas per vlak sou 'n lys klasse verg wat op ses ophou. Die
+   getal self bly waar dit hoort: in die uitvoer se eie kolom. */
+.kt-ry { border-left: 2px solid transparent; }
+.kt-ry:hover { border-left-color: var(--teal); }
+.fk-merkie.kt-hosting { background: #FDF3E3; color: #8a5a1a; }
 .fk-merkie-dup { background: #FDE7E0; color: #a8351a; }
 
 /* --- die twee oorlegsels --- */

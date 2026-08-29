@@ -2653,6 +2653,63 @@ const WOORDEBOEK = {
   // Twee soorte, een register. Die toets is of iemand geld UITGEHAAL het:
   // ja, dan is dit 'n uitgawe wat presies terugkom; nee, hy het gewerk.
   wi_titel: { af: "Werk en uitgawes", en: "Work and expenses" },
+
+  // ── Die register van finansiele kategoriee ──
+  //
+  // NIE die winkel se produkkategoriee nie. Die woord "kategorie" dra twee
+  // betekenisse in hierdie stelsel, en die "kt_"-voorvoegsel hou hulle uit
+  // mekaar: kt_ is finansieel, kat_ is die winkel s'n.
+  kt_titel: { af: "Kategorie\u00eb", en: "Categories" },
+  kt_nuwe_knop: { af: "+ Nuwe kategorie", en: "+ New category" },
+  kt_nuwe_titel: { af: "Nuwe kategorie", en: "New category" },
+  kt_wysig_titel: { af: "Wysig kategorie", en: "Edit category" },
+  kt_lei: {
+    af: "'n Kategorie word nooit uitgevee nie. Is sy verkeerd, word sy onder die regte een gesit \u2014 dan bly 'n ou staat lees soos hy gelees het.",
+    en: "A category is never deleted. If it is wrong, it is placed under the right one \u2014 then an old statement still reads as it read.",
+  },
+  kt_in: { af: "Inkomste", en: "Income" },
+  kt_uit: { af: "Uitgawe", en: "Expense" },
+  kt_rigting_hulp: {
+    af: "Bankkoste is nooit inkomste nie. Die rigting keer dat 'n bedrag aan die verkeerde kant van die staat beland.",
+    en: "Bank charges are never income. The direction stops an amount landing on the wrong side of the statement.",
+  },
+  kt_veld_naam: { af: "Naam", en: "Name" },
+  kt_veld_onder: { af: "Val onder", en: "Falls under" },
+  kt_geen_ouer: { af: "\u2014 hoofkategorie \u2014", en: "\u2014 main category \u2014" },
+  kt_onder_hulp: {
+    af: "Laat leeg vir 'n hoofkategorie. 'n Kategorie mag self inskrywings dra \u00e9n subkategorie\u00eb h\u00ea.",
+    en: "Leave empty for a main category. A category may carry entries of its own and have subcategories.",
+  },
+  kt_hosting: { af: "Word deur hosting gedek", en: "Covered by hosting" },
+  kt_hosting_kort: { af: "Hosting", en: "Hosting" },
+  kt_hosting_hulp: {
+    af: "Die staat tel op wat hier gemerk is en vergelyk dit met die hosting wat ingesamel is. So sien 'n mens of die persentasie reg is.",
+    en: "The statement totals what is marked here and compares it with the hosting collected. That is how you see whether the percentage is right.",
+  },
+  kt_veld_nota: { af: "Aantekening", en: "Note" },
+  kt_opsioneel: { af: "\u2014 opsioneel", en: "\u2014 optional" },
+  kt_nota_hulp: {
+    af: "Vir die boekhouer. Verskyn langs die kategorie in die register.",
+    en: "For the bookkeeper. Appears beside the category in the register.",
+  },
+  kt_vas: { af: "Stelsel", en: "System" },
+  kt_toets: { af: "Toets", en: "Test" },
+  kt_vas_hulp: {
+    af: "Hierdie kategorie word deur die stelsel geskryf. Haar naam en rigting bly; sy mag wel onder 'n ander een gesit word.",
+    en: "This category is written by the system. Its name and direction stay; it may however be placed under another one.",
+  },
+  kt_naam_kort: { af: "Die naam is verpligtend.", en: "The name is required." },
+  kt_skrap: { af: "Skrap", en: "Delete" },
+  kt_skrap_vra: { af: "Vee hierdie kategorie uit?", en: "Delete this category?" },
+  kt_kanselleer: { af: "Kanselleer", en: "Cancel" },
+  kt_stoor: { af: "Stoor", en: "Save" },
+  kt_een: { af: "kategorie", en: "category" },
+  kt_meer: { af: "kategorie\u00eb", en: "categories" },
+  kt_leeg: {
+    af: "Die register is nog leeg. Voeg die eerste kategorie by.",
+    en: "The register is still empty. Add the first category.",
+  },
+  kt_laai_fout: { af: "Kon nie die kategorie\u00eb laai nie.", en: "Could not load the categories." },
   wi_soek_plek: { af: "Soek op naam of beskrywing", en: "Search by name or description" },
   wi_nuwe_knop: { af: "+ Nuwe item", en: "+ New item" },
   wi_kop_werk: { af: "Werk wat betaal word", en: "Work that is paid for" },
