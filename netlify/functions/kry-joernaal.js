@@ -241,9 +241,21 @@ exports.handler = async (event, context) => {
           nota: "",
           bedrag_sent: sent,
           rigting: "uit",
-          // Die uitbetaling se kategorie kom uit die begunstigde se
-          // reel op die faktuur; sy word deur die staat toegeken, nie hier nie.
+          // Die uitbetaling se kategorie kom uit die begunstigde se reel op
+          // die faktuur; sy word deur die STAAT toegeken, nie hier nie.
           kategorie_id: "",
+
+          // `waarvoor` GAAN SAAM, en dit is waarom.
+          //
+          // 'n Uitbetaling loop dikwels oor meer as een reel: R1 200 vir 'n
+          // aanbieding plus R450 vir 'n vraelys, in een oorbetaling. Elke deel
+          // dra sy eie {reel, bedrag_sent}, dus kan die staat elke deel by 'n
+          // ander kategorie sit sonder om te raai.
+          //
+          // Sonder hierdie veld sou die hele R1 650 by een kategorie moes val
+          // of glad nie, en dan is die staat se uitgawekant so grof dat sy niks
+          // se nie.
+          waarvoor: Array.isArray(ry.waarvoor) ? ry.waarvoor : [],
           bron: "uitbetaling",
         });
       });

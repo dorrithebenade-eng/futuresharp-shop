@@ -2603,6 +2603,38 @@ const WOORDEBOEK = {
     af: "Elke syfer word by elke oopmaak uit die fakture herbereken en nooit gestoor nie. Die bedrae kom uit elke faktuur se gevriesde verdeling en word nooit oorgetik nie.",
     en: "Every figure is recalculated from the invoices each time this page opens and is never stored. The amounts come from each invoice's frozen split and are never typed over.",
   },
+  // ── Die inkomste- en uitgawestaat ──
+  fs_titel: { af: "Inkomste en uitgawes", en: "Income and expenses" },
+  fs_hulp: {
+    af: "Kontantbasis. 'n Faktuur tel op die dag dat die geld ontvang is, nie op die dag van uitreiking nie. Die finansi\u00eble jaar loop 1 Maart tot 28 Februarie.",
+    en: "Cash basis. An invoice counts on the day the money was received, not the day it was issued. The financial year runs 1 March to 28 February.",
+  },
+  fs_van: { af: "Van", en: "From" },
+  fs_tot: { af: "Tot", en: "To" },
+  fs_wys: { af: "Wys", en: "Show" },
+  fs_uitvoer: { af: "Voer uit", en: "Export" },
+  fs_inkomste: { af: "Inkomste", en: "Income" },
+  fs_uitgawes: { af: "Uitgawes", en: "Expenses" },
+  fs_tot_in: { af: "Totale inkomste", en: "Total income" },
+  fs_tot_uit: { af: "Totale uitgawes", en: "Total expenses" },
+  fs_oorskot: { af: "Oorskot vir die tydperk", en: "Surplus for the period" },
+  fs_ongekat: { af: "Ongekategoriseer", en: "Uncategorised" },
+  fs_hosting_kop: { af: "Word die hosting gedek?", en: "Is the hosting covered?" },
+  fs_hosting_uit: {
+    af: "Uitgawes gemerk \u201cgedek deur hosting\u201d",
+    en: "Expenses marked \u201ccovered by hosting\u201d",
+  },
+  fs_hosting_hulp: {
+    af: "Uitgawes wat as \u201cgedek deur hosting\u201d gemerk is, teenoor wat hosting ingebring het. Uitgawes wat iemand uit sy eie sak gedra het sonder om te eis, is nie hierin nie.",
+    en: "Expenses marked \u201ccovered by hosting\u201d, against what hosting brought in. Expenses someone carried out of pocket without claiming are not included.",
+  },
+  fs_wag_kop: { af: "Wag vir 'n kategorie", en: "Waiting for a category" },
+  fs_wag_hulp: {
+    af: "Beskrywings wat nie by 'n item in die register pas nie. Die bedrae staan hierbo as Ongekategoriseer \u2014 hulle verdwyn nooit.",
+    en: "Descriptions that do not match an item in the register. The amounts appear above as Uncategorised \u2014 they never disappear.",
+  },
+  fs_laai_fout: { af: "Kon nie die staat laai nie.", en: "Could not load the statement." },
+
   st_werk_titel: {
     af: "Begunstigdes wat uit die hoofrekening betaal moet word",
     en: "Beneficiaries to be paid from the main account",

@@ -434,6 +434,66 @@ a.paneel-kieslys-item { text-decoration: none; }
 .kt-ry { border-left: 2px solid transparent; }
 .kt-ry:hover { border-left-color: var(--teal); }
 .fk-merkie.kt-hosting { background: #FDF3E3; color: #8a5a1a; }
+
+/* ── Die inkomste- en uitgawestaat ──────────────────────────────────────── */
+
+.fs-balk {
+  display: grid;
+  grid-template-columns: 170px 170px auto auto 1fr;
+  gap: 12px;
+  align-items: end;
+  margin: 0 0 18px;
+}
+.fs-balk .veld-etiket { display: block; margin: 0 0 5px; font-size: 11.5px; }
+.fs-balk .veld-invoer { margin: 0; }
+
+.fs-blok { margin: 0 0 26px; }
+.fs-blok-kop {
+  margin: 0 0 4px;
+  font-size: 12px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--grys-teks);
+}
+
+.fs-tabel { width: 100%; border-collapse: collapse; }
+.fs-tabel td { padding: 7px 0; border-bottom: 1px solid #EEEBE6; font-size: 14px; }
+
+/* DRIE KOLOMME: naam, EIE, TOTAAL.
+
+   `eie` is wat DIREK onder daardie kategorie geboek is; `totaal` is eie plus al
+   haar kinders. 'n Ouer sonder eie inskrywings wys 'n leë middelkolom -- dit is
+   die bedoeling, want die getal daar sou nul wees en 'n nul lees soos data. */
+.fs-naam { width: auto; }
+.fs-eie,
+.fs-tot { width: 130px; text-align: right; font-variant-numeric: tabular-nums; }
+.fs-eie { color: var(--grys-teks); }
+
+.fs-hoof .fs-naam,
+.fs-hoof .fs-tot { font-weight: 700; }
+
+.fs-som td {
+  border-top: 1.5px solid var(--swart);
+  border-bottom: 0;
+  font-weight: 700;
+  padding-top: 9px;
+}
+
+/* Ongekategoriseer staan AMBER, nie rooi nie. Sy is nie 'n fout nie -- net iets
+   wat nog iemand se aandag verg -- en rooi sou dit soos 'n breuk laat lyk. */
+.fs-ongekat td { background: #FDF3E3; color: #8a5a1a; }
+
+.fs-slot { max-width: 520px; margin: 0 0 26px; }
+.fs-slot .fs-tot { width: 160px; }
+.fs-tot.kort { color: #C0392B; }
+
+.fs-hosting,
+.fs-wag { margin: 0 0 26px; max-width: 620px; }
+.fs-hulp { margin: 0 0 10px; font-size: 12.5px; color: var(--grys-teks); line-height: 1.5; }
+
+@media (max-width: 760px) {
+  .fs-balk { grid-template-columns: 1fr 1fr; }
+}
 .fk-merkie-dup { background: #FDE7E0; color: #a8351a; }
 
 /* --- die twee oorlegsels --- */

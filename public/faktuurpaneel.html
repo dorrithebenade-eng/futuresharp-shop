@@ -410,6 +410,36 @@
           <div id="st-klaar"></div>
         </div>
 
+        <!-- DIE INKOMSTE- EN UITGAWESTAAT.
+
+             Sy tel op wat kry-joernaal.js reeds gee — die betaalde fakture,
+             die uitbetalings, die winkel se behoue deel en fooi, en die
+             handinskrywings — oor die kategorieboom. Geen eie Function nie:
+             twee kopiee van daardie logika sou uitmekaar dryf. -->
+        <div class="st-afd">
+          <div class="st-afd-kop">
+            <h3 data-i18n="fs_titel">Inkomste en uitgawes</h3>
+          </div>
+          <p class="st-afd-hulp" data-i18n="fs_hulp">Kontantbasis. 'n Faktuur tel op die dag dat die geld ontvang is, nie op die dag van uitreiking nie. Die finansiële jaar loop 1 Maart tot 28 Februarie.</p>
+
+          <div class="fs-balk">
+            <div>
+              <label class="veld-etiket" for="fs-van" data-i18n="fs_van">Van</label>
+              <input class="veld-invoer" type="date" id="fs-van">
+            </div>
+            <div>
+              <label class="veld-etiket" for="fs-tot" data-i18n="fs_tot">Tot</label>
+              <input class="veld-invoer" type="date" id="fs-tot">
+            </div>
+            <button type="button" class="kaart-aksie" id="fs-wys" data-i18n="fs_wys">Wys</button>
+            <button type="button" class="kaart-aksie stil" id="fs-uitvoer" data-i18n="fs_uitvoer">Voer uit</button>
+          </div>
+
+          <div id="fs-staat">
+            <p class="stelsel-boodskap" data-i18n="fp_laai">Word gelaai …</p>
+          </div>
+        </div>
+
       </section>
 
       <!-- ═══ Instellings ═══
@@ -808,5 +838,6 @@
   <script src="js/faktuurpaneel-registers.js"></script>
   <script src="js/faktuurpaneel-werk.js"></script>
   <script src="js/faktuurpaneel-fin-kategoriee.js"></script>
+  <script src="js/faktuurpaneel-fin-staat.js"></script>
 </body>
 </html>
