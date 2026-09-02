@@ -12,6 +12,7 @@
 
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 const { kry_store } = require("./_blob-store");
+const { LEEN_OPGRADERING_VENSTER_DAE } = require("./_leen-venster");
 
 exports.handler = async (event, context) => {
   if (event.httpMethod !== "GET") {
@@ -134,9 +135,9 @@ exports.handler = async (event, context) => {
         // leen reeds verval het, óf daar nog net 5 dae of minder oor is —
         // vroeër as dit voel dit soos 'n te-vroeë upsell, nie 'n tydige
         // herinnering nie.
-        const OPGRADERING_WYS_DAE_VOOR_VERVAL = 5;
         const binne_wys_venster =
-          leen_aktief === false || (leen_aktief === true && dae_oor !== null && dae_oor <= OPGRADERING_WYS_DAE_VOOR_VERVAL);
+          leen_aktief === false ||
+          (leen_aktief === true && dae_oor !== null && dae_oor <= LEEN_OPGRADERING_VENSTER_DAE);
 
         let opgradering = null;
         if (is_leen && boek_item.opgradering_koepon_kode && binne_wys_venster) {

@@ -19,10 +19,10 @@
 const { kry_store } = require("./_blob-store");
 const { stuur_leen_verval_kennisgewing } = require("./_kennisgewing-leen-verval");
 
-// Vyf dae, sodat die pos en die opgradeer-knoppie op "My Boeke" op
-// dieselfde oomblik verskyn. Daardie knoppie se venster staan in
-// kry-my-boeke.js op dieselfde getal. Verander die een, verander die ander.
-const HERINNER_DAE_VOOR_VERVAL = 5;
+// Die venster kom uit _leen-venster.js, wat kry-my-boeke.js ook lees. Die
+// pos en die opgradeer-knoppie op "My Boeke" verskyn dus noodwendig op
+// dieselfde oomblik; hulle kan nie uit pas raak nie.
+const { LEEN_OPGRADERING_VENSTER_DAE } = require("./_leen-venster");
 
 // "Nuut" = die status ná 'n suksesvolle betaling (sien paystack-webhook.js).
 const BETAAL_STATUS = "Nuut";
@@ -110,7 +110,7 @@ exports.handler = async () => {
         // taak op dag 5 om enige rede nie -- 'n ontplooiing, 'n onderbreking
         // by Netlify -- vuur dit op dag 4. 'n Toets op presies vyf sou die
         // pos in daardie geval vir altyd laat val.
-        if (oor > HERINNER_DAE_VOOR_VERVAL || oor < 1) continue;
+        if (oor > LEEN_OPGRADERING_VENSTER_DAE || oor < 1) continue;
 
         if (!aan) {
           oorgeslaan++;
