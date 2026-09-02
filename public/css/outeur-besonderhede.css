@@ -118,6 +118,23 @@
   flex: 0 0 auto;
 }
 
+/* Die staat-ry dra 'n keuselys, nie 'n merkblokkie nie. Die basisreel is
+   'n RY met die kontrole links; 'n keuselys langs die teks druk albei
+   plat. Hierdie ry stapel dus, met die lys onder sy eie etiket.
+   'n Eie modifikasieklas, nie 'n geleende een nie -- die basisklas se
+   aannames oor 'n 17px-kontrole geld hier nie. */
+.mb-keuse--lys {
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mb-keuse--lys select {
+  width: auto;
+  min-width: 220px;
+  max-width: 100%;
+  align-self: flex-start;
+}
+
 .mb-keuse b,
 .mb-vaste b {
   display: block;

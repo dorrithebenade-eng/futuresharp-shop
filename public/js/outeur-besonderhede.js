@@ -23,7 +23,12 @@ const MB_EPOS = "futureshop@futuresharp.co.za";
 
 // Wat op die bediener staan. Elke geslaagde stoor werk dit by; die knoppies
 // meet daarteen.
-const mb_gestoor = { by_verkoop: true, selfoon: "", adres: "" };
+const mb_gestoor = { by_verkoop: true, staat_frekwensie: "maandeliks", selfoon: "", adres: "" };
+
+// Die verstek by die LESER, nie by die stoor nie. 'n Outeur wat nog nooit
+// gekies het nie, kry 'n maandelikse staat -- dieselfde beginsel as
+// by_verkoop hierbo, waar stilte "ja" beteken.
+const MB_STAAT_VERSTEK = "maandeliks";
 
 function mb_vertaal(sleutel, terugval) {
   return window.t ? window.t(sleutel) : terugval;
@@ -115,11 +120,15 @@ function mb_vul(data) {
   // Geen inskrywing beteken aan: die pos is die verstek, en 'n outeur wat
   // nog nooit gekies het nie, hoor van sy verkope.
   mb_gestoor.by_verkoop = kennisgewings.by_verkoop !== false;
+  mb_gestoor.staat_frekwensie = kennisgewings.staat_frekwensie || MB_STAAT_VERSTEK;
   mb_gestoor.selfoon = kontak.selfoon || "";
   mb_gestoor.adres = kontak.adres || "";
 
   const merk = mb_el("mb-verkoop");
   if (merk) merk.checked = mb_gestoor.by_verkoop;
+
+  const staat = mb_el("mb-staat");
+  if (staat) staat.value = mb_gestoor.staat_frekwensie;
 
   const selfoon = mb_el("mb-selfoon");
   if (selfoon) selfoon.value = mb_gestoor.selfoon;
@@ -161,8 +170,15 @@ function mb_stel_knoppie(knoppie_id, nota_id, anders) {
 
 function mb_kyk_kennis() {
   const merk = mb_el("mb-verkoop");
-  if (!merk) return;
-  mb_stel_knoppie("mb-stoor-kennis", "mb-nota-kennis", merk.checked !== mb_gestoor.by_verkoop);
+  const staat = mb_el("mb-staat");
+  if (!merk && !staat) return;
+
+  // Een kaart, een stoorknoppie, twee keuses. Die knoppie word wakker as
+  // EEN van die twee verskil van wat gestoor is.
+  const anders =
+    (merk && merk.checked !== mb_gestoor.by_verkoop) ||
+    (staat && staat.value !== mb_gestoor.staat_frekwensie);
+  mb_stel_knoppie("mb-stoor-kennis", "mb-nota-kennis", Boolean(anders));
 }
 
 function mb_kyk_kontak() {
@@ -193,11 +209,17 @@ async function mb_stoor(deel) {
   const nota = mb_el(nota_id);
 
   const merk = mb_el("mb-verkoop");
+  const staat = mb_el("mb-staat");
   const selfoon = mb_el("mb-selfoon");
   const adres = mb_el("mb-adres");
 
   const las = is_kennis
-    ? { kennisgewings: { by_verkoop: Boolean(merk && merk.checked) } }
+    ? {
+        kennisgewings: {
+          by_verkoop: Boolean(merk && merk.checked),
+          staat_frekwensie: staat ? staat.value : mb_gestoor.staat_frekwensie,
+        },
+      }
     : {
         kontak: {
           selfoon: selfoon ? selfoon.value.trim() : "",
@@ -253,7 +275,10 @@ async function mb_stoor(deel) {
 
     if (antwoord.kennisgewings) {
       mb_gestoor.by_verkoop = antwoord.kennisgewings.by_verkoop !== false;
+      mb_gestoor.staat_frekwensie =
+        antwoord.kennisgewings.staat_frekwensie || MB_STAAT_VERSTEK;
       if (merk) merk.checked = mb_gestoor.by_verkoop;
+      if (staat) staat.value = mb_gestoor.staat_frekwensie;
     }
     if (antwoord.kontak) {
       mb_gestoor.selfoon = antwoord.kontak.selfoon || "";
@@ -283,6 +308,9 @@ async function mb_stoor(deel) {
 function mb_koppel() {
   const merk = mb_el("mb-verkoop");
   if (merk) merk.addEventListener("change", mb_kyk_kennis);
+
+  const staat = mb_el("mb-staat");
+  if (staat) staat.addEventListener("change", mb_kyk_kennis);
 
   ["mb-selfoon", "mb-adres"].forEach((id) => {
     const el = mb_el(id);
