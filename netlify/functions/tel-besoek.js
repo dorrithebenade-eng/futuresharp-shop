@@ -7,17 +7,7 @@
 // voordat dit herstel, sodat 'n geskiedenis oor tyd bewaar bly.
 
 const { kry_store } = require("./_blob-store");
-
-function iso_week_sleutel(datum) {
-  // ISO 8601-weeknommer (Maandag = eerste dag, Week 1 bevat die jaar se
-  // eerste Donderdag) — standaard, ondubbelsinnige weeksleutel.
-  const d = new Date(Date.UTC(datum.getFullYear(), datum.getMonth(), datum.getDate()));
-  const dagNommer = d.getUTCDay() || 7;
-  d.setUTCDate(d.getUTCDate() + 4 - dagNommer);
-  const jaarBegin = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-  const weekNommer = Math.ceil(((d - jaarBegin) / 86400000 + 1) / 7);
-  return `${d.getUTCFullYear()}-W${String(weekNommer).padStart(2, "0")}`;
-}
+const { kry_periode_sleutels } = require("./_periode-sleutels");
 
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
@@ -26,9 +16,11 @@ exports.handler = async (event) => {
 
   const store = kry_store("statistieke");
   const nou = new Date();
-  const vandag_sleutel = nou.toISOString().slice(0, 10); // JJJJ-MM-DD
-  const maand_sleutel = nou.toISOString().slice(0, 7); // JJJJ-MM
-  const week_sleutel = iso_week_sleutel(nou);
+  const {
+    daagliks: vandag_sleutel,
+    weekliks: week_sleutel,
+    maandeliks: maand_sleutel,
+  } = kry_periode_sleutels(nou);
 
   const [totaal_rec, dag_rec, week_rec, maand_rec] = await Promise.all([
     store.get("totaal", { type: "json" }),
