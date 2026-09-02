@@ -27,6 +27,13 @@ const { kry_my_outeur } = require("./_my-outeur");
 const KONTAK_VELDE = ["selfoon", "adres"];
 const MAKS_LENGTE = 200;
 
+// Hoe dikwels die outeur sy staat van verkope en besigtigings wil kry.
+// "af" is 'n WAARDE, nie 'n afwesigheid nie — dan kan 'n mens onderskei
+// tussen iemand wat afgeskakel het en iemand wat nog nooit gekies het nie.
+// Die verstek staan by die leser, nie hier nie; hierdie lêer stoor net wat
+// gekies is.
+const STAAT_FREKWENSIES = ["af", "weekliks", "maandeliks"];
+
 // Leeg is 'n geldige waarde: 'n outeur wat 'n ou selfoonnommer uitvee, moet
 // dit kan doen sonder om die ou een te laat staan. Daarom trim-en-snit ons
 // eerder as om leë waardes weg te gooi soos wysig-outeur.js doen.
@@ -97,6 +104,25 @@ exports.handler = async (event, context) => {
     iets_verander = true;
   }
 
+  if (kennisgewings && typeof kennisgewings === "object" && het(kennisgewings, "staat_frekwensie")) {
+    // Een van drie strings, niks anders nie. 'n Onbekende waarde word
+    // GEWEIER en nie stilweg na 'n verstek toe gelei nie: 'n outeur wat
+    // "weekliks" kies en "maandeliks" kry, sou dit eers 'n maand later
+    // agterkom.
+    if (!STAAT_FREKWENSIES.includes(kennisgewings.staat_frekwensie)) {
+      return {
+        statusCode: 400,
+        body: `Ongeldige waarde vir staat_frekwensie — moet een van wees: ${STAAT_FREKWENSIES.join(", ")}`,
+      };
+    }
+    bygewerk.kennisgewings = {
+      ...(bestaande.kennisgewings || {}),
+      ...(bygewerk.kennisgewings || {}),
+      staat_frekwensie: kennisgewings.staat_frekwensie,
+    };
+    iets_verander = true;
+  }
+
   // --- Kontakbesonderhede ---
   const kontak = versoek.kontak;
   if (kontak && typeof kontak === "object") {
@@ -131,7 +157,10 @@ exports.handler = async (event, context) => {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       ok: true,
-      kennisgewings: { by_verkoop: (bygewerk.kennisgewings || {}).by_verkoop !== false },
+      kennisgewings: {
+        by_verkoop: (bygewerk.kennisgewings || {}).by_verkoop !== false,
+        staat_frekwensie: (bygewerk.kennisgewings || {}).staat_frekwensie || "maandeliks",
+      },
       kontak: {
         selfoon: uit_kontak.selfoon || "",
         adres: uit_kontak.adres || "",
