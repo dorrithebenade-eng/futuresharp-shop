@@ -82,7 +82,24 @@
     // Agtergrond-besoekteller — "fire and forget", nooit die bladsy se
     // werking laat wag of breek as dit misluk nie. Geen persoonlike
     // inligting gestuur nie, net 'n eenvoudige tel-versoek.
-    fetch("/.netlify/functions/tel-besoek", { method: "POST" }).catch(() => {});
+    function tel_hierdie_besoek() {
+      fetch("/.netlify/functions/tel-besoek", { method: "POST" }).catch(() => {});
+    }
+
+    tel_hierdie_besoek();
+
+    // Kom die besoeker met die blaaier se terugknoppie hierheen terug,
+    // herstel die blaaier die bladsy uit sy kas en die skrip hierbo loop
+    // nie weer nie. Daardie terugkeer sou dus nie getel het nie.
+    // `persisted` is waar SLEGS by so 'n herstel — by 'n gewone laai is
+    // dit onwaar en dan tel ons niks, anders tel een laai twee keer.
+    //
+    // Dieselfde meganisme wat betaal-knoppie-herstel.js hanteer.
+    window.addEventListener("pageshow", (gebeurtenis) => {
+      if (gebeurtenis.persisted) {
+        tel_hierdie_besoek();
+      }
+    });
   </script>
 </body>
 </html>
