@@ -239,11 +239,11 @@ const WOORDEBOEK = {
   kontak_raamwerk_bykomend: { af: "Enige bykomende inligting:", en: "Any additional information:" },
 
   // Kop (tuisblad)
-  kop_eyebrow: { af: "E-boeke · Harde kopieë", en: "E-books · Hard copies" },
+  kop_eyebrow: { af: "E-boeke · Harde kopieë · Leen", en: "E-books · Hard copies · Loan" },
   kop_titel_normaal: { af: "Welkom by", en: "Welcome to" },
   kop_subtitel: {
-    af: "Future Sharp se eie boekwinkel. Loer gerus na ons versameling e-boeke, of bestel selfs jou harde kopie van 'n boek indien dit in harde-kopie-formaat beskikbaar is.",
-    en: "Future Sharp's own bookshop. Browse our collection of e-books, or order a hard copy of a book where a hard-copy format is available.",
+    af: "Future Sharp se eie boekwinkel. Elke titel wys watter formate beskikbaar is — koop dit as e-boek, bestel 'n harde kopie, of leen dit vir 'n tydperk.",
+    en: "Future Sharp's own bookshop. Each title shows which formats are available — buy it as an e-book, order a hard copy, or borrow it for a period.",
   },
   kop_cta: { af: "Kyk gerus deur ons katalogus", en: "Browse our catalogue" },
   katalogus_laai: { af: "Katalogus word gelaai …", en: "Loading catalogue …" },
