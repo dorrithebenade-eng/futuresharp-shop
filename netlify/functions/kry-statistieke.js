@@ -52,6 +52,15 @@ exports.handler = async (event, context) => {
       hierdie_week: week?.telling || 0,
       hierdie_maand: maand?.telling || 0,
       maandelikse_geskiedenis: maande_geskiedenis,
+      // Diagnose — die periode-sleutel waarop elke teller tans staan.
+      // tel-besoek.js herstel 'n teller sodra sy sleutel verander; wys 'n
+      // sleutel dus 'n ou periode, het daardie herstel nie plaasgevind
+      // nie. Word nie vertoon nie; net vir die JSON-antwoord.
+      sleutels: {
+        daagliks: dag?.sleutel ?? null,
+        weekliks: week?.sleutel ?? null,
+        maandeliks: maand?.sleutel ?? null,
+      },
     }),
   };
 };
