@@ -537,7 +537,7 @@ function wys_koepons_lys(koepons) {
       const tipe_teks =
         koepon.tipe === "afslag"
           ? koepon.afslag_tipe === "vaste_bedrag"
-            ? `${t("paneel_koepon_tipe_afslag")} — R${(koepon.afslag_waarde / 1).toFixed(2)}`
+            ? `${t("paneel_koepon_tipe_afslag")} — R${(koepon.afslag_waarde / 100).toFixed(2)}`
             : `${t("paneel_koepon_tipe_afslag")} — ${koepon.afslag_waarde}%`
           : t("paneel_koepon_tipe_gratis");
       const formaat_teks =

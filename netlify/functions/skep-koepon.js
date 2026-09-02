@@ -81,6 +81,22 @@ exports.handler = async (event, context) => {
     if (afslag_tipe === "persentasie" && afslag_waarde > 100) {
       return { statusCode: 400, body: JSON.stringify({ fout: "Persentasie-afslag kan nie meer as 100 wees nie" }) };
     }
+
+    // 'n Vaste bedrag word in RAND ingetik (die vorm se etiket lees
+    // "Vaste bedrag (R)") maar moet in SENT gestoor word. Dit is die
+    // eenheid wat begin-betaling.js en verifieer-koepon.js aftrek van
+    // `item_prys_sent`, en dieselfde eenheid wat paystack-webhook.js vir
+    // die leen-opgraderingskoepon skryf. Sonder hierdie omskakeling gee
+    // 'n koepon van R50 vir die kliënt 50 SENT afslag — die som misluk
+    // nie, hy is bloot honderd keer te klein, en niemand kla oor 'n
+    // afslag wat hulle nie verwag het nie.
+    //
+    // Dit gebeur bediener-kant sodat 'n versoek wat die paneelvorm
+    // omseil dit nie kan misloop nie. 'n Persentasie bly 'n gewone
+    // getal en word NIE omgereken nie.
+    if (afslag_tipe === "vaste_bedrag") {
+      afslag_waarde = Math.round(afslag_waarde * 100);
+    }
   }
 
   const store = kry_store("koepons");
