@@ -5,6 +5,17 @@
 [dev]
   publish = "public"
 
+# GESKEDULEERDE FUNKSIES
+#
+# 04:00 UTC is 06:00 in Suid-Afrika (SAST is UTC+2). Netlify se bedieners
+# loop op UTC; die skedule word dus altyd in UTC geskryf en 'n mens moet
+# twee uur aftrek van die tyd wat jy hier wil sien gebeur.
+#
+# leen-herinnering: soek lenings wat binne vyf dae verval en stuur een pos
+# per leen, met die opgraderingskoepon daarin. Sien die lêer se eie nota.
+[functions."leen-herinnering"]
+  schedule = "0 4 * * *"
+
 # Netlify Identity registrasie-instellings word via die Netlify-kontrolepaneel
 # gestel (nie hierdie lêer nie): "Oop registrasie" aan, standaard-rol by
 # registrasie = "koper" (via 'n Identity-triggerfunksie, sien
