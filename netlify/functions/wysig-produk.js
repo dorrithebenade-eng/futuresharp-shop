@@ -10,6 +10,7 @@
 const { kry_store } = require("./_blob-store");
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 const { kry_maks_verdeling_persentasie, beskryf_minimum } = require("./_paystack-koste.js");
+const { kontroleer_leen_prys } = require("./_leen-prys-kontrole");
 
 const GELDIGE_ROL_TIPES = ["outeur", "vennoot", "ontwerp_admin", "printing", "aflewering"];
 
@@ -183,6 +184,11 @@ exports.handler = async (event, context) => {
         body: `Die ${etiket} se verdeling(s) plus Hosting los te min oor vir Future Sharp se hoofrekening — Paystack se fooi (2,9% + R1 + BTW) moet gedek word. Verminder die persentasie/bedrae sodat ${beskryf_minimum(f.prys_sent || 0)} oorbly.`,
       };
     }
+  }
+
+  const leen_prys_kontrole = kontroleer_leen_prys(nuwe_formate);
+  if (!leen_prys_kontrole.ok) {
+    return { statusCode: 400, body: leen_prys_kontrole.fout };
   }
 
   const nuwe_outeur_ids = Array.isArray(wysigings.outeur_ids)
