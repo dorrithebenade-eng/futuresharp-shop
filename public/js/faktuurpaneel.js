@@ -330,17 +330,39 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   });
 
-  // Kom 'n mens met #kwotasies aan, open ons daar. Sonder 'n fragment bly die
-  // merkop se eie `aktief` staan en Fakture open soos altyd.
+  /* DIE PIL WORD GEKLIK, NIE NET GEWYS NIE.
+
+     Kwotasies laai LUI: kwotasiepaneel.js haak sy kw_laai() aan die pil se
+     klik, en niks anders roep hom nie. fp_wys_afdeling() wys die afdeling
+     sonder om daardie luisteraar te laat vuur -- en dan bly die lys op "Word
+     gelaai ..." staan, vir altyd, want die fetch het nooit begin nie.
+
+     Dit is presies wat gebeur het toe die fragment op 4 September 2026
+     bygekom het: tot toe moes 'n mens ALTYD op Kwotasies klik om daar te kom,
+     en die klik was dus gewaarborg.
+
+     `pil.click()` laat elke luisteraar op daardie pil vuur -- ons eie en die
+     van elke module wat later een byvoeg. 'n Module wat more by 'n ander
+     afdeling aanhaak, werk dan vanself. */
   const uit_url = fp_naam_uit_url();
-  if (uit_url) fp_wys_afdeling(uit_url);
+  if (uit_url) {
+    const pil = document.querySelector(
+      `#fp-kieslys .fp-pil[data-gaan="${CSS.escape(uit_url)}"]`
+    );
+    if (pil) pil.click();
+  }
 
   // Die blaaier se terug- en vorentoe-knoppies verander die fragment sonder om
   // die bladsy te herlaai. Sonder hierdie luisteraar verander die adres en die
-  // skerm nie saam nie.
+  // skerm nie saam nie. Ook hier 'n klik, om dieselfde rede.
   window.addEventListener("hashchange", () => {
     const naam = fp_naam_uit_url();
-    if (naam) fp_wys_afdeling(naam);
+    if (!naam) return;
+    const pil = document.querySelector(
+      `#fp-kieslys .fp-pil[data-gaan="${CSS.escape(naam)}"]`
+    );
+    if (pil) pil.click();
+    else fp_wys_afdeling(naam);
   });
 
   let sessie = null;
