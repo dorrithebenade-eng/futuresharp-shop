@@ -26,6 +26,29 @@
 // DIE QR WORD AS BLOKKIES GETEKEN, nie as 'n beeld nie. qrcode-generator gee
 // vir elke module 'n waar/onwaar, en 'n reghoek per donker module is skerper
 // as enige gerasterde beeld — en dit spaar 'n beeld-inbedding.
+//
+// ─────────────────────────────────────────────────────────────────────────
+// HIERDIE LÊER LEES DIE ROU REKORD, NIE DIE SKERM SE WEERGAWE NIE.
+//
+// kry-faktuur.js bou 'n weergawe VIR DIE SKERM en hernoem velde onderweg. Wie
+// PDF-kode skryf, kyk na daardie name en gebruik hulle — en lees dan 'n veld
+// wat op die rekord nie bestaan nie. Die toets is `if (veld)`, dus misluk dit
+// stil: die blok val net weg en niemand sien dit tensy hy die PDF oopmaak.
+//
+// Dit het op 4 September 2026 drie keer gebeur:
+//
+//   op die rekord                      wat hier gestaan het
+//   klient.kontakpersoon               klient.kontak
+//   paystack.authorization_url         betaalskakel
+//   dokument_datum                     (die skerm het geskep_op gewys)
+//
+// Die kontakpersoon het dus NOOIT op 'n PDF gedruk nie, en die betaalskakel
+// en die QR het van elke faktuur weggeval — wat elke kliënt stilweg na
+// bankoorbetaling gedwing het, en daarmee na handmatige uitbetalings.
+//
+// DIE REËL: elke veld wat hier gelees word, moet in _fakture.js se
+// nuwe_faktuur() staan. Staan hy net in kry-faktuur.js, is dit 'n skermnaam.
+// ─────────────────────────────────────────────────────────────────────────
 
 const { PDFDocument, StandardFonts, PDFString, PDFName, rgb } = require("pdf-lib");
 const qrcode = require("../../public/js/qrcode.js");
@@ -436,15 +459,26 @@ async function bou_faktuur_pdf(rekord, maatskappy, opsies) {
   // DIE HOOGTE WORD GEMEET, NIE GERAAI NIE. Die eerste weergawe het 150 punte
   // aangeneem en die QR met sy byskrif het onder die raam uitgehang — 'n
   // faktuur wat lyk of iets afgesny is.
-  const lei_reels = breek(
-    t_in("fd_eft_lei", taal),
-    gewoon,
-    8.5,
-    (REGS - KANT) * 0.52 - 36
-  );
+  /* DIE SKAKEL LEEF OP `paystack.authorization_url`.
+     `betaalskakel` is die SKERM se naam daarvoor — sien kry-faktuur.js. Hy
+     bly eerste as terugval, ingeval iets die veld ooit wel op die rekord stel. */
+  const betaalskakel =
+    rekord.betaalskakel || (rekord.paystack && rekord.paystack.authorization_url) || null;
 
-  const links_hoog =
-    14 + lei_reels.length * 11 + (rekord.betaalskakel ? 6 + 22 + 10 + 66 + 14 : 0);
+  /* GEEN SKAKEL, GEEN OPSKRIF.
+     Tot 4 September 2026 het "Betaal deur die skakel" en sy sinnetjie
+     ONVOORWAARDELIK gedruk, en net die knoppie en die QR van die veld afgehang.
+     Die blok het dus 'n skakel belowe wat nie daar was nie. 'n Opskrif wat lieg
+     is erger as 'n weglating: die leser soek iets wat nooit gedruk is nie.
+     Sonder skakel val die hele linkerkant weg en die bankbesonderhede vul die
+     blok — presies wat 'n R0-faktuur en 'n kwotasie in elk geval nodig het. */
+  const lei_reels = betaalskakel
+    ? breek(t_in("fd_eft_lei", taal), gewoon, 8.5, (REGS - KANT) * 0.52 - 36)
+    : [];
+
+  const links_hoog = betaalskakel
+    ? 14 + lei_reels.length * 11 + (6 + 22 + 10 + 66 + 14)
+    : 0;
 
   const bank_aantal =
     2 +
@@ -471,14 +505,16 @@ async function bou_faktuur_pdf(rekord, maatskappy, opsies) {
   const b_regs = KANT + (REGS - KANT) * 0.52;
   let by = blok_bo - 20;
 
-  skryf(t_in("fd_eft_kop", taal), b_links, by, { grootte: 9, vet: true });
-  by -= 14;
-  lei_reels.forEach((r) => {
-    skryf(r, b_links, by, { grootte: 8.5, kleur: GRYS });
-    by -= 11;
-  });
+  // DIE HELE LINKERKANT HANG AAN DIE SKAKEL: die opskrif, die sinnetjie, die
+  // knoppie en die QR. Sonder hom vul die bankbesonderhede die blok alleen.
+  if (betaalskakel) {
+    skryf(t_in("fd_eft_kop", taal), b_links, by, { grootte: 9, vet: true });
+    by -= 14;
+    lei_reels.forEach((r) => {
+      skryf(r, b_links, by, { grootte: 8.5, kleur: GRYS });
+      by -= 11;
+    });
 
-  if (rekord.betaalskakel) {
     by -= 6;
     const knop_teks = `${t_in("fd_betaal_knop", taal)} ${rekord.nommer || ""}`.trim();
     const knop_w = gewoon.widthOfTextAtSize(knop_teks, 9) + 24;
@@ -508,7 +544,7 @@ async function bou_faktuur_pdf(rekord, maatskappy, opsies) {
           A: {
             Type: "Action",
             S: PDFName.of("URI"),
-            URI: PDFString.of(rekord.betaalskakel),
+            URI: PDFString.of(betaalskakel),
           },
         })
       )
@@ -519,7 +555,7 @@ async function bou_faktuur_pdf(rekord, maatskappy, opsies) {
     // en dit spaar 'n inbedding.
     try {
       const q = qrcode(0, "M");
-      q.addData(rekord.betaalskakel);
+      q.addData(betaalskakel);
       q.make();
       const n = q.getModuleCount();
       const kant = 66 / n;
