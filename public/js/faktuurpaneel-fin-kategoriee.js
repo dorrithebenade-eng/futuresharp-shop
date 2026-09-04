@@ -198,8 +198,11 @@ function kt_teken_lys() {
     </div>`;
 
   plek.innerHTML =
-    blok("kt_in", "Inkomste", inkomste, "in", "kt-lys-in") +
-    blok("kt_uit", "Uitgawe", uitgawes, "uit", "kt-lys-uit");
+    // DIE BLOKOPSKRIF DRA SY EIE SLEUTELS. `kt_in` en `kt_uit` is die VORM se
+    // twee knoppies, waar enkelvoud reg is -- 'n mens kies een rigting. 'n
+    // Opskrif oor twaalf items lees "Uitgawes".
+    blok("kt_kop_in", "Inkomste", inkomste, "in", "kt-lys-in") +
+    blok("kt_kop_uit", "Uitgawes", uitgawes, "uit", "kt-lys-uit");
 
   kt_teken_blok(inkomste, "kt-lys-in");
   kt_teken_blok(uitgawes, "kt-lys-uit");

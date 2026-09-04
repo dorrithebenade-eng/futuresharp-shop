@@ -510,14 +510,20 @@ a.paneel-kieslys-item { text-decoration: none; }
 }
 
 /* DIE MAAT LEEF HIER, nie in die JavaScript nie. Die ry dra slegs `--kt-diep`;
-   hoeveel punte 'n vlak werd is, is 'n ontwerpbesluit. */
-.kt-ry { padding-left: calc(var(--kt-diep, 0) * 26px); }
+   hoeveel punte 'n vlak werd is, is 'n ontwerpbesluit.
+ *
+ * TWEE KLASSE, NIE EEN NIE. `.fk-ry-twee` dra `padding: 0` en staan LATER in
+ * hierdie ler. Met net `.kt-ry` is die spesifisiteit gelyk en wen die laaste
+ * reel -- die inkeping het toe stilweg verdwyn en die hele boom het plat
+ * gelees. Die ou kode het 'n INLINE `padding-left` geskryf, wat elke
+ * stylblad klop; dit is hoekom die fout eers nou verskyn het. */
+.fk-ry.kt-ry { padding-left: calc(var(--kt-diep, 0) * 26px); }
 .kt-lyn { left: calc((var(--kt-diep, 1) - 1) * 26px + 9px); }
 
 /* Op 'n foon is 26 punte maal drie vlakke plus die naam plus Skrap te veel
    vir 380 punte. */
 @media (max-width: 620px) {
-  .kt-ry { padding-left: calc(var(--kt-diep, 0) * 14px); }
+  .fk-ry.kt-ry { padding-left: calc(var(--kt-diep, 0) * 14px); }
   .kt-lyn { left: calc((var(--kt-diep, 1) - 1) * 14px + 5px); }
 }
 

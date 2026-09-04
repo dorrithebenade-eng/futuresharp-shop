@@ -2779,6 +2779,12 @@ const WOORDEBOEK = {
   // DIE SOEK EN DIE TWEE BLOKKE (4 September 2026). Die register lees nou soos
   // die staat wat hy voed: 'n inkomstekant en 'n uitgawekant, elk met sy eie
   // telling en sy eie + wat die rigting reeds kies.
+  // DIE TWEE BLOKOPSKRIFTE. Apart van kt_in en kt_uit, wat die VORM se
+  // knoppies is: daar kies 'n mens een rigting, hier staan 'n opskrif oor
+  // baie items.
+  kt_kop_in: { af: "Inkomste", en: "Income" },
+  kt_kop_uit: { af: "Uitgawes", en: "Expenses" },
+
   kt_soek_plek: {
     af: "Soek op naam of aantekening",
     en: "Search by name or note",
