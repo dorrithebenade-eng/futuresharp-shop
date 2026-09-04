@@ -1760,6 +1760,17 @@ const WOORDEBOEK = {
   bo_reel_naamloos: { af: "Naamloos", en: "Unnamed" },
   bo_soort_inkomste: { af: "Inkomste", en: "Income" },
   bo_soort_uitgawe: { af: "Uitgawe", en: "Expense" },
+
+  // DIE KATEGORIE OP 'N REEL. Backoffice-taal, dus staan sy hier by die ander
+  // bo_-sleutels en nie by die kt_-familie op die Registers-blad nie -- die
+  // woorde is dieselfde, die konteks is 'n ander.
+  bo_kat_kort: { af: "Kategorie", en: "Category" },
+  bo_kat_geen: { af: "\u2014 geen kategorie \u2014", en: "\u2014 no category \u2014" },
+  bo_kat_verkeerde_rigting: { af: "(ander rigting)", en: "(other direction)" },
+  bo_kat_geen_nota: {
+    af: "Sonder 'n kategorie tel hierdie re\u00ebl nie op die staat op nie.",
+    en: "Without a category this line does not roll up on the statement.",
+  },
   bo_voeg_ontvanger: { af: "+ Voeg 'n ontvanger by", en: "+ Add a recipient" },
   bo_hosting_kort: { af: "Hosting", en: "Hosting" },
   // NIE 'n BESTEMMING NIE. Hierdie veld is wat EEN REEL nog nie toegedeel het

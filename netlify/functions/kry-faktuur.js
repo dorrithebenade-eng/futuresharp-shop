@@ -132,6 +132,11 @@ exports.handler = async (event, context) => {
           // stilweg verskyn, vat geld by 'n begunstigde weg.
           hosting_pct: Number.isFinite(Number(r.hosting_pct)) ? Number(r.hosting_pct) : 0,
 
+          // Die kategorie waaronder die reel op die staat val. Die antwoord
+          // word veld vir veld gebou -- sonder hierdie reel bereik hy nooit
+          // die skerm nie.
+          kategorie_id: r.kategorie_id || "",
+
           verdeling: Array.isArray(r.verdeling)
             ? r.verdeling.map((v) => ({
                 ontvanger: v.ontvanger || "",

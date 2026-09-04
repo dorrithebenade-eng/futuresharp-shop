@@ -103,6 +103,25 @@ function lees_reels(rou) {
       // het, en die klient sien 'n bedrag by 'n naam wat nie syne is nie.
       vou_in: item.vou_in === true,
       hosting_pct: Number.isFinite(hosting) ? Math.min(100, Math.max(0, hosting)) : 0,
+
+      // DIE KATEGORIE WAARONDER HIERDIE REEL OP DIE STAAT VAL.
+      //
+      // 'n Verwysing na die `fin-kategoriee`-store, nie 'n naam nie. Die naam
+      // van 'n kategorie mag verander; die id nie.
+      //
+      // DIT VERSKYN NERENS OP DIE DOKUMENT NIE. `beskrywing` is wat die klient
+      // lees -- "Werkswinkel — Bloemfontein 12 Sep" -- en die kategorie is wat
+      // die staat optel. Twee velde, twee betekenisse; hulle mag nie een veld
+      // deel nie.
+      //
+      // DIE ID WORD HIER NIE TEEN DIE REGISTER GETOETS NIE, en dit is 'n
+      // doelbewuste afruil. Die konsep stoor outomaties sowat elke twee
+      // sekondes, en 'n toets sou elke keer die hele kategorieregister lees --
+      // dieselfde prestasiefout as kry-joernaal.js, wat reeds op die lys staan.
+      // Die skerm bied slegs bestaande kategoriee aan, en skrap-fin-kategorie.js
+      // weier om een te skrap waarna 'n reel wys. Die twee kante saam hou die
+      // verwysing geldig sonder 'n leesslag per tikslag.
+      kategorie_id: teks(item.kategorie_id, 60),
       verdeling: lees_verdeling(item.verdeling),
     };
   });

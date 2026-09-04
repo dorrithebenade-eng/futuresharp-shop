@@ -27,6 +27,15 @@
 const HOOFREKENING = "Future Sharp";
 let BEGUNSTIGDES = [];   // { begunstigde_id, naam, subrekening_kode }
 
+/* DIE FINANSIELE KATEGORIEE.
+   { id, naam, onder, vlak, rigting, gedek_deur_hosting, vas }
+
+   kry-fin-kategoriee.js gee die lys REEDS gesorteer, met `vlak` en `pad` op
+   elke inskrywing. Ons bou die boom hier nie self nie -- sou ons dit doen, is
+   daar twee plekke waar 'n weeskind anders hanteer kan word. Dieselfde
+   redenasie as faktuurpaneel-fin-kategoriee.js. */
+let KATEGORIEE = [];
+
 /* ═══════════════════════════════════════════════════════════════════════
    DIE PAD IS 'N GEVOLG, NIE 'N KEUSE NIE
 
@@ -183,6 +192,46 @@ function bo_ontvanger_opsies(gekies, met_hoofrekening) {
     uit.unshift(`<option selected>${ontsnap(HOOFREKENING)}</option>`);
   }
   return uit.join("");
+}
+
+/* DIE KATEGORIE-KEUSELYS VIR EEN REEL.
+
+   DIE RIGTING FILTER. 'n Inkomstereel mag nie onder 'n uitgawekategorie val
+   nie: die staat sou dan 'n bedrag aan die verkeerde kant optel, en dit is
+   presies wat die rigting op die kategorie moet keer. Wissel 'n mens die reel
+   van Inkomste na Uitgawe, bly 'n kategorie wat nie meer pas nie staan --
+   sigbaar, sodat 'n mens dit self regstel; dit word nie stilweg uitgevee nie.
+
+   DIE INKEPING KOM UIT `vlak`, met en-spasies. 'n <option> aanvaar geen merkop
+   en geen marge nie, dus is dit die enigste manier om die boom te wys.
+
+   'n VASTE KATEGORIE VERSKYN OOK. Diensinkomste en Paystack se transaksiefooi
+   word deur die stelsel geskryf, maar hulle is geldige bestemmings. */
+function bo_kategorie_opsies(gekies, soort) {
+  const wil = soort === "koste" ? "uit" : "in";
+  const leeg = `<option value="">${fv_t("bo_kat_geen", "— geen kategorie —")}</option>`;
+
+  const uit = KATEGORIEE.filter((k) => k && k.rigting === wil).map((k) => {
+    const diep = Math.min(Math.max((Number(k.vlak) || 1) - 1, 0), 6);
+    const inkeep = "\u2007\u2007".repeat(diep);
+    return `<option value="${ontsnap(k.id)}"${k.id === gekies ? " selected" : ""}>${
+      inkeep + ontsnap(k.naam)
+    }</option>`;
+  });
+
+  // 'n GEKOSE KATEGORIE WAT NIE MEER PAS NIE, BLY STAAN. Sy verdwyn nie uit
+  // die lys omdat die reel van rigting verander het nie -- dan sou die veld
+  // leeg lyk terwyl die rekord steeds na haar wys.
+  if (gekies && !KATEGORIEE.some((k) => k.id === gekies && k.rigting === wil)) {
+    const k = KATEGORIEE.find((x) => x.id === gekies);
+    uit.unshift(
+      `<option value="${ontsnap(gekies)}" selected>${
+        k ? ontsnap(k.naam) : ontsnap(gekies)
+      } ${fv_t("bo_kat_verkeerde_rigting", "(ander rigting)")}</option>`
+    );
+  }
+
+  return leeg + uit.join("");
 }
 
 function bo_teken_begroting() {
@@ -484,7 +533,21 @@ function bo_teken_verdeling(S) {
               "Uitgawe"
             )}</button>
           </div>
-        </div>
+          <label class="vd-kat">
+            <span>${fv_t("bo_kat_kort", "Kategorie")}</span>
+            <select class="vd-kat-kies" data-reel="${rx}">${bo_kategorie_opsies(
+              r.kategorie_id || "",
+              r.soort
+            )}</select>
+          </label>
+        </div>${
+          r.kategorie_id
+            ? ""
+            : `<div class="vd-kat-let">${fv_t(
+                "bo_kat_geen_nota",
+                "Sonder 'n kategorie tel hierdie reel nie op die staat op nie."
+              )}</div>`
+        }
         ${rye}
         <button type="button" class="vd-voeg" data-reel="${rx}">${fv_t(
           "bo_voeg_ontvanger",
@@ -640,6 +703,21 @@ function bo_teken_verdeling(S) {
       // persoon minder terug as wat hy uitgegee het -- maar daardie reel leef
       // nou in faktuur-som.js. Die getik getal bly staan en kom terug sodra
       // die reel weer Inkomste word.
+      bo_teken();
+      merk_vuil();
+    });
+  });
+
+  /* DIE KATEGORIE VERANDER NIE 'N ENKELE SYFER NIE.
+
+     Daarom bo_teken() en nie bo_teken_syfers() nie: die blok moet herteken
+     sodat die "sonder 'n kategorie"-reeltjie verdwyn, maar geen som verander.
+     Die keuselys self verloor nie sy plek nie -- hy word herbou met dieselfde
+     waarde gekies. */
+  plek.querySelectorAll(".vd-kat-kies").forEach((el) => {
+    el.addEventListener("change", () => {
+      const rx = Number(el.getAttribute("data-reel"));
+      V.reels[rx].kategorie_id = el.value || "";
       bo_teken();
       merk_vuil();
     });
@@ -1180,6 +1258,26 @@ document.addEventListener("DOMContentLoaded", () => {
   } catch (fout) {
     console.error("Kon nie die begunstigdes laai nie:", fout);
     BEGUNSTIGDES = [];
+  }
+
+  /* DIE KATEGORIEE, IN DIESELFDE OOMBLIK.
+
+     'n Eie try/catch: misluk die een lees, moet die ander steeds deurkom.
+     Misluk hierdie een, wys die keuselys net "— geen kategorie —" en die res
+     van die backoffice werk -- dieselfde keuse as by die begunstigdes.
+
+     Die rol is `boekhouding`, wat die persoon reeds dra: hy staan op
+     faktuur.html, wat 'n paneelbladsy is. */
+  try {
+    const kresp = await fetch("/.netlify/functions/kry-fin-kategoriee", {
+      headers: { Authorization: `Bearer ${SESSIE.access_token}` },
+    });
+    if (!kresp.ok) throw new Error(`Status ${kresp.status}`);
+    const kdata = await kresp.json();
+    KATEGORIEE = kdata.kategoriee || [];
+  } catch (fout) {
+    console.error("Kon nie die finansiele kategoriee laai nie:", fout);
+    KATEGORIEE = [];
   }
 
   bo_teken();

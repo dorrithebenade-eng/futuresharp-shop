@@ -95,6 +95,11 @@ function nuwe_reel() {
     // `vou_in` self — sien voeg_reel_in().
     vou_in: false,
     hosting_pct: HOSTING_VERSTEK,
+    // Die kategorie waaronder die reel op die staat val. Leeg is 'n geldige
+    // toestand: 'n reel sonder kategorie keer NIKS -- nie die stoor nie en nie
+    // die uitreiking nie. Die backoffice se blok se dit; dit is 'n
+    // aantekening, nie 'n hek nie.
+    kategorie_id: "",
     verdeling: [],
   };
 }
@@ -1257,6 +1262,7 @@ function liggaam() {
       vou_in: r.vou_in === true,
       // Geen `|| 5`-terugval nie: 'n doelbewuste nul moet oorleef.
       hosting_pct: Number.isFinite(Number(r.hosting_pct)) ? Number(r.hosting_pct) : 0,
+      kategorie_id: r.kategorie_id || "",
       verdeling: Array.isArray(r.verdeling) ? r.verdeling : [],
     })),
   };
@@ -1336,6 +1342,7 @@ async function laai_faktuur(vraag) {
         // wat Hosting doelbewus afskakel, dit elke keer terugkry. Op 'n
         // kostereel is nul die REGTE antwoord.
         hosting_pct: Number.isFinite(Number(r.hosting_pct)) ? Number(r.hosting_pct) : 0,
+        kategorie_id: r.kategorie_id || "",
         verdeling: Array.isArray(r.verdeling) ? r.verdeling : [],
       }))
     : [];

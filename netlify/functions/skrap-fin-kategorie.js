@@ -45,9 +45,21 @@ const ROLLE = ["boekhouding"];
 
 // Tel hoeveel inskrywings na hierdie kategorie wys. Gooi op 'n leesfout —
 // die oproeper moet dan STOP, nie voortgaan nie.
+// DIE FAKTUURREELS TEL SAAM.
+//
+// Sedert 4 September 2026 dra elke faktuur- en kwotasiereel 'n `kategorie_id`.
+// Sou hulle nie hier tel nie, kon 'n kategorie geskrap word waarna 'n
+// UITGEREIKTE faktuur wys -- en daardie faktuur is gevries en kan nie
+// reggemaak word nie. Die staat sou dan 'n bedrag onder 'n kategorie wys wat
+// nie meer bestaan nie.
+//
+// Dit lees elke rekord in die faktuurstore. Dieselfde prestasiekwessie as
+// kry-joernaal.js, en om dieselfde rede aanvaarbaar: skrap gebeur selde, en
+// die alternatief is 'n stukkende verwysing.
 async function tel_verwysings(id) {
   let werk = 0;
   let joernaal = 0;
+  let reels = 0;
 
   const werk_store = kry_store("werk-items");
   const { blobs: werk_blobs } = await werk_store.list();
@@ -63,7 +75,20 @@ async function tel_verwysings(id) {
   ).filter(Boolean);
   joernaal = jn_items.filter((r) => r && r.kategorie_id === id).length;
 
-  return { werk, joernaal, totaal: werk + joernaal };
+  // Fakture en kwotasies leef in DIESELFDE store, met verskillende
+  // voorvoegsels op die sleutel. Ons tel albei: 'n kwotasie word later 'n
+  // faktuur, en 'n verwysing wat dan breek, breek op die verkeerde oomblik.
+  const fk_store = kry_store("fakture");
+  const { blobs: fk_blobs } = await fk_store.list();
+  const fk_items = (
+    await Promise.all((fk_blobs || []).map((b) => fk_store.get(b.key, { type: "json" })))
+  ).filter(Boolean);
+  for (const dok of fk_items) {
+    if (!dok || !Array.isArray(dok.reels)) continue;
+    reels += dok.reels.filter((r) => r && r.kategorie_id === id).length;
+  }
+
+  return { werk, joernaal, reels, totaal: werk + joernaal + reels };
 }
 
 exports.handler = async (event, context) => {

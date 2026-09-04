@@ -36,6 +36,49 @@
 .vd-reel-keuse {
   padding-left: 22px;
   margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* DIE KATEGORIE STAAN NAAS INKOMSTE/UITGAWE, want dit is dieselfde soort
+   keuse: albei se waaronder die reel val, en nie een van hulle verskyn op die
+   dokument nie. */
+.vd-kat {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  flex: 1 1 180px;
+  font-size: 11px;
+  color: var(--grys-teks);
+}
+
+.vd-kat select {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid #DDD9D2;
+  border-radius: 7px;
+  background: #fff;
+  font-family: var(--font-liggaam);
+  font-size: 12px;
+  padding: 5px 8px;
+  color: var(--swart);
+}
+
+/* 'n AANTEKENING, NIE 'N WAARSKUWING NIE. 'n Reel sonder kategorie keer niks:
+   nie die stoor nie en nie die uitreiking nie. Sy se net wat die gevolg is,
+   in die grys van 'n hulpreel en nie in koraal nie. */
+.vd-kat-let {
+  padding-left: 22px;
+  margin: -4px 0 10px;
+  font-size: 11px;
+  color: var(--grys-teks);
+}
+
+@media (max-width: 620px) {
+  .vd-kat { flex-basis: 100%; }
 }
 
 .vd-nr {

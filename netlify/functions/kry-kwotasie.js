@@ -122,6 +122,9 @@ exports.handler = async (event, context) => {
           // nie. Hosting wat stilweg verskyn, vat geld by 'n begunstigde weg.
           hosting_pct: Number.isFinite(Number(r.hosting_pct)) ? Number(r.hosting_pct) : 0,
 
+          // Sien kry-faktuur.js: veld vir veld gebou, dus moet hy hier staan.
+          kategorie_id: r.kategorie_id || "",
+
           verdeling: Array.isArray(r.verdeling)
             ? r.verdeling.map((v) => ({
                 ontvanger: v.ontvanger || "",

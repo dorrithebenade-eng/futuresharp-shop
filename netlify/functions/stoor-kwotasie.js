@@ -106,6 +106,11 @@ function lees_reels(rou) {
       // het, en die klient sien 'n bedrag by 'n naam wat nie syne is nie.
       vou_in: item.vou_in === true,
       hosting_pct: Number.isFinite(hosting) ? Math.min(100, Math.max(0, hosting)) : 0,
+
+      // Die kategorie waaronder hierdie reel op die staat val. Sien die volle
+      // nota by lees_reels() in stoor-faktuur.js. Die kwotasie dra hom saam
+      // sodat die omskakeling na 'n faktuur niks verloor nie.
+      kategorie_id: teks(item.kategorie_id, 60),
       verdeling: lees_verdeling(item.verdeling),
     };
   });
