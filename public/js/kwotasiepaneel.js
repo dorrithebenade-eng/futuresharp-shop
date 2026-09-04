@@ -337,4 +337,42 @@ document.addEventListener("DOMContentLoaded", async () => {
   } catch {
     KW_SESSIE = null;
   }
+
+  /* DIE AFDELING KAN REEDS OOP WEES TEEN DIE TYD DAT DIE SESSIE GEREED IS.
+
+     faktuurpaneel.js klik die pil wanneer die adres se fragment #kwotasies
+     dra -- en hy doen dit sodra SY sessie gereed is, wat vroeer kan wees as
+     hierdie een. kw_laai() keer dan by `!KW_SESSIE` om, stilweg, en die lys
+     bly op "Word gelaai ..." staan.
+
+     Die wag hierbo is nie 'n oplossing nie: die volgorde tussen twee modules
+     wat albei op die sessie wag, staan nie vas. Die module moet dus SELF kyk
+     of hy oop is sodra hy kan laai. Dan werk hy ongeag wie eerste klaarmaak
+     en ongeag of die pil ooit geklik is.
+
+     kw_laai() se eie KW_GELAAI-wag keer 'n tweede oproep, dus is 'n klik wat
+     wel gebeur het, nie 'n probleem nie. */
+  if (KW_SESSIE) {
+    const afd = document.querySelector('.fp-afdeling[data-afdeling="kwotasies"]');
+    if (afd && afd.classList.contains("wys")) kw_laai();
+  }
+
+  /* DIE AFDELING KAN REEDS OOP WEES TEEN DIE TYD DAT DIE SESSIE GEREED IS.
+
+     faktuurpaneel.js klik die pil wanneer die adres se fragment #kwotasies
+     dra -- en hy doen dit sodra SY sessie gereed is, wat vroeer kan wees as
+     hierdie een. kw_laai() keer dan by `!KW_SESSIE` om, stilweg, en die lys
+     bly op "Word gelaai ..." staan.
+
+     Die wag hierbo is nie 'n oplossing nie: die volgorde tussen twee modules
+     wat albei op die sessie wag, staan nie vas. Die module moet dus SELF kyk
+     of hy oop is sodra hy kan laai. Dan werk hy ongeag wie eerste klaarmaak
+     en ongeag of die pil ooit geklik is.
+
+     kw_laai() se eie KW_GELAAI-wag keer 'n tweede oproep, dus is 'n klik wat
+     wel gebeur het, nie 'n probleem nie. */
+  if (KW_SESSIE) {
+    const afd = document.querySelector('.fp-afdeling[data-afdeling="kwotasies"]');
+    if (afd && afd.classList.contains("wys")) kw_laai();
+  }
 });
