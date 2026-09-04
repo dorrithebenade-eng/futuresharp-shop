@@ -200,6 +200,22 @@ function fu_vra() {
     }
   }
 
+  // NA die betalingsrye, want daardie ry gaan oor geld wat kan misluk en
+  // hierdie een oor 'n aantekening wat later ontbreek.
+  const sonder_kat = fu_reels_sonder_kategorie();
+  if (sonder_kat > 0) {
+    rye.push(
+      `<div class="fu-let-op"><dt>${fu_t(
+        "fu_sonder_kategorie",
+        "Sonder kategorie"
+      )}</dt><dd>${
+        sonder_kat === 1
+          ? fu_t("fu_sonder_kategorie_een", "een re\u00ebl")
+          : sonder_kat + " " + fu_t("fu_sonder_kategorie_meer", "re\u00eble")
+      }</dd></div>`
+    );
+  }
+
   fu_wys(`
     <h2>${fu_t("fu_vra_kop", "Reik hierdie faktuur uit?")}</h2>
     <p>${
@@ -227,6 +243,36 @@ function fu_vra() {
 
   document.getElementById("fu-terug").addEventListener("click", fu_toe);
   document.getElementById("fu-doen").addEventListener("click", fu_doen);
+}
+
+/* HOEVEEL REELS GEEN KATEGORIE DRA.
+
+   'n Uitgereikte faktuur is gevries. 'n Reel wat sonder kategorie uitgaan, sal
+   nooit een kry nie, en sy bedrag staan vir altyd buite die staat se
+   optelling. Dit is presies die restant wat die kategorie moes voorkom.
+
+   DIT KEER NIE. 'n Kategorie is 'n aantekening vir die boeke, nie 'n
+   voorwaarde vir 'n dokument -- anders staan 'n faktuur wat vandag moet uitgaan
+   stil oor 'n reel wat later reggemaak kan word. Die skerm SE dit; jy besluit.
+   Dieselfde gewig as die "met die hand oorbetaal"-ry hierbo: 'n let op, nie 'n
+   hek nie.
+
+   Die toets kom uit faktuur-backoffice.js sodat die twee skerms nie oor
+   verskillende reels praat nie. Ontbreek daardie leer, val ons terug op
+   dieselfde reel hier -- die knoppie moet werk al laai een skrip nie. */
+function fu_reels_sonder_kategorie() {
+  const toets =
+    typeof window.bo_kat_ontbreek === "function"
+      ? window.bo_kat_ontbreek
+      : (r) => {
+          if (!r || r.kategorie_id) return false;
+          const naam = String(r.beskrywing || "").trim();
+          const bedrag = Math.round(
+            (Number(r.hoeveelheid) || 0) * (Number(r.prys_pp_sent) || 0)
+          );
+          return Boolean(naam) || bedrag > 0;
+        };
+  return (V.reels || []).filter(toets).length;
 }
 
 function fu_totaal_sent() {

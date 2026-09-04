@@ -2233,6 +2233,12 @@ const WOORDEBOEK = {
   // kan nie deur Paystack betaal word nie, en sonder hierdie getal lyk dit of
   // almal outomaties betaal word.
   fu_met_hand: { af: "Met die hand oorbetaal", en: "Paid over by hand" },
+
+  // 'n LET OP BY UITREIKING, nie 'n hek nie. 'n Reel wat sonder kategorie
+  // uitgaan, is gevries en sal nooit een kry nie.
+  fu_sonder_kategorie: { af: "Sonder kategorie", en: "Without a category" },
+  fu_sonder_kategorie_een: { af: "een re\u00ebl", en: "one line" },
+  fu_sonder_kategorie_meer: { af: "re\u00eble", en: "lines" },
   fu_ontvanger_een: { af: "1 ontvanger", en: "1 recipient" },
   fu_ontvangers: { af: "ontvangers", en: "recipients" },
   fu_geen_skakel: {

@@ -234,6 +234,29 @@ function bo_kategorie_opsies(gekies, soort) {
   return leeg + uit.join("");
 }
 
+/* WANNEER DIE REELTJIE VERSKYN.
+
+   NIE OP 'N LEE REEL NIE. 'n Faktuur begin met een leë reël, en 'n mens voeg
+   hulle by voordat hy hulle vul. Sou die reëltjie op elke reël staan, lees 'n
+   mens hom vyf keer op 'n vyf-reël-faktuur voordat daar iets is om te
+   kategoriseer -- en dan raak 'n mens gewoond daaraan om hom te ignoreer.
+
+   'n Reël is "werklik iets" sodra sy 'n beskrywing OF 'n bedrag dra. Die OF is
+   doelbewus: 'n reël met 'n bedrag en nog geen naam is net so goed 'n reël, en
+   'n naam sonder 'n bedrag ook.
+
+   DIESELFDE TOETS DIEN BY UITREIKING -- sien fu_reels_sonder_kategorie() in
+   faktuur-uitreik.js. Twee toetse wat "leeg" verskillend antwoord, sou beteken
+   die skerm swyg oor 'n reël waaroor die uitreiking praat. */
+function bo_kat_ontbreek(r) {
+  if (!r || r.kategorie_id) return false;
+  const naam = String(r.beskrywing || "").trim();
+  const bedrag = Math.round((Number(r.hoeveelheid) || 0) * (Number(r.prys_pp_sent) || 0));
+  return Boolean(naam) || bedrag > 0;
+}
+
+window.bo_kat_ontbreek = bo_kat_ontbreek;
+
 function bo_teken_begroting() {
   const plek = document.getElementById("bt-lys");
   if (!plek) return;
@@ -541,12 +564,12 @@ function bo_teken_verdeling(S) {
             )}</select>
           </label>
         </div>${
-          r.kategorie_id
-            ? ""
-            : `<div class="vd-kat-let">${fv_t(
+          bo_kat_ontbreek(r)
+            ? `<div class="vd-kat-let">${fv_t(
                 "bo_kat_geen_nota",
                 "Sonder 'n kategorie tel hierdie reel nie op die staat op nie."
               )}</div>`
+            : ""
         }
         ${rye}
         <button type="button" class="vd-voeg" data-reel="${rx}">${fv_t(
