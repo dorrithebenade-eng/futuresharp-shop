@@ -1,0 +1,70 @@
+/* public/css/paneel-area-pille.css
+ *
+ * Die twee area-pille bo-aan albei paneelbladsye. Sien paneel-area-pille.js.
+ *
+ * SY EIE KLAS, NIE .fp-pil NIE. Die twee lyk vandag eenders — dit is die punt,
+ * want dieselfde vorm beteken dieselfde soort keuse. Maar .fp-pil wissel 'n
+ * AFDELING binne Boekhouding en hierdie een wissel die AREA, en op die
+ * Boekhouding-bladsy staan die twee rye reg bo mekaar. Sou hulle een klas
+ * deel, kan die een nooit verander sonder om die ander te sleep.
+ */
+
+.paneel-area-kieslys {
+  display: flex;
+  gap: 9px;
+  margin: 0 0 22px;
+  flex-wrap: wrap;
+}
+
+.paneel-area-pil {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  background: var(--wit);
+  color: var(--grys-teks);
+  border: 1px solid #E4E2DD;
+  border-radius: 999px;
+  padding: 11px 20px;
+  font-family: var(--font-liggaam);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(23, 23, 23, .07);
+}
+
+.paneel-area-pil:hover { transform: translateY(-1px); }
+
+/* Die aktiewe pil is 'n <span>: 'n mens is reeds daar en daar is niks om te
+   klik nie. Geen hover-beweging, geen wyser. */
+.paneel-area-pil.aktief {
+  background: var(--swart);
+  color: var(--wit);
+  border-color: var(--swart);
+  cursor: default;
+}
+
+.paneel-area-pil.aktief:hover { transform: none; }
+
+/* DIE OU GROEPOPSKRIFTE EN DIE SKAKEL VAL WEG wanneer die pille staan.
+ *
+ * paneel-boekhouding-skakel.js skryf hulle steeds — daardie lêer bly
+ * onaangeraak, en sonder hierdie een (of vir wie net EEN area het) is hy
+ * steeds die enigste pad na Boekhouding. Die klas op <body> word eers gestel
+ * wanneer die pilry werklik gebou is.
+ *
+ * Versteek en nie verwyder nie, want die twee skripte wag albei vir die
+ * sessie en die volgorde tussen hulle is nie vasgestel nie. 'n CSS-reël geld
+ * ook vir 'n element wat later bykom.
+ */
+body.paneel-area-pille-aan .paneel-kieslys-groep { display: none; }
+body.paneel-area-pille-aan #paneel-boekhouding-skakel { display: none; }
+
+/* Dieselfde breekpunt as .fp-kieslys s'n, sodat die twee rye op 'n foon
+   dieselfde grootte pille dra. */
+@media (max-width: 620px) {
+  .paneel-area-pil {
+    font-size: 13.5px;
+    padding: 10px 17px;
+  }
+}

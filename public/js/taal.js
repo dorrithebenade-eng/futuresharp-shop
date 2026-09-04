@@ -47,6 +47,7 @@ const WOORDEBOEK = {
   paneel_nav_uitnodigings: { af: "Uitnodigings", en: "Invitations" },
   paneel_nav_waarskuwings: { af: "Waarskuwings ⚠️", en: "Warnings ⚠️" },
   paneel_kieslys_groep_admin: { af: "Admin", en: "Admin" },
+  paneel_area_kieslys: { af: "Areas", en: "Areas" },
   paneel_nav_kategoriee: { af: "Kategorieë", en: "Categories" },
   paneel_word_gelaai: { af: "Word gelaai …", en: "Loading …" },
   paneel_kopieer: { af: "Kopieer", en: "Copy" },
