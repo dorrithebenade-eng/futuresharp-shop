@@ -232,6 +232,10 @@ exports.handler = async (event, context) => {
   // by uitreiking, stel uitreik-kwotasie.js hom op dertig dae.
   if (invoer.geldig_tot !== undefined) rekord.geldig_tot = datum(invoer.geldig_tot);
 
+  // Die datum op die dokument. Leeg beteken die dag van uitreiking;
+  // uitreik-kwotasie.js vul hom dan in.
+  if (invoer.dokument_datum !== undefined) rekord.dokument_datum = datum(invoer.dokument_datum);
+
   // ── Die backoffice ──────────────────────────────────────────────────────
 
   if (invoer.koste !== undefined) rekord.koste = lees_koste(invoer.koste);

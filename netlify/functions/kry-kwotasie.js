@@ -86,6 +86,7 @@ exports.handler = async (event, context) => {
     bygewerk_op: rekord.bygewerk_op || null,
     geskep_deur: rekord.geskep_deur || "",
     uitgereik_op: rekord.uitgereik_op || null,
+    dokument_datum: rekord.dokument_datum || null,
     geldig_tot: rekord.geldig_tot || null,
 
     // Die DOKUMENT se taal, per kwotasie. Die skerm lees daarmee met

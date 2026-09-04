@@ -425,6 +425,10 @@ async function reik_faktuur_uit(store, sleutel, rekord, wie) {
   rekord.nommer = nommer;
   rekord.publieke_kode = publieke_kode;
   rekord.uitgereik_op = nou;
+  // Is die datum nie met die hand gestel nie, is dit vandag. Dit gebeur HIER
+  // en nie by die skepping nie, sodat 'n konsep wat twee weke lê nie met 'n ou
+  // datum uitgaan nie.
+  if (!rekord.dokument_datum) rekord.dokument_datum = nou;
   rekord.bygewerk_op = nou;
   rekord.totaal_sent = totaal_sent;
   rekord.verdeling_gevries = verdeling_gevries;

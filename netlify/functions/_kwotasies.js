@@ -332,6 +332,10 @@ function nuwe_kwotasie(wie) {
                                 // andersins nie uitmekaar te ken nie.
     uitgereik_op: null,
 
+    // Die datum op die dokument. Sien die volle nota by nuwe_faktuur() in
+    // _fakture.js; leeg beteken die dag van uitreiking.
+    dokument_datum: null,
+
     taal: "af",
 
     klient_id: null,

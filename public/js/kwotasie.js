@@ -117,7 +117,7 @@ function kw_dokument(u) {
         <p class="kw-et">${kw_ontsnap(t_in("fd_besonderhede", u.taal))}</p>
         <div class="kw-datums">
           <div><span>${kw_ontsnap(t_in("fd_datum", u.taal))}</span><b>${kw_ontsnap(
-            kw_datum(u.uitgereik_op, u.taal)
+            kw_datum(u.dokument_datum || u.uitgereik_op, u.taal)
           )}</b></div>
           <div><span>${kw_ontsnap(t_in("fd_geldig_tot", u.taal))}</span><b>${kw_ontsnap(
             kw_datum(u.geldig_tot, u.taal)

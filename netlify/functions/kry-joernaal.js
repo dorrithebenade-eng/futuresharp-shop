@@ -171,7 +171,11 @@ exports.handler = async (event, context) => {
 
       // Uitgereik en nog nie betaal nie.
       if (f.stand === "gestuur") {
-        const uitgereik = dag(f.uitgereik_op);
+        // DIE DOKUMENT SE DATUM, nie die oomblik van uitreiking nie. Wat die
+        // kliënt op sy faktuur sien, is wat in die boeke moet staan; twee
+        // antwoorde op dieselfde vraag is 'n verskil wat later verklaar moet
+        // word. Die terugval geld rekords van voor 4 September 2026.
+        const uitgereik = dag(f.dokument_datum || f.uitgereik_op);
         if (in_tydperk(uitgereik)) {
           debiteure.push({
             datum: uitgereik,

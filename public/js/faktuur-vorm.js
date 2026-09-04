@@ -133,6 +133,13 @@ const V = {
   hosting_pct: 5,
   betaalbaar_teen: null,
 
+  // Die datum op die dokument. Leeg beteken "die dag van uitreiking" — die
+  // uitreik-Function vul hom dan in. `uitgereik_op` staan hier saam omdat 'n
+  // rekord van voor 4 September 2026 geen `dokument_datum` dra nie en die
+  // skerm dan op hom moet terugval.
+  dokument_datum: null,
+  uitgereik_op: null,
+
   // SLEGS OP 'N KWOTASIE. Hulle bly leeg op 'n faktuur en gaan nooit na
   // stoor-faktuur.js nie -- liggaam() stuur hulle net wanneer IS_KW.
   geldig_tot: null,
@@ -237,6 +244,16 @@ function invoer_datum(iso) {
   if (!iso) return "";
   const d = new Date(iso);
   return Number.isNaN(d.getTime()) ? "" : d.toISOString().slice(0, 10);
+}
+
+// Vandag, uit die PLAASLIKE datumdele en nie uit toISOString() nie. Suid-Afrika
+// staan op UTC+2, dus gee toISOString() voor 02:00 nog gister se dag — en 'n
+// faktuur wat om 01:30 opgestel word, sou met die verkeerde datum begin.
+function vandag_invoer() {
+  const d = new Date();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const g = String(d.getDate()).padStart(2, "0");
+  return `${d.getFullYear()}-${m}-${g}`;
 }
 
 /* ═══ die somme op die dokument ═══
@@ -705,8 +722,9 @@ function teken_dok_taal() {
   // keer geteken, in faktuur-uitreik.js.
   stel("d-qr-teks", "fd_qr_teks", "Skandeer om te betaal");
 
-  const datum_w = document.getElementById("d-datum-w");
-  if (datum_w) datum_w.textContent = dok_datum(V.geskep_op);
+  // Die datum is nou 'n invoerveld wat EEN KEER gevul word, saam met die
+  // ander velde buite die tabel — sien fv-datum hieronder. Hy word nie hier
+  // oorgeteken nie, anders spring die wyser terwyl 'n mens tik.
 
   // Die nommer bestaan eers by stuur. Tot dan staan daar "Konsep" — nie 'n
   // voorlopige nommer nie, want 'n nommer wat verander, is nie 'n nommer nie.
@@ -1218,6 +1236,9 @@ function liggaam() {
     klient_id: V.klient_id || "",
     bestelnommer: V.bestelnommer,
     dokument_nota: V.dokument_nota,
+    // Leeg gaan as leeg deur. Dit is 'n geldige waarde en beteken "die dag van
+    // uitreiking"; dit is nie 'n veld wat vergeet is nie.
+    dokument_datum: V.dokument_datum || "",
     // Elke dokument stuur SLEGS sy eie datumveld. stoor-kwotasie.js ken
     // `betaalbaar_teen` glad nie, en stoor-faktuur.js ken `geldig_tot` nie --
     // 'n veld wat deurgaan na 'n Function wat hom nie ken nie, val stil weg.
@@ -1327,6 +1348,8 @@ async function laai_faktuur(vraag) {
   V.geldig_tot = f.geldig_tot || null;
   V.hersiening = Number(f.hersiening) || 1;
   V.geskep_op = f.geskep_op || null;
+  V.dokument_datum = f.dokument_datum || null;
+  V.uitgereik_op = f.uitgereik_op || null;
   V.betaalskakel = f.betaalskakel || null;
 }
 
@@ -1553,6 +1576,31 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (bestelnr) {
     bestelnr.value = V.bestelnommer;
     bestelnr.addEventListener("input", () => { V.bestelnommer = bestelnr.value; merk_vuil(); });
+  }
+
+  /* DIE DOKUMENT SE DATUM.
+
+     'n Konsep wat nog nooit verstel is nie, wys VANDAG maar stoor niks. Die
+     veld bly leeg op die rekord, en die uitreik-Function stel hom op die dag
+     waarop die dokument werklik uitgaan. So gaan 'n konsep wat twee weke lê
+     nie met 'n ou datum uit nie, en 'n mens sien tog 'n datum in plaas van 'n
+     leë blokkie.
+
+     Verstel jy hom, is dit jou keuse en niks skuif hom weer nie.
+
+     'n Uitgereikte dokument val terug op `uitgereik_op` en dan `geskep_op`,
+     want 'n rekord van voor 4 September 2026 dra geen `dokument_datum`. */
+  const datumveld = document.getElementById("fv-datum");
+  if (datumveld) {
+    datumveld.value =
+      invoer_datum(V.dokument_datum) ||
+      (V.stand === "konsep"
+        ? vandag_invoer()
+        : invoer_datum(V.uitgereik_op || V.geskep_op));
+    datumveld.addEventListener("change", () => {
+      V.dokument_datum = datumveld.value || null;
+      merk_vuil();
+    });
   }
 
   /* DIESELFDE VELD, TWEE BETEKENISSE.

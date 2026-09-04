@@ -134,6 +134,7 @@ exports.handler = async (event) => {
       kan_aanvaar: kan_aanvaar(rekord, nou),
 
       uitgereik_op: rekord.uitgereik_op || null,
+      dokument_datum: rekord.dokument_datum || null,
       geldig_tot: rekord.geldig_tot || null,
 
       // Die DOKUMENT se taal, nie die blaaier s'n nie. Die kwotasie wat die

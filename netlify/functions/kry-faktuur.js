@@ -74,6 +74,9 @@ exports.handler = async (event, context) => {
     geskep_op: rekord.geskep_op || null,
     bygewerk_op: rekord.bygewerk_op || null,
     uitgereik_op: rekord.uitgereik_op || null,
+    // Die datum op die dokument. Sonder hierdie reël bereik hy nooit die
+    // skerm nie — die antwoord word veld vir veld gebou.
+    dokument_datum: rekord.dokument_datum || null,
 
     // Die DOKUMENT se taal, per faktuur. Die skerm lees daarmee met
     // t_in(sleutel, faktuur.taal), nooit met t() nie — t() gee die platform

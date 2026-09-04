@@ -233,7 +233,15 @@
           <div>
             <p class="dok-et" id="d-besonderhede">Besonderhede</p>
             <div class="dok-datums">
-              <div><span id="d-datum">Datum</span><b id="d-datum-w">—</b></div>
+              <!-- Die datum is 'n VELD, nie 'n stempel nie. Tot 4 September
+                   2026 het hier `geskep_op` gestaan — die oomblik waarop die
+                   konsep ontstaan het — terwyl die PDF `uitgereik_op` gedruk
+                   het. Nou dra `dokument_datum` albei, en 'n mens kan hom
+                   verstel: 'n faktuur vir 'n werksessie van verlede week hoort
+                   nie vandag se datum te dra nie.
+                   Hy gaan toe saam met elke ander veld sodra die dokument
+                   uitgereik is — sien sluit_toe() in faktuur-vorm.js. -->
+              <div><span id="d-datum">Datum</span><input type="date" id="fv-datum"></div>
               <!-- betaalbaar_teen staan op die DOKUMENT en keer niks. Dit is
                    NIE verval_op, wat die betaalskakel doodmaak. -->
               <div>

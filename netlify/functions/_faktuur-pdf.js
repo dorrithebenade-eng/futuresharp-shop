@@ -256,7 +256,12 @@ async function bou_faktuur_pdf(rekord, maatskappy, opsies) {
     regs_skryf(waarde, REGS, ry, { grootte: 9.5, vet: true });
     ry -= 15;
   };
-  besonderheid(t_in("fd_datum", taal), datum_kort(rekord.uitgereik_op || rekord.geskep_op, taal));
+  // `dokument_datum` is die enigste datum wat op die dokument hoort. Die twee
+  // agter hom is die terugval vir rekords van voor 4 September 2026.
+  besonderheid(
+    t_in("fd_datum", taal),
+    datum_kort(rekord.dokument_datum || rekord.uitgereik_op || rekord.geskep_op, taal)
+  );
   // ELKE DOKUMENT SE EIE DATUMVELD. `geldig_tot` KEER die aanvaarding;
   // `betaalbaar_teen` keer niks. Twee velde met twee betekenisse.
   if (IS_KW) besonderheid(t_in("fd_geldig_tot", taal), datum_veld(rekord.geldig_tot));

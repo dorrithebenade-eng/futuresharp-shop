@@ -193,6 +193,8 @@ exports.handler = async (event, context) => {
   rekord.nommer = nommer;
   rekord.stand = "uitgereik";
   rekord.uitgereik_op = nou;
+  // Dieselfde reël as by die faktuur: leeg beteken vandag.
+  if (!rekord.dokument_datum) rekord.dokument_datum = nou;
   rekord.bygewerk_op = nou;
   rekord.publieke_kode = publieke_kode;
   voeg_geskiedenis_by(

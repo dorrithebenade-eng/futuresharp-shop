@@ -243,6 +243,10 @@ exports.handler = async (event, context) => {
   if (invoer.betaalbaar_teen !== undefined) rekord.betaalbaar_teen = datum(invoer.betaalbaar_teen);
   if (invoer.verval_op !== undefined) rekord.verval_op = datum(invoer.verval_op);
 
+  // Die datum op die dokument. Leeg is 'n geldige waarde en beteken "die dag
+  // van uitreiking"; _faktuur-uitreik.js vul hom dan in.
+  if (invoer.dokument_datum !== undefined) rekord.dokument_datum = datum(invoer.dokument_datum);
+
   // ── Die backoffice ──────────────────────────────────────────────────────
 
   // Die begroting. 'n MAATSTAF, nie 'n verpligting: wat julle verwag om te

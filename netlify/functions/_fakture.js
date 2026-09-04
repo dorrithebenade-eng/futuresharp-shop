@@ -284,6 +284,18 @@ function nuwe_faktuur(wie) {
     geskep_deur: wie || "",
     uitgereik_op: null,
 
+    // DIE DATUM OP DIE DOKUMENT, en die enigste een wat die kliënt sien.
+    //
+    // `geskep_op` is wanneer die konsep ontstaan het en `uitgereik_op` wanneer
+    // die knoppie gedruk is; albei is ouditfeite en albei kan verkeer wees vir
+    // 'n dokument wat 'n werksessie van verlede week dek. Tot 4 September het
+    // die skerm `geskep_op` gewys en die PDF `uitgereik_op`, en dieselfde
+    // faktuur kon dus twee datums dra.
+    //
+    // Leeg beteken "die dag van uitreiking" — _faktuur-uitreik.js vul hom dan
+    // in. So bly 'n konsep wat twee weke lê nie met 'n ou datum staan nie.
+    dokument_datum: null,
+
     // Die taal van die DOKUMENT, per faktuur. Afrikaans is die voorstel wat
     // die vorm maak; dit is per faktuur oorskryfbaar, dus kos 'n verkeerde
     // raaiskoot niks.
