@@ -365,6 +365,23 @@ function fs_invoer_uit_faktuur(faktuur, het_subrekening) {
       soort: r.soort === "koste" ? "koste" : "verkoop",
       beskrywing: r.beskrywing || "",
       bedrag: Math.max(0, bruto - deel) / 100,
+
+      /* DIE KATEGORIE MOET HIERDEUR.
+
+         Hierdie funksie bou die som se invoer VELD VIR VELD. Wat hier nie
+         staan nie, bestaan nie vir fs_bereken() nie -- en fs_bereken() sit die
+         kategorie op elke ontvanger, waar _faktuur-uitreik.js hom in
+         `waarvoor` vries en die staat hom later lees.
+
+         Sonder hierdie reel lees `rl.kategorie_id` daar `undefined`, skryf die
+         ontvanger 'n lee string, en elke uitbetaling val op die staat onder
+         Ongekategoriseer -- terwyl die reel op die skerm 'n kategorie dra.
+
+         Dit is die vyfde keer op 4 September 2026 dat 'n nuwe veld verlore
+         gaan by 'n funksie wat 'n rekord veld vir veld oorskryf. Die vorige
+         vier: _faktuur-pdf.js, kry-faktuur.js, kry-fakture.js en
+         aanvaar-kwotasie.js. */
+      kategorie_id: r.kategorie_id || "",
       verdeling: rye,
     };
   });
