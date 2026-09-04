@@ -174,6 +174,26 @@ exports.handler = async (event) => {
   // een wen: hy is die vars inligting.
   faktuur.bestelnommer = bestelnommer || teks(kwotasie.bestelnommer, 100);
 
+  /* DIE AFDELING BINNE DIE INSTANSIE GAAN SAAM.
+
+     'n Graadgroep, 'n fase, 'n sektor. Sy staan op die DOKUMENT, en die faktuur
+     is dieselfde dokument as die kwotasie -- dieselfde klient, dieselfde werk,
+     dieselfde afdeling. Sonder haar dra die faktuur die instansie se naam
+     alleen, en die faktuurlys wys weer vyf eenderse rye.
+
+     DIT IS DIE VIERDE KEER OP 4 SEPTEMBER 2026 dat 'n nuwe veld stilweg
+     verlore gegaan het omdat 'n funksie 'n rekord VELD VIR VELD oorskryf:
+     kry-faktuur.js, kry-kwotasie.js, kry-fakture.js -- en hier.
+
+     DIE REEL: kom daar 'n veld by nuwe_faktuur() in _fakture.js, moet hierdie
+     funksie besluit wat daarmee gebeur. Stilbly is 'n besluit om hom te
+     verloor.
+
+     `dokument_datum` gaan NIE saam nie, en dit is doelbewus. Die faktuur se
+     datum is die dag waarop hy uitgereik word, nie die dag waarop die kwotasie
+     opgestel is nie. _faktuur-uitreik.js vul hom in. */
+  faktuur.afdeling = teks(kwotasie.afdeling, 120);
+
   faktuur.reels = Array.isArray(kwotasie.reels)
     ? JSON.parse(JSON.stringify(kwotasie.reels))
     : [];
