@@ -1,0 +1,59 @@
+/* public/css/paneel-breedte.css
+ *
+ * EEN BREEDTE VIR ALBEI PANEELBLADSYE.
+ *
+ * `.paneel-wrap` in styl.css dra 900px. Dit is reg vir 'n bladsy met een kolom
+ * teks, verkeerd vir 'n paneel met 'n sy-kieslys van 190px langs 'n tabel.
+ *
+ * Boekhouding het reeds op 1500px gestaan, maar die reël het in
+ * faktuurpaneel-joernaal.css gesit — 'n lêer wat net op daardie bladsy laai.
+ * Die gevolg was dat die BLAD SELF van breedte verander wanneer 'n mens tussen
+ * Admin en Boekhouding klik: die inhoud spring links en die area-pille skuif
+ * onder die muis uit.
+ *
+ * Dit is dieselfde fout een vlak hoër as die een wat daardie lêer se eie
+ * kommentaar beskryf. Die eerste weergawe daarvan het 1500px net op die
+ * Joernaal gesit, en toe spring die blad tussen Boekhouding se afdelings. Die
+ * oplossing was een breedte vir die hele afdeling. Nou is dit een breedte vir
+ * die hele paneel.
+ *
+ * DIE REËL WOON HIER EN NIE MEER IN faktuurpaneel-joernaal.css NIE. Twee
+ * plekke wat dieselfde maat stel, loop uiteen sodra een verander.
+ */
+
+#paneel-hoof.paneel-wrap,
+#fp-hoof.paneel-wrap {
+  max-width: 1500px;
+}
+
+/* ---------- Wat NIE saam mag rek nie ----------
+ *
+ * 'n Teksveld van 1200px is nie bruikbaarder as een van 600px; hy is net
+ * moeiliker om te lees, want die oog verloor die reël se begin. Op 900px het
+ * die sy-kieslys die inhoud tot sowat 630px gedruk en het die vorms toevallig
+ * reg gelyk. Daardie perk moet nou uitdruklik gestel word, anders word elke
+ * naamveld op die paneelbord dubbel so lank.
+ *
+ * Dieselfde patroon as .fs-slot en .fs-wag in faktuurpaneel.css, wat hul eie
+ * perk hou terwyl die blad om hulle breed is.
+ *
+ * DIE LYSTE KRY WEL DIE BREEDTE. 'n Katalogusry, 'n bestelling en 'n
+ * dokumentlys dra kolomme, en dit is presies waarvoor die ruimte bedoel is.
+ */
+#paneel-hoof .paneel-afdeling form {
+  max-width: 660px;
+}
+
+/* Die soekstrook bo die katalogus. Sy is nie 'n vorm nie, maar sy dra 'n
+   teksveld en 'n keuselys en lees dieselfde. Sien paneel-katalogus-soek.js —
+   die balk word deur JavaScript ingevoeg, dus geld die perk ook vir 'n balk
+   wat later verskyn. */
+#paneel-hoof .pks-balk {
+  max-width: 660px;
+}
+
+/* Die hulpteks onder 'n afdeling se opskrif is 'n sin, nie 'n tabel nie.
+   Oor 1200px word hy 'n streep. */
+#paneel-hoof .paneel-hulp-teks {
+  max-width: 780px;
+}

@@ -17,9 +17,10 @@
    blad: Fakture 900px, Joernaal 1500px, Instellings weer 900px. Die pille
    self skuif dan onder 'n mens se muis uit. Een breedte vir die hele
    afdeling, en niks beweeg nie. */
-#fp-hoof.paneel-wrap {
-  max-width: 1500px;
-}
+/* DIE BREEDTE HET UITGETREK na paneel-breedte.css, wat op ALBEI paneelbladsye
+   laai. Die reel het hier net op Boekhouding gegeld, en die blad het dus van
+   breedte verander wanneer 'n mens tussen Admin en Boekhouding klik -- presies
+   die sprong wat die nota hierbo een vlak laer beskryf. */
 
 .jn-wrap { max-width: none; }
 
