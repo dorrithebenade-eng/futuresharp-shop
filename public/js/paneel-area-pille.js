@@ -61,13 +61,17 @@
     return null;
   }
 
-  function bou_pil(teks, aktief, href) {
+  // Die kleur sit in 'n klas per area, nie in 'n styl hier nie: die kleur is
+  // 'n ontwerpbesluit en hoort in die CSS, waar dieselfde waarde ook die
+  // kieslys se kolletjies dra.
+  function bou_pil(teks, aktief, href, area) {
+    const klas = "paneel-area-pil paneel-area-pil-" + area;
     // Die aktiewe pil is 'n <span>, nie 'n knoppie of 'n skakel nie. Hy gaan
     // nêrens heen — 'n mens is reeds daar. 'n Knoppie wat niks doen, nooi 'n
     // klik uit en beloon hom nie.
     if (aktief) {
       const pil = document.createElement("span");
-      pil.className = "paneel-area-pil aktief";
+      pil.className = klas + " aktief";
       pil.setAttribute("aria-current", "page");
       pil.textContent = teks;
       return pil;
@@ -76,7 +80,7 @@
     // bladsy. 'n Anker gee middelklik-in-'n-nuwe-oortjie en die adres in die
     // statusbalk gratis.
     const pil = document.createElement("a");
-    pil.className = "paneel-area-pil";
+    pil.className = klas;
     pil.href = href;
     pil.textContent = teks;
     return pil;
@@ -104,14 +108,16 @@
       bou_pil(
         woord("paneel_kieslys_groep_admin", "Admin"),
         bladsy.area === "admin",
-        "paneelbord.html"
+        "paneelbord.html",
+        "admin"
       )
     );
     ry.appendChild(
       bou_pil(
         woord("fp_titel", "Boekhouding"),
         bladsy.area === "boekhouding",
-        "faktuurpaneel.html"
+        "faktuurpaneel.html",
+        "boekhouding"
       )
     );
 

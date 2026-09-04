@@ -35,13 +35,34 @@
 
 .paneel-area-pil:hover { transform: translateY(-1px); }
 
+/* DIE KLEUR BESKRYF DIE AREA, NIE JOU TOEGANG NIE. Dieselfde reel as die
+   kolletjies in die sy-kieslys: koraal is die winkelkant, teal is
+   Boekhouding. Sou die kleur toegang beskryf, wissel dieselfde pil van kleur
+   na gelang van wie aangemeld is, en dan beteken 'n skermskoot niks sonder om
+   te weet wie gekyk het.
+
+   DIE ONAKTIEWE PIL DRA DIE DIEPER SKAKERING as teks (#B8451F, #2F6B60), nie
+   die helder merkkleur nie -- dieselfde twee waardes as die kieslys se
+   kolletjies. Op wit lees hulle skoon; die helder koraal en teal is te lig
+   vir 14-punt teks op wit. */
+.paneel-area-pil-admin { color: #B8451F; }
+.paneel-area-pil-boekhouding { color: #2F6B60; }
+
 /* Die aktiewe pil is 'n <span>: 'n mens is reeds daar en daar is niks om te
    klik nie. Geen hover-beweging, geen wyser. */
 .paneel-area-pil.aktief {
-  background: var(--swart);
   color: var(--wit);
-  border-color: var(--swart);
   cursor: default;
+}
+
+.paneel-area-pil-admin.aktief {
+  background: var(--koraal);
+  border-color: var(--koraal);
+}
+
+.paneel-area-pil-boekhouding.aktief {
+  background: var(--teal);
+  border-color: var(--teal);
 }
 
 .paneel-area-pil.aktief:hover { transform: none; }
