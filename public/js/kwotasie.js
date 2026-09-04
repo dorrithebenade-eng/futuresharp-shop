@@ -110,6 +110,8 @@ function kw_dokument(u) {
       <div>
         <p class="kw-et">${kw_ontsnap(t_in("fd_gekwoteer_aan", u.taal))}</p>
         <div class="kw-klient"><strong>${kw_ontsnap(u.klient.naam)}</strong>${
+          u.afdeling ? "<br>" + kw_ontsnap(u.afdeling) : ""
+        }${
           u.klient.kontakpersoon ? "<br>" + kw_ontsnap(u.klient.kontakpersoon) : ""
         }${u.klient.adres ? "<br>" + kw_ontsnap(u.klient.adres).replace(/\n/g, "<br>") : ""}</div>
       </div>

@@ -253,6 +253,10 @@ exports.handler = async (event, context) => {
   }
 
   if (invoer.bestelnommer !== undefined) rekord.bestelnommer = teks(invoer.bestelnommer, 100);
+
+  // Die afdeling binne die instansie. Sien die volle nota by nuwe_faktuur() in
+  // _fakture.js: dit staan op die DOKUMENT en nooit op die klientrekord nie.
+  if (invoer.afdeling !== undefined) rekord.afdeling = teks(invoer.afdeling, 120);
   if (invoer.dokument_nota !== undefined) rekord.dokument_nota = teks(invoer.dokument_nota, 3000);
   if (invoer.reels !== undefined) rekord.reels = lees_reels(invoer.reels);
 

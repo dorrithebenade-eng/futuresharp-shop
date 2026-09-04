@@ -229,6 +229,18 @@
             <div class="fv-klient-kies" id="fv-klient-kies">
               <select id="fv-klient"></select>
             </div>
+            <!-- DIE AFDELING BINNE DIE INSTANSIE — 'n graadgroep, 'n fase, 'n
+                 sektor. Sy staan op die DOKUMENT en nie op die kliëntrekord
+                 nie: die debiteur is die instansie, en 'n kliënt wat per
+                 afdeling opgedeel word, kan nooit as een bedrag in die
+                 debiteurelys staan nie.
+                 Sy verskyn slegs by 'n instansie, en op die dokument
+                 verdwyn die reël heeltemal wanneer sy leeg is. Sy staan
+                 binne #fv-dok, dus gaan sy saam met elke ander veld toe
+                 sodra die dokument uitgereik is. -->
+            <div class="fv-afdeling" id="fv-afdeling-blok">
+              <input type="text" id="fv-afdeling" maxlength="120">
+            </div>
           </div>
           <div>
             <p class="dok-et" id="d-besonderhede">Besonderhede</p>

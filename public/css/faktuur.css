@@ -736,6 +736,22 @@ body.fv-kwotasie .dok-betaal { display: none !important; }
 
 /* ── Die kliëntkeuse ─────────────────────────────────────────────────────
    Nie op die dokument nie: dit is die keuse wat die dokument se kop vul. */
+/* DIE AFDELING SE VELD, onder die klient-keuselys. Sy eie klas: die keuselys
+   se reel dra 'n flex-rooster wat 'n volbreedte-teksveld tot 'n blokkie sou
+   druk -- dieselfde slaggat as .veld-ry, wat 'n tweekolom-rooster is. */
+.fv-afdeling { margin-top: 6px; }
+
+.fv-afdeling input {
+  font-family: var(--font-liggaam);
+  font-size: 12.5px;
+  padding: 5px 8px;
+  border: 1px solid var(--fv-lyn);
+  border-radius: 6px;
+  background: #fff;
+  width: 100%;
+  max-width: 320px;
+}
+
 .fv-klient-kies { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
 .fv-klient-kies select {
   font-family: var(--font-liggaam);

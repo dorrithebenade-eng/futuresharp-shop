@@ -313,6 +313,20 @@ function nuwe_faktuur(wie) {
       selfoon: "",
       adres: "",               // vrye teksblok; gedruk soos dit gestoor is
     },
+
+    // DIE AFDELING BINNE DIE INSTANSIE -- 'n graadgroep, 'n fase, 'n sektor.
+    //
+    // OP DIE DOKUMENT, NIE OP DIE KLIENT NIE. Die debiteur is die instansie:
+    // Standard Bank betaal, 'n sektor betaal nie. Sou die afdeling 'n veld op
+    // die klientrekord wees, staan Standard Bank drie keer in die
+    // debiteurelys en niemand kan sien wat die bank in totaal skuld nie.
+    //
+    // VRYE TEKS, geen register. 'n Register van afdelings per klient is 'n
+    // derde register wat niemand vul -- dieselfde les as die werk-items.
+    // Dit word gedruk soos dit gestoor is, nes `adres`.
+    //
+    // Leeg beteken die reel verskyn glad nie op die dokument nie.
+    afdeling: "",
     bestelnommer: "",           // die kliënt se PO; opsioneel, op die dokument
 
     // ELKE REEL DRA SY EIE VERDELING (25 Augustus 2026). Voor dit het die

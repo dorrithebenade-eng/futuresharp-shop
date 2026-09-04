@@ -111,6 +111,8 @@ const V = {
   taal: "af",             // die DOKUMENT se taal
   klient_id: null,
   klient: { naam: "", kontakpersoon: "", epos: "", selfoon: "", adres: "" },
+  // Die afdeling binne die instansie. Op die DOKUMENT, nie op die kliënt nie.
+  afdeling: "",
   bestelnommer: "",
   // ELKE REEL DRA SY EIE VERDELING EN SY EIE HOSTING (25 Augustus 2026).
   // Die reels en die verdeling is EEN lys: tik iemand 'n reel by, kom die
@@ -285,6 +287,9 @@ function teken_klient() {
     return;
   }
   const reels = [`<strong>${ontsnap(k.naam)}</strong>`];
+  // Die afdeling staan tussen die naam en die kontakpersoon: so lees 'n
+  // institusionele adresblok, en so druk die PDF hom ook.
+  if (V.afdeling) reels.push(ontsnap(V.afdeling));
   if (k.kontakpersoon) reels.push(ontsnap(k.kontakpersoon));
   if (k.adres) reels.push(`<span class="adres">${ontsnap(k.adres)}</span>`);
   plek.innerHTML = reels.join("<br>");
@@ -1047,8 +1052,30 @@ function teken_soort() {
   if (tot) tot.textContent = fv_t("fv_kw_totaal", "Kwotasietotaal");
 }
 
+/* DIE AFDELING-VELD SE SIGBAARHEID.
+
+   SLEGS BY 'N INSTANSIE. 'n Privaat klient het geen afdeling nie, en 'n veld
+   wat by die helfte van die gevalle betekenisloos is, word by almal
+   geignoreer.
+
+   IS DIE SOORT ONBEKEND, WYS ONS HOM. Dit gebeur by 'n uitgereikte dokument
+   waarvan die klient intussen uit die register verdwyn het: die keuse is dan
+   tussen 'n veld wat dalk oorbodig is en 'n waarde wat onsigbaar raak, en die
+   tweede is erger.
+
+   `hidden` word NIE gebruik nie -- 'n klasreel met 'n `display` klop die
+   blaaier se verstek [hidden]-reel. Sien die nota by .oi-knoppie. */
+function teken_afdeling() {
+  const blok = document.getElementById("fv-afdeling-blok");
+  if (!blok) return;
+  const gekose = KLIENTE.find((k) => k.nommer === V.klient_id);
+  const privaat = gekose && gekose.soort === "privaat";
+  blok.style.display = privaat ? "none" : "";
+}
+
 function teken_alles() {
   teken_klient();
+  teken_afdeling();
   teken_reels();
   teken_somme();
   teken_dok_taal();
@@ -1239,6 +1266,7 @@ function liggaam() {
     sleutel: V.sleutel || undefined,
     taal: V.taal,
     klient_id: V.klient_id || "",
+    afdeling: V.afdeling,
     bestelnommer: V.bestelnommer,
     dokument_nota: V.dokument_nota,
     // Leeg gaan as leeg deur. Dit is 'n geldige waarde en beteken "die dag van
@@ -1330,6 +1358,7 @@ async function laai_faktuur(vraag) {
   V.taal = f.taal || "af";
   V.klient_id = f.klient_id || null;
   V.klient = f.klient || V.klient;
+  V.afdeling = f.afdeling || "";
   V.bestelnommer = f.bestelnommer || "";
   V.reels = Array.isArray(f.reels)
     ? f.reels.map((r) => ({
@@ -1579,6 +1608,21 @@ document.addEventListener("DOMContentLoaded", async () => {
     nota.addEventListener("input", () => { V.dokument_nota = nota.value; merk_vuil(); });
   }
 
+  const afdeling = document.getElementById("fv-afdeling");
+  if (afdeling) {
+    afdeling.placeholder = fv_t(
+      "fv_afdeling_plek",
+      "Afdeling of groep — bv. Intersenfase, Graad 8, Sektor"
+    );
+    afdeling.value = V.afdeling;
+    afdeling.addEventListener("input", () => {
+      V.afdeling = afdeling.value;
+      // Die dokument wys hom onder die naam, dus moet die blok herteken.
+      teken_klient();
+      merk_vuil();
+    });
+  }
+
   const bestelnr = document.getElementById("fv-bestelnommer");
   if (bestelnr) {
     bestelnr.value = V.bestelnommer;
@@ -1736,6 +1780,8 @@ document.addEventListener("DOMContentLoaded", async () => {
           }
         : { naam: "", kontakpersoon: "", epos: "", selfoon: "", adres: "" };
       teken_klient();
+      // Die soort kan verander het: 'n privaat klient dra geen afdeling nie.
+      teken_afdeling();
       merk_vuil();
     });
   }

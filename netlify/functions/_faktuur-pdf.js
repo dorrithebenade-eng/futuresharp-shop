@@ -241,7 +241,15 @@ async function bou_faktuur_pdf(rekord, maatskappy, opsies) {
   let ly = y;
   skryf(klient.naam || "", KANT, ly, { grootte: 11, vet: true });
   ly -= 15;
-  [klient.kontak, klient.adres].forEach((reel) => {
+  // `kontakpersoon`, NIE `kontak` NIE. Die klienteregister se veld heet
+  // `kontak`; die AFSKRIF op die faktuur heet `kontakpersoon` -- sien
+  // stoor-faktuur.js, wat die naam by die oorskryf verander. Tot 4 September
+  // 2026 het hier `kontak` gestaan en die kontakpersoon het nooit op die PDF
+  // gedruk nie. Die ou naam bly as terugval vir 'n rekord wat hom wel dra.
+  //
+  // Die AFDELING kom tussen die naam en die kontakpersoon in: so lees 'n
+  // institusionele adresblok, en so staan dit ook op die skerm.
+  [rekord.afdeling, klient.kontakpersoon || klient.kontak, klient.adres].forEach((reel) => {
     if (!String(reel || "").trim()) return;
     breek(reel, gewoon, 9.5, mid - KANT - 20).forEach((r) => {
       skryf(r, KANT, ly, { grootte: 9.5, kleur: GRYS });

@@ -1964,6 +1964,13 @@ const WOORDEBOEK = {
   fd_besonderhede: { af: "Besonderhede", en: "Details" },
   fd_datum: { af: "Datum", en: "Date" },
   fd_betaalbaar_teen: { af: "Betaalbaar teen", en: "Payable by" },
+  // DIE AFDELING BINNE DIE INSTANSIE. Slegs 'n plekhouer -- die veld dra geen
+  // etiket op die dokument nie, want die waarde staan tussen die naam en die
+  // kontakpersoon en lees vanself.
+  fv_afdeling_plek: {
+    af: "Afdeling of groep \u2014 bv. Intersenfase, Graad 8, Sektor",
+    en: "Department or group \u2014 e.g. Intersen phase, Grade 8, Sector",
+  },
   fd_bestelnommer: { af: "Bestelnommer", en: "Order number" },
   fd_kol_beskrywing: { af: "Beskrywing", en: "Description" },
   fd_kol_hoeveelheid: { af: "Hoeveelheid", en: "Quantity" },

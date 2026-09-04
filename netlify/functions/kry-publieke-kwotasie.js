@@ -147,6 +147,7 @@ exports.handler = async (event) => {
         kontakpersoon: klient.kontakpersoon || "",
         adres: klient.adres || "",
       },
+      afdeling: rekord.afdeling || "",
       bestelnommer: rekord.bestelnommer || "",
 
       reels: groepeer(rekord.reels),

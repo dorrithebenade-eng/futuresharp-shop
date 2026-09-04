@@ -91,6 +91,9 @@ exports.handler = async (event, context) => {
       selfoon: klient.selfoon || "",
       adres: klient.adres || "",
     },
+    // Die afdeling binne die instansie. Die antwoord word veld vir veld
+    // gebou; sonder hierdie reel bereik hy nooit die skerm nie.
+    afdeling: rekord.afdeling || "",
     bestelnommer: rekord.bestelnommer || "",
 
     // ELKE REEL DRA SY EIE VERDELING, SY EIE HOSTING EN SY EIE `vou_in`

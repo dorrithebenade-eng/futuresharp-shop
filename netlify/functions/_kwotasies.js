@@ -346,6 +346,11 @@ function nuwe_kwotasie(wie) {
       selfoon: "",
       adres: "",
     },
+    // Die afdeling binne die instansie -- 'n graadgroep, 'n fase, 'n sektor.
+    // Sien die volle nota by nuwe_faktuur() in _fakture.js: dit staan op die
+    // DOKUMENT en nooit op die klientrekord nie.
+    afdeling: "",
+
     bestelnommer: "",           // opsioneel. 'n Skool se PO bestaan gewoonlik
                                 // nog nie wanneer gekwoteer word nie.
 
