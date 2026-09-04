@@ -219,6 +219,11 @@ function fs_bereken(invoer) {
   };
 }
 
+/* DIE KATEGORIE WAARONDER ELKE UITBETALING UIT 'N VERKOOPREEL VAL.
+   Sien die volle nota by fs_invoer_uit_faktuur() hieronder. Die id kom uit die
+   naam "Vergoeding vir dienste" en verander nooit. */
+const FS_VERGOEDING_KATEGORIE = "vergoeding-vir-dienste";
+
 // Wat 'n reël se basis moet wees sodat elke ry kry wat hy moet kry.
 //     basis = vaste bedrae / (1 − die persentasies)
 function fs_basis_uit_rye(reel) {
@@ -366,15 +371,14 @@ function fs_invoer_uit_faktuur(faktuur, het_subrekening) {
       beskrywing: r.beskrywing || "",
       bedrag: Math.max(0, bruto - deel) / 100,
 
-      /* DIE KATEGORIE GAAN SLEGS SAAM OP 'N KOSTEREEL.
+      /* WATTER KATEGORIE 'N UITBETALING DRA.
 
          Hierdie funksie bou die som se invoer VELD VIR VELD, en fs_bereken()
          sit die kategorie op elke ONTVANGER -- waar _faktuur-uitreik.js hom in
          `waarvoor` vries en die staat hom as 'n UITGAWE lees.
 
          'n KOSTEREEL se kategorie is 'n uitgawekategorie (Brandstof,
-         Akkommodasie). Die uitbetaling daaruit IS daardie uitgawe, dus is die
-         kategorie reg.
+         Akkommodasie). Die uitbetaling daaruit IS daardie uitgawe.
 
          'n VERKOOPREEL se kategorie is 'n INKOMSTEkategorie (The COMPASS
          Method). Die uitbetaling daaruit is 'n uitgawe, en 'n uitgawe onder 'n
@@ -383,11 +387,32 @@ function fs_invoer_uit_faktuur(faktuur, het_subrekening) {
          inkomste opgetel -- die staat het R35 802,71 gewys waar R31 237,70
          reg was.
 
-         'n Verkoopreel se uitbetaling val dus terug op die werk-itemregister
-         se naampassing, waar 'n werk-item sy EIE kategorie dra en dit 'n
-         uitgawekategorie kan wees. Sien fs_dele_van() in
-         faktuurpaneel-fin-staat.js. */
-      kategorie_id: r.soort === "koste" ? r.kategorie_id || "" : "",
+         WAAROM 'N VERSTEK EN NIE 'N REGISTER NIE.
+
+         Die eerste weergawe het 'n verkoopreel se uitbetaling op die
+         werk-itemregister se NAAMPASSING laat terugval. Dit werk slegs solank
+         daardie register volledig bly, en 'n register wat volledig moet bly om
+         reg te wees, bly nie volledig nie: elke nuwe bewoording -- "Online
+         Course", "Online Workshop", "Aanlyn Werkswinkel" -- is 'n nuwe
+         inskrywing wat iemand moet skep, en die dag wat iemand vergeet, val
+         die bedrag stilweg onder Ongekategoriseer.
+
+         Vra 'n mens wat 'n uitbetaling uit 'n verkoopreel OOIT kan wees, is
+         daar net een antwoord: geld aan iemand vir werk gelewer. Daar is nie
+         'n tweede geval nie. Dan is dit 'n reel, nie data nie.
+
+         DIE ID EN NIE DIE NAAM NIE. `vergoeding-vir-dienste` kom uit die naam
+         by die skepping en verander NOOIT, ook nie wanneer die kategorie
+         hernoem word nie. Skrap iemand haar egter, val elke nuwe uitbetaling
+         weer onder Ongekategoriseer -- sy is nie 'n stelselkategorie nie. Word
+         dit ooit 'n probleem, is dit 'n derde inskrywing in VAS in
+         _fin-kategoriee.js.
+
+         Wil 'n mens dit later fyner he -- aanbiedersfooie apart van
+         ontwikkeling -- is dit 'n subkategorie hieronder plus 'n keuse op die
+         reel. Nie 'n register wat vol gehou moet word nie. */
+      kategorie_id:
+        r.soort === "koste" ? r.kategorie_id || "" : FS_VERGOEDING_KATEGORIE,
       verdeling: rye,
     };
   });
