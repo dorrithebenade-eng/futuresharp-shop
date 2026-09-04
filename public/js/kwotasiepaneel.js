@@ -99,7 +99,11 @@ function kw_url(k) {
 // saak maak, en dit verskil per stand — 'n verlope kwotasie se geldigheidsdatum
 // is nie meer nuus nie, maar wanneer sy verval het, is dit wel.
 function kw_onderreel(k) {
-  const klient = kw_ontsnap(k.klient_naam) || "—";
+  // Dieselfde reel as in faktuurpaneel.js: die afdeling hang met 'n en-streep
+  // aan die klient se naam, want sy is deel van wie gekwoteer word en nie 'n
+  // aparte feit langs die datum en die stand nie.
+  const klient_naam = kw_ontsnap(k.klient_naam) || "—";
+  const klient = k.afdeling ? klient_naam + " – " + kw_ontsnap(k.afdeling) : klient_naam;
   const dele = [klient];
 
   // 'n Hersiening is 'n ONDERHANDELING, nie 'n fout nie. Sy wys van 2 af.

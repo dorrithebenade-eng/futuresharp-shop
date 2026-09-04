@@ -61,6 +61,11 @@ exports.handler = async (event, context) => {
       geskep_op: rekord.geskep_op || null,
       uitgereik_op: rekord.uitgereik_op || null,
       klient_naam: (rekord.klient && rekord.klient.naam) || "",
+      // DIE AFDELING BINNE DIE INSTANSIE. Drie konsepte vir dieselfde skool
+      // is anders drie eenderse rye; die afdeling is dikwels die enigste ding
+      // wat hulle uitmekaar hou. DIE ANTWOORD WORD VELD VIR VELD GEBOU -- 'n
+      // nuwe veld op die rekord kom nie vanself hier deur nie.
+      afdeling: rekord.afdeling || "",
       bestelnommer: rekord.bestelnommer || "",
       totaal_sent: rekord.totaal_sent || 0,
       // Die toetsstempel. Die skerm gebruik hom om te sê wat geskrap kan word;

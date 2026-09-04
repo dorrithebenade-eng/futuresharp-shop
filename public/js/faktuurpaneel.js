@@ -123,7 +123,14 @@ function fp_teken_fakture(fakture) {
       // nie twee inskrywings nie — dit is een woord wat twee keer staan, en
       // 'n mens kan nie sê watter een watter is nie. 'n Uitgereikte faktuur
       // dra sy nommer en het dit nie nodig nie.
-      const klient = fp_ontsnap(f.klient_naam);
+      // DIE AFDELING STAAN BY DIE KLIENT, met 'n en-streep en nie 'n punt nie.
+      // Die punte skei VERSKILLENDE feite -- datum, klient, stand. Die
+      // afdeling is nie 'n eie feit nie; sy is deel van wie gefaktureer word,
+      // en drie konsepte vir dieselfde skool verskil dikwels net daarin.
+      const klient_naam = fp_ontsnap(f.klient_naam);
+      const klient = f.afdeling
+        ? (klient_naam || "—") + " – " + fp_ontsnap(f.afdeling)
+        : klient_naam;
       const onder = f.nommer
         ? klient || "—"
         : `<span class="fp-datum">${fp_datum_kort(f.geskep_op)}</span>` +
