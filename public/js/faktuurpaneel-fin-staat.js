@@ -157,7 +157,24 @@ function fs_tel_op() {
     const teken = r.rigting === "in" ? "in" : "uit";
     fs_dele_van(r, per_naam).forEach((d) => {
       if (!d.bedrag_sent) return;
-      if (d.kategorie_id && per_id.has(d.kategorie_id)) {
+
+      /* DIE RIGTING MOET PAS.
+       *
+       * `eie` is EEN versameling per kategorie, sonder rigting. 'n Uitgawe wat
+       * na 'n INKOMSTEkategorie wys, is dus tot 4 September 2026 by daardie
+       * kategorie se inkomste opgetel -- en die staat het R4 565,01 se
+       * uitbetaling as inkomste gewys.
+       *
+       * Die rigting op die kategorie bestaan juis om dit te keer. Die staat
+       * moet hom lees.
+       *
+       * PAS DIT NIE, VAL DIE BEDRAG ONDER ONGEKATEGORISEER -- sigbaar, en
+       * nooit stil. 'n Bedrag wat weggelaat word, laat die staat nie meer tot
+       * die bank tel nie, en niemand weet dit nie. */
+      const kat = d.kategorie_id ? per_id.get(d.kategorie_id) : null;
+      const rigting_pas = kat && (kat.rigting === "in" ? "in" : "uit") === teken;
+
+      if (kat && rigting_pas) {
         eie.set(d.kategorie_id, (eie.get(d.kategorie_id) || 0) + d.bedrag_sent);
         return;
       }

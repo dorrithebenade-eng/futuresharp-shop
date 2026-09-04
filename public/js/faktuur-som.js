@@ -366,22 +366,28 @@ function fs_invoer_uit_faktuur(faktuur, het_subrekening) {
       beskrywing: r.beskrywing || "",
       bedrag: Math.max(0, bruto - deel) / 100,
 
-      /* DIE KATEGORIE MOET HIERDEUR.
+      /* DIE KATEGORIE GAAN SLEGS SAAM OP 'N KOSTEREEL.
 
-         Hierdie funksie bou die som se invoer VELD VIR VELD. Wat hier nie
-         staan nie, bestaan nie vir fs_bereken() nie -- en fs_bereken() sit die
-         kategorie op elke ontvanger, waar _faktuur-uitreik.js hom in
-         `waarvoor` vries en die staat hom later lees.
+         Hierdie funksie bou die som se invoer VELD VIR VELD, en fs_bereken()
+         sit die kategorie op elke ONTVANGER -- waar _faktuur-uitreik.js hom in
+         `waarvoor` vries en die staat hom as 'n UITGAWE lees.
 
-         Sonder hierdie reel lees `rl.kategorie_id` daar `undefined`, skryf die
-         ontvanger 'n lee string, en elke uitbetaling val op die staat onder
-         Ongekategoriseer -- terwyl die reel op die skerm 'n kategorie dra.
+         'n KOSTEREEL se kategorie is 'n uitgawekategorie (Brandstof,
+         Akkommodasie). Die uitbetaling daaruit IS daardie uitgawe, dus is die
+         kategorie reg.
 
-         Dit is die vyfde keer op 4 September 2026 dat 'n nuwe veld verlore
-         gaan by 'n funksie wat 'n rekord veld vir veld oorskryf. Die vorige
-         vier: _faktuur-pdf.js, kry-faktuur.js, kry-fakture.js en
-         aanvaar-kwotasie.js. */
-      kategorie_id: r.kategorie_id || "",
+         'n VERKOOPREEL se kategorie is 'n INKOMSTEkategorie (The COMPASS
+         Method). Die uitbetaling daaruit is 'n uitgawe, en 'n uitgawe onder 'n
+         inkomstekop is presies wat die rigting op die kategorie moet keer. Op
+         4 September 2026 het daardie fout R4 565,01 se uitbetaling by die
+         inkomste opgetel -- die staat het R35 802,71 gewys waar R31 237,70
+         reg was.
+
+         'n Verkoopreel se uitbetaling val dus terug op die werk-itemregister
+         se naampassing, waar 'n werk-item sy EIE kategorie dra en dit 'n
+         uitgawekategorie kan wees. Sien fs_dele_van() in
+         faktuurpaneel-fin-staat.js. */
+      kategorie_id: r.soort === "koste" ? r.kategorie_id || "" : "",
       verdeling: rye,
     };
   });
