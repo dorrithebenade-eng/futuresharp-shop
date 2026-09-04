@@ -174,6 +174,14 @@ function fs_bereken(invoer) {
         ontvangers.push({
           naam: v.ontvanger,
           wat: rl.beskrywing,
+          // DIE REEL SE KATEGORIE GAAN SAAM. Sonder haar moet die staat 'n
+          // uitbetaling se kategorie uit die BESKRYWING aflei, deur haar teen
+          // die werk-itemregister se name te pas -- en 'n naam wat 'n dag
+          // later anders getik word, val dan onder Ongekategoriseer.
+          //
+          // Sy word saam met die res gevries by uitreiking, dus verander 'n
+          // latere wysiging aan die register niks aan 'n ou staat nie.
+          kategorie_id: rl.kategorie_id || "",
           soort: rl.soort === "koste" ? "koste terug" : "verdienste",
           sent,
         });

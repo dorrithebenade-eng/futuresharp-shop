@@ -91,6 +91,22 @@ function fs_sleutel(naam) {
 // Watter kategorie hoort by hierdie inskrywing? Gee 'n LYS van dele, want 'n
 // uitbetaling kan oor meer as een reel loop en elke reel dra sy eie bedrag.
 function fs_dele_van(r, per_naam) {
+  /* DIE INSKRYWING SE EIE DELE KOM EERSTE.
+   *
+   * 'n Ontvangs uit 'n faktuur dra sedert 4 September 2026 'n `dele`-lys:
+   * die reels se kategoriee, pro rata oor hul bedrae. Sy dra OOK
+   * `kategorie_id: "diensinkomste"` -- daardie waarde is die inskrywing se
+   * eie kop en die terugval vir 'n ontvangs van voor daardie datum, wat geen
+   * dele het nie. Word die dele hier nie eerste gelees nie, val elke ontvangs
+   * onder Diensinkomste en die hele oefening was verniet. */
+  const eie = Array.isArray(r.dele) ? r.dele.filter((d) => d && d.bedrag_sent) : [];
+  if (eie.length) {
+    return eie.map((d) => ({
+      kategorie_id: d.kategorie_id || "",
+      bedrag_sent: Number(d.bedrag_sent) || 0,
+    }));
+  }
+
   if (r.kategorie_id) {
     return [{ kategorie_id: r.kategorie_id, bedrag_sent: r.bedrag_sent }];
   }
@@ -101,9 +117,18 @@ function fs_dele_van(r, per_naam) {
   }
 
   const dele = waarvoor.map((w) => {
+    /* DIE GEVRIESDE ID EERSTE, DIE NAAMPASSING DAARNA.
+     *
+     * 'n Uitbetaling wat sedert 4 September 2026 uitgereik is, dra die reel se
+     * `kategorie_id` in `waarvoor`. Sy is gevries, dus verander 'n latere
+     * wysiging aan die werk-itemregister niks aan 'n ou staat nie.
+     *
+     * Die naampassing bly vir alles wat voor daardie datum gevries is -- en
+     * daardie fakture kan nooit reggemaak word nie, dus mag die pad nooit
+     * verdwyn nie. */
     const item = per_naam.get(fs_sleutel(w.reel));
     return {
-      kategorie_id: (item && item.kategorie_id) || "",
+      kategorie_id: w.kategorie_id || (item && item.kategorie_id) || "",
       bedrag_sent: Number(w.bedrag_sent) || 0,
       reel: w.reel || "",
     };

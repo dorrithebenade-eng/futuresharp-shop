@@ -208,6 +208,10 @@ async function reik_faktuur_uit(store, sleutel, rekord, wie) {
     if (o.wat) {
       bestaande.waarvoor.push({
         reel: teks(o.wat, 300),
+        // Die reel se kategorie, gevries saam met die bedrag. Die staat lees
+        // haar; die naampassing teen die werk-items bly slegs die terugval vir
+        // fakture wat voor 4 September 2026 uitgereik is.
+        kategorie_id: teks(o.kategorie_id, 60),
         soort: o.soort || "",
         bedrag_sent: o.sent,
       });
