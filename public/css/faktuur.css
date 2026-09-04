@@ -65,18 +65,49 @@
   align-items: center;
   gap: 12px;
 }
-.fv-stand {
-  display: inline-block;
-  background: #EFEDE8;
-  color: var(--grys-teks);
-  border-radius: 999px;
-  padding: 3px 11px;
-  font-size: 11.5px;
-  font-weight: 500;
+/* DIE BALK SE LINKERKANT: die terug-skakel, 'n skeier, en die dokument se
+   naam. Die twee word op die BASISLYN belyn en nie in die middel nie -- hulle
+   verskil in grootte, en 'n middelbelyning laat die kleiner een sweef. */
+.fv-balk-links { align-items: baseline; gap: 10px; }
+
+/* DIE TERUG-SKAKEL WEEG SWAARDER AS DIE TITEL. Dit is 'n doelbewuste keuse:
+   die oog land eerste op waar 'n mens heen kan, en die dokument self staan 'n
+   paar sentimeter laer in groot letters. `.terug-skakel` in styl.css dra 14px
+   en 'n onderste marge wat in hierdie balk niks beteken nie. */
+.fv-balk-links .terug-skakel {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2F6B60;
+  margin-bottom: 0;
 }
-.fv-stand-gestuur { background: #E8F3F0; color: #2f6b60; }
-.fv-stand-betaal { background: var(--teal); color: #fff; }
-.fv-stand-gekanselleer { background: #F1EFEA; color: var(--grys-teks); }
+.fv-balk-links .terug-skakel:hover { color: var(--swart); }
+
+.fv-balk-skei {
+  color: #D8D4CC;
+  font-size: 14px;
+  user-select: none;
+}
+
+/* Die dokument se naam. Geen blokkie, geen agtergrond: dit is 'n titel en nie
+   'n merkie nie. */
+.fv-dok-titel {
+  font-size: 13.5px;
+  font-weight: 400;
+  color: var(--swart);
+}
+
+/* Die nommer of die stand agter die soortwoord. */
+.fv-dok-titel-tweede { color: var(--grys-teks); margin-left: 4px; }
+
+/* 'n Betaalde faktuur se nommer dra die teal; dit is die enigste stand waar
+   die balk self iets moet sê wat die dokument nie reeds skree nie. */
+.fv-dok-titel-betaal .fv-dok-titel-tweede { color: var(--teal); font-weight: 500; }
+.fv-dok-titel-gekanselleer .fv-dok-titel-tweede { text-decoration: line-through; }
+
+@media (max-width: 620px) {
+  .fv-balk-links .terug-skakel { font-size: 15px; }
+  .fv-dok-titel { font-size: 12.5px; }
+}
 
 /* Die stoor-aanwyser is die enigste manier waarop 'n mens WEET dit is
    gestoor. Hy sê dit ook eerlik wanneer dit misluk. */

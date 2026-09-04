@@ -33,6 +33,39 @@ function fp_wys_afdeling(naam) {
   });
 }
 
+/* WATTER PIL OOP IS, STAAN IN DIE URL.
+
+   Tot 4 September 2026 het hierdie bladsy ALTYD op Fakture geopen. Kom 'n mens
+   van 'n kwotasie af terug, land hy dus op die verkeerde lys en moet self weer
+   klik -- elke keer.
+
+   Die fragment (`#kwotasies`) en nie 'n soekparameter of localStorage nie:
+   - 'n Fragment maak deel uit van die adres, dus werk 'n boekmerk na Joernaal
+     en 'n middelklik-in-'n-nuwe-oortjie vanself.
+   - localStorage sou beteken die bladsy open op iets wat 'n mens gister
+     gedoen het, en 'n adres wat na twee verskillende skerms lei, is geen adres
+     nie.
+
+   'n ONBEKENDE FRAGMENT WORD GEIGNOREER. Tik iemand #onsin, open Fakture --
+   nie 'n leë blad nie. */
+function fp_naam_uit_url() {
+  const naam = String(window.location.hash || "").replace(/^#/, "").trim();
+  if (!naam) return null;
+  const pil = document.querySelector(`#fp-kieslys .fp-pil[data-gaan="${CSS.escape(naam)}"]`);
+  return pil ? naam : null;
+}
+
+// Die adres word bygewerk sonder om 'n inskrywing in die geskiedenis te maak.
+// Met pushState sou die blaaier se terug-knoppie deur elke pil loop wat 'n
+// mens aangeraak het, in plaas van om die bladsy te verlaat.
+function fp_stel_url(naam) {
+  try {
+    history.replaceState(null, "", "#" + naam);
+  } catch {
+    /* Nie kritiek nie: die pil wys reeds; net die adres bly agter. */
+  }
+}
+
 // Die formateerder leef in taal.js — die desimaalteken is 'n taalsaak, en so
 // is daar EEN weergawe vir die dokument, die skerm en die begroting.
 // Hier geld die PLATFORM se taal: dit is jou skerm, nie die klient s'n nie.
@@ -290,7 +323,24 @@ document.addEventListener("DOMContentLoaded", async () => {
   };
 
   document.querySelectorAll("#fp-kieslys .fp-pil").forEach((pil) => {
-    pil.addEventListener("click", () => fp_wys_afdeling(pil.getAttribute("data-gaan")));
+    pil.addEventListener("click", () => {
+      const naam = pil.getAttribute("data-gaan");
+      fp_wys_afdeling(naam);
+      fp_stel_url(naam);
+    });
+  });
+
+  // Kom 'n mens met #kwotasies aan, open ons daar. Sonder 'n fragment bly die
+  // merkop se eie `aktief` staan en Fakture open soos altyd.
+  const uit_url = fp_naam_uit_url();
+  if (uit_url) fp_wys_afdeling(uit_url);
+
+  // Die blaaier se terug- en vorentoe-knoppies verander die fragment sonder om
+  // die bladsy te herlaai. Sonder hierdie luisteraar verander die adres en die
+  // skerm nie saam nie.
+  window.addEventListener("hashchange", () => {
+    const naam = fp_naam_uit_url();
+    if (naam) fp_wys_afdeling(naam);
   });
 
   let sessie = null;

@@ -708,6 +708,9 @@ function teken_dok_taal() {
   // woordverskil nie: geldig_tot KEER die aanvaarding, betaalbaar_teen keer
   // niks. Twee velde met twee betekenisse.
   if (IS_KW) {
+    // Die terug-skakel land op die pil waarvandaan 'n mens gekom het.
+    const terug = document.getElementById("fv-terug");
+    if (terug) terug.setAttribute("href", "faktuurpaneel.html#kwotasies");
     stel("d-soort", "fd_kwotasie", "Kwotasie");
     stel("d-aan", "fd_gekwoteer_aan", "Gekwoteer aan");
     stel("d-betaalbaar", "fd_geldig_tot", "Geldig tot");
@@ -853,7 +856,7 @@ async function laai_maatskappy() {
 }
 
 function teken_stand() {
-  const el = document.getElementById("fv-stand");
+  const el = document.getElementById("fv-dok-titel");
   if (!el) return;
   // DIE KWOTASIE SE STANDE IS EIE WOORDE, nie die faktuur s'n nie. Sien
   // _kwotasies.js: kry-staat.js en kry-joernaal.js filtreer albei op
@@ -872,8 +875,33 @@ function teken_stand() {
         betaal: fv_t("fv_stand_betaal", "Betaal"),
         gekanselleer: fv_t("fv_stand_gekanselleer", "Gekanselleer"),
       };
-  el.textContent = name[V.stand] || V.stand;
-  el.className = "fv-stand fv-stand-" + V.stand;
+  /* DIE NOMMER WORD DIE NAAM sodra hy bestaan.
+
+     'n Konsep dra geen nommer, dus is sy stand die enigste onderskeid en lees
+     die balk "Faktuur · Konsep". 'n Uitgereikte dokument dra sy nommer, en dan
+     is die stand die kleiner feit: "Faktuur FS/01961". Wie wil weet of hy
+     betaal is, kyk na die dokument self — dit staan daar in groter letters.
+
+     Die soortwoord kom uit fd_kwotasie en fd_proforma, dieselfde twee sleutels
+     wat die dokument se eie opskrif dra. Twee stelle woorde vir dieselfde ding
+     sou beteken die balk en die dokument kan uiteenloop. */
+  const soortwoord = IS_KW
+    ? fv_t("fd_kwotasie", "Kwotasie")
+    : fv_t("fd_proforma", "Proforma-faktuur");
+  const standwoord = name[V.stand] || V.stand;
+
+  el.innerHTML = "";
+  el.appendChild(document.createTextNode(soortwoord + " "));
+
+  const tweede = document.createElement("span");
+  tweede.className = "fv-dok-titel-tweede";
+  // Die skeier staan slegs by die stand: "Faktuur · Konsep" teenoor
+  // "Faktuur FS/01961". 'n Nommer is deel van die naam; 'n stand is 'n
+  // toevoeging daarby.
+  tweede.textContent = V.nommer ? V.nommer : "\u00b7 " + standwoord;
+  el.appendChild(tweede);
+
+  el.className = "fv-dok-titel fv-dok-titel-" + V.stand;
 }
 
 /* WAT 'N KWOTASIE NIE HET NIE.

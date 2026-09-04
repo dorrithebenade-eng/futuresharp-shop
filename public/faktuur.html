@@ -82,8 +82,20 @@
 
       <div class="fv-balk">
         <div class="fv-balk-links">
-          <a href="faktuurpaneel.html" class="terug-skakel" data-i18n="fv_terug">← Boekhouding</a>
-          <span class="fv-stand" id="fv-stand">Konsep</span>
+          <!-- DIE HREF DRA DIE PIL SAAM. Sonder die fragment open
+               faktuurpaneel.html altyd op Fakture, ook wanneer 'n mens vanaf 'n
+               KWOTASIE terugkom. teken_soort() stel hom op #kwotasies. -->
+          <a href="faktuurpaneel.html#fakture" class="terug-skakel" id="fv-terug"
+             data-i18n="fv_terug">← Boekhouding</a>
+          <span class="fv-balk-skei" aria-hidden="true">|</span>
+          <!-- DIE DOKUMENT SE IDENTITEIT, nie sy stand alleen nie.
+               'n Konsep lees "Faktuur · Konsep"; sodra hy uitgereik is, word
+               die nommer die naam — "Faktuur FS/01961" — want dit is dan die
+               enigste ding wat een dokument van 'n ander onderskei.
+               Die kaal Konsep-blokkie wat hier gestaan het, het herhaal wat 'n
+               paar sentimeter laer in groter letters op die dokument self
+               staan. -->
+          <span class="fv-dok-titel" id="fv-dok-titel"></span>
         </div>
         <div class="fv-balk-regs">
           <!-- Die enigste manier waarop 'n mens WEET dit is gestoor. Hy sê
