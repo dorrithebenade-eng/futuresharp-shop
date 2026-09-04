@@ -252,10 +252,16 @@
              inkomste en uitgawes op die staat val. Nie die winkel se
              produkkategorieë nie; dié leef in skep-kategorie.js. -->
         <div class="fk-reg" data-reg="kategoriee">
+          <!-- Dieselfde soekbalk as die Werk en uitgawes-blok s'n. Ses-en-
+               dertig kategorieë is te veel om met die oog te soek, en die lys
+               groei met elke werkswinkel en elke vraelys. -->
           <div class="fk-soekbalk">
-            <p class="fk-hulp" id="kt-hulp"></p>
+            <input type="text" class="veld-invoer" id="kt-soek"
+                   data-i18n-placeholder="kt_soek_plek"
+                   placeholder="Soek op naam of aantekening">
             <button type="button" class="kaart-aksie" id="kt-nuut" data-i18n="kt_nuwe_knop">+ Nuwe kategorie</button>
           </div>
+          <p class="fk-hulp" id="kt-hulp"></p>
 
           <div id="kt-lys">
             <p class="stelsel-boodskap" data-i18n="fp_laai">Word gelaai …</p>

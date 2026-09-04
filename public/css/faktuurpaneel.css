@@ -431,9 +431,95 @@ a.paneel-kieslys-item { text-decoration: none; }
    Die inkeping kom uit `vlak` as 'n inline padding-left, want die diepte is
    onbeperk en 'n klas per vlak sou 'n lys klasse verg wat op ses ophou. Die
    getal self bly waar dit hoort: in die uitvoer se eie kolom. */
-.kt-ry { border-left: 2px solid transparent; }
+.kt-ry { border-left: 2px solid transparent; position: relative; }
 .kt-ry:hover { border-left-color: var(--teal); }
 .fk-merkie.kt-hosting { background: #FDF3E3; color: #8a5a1a; }
+
+/* ── Die register in twee blokke ────────────────────────────────────────────
+ *
+ * Die staat wat hierdie register voed, het twee kante. Tot 4 September 2026
+ * was dit een alfabetiese lys, en 'n mens moes eers self sorteer.
+ *
+ * Die rigtingwoord staan nou EEN keer as 'n blokopskrif in plaas van op elke
+ * ry. 'n Kind se rigting kan nie van sy ouer s'n verskil nie -- die woord het
+ * dus ses-en-dertig keer gestaan sonder om iets by te dra. */
+
+.kt-blok { margin-bottom: 26px; }
+.kt-blok:last-child { margin-bottom: 0; }
+
+.kt-blok-kop {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 0 6px;
+  border-bottom: 1px solid #EDEBE6;
+  margin-bottom: 2px;
+  font-family: var(--font-opskrif);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--grys-teks);
+}
+
+.kt-blok-tel {
+  font-family: var(--font-liggaam);
+  font-size: 11.5px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--grys-teks);
+  opacity: .75;
+}
+
+/* Die + open die venster met daardie blok se rigting reeds gekies. Hy staan
+   heel regs sodat hy nie tussen die opskrif en die telling indruk nie. */
+.kt-blok-voeg {
+  margin-left: auto;
+  border: 1px solid #DDD9D2;
+  background: #fff;
+  color: var(--grys-teks);
+  border-radius: 999px;
+  width: 24px;
+  height: 24px;
+  min-height: 0;
+  padding: 0;
+  font-family: var(--font-liggaam);
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+}
+.kt-blok-voeg:hover { border-color: var(--teal); color: var(--teal); }
+
+/* 'n HOOFKATEGORIE WEEG SWAARDER. Die oog vind dan die takke sonder om te
+   lees. Die kinders bly gewoon. */
+.kt-ry-hoof > .fk-ry-oop .fk-ry-naam { font-weight: 700; }
+
+/* DIE LYN WAT 'N KIND AAN SY OUER BIND.
+ *
+ * Sy loop van bo tot onder deur die ry, dus vorm drie susters EEN lyn en nie
+ * drie strepies nie. 18 punte inkeping was te min om 'n boom van drie vlakke
+ * te sien; 26 met 'n lyn is genoeg. */
+.kt-lyn {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: rgba(0, 0, 0, .13);
+  pointer-events: none;
+}
+
+/* DIE MAAT LEEF HIER, nie in die JavaScript nie. Die ry dra slegs `--kt-diep`;
+   hoeveel punte 'n vlak werd is, is 'n ontwerpbesluit. */
+.kt-ry { padding-left: calc(var(--kt-diep, 0) * 26px); }
+.kt-lyn { left: calc((var(--kt-diep, 1) - 1) * 26px + 9px); }
+
+/* Op 'n foon is 26 punte maal drie vlakke plus die naam plus Skrap te veel
+   vir 380 punte. */
+@media (max-width: 620px) {
+  .kt-ry { padding-left: calc(var(--kt-diep, 0) * 14px); }
+  .kt-lyn { left: calc((var(--kt-diep, 1) - 1) * 14px + 5px); }
+}
 
 /* ── Die inkomste- en uitgawestaat ──────────────────────────────────────── */
 

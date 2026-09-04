@@ -2776,6 +2776,19 @@ const WOORDEBOEK = {
   kt_stoor: { af: "Stoor", en: "Save" },
   kt_een: { af: "kategorie", en: "category" },
   kt_meer: { af: "kategorie\u00eb", en: "categories" },
+  // DIE SOEK EN DIE TWEE BLOKKE (4 September 2026). Die register lees nou soos
+  // die staat wat hy voed: 'n inkomstekant en 'n uitgawekant, elk met sy eie
+  // telling en sy eie + wat die rigting reeds kies.
+  kt_soek_plek: {
+    af: "Soek op naam of aantekening",
+    en: "Search by name or note",
+  },
+  kt_van: { af: "van", en: "of" },
+  kt_geen_treffer: {
+    af: "Geen kategorie pas by die soektog nie.",
+    en: "No category matches the search.",
+  },
+
   kt_leeg: {
     af: "Die register is nog leeg. Voeg die eerste kategorie by.",
     en: "The register is still empty. Add the first category.",

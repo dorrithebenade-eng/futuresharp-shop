@@ -62,27 +62,55 @@ async function kt_vra(naam, opsies) {
 
 /* ═══ die lys ═══ */
 
-function kt_teken_lys() {
-  const plek = document.getElementById("kt-lys");
+// Die soek ignoreer spasies, sodat "reis koste" en "reiskoste" dieselfde ding
+// vind -- dieselfde gedrag as die werk-itemskerm s'n.
+function kt_pas(k, soek) {
+  if (!soek) return true;
+  return [k.naam, k.nota]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase()
+    .replace(/\s+/g, "")
+    .includes(soek);
+}
+
+/* EEN BLOK SE RYE.
+
+   DIE VLAK WORD HIER HERBEREKEN, nie uit `vlak` geneem nie.
+
+   kry-fin-kategoriee.js se `vlak` tel oor die HELE lys. Word die lys in twee
+   blokke gesny -- en word 'n soek boonop rye uitgehaal -- kan 'n ry se ouer
+   buite die blok wees. Die ou inkeping sou haar dan onder 'n leegte indruk en
+   die hierargie lieg.
+
+   Die reel: is jou ouer nie in HIERDIE lys nie, staan jy op vlak 1. Sigbaar
+   los is beter as stil verkeerd.
+
+   Dieselfde reel vang 'n weeskind -- 'n kategorie waarvan die ouer weg is. */
+function kt_teken_blok(lys, plek_id) {
+  const plek = document.getElementById(plek_id);
   if (!plek) return;
 
-  const hulp = document.getElementById("kt-hulp");
-  if (hulp) {
-    const n = KT.kategoriee.length;
-    hulp.textContent =
-      n + " " + (n === 1 ? kt_t("kt_een", "kategorie") : kt_t("kt_meer", "kategoriee"));
-  }
+  const in_lys = new Set(lys.map((k) => k.id));
 
-  if (!KT.kategoriee.length) {
-    plek.innerHTML = `<p class="stelsel-boodskap">${kt_t(
-      "kt_leeg", "Die register is nog leeg. Voeg die eerste kategorie by.")}</p>`;
-    return;
-  }
+  const vlak_van_ry = (k) => {
+    let diep = 1;
+    let ouer = k.onder;
+    while (ouer && in_lys.has(ouer) && diep < 8) {
+      diep += 1;
+      const volgende = lys.find((x) => x.id === ouer);
+      ouer = volgende ? volgende.onder : "";
+    }
+    return diep;
+  };
 
-  plek.innerHTML = KT.kategoriee.map((k) => {
-    // Die inkeping kom uit `vlak`, met 'n perk sodat 'n diep tak nie van die
-    // skerm af loop nie. Die getal self bly waar dit hoort: in die uitvoer.
-    const kant = Math.min((Number(k.vlak) || 1) - 1, 6) * 18;
+  plek.innerHTML = lys.map((k) => {
+    /* DIE DIEPTE GAAN AS 'N CSS-VERANDERLIKE, nie as punte nie.
+
+       Skryf die JavaScript `padding-left: 52px`, kan geen breekpunt daaraan
+       raak nie -- 'n inline-styl klop elke reel. Met `--kt-diep` bly die MAAT
+       in die CSS, waar 'n foon hom kan halveer. */
+    const diep = Math.min(vlak_van_ry(k) - 1, 5);
 
     const merkies = [
       k.vas
@@ -93,16 +121,23 @@ function kt_teken_lys() {
         ? `<span class="fk-merkie">${kt_t("kt_toets", "Toets")}</span>` : "",
     ].join("");
 
-    const rigting = k.rigting === "in"
-      ? kt_t("kt_in", "Inkomste")
-      : kt_t("kt_uit", "Uitgawe");
+    /* DIE RIGTING STAAN NIE MEER OP DIE RY NIE.
+
+       'n Kind se rigting KAN nie van sy ouer s'n verskil nie --
+       stoor-fin-kategorie.js weier dit. Die woord het dus ses-en-dertig keer
+       op die skerm gestaan sonder om iets te se wat die blok nie reeds se nie.
+
+       Wat oorbly op die tweede reel is die nota, en sy verskyn slegs wanneer
+       daar een is. */
+    const lyn = diep > 0 ? `<span class="kt-lyn"></span>` : "";
 
     return `
-      <div class="fk-ry fk-ry-twee kt-ry" style="padding-left:${kant}px">
+      <div class="fk-ry fk-ry-twee kt-ry${diep === 0 ? " kt-ry-hoof" : ""}"
+           style="--kt-diep:${diep}">
+        ${lyn}
         <button type="button" class="fk-ry-oop" data-kt="${kt_ontsnap(k.id)}">
           <span class="fk-ry-naam">${kt_ontsnap(k.naam)}${merkies}</span>
-          <span class="fk-ry-onder">${rigting}${
-            k.nota ? " \u00b7 " + kt_ontsnap(k.nota) : ""}</span>
+          ${k.nota ? `<span class="fk-ry-onder">${kt_ontsnap(k.nota)}</span>` : ""}
         </button>
         <span class="fk-ry-rand">${
           k.vas ? "" :
@@ -110,6 +145,67 @@ function kt_teken_lys() {
                   >${kt_t("kt_skrap", "Skrap")}</button>`}</span>
       </div>`;
   }).join("");
+}
+
+/* DIE REGISTER LEES SOOS DIE STAAT WAT HY VOED: twee kante.
+
+   Voor 4 September 2026 was dit een alfabetiese lys, en inkomste en uitgawes
+   het deurmekaar gestaan -- Aanbiedings, Akkommodasie, Diensinkomste,
+   Learnworlds, Paystack, Reiskoste. Die leser moes eers self sorteer. */
+function kt_teken_lys() {
+  const plek = document.getElementById("kt-lys");
+  if (!plek) return;
+
+  const soekveld = document.getElementById("kt-soek");
+  const soek = (soekveld ? soekveld.value || "" : "")
+    .trim().toLowerCase().replace(/\s+/g, "");
+
+  const pas = KT.kategoriee.filter((k) => kt_pas(k, soek));
+  const inkomste = pas.filter((k) => k.rigting === "in");
+  const uitgawes = pas.filter((k) => k.rigting !== "in");
+
+  const hulp = document.getElementById("kt-hulp");
+  if (hulp) {
+    hulp.textContent = soek
+      ? pas.length + " " + kt_t("kt_van", "van") + " " + KT.kategoriee.length
+      : KT.kategoriee.length + " " +
+        (KT.kategoriee.length === 1 ? kt_t("kt_een", "kategorie") : kt_t("kt_meer", "kategoriee"));
+  }
+
+  if (!KT.kategoriee.length) {
+    plek.innerHTML = `<p class="stelsel-boodskap">${kt_t(
+      "kt_leeg", "Die register is nog leeg. Voeg die eerste kategorie by.")}</p>`;
+    return;
+  }
+
+  if (!pas.length) {
+    plek.innerHTML = `<p class="stelsel-boodskap">${kt_t(
+      "kt_geen_treffer", "Geen kategorie pas by die soektog nie.")}</p>`;
+    return;
+  }
+
+  /* DIE + OP DIE BLOKOPSKRIF open die venster met die rigting REEDS gekies.
+     Die eerste keuse in daardie venster is dan nie meer 'n keuse nie. */
+  const blok = (sleutel, verstek, lys, rigting, lys_id) => `
+    <div class="kt-blok">
+      <div class="kt-blok-kop">
+        <span>${kt_t(sleutel, verstek)}</span>
+        <span class="kt-blok-tel">${lys.length}</span>
+        <button type="button" class="kt-blok-voeg" data-kt-nuut="${rigting}"
+                title="${kt_t("kt_nuwe_knop", "+ Nuwe kategorie")}">+</button>
+      </div>
+      <div id="${lys_id}"></div>
+    </div>`;
+
+  plek.innerHTML =
+    blok("kt_in", "Inkomste", inkomste, "in", "kt-lys-in") +
+    blok("kt_uit", "Uitgawe", uitgawes, "uit", "kt-lys-uit");
+
+  kt_teken_blok(inkomste, "kt-lys-in");
+  kt_teken_blok(uitgawes, "kt-lys-uit");
+
+  plek.querySelectorAll("[data-kt-nuut]").forEach((b) =>
+    b.addEventListener("click", () => kt_maak_vorm_oop(null, b.getAttribute("data-kt-nuut"))));
 
   plek.querySelectorAll("[data-kt]").forEach((b) =>
     b.addEventListener("click", () => kt_maak_vorm_oop(b.getAttribute("data-kt"))));
@@ -151,7 +247,10 @@ function kt_onder_opsies(huidige_id, gekies) {
     .join("");
 }
 
-function kt_maak_vorm_oop(id) {
+// `verstek_rigting` kom van die + op 'n blokopskrif: klik 'n mens die een op
+// Uitgawes, is die rigting reeds gekies wanneer die venster oopgaan. Hy geld
+// slegs vir 'n NUWE kategorie -- 'n bestaande een dra haar eie.
+function kt_maak_vorm_oop(id, verstek_rigting) {
   const k = id ? KT.kategoriee.find((x) => x.id === id) : null;
   KT.wysig = k ? k.id : null;
 
@@ -165,7 +264,7 @@ function kt_maak_vorm_oop(id) {
   document.getElementById("kt-nota").value = k ? k.nota || "" : "";
   document.getElementById("kt-hosting").checked = Boolean(k && k.gedek_deur_hosting);
 
-  kt_stel_rigting(k ? k.rigting : "uit");
+  kt_stel_rigting(k ? k.rigting : (verstek_rigting === "in" ? "in" : "uit"));
 
   // 'n VASTE KATEGORIE SE NAAM EN RIGTING IS TOE. Sy mag onder 'n ander een
   // gesit word, en haar merkie en nota mag verander — dit is die enigste
@@ -283,6 +382,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   document.getElementById("kt-nuut")
     .addEventListener("click", () => kt_maak_vorm_oop(null));
+
+  // Die soek teken die lys oor terwyl 'n mens tik. Sy loop op wat reeds
+  // gelaai is -- geen oproep per tikslag.
+  const soekveld = document.getElementById("kt-soek");
+  if (soekveld) soekveld.addEventListener("input", kt_teken_lys);
   document.getElementById("kt-stoor").addEventListener("click", kt_stoor);
   document.getElementById("kt-kanselleer").addEventListener("click", kt_maak_vorm_toe);
 
