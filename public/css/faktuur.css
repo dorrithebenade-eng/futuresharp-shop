@@ -104,9 +104,45 @@
 .fv-dok-titel-betaal .fv-dok-titel-tweede { color: var(--teal); font-weight: 500; }
 .fv-dok-titel-gekanselleer .fv-dok-titel-tweede { text-decoration: line-through; }
 
+/* ── DIE BALK OP 'N FOON ─────────────────────────────────────────────────────
+ *
+ * `.fv-balk` wikkel wel, maar `.fv-balk-regs` NIE -- hy is 'n flex-ry sonder
+ * `flex-wrap`. Op 380 punte loop die stoorstand, twee pyltjies, Druk, Stoor en
+ * Reik uit dus by die regterkant uit en word afgesny: 'n mens sien "Druk"
+ * halfpad en die res glad nie.
+ *
+ * Die twee groepe kom op hul eie reels, en die regterkant wikkel binne homself.
+ * Die knoppies krimp saam -- 28 punte se opvulling per kant is 'n
+ * lessenaarsmaat.
+ *
+ * DIE BALK BLY STICKY, dus tel elke reel wat bykom van die dokument af. Daarom
+ * krimp die knoppies eerder as om 'n derde reel toe te laat. */
 @media (max-width: 620px) {
   .fv-balk-links .terug-skakel { font-size: 15px; }
   .fv-dok-titel { font-size: 12.5px; }
+
+  .fv-balk {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .fv-balk-links { flex-wrap: wrap; }
+
+  .fv-balk-regs {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  /* Die stoorstand vat die hele eerste reel van die groep, sodat die knoppies
+     langs mekaar bly. Sonder dit stoot "Gestoor 19:28" hulle uitmekaar. */
+  .fv-balk-regs .fv-stoorstand { flex: 1 0 100%; text-align: right; }
+
+  .fv-balk-regs .kaart-aksie {
+    padding: 10px 16px;
+    font-size: 13.5px;
+  }
 }
 
 /* Die stoor-aanwyser is die enigste manier waarop 'n mens WEET dit is
