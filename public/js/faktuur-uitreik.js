@@ -354,10 +354,7 @@ async function fu_stoor_epos() {
   try {
     const resp = await fetch("/.netlify/functions/stoor-klient", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${SESSIE.access_token}`,
-      },
+      headers: await identiteit_kop({ "Content-Type": "application/json" }),
       body: JSON.stringify({
         nommer: bestaande.nommer,
         soort: bestaande.soort,
@@ -400,10 +397,7 @@ async function fu_doen() {
   try {
     const resp = await fetch("/.netlify/functions/" + FU_UITREIK_EIND, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${SESSIE.access_token}`,
-      },
+      headers: await identiteit_kop({ "Content-Type": "application/json" }),
       body: JSON.stringify({ sleutel: V.sleutel }),
     });
 
@@ -530,10 +524,7 @@ async function fu_kanselleer() {
   try {
     const resp = await fetch("/.netlify/functions/kanselleer-faktuur", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${SESSIE.access_token}`,
-      },
+      headers: await identiteit_kop({ "Content-Type": "application/json" }),
       body: JSON.stringify({ sleutel: V.sleutel, rede }),
     });
     if (!resp.ok) throw new Error(await resp.text());

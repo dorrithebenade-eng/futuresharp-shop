@@ -50,7 +50,7 @@ async function kt_vra(naam, opsies) {
     ...(opsies || {}),
     headers: {
       ...((opsies && opsies.headers) || {}),
-      Authorization: `Bearer ${KT.sessie.access_token}`,
+      ...(await identiteit_kop()),
     },
   });
   if (!resp.ok) {

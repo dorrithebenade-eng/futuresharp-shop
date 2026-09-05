@@ -106,7 +106,7 @@ async function jn_vra(pad, opsies) {
     ...(opsies || {}),
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${JN_SESSIE.access_token}`,
+      ...(await identiteit_kop()),
       ...((opsies || {}).headers || {}),
     },
   });

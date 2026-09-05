@@ -59,7 +59,7 @@ async function st_vra(naam, opsies) {
     ...(opsies || {}),
     headers: {
       ...((opsies && opsies.headers) || {}),
-      Authorization: `Bearer ${ST.sessie.access_token}`,
+      ...(await identiteit_kop()),
     },
   });
   if (!resp.ok) {

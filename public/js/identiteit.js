@@ -242,6 +242,60 @@ async function identiteit_kry_huidige_sessie() {
   return IDENTITEIT_VERVERS_BESIG;
 }
 
+/* DIE KOP VIR ELKE FUNCTION-OPROEP.
+ *
+ * WAAROM DIT BESTAAN.
+ *
+ * Elke paneelmodule het identiteit_kry_huidige_sessie() EEN keer by die laai
+ * geroep en die uitslag gestoor. Elke fetch daarna het `SESSIE.access_token`
+ * gestuur -- die token soos hy by daardie eerste oproep was.
+ *
+ * 'n Toegangstoken leef 'n uur. Ná daardie uur faal elke oproep met 403, en op
+ * die skerm lyk dit of 'n mens uitgeteken is. 'n Verfris los dit, want die
+ * bladsy roep die funksie dan weer -- tot die volgende uur.
+ *
+ * Dit was nie 'n fout in die verversing nie. identiteit_kry_huidige_sessie()
+ * doen sy werk; niemand het hom weer gevra nie.
+ *
+ * DIE VORM: vra die token op die OOMBLIK van die oproep, nooit vroeer nie.
+ *
+ *   const resp = await fetch("/.netlify/functions/kry-kliente", {
+ *     headers: await identiteit_kop(),
+ *   });
+ *
+ *   const resp = await fetch("/.netlify/functions/stoor-klient", {
+ *     method: "POST",
+ *     headers: await identiteit_kop({ "Content-Type": "application/json" }),
+ *     body: JSON.stringify(liggaam),
+ *   });
+ *
+ * DIT IS GOEDKOOP. identiteit_kry_huidige_sessie() lees uit die stoor en raak
+ * die netwerk slegs wanneer die token binne 30 sekondes verval. Loop twee
+ * oproepe gelyk op daardie oomblik, deel hulle een verversing -- sien
+ * IDENTITEIT_VERVERS_BESIG hierbo.
+ *
+ * IS DAAR GEEN SESSIE NIE, kom die Authorization-kop nie saam nie en die
+ * Function antwoord 403. Dit is reg: 'n dooie token stuur is nie beter as om
+ * niks te stuur nie, en die module se eie foutpad wys dan sy boodskap.
+ *
+ * DIE MODULES HOU HUL EIE `SESSIE` vir identiteit_het_rol() -- die gebruiker
+ * se rolle verander nie tussen twee oproepe nie. Slegs die TOKEN moet vars
+ * wees.
+ */
+async function identiteit_kop(ekstra) {
+  const kop = Object.assign({}, ekstra || {});
+  let sessie = null;
+  try {
+    sessie = await identiteit_kry_huidige_sessie();
+  } catch {
+    sessie = null;
+  }
+  if (sessie && sessie.access_token) {
+    kop.Authorization = `Bearer ${sessie.access_token}`;
+  }
+  return kop;
+}
+
 function identiteit_meld_af() {
   identiteit_verwyder_sessie();
   // Maak ook die mandjie leeg — dit is 'n gedeelde localStorage-toestand

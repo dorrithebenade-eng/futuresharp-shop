@@ -241,10 +241,7 @@ async function fp_skrap(ix, plek) {
   try {
     const resp = await fetch("/.netlify/functions/skrap-faktuur", {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${FP_SESSIE.access_token}`,
-        "Content-Type": "application/json",
-      },
+      headers: await identiteit_kop({ "Content-Type": "application/json" }),
       body: JSON.stringify({ sleutel: f.sleutel }),
     });
     if (!resp.ok) throw new Error(await resp.text());
@@ -273,7 +270,7 @@ async function fp_laai_fakture(sessie) {
   const plek = document.getElementById("fp-fakture-lys");
   try {
     const resp = await fetch("/.netlify/functions/kry-fakture", {
-      headers: { Authorization: `Bearer ${sessie.access_token}` },
+      headers: await identiteit_kop(),
     });
 
     // 403 hier beteken die token dra nie die rol nie. Dit gebeur wanneer die

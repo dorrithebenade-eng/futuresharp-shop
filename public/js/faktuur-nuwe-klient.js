@@ -209,10 +209,7 @@
     try {
       var resp = await fetch("/.netlify/functions/stoor-klient", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + SESSIE.access_token,
-        },
+        headers: await identiteit_kop({ "Content-Type": "application/json" }),
         body: JSON.stringify(liggaam),
       });
       if (!resp.ok) throw new Error("Status " + resp.status);

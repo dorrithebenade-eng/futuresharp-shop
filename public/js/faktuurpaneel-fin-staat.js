@@ -74,7 +74,7 @@ function fs_rand(sent) {
 async function fs_vra(naam, vraag) {
   const resp = await fetch(
     "/.netlify/functions/" + naam + (vraag ? "?" + vraag : ""),
-    { headers: { Authorization: `Bearer ${FS.sessie.access_token}` } }
+    { headers: await identiteit_kop() }
   );
   if (!resp.ok) throw new Error((await resp.text().catch(() => "")) || String(resp.status));
   return resp.json();
@@ -420,10 +420,7 @@ async function fs_bank_stoor() {
   try {
     const resp = await fetch("/.netlify/functions/stoor-fin-bank", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${FS.sessie.access_token}`,
-      },
+      headers: await identiteit_kop({ "Content-Type": "application/json" }),
       body: JSON.stringify({ datum, balans_sent: sent }),
     });
     if (!resp.ok) throw new Error(await resp.text());

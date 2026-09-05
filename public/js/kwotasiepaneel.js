@@ -263,10 +263,7 @@ async function kw_skrap(ix, plek) {
   try {
     const resp = await fetch("/.netlify/functions/skrap-kwotasie", {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${KW_SESSIE.access_token}`,
-        "Content-Type": "application/json",
-      },
+      headers: await identiteit_kop({ "Content-Type": "application/json" }),
       body: JSON.stringify({ sleutel: k.sleutel }),
     });
     if (!resp.ok) throw new Error(await resp.text());
@@ -299,7 +296,7 @@ async function kw_laai() {
   const plek = document.getElementById("kw-lys");
   try {
     const resp = await fetch("/.netlify/functions/kry-kwotasies", {
-      headers: { Authorization: `Bearer ${KW_SESSIE.access_token}` },
+      headers: await identiteit_kop(),
     });
     if (!resp.ok) throw new Error(`Status ${resp.status}`);
     const data = await resp.json();

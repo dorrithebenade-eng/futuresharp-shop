@@ -843,7 +843,7 @@ function teken_maatskappy() {
 async function laai_maatskappy() {
   try {
     const resp = await fetch("/.netlify/functions/kry-instellings", {
-      headers: { Authorization: `Bearer ${SESSIE.access_token}` },
+      headers: await identiteit_kop(),
     });
     if (!resp.ok) throw new Error(`Status ${resp.status}`);
     const data = await resp.json();
@@ -1119,7 +1119,7 @@ function teken_alles() {
 async function laai_kliente() {
   try {
     const resp = await fetch("/.netlify/functions/kry-kliente", {
-      headers: { Authorization: `Bearer ${SESSIE.access_token}` },
+      headers: await identiteit_kop(),
     });
     if (!resp.ok) throw new Error(`Status ${resp.status}`);
     const data = await resp.json();
@@ -1332,10 +1332,7 @@ async function stoor() {
   try {
     const resp = await fetch("/.netlify/functions/" + EIND.stoor, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${SESSIE.access_token}`,
-      },
+      headers: await identiteit_kop({ "Content-Type": "application/json" }),
       body: JSON.stringify(liggaam()),
     });
 
@@ -1374,7 +1371,7 @@ async function stoor() {
 /* ═══ laai ═══ */
 async function laai_faktuur(vraag) {
   const resp = await fetch("/.netlify/functions/" + EIND.kry + "?" + vraag, {
-    headers: { Authorization: `Bearer ${SESSIE.access_token}` },
+    headers: await identiteit_kop(),
   });
   if (!resp.ok) throw new Error(`Status ${resp.status}`);
   const data = await resp.json();
@@ -1542,10 +1539,7 @@ async function hersien_stuur() {
   try {
     const resp = await fetch("/.netlify/functions/hersien-kwotasie", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${SESSIE.access_token}`,
-      },
+      headers: await identiteit_kop({ "Content-Type": "application/json" }),
       body: JSON.stringify(liggaam()),
     });
     if (!resp.ok) throw new Error(await resp.text());

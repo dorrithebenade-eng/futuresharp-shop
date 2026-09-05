@@ -85,7 +85,7 @@ function in_stand(teks, is_fout) {
 async function in_laai() {
   try {
     const resp = await fetch("/.netlify/functions/kry-instellings", {
-      headers: { Authorization: `Bearer ${IN.sessie.access_token}` },
+      headers: await identiteit_kop(),
     });
     if (!resp.ok) throw new Error(`Status ${resp.status}`);
     const data = await resp.json();
@@ -114,10 +114,7 @@ async function in_stoor() {
   try {
     const resp = await fetch("/.netlify/functions/stoor-instellings", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${IN.sessie.access_token}`,
-      },
+      headers: await identiteit_kop({ "Content-Type": "application/json" }),
       body: JSON.stringify(liggaam),
     });
     if (!resp.ok) throw new Error(await resp.text());

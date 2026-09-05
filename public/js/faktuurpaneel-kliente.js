@@ -48,7 +48,7 @@ async function fk_vra(pad, opsies) {
   const resp = await fetch("/.netlify/functions/" + pad, {
     method: o.metode || "GET",
     headers: {
-      Authorization: `Bearer ${FK.sessie.access_token}`,
+      ...(await identiteit_kop()),
       ...(o.liggaam ? { "Content-Type": "application/json" } : {}),
     },
     ...(o.liggaam ? { body: JSON.stringify(o.liggaam) } : {}),

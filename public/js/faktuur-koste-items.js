@@ -80,7 +80,7 @@ async function ki_laai() {
 
   try {
     const resp = await fetch("/.netlify/functions/kry-werk-items", {
-      headers: { Authorization: `Bearer ${sessie.access_token}` },
+      headers: await identiteit_kop(),
     });
     if (!resp.ok) throw new Error(String(resp.status));
     const data = await resp.json();

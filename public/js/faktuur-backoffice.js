@@ -1273,7 +1273,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   try {
     const resp = await fetch("/.netlify/functions/kry-begunstigdes", {
-      headers: { Authorization: `Bearer ${SESSIE.access_token}` },
+      headers: await identiteit_kop(),
     });
     if (!resp.ok) throw new Error(`Status ${resp.status}`);
     const data = await resp.json();
@@ -1293,7 +1293,7 @@ document.addEventListener("DOMContentLoaded", () => {
      faktuur.html, wat 'n paneelbladsy is. */
   try {
     const kresp = await fetch("/.netlify/functions/kry-fin-kategoriee", {
-      headers: { Authorization: `Bearer ${SESSIE.access_token}` },
+      headers: await identiteit_kop(),
     });
     if (!kresp.ok) throw new Error(`Status ${kresp.status}`);
     const kdata = await kresp.json();
