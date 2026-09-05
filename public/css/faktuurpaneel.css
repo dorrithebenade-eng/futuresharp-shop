@@ -577,6 +577,25 @@ a.paneel-kieslys-item { text-decoration: none; }
 
 .fs-slot { max-width: 520px; margin: 0 0 26px; }
 .fs-slot .fs-tot { width: 160px; }
+
+/* ── DIE TRAP IN DIE SLOTTABEL ──────────────────────────────────────────────
+ *
+ * Elke uitgawekop word apart afgetrek, met 'n tussentotaal daarna. Die
+ * aftrekkings staan ingekeep onder die inkomste waarvan hulle afkom; die
+ * tussentotale staan links, want hulle is saldo's en nie aftrekkings nie.
+ */
+.fs-aftrek .fs-naam { padding-left: 16px; color: var(--grys-teks); }
+
+.fs-tussen td {
+  border-top: 1px solid #D8D3CB;
+  border-bottom: 0;
+  padding-top: 8px;
+  font-weight: 600;
+}
+
+/* Die laaste reel bly die swaarste: die tussentotale is stasies, die surplus
+   is die antwoord. */
+.fs-tussen .fs-naam { color: var(--swart); }
 .fs-tot.kort { color: #C0392B; }
 
 .fs-hosting,

@@ -273,6 +273,66 @@ function fs_teken() {
     .filter((b) => b.kategorie.gedek_deur_hosting && b.kategorie.rigting === "uit")
     .reduce((a, b) => a + b.eie_sent, 0);
 
+  /* DIE SLOTTABEL TREK ELKE UITGAWEKOP APART AF.
+   *
+   * Tot 5 September 2026 was daar EEN aftrekking: totale inkomste minus totale
+   * uitgawes. Dit gee die surplus, maar dit se nie wat die WERK oorhou voordat
+   * die bedryf betaal is nie -- en dit is die vraag waarvoor die kategorieboom
+   * op 4 September in twee takke verdeel is.
+   *
+   * DIE BOOM IS DIE KLASSIFIKASIE, en die staat lees hom. Geen naam in die
+   * kode, geen vlag op 'n kategorie, geen nuwe veld. Alles onder 'n
+   * hoofkategorie tel by daardie hoof se subtotaal, want dit is wat 'n ouer
+   * beteken. Skep 'n mens more 'n derde hoofkategorie, kry sy vanself haar eie
+   * reel en haar eie tussentotaal.
+   *
+   * 'n VLAG SOU DIESELFDE FEIT 'N TWEEDE KEER STEL, en dan kan die twee
+   * verskil: 'n kind onder Direkte projekkoste met die vlag af, of andersom.
+   * Watter een is dan waar? `gedek_deur_hosting` is nie 'n teenvoorbeeld nie
+   * -- daardie vlag sny DWARS oor die boom, en 'n eienskap wat dwars sny,
+   * verdien 'n vlag. Een wat met die takke saamloop, IS die tak.
+   *
+   * DIE VOLGORDE IS ALFABETIES, soos oral in die register. Met twee koppe is
+   * dit 'n benoemingsvraag, nie 'n sorteervraag nie. Kom daar ooit vier of vyf
+   * by, is 'n sorteergetal per hoofkategorie die antwoord -- en dan met 'n
+   * duidelike rede, nie as spekulasie nie.
+   *
+   * ONGEKATEGORISEER KRY SY EIE REEL, want sy hoort onder geen kop nie en 'n
+   * bedrag wat stilweg by die laaste subtotaal inskuif, is presies wat 'n
+   * mens nie moet doen nie.
+   *
+   * DIE TUSSENTOTAAL VERDWYN WANNEER DAAR NET EEN KOP IS. Twee reels wat
+   * dieselfde getal wys, se minder as een. */
+  const uit_koppe = FS.boom.filter(
+    (b) => b.kategorie.rigting === "uit" && !b.kategorie.onder && b.totaal_sent !== 0
+  );
+  if (FS.ongekat.uit) {
+    uit_koppe.push({
+      kategorie: { naam: fs_t("fs_ongekat", "Ongekategoriseer") },
+      totaal_sent: FS.ongekat.uit,
+    });
+  }
+
+  let loop = inkomste;
+  const trap = uit_koppe.map((b, i) => {
+    loop -= b.totaal_sent;
+    const laaste = i === uit_koppe.length - 1;
+    const tussen = laaste || uit_koppe.length < 2
+      ? ""
+      : `
+        <tr class="fs-tussen">
+          <td class="fs-naam">${fs_t("fs_na", "Surplus n\u00e1")} ${
+            fs_ontsnap(b.kategorie.naam.toLowerCase())}</td>
+          <td class="fs-tot${loop < 0 ? " kort" : ""}">${
+            (loop < 0 ? "\u2212 " : "") + fs_rand(loop)}</td>
+        </tr>`;
+    return `
+      <tr class="fs-aftrek">
+        <td class="fs-naam">${fs_ontsnap(b.kategorie.naam)}</td>
+        <td class="fs-tot">\u2212 ${fs_rand(b.totaal_sent)}</td>
+      </tr>${tussen}`;
+  }).join("");
+
   plek.innerHTML = `
     ${blok("in", fs_t("fs_inkomste", "Inkomste"))}
     ${blok("uit", fs_t("fs_uitgawes", "Uitgawes"))}
@@ -281,10 +341,9 @@ function fs_teken() {
       <tbody>
         <tr><td class="fs-naam">${fs_t("fs_tot_in", "Totale inkomste")}</td>
             <td class="fs-tot">${fs_rand(inkomste)}</td></tr>
-        <tr><td class="fs-naam">${fs_t("fs_tot_uit", "Totale uitgawes")}</td>
-            <td class="fs-tot">${fs_rand(uitgawes)}</td></tr>
+        ${trap}
         <tr class="fs-som"><td class="fs-naam">${
-          fs_t("fs_oorskot", "Oorskot vir die tydperk")}</td>
+          fs_t("fs_surplus", "Surplus")}</td>
             <td class="fs-tot${oorskot < 0 ? " kort" : ""}">${
               (oorskot < 0 ? "\u2212 " : "") + fs_rand(oorskot)}</td></tr>
       </tbody>

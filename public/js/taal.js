@@ -2644,6 +2644,16 @@ const WOORDEBOEK = {
   fs_uitgawes: { af: "Uitgawes", en: "Expenses" },
   fs_tot_in: { af: "Totale inkomste", en: "Total income" },
   fs_tot_uit: { af: "Totale uitgawes", en: "Total expenses" },
+  // DIE SLOTTABEL SE TRAP (5 September 2026). Elke uitgawekop word apart
+  // afgetrek, met 'n tussentotaal daarna: "Surplus na direkte projekkoste".
+  //
+  // SURPLUS, NIE OORSKOT NIE. `fs_oorskot` bly staan vir enigiets wat hom nog
+  // gebruik, maar die slotreel lees nou Surplus: 'n NPC se staat gebruik
+  // surplus en tekort, en `oorskot` dra reeds 'n ander betekenis in hierdie
+  // stelsel -- wat op 'n FAKTUUR oorbly na die verdeling.
+  fs_surplus: { af: "Surplus", en: "Surplus" },
+  fs_na: { af: "Surplus n\u00e1", en: "Surplus after" },
+
   fs_oorskot: { af: "Oorskot vir die tydperk", en: "Surplus for the period" },
   fs_ongekat: { af: "Ongekategoriseer", en: "Uncategorised" },
   fs_hosting_kop: { af: "Hostingdekking", en: "Hosting cover" },
