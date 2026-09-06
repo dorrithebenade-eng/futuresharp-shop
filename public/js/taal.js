@@ -697,6 +697,10 @@ const WOORDEBOEK = {
   jn_wag_leeg: { af: "Niks staan uit nie.", en: "Nothing outstanding." },
   jn_deb_kred_kop: { af: "Debiteure en krediteure", en: "Debtors and creditors" },
   jn_laaste: { af: "Laaste inskrywings", en: "Latest entries" },
+  jn_nie_geboek_kort: {
+    af: "gesien, nie geboek nie",
+    en: "seen, not booked",
+  },
   jn_wys_al: { af: "Wys al", en: "Show all" },
   jn_wys_minder: { af: "Wys minder", en: "Show fewer" },
   jn_teken_inskrywing: {

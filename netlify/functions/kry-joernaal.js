@@ -185,6 +185,18 @@ exports.handler = async (event, context) => {
 
   const inskrywings = [];
 
+  // GESIEN MAAR NIE GEBOEK NIE.
+  //
+  // 'n Paystack-transaksie wat VOLLEDIG na 'n subrekening vereffen, laat niks
+  // in die hoofrekening nie en is op 'n kontantbasis geen inskrywing. Dit
+  // stilweg weglaat, maak egter 'n rekonsiliasie onmoontlik: iemand wat die
+  // joernaal teen Paystack se lys hou, sien agt transaksies wat ontbreek en
+  // kan nie weet of hulle oorweeg is en of hulle weggeval het.
+  //
+  // Hulle kom dus in 'n APARTE lys. Hulle raak geen totaal en hulle bereik
+  // nie die staat nie -- die staat lees slegs `inskrywings`.
+  const nie_geboek = [];
+
   // DEBITEURE EN KREDITEURE TEL NIE IN DIE SOMME NIE.
   //
   // Op kontantbasis bestaan hulle nie as transaksies nie -- die geld het nie
@@ -291,6 +303,8 @@ exports.handler = async (event, context) => {
           // reels, en die joernaal se telling en die CSV verander saam.
           dele: ontvangs_dele(f, ontvang_sent),
           bron: "faktuur",
+          verwysing: (f.betaling && f.betaling.verwysing) || f.nommer || "",
+          bruto_sent: ontvang_sent,
         });
       }
 
@@ -404,6 +418,11 @@ exports.handler = async (event, context) => {
           // dieselfde vaste kategorie as die faktuur se totaal.
           kategorie_id: "diensinkomste",
           bron: "winkel",
+          // DIE OUDIT-SPOOR. `bruto_sent` is wat die koper betaal het;
+          // `bedrag_sent` is wat die hoofrekening behou het. Sonder albei lyk
+          // R3,50 soos die verkoopprys van 'n R50-bestelling.
+          verwysing: nommer,
+          bruto_sent: totaal,
         });
       }
 
@@ -419,6 +438,8 @@ exports.handler = async (event, context) => {
           rigting: "uit",
           kategorie_id: "paystack-transaksiefooi",
           bron: "winkel",
+          verwysing: nommer,
+          bruto_sent: totaal,
         });
       }
     }
@@ -524,6 +545,8 @@ exports.handler = async (event, context) => {
             rigting: "in",
             kategorie_id: kategorie,
             bron: "paystack",
+            verwysing: t.verwysing,
+            bruto_sent: bedrag,
           });
         }
 
@@ -539,6 +562,21 @@ exports.handler = async (event, context) => {
             rigting: "uit",
             kategorie_id: "paystack-transaksiefooi",
             bron: "paystack",
+            verwysing: t.verwysing,
+            bruto_sent: bedrag,
+          });
+        }
+
+        // Niks behou en geen fooi gedra nie: die transaksie het die bank nooit
+        // geraak nie. Dit word aangeteken sodat 'n rekonsiliasie klop.
+        if (behou === 0 && fooi === 0) {
+          nie_geboek.push({
+            datum: t.datum,
+            beskrywing: naam,
+            verwysing: t.verwysing,
+            bruto_sent: bedrag,
+            bron: "paystack",
+            rede: "Volledig na 'n subrekening vereffen; niks in die hoofrekening nie.",
           });
         }
       }
@@ -569,6 +607,7 @@ exports.handler = async (event, context) => {
       tot: dag_tot,
       soek,
       inskrywings,
+      nie_geboek,
       in_sent,
       uit_sent,
       netto_sent: in_sent - uit_sent,

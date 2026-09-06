@@ -202,8 +202,17 @@ function jn_teken() {
       (alles.length === 1
         ? jn_t("jn_inskrywing", "inskrywing")
         : jn_t("jn_inskrywings", "inskrywings"));
+    // GESIEN MAAR NIE GEBOEK NIE. Transaksies wat volledig na 'n subrekening
+    // vereffen, raak die hoofrekening nooit en is geen inskrywing. Stilweg
+    // weglaat maak 'n rekonsiliasie teen Paystack se lys onmoontlik; die
+    // getal staan dus hier, en die transaksies self in die uitvoer.
+    const ng = (JN_DATA.nie_geboek || []).length;
+    const staart = ng
+      ? " \u00B7 " + ng + " " + jn_t("jn_nie_geboek_kort", "gesien, nie geboek nie")
+      : "";
+
     tydperk.textContent =
-      jn_datum_af(JN_DATA.van) + " \u2013 " + jn_datum_af(JN_DATA.tot) + " \u00B7 " + aantal;
+      jn_datum_af(JN_DATA.van) + " \u2013 " + jn_datum_af(JN_DATA.tot) + " \u00B7 " + aantal + staart;
   }
 
   jn_koppel_lys();
@@ -451,19 +460,39 @@ function jn_voer_uit() {
   if (!JN_DATA) return;
   const veilig = (w) => '"' + String(w == null ? "" : w).replace(/"/g, '""') + '"';
 
-  const reels = [
-    ["Datum", "Beskrywing", "Betaal deur", "Kategorie", "Bron", "In", "Uit"].map(veilig).join(","),
-  ];
+  // DIE VERWYSING IS DIE OUDIT-SPOOR. Sonder dit kan geen reel na sy
+  // brondokument -- 'n Paystack-transaksie, 'n bestelling, 'n faktuur --
+  // teruggevoer word nie, en dan is die uitvoer vir 'n boekhouer onbruikbaar
+  // hoe korrek die bedrag ook al is.
+  //
+  // BRUTO NAAS DIE BEDRAG. Die joernaal boek wat die HOOFREKENING ontvang
+  // het, nie wat die klient betaal het nie: 'n bestelling van R50 waarvan
+  // R46,50 na 'n outeur gaan, staan hier as R3,50. Sonder die bruto kolom lyk
+  // R3,50 soos die verkoopprys en klop niks teen Paystack se lys nie.
+  const KOPPE = ["Datum", "Verwysing", "Beskrywing", "Betaal deur", "Kategorie",
+                 "Bron", "Bruto", "In", "Uit"];
+  const reels = [KOPPE.map(veilig).join(",")];
+
+  const rand = (sent) => (Number(sent) / 100).toFixed(2);
 
   (JN_DATA.inskrywings || []).forEach((r) => {
-    const bedrag = (r.bedrag_sent / 100).toFixed(2);
+    const bedrag = rand(r.bedrag_sent);
+    // Die bruto kolom bly LEEG waar hy dieselfde as die bedrag sou wees --
+    // 'n handinskrywing, 'n uitbetaling. Twee identiese kolomme lees soos 'n
+    // fout; 'n lee kolom se dat daar niks weerhou is nie.
+    const bruto =
+      r.bruto_sent != null && Number(r.bruto_sent) !== Number(r.bedrag_sent)
+        ? rand(r.bruto_sent)
+        : "";
     reels.push(
       [
         r.datum,
+        r.verwysing || "",
         r.beskrywing,
         r.wie || "",
         jn_kategorie_naam(r.kategorie_id),
         r.bron,
+        bruto,
         r.rigting === "in" ? bedrag : "",
         r.rigting === "uit" ? bedrag : "",
       ]
@@ -474,10 +503,33 @@ function jn_voer_uit() {
 
   reels.push("");
   // DIE LEE KOLOMME TEL. Kom daar 'n kolom by, moet hierdie drie reels saam
-  // skuif, anders staan die totale onder die verkeerde kop.
-  reels.push([veilig("Totaal in"), "", "", "", "", veilig((JN_DATA.in_sent / 100).toFixed(2)), ""].join(","));
-  reels.push([veilig("Totaal uit"), "", "", "", "", "", veilig((JN_DATA.uit_sent / 100).toFixed(2))].join(","));
-  reels.push([veilig("Verskil"), "", "", "", "", veilig((JN_DATA.netto_sent / 100).toFixed(2)), ""].join(","));
+  // skuif, anders staan die totale onder die verkeerde kop. Nege koppe: In is
+  // die agtste, Uit die negende.
+  const totaal_ry = (naam, in_sent, uit_sent) =>
+    [veilig(naam), "", "", "", "", "", "",
+     in_sent == null ? "" : veilig(rand(in_sent)),
+     uit_sent == null ? "" : veilig(rand(uit_sent))].join(",");
+
+  reels.push(totaal_ry("Totaal in", JN_DATA.in_sent, null));
+  reels.push(totaal_ry("Totaal uit", null, JN_DATA.uit_sent));
+  reels.push(totaal_ry("Verskil", JN_DATA.netto_sent, null));
+
+  // GESIEN MAAR NIE GEBOEK NIE, as 'n eie blok onderaan. Hulle raak geen
+  // totaal; hulle is daar sodat 'n rekonsiliasie teen Paystack se lys klop en
+  // niemand hoef te wonder waar agt transaksies heen is nie.
+  const nie_geboek = JN_DATA.nie_geboek || [];
+  if (nie_geboek.length) {
+    reels.push("");
+    reels.push(veilig("Gesien, nie geboek nie"));
+    reels.push(["Datum", "Verwysing", "Beskrywing", "Bron", "Bruto", "Rede"]
+      .map(veilig).join(","));
+    nie_geboek.forEach((r) => {
+      reels.push(
+        [r.datum, r.verwysing || "", r.beskrywing || "", r.bron || "",
+         rand(r.bruto_sent), r.rede || ""].map(veilig).join(",")
+      );
+    });
+  }
 
   // \uFEFF sodat Excel die lêer as UTF-8 lees; sonder dit word ë en é onleesbaar.
   const blob = new Blob(["\uFEFF" + reels.join("\r\n")], {
