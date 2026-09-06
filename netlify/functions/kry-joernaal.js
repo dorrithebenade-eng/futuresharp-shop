@@ -558,10 +558,18 @@ exports.handler = async (event, context) => {
           (t.metadata && t.metadata.course_name) || t.kursus_slak || t.verwysing;
         const besk = `Paystack \u2014 ${naam}`;
 
-        // 'n VERDEELDE TRANSAKSIE IS 'N HEFFING, NIE 'N VERKOOP NIE. Wat
-        // behou word, is die fooi plus die hosting; die kursus self is deur
-        // die ontwikkelaar verkoop.
-        const kategorie = verdeel ? "diensinkomste" : KURSUS_KATEGORIE;
+        // TWEE TOETSE, EN ALBEI MOET SLAAG VOOR DIT 'N KURSUSVERKOOP IS.
+        //
+        //   1. `course_slug` in die metadata -- dit KOM van die checkout-werf.
+        //      Sonder hierdie toets val 'n faktuur wie se dokument uitgevee is
+        //      ook hier, en dan lees 'n faktuurbetaling as 'n kursusverkoop.
+        //      Op 6 September 2026 het dit met FS/01961 en FS/01962 gebeur.
+        //
+        //   2. Geen verdeling nie. Is daar een, is wat behou word die fooi
+        //      plus die hosting -- 'n heffing, nie 'n verkoop nie, want die
+        //      kursus self is deur die ontwikkelaar verkoop.
+        const kategorie =
+          t.kursus_slak && !verdeel ? KURSUS_KATEGORIE : "diensinkomste";
 
         if (behou > 0 && pas({ beskrywing: besk })) {
           inskrywings.push({
