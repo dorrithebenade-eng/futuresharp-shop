@@ -100,7 +100,17 @@ exports.handler = async (event, context) => {
   if (!invoer.id && bestaande) {
     return { statusCode: 409, body: `'n Kategorie met die naam "${naam}" bestaan reeds` };
   }
-  if (invoer.id && !bestaande) {
+  // 'n VASTE KATEGORIE BESTAAN VOOR HAAR EERSTE STOOR NIE IN DIE STORE NIE.
+  //
+  // Diensinkomste en Paystack se transaksiefooi word by die LEES ingeweef --
+  // hulle staan in VAS. Die skerm stuur hul id saam, want vir die skerm is dit
+  // 'n wysiging; die store het egter niks, en die 404 hieronder het hulle
+  // geweier. Hulle kon dus nooit onder 'n ander een gesit word nie, wat juis
+  // die een ding is wat aan hulle mag verander.
+  //
+  // Alles hierna hanteer `!bestaande` reeds: die rekord kom uit
+  // nuwe_kategorie(), en `is_vas` lees VAS[id].
+  if (invoer.id && !bestaande && !VAS[id]) {
     return { statusCode: 404, body: "Kategorie nie gevind nie" };
   }
 
@@ -174,6 +184,11 @@ exports.handler = async (event, context) => {
     rekord.geskep_op = nou;
     rekord.geskep_deur = gebruiker.email || "";
   }
+
+  // 'n STELSELKATEGORIE DRA NOOIT DIE TOETSSTEMPEL NIE. nuwe_kategorie() sit
+  // hom op elke nuwe rekord terwyl TOETSFASE aan is; op die vaste twee sou hy
+  // 'n "Toets"-merkie langs 'n permanente kategorie laat staan.
+  if (is_vas) rekord.toets = false;
 
   try {
     await store.setJSON(id, rekord);
