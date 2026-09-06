@@ -112,6 +112,28 @@ exports.handler = async (event) => {
     return await hanteer_faktuur_betaling(data, new Date().toISOString());
   }
 
+  // 'N KURSUS VAN DIE CHECKOUT-WERF. NIE ONS S'N NIE, EN DIT IS REG SO.
+  //
+  // Paystack laat EEN webhook-adres per rekening toe, en die rekening dra ook
+  // die kursusbetalings van futuresharp-checkout. Daardie transaksies dra
+  // `course_slug` in die metadata en het geen bestelling en geen faktuur hier.
+  //
+  // Hulle word ERKEN met 200, nie geweier nie. 'n 404 sou Paystack laat
+  // herprobeer en die log met mislukkings vul vir iets wat nooit hierheen
+  // bedoel was nie.
+  //
+  // DIE INSKRYWING GEBEUR ELDERS: die checkout-werf se eie Zap trek Paystack
+  // af en skryf die student by LearnWorlds in. DIE BOEKHOUDING GEBEUR OOK
+  // ELDERS: haal-paystack.js lees Paystack se lys nagliks en kry-joernaal.js
+  // lei die inskrywings daaruit af. Hierdie lêer hoef niks te doen nie.
+  if (data.metadata && data.metadata.course_slug) {
+    console.log(
+      `Webhook: kursus "${data.metadata.course_slug}" (${data.reference}) — ` +
+        "die checkout-werf s'n; erken sonder aksie."
+    );
+    return { statusCode: 200, body: "Erken (kursus, geen aksie hier nie)" };
+  }
+
   // DIE VERWYSING IS NIE DIE BESTELNOMMER NIE. Kanselleer 'n koper by
   // Paystack en probeer weer, dra die tweede transaksie 'n verwysing soos
   // FS-2026-250270-2 — Paystack weier 'n herhaalde verwysing. Die
@@ -126,8 +148,17 @@ exports.handler = async (event) => {
   const bestelling = await store.get(bestelnommer, { type: "json" });
 
   if (!bestelling) {
+    // 200, NIE 404 NIE.
+    //
+    // 'n 404 laat Paystack herprobeer -- vyf keer, oor ure -- vir iets wat
+    // nooit sal pas nie. Sedert die rekening ook betalings van buite hierdie
+    // werf dra, is 'n onbekende verwysing nie meer 'n fout nie.
+    //
+    // NIKS GAAN VERLORE NIE: haal-paystack.js lees Paystack se lys en die
+    // joernaal lei elke transaksie daaruit af, ook dié wat hier nie pas nie.
+    // Die reël hieronder is dus 'n aantekening, nie 'n weiering.
     console.error(`Webhook: geen konsep-bestelling gevind vir ${bestelnommer}`);
-    return { statusCode: 404, body: "Geen ooreenstemmende bestelling gevind nie" };
+    return { statusCode: 200, body: "Erken (geen ooreenstemmende bestelling nie)" };
   }
 
   // Verhoed dubbele verwerking as Paystack dieselfde gebeurtenis weer stuur
