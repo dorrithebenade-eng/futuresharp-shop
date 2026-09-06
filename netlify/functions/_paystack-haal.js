@@ -48,6 +48,17 @@ async function haal_paystack_transaksies(van, tot) {
 
   const store = kry_paystack_transaksies_store();
 
+  // 'N DATUM SONDER 'N TYD IS MIDDERNAG AAN DIE BEGIN VAN DIE DAG.
+  //
+  // Paystack lees `to=2026-09-06` as 06 September 00:00, dus val alles wat op
+  // daardie dag gebeur het BUITE die venster. Op 6 September 2026 het 'n
+  // inhaal vir "vandag tot vandag" nul transaksies gegee terwyl daar twee was.
+  //
+  // Die tydstempels word dus hier aangeheg: die begindag vanaf middernag, die
+  // einddag tot die laaste sekonde daarvan.
+  const van_t = `${van} 00:00:00`;
+  const tot_t = `${tot} 23:59:59`;
+
   let gehaal = 0;
   let geskryf = 0;
   let oorgeslaan = 0;
@@ -57,7 +68,7 @@ async function haal_paystack_transaksies(van, tot) {
   while (blad <= MAKS_BLAAIE) {
     const url =
       `${PAYSTACK_LYS}?perPage=${PER_BLAD}&page=${blad}` +
-      `&status=success&from=${encodeURIComponent(van)}&to=${encodeURIComponent(tot)}`;
+      `&status=success&from=${encodeURIComponent(van_t)}&to=${encodeURIComponent(tot_t)}`;
 
     let data;
     try {
