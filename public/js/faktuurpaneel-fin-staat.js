@@ -381,6 +381,69 @@ function fs_teken() {
           </tbody>
         </table>
       </div>` : ""}`;
+
+  /* DIE PDF SE VRAG WORD HIER GEBOU, uit dieselfde veranderlikes as die skerm.
+
+     kry-staat-pdf.js teken wat dit ontvang en tel niks self op nie. Sou die
+     bediener die boom oordoen, kon die PDF en die skerm uitmekaar loop sonder
+     dat iemand dit sien, en dan is die vraag watter een die waarheid is.
+
+     Dit staan aan die EINDE van fs_teken(), sodat die vrag nooit ouer as die
+     skerm kan wees. faktuurpaneel-staat-pdf.js lees dit. */
+  const vrag_blok = (rigting, titel) => {
+    const rye = FS.boom
+      .filter((b) => b.kategorie.rigting === rigting && b.totaal_sent !== 0)
+      .map((b) => ({
+        naam: b.kategorie.naam,
+        vlak: b.kategorie.vlak || 0,
+        eie_sent: b.eie_sent || 0,
+        totaal_sent: b.totaal_sent || 0,
+        hoof: !b.kategorie.onder,
+      }));
+    if (FS.ongekat[rigting]) {
+      rye.push({
+        naam: fs_t("fs_ongekat", "Ongekategoriseer"),
+        vlak: 0,
+        eie_sent: FS.ongekat[rigting],
+        totaal_sent: FS.ongekat[rigting],
+        hoof: false,
+      });
+    }
+    return { titel, rye, som_sent: som_van(rigting) };
+  };
+
+  const vrag_slot = [
+    { naam: fs_t("fs_tot_in", "Totale inkomste"), bedrag_sent: inkomste, soort: "reel" },
+  ];
+  let vloop = inkomste;
+  uit_koppe.forEach((b, i) => {
+    vloop -= b.totaal_sent;
+    vrag_slot.push({ naam: b.kategorie.naam, bedrag_sent: b.totaal_sent, soort: "aftrek" });
+    if (!(i === uit_koppe.length - 1 || uit_koppe.length < 2)) {
+      vrag_slot.push({
+        naam: `${fs_t("fs_na", "Surplus n\u00e1")} ${b.kategorie.naam.toLowerCase()}`,
+        bedrag_sent: vloop,
+        soort: "tussen",
+      });
+    }
+  });
+  vrag_slot.push({ naam: fs_t("fs_surplus", "Surplus"), bedrag_sent: oorskot, soort: "som" });
+
+  // OP `window`, want FS is module-geslote. faktuurpaneel-staat-pdf.js is 'n
+  // aparte leer en kan nie by hierdie skoop kom nie.
+  window.FS_PDF_VRAG = {
+    van: FS.van,
+    tot: FS.tot,
+    blokke: [
+      vrag_blok("in", fs_t("fs_inkomste", "Inkomste")),
+      vrag_blok("uit", fs_t("fs_uitgawes", "Uitgawes")),
+    ].filter((b) => b.rye.length),
+    slot: vrag_slot,
+    nota: {
+      kop: fs_t("fs_pdf_nota_kop", "Grondslag van inkomste"),
+      teks: fs_t("fs_pdf_nota", "Waar 'n kursus deur 'n eksterne ontwikkelaar aangebied word en die betaling regstreeks na daardie ontwikkelaar se rekening vereffen, tree Future Sharp as agent op. Slegs wat behou word, is inkomste."),
+    },
+  };
 }
 
 /* ═══ die bankrekonsiliasie ═══ */

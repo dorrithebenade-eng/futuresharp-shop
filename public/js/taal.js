@@ -2658,7 +2658,24 @@ const WOORDEBOEK = {
   fs_van: { af: "Van", en: "From" },
   fs_tot: { af: "Tot", en: "To" },
   fs_wys: { af: "Wys", en: "Show" },
-  fs_uitvoer: { af: "Voer uit", en: "Export" },
+  fs_uitvoer: { af: "Laai af", en: "Download" },
+  // DIE STAAT AS PDF (6 September 2026). Die aflaai is die sigblad; die PDF
+  // is die aanbiedingsdokument.
+  fs_pdf: { af: "Staat as PDF", en: "Statement as PDF" },
+  fs_pdf_besig: { af: "Word gebou \u2026", en: "Building \u2026" },
+  fs_pdf_geen: {
+    af: "Wys eers die staat vir 'n tydperk.",
+    en: "Display the statement for a period first.",
+  },
+  fs_pdf_fout: {
+    af: "Kon nie die staat as PDF bou nie.",
+    en: "Could not build the statement as a PDF.",
+  },
+  fs_pdf_nota_kop: { af: "Grondslag van inkomste", en: "Basis of income" },
+  fs_pdf_nota: {
+    af: "Waar 'n kursus deur 'n eksterne ontwikkelaar aangebied word en die betaling regstreeks na daardie ontwikkelaar se rekening vereffen, tree Future Sharp as agent op. Slegs wat behou word, is inkomste.",
+    en: "Where a course is presented by an external developer and payment settles directly to that developer's account, Future Sharp acts as agent. Only the amount retained is income.",
+  },
   fs_inkomste: { af: "Inkomste", en: "Income" },
   fs_uitgawes: { af: "Uitgawes", en: "Expenses" },
   fs_tot_in: { af: "Totale inkomste", en: "Total income" },
