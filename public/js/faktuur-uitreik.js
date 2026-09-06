@@ -630,15 +630,30 @@ function fu_teken_strook() {
   //
   // Die strook staan BO die betaalskakel, want dit sê presies wat 'n mens met
   // daardie skakel moet doen.
+  /* DIE WOORDE VERSKIL PER DOKUMENT.
+     'n Kwotasie dra geen betaalskakel nie, dus kan die strook nie se "stuur
+     die skakel hieronder" nie -- daar is niks hieronder. Wat 'n mens met 'n
+     kwotasie doen, is die PDF self aanstuur. */
   const pos_fout = fu_neem_pos_fout();
   let waarsku = "";
   if (pos_fout !== null) {
     waarsku = `<div class="fu-strook fu-strook-wag">
-      <h4>${fu_t("fu_pos_kop", "Die proforma het nie uitgegaan nie")}</h4>
-      <p class="fu-strook-teks">${fu_t(
-        "fu_pos_teks",
-        "Die faktuur is uitgereik en die betaalskakel werk. Stuur die skakel hieronder self aan die kli\u00ebnt."
-      )}${pos_fout ? ` <span class="fu-strook-rede">${fu_ontsnap(pos_fout)}</span>` : ""}</p>
+      <h4>${
+        FU_IS_KW
+          ? fu_t("fu_pos_kop_kw", "Die kwotasie het nie uitgegaan nie")
+          : fu_t("fu_pos_kop", "Die proforma het nie uitgegaan nie")
+      }</h4>
+      <p class="fu-strook-teks">${
+        FU_IS_KW
+          ? fu_t(
+              "fu_pos_teks_kw",
+              "Die kwotasie is uitgereik en haar nommer is opgebruik. Druk haar hieronder en stuur haar self aan die kli\u00ebnt."
+            )
+          : fu_t(
+              "fu_pos_teks",
+              "Die faktuur is uitgereik en die betaalskakel werk. Stuur die skakel hieronder self aan die kli\u00ebnt."
+            )
+      }${pos_fout ? ` <span class="fu-strook-rede">${fu_ontsnap(pos_fout)}</span>` : ""}</p>
     </div>`;
   }
 

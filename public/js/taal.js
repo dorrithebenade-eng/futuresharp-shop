@@ -2223,6 +2223,18 @@ const WOORDEBOEK = {
   // AMBER, NIE KORAAL NIE. Die faktuur IS uitgereik, die nommer is opgebruik
   // en die betaalskakel leef -- daar is niks om te stop nie. Wat oorbly, is
   // werk: die skakel moet met die hand aangestuur word.
+  // 'n KWOTASIE DRA GEEN BETAALSKAKEL NIE, dus kan die strook nie se "stuur
+  // die skakel hieronder" nie. Wat 'n mens met 'n kwotasie doen, is die PDF
+  // self aanstuur.
+  fu_pos_kop_kw: {
+    af: "Die kwotasie het nie uitgegaan nie",
+    en: "The quotation did not go out",
+  },
+  fu_pos_teks_kw: {
+    af: "Die kwotasie is uitgereik en haar nommer is opgebruik. Druk haar hieronder en stuur haar self aan die kli\u00ebnt.",
+    en: "The quotation has been issued and its number is used. Print it below and send it to the client yourself.",
+  },
+
   fu_pos_kop: {
     af: "Die proforma het nie uitgegaan nie",
     en: "The proforma did not go out",

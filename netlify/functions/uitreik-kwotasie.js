@@ -236,8 +236,25 @@ exports.handler = async (event, context) => {
       geldig_tot: rekord.geldig_tot,
       publieke_kode,
       totaal_sent: rekord.totaal_sent,
+
+      /* DIE POSSTATUS HEET `pos_gestuur`, NET SOOS BY DIE FAKTUUR.
+       *
+       * Tot 5 September 2026 het hierdie Function `pos_ok` teruggegee terwyl
+       * faktuur-uitreik.js -- die skerm wat ALBEI hanteer -- op
+       * `data.pos_gestuur === false` toets. Vir 'n kwotasie was daardie veld
+       * dus `undefined`, nooit `false` nie, en die waarskuwingstrook het nooit
+       * verskyn nie.
+       *
+       * Die gevolg was presies wat die kommentaar in faktuur-uitreik.js
+       * beskryf en probeer voorkom: 'n kwotasie gaan uit terwyl die pos
+       * misluk, die skerm swyg, en 'n mens neem aan die klient het sy aanbod.
+       *
+       * `pos_ok` bly as ou naam vir enigiets wat hom dalk nog lees. Die
+       * skerm lees `pos_gestuur`.
+       */
+      pos_gestuur: Boolean(pos && pos.ok),
       pos_ok: Boolean(pos && pos.ok),
-      pos_fout: (pos && pos.fout) || null,
+      pos_fout: (pos && pos.ok) ? null : ((pos && pos.fout) || null),
     }),
   };
 };
