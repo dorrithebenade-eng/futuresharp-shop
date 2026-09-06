@@ -244,10 +244,27 @@ exports.handler = async (event, context) => {
     return { statusCode: 500, body: "Kon nie die joernaal laai nie" };
   }
 
+  // WATTER DOKUMENTE BESTAAN NOG.
+  //
+  // Tak 4 slaan 'n Paystack-transaksie oor wanneer 'n faktuur of 'n bestelling
+  // hom reeds boek. Word daardie dokument egter UITGEVEE -- 'n toetsfaktuur wat
+  // opgeruim word -- boek nie een van die twee hom nie, en 'n werklike ontvangs
+  // verdwyn stil uit die staat.
+  //
+  // Die sleutels word dus hier ingesamel en tak 4 toets daarteen. Die vlae sê
+  // of die insameling geslaag het: misluk 'n leesoproep, slaan tak 4 liewer
+  // oor as om te dubbel.
+  const faktuur_sleutels = new Set();
+  const bestelnommers = new Set();
+  let fakture_gelees = false;
+  let bestellings_gelees = false;
+
   // ── 2. Wat uit die fakture kom ───────────────────────────────────────
   try {
     const store = kry_fakture_store();
     const lys = await store.list();
+    for (const b of lys.blobs || []) faktuur_sleutels.add(b.key);
+    fakture_gelees = true;
 
     for (const b of lys.blobs || []) {
       // 'n KWOTASIE IS GEEN INSKRYWING NIE. Hy leef in dieselfde store met 'n
@@ -377,6 +394,8 @@ exports.handler = async (event, context) => {
   try {
     const store = kry_store("bestellings");
     const lys = await store.list();
+    for (const b of lys.blobs || []) bestelnommers.add(b.key);
+    bestellings_gelees = true;
 
     for (const b of lys.blobs || []) {
       const o = await store.get(b.key, { type: "json" });
@@ -493,7 +512,17 @@ exports.handler = async (event, context) => {
         // ontbreek daardie bedrag. Die regstelling is om die betaling by die
         // faktuur aan te teken, nie om hom hier by te tel: die joernaal mag
         // nie 'n faktuur se stand toesmeer nie.
-        if (t.faktuur_sleutel || t.bestelnommer) continue;
+        // SLEGS AS DIE DOKUMENT NOG BESTAAN. Bestaan die faktuur of die
+        // bestelling nie meer nie, boek niemand anders hierdie ontvangs nie en
+        // hoort dit hier.
+        //
+        // Kon die betrokke store nie gelees word nie, word oorgeslaan --
+        // 'n ontbrekende reel is herstelbaar, 'n dubbele een lieg.
+        const faktuur_bestaan =
+          t.faktuur_sleutel && (!fakture_gelees || faktuur_sleutels.has(t.faktuur_sleutel));
+        const bestelling_bestaan =
+          t.bestelnommer && (!bestellings_gelees || bestelnommers.has(t.bestelnommer));
+        if (faktuur_bestaan || bestelling_bestaan) continue;
 
         const bedrag = Number(t.bedrag_sent) || 0;
         if (bedrag <= 0) continue;

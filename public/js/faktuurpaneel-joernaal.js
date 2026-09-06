@@ -452,6 +452,17 @@ function jn_kategorie_naam(id) {
   return k ? k.pad || k.naam : id;
 }
 
+// DIE BLAAR ALLEEN, vir die kolom waarop 'n mens filter.
+//
+// "Bedryfskoste / Bankkoste / Paystack - transaksiefooi" is 51 karakters en
+// Excel kap dit af; die naam waarop die boekhouer soek, staan heel agter. Die
+// kontantboek dra dus albei: die blaar in Kategorie, die volle roete in Pad.
+function jn_kategorie_blaar(id) {
+  if (!id) return "";
+  const k = JN_KATEGORIEE.find((x) => x.id === id);
+  return k ? k.naam : id;
+}
+
 
 /* ═══ die kontantboek ═══
 
@@ -500,7 +511,8 @@ function jn_boek_rye() {
       verwysing: r.verwysing || "",
       beskrywing: r.beskrywing,
       wie: r.wie || "",
-      kategorie: jn_kategorie_naam(r.kategorie_id),
+      kategorie: jn_kategorie_blaar(r.kategorie_id),
+      pad: jn_kategorie_naam(r.kategorie_id),
       bron: r.bron,
       bruto,
       in_bedrag: in_ry ? rand(r.bedrag_sent) : null,
@@ -510,8 +522,8 @@ function jn_boek_rye() {
 }
 
 const JN_KOPPE = ["Datum", "Verwysing", "Beskrywing", "Betaal deur", "Kategorie",
-                  "Bron", "Bruto", "In", "Uit"];
-const JN_WYDTES = [12, 20, 46, 22, 44, 11, 12, 12, 12];
+                  "Pad", "Bron", "Bruto", "In", "Uit"];
+const JN_WYDTES = [12, 20, 46, 22, 26, 44, 11, 12, 12, 12];
 const JN_GELD = "#,##0.00";
 
 async function jn_voer_uit() {
@@ -552,21 +564,21 @@ async function jn_xlsx() {
 
   jn_boek_rye().forEach((r) => {
     const ry = bl.addRow([
-      r.datum, r.verwysing, r.beskrywing, r.wie, r.kategorie, r.bron,
+      r.datum, r.verwysing, r.beskrywing, r.wie, r.kategorie, r.pad, r.bron,
       r.bruto, r.in_bedrag, r.uit_bedrag,
     ]);
-    [7, 8, 9].forEach((k) => (ry.getCell(k).numFmt = JN_GELD));
+    [8, 9, 10].forEach((k) => (ry.getCell(k).numFmt = JN_GELD));
   });
 
   // Die totale onder 'n LEE reel, sodat 'n filter of 'n draaitabel hulle nie
   // as data optel nie.
   bl.addRow([]);
   const tel = (naam, in_sent, uit_sent) => {
-    const ry = bl.addRow([naam, "", "", "", "", "", "",
+    const ry = bl.addRow([naam, "", "", "", "", "", "", "",
       in_sent == null ? null : in_sent / 100,
       uit_sent == null ? null : uit_sent / 100]);
     ry.font = { bold: true };
-    [8, 9].forEach((k) => (ry.getCell(k).numFmt = JN_GELD));
+    [9, 10].forEach((k) => (ry.getCell(k).numFmt = JN_GELD));
     return ry;
   };
   tel("Totaal in", JN_DATA.in_sent, null);
@@ -620,15 +632,16 @@ function jn_csv() {
   const reels = [JN_KOPPE.map(veilig).join(",")];
 
   jn_boek_rye().forEach((r) => {
-    reels.push([r.datum, r.verwysing, r.beskrywing, r.wie, r.kategorie, r.bron,
-      geld(r.bruto), geld(r.in_bedrag), geld(r.uit_bedrag)].map(veilig).join(","));
+    reels.push([r.datum, r.verwysing, r.beskrywing, r.wie, r.kategorie, r.pad,
+      r.bron, geld(r.bruto), geld(r.in_bedrag), geld(r.uit_bedrag)]
+      .map(veilig).join(","));
   });
 
   reels.push("");
   // DIE LEE KOLOMME TEL. Kom daar 'n kolom by, moet hierdie drie reels saam
   // skuif, anders staan die totale onder die verkeerde kop.
   const totaal_ry = (naam, in_sent, uit_sent) =>
-    [veilig(naam), "", "", "", "", "", "",
+    [veilig(naam), "", "", "", "", "", "", "",
      in_sent == null ? "" : veilig((in_sent / 100).toFixed(2)),
      uit_sent == null ? "" : veilig((uit_sent / 100).toFixed(2))].join(",");
   reels.push(totaal_ry("Totaal in", JN_DATA.in_sent, null));
