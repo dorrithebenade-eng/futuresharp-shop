@@ -95,8 +95,23 @@ function bk_teken(u) {
 
 async function bk_begin() {
   const vraag = new URLSearchParams(window.location.search);
-  const f = vraag.get("f") || "";
-  const k = vraag.get("k") || "";
+
+  // PAYSTACK HEG SY EIE PARAMETERS AAN DIE CALLBACK-SKAKEL.
+  //
+  // Ons stuur ...betaal-klaar.html?f=<sleutel>&k=<kode>. Paystack voeg
+  // `trxref` en `reference` by, en waar dit met 'n TWEEDE vraagteken gebeur
+  // in plaas van 'n &, lees die laaste parameter as "ABC123?trxref=...".
+  //
+  // Die kode stem dan nie ooreen nie, kry-betaalstand.js gee 404, en die
+  // bladsy wys "onbevestig" -- vir 'n betaling wat wel deurgegaan het. Op
+  // 6 September 2026 het dit met FS/01961 gebeur.
+  //
+  // 'n Egte sleutel en 'n egte kode dra nooit 'n vraagteken nie, dus is die
+  // afsny veilig en kan dit niks anders breek nie.
+  const skoon = (w) => String(w || "").split("?")[0];
+
+  const f = skoon(vraag.get("f"));
+  const k = skoon(vraag.get("k"));
 
   const raaiskoot = kry_huidige_taal();
   bk_teken_besig(raaiskoot);

@@ -2082,9 +2082,12 @@ const WOORDEBOEK = {
   },
 
   bk_kop_onbekend: { af: "Betalingstatus onbevestig", en: "Payment status unconfirmed" },
+  // GEEN "DIE REKORD IS ONVERANDERD" NIE. Daardie sin lees vir 'n klient
+  // soos "niks het gebeur nie", en dit is presies wat 'n mens NIE weet nie --
+  // die stand is onbekend, nie misluk nie.
   bk_teks_onbekend: {
-    af: "Die transaksie se status kon nie tans bevestig word nie. Die faktuur se rekord is onveranderd. Het die betaling deurgegaan, volg die kwitansie per e-pos.",
-    en: "The status of the transaction could not be confirmed at this time. The invoice record is unchanged. If the payment cleared, a receipt follows by email.",
+    af: "Het die betaling deurgegaan, volg jou kwitansie per e-pos.",
+    en: "If the payment cleared, your receipt follows by email.",
   },
 
   bk_nommer: { af: "Faktuurnommer", en: "Invoice number" },
