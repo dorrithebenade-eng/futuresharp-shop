@@ -2,12 +2,13 @@
 //
 // Die joernaal vir een finansiele jaar. Rol: boekhouding.
 //
-// DRIE BRONNE, EEN LYS
+// VIER BRONNE, EEN LYS
 //
 //   faktuur      'n betaalde faktuur se totaal -- INKOMSTE
 //   uitbetaling  'n uitbetaalry wat afgemerk is -- UITGAWE
 //   hand         alles wat nie deur Paystack vloei nie -- albei rigtings
 //   winkel       wat 'n bestelling in die HOOFREKENING laat -- albei rigtings
+//   paystack     elke ander transaksie op die rekening -- albei rigtings
 //
 // DIE WINKEL WORD NETTO GEBOEK, EN DIT IS NIE 'N VEREENVOUDIGING NIE.
 //
@@ -57,6 +58,17 @@ const {
 } = require("./_joernaal");
 const { kry_store } = require("./_blob-store");
 const { kry_paystack_fooi_sent } = require("./_paystack-koste");
+const {
+  kry_paystack_transaksies_store,
+  jaar_voorvoegsel: ps_jaar_voorvoegsel,
+} = require("./_paystack-transaksies");
+
+// DIE KOP WAARONDER 'N KURSUSVERKOOP VAL wanneer die VOLLE bedrag in die
+// hoofrekening beland. Behou Future Sharp net 'n deel -- die fooi plus die
+// hostingheffing terwyl die res na 'n ontwikkelaar gaan -- is dit nie 'n
+// kursusverkoop nie maar 'n heffing, en dan geld Diensinkomste, presies soos
+// by die winkel.
+const KURSUS_KATEGORIE = "learnworlds-kursusse";
 
 function dag(iso) {
   return String(iso || "").slice(0, 10);
@@ -415,6 +427,126 @@ exports.handler = async (event, context) => {
     // inskrywings is reeds gelees; 'n leesfout hier moet die res nie wegvat
     // nie. Die syfer is dan onvolledig, en dit staan in die log.
     console.error("Kon nie die bestellings vir die joernaal lees nie:", fout);
+  }
+
+  // ── 4. Elke ander Paystack-transaksie ────────────────────────────────
+  //
+  // DIE AFHAAL IS DIE BRON, NIE DIE WEBHOOK NIE. haal-paystack.js skryf die
+  // ROU transaksie na sy eie store; hier word besluit wat daarvan inkomste is.
+  // Dieselfde reel as die fakture: die syfer word AFGELEI en nooit in die
+  // joernaal se store geskryf nie.
+  //
+  // WAT `fees_split` SE. Paystack gee dit as 'n STRING, nie 'n voorwerp nie,
+  // en dit dra drie bedrae wat altyd tot die volle bedrag tel:
+  //
+  //   paystack     die fooi
+  //   integration  wat die hoofrekening NETTO ontvang, fooi reeds af
+  //   subaccount   wat na die subrekening gaan
+  //
+  // Bevestig teen 'n werklike transaksie op 8 Augustus 2026: R1 500 met
+  // 5118 + 0 + 144882 = 150000. `params.bearer` was "subaccount", dus het die
+  // ontwikkelaar die fooi gedra en die hoofrekening NIKS ontvang nie.
+  //
+  // Op 'n kontantbasis is daar dan ook niks te boek nie. Dit is dieselfde
+  // beginsel as die winkel s'n: geld wat nooit die bank raak nie, is nie
+  // inkomste nie.
+  //
+  // GEEN `fees_split` BETEKEN GEEN VERDELING. Dan is die volle bedrag inkomste
+  // en die volle fooi 'n uitgawe.
+  try {
+    const store = kry_paystack_transaksies_store();
+
+    for (const jaar of jare) {
+      const lys = await store.list({ prefix: ps_jaar_voorvoegsel(jaar) });
+
+      for (const b of lys.blobs || []) {
+        const t = await store.get(b.key, { type: "json" });
+        if (!t || !in_tydperk(t.datum)) continue;
+
+        // REEDS ELDERS GEBOEK. 'n Faktuur boek uit die faktuurrekord en 'n
+        // bestelling uit die bestelling; hulle albei hier ook boek, sou elke
+        // bedrag twee keer laat staan.
+        //
+        // LET WEL: bly 'n faktuur op "Gestuur" staan omdat die webhook hom
+        // nooit gesien het nie, boek die faktuurtak hom OOK nie -- en dan
+        // ontbreek daardie bedrag. Die regstelling is om die betaling by die
+        // faktuur aan te teken, nie om hom hier by te tel: die joernaal mag
+        // nie 'n faktuur se stand toesmeer nie.
+        if (t.faktuur_sleutel || t.bestelnommer) continue;
+
+        const bedrag = Number(t.bedrag_sent) || 0;
+        if (bedrag <= 0) continue;
+
+        let fooi = Number(t.fooi_sent) || 0;
+        let behou = bedrag;
+        let verdeel = false;
+
+        const rou_split = t.rou && t.rou.fees_split;
+        if (rou_split) {
+          let fs = rou_split;
+          if (typeof fs === "string") {
+            try {
+              fs = JSON.parse(fs);
+            } catch {
+              fs = null;
+            }
+          }
+          if (fs && typeof fs === "object") {
+            verdeel = true;
+            const ps_fooi = Number(fs.paystack) || 0;
+            const hoof_netto = Number(fs.integration) || 0;
+            const draer = (fs.params && fs.params.bearer) || "";
+
+            // Dra die subrekening die fooi, kom dit nie uit die hoofrekening
+            // nie en is dit hier geen uitgawe nie.
+            fooi = draer === "subaccount" ? 0 : ps_fooi;
+            behou = hoof_netto + fooi;
+          }
+        }
+
+        const naam =
+          (t.metadata && t.metadata.course_name) || t.kursus_slak || t.verwysing;
+        const besk = `Paystack \u2014 ${naam}`;
+
+        // 'n VERDEELDE TRANSAKSIE IS 'N HEFFING, NIE 'N VERKOOP NIE. Wat
+        // behou word, is die fooi plus die hosting; die kursus self is deur
+        // die ontwikkelaar verkoop.
+        const kategorie = verdeel ? "diensinkomste" : KURSUS_KATEGORIE;
+
+        if (behou > 0 && pas({ beskrywing: besk })) {
+          inskrywings.push({
+            sleutel: null,
+            datum: t.datum,
+            beskrywing: besk,
+            wie: "",
+            nota: "",
+            bedrag_sent: behou,
+            rigting: "in",
+            kategorie_id: kategorie,
+            bron: "paystack",
+          });
+        }
+
+        const fooi_besk = `Paystack se fooi \u2014 ${naam}`;
+        if (fooi > 0 && pas({ beskrywing: fooi_besk })) {
+          inskrywings.push({
+            sleutel: null,
+            datum: t.datum,
+            beskrywing: fooi_besk,
+            wie: "",
+            nota: "",
+            bedrag_sent: fooi,
+            rigting: "uit",
+            kategorie_id: "paystack-transaksiefooi",
+            bron: "paystack",
+          });
+        }
+      }
+    }
+  } catch (fout) {
+    // Soos die winkel s'n: 'n leesfout hier mag nie die res van die joernaal
+    // wegvat nie. Die syfer is dan onvolledig, en dit staan in die log.
+    console.error("Kon nie die Paystack-transaksies vir die joernaal lees nie:", fout);
   }
 
   // Nuutste eerste.
