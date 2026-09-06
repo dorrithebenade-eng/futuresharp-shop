@@ -16,6 +16,16 @@
 [functions."leen-herinnering"]
   schedule = "0 4 * * *"
 
+# haal-paystack: haal Paystack se transaksielys vir die afgelope sewe dae en
+# skryf elke geslaagde transaksie na die store. Die joernaal lei sy
+# inskrywings daaruit af; niks word in die joernaal se store geskryf nie.
+#
+# 03:30 en nie 04:00 nie, sodat die twee funksies se logs nie deurmekaar loop
+# nie. Die venster is sewe dae en nie een nie: loop die skedule een nag nie,
+# dek die volgende loop daardie dag steeds.
+[functions."haal-paystack"]
+  schedule = "30 3 * * *"
+
 # Netlify Identity registrasie-instellings word via die Netlify-kontrolepaneel
 # gestel (nie hierdie lêer nie): "Oop registrasie" aan, standaard-rol by
 # registrasie = "koper" (via 'n Identity-triggerfunksie, sien
