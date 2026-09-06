@@ -453,93 +453,213 @@ function jn_kategorie_naam(id) {
 }
 
 
-// 'n CSV, nie 'n Excel-lêer nie. Die boekhouer maak dit in Excel oop en die
-// kolomme is skoon; 'n xlsx sou 'n biblioteek verg vir presies dieselfde
-// uitkoms. Kommas word deur aanhalingstekens gedra.
-function jn_voer_uit() {
-  if (!JN_DATA) return;
-  const veilig = (w) => '"' + String(w == null ? "" : w).replace(/"/g, '""') + '"';
+/* ═══ die kontantboek ═══
 
-  // DIE VERWYSING IS DIE OUDIT-SPOOR. Sonder dit kan geen reel na sy
-  // brondokument -- 'n Paystack-transaksie, 'n bestelling, 'n faktuur --
-  // teruggevoer word nie, en dan is die uitvoer vir 'n boekhouer onbruikbaar
-  // hoe korrek die bedrag ook al is.
-  //
-  // BRUTO NAAS DIE BEDRAG. Die joernaal boek wat die HOOFREKENING ontvang
-  // het, nie wat die klient betaal het nie: 'n bestelling van R50 waarvan
-  // R46,50 na 'n outeur gaan, staan hier as R3,50. Sonder die bruto kolom lyk
-  // R3,50 soos die verkoopprys en klop niks teen Paystack se lys nie.
-  const KOPPE = ["Datum", "Verwysing", "Beskrywing", "Betaal deur", "Kategorie",
-                 "Bron", "Bruto", "In", "Uit"];
-  const reels = [KOPPE.map(veilig).join(",")];
+   'n XLSX, NIE 'N CSV NIE.
 
-  const rand = (sent) => (Number(sent) / 100).toFixed(2);
+   'n CSV dra geen opmaak: smal kolomme, bedrae as teks, geen gevriesde kop,
+   en die nie-geboek-lys onderaan dieselfde blad waar sy elke filter breek.
+   Die boekhouer werk IN hierdie leer -- filter, sorteer, tel op -- en dan tel
+   die vorm.
 
-  (JN_DATA.inskrywings || []).forEach((r) => {
-    const bedrag = rand(r.bedrag_sent);
-    // Die bruto kolom bly LEEG waar hy dieselfde as die bedrag sou wees --
-    // 'n handinskrywing, 'n uitbetaling. Twee identiese kolomme lees soos 'n
-    // fout; 'n lee kolom se dat daar niks weerhou is nie.
+   ExcelJS word LUI gelaai, eers wanneer iemand die knoppie druk. Dit is sowat
+   900 kB en dit hoort nie op elke laai van die paneel nie.
+
+   MISLUK DIE LAAI, VAL DIT TERUG NA DIE CSV. 'n Netwerkfout mag nie beteken
+   dat 'n mens met niks bly staan nie. */
+
+const JN_EXCELJS =
+  "https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js";
+
+function jn_laai_exceljs() {
+  if (window.ExcelJS) return Promise.resolve(window.ExcelJS);
+  return new Promise((los, breek) => {
+    const s = document.createElement("script");
+    s.src = JN_EXCELJS;
+    s.onload = () => (window.ExcelJS ? los(window.ExcelJS) : breek(new Error("ExcelJS het nie gelaai nie")));
+    s.onerror = () => breek(new Error("Kon nie ExcelJS laai nie"));
+    document.head.appendChild(s);
+  });
+}
+
+// Die rye, een keer gebou en deur albei uitvoere gebruik.
+//
+// DIE BRUTO KOLOM STAAN OP DIE ONTVANGSREEL, NOOIT OP DIE FOOIREEL NIE. Die
+// fooi is nie 'n deel van 'n bedrag wat weerhou is nie; 'n bruto daarnaas sou
+// lees asof R1,82 uit R20 weerhou is.
+function jn_boek_rye() {
+  const rand = (sent) => Number(sent) / 100;
+  return (JN_DATA.inskrywings || []).map((r) => {
+    const in_ry = r.rigting === "in";
     const bruto =
-      r.bruto_sent != null && Number(r.bruto_sent) !== Number(r.bedrag_sent)
+      in_ry && r.bruto_sent != null && Number(r.bruto_sent) !== Number(r.bedrag_sent)
         ? rand(r.bruto_sent)
-        : "";
-    reels.push(
-      [
-        r.datum,
-        r.verwysing || "",
-        r.beskrywing,
-        r.wie || "",
-        jn_kategorie_naam(r.kategorie_id),
-        r.bron,
-        bruto,
-        r.rigting === "in" ? bedrag : "",
-        r.rigting === "uit" ? bedrag : "",
-      ]
-        .map(veilig)
-        .join(",")
-    );
+        : null;
+    return {
+      datum: r.datum,
+      verwysing: r.verwysing || "",
+      beskrywing: r.beskrywing,
+      wie: r.wie || "",
+      kategorie: jn_kategorie_naam(r.kategorie_id),
+      bron: r.bron,
+      bruto,
+      in_bedrag: in_ry ? rand(r.bedrag_sent) : null,
+      uit_bedrag: in_ry ? null : rand(r.bedrag_sent),
+    };
+  });
+}
+
+const JN_KOPPE = ["Datum", "Verwysing", "Beskrywing", "Betaal deur", "Kategorie",
+                  "Bron", "Bruto", "In", "Uit"];
+const JN_WYDTES = [12, 20, 46, 22, 44, 11, 12, 12, 12];
+const JN_GELD = "#,##0.00";
+
+async function jn_voer_uit() {
+  if (!JN_DATA) return;
+  try {
+    await jn_xlsx();
+  } catch (fout) {
+    console.error("Kon nie die xlsx bou nie; die CSV volg:", fout);
+    jn_csv();
+  }
+}
+
+async function jn_xlsx() {
+  const ExcelJS = await jn_laai_exceljs();
+  const wb = new ExcelJS.Workbook();
+  wb.creator = "Future Sharp";
+  wb.created = new Date();
+
+  const bl = wb.addWorksheet("Kontantboek", {
+    views: [{ state: "frozen", ySplit: 3 }],
+  });
+
+  // Twee reels bo die tabel: wat dit is, en vir watter tydperk. 'n Blad wat
+  // uitgedruk of aangestuur word, moet dit self se.
+  bl.addRow(["Future Sharp NPC \u2014 Kontantboek"]);
+  bl.addRow([`${JN_DATA.van} tot ${JN_DATA.tot}`]);
+  bl.getRow(1).font = { bold: true, size: 14 };
+  bl.getRow(2).font = { color: { argb: "FF6B6660" } };
+
+  const kop = bl.addRow(JN_KOPPE);
+  kop.font = { bold: true };
+  kop.eachCell((s) => {
+    s.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFEFEDE9" } };
+    s.border = { bottom: { style: "thin", color: { argb: "FFB8B2A8" } } };
+  });
+
+  JN_WYDTES.forEach((w, i) => (bl.getColumn(i + 1).width = w));
+
+  jn_boek_rye().forEach((r) => {
+    const ry = bl.addRow([
+      r.datum, r.verwysing, r.beskrywing, r.wie, r.kategorie, r.bron,
+      r.bruto, r.in_bedrag, r.uit_bedrag,
+    ]);
+    [7, 8, 9].forEach((k) => (ry.getCell(k).numFmt = JN_GELD));
+  });
+
+  // Die totale onder 'n LEE reel, sodat 'n filter of 'n draaitabel hulle nie
+  // as data optel nie.
+  bl.addRow([]);
+  const tel = (naam, in_sent, uit_sent) => {
+    const ry = bl.addRow([naam, "", "", "", "", "", "",
+      in_sent == null ? null : in_sent / 100,
+      uit_sent == null ? null : uit_sent / 100]);
+    ry.font = { bold: true };
+    [8, 9].forEach((k) => (ry.getCell(k).numFmt = JN_GELD));
+    return ry;
+  };
+  tel("Totaal in", JN_DATA.in_sent, null);
+  tel("Totaal uit", null, JN_DATA.uit_sent);
+  tel("Verskil", JN_DATA.netto_sent, null);
+
+  // GESIEN, NIE GEBOEK NIE -- 'n EIE BLAD.
+  //
+  // Onderaan dieselfde blad sou dit elke filter en elke draaitabel breek, en
+  // 'n leser sou dit vir data hou. Dit is geen data nie: dit is die bewys dat
+  // daardie transaksies gesien en oorweeg is.
+  const ng = JN_DATA.nie_geboek || [];
+  if (ng.length) {
+    const b2 = wb.addWorksheet("Gesien, nie geboek nie", {
+      views: [{ state: "frozen", ySplit: 3 }],
+    });
+    b2.addRow(["Gesien, nie geboek nie"]);
+    b2.addRow(["Hierdie transaksies het die hoofrekening nooit geraak nie en is dus geen inskrywing. Hulle staan hier sodat 'n rekonsiliasie teen Paystack se lys klop."]);
+    b2.getRow(1).font = { bold: true, size: 14 };
+    b2.getRow(2).font = { color: { argb: "FF6B6660" } };
+
+    const k2 = b2.addRow(["Datum", "Verwysing", "Beskrywing", "Bron", "Bruto", "Rede"]);
+    k2.font = { bold: true };
+    k2.eachCell((s) => {
+      s.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFEFEDE9" } };
+      s.border = { bottom: { style: "thin", color: { argb: "FFB8B2A8" } } };
+    });
+    [12, 20, 46, 11, 12, 62].forEach((w, i) => (b2.getColumn(i + 1).width = w));
+
+    ng.forEach((r) => {
+      const ry = b2.addRow([r.datum, r.verwysing || "", r.beskrywing || "",
+        r.bron || "", Number(r.bruto_sent) / 100, r.rede || ""]);
+      ry.getCell(5).numFmt = JN_GELD;
+    });
+  }
+
+  const buf = await wb.xlsx.writeBuffer();
+  jn_stuur_af(
+    new Blob([buf], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    }),
+    `kontantboek-${JN_DATA.van}-tot-${JN_DATA.tot}.xlsx`
+  );
+}
+
+// DIE TERUGVAL. Dieselfde kolomme, sonder opmaak.
+function jn_csv() {
+  const veilig = (w) => '"' + String(w == null ? "" : w).replace(/"/g, '""') + '"';
+  const geld = (n) => (n == null ? "" : n.toFixed(2));
+
+  const reels = [JN_KOPPE.map(veilig).join(",")];
+
+  jn_boek_rye().forEach((r) => {
+    reels.push([r.datum, r.verwysing, r.beskrywing, r.wie, r.kategorie, r.bron,
+      geld(r.bruto), geld(r.in_bedrag), geld(r.uit_bedrag)].map(veilig).join(","));
   });
 
   reels.push("");
   // DIE LEE KOLOMME TEL. Kom daar 'n kolom by, moet hierdie drie reels saam
-  // skuif, anders staan die totale onder die verkeerde kop. Nege koppe: In is
-  // die agtste, Uit die negende.
+  // skuif, anders staan die totale onder die verkeerde kop.
   const totaal_ry = (naam, in_sent, uit_sent) =>
     [veilig(naam), "", "", "", "", "", "",
-     in_sent == null ? "" : veilig(rand(in_sent)),
-     uit_sent == null ? "" : veilig(rand(uit_sent))].join(",");
-
+     in_sent == null ? "" : veilig((in_sent / 100).toFixed(2)),
+     uit_sent == null ? "" : veilig((uit_sent / 100).toFixed(2))].join(",");
   reels.push(totaal_ry("Totaal in", JN_DATA.in_sent, null));
   reels.push(totaal_ry("Totaal uit", null, JN_DATA.uit_sent));
   reels.push(totaal_ry("Verskil", JN_DATA.netto_sent, null));
 
-  // GESIEN MAAR NIE GEBOEK NIE, as 'n eie blok onderaan. Hulle raak geen
-  // totaal; hulle is daar sodat 'n rekonsiliasie teen Paystack se lys klop en
-  // niemand hoef te wonder waar agt transaksies heen is nie.
-  const nie_geboek = JN_DATA.nie_geboek || [];
-  if (nie_geboek.length) {
+  const ng = JN_DATA.nie_geboek || [];
+  if (ng.length) {
     reels.push("");
     reels.push(veilig("Gesien, nie geboek nie"));
     reels.push(["Datum", "Verwysing", "Beskrywing", "Bron", "Bruto", "Rede"]
       .map(veilig).join(","));
-    nie_geboek.forEach((r) => {
-      reels.push(
-        [r.datum, r.verwysing || "", r.beskrywing || "", r.bron || "",
-         rand(r.bruto_sent), r.rede || ""].map(veilig).join(",")
-      );
+    ng.forEach((r) => {
+      reels.push([r.datum, r.verwysing || "", r.beskrywing || "", r.bron || "",
+        (Number(r.bruto_sent) / 100).toFixed(2), r.rede || ""].map(veilig).join(","));
     });
   }
 
-  // \uFEFF sodat Excel die lêer as UTF-8 lees; sonder dit word ë en é onleesbaar.
-  const blob = new Blob(["\uFEFF" + reels.join("\r\n")], {
-    type: "text/csv;charset=utf-8;",
-  });
+  // \uFEFF sodat Excel die leer as UTF-8 lees; sonder dit word e en e onleesbaar.
+  jn_stuur_af(
+    new Blob(["\uFEFF" + reels.join("\r\n")], { type: "text/csv;charset=utf-8;" }),
+    `kontantboek-${JN_DATA.van}-tot-${JN_DATA.tot}.csv`
+  );
+}
+
+// Die leernaam dra die tydperk, want die uitvoer volg die filter: wat op die
+// skerm is, is wat in die leer beland.
+function jn_stuur_af(blob, naam) {
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  // Die lêernaam dra die tydperk, want die uitvoer volg die filter: wat op
-  // die skerm is, is wat in die lêer beland.
-  a.download = `joernaal-${JN_DATA.van}-tot-${JN_DATA.tot}.csv`;
+  a.download = naam;
   a.click();
   URL.revokeObjectURL(a.href);
 }

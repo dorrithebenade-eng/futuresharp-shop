@@ -589,6 +589,7 @@ exports.handler = async (event, context) => {
 
   // Nuutste eerste.
   inskrywings.sort((a, b) => String(b.datum).localeCompare(String(a.datum)));
+  nie_geboek.sort((a, b) => String(b.datum).localeCompare(String(a.datum)));
   debiteure.sort((a, b) => String(a.datum).localeCompare(String(b.datum)));
   krediteure.sort((a, b) => String(a.datum).localeCompare(String(b.datum)));
 
