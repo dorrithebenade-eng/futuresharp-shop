@@ -84,6 +84,10 @@ exports.handler = async (event, context) => {
 
   const boom = sorteer_boom(almal).map((k) => ({
     ...k,
+    // 'n REKORD VAN VOOR 6 SEPTEMBER 2026 DRA DIE VELD NIE. Hier word dit een
+    // keer na 'n boolean genormaliseer, sodat geen leser aan die ander kant
+    // `undefined` hoef te hanteer nie.
+    aktief: k.aktief !== false,
     vlak: vlak_van(k, almal),
     pad: pad_van(k, almal),
   }));

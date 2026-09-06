@@ -435,6 +435,20 @@ a.paneel-kieslys-item { text-decoration: none; }
 .kt-ry:hover { border-left-color: var(--teal); }
 .fk-merkie.kt-hosting { background: #FDF3E3; color: #8a5a1a; }
 
+/* GEDEAKTIVEER: GRYS, NIE AMBER NIE. Die amber merkie beteken oral elders
+   "dit verg aandag". 'n Onaktiewe kategorie verg niks -- dit is 'n toestand,
+   nie 'n taak nie. */
+.fk-merkie.kt-onaktief { background: #EFEDE9; color: #6b6660; }
+
+/* Die naam self verbleik saam, sodat 'n mens die toestand in die lys sien
+   sonder om die merkie te lees. */
+.kt-ry-onaktief .fk-ry-naam { color: var(--grys-teks); }
+
+/* AKTIVEER IS NIE 'N SKRAP NIE. Die knoppie erf .fp-skrap se vorm -- dieselfde
+   grootte en plek in die ry -- maar .fp-skrap:hover word koraal, en 'n koraal
+   Aktiveer lees soos 'n waarskuwing. Hierdie reel staan NA daardie een. */
+.fp-skrap.kt-aktiveer:hover { color: var(--teal); background: #E8F3F0; }
+
 /* ── Die register in twee blokke ────────────────────────────────────────────
  *
  * Die staat wat hierdie register voed, het twee kante. Tot 4 September 2026

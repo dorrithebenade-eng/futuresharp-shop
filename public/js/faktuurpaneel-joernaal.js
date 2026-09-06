@@ -371,6 +371,10 @@ function jn_teken_kategoriee() {
     // die stelsel skryf, en 'n mens moet hulle onder 'n ander een kan sit.
     .filter((k) => !k.vas)
     .filter((k) => k.rigting === JN_RIGTING)
+    // 'n GEDEAKTIVEERDE KATEGORIE WORD NIE VIR 'N NUWE INSKRYWING AANGEBIED
+    // NIE. Dit bly staan wanneer dit reeds die gekose een is, anders val die
+    // keuse by die volgende teken stilweg terug na leeg.
+    .filter((k) => k.aktief !== false || k.id === gekies)
     .map((k) => `<option value="${jn_ontsnap(k.id)}">${jn_ontsnap(k.pad || k.naam)}</option>`)
     .join("");
 

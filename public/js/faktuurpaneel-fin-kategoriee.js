@@ -22,9 +22,15 @@
 // `kt_` pas boonop by die taal.js-sleutels en die CSS-klasse, wat albei reeds
 // so heet.
 
-// SKRAP VERSKYN SELDE, EN DIT IS REG SO. Die knoppie is daar vir 'n tikfout
-// van 'n minuut gelede en vir toetsdata. Die bediener weier alles anders — 'n
-// kategorie wat gebruik word, word onder 'n ander een gesit, nie uitgevee nie.
+// SKRAP HET TWEE UITKOMSTE, EN DIE SKERM KEN HULLE NIE VOORUIT NIE.
+//
+// Dra die kategorie geen verwysing nie, of dra dit die toetsstempel, word dit
+// uitgevee. Dra dit verwysings buite die toetsfase, word dit GEDEAKTIVEER:
+// die rekord bly, elke bestaande faktuur en staat lees dieselfde, en die naam
+// verdwyn uit die keuselyste. Die bediener tel; die skerm se agterna wat
+// gebeur het.
+//
+// 'n Gedeaktiveerde ry dra 'n Aktiveer-knoppie in Skrap se plek.
 
 const KT = {
   kategoriee: [],
@@ -113,6 +119,10 @@ function kt_teken_blok(lys, plek_id) {
     const diep = Math.min(vlak_van_ry(k) - 1, 5);
 
     const merkies = [
+      // ONAKTIEF STAAN EERSTE. Dit is die enigste merkie wat se dat die
+      // kategorie nie meer vir nuwe inskrywings aangebied word nie.
+      k.aktief === false
+        ? `<span class="fk-merkie kt-onaktief">${kt_t("kt_onaktief", "Onaktief")}</span>` : "",
       k.vas
         ? `<span class="fk-merkie">${kt_t("kt_vas", "Stelsel")}</span>` : "",
       k.gedek_deur_hosting
@@ -131,18 +141,30 @@ function kt_teken_blok(lys, plek_id) {
        daar een is. */
     const lyn = diep > 0 ? `<span class="kt-lyn"></span>` : "";
 
+    /* DIE KNOPPIE REGS DRA DRIE TOESTANDE.
+
+       'n Stelselkategorie kry niks: dit word nooit uitgevee of gedeaktiveer
+       nie. 'n Gedeaktiveerde kategorie kry Aktiveer. Al die ander kry Skrap,
+       en die bediener besluit dan self of dit 'n uitvee of 'n deaktivering
+       word -- die skerm weet nie hoeveel inskrywings daarheen wys nie. */
+    const rand = k.vas
+      ? ""
+      : k.aktief === false
+        ? `<button type="button" class="fp-skrap kt-aktiveer" data-kt-aktiveer="${kt_ontsnap(k.id)}"
+                  >${kt_t("kt_aktiveer", "Aktiveer")}</button>`
+        : `<button type="button" class="fp-skrap" data-kt-skrap="${kt_ontsnap(k.id)}"
+                  >${kt_t("kt_skrap", "Skrap")}</button>`;
+
     return `
-      <div class="fk-ry fk-ry-twee kt-ry${diep === 0 ? " kt-ry-hoof" : ""}"
+      <div class="fk-ry fk-ry-twee kt-ry${diep === 0 ? " kt-ry-hoof" : ""}${
+        k.aktief === false ? " kt-ry-onaktief" : ""}"
            style="--kt-diep:${diep}">
         ${lyn}
         <button type="button" class="fk-ry-oop" data-kt="${kt_ontsnap(k.id)}">
           <span class="fk-ry-naam">${kt_ontsnap(k.naam)}${merkies}</span>
           ${k.nota ? `<span class="fk-ry-onder">${kt_ontsnap(k.nota)}</span>` : ""}
         </button>
-        <span class="fk-ry-rand">${
-          k.vas ? "" :
-          `<button type="button" class="fp-skrap" data-kt-skrap="${kt_ontsnap(k.id)}"
-                  >${kt_t("kt_skrap", "Skrap")}</button>`}</span>
+        <span class="fk-ry-rand">${rand}</span>
       </div>`;
   }).join("");
 }
@@ -214,6 +236,8 @@ function kt_teken_lys() {
     b.addEventListener("click", () => kt_maak_vorm_oop(b.getAttribute("data-kt"))));
   plek.querySelectorAll("[data-kt-skrap]").forEach((b) =>
     b.addEventListener("click", () => kt_skrap(b.getAttribute("data-kt-skrap"))));
+  plek.querySelectorAll("[data-kt-aktiveer]").forEach((b) =>
+    b.addEventListener("click", () => kt_aktiveer(b.getAttribute("data-kt-aktiveer"))));
 }
 
 /* ═══ die vorm ═══ */
@@ -245,6 +269,10 @@ function kt_onder_opsies(huidige_id, gekies) {
   const kop = `<option value="">${kt_t("kt_geen_ouer", "\u2014 hoofkategorie \u2014")}</option>`;
   return kop + KT.kategoriee
     .filter((k) => !verbode.has(k.id))
+    // 'n GEDEAKTIVEERDE KATEGORIE WORD NIE AS HOOFKATEGORIE AANGEBIED NIE.
+    // Dit bly wel in die lys wanneer dit REEDS die gekose een is, anders val
+    // die bestaande verwysing stilweg weg by die volgende stoor.
+    .filter((k) => k.aktief !== false || k.id === gekies)
     .map((k) => `<option value="${kt_ontsnap(k.id)}"${
       k.id === gekies ? " selected" : ""}>${kt_ontsnap(k.pad || k.naam)}</option>`)
     .join("");
@@ -342,10 +370,37 @@ async function kt_skrap(id) {
   const k = KT.kategoriee.find((x) => x.id === id);
   if (!k) return;
   if (!window.confirm(
-    kt_t("kt_skrap_vra", "Vee hierdie kategorie uit?") + "\n\n" + k.naam)) return;
+    kt_t("kt_skrap_vra",
+      "Vee hierdie kategorie uit? Word dit reeds deur inskrywings gebruik, " +
+      "word dit gedeaktiveer in plaas van uitgevee.") + "\n\n" + k.naam)) return;
 
   try {
-    await kt_vra("skrap-fin-kategorie", {
+    const uitslag = await kt_vra("skrap-fin-kategorie", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    });
+    await kt_laai();
+
+    // DIE UITKOMS WORD GESE, NIE AFGELEI NIE. Die ry bly staan met 'n
+    // Onaktief-merkie, en sonder hierdie reel sou dit lyk of die Skrap niks
+    // gedoen het nie.
+    if (uitslag && uitslag.gedeaktiveer) {
+      const n = Number(uitslag.verwysings) || 0;
+      window.alert(
+        kt_t("kt_gedeaktiveer",
+          "Hierdie kategorie word deur {n} inskrywings gebruik en is " +
+          "gedeaktiveer. Bestaande inskrywings en state bly onveranderd; die " +
+          "kategorie verskyn nie meer in keuselyste nie.").replace("{n}", n));
+    }
+  } catch (fout) {
+    window.alert(String(fout.message || fout));
+  }
+}
+
+async function kt_aktiveer(id) {
+  try {
+    await kt_vra("aktiveer-fin-kategorie", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id }),

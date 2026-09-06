@@ -102,6 +102,16 @@ function nuwe_kategorie() {
     rigting: "uit",
     gedek_deur_hosting: false,
     vas: false,             // deur die stelsel geskryf; naam en rigting is vas
+    // AKTIEF OF GEDEAKTIVEER.
+    //
+    // 'n Kategorie wat reeds inskrywings dra, word nie uitgevee nie -- 'n
+    // uitgereikte faktuur en 'n ou staat sou dan na niks wys. Die kategorie
+    // word gedeaktiveer: die rekord bly, die verwysings bly geldig, en die naam
+    // verdwyn uit die keuselyste waar nuwe inskrywings gemaak word.
+    //
+    // 'n Rekord van voor 6 September 2026 dra die veld nie. Elke leser toets
+    // dus `aktief !== false`, nooit `aktief === true` nie.
+    aktief: true,
     toets: is_toetsfase(),  // mag uitgevee word; sien skrap-fin-kategorie.js
     nota: "",               // vir die boekhouer
     geskep_op: nou,

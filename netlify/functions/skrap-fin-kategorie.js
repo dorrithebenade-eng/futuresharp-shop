@@ -12,6 +12,21 @@
 // Is daar egter GEEN bedrag nie, beskerm die reel niks. Dan is dit bloot 'n
 // tikfout van 'n minuut gelede.
 //
+// SEDERT 6 SEPTEMBER 2026: TWEE UITKOMSTE, NIE 'N WEIERING NIE.
+//
+// Die weiering het die historiese bedrag beskerm maar die register laat groei:
+// 'n kategorie wat nie meer gebruik word nie, kon nie weggaan nie en het in
+// elke keuselys bly staan. Nou geld:
+//
+//   geen verwysing, of die toetsstempel  -> uitgevee
+//   verwysings buite die toetsfase       -> gedeaktiveer
+//   subkategoriee                        -> geweier
+//
+// Gedeaktiveer beteken `aktief: false`: die rekord bly, elke bestaande
+// verwysing bly geldig, elke ou staat lees dieselfde, en die naam verdwyn uit
+// die keuselyste waar NUWE inskrywings gemaak word. Heraktivering gebeur deur
+// aktiveer-fin-kategorie.js.
+//
 // TWEE POORTE, EN 'N MENS MOET DEUR ALBEI:
 //
 //   1. Die kategorie dra die TOETSSTEMPEL, of sy word deur niks gebruik nie.
@@ -164,9 +179,26 @@ exports.handler = async (event, context) => {
 
   const dra_stempel = kategorie.toets === true && is_toetsfase();
   if (!dra_stempel && verwysings.totaal > 0) {
+    try {
+      await store.setJSON(id, {
+        ...kategorie,
+        aktief: false,
+        bygewerk_op: new Date().toISOString(),
+      });
+    } catch (fout) {
+      console.error(`Kon nie kategorie "${id}" deaktiveer nie:`, fout);
+      return { statusCode: 500, body: "Kon nie die kategorie deaktiveer nie" };
+    }
+
     return {
-      statusCode: 409,
-      body: `Hierdie kategorie word deur ${verwysings.totaal} inskrywing${verwysings.totaal === 1 ? "" : "s"} gebruik. Sit haar eerder onder 'n ander kategorie.`,
+      statusCode: 200,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id,
+        uitgevee: false,
+        gedeaktiveer: true,
+        verwysings: verwysings.totaal,
+      }),
     };
   }
 
@@ -180,6 +212,11 @@ exports.handler = async (event, context) => {
   return {
     statusCode: 200,
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ id, uitgevee: true, verwysings: verwysings.totaal }),
+    body: JSON.stringify({
+      id,
+      uitgevee: true,
+      gedeaktiveer: false,
+      verwysings: verwysings.totaal,
+    }),
   };
 };

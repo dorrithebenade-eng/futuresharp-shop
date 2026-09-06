@@ -282,6 +282,12 @@ function wi_teken_kategoriee(gekies) {
   const leeg = `<option value="">${wi_t("wi_kat_geen", "\u2014 geen kategorie \u2014")}</option>`;
   kies.innerHTML = leeg + WI_KATEGORIEE
     .filter((k) => !k.vas && k.rigting === "uit")
+    // 'n GEDEAKTIVEERDE KATEGORIE WORD NIE VIR 'N NUWE ITEM AANGEBIED NIE, maar
+    // dit bly staan wanneer dit REEDS die item se keuse is. Sonder daardie
+    // uitsondering val die bestaande kategorie by die volgende stoor weg --
+    // die reel hieronder stel die keuse terug na leeg wanneer dit nie in die
+    // lys is nie.
+    .filter((k) => k.aktief !== false || k.id === gekies)
     .map((k) => `<option value="${wi_ontsnap(k.id)}">${wi_ontsnap(k.pad || k.naam)}</option>`)
     .join("");
 

@@ -100,7 +100,7 @@ exports.handler = async (event, context) => {
   if (!invoer.id && bestaande) {
     return { statusCode: 409, body: `'n Kategorie met die naam "${naam}" bestaan reeds` };
   }
-  // 'n VASTE KATEGORIE BESTAAN VOOR HAAR EERSTE STOOR NIE IN DIE STORE NIE.
+  // 'n VASTE KATEGORIE BESTAAN VOOR DIE EERSTE STOOR NIE IN DIE STORE NIE.
   //
   // Diensinkomste en Paystack se transaksiefooi word by die LEES ingeweef --
   // hulle staan in VAS. Die skerm stuur hul id saam, want vir die skerm is dit
@@ -134,9 +134,12 @@ exports.handler = async (event, context) => {
   const ouer = onder ? almal.find((k) => k.id === onder) : null;
   const ouer_rigting = ouer ? ouer.rigting : VAS[onder] && VAS[onder].rigting;
   if (onder && ouer_rigting && ouer_rigting !== rigting) {
+    // Die boodskap dra die WOORD, nie die kode nie. "in" en "uit" is die
+    // veld se waardes; op die skerm lees 'n mens inkomste en uitgawe.
+    const woord = (r) => (r === "in" ? "inkomste" : "uitgawe");
     return {
       statusCode: 409,
-      body: `Die rigting stem nie ooreen nie: hierdie kategorie is "${rigting}" en die een waaronder sy val, is "${ouer_rigting}"`,
+      body: `Die klassifikasie stem nie ooreen nie: hierdie kategorie is 'n ${woord(rigting)} en die hoofkategorie 'n ${woord(ouer_rigting)}.`,
     };
   }
 
@@ -148,7 +151,7 @@ exports.handler = async (event, context) => {
     if (naam !== vaste_naam || rigting !== vaste_rigting) {
       return {
         statusCode: 409,
-        body: "Hierdie kategorie word deur die stelsel geskryf. Sy mag onder 'n ander een geplaas word, maar haar naam en rigting bly.",
+        body: "Hierdie kategorie word deur die stelsel onderhou. Die naam en die klassifikasie kan nie verander word nie.",
       };
     }
   }
@@ -163,7 +166,7 @@ exports.handler = async (event, context) => {
     if (het_kinders) {
       return {
         statusCode: 409,
-        body: "Hierdie kategorie het subkategoriee. Verander eers hulle rigting, of skuif hulle weg.",
+        body: "Hierdie kategorie het subkategorieë. Verander eers hul klassifikasie, of skuif hulle weg.",
       };
     }
   }
@@ -186,9 +189,14 @@ exports.handler = async (event, context) => {
   }
 
   // 'n STELSELKATEGORIE DRA NOOIT DIE TOETSSTEMPEL NIE. nuwe_kategorie() sit
-  // hom op elke nuwe rekord terwyl TOETSFASE aan is; op die vaste twee sou hy
-  // 'n "Toets"-merkie langs 'n permanente kategorie laat staan.
+  // die stempel op elke nuwe rekord terwyl TOETSFASE aan is, en op die vaste
+  // twee sou dit 'n "Toets"-merkie langs 'n permanente kategorie laat staan.
   if (is_vas) rekord.toets = false;
+
+  // AKTIEF BLY WAT DIT WAS. Die vorm stuur die veld nie, en 'n wysiging aan 'n
+  // gedeaktiveerde kategorie mag dit nie stilweg heraktiveer nie. Dit gebeur
+  // slegs deur aktiveer-fin-kategorie.js.
+  rekord.aktief = bestaande ? bestaande.aktief !== false : true;
 
   try {
     await store.setJSON(id, rekord);
