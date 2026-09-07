@@ -1988,12 +1988,16 @@ const WOORDEBOEK = {
   // GEEN METODELYS NIE. Watter metodes Paystack bied, verander DAAR en nie
   // hier nie; die opskrif noem die pad, die betaler sien die metodes daar.
   fd_eft_kop: {
-    af: "Betaal deur die skakel",
-    en: "Pay via the link",
+    af: "Betaalskakel",
+    en: "Payment link",
   },
+  // DIE SIN WYS NA DIE KNOPPIE, nie na die bevestiging nie. Op papier kan
+  // niks geklik word nie; die QR se byskrif dek daardie geval. In die PDF is
+  // die knoppie 'n werklike Link-annotasie - sien _faktuur-pdf.js - dus geld
+  // dieselfde sin daar.
   fd_eft_lei: {
-    af: "Die betaling word dadelik bevestig.",
-    en: "Payment is confirmed immediately.",
+    af: "Klik op die blok hier onder om na die betaalbladsy te gaan.",
+    en: "Click the block below to go to the payment page.",
   },
   // Die inline "+ Nuwe klient"-paneel in die faktuurvorm. Sien
   // faktuur-nuwe-klient.js. Die paneel dra sy eie sleutels omdat sy

@@ -391,6 +391,25 @@ async function reik_faktuur_uit(store, sleutel, rekord, wie) {
           `${process.env.URL || "http://localhost:8888"}/betaal-klaar.html` +
           `?f=${nuwe_sleutel}&k=${publieke_kode}`,
         metadata: {
+          // WAAR DIE BETALER LAND WANNEER HY KANSELLEER.
+          //
+          // callback_url geld slegs na 'n VOLTOOIDE poging. By 'n kansellasie
+          // gebruik Paystack dit nie, en sonder cancel_action val hy terug op
+          // die blaaier se geskiedenis. Die winkel oorleef dit omdat
+          // voltooi-betaling.js in DIESELFDE oortjie navigeer; die faktuur se
+          // skakel maak in 'n VARS oortjie oop - uit die dokument, die e-pos,
+          // die PDF of die QR - en 'n vars oortjie het geen geskiedenis nie.
+          // Die knoppie het dus niks gedoen.
+          //
+          // Dieselfde bladsy as die callback dien hier: kry-betaalstand.js gee
+          // die stand "oop" terug en betaal-klaar.js wys "Betaling nie voltooi
+          // nie" met 'n knoppie om te hervat.
+          //
+          // DIT GELD SLEGS VIR NUWE UITREIKINGS. Die skakel word een keer,
+          // hier, geskep; 'n bestaande skakel kan dit nie agterna kry nie.
+          cancel_action:
+            `${process.env.URL || "http://localhost:8888"}/betaal-klaar.html` +
+            `?f=${nuwe_sleutel}&k=${publieke_kode}`,
           faktuur_sleutel: nuwe_sleutel,
           faktuur_nommer: nommer,
           klient: rekord.klient ? rekord.klient.naam || "" : "",

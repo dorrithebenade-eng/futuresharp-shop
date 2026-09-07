@@ -757,12 +757,17 @@ body.fv-kwotasie .dok-betaal { display: none !important; }
   border-radius: 8px;
   padding: 16px 18px;
 }
-.dok-betaal h3 { font-size: 12.5px; margin: 0 0 7px; font-family: var(--font-opskrif); }
+.dok-betaal h3 { font-size: 12.5px; margin: 0 0 6px; font-family: var(--font-opskrif); }
 .dok-betaal p { margin: 0; font-size: 12.5px; line-height: 1.65; color: var(--grys-teks); }
 .dok-betaal .verw { color: var(--swart); font-weight: 600; }
+/* VYFTIEN. Met 9px staan die knoppie net 2px verder van die sin af as wat
+   die sin van die kop af staan, en die drie lees as een stapel. Op papier
+   vererger die drukstyl dit: die gevulde blok word 'n omlyning, en die rand
+   staan nader aan die teks as die vulling. Die PDF dra dieselfde gaping as
+   20 punte - sien _faktuur-pdf.js. */
 .dok-skakel {
   display: inline-block;
-  margin-top: 9px;
+  margin-top: 15px;
   background: var(--teal);
   color: #fff;
   border-radius: 6px;
@@ -1581,7 +1586,7 @@ body.fv-toe #fv-bo .bo-vee {
   flex-direction: column;
   align-items: flex-start;
   gap: 6px;
-  margin-top: 14px;
+  margin-top: 18px;
 }
 .dok-qr[hidden] { display: none; }
 

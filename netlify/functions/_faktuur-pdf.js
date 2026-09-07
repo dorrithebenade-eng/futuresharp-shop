@@ -477,7 +477,7 @@ async function bou_faktuur_pdf(rekord, maatskappy, opsies) {
     : [];
 
   const links_hoog = betaalskakel
-    ? 14 + lei_reels.length * 11 + (6 + 22 + 10 + 66 + 14)
+    ? 14 + lei_reels.length * 11 + (20 + 22 + 10 + 66 + 14)
     : 0;
 
   const bank_aantal =
@@ -515,7 +515,12 @@ async function bou_faktuur_pdf(rekord, maatskappy, opsies) {
       by -= 11;
     });
 
-    by -= 6;
+    // TWINTIG, NIE SES NIE. Die knoppie se boonste rand sit op by + 16: die
+    // reghoek begin op by - 6 en is 22 hoog. Met 6 val daardie rand 1 punt
+    // onder die laaste teksreel se basislyn en sny deur die onderlengtes.
+    // Twintig gee dieselfde verhouding as die skerm se 15px onder 'n reel
+    // van 12.5px. Die 20 in links_hoog hierbo moet saam beweeg.
+    by -= 20;
     const knop_teks = `${t_in("fd_betaal_knop", taal)} ${rekord.nommer || ""}`.trim();
     const knop_w = gewoon.widthOfTextAtSize(knop_teks, 9) + 24;
     bl.drawRectangle({
