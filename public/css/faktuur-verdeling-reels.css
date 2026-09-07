@@ -305,6 +305,17 @@
    Die knoppies krimp saam -- sien faktuur.css se .fv-a onder dieselfde
    drumpel -- maar hulle bly vyf, dus is die persentasie hoer as die ander. */
 @media (max-width: 1100px) {
+  /* DIE KORT WOORDE BEGIN HIER, NIE BY DIE FOON NIE.
+     Bo 1100px is die kolomme vas op 96, 116 en 120px en pas HOEVEELHEID en
+     EENHEIDSPRYS ruim. Onder 1100px word hulle persentasies en is hulle
+     altyd te smal: op 880px -- 'n foon wat dwars gedraai is -- gee 10% net
+     76px, waarvan 14px opvulling is, terwyl HOEVEELHEID by 10.5px sowat 80px
+     nodig het. Die woorde het oorgeloop en oor mekaar gelees.
+     Druk en die PDF val nie onder 'n skermbreekpunt nie en hou die volle
+     woorde. */
+  .dok-kol-vol { display: none; }
+  .dok-kol-kort { display: inline; }
+
   .dok-tabel th:nth-child(2) { width: 10%; }
   .dok-tabel th:nth-child(3) { width: 14%; }
   .dok-tabel th:nth-child(4) { width: 15%; }
@@ -326,13 +337,18 @@
    DRUK VAL NIE HIERONDER NIE. @media print dra sy eie reels, dus hou 'n
    gedrukte bladsy en die PDF die volle woorde. */
 @media (max-width: 620px) {
-  .dok-kol-vol { display: none; }
-  .dok-kol-kort { display: inline; }
-
-  .dok-tabel th:nth-child(2) { width: 15%; }
-  .dok-tabel th:nth-child(3) { width: 12%; }
-  .dok-tabel th:nth-child(4) { width: 15%; }
-  .dok-tabel th:nth-child(5) { width: 15%; }
+  /* GEMEET TEEN DIE WAARDE, NIE TEEN DIE OPSKRIF NIE.
+     Die eerste weergawe hiervan het die eenheidsprys op 12% gestel omdat
+     "PRYS" vier letters is. Verkeerde maatstaf: die kolom moet die langste
+     WAARDE dra. Op 380px gee 12% net 38px, waarvan 10px opvulling is, en
+     0,00 het by 13.5px sowat 30px nodig -- die getal is afgesny.
+     Die syferkolomme kry nou wat hulle nodig het en die beskrywing kry wat
+     oorbly. Op 'n foon is die beskrywing 'n invoerveld wat rol; 'n bedrag
+     wat afgesny is, is 'n leuen. */
+  .dok-tabel th:nth-child(2) { width: 14%; }
+  .dok-tabel th:nth-child(3) { width: 20%; }
+  .dok-tabel th:nth-child(4) { width: 22%; }
+  .dok-tabel th:nth-child(5) { width: 16%; }
 }
 
 /* Die beskrywing se veld het sy houer nie gevul nie -- 'n smal kassie in 'n
