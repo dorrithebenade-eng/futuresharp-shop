@@ -568,9 +568,15 @@ function teken_reels() {
               }</span>`
             : ""
         }</td>
-        <td class="n"><input class="tel-invoer n" data-veld="hoeveelheid" inputmode="decimal" value="${ontsnap(r.hoeveelheid)}"></td>
-        <td class="n"><input class="tel-invoer n" data-veld="prys" inputmode="decimal" value="${veld_sent(r.prys_pp_sent)}" placeholder="0,00"></td>
-        <td class="n sterk">${rand(bedrag)}</td>
+        <!-- data-etiket DIEN DIE FOON. Onder 620px word die reel gestapel en
+             die kolomkoppe verdwyn; elke syfersel dra dan sy eie etiket, wat
+             die CSS met content: attr(data-etiket) lees. Die woord kom uit
+             taal.js, want CSS kan nie 'n vertaalsleutel lees nie en 'n vaste
+             woord sou die Engelse dokument breek. Bo 620px word die attribuut
+             nie gebruik nie. -->
+        <td class="n" data-etiket="${ontsnap(fv_t("fd_kol_hoeveelheid_kort", "Aantal"))}"><input class="tel-invoer n" data-veld="hoeveelheid" inputmode="decimal" value="${ontsnap(r.hoeveelheid)}"></td>
+        <td class="n" data-etiket="${ontsnap(fv_t("fd_kol_eenheidsprys_kort", "Prys"))}"><input class="tel-invoer n" data-veld="prys" inputmode="decimal" value="${veld_sent(r.prys_pp_sent)}" placeholder="0,00"></td>
+        <td class="n sterk" data-etiket="${ontsnap(fv_t("fd_kol_bedrag", "Bedrag"))}">${rand(bedrag)}</td>
         <td class="fv-aksies">
           <button type="button" class="fv-a fv-vou${r.vou_in ? " aan" : ""}" data-vou
             ${ix > 0 ? "" : "disabled"}

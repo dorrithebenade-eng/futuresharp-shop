@@ -337,18 +337,67 @@
    DRUK VAL NIE HIERONDER NIE. @media print dra sy eie reels, dus hou 'n
    gedrukte bladsy en die PDF die volle woorde. */
 @media (max-width: 620px) {
-  /* GEMEET TEEN DIE WAARDE, NIE TEEN DIE OPSKRIF NIE.
-     Die eerste weergawe hiervan het die eenheidsprys op 12% gestel omdat
-     "PRYS" vier letters is. Verkeerde maatstaf: die kolom moet die langste
-     WAARDE dra. Op 380px gee 12% net 38px, waarvan 10px opvulling is, en
-     0,00 het by 13.5px sowat 30px nodig -- die getal is afgesny.
-     Die syferkolomme kry nou wat hulle nodig het en die beskrywing kry wat
-     oorbly. Op 'n foon is die beskrywing 'n invoerveld wat rol; 'n bedrag
-     wat afgesny is, is 'n leuen. */
-  .dok-tabel th:nth-child(2) { width: 14%; }
-  .dok-tabel th:nth-child(3) { width: 20%; }
-  .dok-tabel th:nth-child(4) { width: 22%; }
-  .dok-tabel th:nth-child(5) { width: 16%; }
+  /* DIE REEL WORD GESTAPEL. Nie meer vier kolomme nie.
+     ---------------------------------------------------------------------
+     Vier kolomme pas nie op 320px nie, en elke poging om dit met
+     persentasies af te dwing was 'n skatting van 'n skerm wat ek nie kan
+     meet nie: 12% het die prys afgesny, 20% het hom weer afgesny. Die fout
+     was nie die getal nie -- dit was die uitleg.
+
+     Nou kry die beskrywing 'n reel op sy eie, en aantal, prys en bedrag
+     staan daaronder langs mekaar met hul eie etikette. Elke kolom groei
+     saam met sy inhoud, dus kan 'n bedrag nie meer afgesny word nie,
+     ongeag hoe breed die skerm is.
+
+     DIE ETIKETTE KOM UIT data-etiket, wat faktuur-vorm.js op elke td.n stel
+     uit taal.js. CSS kan nie 'n vertaalsleutel lees nie; 'n vaste woord in
+     content sou die Engelse dokument breek.
+
+     #fv-reels BY DIE NAAM, NIE tbody NIE. Daar is 'n tweede tbody --
+     #fv-druk-reels, met .fv-net-druk { display: none } -- en 'n reel op
+     `tbody` sou daardie een oorheers en die drukreels op 'n foon oopmaak.
+
+     BO 620px BLY ALLES SOOS DIT IS: rekenaar, druk en die PDF raak hierdie
+     blok nooit. */
+  .dok-tabel,
+  .dok-tabel tbody#fv-reels { display: block; width: 100%; }
+  .dok-tabel thead { display: none; }
+
+  .dok-tabel tbody#fv-reels tr {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 10px;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--fv-lyn);
+  }
+
+  .dok-tabel tbody#fv-reels td {
+    display: block;
+    padding: 0;
+    border-bottom: 0;
+  }
+
+  /* Die beskrywing dwing die reelbreuk: 100% van die basis, dus vloei die
+     res na die volgende reel. */
+  .dok-tabel tbody#fv-reels td.fv-besk { flex: 1 0 100%; }
+
+  /* flex-basis 0, dus deel die drie getalle die oorblywende breedte gelyk
+     op in plaas van dat die langste een die ander verdring. */
+  .dok-tabel tbody#fv-reels td.n { flex: 1 1 0; min-width: 0; }
+  .dok-tabel tbody#fv-reels td.fv-aksies { flex: 0 0 auto; }
+
+  .dok-tabel tbody#fv-reels td.n::before {
+    content: attr(data-etiket);
+    display: block;
+    font-family: var(--font-opskrif);
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: var(--grys-teks);
+    margin-bottom: 2px;
+  }
 }
 
 /* Die beskrywing se veld het sy houer nie gevul nie -- 'n smal kassie in 'n
