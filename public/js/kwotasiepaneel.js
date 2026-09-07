@@ -39,12 +39,19 @@ function kw_rand(sent) {
 // Slegs die datum, sonder die tyd. 'n Kwotasie se geldigheid loop op DAE — sy
 // is die hele laaste dag geldig — en 'n uur langs "geldig tot" sou suggereer
 // dat sy om 14:32 doodgaan.
+// JJJJ/MM/DD. Geen tyd nie: hierdie een wys geldig_tot, 'n datumveld, en 'n
+// uur langs "geldig tot" sou suggereer dat die kwotasie om 14:32 doodgaan.
 function kw_datum(iso) {
   if (!iso) return "";
+  const teks = String(iso);
+  if (teks.length === 10 && /^\d{4}-\d{2}-\d{2}$/.test(teks)) {
+    return teks.replace(/-/g, "/");
+  }
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return "";
-  const maande = kw_t("fd_maande", "Jan,Feb,Mrt,Apr,Mei,Jun,Jul,Aug,Sep,Okt,Nov,Des").split(",");
-  return `${d.getDate()} ${maande[d.getMonth()]} ${d.getFullYear()}`;
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${d.getFullYear()}/${mm}/${dd}`;
 }
 
 /* Die deel voor die @ , met die eerste letter groot en punte as spasies:

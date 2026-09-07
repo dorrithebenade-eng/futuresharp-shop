@@ -88,12 +88,31 @@ async function kry_logo() {
   return logo_grepe;
 }
 
+// JJJJ/MM/DD, NIE "7 Sep 2026" NIE.
+//
+// Betaalbaar teen en Geldig tot loop deur datum_dokument() en lees al lank
+// 2026/09/09. Die Datum het langs hulle in 'n ander vorm gestaan. Een soort
+// feit, een vorm.
+//
+// TWEE PAAIE, EN DIT IS OPSETLIK. 'n Datumveld is presies tien karakters lank
+// en word direk omgeskakel -- geen Date, dus geen tydsoneskuif. 'n Volle
+// tydstempel gaan deur Date en gebruik die plaaslike dele. Sou albei deur die
+// string gesny word, sou 'n tydstempel van 23:30 gister se dag gewys het.
+//
+// `taal` bly in die handtekening al word dit nie meer gebruik nie: die
+// roepplek gee dit, en 'n handtekening wat verander, is 'n tweede verandering
+// vir niks.
 function datum_kort(iso, taal) {
   if (!iso) return "";
+  const teks = String(iso);
+  if (teks.length === 10 && /^\d{4}-\d{2}-\d{2}$/.test(teks)) {
+    return teks.replace(/-/g, "/");
+  }
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return "";
-  const maande = t_in("fd_maande", taal).split(",");
-  return `${d.getDate()} ${maande[d.getMonth()]} ${d.getFullYear()}`;
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${d.getFullYear()}/${mm}/${dd}`;
 }
 
 // 'n Datumveld word as JJJJ-MM-DD gestoor en so op die skerm gedruk.

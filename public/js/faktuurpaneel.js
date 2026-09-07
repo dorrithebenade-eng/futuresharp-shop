@@ -77,14 +77,23 @@ function fp_rand(sent) {
 
 // Die maandafkortings kom uit fd_maande — een sleutel, twaalf afkortings, wat
 // reeds vir die dokument bestaan. Mrt/Mar, Okt/Oct en Des/Dec verskil.
+// JJJJ/MM/DD EN DIE TYD. Die lys dra tydstempels, nie datumvelde nie, en twee
+// konsepte van dieselfde dag is sonder die tyd nie uitmekaar te hou nie. Die
+// jaar kom by: die reeks loop deur en 'n lys sonder jaar lieg oor ouer
+// rekords.
 function fp_datum_kort(iso) {
   if (!iso) return "";
+  const teks = String(iso);
+  if (teks.length === 10 && /^\d{4}-\d{2}-\d{2}$/.test(teks)) {
+    return teks.replace(/-/g, "/");
+  }
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return "";
-  const maande = fp_t("fd_maande", "Jan,Feb,Mrt,Apr,Mei,Jun,Jul,Aug,Sep,Okt,Nov,Des").split(",");
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
   const uur = String(d.getHours()).padStart(2, "0");
   const min = String(d.getMinutes()).padStart(2, "0");
-  return `${d.getDate()} ${maande[d.getMonth()]} ${uur}:${min}`;
+  return `${d.getFullYear()}/${mm}/${dd} ${uur}:${min}`;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════

@@ -238,12 +238,19 @@ function ontsnap(waarde) {
 // Die datum word met fd_maande gebou, NIE met toLocaleDateString nie —
 // daardie een gee die blaaier se taal, wat 'n derde bron sou wees naas die
 // platform en die faktuur.
+// JJJJ/MM/DD, dieselfde as datum_kort() in _faktuur-pdf.js. Die skerm en die
+// PDF wys dieselfde dokument; hulle mag nie in vorm verskil nie.
 function dok_datum(iso) {
   if (!iso) return "—";
+  const teks = String(iso);
+  if (teks.length === 10 && /^\d{4}-\d{2}-\d{2}$/.test(teks)) {
+    return teks.replace(/-/g, "/");
+  }
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return "—";
-  const maande = dt("fd_maande", "Jan,Feb,Mrt,Apr,Mei,Jun,Jul,Aug,Sep,Okt,Nov,Des").split(",");
-  return `${d.getDate()} ${maande[d.getMonth()] || ""} ${d.getFullYear()}`;
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${d.getFullYear()}/${mm}/${dd}`;
 }
 
 // Vir 'n <input type="date">, wat altyd YYYY-MM-DD wil hê.

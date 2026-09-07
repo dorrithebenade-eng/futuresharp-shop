@@ -38,13 +38,20 @@ function kw_ontsnap(waarde) {
 // Slegs die datum. 'n Kwotasie se geldigheid loop op DAE — sy is die hele
 // laaste dag geldig — en 'n uur langs "geldig tot" sou suggereer dat sy om
 // 14:32 doodgaan.
+// JJJJ/MM/DD, dieselfde as die faktuurdokument. Die terugval op die
+// maandnommer verdwyn saam met die maandname: 'n syferdatum het geen taal en
+// kan dus nie 'n onvolledige lys he nie.
 function kw_datum(iso, taal) {
   if (!iso) return "";
+  const teks = String(iso);
+  if (teks.length === 10 && /^\d{4}-\d{2}-\d{2}$/.test(teks)) {
+    return teks.replace(/-/g, "/");
+  }
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return "";
-  const maande = t_in("fd_maande", taal).split(",");
-  const naam = maande.length === 12 ? maande[d.getMonth()] : String(d.getMonth() + 1);
-  return `${d.getDate()} ${naam} ${d.getFullYear()}`;
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${d.getFullYear()}/${mm}/${dd}`;
 }
 
 function kw_reels_na_html(u) {
