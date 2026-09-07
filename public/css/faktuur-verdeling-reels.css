@@ -311,6 +311,30 @@
   .dok-tabel th:nth-child(5) { width: 15%; }
 }
 
+/* DIE FOON.
+   ---------------------------------------------------------------------------
+   Op 380px is die tabel sowat 320px. Met die persentasies hierbo kry die
+   tweede kolom 32px en die derde 45px, terwyl HOEVEELHEID by 9.5px sowat 68px
+   nodig het en EENHEIDSPRYS sowat 74px. Albei is EEN woord en kan nie breek
+   nie, dus loop hulle by hul selle uit en oor hul bure -- die kop het gelees
+   as HOEVEENHEIDSEPDRVSG. Dieselfde smal kolomme sny die bedrae af: R0,00 het
+   as 0,C vertoon.
+
+   Die kort woorde kom hier in, en die syferkolomme kry die ruimte wat hulle
+   nodig het. Die beskrywing hou 43% -- sowat 138px, genoeg vir 'n invoerveld.
+
+   DRUK VAL NIE HIERONDER NIE. @media print dra sy eie reels, dus hou 'n
+   gedrukte bladsy en die PDF die volle woorde. */
+@media (max-width: 620px) {
+  .dok-kol-vol { display: none; }
+  .dok-kol-kort { display: inline; }
+
+  .dok-tabel th:nth-child(2) { width: 15%; }
+  .dok-tabel th:nth-child(3) { width: 12%; }
+  .dok-tabel th:nth-child(4) { width: 15%; }
+  .dok-tabel th:nth-child(5) { width: 15%; }
+}
+
 /* Die beskrywing se veld het sy houer nie gevul nie -- 'n smal kassie in 'n
    bree kolom lyk soos iets wat halfpad gelaai het. */
 .dok-tabel td input.tel-invoer { width: 100%; min-width: 0; }

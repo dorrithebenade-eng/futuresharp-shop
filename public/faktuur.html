@@ -295,8 +295,16 @@
               <!-- Die breedtes staan in faktuur.css, nie hier nie. 'n Inline
                    styl kan nie deur CSS oorheers word nie, dus kon hierdie
                    kolomme nooit op 'n smal skerm krimp nie. -->
-              <th id="d-k-hoeveelheid">Hoeveelheid</th>
-              <th id="d-k-eenheid">Eenheidsprys</th>
+              <!-- TWEE SPANS PER KOP. Die volle woord en die kort woord staan
+                   albei in die opmaak; CSS wys een van die twee. Onder 620px
+                   wen die kort woord, want HOEVEELHEID het 68px nodig in 'n
+                   sel van 22px en breek nie netjies nie.
+
+                   NIE 'n omruiling in JavaScript nie: dan sou 'n draai van
+                   die foon, en 'n druk vanaf die foon, die kort woord behou.
+                   CSS volg die venster en druk gebruik sy eie media. -->
+              <th id="d-k-hoeveelheid"><span class="dok-kol-vol" id="d-k-hoeveelheid-vol">Hoeveelheid</span><span class="dok-kol-kort" id="d-k-hoeveelheid-kort">Aantal</span></th>
+              <th id="d-k-eenheid"><span class="dok-kol-vol" id="d-k-eenheid-vol">Eenheidsprys</span><span class="dok-kol-kort" id="d-k-eenheid-kort">Prys</span></th>
               <th id="d-k-bedrag">Bedrag</th>
               <!-- Vyf knoppies: vou in, op, af, +, skrap. Die breedte staan
                    in faktuur.css sodat sy op 'n smal skerm kan krimp. -->

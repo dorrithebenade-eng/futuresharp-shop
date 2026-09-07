@@ -385,6 +385,12 @@ body.fv-kwotasie .dok-betaal { display: none !important; }
    Die kop moet dieselfde ruimte kry as die sel daaronder. */
 .dok-tabel th + th { padding-left: 14px; }
 
+/* DIE TWEE VORMS VAN 'N KOP. Die volle woord is die verstek; die kort een
+   wag. Die omruiling staan in faktuur-verdeling-reels.css, saam met die
+   kolombreedtes -- daardie leer laai NA hierdie een en is die enigste plek
+   waar 'n breedte iets doen. */
+.dok-kol-kort { display: none; }
+
 /* DIE KOLOMBREEDTES STAAN IN faktuur-verdeling-reels.css, NIE HIER NIE.
 
    Hulle het lank in albei lêers gestaan. Daardie een laai NA hierdie een en

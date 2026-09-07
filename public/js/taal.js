@@ -1979,6 +1979,11 @@ const WOORDEBOEK = {
   fd_kol_beskrywing: { af: "Beskrywing", en: "Description" },
   fd_kol_hoeveelheid: { af: "Hoeveelheid", en: "Quantity" },
   fd_kol_eenheidsprys: { af: "Eenheidsprys", en: "Unit price" },
+  // DIE KORT VORMS DIEN SLEGS 'N NOU SKERM. Die dokument wat na 'n klient
+  // gaan -- die PDF en die gedrukte bladsy -- hou die volle woorde. Op 'n
+  // foon is die gebruiker besig om te redigeer, nie om te lees nie.
+  fd_kol_hoeveelheid_kort: { af: "Aantal", en: "Qty" },
+  fd_kol_eenheidsprys_kort: { af: "Prys", en: "Price" },
   fd_kol_bedrag: { af: "Bedrag", en: "Amount" },
   fd_subtotaal: { af: "Subtotaal", en: "Subtotal" },
   fd_afslag: { af: "Afslag", en: "Discount" },

@@ -730,8 +730,12 @@ function teken_dok_taal() {
   stel("d-datum", "fd_datum", "Datum");
   stel("d-bestelnr", "fd_bestelnommer", "Bestelnommer");
   stel("d-k-beskrywing", "fd_kol_beskrywing", "Beskrywing");
-  stel("d-k-hoeveelheid", "fd_kol_hoeveelheid", "Hoeveelheid");
-  stel("d-k-eenheid", "fd_kol_eenheidsprys", "Eenheidsprys");
+  // DIE SPANS, NIE DIE th NIE. stel() skryf textContent, en op die th sou dit
+  // albei spans uitvee. Elke span kry sy eie sleutel.
+  stel("d-k-hoeveelheid-vol", "fd_kol_hoeveelheid", "Hoeveelheid");
+  stel("d-k-hoeveelheid-kort", "fd_kol_hoeveelheid_kort", "Aantal");
+  stel("d-k-eenheid-vol", "fd_kol_eenheidsprys", "Eenheidsprys");
+  stel("d-k-eenheid-kort", "fd_kol_eenheidsprys_kort", "Prys");
   stel("d-k-bedrag", "fd_kol_bedrag", "Bedrag");
   stel("d-aantekening", "fd_aantekening", "Aantekening");
   stel("d-eft", "fd_eft_kop", "Betaalskakel");
