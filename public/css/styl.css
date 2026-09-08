@@ -511,22 +511,8 @@ body {
   background: var(--swart);
   color: var(--wit);
   position: sticky;
-
-  /* env() MET 'N TERUGVAL. Op 'n toestel sonder 'n kerf of 'n boonste
-     stelselgebied is die waarde nul en gedra die strook hom presies soos
-     voorheen. Waar die gebied wel bestaan, stop die strook daaronder in
-     plaas van daaragter. */
-  top: env(safe-area-inset-top, 0px);
+  top: 0;
   z-index: 35;
-
-  /* DIE STROOK KRY SY EIE LAAG. Sonder dit teken Android se blaaier hom saam
-     met die res van die bladsy, en tydens 'n vinnige veeg -- of terwyl die
-     blaaier sy eie werkbalk in- of uitvou -- kom hy 'n raampie agter. Dan
-     lyk dit of hy onder die foon se kop inskuif.
-
-     Dit is 'n MAATREEL, nie 'n diagnose nie. Die oorsaak van die verskil
-     tussen die katalogus en die produkbladsy is nooit vasgestel nie. */
-  will-change: transform;
 }
 
 .mini-kop-inner {
