@@ -121,11 +121,48 @@
       )
     );
 
-    if (bladsy.waar === "voor") {
-      bladsy.anker.parentNode.insertBefore(ry, bladsy.anker);
-    } else {
-      bladsy.anker.parentNode.insertBefore(ry, bladsy.anker.nextSibling);
+    // WAAR DIE RY STAAN, HANG VAN DIE SKERM AF.
+    //
+    // Op 'n rekenaarskerm staan hy IN die swart kop, net regs van die
+    // woordmerk. Die kop is vasgeplak, dus bly die pille sigbaar terwyl 'n
+    // mens deur 'n lang register blaai -- vandag verdwyn hulle bo-af.
+    //
+    // Links, NIE regs by "Meld af" NIE. Die pil is 'n navigasiekontrole wat
+    // 'n mens twintig keer per sessie druk; "Meld af" is een wat 'n mens een
+    // keer druk en nooit per ongeluk wil raak nie. Hulle hoort nie langs
+    // mekaar nie.
+    //
+    // Op 'n foon is die kop reeds vol -- woordmerk, taal, hamburger -- en die
+    // ry val terug na presies waar hy vandag staan.
+    //
+    // MOVE, NIE HERBOU NIE. insertBefore op 'n element wat reeds in die DOM
+    // is, VERSKUIF hom. Die pille word dus nooit twee keer gebou nie en daar
+    // is geen toestand om te verloor nie.
+    //
+    // Die matchMedia-luisteraar dek die draai van 'n foon en die verstel van
+    // 'n venster. Sonder hom staan die ry op die plek wat by die EERSTE laai
+    // gegeld het, en 'n mens wat sy venster smal trek, sien die pille in 'n
+    // kop wat te vol is.
+    const kop_inner = document.querySelector(".mini-kop-inner");
+    const merk = kop_inner ? kop_inner.querySelector(".mini-kop-merk") : null;
+    const nou_skerm = window.matchMedia("(max-width: 620px)");
+
+    function plaas_ry() {
+      if (!nou_skerm.matches && kop_inner && merk) {
+        ry.classList.add("in-kop");
+        kop_inner.insertBefore(ry, merk.nextSibling);
+        return;
+      }
+      ry.classList.remove("in-kop");
+      if (bladsy.waar === "voor") {
+        bladsy.anker.parentNode.insertBefore(ry, bladsy.anker);
+      } else {
+        bladsy.anker.parentNode.insertBefore(ry, bladsy.anker.nextSibling);
+      }
     }
+
+    plaas_ry();
+    nou_skerm.addEventListener("change", plaas_ry);
 
     // DIE VOLGORDE.
     //

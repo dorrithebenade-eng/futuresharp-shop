@@ -67,6 +67,75 @@
 
 .paneel-area-pil.aktief:hover { transform: none; }
 
+/* ---------------------------------------------------------------------------
+   DIE RY IN DIE SWART KOP
+   ---------------------------------------------------------------------------
+   .in-kop word deur paneel-area-pille.js gestel wanneer die ry in
+   .mini-kop-inner staan -- bo 620px. Onder daardie punt val die klas weg en
+   geld alles hierbo weer, onveranderd.
+
+   DIE AKTIEWE PIL BLY PRESIES SOOS HY IS: koraal of teal, wit teks. Dit is
+   die kleur wat se watter area 'n mens in is, en hy verander nie omdat die
+   agtergrond verander nie.
+
+   DIE ONAKTIEWE PIL MOET WEL VERANDER. Op wit was hy 'n WIT pil met donker
+   teks. Daardie wit pil op 'n swart strook lees HARDER as die aktiewe een, en
+   dan wys die kleur die verkeerde ding aan. Hy word dus 'n buitelyn in
+   dieselfde merkkleur, met 'n ligter skakering vir die teks -- lig genoeg om
+   op swart te lees, sag genoeg om agter die gevulde pil te bly. */
+.paneel-area-kieslys.in-kop {
+  margin: 0;
+  flex-wrap: nowrap;
+  gap: 8px;
+}
+
+/* .mini-kop-inner staan op space-between met twee kinders. Met 'n derde kind
+   tussenin sou die drie uitmekaar gedryf word en die pille in die middel van
+   die strook beland. Die regterblok word dus self na regs gestoot en die
+   pille bly by die woordmerk. */
+.mini-kop-inner:has(> .paneel-area-kieslys.in-kop) { gap: 18px; }
+.mini-kop-inner:has(> .paneel-area-kieslys.in-kop) .mini-kop-regs {
+  margin-left: auto;
+}
+
+.paneel-area-kieslys.in-kop .paneel-area-pil {
+  padding: 6px 15px;
+  font-size: 12.5px;
+  box-shadow: none;
+  background: transparent;
+}
+
+.paneel-area-kieslys.in-kop .paneel-area-pil-admin {
+  border-color: var(--koraal);
+  color: #F08A65;
+}
+
+.paneel-area-kieslys.in-kop .paneel-area-pil-boekhouding {
+  border-color: var(--teal);
+  color: #7FC4B7;
+}
+
+.paneel-area-kieslys.in-kop .paneel-area-pil-admin.aktief {
+  background: var(--koraal);
+  color: var(--wit);
+}
+
+.paneel-area-kieslys.in-kop .paneel-area-pil-boekhouding.aktief {
+  background: var(--teal);
+  color: var(--wit);
+}
+
+/* DIE E-POS WYK EERSTE. Met die pille by is die kop op 'n nou rekenaarskerm
+   vol: woordmerk, twee pille, e-pos, "Meld af" en AF/EN. Die adres is die
+   langste en die minste dringende -- die aangemelde gebruiker staan in elk
+   geval op die paneel self. Onder 620px is die ry uit die kop uit en geld
+   hierdie reel nie meer nie. */
+@media (max-width: 1100px) {
+  .mini-kop-inner:has(> .paneel-area-kieslys.in-kop) .paneel-gebruiker-epos {
+    display: none;
+  }
+}
+
 /* DIE OU GROEPOPSKRIFTE EN DIE SKAKEL VAL WEG wanneer die pille staan.
  *
  * paneel-boekhouding-skakel.js skryf hulle steeds — daardie lêer bly
