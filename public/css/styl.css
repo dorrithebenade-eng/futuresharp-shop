@@ -18,6 +18,14 @@
 
 html {
   scroll-behavior: smooth;
+
+  /* DIE VASGEPLAKTE KOPSTROOK DEK DIE BOKANT VAN DIE BLADSY.
+     Sonder hierdie reel spring 'n skakel na 'n plek op die bladsy en die
+     eerste 60-odd punte daarvan sit agter .mini-kop. Dieselfde geld vir die
+     fokus wat met Tab beweeg.
+     76px is die strook by sy grootste -- clamp(16px, 1.6vw, 22px) bo en
+     onder plus 'n reel van hoogstens 19px -- met 'n bietjie lug. */
+  scroll-padding-top: 76px;
 }
 
 body {
@@ -485,11 +493,25 @@ body {
 
 /* ---------- Mini-nav (produk- en ander binneblaaie) ---------- */
 
+/* DIE STROOK BLY BO.
+   Die mandjieteller is die enigste plek waar 'n mens sien dat iets bygevoeg
+   is. Blaai die strook weg, is daardie bevestiging weg saam met hom.
+
+   STICKY, NIE FIXED NIE. Fixed haal die strook uit die vloei en die eerste
+   skerm se inhoud skuif onder hom in; sticky hou sy plek en bly staan eers
+   wanneer die bladsy hom bereik. Geen opvulling elders nodig nie.
+
+   z-index 35 BLY. Die faktuurmodule se uitreikskerm loop op 40 en bly dus
+   bo die strook -- dit is die enigste ding wat oor hom heen mag kom.
+
+   position: relative was hier omdat z-index niks doen op 'n statiese
+   element nie. Sticky is ook 'n gepositioneerde element, dus bly dit waar. */
 .mini-kop {
   padding: clamp(16px, 1.6vw, 22px) 24px;
   background: var(--swart);
   color: var(--wit);
-  position: relative;
+  position: sticky;
+  top: 0;
   z-index: 35;
 }
 
@@ -1130,8 +1152,15 @@ body {
   display: flex;
   flex-direction: column;
   gap: 20px;
+
+  /* 96px, NIE 20px NIE. Twee vasgeplakte elemente op een bladsy: .mini-kop
+     bly bo, en hierdie kolom bly langs die beskrywing staan. Stop die kolom
+     op 20px, sit sy boonste punte -- die prys en die koopknoppie -- agter
+     die strook. 76px is die strook se hoogte; die 20px is dieselfde lug wat
+     hier altyd was.
+     Onder 720px is hierdie kolom static en geld die getal nie. */
   position: sticky;
-  top: 20px;
+  top: 96px;
 }
 
 @media (max-width: 720px) {
