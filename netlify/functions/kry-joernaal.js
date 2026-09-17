@@ -197,6 +197,23 @@ exports.handler = async (event, context) => {
   // nie die staat nie -- die staat lees slegs `inskrywings`.
   const nie_geboek = [];
 
+  // WAT HOSTING INGEBRING HET.
+  //
+  // Die staat se blok "Word die hosting gedek?" tel die uitgawes wat as
+  // gedek deur hosting gemerk is. Sy hulpteks belowe die ander kant ook,
+  // maar daardie kant is nooit bereken nie -- die blok het dus 'n vraag
+  // gevra en een syfer gewys.
+  //
+  // Die bedrag word NIE hier afgelei nie. Hosting is sedert Julie 2026 'n
+  // dokumentasielyn: die geld bly by die hoofrekening saam met die
+  // fooivoorsiening, en die bedrag word by uitreiking en by verkoop
+  // gevries. Ons tel dus net op wat reeds gestoor is.
+  //
+  // DIT IS NIE DIESELFDE AS DIE BEHOUE DEEL NIE. Die behoue deel is die
+  // totaal min die subrekeninge, en dra ook die fooivoorsiening en enige
+  // onverdeelde oorskot. `hosting_sent` is hosting alleen.
+  let hosting_ingebring_sent = 0;
+
   // DEBITEURE EN KREDITEURE TEL NIE IN DIE SOMME NIE.
   //
   // Op kontantbasis bestaan hulle nie as transaksies nie -- die geld het nie
@@ -323,6 +340,12 @@ exports.handler = async (event, context) => {
           verwysing: (f.betaling && f.betaling.verwysing) || f.nommer || "",
           bruto_sent: ontvang_sent,
         });
+
+        // Op die dag van ontvangs, want dit is wanneer die hosting werklik
+        // in die hoofrekening beland. Die gevriesde bedrag, nie 'n
+        // herberekening uit die persentasie nie.
+        hosting_ingebring_sent +=
+          Number(f.verdeling_gevries && f.verdeling_gevries.hosting_sent) || 0;
       }
 
       // Elke uitbetaling wat werklik gebeur het
@@ -422,6 +445,11 @@ exports.handler = async (event, context) => {
       const behou = Math.max(0, totaal - verdeel);
       const fooi = kry_paystack_fooi_sent(totaal);
       const nommer = o.bestelnommer || b.key;
+
+      // Die winkel se hosting staan op die bestelling as `hosting_totaal_sent`
+      // (sien begin-betaling.js). Ontbreek dit -- rekords van voor daardie
+      // veld -- tel ons NIKS eerder as om iets te skat.
+      hosting_ingebring_sent += Number(o.hosting_totaal_sent) || 0;
 
       const in_besk = `Winkel \u2014 ${nommer}`;
       if (behou > 0 && pas({ beskrywing: in_besk })) {
@@ -646,6 +674,7 @@ exports.handler = async (event, context) => {
       soek,
       inskrywings,
       nie_geboek,
+      hosting_ingebring_sent,
       in_sent,
       uit_sent,
       netto_sent: in_sent - uit_sent,

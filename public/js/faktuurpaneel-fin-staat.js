@@ -273,6 +273,17 @@ function fs_teken() {
     .filter((b) => b.kategorie.gedek_deur_hosting && b.kategorie.rigting === "uit")
     .reduce((a, b) => a + b.eie_sent, 0);
 
+  /* DIE ANDER KANT. Hosting is sedert Julie 2026 'n dokumentasielyn: die geld
+   * bly by die hoofrekening saam met die fooivoorsiening, en die bedrag word
+   * by uitreiking en by verkoop GEVRIES. kry-joernaal.js tel daardie gevriesde
+   * bedrae vir die tydperk op; hier word niks herbereken nie.
+   *
+   * DIT IS NIE DIE BEHOUE DEEL NIE. Die behoue deel wat as inkomste geboek
+   * word, dra ook die fooivoorsiening en enige onverdeelde oorskot. Sou ons
+   * daardie syfer hier gebruik, sou die hosting altyd gedek gelyk het. */
+  const ingebring = Number(FS.hosting_ingebring_sent) || 0;
+  const verskil = ingebring - gedek;
+
   /* DIE SLOTTABEL TREK ELKE UITGAWEKOP APART AF.
    *
    * Tot 5 September 2026 was daar EEN aftrekking: totale inkomste minus totale
@@ -349,7 +360,7 @@ function fs_teken() {
       </tbody>
     </table>
 
-    ${gedek ? `
+    ${(gedek || ingebring) ? `
       <div class="fs-hosting">
         <h4 class="fs-blok-kop">${fs_t("fs_hosting_kop", "Word die hosting gedek?")}</h4>
         <p class="fs-hulp">${fs_t("fs_hosting_hulp",
@@ -357,8 +368,17 @@ function fs_teken() {
         <table class="fs-tabel">
           <tbody>
             <tr><td class="fs-naam">${
+              fs_t("fs_hosting_in", "Hosting ingebring")}</td>
+                <td class="fs-tot">${fs_rand(ingebring)}</td></tr>
+            <tr><td class="fs-naam">${
               fs_t("fs_hosting_uit", "Uitgawes gemerk \u201cgedek deur hosting\u201d")}</td>
                 <td class="fs-tot">${fs_rand(gedek)}</td></tr>
+            <tr class="fs-hosting-slot">
+              <td class="fs-naam">${
+                verskil >= 0
+                  ? fs_t("fs_hosting_oor", "Hosting oor")
+                  : fs_t("fs_hosting_kort", "Hosting kort")}</td>
+              <td class="fs-tot">${fs_rand(Math.abs(verskil))}</td></tr>
           </tbody>
         </table>
       </div>` : ""}
@@ -648,6 +668,9 @@ async function fs_laai() {
       fs_vra("kry-fin-bank", `van=${FS.van}&tot=${FS.tot}`),
     ]);
     FS.inskrywings = Array.isArray(jn.inskrywings) ? jn.inskrywings : [];
+    // Nul as die veld ontbreek -- 'n ouer ontplooiing van kry-joernaal.js gee
+    // dit nie, en dan moet die blok 'n leeg wys, nie 'n NaN nie.
+    FS.hosting_ingebring_sent = Number(jn.hosting_ingebring_sent) || 0;
     FS.kategoriee = Array.isArray(kat.kategoriee) ? kat.kategoriee : [];
     FS.werk_items = Array.isArray(wi.items) ? wi.items : [];
     FS.bank = { opening: bank.opening || null, sluiting: bank.sluiting || null };

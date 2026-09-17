@@ -623,6 +623,12 @@ a.paneel-kieslys-item { text-decoration: none; }
 .fs-bank,
 .fs-wag { margin: 0 0 26px; max-width: 620px; }
 
+/* Die laaste ry van die hostingblok is die ANTWOORD; die twee daarbo is die
+   twee kante wat daarheen lei. Dieselfde beginsel as die slottabel hierbo,
+   waar die surplus swaarder staan as die tussentotale. */
+.fs-hosting-slot .fs-naam,
+.fs-hosting-slot .fs-tot { font-weight: 700; border-top: 1px solid #E4E1DC; }
+
 .fs-bank-vorm {
   display: grid;
   grid-template-columns: 160px 1fr auto;
