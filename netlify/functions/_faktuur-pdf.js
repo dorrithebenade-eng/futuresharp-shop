@@ -471,41 +471,32 @@ async function bou_faktuur_pdf(rekord, maatskappy, opsies) {
 
   // ── die betaalblok ─────────────────────────────────────────────────────
   //
-  // ALBEI PAAIE WORD GEDRUK. Die skakel vir wie hom kan gebruik, en die
-  // bankbesonderhede vir 'n finansiële afdeling wat net teen 'n bankrekening
-  // betaal. Die faktuurnommer is die verwysing; sonder dit sit 'n mens met 'n
-  // bedrag in 'n bankstaat en geen naam nie.
-  // DIE HOOGTE WORD GEMEET, NIE GERAAI NIE. Die eerste weergawe het 150 punte
-  // aangeneem en die QR met sy byskrif het onder die raam uitgehang — 'n
-  // faktuur wat lyk of iets afgesny is.
+  // EEN PAD (17 Sep 2026): die skakel. Geen bankbesonderhede nie, sodat die
+  // verdeling altyd gebeur. Links die opskrif, die sin en die knoppie; regs
+  // die QR. Tot vandag het die regterhelfte die bankbesonderhede gedra.
+  //
   /* DIE SKAKEL LEEF OP `paystack.authorization_url`.
      `betaalskakel` is die SKERM se naam daarvoor — sien kry-faktuur.js. Hy
      bly eerste as terugval, ingeval iets die veld ooit wel op die rekord stel. */
   const betaalskakel =
     rekord.betaalskakel || (rekord.paystack && rekord.paystack.authorization_url) || null;
 
-  /* GEEN SKAKEL, GEEN OPSKRIF.
-     Tot 4 September 2026 het "Betaal deur die skakel" en sy sinnetjie
-     ONVOORWAARDELIK gedruk, en net die knoppie en die QR van die veld afgehang.
-     Die blok het dus 'n skakel belowe wat nie daar was nie. 'n Opskrif wat lieg
-     is erger as 'n weglating: die leser soek iets wat nooit gedruk is nie.
-     Sonder skakel val die hele linkerkant weg en die bankbesonderhede vul die
-     blok — presies wat 'n R0-faktuur en 'n kwotasie in elk geval nodig het. */
-  const lei_reels = betaalskakel
-    ? breek(t_in("fd_eft_lei", taal), gewoon, 8.5, (REGS - KANT) * 0.52 - 36)
-    : [];
+  /* GEEN SKAKEL, GEEN BLOK.
+     Sonder skakel (die R0-faktuur) bly daar niks oor om te druk nie. 'n Leë
+     raam lyk of iets vergeet is. */
+  if (!betaalskakel) return pdf.save();
 
-  const links_hoog = betaalskakel
-    ? 14 + lei_reels.length * 11 + (20 + 22 + 10 + 66 + 14)
-    : 0;
+  const QR_KANT = 66;
+  const qr_x = REGS - 16 - QR_KANT;
 
-  const bank_aantal =
-    2 +
-    (String(m.bank || "").trim() ? 1 : 0) +
-    (String(m.bank_rekeningtipe || "").trim() ? 1 : 0) +
-    2; // rekening, takkode, verwysing
-  const regs_hoog = 15 + bank_aantal * 12;
+  // DIE SIN KRY DIE BREEDTE TOT BY DIE QR, min 'n gaping van 24.
+  const b_links = KANT + 16;
+  const lei_reels = breek(t_in("fd_eft_lei", taal), gewoon, 8.5, qr_x - 24 - b_links);
 
+  // DIE HOOGTE WORD GEMEET, NIE GERAAI NIE. Links: opskrif 14, die sin, 20
+  // tot die knoppie se basislyn, 22 knoppie. Regs: die QR plus sy byskrif.
+  const links_hoog = 14 + lei_reels.length * 11 + 20 + 22;
+  const regs_hoog = QR_KANT + 16;
   const blok_hoogte = Math.max(links_hoog, regs_hoog) + 30;
   const blok_bo = y;
   const blok_onder = blok_bo - blok_hoogte;
@@ -520,112 +511,82 @@ async function bou_faktuur_pdf(rekord, maatskappy, opsies) {
     borderWidth: 0.7,
   });
 
-  const b_links = KANT + 16;
-  const b_regs = KANT + (REGS - KANT) * 0.52;
   let by = blok_bo - 20;
+  skryf(t_in("fd_eft_kop", taal), b_links, by, { grootte: 9, vet: true });
+  by -= 14;
+  lei_reels.forEach((r) => {
+    skryf(r, b_links, by, { grootte: 8.5, kleur: GRYS });
+    by -= 11;
+  });
 
-  // DIE HELE LINKERKANT HANG AAN DIE SKAKEL: die opskrif, die sinnetjie, die
-  // knoppie en die QR. Sonder hom vul die bankbesonderhede die blok alleen.
-  if (betaalskakel) {
-    skryf(t_in("fd_eft_kop", taal), b_links, by, { grootte: 9, vet: true });
-    by -= 14;
-    lei_reels.forEach((r) => {
-      skryf(r, b_links, by, { grootte: 8.5, kleur: GRYS });
-      by -= 11;
-    });
+  // TWINTIG, NIE SES NIE. Die knoppie se boonste rand sit op by + 16: die
+  // reghoek begin op by - 6 en is 22 hoog. Met 6 val daardie rand 1 punt
+  // onder die laaste teksreel se basislyn en sny deur die onderlengtes.
+  // Twintig gee dieselfde verhouding as die skerm se 15px onder 'n reel
+  // van 12.5px. Die 20 in links_hoog hierbo moet saam beweeg.
+  by -= 20;
+  const knop_teks = `${t_in("fd_betaal_knop", taal)} ${rekord.nommer || ""}`.trim();
+  const knop_w = gewoon.widthOfTextAtSize(knop_teks, 9) + 24;
+  bl.drawRectangle({
+    x: b_links,
+    y: by - 6,
+    width: knop_w,
+    height: 22,
+    borderColor: TEAL,
+    borderWidth: 0.9,
+  });
+  skryf(knop_teks, b_links + 12, by, { grootte: 9, vet: true, kleur: TEAL });
 
-    // TWINTIG, NIE SES NIE. Die knoppie se boonste rand sit op by + 16: die
-    // reghoek begin op by - 6 en is 22 hoog. Met 6 val daardie rand 1 punt
-    // onder die laaste teksreel se basislyn en sny deur die onderlengtes.
-    // Twintig gee dieselfde verhouding as die skerm se 15px onder 'n reel
-    // van 12.5px. Die 20 in links_hoog hierbo moet saam beweeg.
-    by -= 20;
-    const knop_teks = `${t_in("fd_betaal_knop", taal)} ${rekord.nommer || ""}`.trim();
-    const knop_w = gewoon.widthOfTextAtSize(knop_teks, 9) + 24;
-    bl.drawRectangle({
-      x: b_links,
-      y: by - 6,
-      width: knop_w,
-      height: 22,
-      borderColor: TEAL,
-      borderWidth: 0.9,
-    });
-    skryf(knop_teks, b_links + 12, by, { grootte: 9, vet: true, kleur: TEAL });
+  // DIE SKAKEL BLY KLIKBAAR IN DIE PDF. Dit is die punt van die knoppie —
+  // op papier is hy 'n omlynde blok, in 'n PDF is hy 'n skakel.
+  bl.node.addAnnot(
+    pdf.context.register(
+      pdf.context.obj({
+        // DIE URI MOET 'N PDF-STRING WEES. 'n Kaal JS-string word 'n
+        // PDF-naam, en dan lees 'n leser dit as "Illegal URI-type link" en
+        // die knoppie doen niks — presies dieselfde soort stil mislukking
+        // as die onclick op die skerm se Betaal-knoppie.
+        Type: "Annot",
+        Subtype: "Link",
+        Rect: [b_links, by - 6, b_links + knop_w, by + 16],
+        Border: [0, 0, 0],
+        A: {
+          Type: "Action",
+          S: PDFName.of("URI"),
+          URI: PDFString.of(betaalskakel),
+        },
+      })
+    )
+  );
 
-    // DIE SKAKEL BLY KLIKBAAR IN DIE PDF. Dit is die punt van die knoppie —
-    // op papier is hy 'n omlynde blok, in 'n PDF is hy 'n skakel.
-    bl.node.addAnnot(
-      pdf.context.register(
-        pdf.context.obj({
-          // DIE URI MOET 'N PDF-STRING WEES. 'n Kaal JS-string word 'n
-          // PDF-naam, en dan lees 'n leser dit as "Illegal URI-type link" en
-          // die knoppie doen niks — presies dieselfde soort stil mislukking
-          // as die onclick op die skerm se Betaal-knoppie.
-          Type: "Annot",
-          Subtype: "Link",
-          Rect: [b_links, by - 6, b_links + knop_w, by + 16],
-          Border: [0, 0, 0],
-          A: {
-            Type: "Action",
-            S: PDFName.of("URI"),
-            URI: PDFString.of(betaalskakel),
-          },
-        })
-      )
-    );
-    by -= 24;
-
-    // Die QR: een blokkie per donker module. Skerper as 'n gerasterde beeld,
-    // en dit spaar 'n inbedding.
-    try {
-      const q = qrcode(0, "M");
-      q.addData(betaalskakel);
-      q.make();
-      const n = q.getModuleCount();
-      const kant = 66 / n;
-      const qx = b_links;
-      const qy = by - 70;
-      for (let r = 0; r < n; r += 1) {
-        for (let c = 0; c < n; c += 1) {
-          if (!q.isDark(r, c)) continue;
-          bl.drawRectangle({
-            x: qx + c * kant,
-            y: qy + (n - 1 - r) * kant,
-            width: kant,
-            height: kant,
-            color: SWART,
-          });
-        }
+  // Die QR: een blokkie per donker module. Skerper as 'n gerasterde beeld,
+  // en dit spaar 'n inbedding. Bo-aan die blok, regs, met die byskrif
+  // daaronder gesentreer.
+  try {
+    const q = qrcode(0, "M");
+    q.addData(betaalskakel);
+    q.make();
+    const n = q.getModuleCount();
+    const kant = QR_KANT / n;
+    const qy = blok_bo - 14 - QR_KANT;
+    for (let r = 0; r < n; r += 1) {
+      for (let c = 0; c < n; c += 1) {
+        if (!q.isDark(r, c)) continue;
+        bl.drawRectangle({
+          x: qr_x + c * kant,
+          y: qy + (n - 1 - r) * kant,
+          width: kant,
+          height: kant,
+          color: SWART,
+        });
       }
-      skryf(t_in("fd_qr_teks", taal), qx, qy - 12, { grootte: 7.5, kleur: GRYS });
-    } catch (fout) {
-      console.error("PDF: kon nie die QR teken nie:", fout && fout.message);
     }
+    const byskrif = t_in("fd_qr_teks", taal);
+    const bw = gewoon.widthOfTextAtSize(byskrif, 7.5);
+    skryf(byskrif, qr_x + (QR_KANT - bw) / 2, qy - 11, { grootte: 7.5, kleur: GRYS });
+  } catch (fout) {
+    console.error("PDF: kon nie die QR teken nie:", fout && fout.message);
   }
-
-  let ry2 = blok_bo - 20;
-  skryf(t_in("fd_bank_kop", taal), b_regs, ry2, { grootte: 9, vet: true });
-  ry2 -= 15;
-
-  const streep = (waarde) => (String(waarde || "").trim() ? String(waarde).trim() : "—");
-  const bankreels = [];
-  if (String(m.bank || "").trim()) bankreels.push(m.bank.trim());
-  bankreels.push(String(m.bank_rekeningnaam || m.naam || "").trim());
-  bankreels.push(`${t_in("fd_rekening", taal)}: ${streep(m.bank_rekeningnommer)}`);
-  bankreels.push(`${t_in("fd_takkode", taal)}: ${streep(m.bank_takkode)}`);
-  if (String(m.bank_rekeningtipe || "").trim()) bankreels.push(m.bank_rekeningtipe.trim());
-
-  bankreels.forEach((r) => {
-    skryf(r, b_regs, ry2, { grootte: 8.5, kleur: GRYS });
-    ry2 -= 12;
-  });
-
-  const verw = `${t_in("fd_verwysing", taal)}: `;
-  skryf(verw, b_regs, ry2, { grootte: 8.5, kleur: GRYS });
-  skryf(rekord.nommer || "", b_regs + gewoon.widthOfTextAtSize(verw, 8.5), ry2, {
-    grootte: 8.5,
-    vet: true,
-  });
 
   return pdf.save();
 }

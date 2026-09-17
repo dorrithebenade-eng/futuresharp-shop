@@ -62,7 +62,7 @@ const { stuur_kwitansie, stuur_kennisgewing } = require("./_faktuur-betaling");
 // Dieselfde formateerder as die skerm en die PDF. Die desimaalteken verskil
 // per taal — R25 500,00 teenoor R25 500.00 — en dit is die konvensie waarteen
 // 'n debiteureklerk lees, nie 'n voorkeur nie.
-const { t_rand } = require("../../public/js/taal.js");
+const { t_rand, t_in } = require("../../public/js/taal.js");
 
 // DIESELFDE LÊER WAT DIE BLAAIER LAAI. Nie 'n kopie nie — die lêer self.
 const {
@@ -623,20 +623,11 @@ async function stuur_proforma(rekord, sleutel, gratis) {
           : "Daar is niks op hierdie faktuur betaalbaar nie."
       );
     } else {
-      // DIE BANKBESONDERHEDE STAAN OOK IN DIE POS, nie net in die PDF nie.
-      // 'n Finansiele afdeling wat teen 'n bankrekening betaal, hoef nie die
-      // aanhegsel oop te maak om die nommer te kry nie. Die faktuurnommer is
-      // die verwysing.
-      const m = maatskappy || {};
-      const streep = (w) => (String(w || "").trim() ? ontsnap(String(w).trim()) : "—");
-      reels.push(
-        `<b>${en ? "Bank transfer" : "Bankoorbetaling"}</b><br>` +
-          (String(m.bank || "").trim() ? `${ontsnap(m.bank.trim())}<br>` : "") +
-          `${ontsnap(String(m.bank_rekeningnaam || m.naam || "").trim())}<br>` +
-          `${en ? "Account" : "Rekening"}: ${streep(m.bank_rekeningnommer)}<br>` +
-          `${en ? "Branch code" : "Takkode"}: ${streep(m.bank_takkode)}<br>` +
-          `${en ? "Reference" : "Verwysing"}: <b>${ontsnap(nommer)}</b>`
-      );
+      // GEEN BANKBESONDERHEDE NIE (17 Sep 2026). Alles loop deur die skakel,
+      // sodat die verdeling altyd gebeur. Die e-pos wys geen QR nie, dus
+      // noem sy sin net die knoppie hier onder. Die PDF in die aanhegsel dra
+      // die QR vir wie dit wil druk.
+      reels.push(ontsnap(t_in("fd_eft_lei_epos", en ? "en" : "af")));
     }
 
     return await stuur_epos({

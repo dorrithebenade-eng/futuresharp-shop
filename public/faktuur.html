@@ -350,10 +350,18 @@
              dieselfde plek op die dokument: wat volgende gebeur. -->
         <div class="dok-geldig" id="fv-geldig" hidden></div>
 
-        <div class="dok-betaal">
+        <!-- DIE BETAALBLOK HET EEN PAD (17 Sep 2026): die skakel. Geen
+             bankbesonderhede nie, sodat die verdeling altyd gebeur. Links die
+             sin en die knoppie, regs die QR.
+
+             'N UITGEREIKTE FAKTUUR SONDER SKAKEL WYS DIE BLOK NIE. Dit is die
+             R0-faktuur: met die bankkolom weg bly daar niks oor om te wys nie.
+             faktuur-vorm.js stel dan .sonder-skakel. 'n Konsep wys die blok
+             wel, met 'n dooie knoppie, sodat 'n mens sien waar hy kom. -->
+        <div class="dok-betaal" id="d-betaalblok">
           <div>
             <h3 id="d-eft">Betaalskakel</h3>
-            <p id="d-eft-lei">Klik op die blok hier onder om na die betaalbladsy te gaan.</p>
+            <p id="d-eft-lei">Klik op die skakel of skandeer die kode vir 'n onmiddellike EFT of kaarttransaksie.</p>
             <!-- GEEN onclick="return false" NIE. Daardie attribuut was
                  vasgespyker en het die klik ALTYD gekanselleer, ook nadat die
                  JS die href gestel het: die knoppie het lewendig gelyk en niks
@@ -368,25 +376,18 @@
                  target="_blank" sodat 'n mens nie die faktuur verloor wanneer
                  die betaalbladsy oopmaak nie. -->
             <a class="dok-skakel dood" id="d-betaal" target="_blank" rel="noopener">Betaal</a>
-
-            <!-- DIE QR IS VIR DIE GEDRUKTE BLADSY. Op 'n skerm skandeer 'n
-                 mens nie sy eie skerm nie; op papier is die kode die enigste
-                 pad na die skakel.
-
-                 Hy staan in DIESELFDE kolom as die knoppie, want hy vervang
-                 hom: dieselfde skakel, ander medium. In die bankkolom sou dit
-                 lyk of hy met die bankoorbetaling te doen het.
-
-                 'n KONSEP KRY GEEN QR NIE. 'n Kode wat na niks lei, is erger
-                 as geen kode: iemand skandeer hom en land op 'n foutbladsy. -->
-            <div class="dok-qr" id="d-qr" hidden>
-              <div id="d-qr-kode"></div>
-              <p class="dok-qr-teks" id="d-qr-teks">Skandeer om te betaal</p>
-            </div>
           </div>
-          <div>
-            <h3 id="d-bank">Bankoorbetaling</h3>
-            <p id="d-bank-lei"></p>
+
+          <!-- DIE QR IS VIR DIE GEDRUKTE BLADSY. Op 'n skerm skandeer 'n
+               mens nie sy eie skerm nie; op papier is die kode die enigste
+               pad na die skakel. Met die bankkolom weg staan hy in sy eie
+               kolom regs.
+
+               'n KONSEP KRY GEEN QR NIE. 'n Kode wat na niks lei, is erger
+               as geen kode: iemand skandeer hom en land op 'n foutbladsy. -->
+          <div class="dok-qr" id="d-qr" hidden>
+            <div id="d-qr-kode"></div>
+            <p class="dok-qr-teks" id="d-qr-teks">Skandeer om te betaal</p>
           </div>
         </div>
 

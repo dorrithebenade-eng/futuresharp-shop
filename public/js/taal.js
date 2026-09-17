@@ -1990,19 +1990,31 @@ const WOORDEBOEK = {
   fd_skenking: { af: "Skenking", en: "Donation" },
   fd_totaal_verskuldig: { af: "Totaal verskuldig", en: "Total due" },
   fd_aantekening: { af: "Aantekening", en: "Note" },
-  // GEEN METODELYS NIE. Watter metodes Paystack bied, verander DAAR en nie
-  // hier nie; die opskrif noem die pad, die betaler sien die metodes daar.
+  // TWEE METODES, NIE 'N LYS NIE (17 Sep 2026). Op 19 Aug is die metodes
+  // weggeneem omdat Instant EFT nog nie deur Paystack se KYC was nie. Dit is
+  // nou lewendig en getoets. 'n Klerk wat nie lees dat EFT deur die skakel
+  // kan nie, soek 'n bankrekening. Slegs kaart en onmiddellike EFT word
+  // genoem; kyk in Paystack se paneel voordat dit verander word.
+  //
+  // GEEN BANKBESONDERHEDE NIE (17 Sep 2026). Alles loop deur die skakel of
+  // die QR, sodat die verdeling altyd gebeur. fd_bank_kop en sy maats bly
+  // bestaan vir die Instellings-blad, maar druk op geen dokument nie.
   fd_eft_kop: {
     af: "Betaalskakel",
     en: "Payment link",
   },
-  // DIE SIN WYS NA DIE KNOPPIE, nie na die bevestiging nie. Op papier kan
-  // niks geklik word nie; die QR se byskrif dek daardie geval. In die PDF is
-  // die knoppie 'n werklike Link-annotasie - sien _faktuur-pdf.js - dus geld
-  // dieselfde sin daar.
+  // DIE SIN NOEM ALBEI PAAIE: die knoppie vir 'n skerm of 'n PDF (in die PDF
+  // is hy 'n werklike Link-annotasie, sien _faktuur-pdf.js) en die QR vir
+  // papier. "EFT" staan nooit alleen nie: "onmiddellike EFT" se dit is die
+  // skakel, nie 'n bankoorbetaling nie.
   fd_eft_lei: {
-    af: "Klik op die blok hier onder om na die betaalbladsy te gaan.",
-    en: "Click the block below to go to the payment page.",
+    af: "Klik op die skakel of skandeer die kode vir 'n onmiddellike EFT of kaarttransaksie.",
+    en: "Click the link or scan the code to pay by Instant EFT or card.",
+  },
+  // Die e-pos wys geen QR nie, dus noem sy sin net die knoppie.
+  fd_eft_lei_epos: {
+    af: "Klik op die knoppie hier onder vir 'n onmiddellike EFT of kaarttransaksie.",
+    en: "Click the button below to pay by Instant EFT or card.",
   },
   // Die inline "+ Nuwe klient"-paneel in die faktuurvorm. Sien
   // faktuur-nuwe-klient.js. Die paneel dra sy eie sleutels omdat sy
@@ -2448,8 +2460,8 @@ const WOORDEBOEK = {
     en: "This quotation is valid until",
   },
   fd_kw_geldig_lei: {
-    af: "By aanvaarding word 'n faktuur uitgereik en die betaalopsies verskyn onmiddellik.",
-    en: "On acceptance an invoice is issued and the payment options appear immediately.",
+    af: "By aanvaarding word 'n faktuur uitgereik. Betaal dan met 'n onmiddellike EFT of kaart deur die betaalskakel of die QR-kode.",
+    en: "On acceptance an invoice is issued. Then pay by Instant EFT or card via the payment link or the QR code.",
   },
   fd_kw_uit_kwotasie: { af: "Uit kwotasie", en: "From quotation" },
 

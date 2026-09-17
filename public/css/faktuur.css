@@ -750,13 +750,18 @@ body.fv-kwotasie .dok-betaal { display: none !important; }
 .dok-nota textarea:hover { border-color: var(--fv-lyn); }
 .dok-nota textarea:focus { outline: 0; border-color: var(--teal-helder); background: #fff; }
 
-/* Albei betaalpaaie word gedruk. Die woord "EFT" staan nooit alleen nie: in
-   Suid-Afrika heet 'n Instant EFT deur die skakel en 'n gewone
-   bankoorbetaling albei so, en 'n klerk lees dit as die tweede. */
+/* EEN BETAALPAD (17 Sep 2026): die skakel, links die sin en die knoppie,
+   regs die QR. Geen bankbesonderhede nie. Die woord "EFT" staan nooit alleen
+   nie: in Suid-Afrika heet 'n Instant EFT deur die skakel en 'n gewone
+   bankoorbetaling albei so, en 'n klerk lees dit as die tweede.
+
+   auto, nie 1fr nie, vir die QR-kolom: hy is so breed soos die kode en die
+   sin kry die res. */
 .dok-betaal {
   margin-top: 22px;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
   gap: 20px;
   background: #FAFAF8;
   border: 1px solid var(--fv-lyn);
@@ -1594,10 +1599,12 @@ body.fv-toe #fv-bo .bo-vee {
 .dok-qr {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   gap: 6px;
-  margin-top: 18px;
 }
+
+/* 'n Uitgereikte faktuur sonder skakel (R0) wys geen betaalblok nie. */
+.dok-betaal.sonder-skakel { display: none; }
 .dok-qr[hidden] { display: none; }
 
 .dok-qr svg {
@@ -1739,9 +1746,8 @@ body.fv-toe #fv-bo .bo-vee {
      hoogte kom van die inhoud. */
   .dok textarea { height: auto; min-height: 0; overflow: visible; }
 
-  /* DIE BETAALBLOK BREEK NIE OOR TWEE BLADSYE NIE. Die skakel, die
-     bankbesonderhede en die QR hoort bymekaar; 'n QR wat halfpad afgesny is,
-     skandeer nie. */
+  /* DIE BETAALBLOK BREEK NIE OOR TWEE BLADSYE NIE. Die skakel en die QR
+     hoort bymekaar; 'n QR wat halfpad afgesny is, skandeer nie. */
   .dok-betaal { break-inside: avoid; page-break-inside: avoid; }
   .dok-qr { break-inside: avoid; page-break-inside: avoid; }
   .dok-tabel tr { break-inside: avoid; page-break-inside: avoid; }

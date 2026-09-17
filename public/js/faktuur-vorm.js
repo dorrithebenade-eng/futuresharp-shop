@@ -745,8 +745,11 @@ function teken_dok_taal() {
   stel("d-k-bedrag", "fd_kol_bedrag", "Bedrag");
   stel("d-aantekening", "fd_aantekening", "Aantekening");
   stel("d-eft", "fd_eft_kop", "Betaalskakel");
-  stel("d-eft-lei", "fd_eft_lei", "Klik op die blok hier onder om na die betaalbladsy te gaan.");
-  stel("d-bank", "fd_bank_kop", "Bankoorbetaling");
+  stel(
+    "d-eft-lei",
+    "fd_eft_lei",
+    "Klik op die skakel of skandeer die kode vir 'n onmiddellike EFT of kaarttransaksie."
+  );
   // Die QR se byskrif is dokumentinhoud, dus die FAKTUUR se taal. Die kode
   // self verander nooit met taal nie — dit is 'n URL — dus word hy net een
   // keer geteken, in faktuur-uitreik.js.
@@ -781,41 +784,12 @@ function teken_dok_taal() {
     else knop.removeAttribute("href");
   }
 
-  // DIE FAKTUURNOMMER IS DIE BANKVERWYSING. Sonder dit sit 'n mens met 'n
-  // bedrag in 'n bankstaat en geen naam nie. Die bankblok dra <br> en 'n
-  // <span>, dus innerHTML — die inhoud kom uit taal.js en uit die nommer,
-  // nooit van 'n gebruiker nie.
-  const bank = document.getElementById("d-bank-lei");
-  if (bank) {
-    const verw = V.nommer || dt("fd_stand_konsep", "Konsep");
-    const m = MAATSKAPPY || {};
-
-    // 'n ONTBREKENDE VELD DRUK AS 'N STREPIE, nie as niks nie. 'n Leë reël
-    // lyk soos 'n uitleg-keuse; 'n strepie sê daar hoort iets te wees. Die
-    // Instellings-blad waarsku boonop op die Fakture-blad self.
-    const of_streep = (waarde) => {
-      const teks = String(waarde || "").trim();
-      return teks ? ontsnap(teks) : "—";
-    };
-
-    const rye = [
-      ontsnap(String(m.bank_rekeningnaam || m.naam || "").trim()),
-      `${dt("fd_rekening", "Rekening")}: ${of_streep(m.bank_rekeningnommer)}`,
-      `${dt("fd_takkode", "Takkode")}: ${of_streep(m.bank_takkode)}`,
-    ];
-    // Die bank en die rekeningtipe verskyn slegs as hulle bestaan. Hulle is
-    // nie nodig om 'n betaling te maak nie, en 'n strepie langs "Bank" voeg
-    // niks by wat die res nie reeds sê nie.
-    if (String(m.bank || "").trim()) rye.unshift(ontsnap(m.bank.trim()));
-    if (String(m.bank_rekeningtipe || "").trim()) {
-      rye.push(ontsnap(m.bank_rekeningtipe.trim()));
-    }
-    rye.push(
-      `${dt("fd_verwysing", "Verwysing")}: <span class="verw">${ontsnap(verw)}</span>`
-    );
-
-    bank.innerHTML = rye.join("<br>");
-  }
+  // GEEN BANKBESONDERHEDE NIE (17 Sep 2026). Alles loop deur die skakel of
+  // die QR, sodat die verdeling altyd gebeur. 'n UITGEREIKTE faktuur sonder
+  // skakel is die R0-faktuur: daar bly niks in die blok oor nie, dus
+  // verdwyn hy. 'n Konsep wys hom met 'n dooie knoppie.
+  const blok = document.getElementById("d-betaalblok");
+  if (blok) blok.classList.toggle("sonder-skakel", Boolean(V.nommer) && !V.betaalskakel);
 
   teken_maatskappy();
   teken_titel();
@@ -954,7 +928,7 @@ function teken_geldig() {
     ontsnap(
       dt(
         "fd_kw_geldig_lei",
-        "By aanvaarding word 'n faktuur uitgereik en die betaalopsies verskyn onmiddellik."
+        "By aanvaarding word 'n faktuur uitgereik. Betaal dan met 'n onmiddellike EFT of kaart deur die betaalskakel of die QR-kode."
       )
     );
 }
