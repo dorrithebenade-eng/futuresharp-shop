@@ -952,9 +952,21 @@ body.fv-sleep * {
 
   /* KOLOMME IS VIR REKENAARS. Op 'n foon val die backoffice onder die dokument
      in, en dan is daar niks om te skuif nie -- 'n handvatsel tussen twee dinge
-     wat onder mekaar staan, is 'n knoppie wat niks doen nie. */
+     wat onder mekaar staan, is 'n knoppie wat niks doen nie.
+
+     DIE KOLOMME EN DIE HANDVATSEL VAL OP DIESELFDE BREEDTE WEG, en dit moet
+     so bly. 'n Tweede navraag het die rooster voorheen reeds by 1400px na een
+     kolom gestel terwyl die handvatsel eers hier verdwyn het. Tussen 981px en
+     1400px -- die meeste skootrekenaars -- was die handvatsel dus sigbaar en
+     het niks gedoen nie, want daar was net een kolom om te skuif.
+
+     Daardie navraag is verwyder. Word hierdie breedte ooit verander, verander
+     albei reels hieronder saam. */
   .fv-blad { grid-template-columns: 1fr; }
   .fv-greep { display: none; }
+
+  /* Onder mekaar het die backoffice geen rede om smal te bly nie. */
+  .bo-kaart { max-width: 900px; }
 }
 /* DIE HERSIENINGSMERK ONDER DIE NOMMER. Fyn, in dieselfde register as die
    "KWOTASIE"-etiket daarbo -- dit is 'n identifikasie, nie 'n aankondiging. */
@@ -1161,14 +1173,6 @@ body.fv-toe #fv-bo .bo-vee {
 }
 .bo-boodskap button { margin-left: 6px; }
 
-/* Nie alles hoort op 'n foon nie. Die backoffice val onder die dokument in
-   eerder as om in 'n kolom van 200px saam te druk. */
-@media (max-width: 1400px) {
-  .fv-blad { grid-template-columns: 1fr; }
-  .bo { position: static; }
-  /* Onder mekaar het die backoffice geen rede om smal te bly nie. */
-  .bo-kaart { max-width: 900px; }
-}
 @media (max-width: 620px) {
   .bt-boonste { grid-template-columns: 1fr 22px; }
   .bt-boonste select, .bt-boonste input.n { grid-column: 1 / -1; }

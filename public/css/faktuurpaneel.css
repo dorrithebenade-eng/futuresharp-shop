@@ -305,7 +305,14 @@ a.paneel-kieslys-item { text-decoration: none; }
 @media (max-width: 560px) {
   .fp-ry-oop {
     flex-direction: column;
-    align-items: flex-start;
+    /* STRETCH, NIE FLEX-START NIE. In 'n kolom krimp `flex-start` elke kind
+       tot sy eie inhoud. Die naamblok word dan so breed soos die langste
+       klientnaam, en `.fp-klient` se text-overflow: ellipsis het niks om
+       teen af te sny nie -- die naam loop by die ry uit en die Skrap-knoppie
+       daarnaas verdwyn daaronder. `stretch` gee die kind die ry se breedte;
+       die teks bly links belyn, want dit is text-align se werk, nie
+       align-items s'n nie. */
+    align-items: stretch;
     gap: 8px;
   }
 }
