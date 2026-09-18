@@ -307,7 +307,17 @@ async function laai_bestellings_as_excel() {
       blad.getRow(2).height = 20;
       blad.getRow(3).height = 20;
 
-      if (logo_id) {
+      // DIE ID KAN 0 WEES, EN 0 IS VALS. werkboek.addImage() gee die prent se
+      // INDEKS terug, en die eerste prent in 'n werkboek kry indeks 0. 'n Toets
+      // van `if (logo_id)` is dus altyd vals, en blad.addImage() word nooit
+      // geroep nie. Die PNG beland wel in xl/media, want die werkboek het hom
+      // aanvaar, maar sonder 'n tekening wat se waar hy staan, laat Excel hom
+      // stilweg val. Presies daardie lêer is op 18 Sep oopgerits: image1.png
+      // teenwoordig, geen xl/drawings nie.
+      //
+      // Toets dus of daar 'n id IS. null beteken die logo kon nie gehaal word
+      // nie, en dan gaan die uitvoer sonder hom voort.
+      if (logo_id !== null) {
         blad.addImage(logo_id, { tl: { col: 0.1, row: 0.1 }, ext: { width: 56, height: 56 } });
       }
 
