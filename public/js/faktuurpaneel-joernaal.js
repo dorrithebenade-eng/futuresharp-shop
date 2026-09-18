@@ -663,7 +663,8 @@ function jn_csv() {
   // \uFEFF sodat Excel die leer as UTF-8 lees; sonder dit word e en e onleesbaar.
   jn_stuur_af(
     new Blob(["\uFEFF" + reels.join("\r\n")], { type: "text/csv;charset=utf-8;" }),
-    `kontantboek-${JN_DATA.van}-tot-${JN_DATA.tot}.csv`
+    `Future-Sharp-${jn_t("uit_naam_kontantboek", "Kontantboek")}-${JN_DATA.van}` +
+      `-${jn_t("uit_naam_tot", "tot")}-${JN_DATA.tot}.csv`
   );
 }
 

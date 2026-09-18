@@ -31,6 +31,18 @@ function os_vertaal(sleutel, terugval) {
   return window.t ? window.t(sleutel) : terugval;
 }
 
+// 'n NAAM WORD 'n LÊERNAAMDEEL. Aksente word afgehaal (Dorrithé word Dorrithe),
+// en alles wat nie 'n letter of syfer is nie word 'n koppelteken. Sonder dit
+// struikel 'n lêernaam op een of ander stelsel of in een of ander e-posprogram.
+function os_leernaam_deel(naam) {
+  const skoon = String(naam || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^A-Za-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return skoon || "Outeur";
+}
+
 function os_el(id) {
   return document.getElementById(id);
 }
@@ -483,7 +495,16 @@ async function os_laai_af_as_excel() {
     const url = URL.createObjectURL(blob);
     const skakel = document.createElement("a");
     skakel.href = url;
-    skakel.download = `Future-Shop-Staat-${OS_SIGBAAR.van}-tot-${OS_SIGBAAR.tot}.xlsx`;
+    // DIE NAAM DRA DIE OUTEUR EN DIE TYDPERK. Sonder die naam lê drie outeurs
+    // se state as dieselfde lêernaam in een gids, en Windows maak daarvan (1)
+    // en (2). Die woorde volg die blad se taal; die outeur se eie naam bly
+    // soos hy is, net sonder aksente en spasies sodat die lêer op elke stelsel
+    // oopmaak.
+    const os_woord = os_vertaal("uit_naam_outeurstaat", "Outeurstaat");
+    const os_tot = os_vertaal("uit_naam_tot", "tot");
+    skakel.download =
+      `Future-Shop-${os_woord}-${os_leernaam_deel(OS_DATA.outeur_naam)}` +
+      `-${OS_SIGBAAR.van}-${os_tot}-${OS_SIGBAAR.tot}.xlsx`;
     document.body.appendChild(skakel);
     skakel.click();
     skakel.remove();

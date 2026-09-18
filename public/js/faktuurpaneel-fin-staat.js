@@ -641,7 +641,10 @@ function fs_voer_uit() {
   });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = `staat-${FS.van}-tot-${FS.tot}.csv`;
+  // Die naam sê aan watter entiteit die staat behoort, en volg die blad se taal.
+  a.download =
+    `Future-Sharp-${fs_t("uit_naam_fin_staat", "Finansiele-staat")}-${FS.van}` +
+    `-${fs_t("uit_naam_tot", "tot")}-${FS.tot}.csv`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);

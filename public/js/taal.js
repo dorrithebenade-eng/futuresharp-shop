@@ -2054,6 +2054,21 @@ const WOORDEBOEK = {
   // Die QR se byskrif. Die kode self is 'n URL en verander nooit met taal
   // nie; net hierdie reël skakel saam met die dokument.
   fd_qr_teks: { af: "Skandeer om te betaal", en: "Scan to pay" },
+
+  // ── LÊERNAME VAN UITVOERE ────────────────────────────────────────────────
+  //
+  // DIE LÊERNAAM VOLG DIE BLAD SE TAAL, want die lêer land op die aflaaier se
+  // rekenaar en bly daar jare lank. 'n Engelssprekende outeur wat sy staat in
+  // Engels lees, moet nie 'n lêer met die naam Outeurstaat kry nie, en die
+  // woord "tot" moet nie in 'n Engelse naam bly staan nie.
+  //
+  // GEEN SPASIES NIE. Hierdie waardes word woord vir woord in 'n lêernaam
+  // geplak, dus dra hulle self hul koppeltekens.
+  uit_naam_outeurstaat: { af: "Outeurstaat", en: "Author-statement" },
+  uit_naam_bestellings: { af: "Bestellings", en: "Orders" },
+  uit_naam_kontantboek: { af: "Kontantboek", en: "Cash-book" },
+  uit_naam_fin_staat: { af: "Finansiele-staat", en: "Financial-statement" },
+  uit_naam_tot: { af: "tot", en: "to" },
   // Een sleutel, twaalf afkortings. Mrt/Mar, Okt/Oct en Des/Dec verskil;
   // die res is dieselfde. Die kode split op die komma.
   fd_maande: {

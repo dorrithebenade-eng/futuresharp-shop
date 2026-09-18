@@ -435,7 +435,12 @@ async function laai_bestellings_as_excel() {
     const skakel = document.createElement("a");
     const vandag_kort = new Date().toISOString().slice(0, 10);
     skakel.href = url;
-    skakel.download = `Future-Shop-Bestellings-${van_waarde || "alles"}-tot-${tot_waarde || vandag_kort}.xlsx`;
+    // Die woorde in die naam volg die blad se taal, soos by die ander uitvoere.
+    const pb_woord = window.t ? window.t("uit_naam_bestellings") : "Bestellings";
+    const pb_tot = window.t ? window.t("uit_naam_tot") : "tot";
+    skakel.download =
+      `Future-Shop-${pb_woord}-${van_waarde || "alles"}` +
+      `-${pb_tot}-${tot_waarde || vandag_kort}.xlsx`;
     document.body.appendChild(skakel);
     skakel.click();
     skakel.remove();
