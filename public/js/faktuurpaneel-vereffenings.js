@@ -114,10 +114,29 @@ function vf_faktuur_blok(f) {
       );
     }
 
+    // DIE VERWYSING STAAN EEN KEER. Waar daar 'n faktuurnommer is, is dit die
+    // opskrif en die verwysing die klein reël daaronder. Waar daar nie een is
+    // nie, is die verwysing self die opskrif, en dan moet sy nie ook nog 'n
+    // keer daaronder herhaal word nie.
+    //
+    // 'n BETALING BUITE DIE STELSEL kry 'n ewekansige verwysing van Paystack,
+    // soos c0fa3dsqhw. Dit gebeur wanneer iemand 'n betaalskakel in Paystack se
+    // eie paneel maak. Sonder 'n woord daaroor lyk daardie string soos 'n fout.
+    if (!rede && f.soort === "ander") {
+      rede = vf_t(
+        "vf_buite_stelsel",
+        "Betaling met Paystack se eie verwysing, buite die faktuur en die winkel om."
+      );
+    }
+
     return `
       <div class="vf-fk">
         <div class="vf-fk-kop"><span>${vf_ontsnap(f.nommer || f.verwysing)}</span><span></span></div>
-        <div class="vf-fk-r"><span class="vf-fk-sag">${vf_ontsnap(f.verwysing)}</span><span></span></div>
+        ${
+          f.nommer
+            ? `<div class="vf-fk-r"><span class="vf-fk-sag">${vf_ontsnap(f.verwysing)}</span><span></span></div>`
+            : ""
+        }
         ${rede ? `<div class="vf-fk-r"><span class="vf-fk-sag">${rede}</span><span></span></div>` : ""}
       </div>`;
   }

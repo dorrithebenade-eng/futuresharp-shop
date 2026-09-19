@@ -2094,6 +2094,10 @@ const WOORDEBOEK = {
   },
   vf_hoofrekening: { af: "Hoofrekening", en: "Main account" },
   vf_betaal: { af: "Kliënte het betaal", en: "Customers paid" },
+  vf_buite_stelsel: {
+    af: "Betaling met Paystack se eie verwysing, buite die faktuur en die winkel om.",
+    en: "Payment with Paystack's own reference, outside the invoice and the shop.",
+  },
   vf_winkelbestelling: {
     af: "Winkelbestelling, nie 'n faktuur nie.",
     en: "Shop order, not an invoice.",
