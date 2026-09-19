@@ -83,17 +83,38 @@ function dag(tydstempel) {
 }
 
 /**
+ * Wie hierdie vereffening ontvang het, uit die rekord self.
+ *
+ * DIE VEREFFENING SE `subaccount` IS DIE ANTWOORD, en sy afwesigheid ook.
+ * Bevestig teen werklike data op 19 September 2026: vereffening 11769136 het
+ * geen `subaccount` nie en is die hoofrekening s'n (R1,54 netto, R0,46 fooi);
+ * 11769137 dra `subaccount.subaccount_code` ACCT_9deilnnmvjvfq1q met
+ * `business_name` "Face to Face Educational Psychologist" (R18,00, geen fooi).
+ *
+ * MOENIE DIT MET PAYSTACK SE `subaccount`-PARAMETER PROBEER DOEN NIE. Op
+ * /settlement neem daardie parameter die subrekeninge se uitbetalings WEG in
+ * plaas van hulle te kies: met die filter het 'n inhaal 17 van 31 gegee,
+ * sonder dit al 31, en sonder 'n enkele fout.
+ */
+function kry_ontvanger(v) {
+  const sub = v && v.subaccount;
+  const kode = String((sub && sub.subaccount_code) || "").trim();
+  if (!kode) return { kode: HOOFREKENING, naam: "Hoofrekening" };
+  return {
+    kode,
+    naam: String((sub && (sub.business_name || sub.description)) || kode),
+  };
+}
+
+/**
  * Bou die rekord uit Paystack se vereffening.
  *
  * @param {object} v            Paystack se vereffening, rou.
- * @param {object} ontvanger    { kode, naam } -- wie uitbetaal is. Die kode is
- *                              HOOFREKENING of 'n ACCT_-kode. Dit kom van die
- *                              afhaal af, want die API se antwoord se dit nie
- *                              altyd self nie.
  * @param {string[]} verwysings Die transaksies wat in hierdie uitbetaling was.
  */
-function bou_rekord(v, ontvanger, verwysings) {
-  const kode = String((ontvanger && ontvanger.kode) || HOOFREKENING);
+function bou_rekord(v, verwysings) {
+  const ontvanger = kry_ontvanger(v);
+  const kode = ontvanger.kode;
   const datum = dag(v.settlement_date || v.settlementDate || v.created_at);
 
   return {
@@ -107,7 +128,7 @@ function bou_rekord(v, ontvanger, verwysings) {
     // tussen Future Sharp se geld en 'n begunstigde s'n is die belangrikste
     // onderskeid in hierdie hele vlak.
     ontvanger_kode: kode,
-    ontvanger_naam: String((ontvanger && ontvanger.naam) || ""),
+    ontvanger_naam: ontvanger.naam,
     is_hoofrekening: kode === HOOFREKENING,
 
     // Alles in sent, soos oral elders in hierdie stelsel.
@@ -119,6 +140,9 @@ function bou_rekord(v, ontvanger, verwysings) {
     // Die drie klop nie altyd presies as 'n som nie -- Paystack ken ook
     // `deductions` en `additions` -- dus word al drie gestoor soos hulle is en
     // word niks hier afgelei nie.
+    // `total_processed` is wat die kliënt betaal het (R20,00 op 18 Sep);
+    // `total_amount` is wat HIERDIE ontvanger daarvan kry (R1,54 en R18,00).
+    verwerk_sent: Number(v.total_processed) || 0,
     bruto_sent: Number(v.total_amount) || 0,
     fooi_sent: Number(v.total_fees) || 0,
     netto_sent: Number(v.effective_amount != null ? v.effective_amount : v.total_amount) || 0,
@@ -142,6 +166,7 @@ function bou_rekord(v, ontvanger, verwysings) {
 module.exports = {
   STORE_NAAM,
   HOOFREKENING,
+  kry_ontvanger,
   kry_vereffenings_store,
   skep_sleutel,
   jaar_voorvoegsel,

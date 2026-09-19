@@ -3,9 +3,9 @@
 // GESKEDULEERD -- 03:45 UTC daagliks, dit is 05:45 in Suid-Afrika. Die skedule
 // staan in netlify.toml, nie hier nie.
 //
-// Dit haal Paystack se vereffenings vir die afgelope SEWE dae, vir die
-// hoofrekening en vir elke begunstigde met 'n subrekening, en skryf hulle na
-// die store. Die werk self leef in _vereffening-haal.js, wat
+// Dit haal Paystack se vereffenings vir die afgelope SEWE dae -- die
+// hoofrekening s'n en die subrekeninge s'n kom in dieselfde lys -- en skryf
+// hulle na die store. Die werk self leef in _vereffening-haal.js, wat
 // haal-vereffenings-inhaal.js ook gebruik.
 //
 // WAAROM 03:45 EN NIE 03:30 NIE. haal-paystack.js loop om 03:30. Die
@@ -33,7 +33,8 @@ exports.handler = async () => {
 
     console.log(
       `Vereffening-afhaal ${van} tot ${tot}: ${uitslag.gehaal} gehaal, ` +
-        `${uitslag.geskryf} geskryf, oor ${uitslag.ontvangers} ontvangers.`
+        `${uitslag.geskryf} geskryf. Per ontvanger: ` +
+        uitslag.per_ontvanger.map((o) => `${o.naam} ${o.geskryf}`).join(", ")
     );
     if (uitslag.foute.length) {
       console.error("Vereffening-afhaal se foute:", uitslag.foute);

@@ -8,11 +8,15 @@
 // 'n Gemiste kennisgewing ontbreek stil, en in 'n grootboek merk niemand dit
 // op nie. Paystack se lys is die gesag.
 //
-// DIE AFHAAL LOOP PER ONTVANGER, want Paystack betaal per ontvanger uit. Die
-// parameter `subaccount` kies wie: "none" vir die hoofrekening, of 'n ACCT_
-// kode vir 'n begunstigde. Sonder die parameter mis 'n mens die subrekeninge se
-// uitbetalings heeltemal, en dit is juis hulle wat die vraag "het Ignatius sy
-// geld gekry" beantwoord.
+// EEN OPROEP, GEEN FILTER, EN DIE ONTVANGER KOM UIT DIE REKORD. Paystack
+// betaal per ontvanger uit, dus was die eerste weergawe 'n lus oor die
+// hoofrekening en elke subrekening, met die `subaccount`-parameter. Dit was
+// verkeerd: op /settlement neem daardie parameter die subrekeninge se
+// uitbetalings WEG in plaas van hulle te kies. Op 19 September het die lus 17
+// van 31 gegee, sonder een fout, en 'n oproep sonder die filter al 31.
+//
+// Die vereffening dra self haar ontvanger in `subaccount`; geen `subaccount`
+// beteken die hoofrekening. Sien kry_ontvanger() in _vereffenings.js.
 //
 // DIE TRANSAKSIES KOM UIT 'N TWEEDE OPROEP. /settlement gee die uitbetaling;
 // /settlement/:id/transactions gee wat daarin was. Net die VERWYSINGS word
@@ -24,7 +28,6 @@
 // vereffening wat gister nog `processing` was, is vandag `success`, en die
 // tweede loop werk dieselfde rekord by.
 
-const { kry_store } = require("./_blob-store");
 const {
   kry_vereffenings_store,
   HOOFREKENING,
@@ -46,34 +49,6 @@ function kop() {
     throw new Error("PAYSTACK_SECRET_KEY is nie gestel nie");
   }
   return { Authorization: `Bearer ${sleutel}` };
-}
-
-/**
- * Die ontvangers wie se uitbetalings gehaal word: die hoofrekening, plus elke
- * begunstigde met 'n subrekening.
- *
- * 'n BEGUNSTIGDE SONDER 'N SUBREKENING WORD OORGESLAAN. Hy het nog nooit geld
- * ontvang nie, en Paystack sou die oproep met 'n fout beantwoord.
- */
-async function kry_ontvangers() {
-  const ontvangers = [{ kode: HOOFREKENING, naam: "Hoofrekening" }];
-
-  try {
-    const store = kry_store("begunstigdes");
-    const lys = (await store.list()).blobs || [];
-    for (const b of lys) {
-      const rekord = await store.get(b.key, { type: "json" });
-      const kode = String((rekord && rekord.subrekening_kode) || "").trim();
-      if (!kode) continue;
-      ontvangers.push({ kode, naam: String((rekord && rekord.naam) || kode) });
-    }
-  } catch (fout) {
-    // DIT IS NIE FATAAL NIE. Sonder die begunstigdes haal die loop steeds die
-    // hoofrekening s'n, en dit is die deel wat in die joernaal boek.
-    console.error("Kon nie die begunstigdes lees nie:", fout && fout.message);
-  }
-
-  return ontvangers;
 }
 
 /**
@@ -115,12 +90,10 @@ async function haal_verwysings(id, foute) {
 /**
  * @param {string} van   ISO-datum, ingesluit. Bv. "2026-07-15"
  * @param {string} tot   ISO-datum, ingesluit.
- * @param {object[]} [ontvangers]  { kode, naam }; verstek is almal.
- * @returns {Promise<{gehaal:number, geskryf:number, ontvangers:number, foute:string[]}>}
+ * @returns {Promise<{gehaal:number, geskryf:number, per_ontvanger:object[], foute:string[]}>}
  */
-async function haal_vereffenings(van, tot, ontvangers) {
+async function haal_vereffenings(van, tot) {
   const store = kry_vereffenings_store();
-  const lys_ontvangers = ontvangers && ontvangers.length ? ontvangers : await kry_ontvangers();
 
   // 'N DATUM SONDER 'N TYD IS MIDDERNAG AAN DIE BEGIN VAN DIE DAG, en daardie
   // dag se eie rekords val dan buite die venster. Dieselfde val wat op 6
@@ -131,90 +104,74 @@ async function haal_vereffenings(van, tot, ontvangers) {
 
   let gehaal = 0;
   let geskryf = 0;
+  let blad = 1;
   const foute = [];
 
-  // 'N TELLING PER ONTVANGER. Die eerste inhaal op 19 September het 17 van 31
-  // uitbetalings gekry, sonder 'n enkele fout: die hoofrekening s'n het gekom
-  // en die subrekeninge s'n nie. 'n Totaal alleen wys nie so iets nie, en 'n
-  // stil nul is die soort ding wat 'n mens eers maande later agterkom.
-  const per_ontvanger = [];
+  // 'N TELLING PER ONTVANGER. Die eerste inhaal het 17 van 31 gegee sonder 'n
+  // enkele fout, en 'n totaal alleen wys nie so iets nie. 'n Stil nul is die
+  // soort ding wat 'n mens eers maande later agterkom.
+  const tel = new Map();
 
-  for (const ontvanger of lys_ontvangers) {
-    let blad = 1;
-    let o_gehaal = 0;
-    let o_geskryf = 0;
+  while (blad <= MAKS_BLAAIE) {
+    const url =
+      `${PAYSTACK_VEREFFENINGS}?perPage=${PER_BLAD}&page=${blad}` +
+      `&from=${encodeURIComponent(van_t)}&to=${encodeURIComponent(tot_t)}`;
 
-    while (blad <= MAKS_BLAAIE) {
-      // 'N LEE KODE BETEKEN: GEEN FILTER. Paystack se `subaccount` neem "none"
-      // vir die rekening self of 'n ACCT_-kode vir 'n subrekening. Word die
-      // parameter heeltemal weggelaat, gee Paystack alles wat hy sou gee. Dit
-      // is hoe 'n mens toets wat die filter self wegneem, sonder om te raai.
-      const filter = ontvanger.kode
-        ? `&subaccount=${encodeURIComponent(ontvanger.kode)}`
-        : "";
-
-      const url =
-        `${PAYSTACK_VEREFFENINGS}?perPage=${PER_BLAD}&page=${blad}${filter}` +
-        `&from=${encodeURIComponent(van_t)}&to=${encodeURIComponent(tot_t)}`;
-
-      let data;
-      try {
-        const resp = await fetch(url, { headers: kop() });
-        data = await resp.json();
-        if (!resp.ok || !data.status) {
-          foute.push(`${ontvanger.naam}, blad ${blad}: ${(data && data.message) || resp.status}`);
-          break;
-        }
-      } catch (fout) {
-        foute.push(`${ontvanger.naam}, blad ${blad}: ${fout.message || fout}`);
+    let data;
+    try {
+      const resp = await fetch(url, { headers: kop() });
+      data = await resp.json();
+      if (!resp.ok || !data.status) {
+        foute.push(`Blad ${blad}: ${(data && data.message) || resp.status}`);
         break;
       }
-
-      const lys = Array.isArray(data.data) ? data.data : [];
-      gehaal += lys.length;
-      o_gehaal += lys.length;
-
-      for (const v of lys) {
-        const verwysings = await haal_verwysings(v.id, foute);
-
-        let rekord;
-        try {
-          rekord = bou_rekord(v, ontvanger, verwysings);
-        } catch (fout) {
-          foute.push(`${ontvanger.naam}, ${v.id}: kon nie die rekord bou nie -- ${fout.message || fout}`);
-          continue;
-        }
-
-        if (!rekord.datum) {
-          // Sonder 'n datum kan die sleutel nie 'n finansiele jaar dra nie en
-          // sou die rekord onvindbaar wees. Dit behoort nooit te gebeur nie.
-          foute.push(`${ontvanger.naam}, ${v.id}: geen datum op die vereffening`);
-          continue;
-        }
-
-        try {
-          await store.setJSON(rekord.sleutel, rekord);
-          geskryf++;
-          o_geskryf++;
-        } catch (fout) {
-          foute.push(`${ontvanger.naam}, ${v.id}: kon nie stoor nie -- ${fout.message || fout}`);
-        }
-      }
-
-      const bladsye = (data.meta && Number(data.meta.pageCount)) || 1;
-      if (blad >= bladsye || !lys.length) break;
-      blad++;
+    } catch (fout) {
+      foute.push(`Blad ${blad}: ${fout.message || fout}`);
+      break;
     }
 
-    per_ontvanger.push({
-      naam: ontvanger.naam,
-      kode: ontvanger.kode,
-      gehaal: o_gehaal,
-      geskryf: o_geskryf,
-    });
+    const lys = Array.isArray(data.data) ? data.data : [];
+    gehaal += lys.length;
+
+    for (const v of lys) {
+      const verwysings = await haal_verwysings(v.id, foute);
+
+      let rekord;
+      try {
+        rekord = bou_rekord(v, verwysings);
+      } catch (fout) {
+        foute.push(`${v.id}: kon nie die rekord bou nie -- ${fout.message || fout}`);
+        continue;
+      }
+
+      if (!rekord.datum) {
+        // Sonder 'n datum kan die sleutel nie 'n finansiele jaar dra nie en sou
+        // die rekord onvindbaar wees. Dit behoort nooit te gebeur nie.
+        foute.push(`${v.id}: geen datum op die vereffening`);
+        continue;
+      }
+
+      try {
+        await store.setJSON(rekord.sleutel, rekord);
+        geskryf++;
+        const sleutel = rekord.ontvanger_naam || rekord.ontvanger_kode;
+        tel.set(sleutel, (tel.get(sleutel) || 0) + 1);
+      } catch (fout) {
+        foute.push(`${v.id}: kon nie stoor nie -- ${fout.message || fout}`);
+      }
+    }
+
+    const bladsye = (data.meta && Number(data.meta.pageCount)) || 1;
+    if (blad >= bladsye || !lys.length) break;
+    blad++;
   }
 
-  return { gehaal, geskryf, ontvangers: lys_ontvangers.length, per_ontvanger, foute };
+  const per_ontvanger = [...tel.entries()].map(([naam, geskryf_aantal]) => ({
+    naam,
+    geskryf: geskryf_aantal,
+  }));
+
+  return { gehaal, geskryf, per_ontvanger, foute };
 }
 
 // "Vandag min N dae", as YYYY-MM-DD in UTC.
@@ -228,4 +185,4 @@ function vandag() {
   return new Date().toISOString().slice(0, 10);
 }
 
-module.exports = { haal_vereffenings, kry_ontvangers, dae_terug, vandag };
+module.exports = { haal_vereffenings, dae_terug, vandag };
