@@ -71,6 +71,10 @@ exports.handler = async (event, context) => {
         ontvanger_kode: r.ontvanger_kode,
         ontvanger_naam: r.ontvanger_naam,
         is_hoofrekening: r.is_hoofrekening,
+        // `verwerk_sent` is wat die kliënt betaal het; `bruto_sent` is wat
+        // HIERDIE ontvanger daarvan kry. Laat die eerste uit, wys die skerm
+        // R0,00 waar R20,00 moet staan -- en dit het presies so gebeur.
+        verwerk_sent: r.verwerk_sent,
         bruto_sent: r.bruto_sent,
         fooi_sent: r.fooi_sent,
         netto_sent: r.netto_sent,
