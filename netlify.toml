@@ -26,6 +26,16 @@
 [functions."haal-paystack"]
   schedule = "30 3 * * *"
 
+# haal-vereffenings: haal Paystack se uitbetalings vir die afgelope sewe dae,
+# vir die hoofrekening en vir elke begunstigde se subrekening, en skryf hulle
+# na die store. Paystack betaal elke werksdag uit, en elke ontvanger kry sy
+# eie uitbetaling.
+#
+# 03:45 en nie 03:30 nie: haal-paystack loop eerste, sodat die transaksies
+# waarna 'n vereffening verwys reeds gestoor is wanneer sy aankom.
+[functions."haal-vereffenings"]
+  schedule = "45 3 * * *"
+
 # Netlify Identity registrasie-instellings word via die Netlify-kontrolepaneel
 # gestel (nie hierdie lêer nie): "Oop registrasie" aan, standaard-rol by
 # registrasie = "koper" (via 'n Identity-triggerfunksie, sien
