@@ -15,6 +15,18 @@
 
 let VF_SESSIE = null;
 let VF_DATA = null;
+
+// DIE NAME KOM UIT ONS EIE REGISTERS, nie uit Paystack nie.
+//
+// Paystack noem 'n subrekening by sy BESIGHEIDSNAAM ("Face to Face
+// Educational Psychologist"), en die hoofrekening noem hy glad nie. Op hierdie
+// blad ken 'n mens die mense by hul naam soos hulle in die begunstigderegister
+// staan, en die hoofrekening by die maatskappy se eie naam.
+//
+// Paystack se naam bly wel sigbaar as dit van ons s'n verskil: dit is die naam
+// wat op sy paneel staan, en 'n mens moet die twee langs mekaar kan hou.
+let VF_NAME = new Map(); // subrekening_kode -> naam van die rekeninghouer
+let VF_HOOF_NAAM = "";
 let VF_OOP = null; // die sleutel van die ry wat oop is, of null
 
 function vf_t(sleutel, verstek) {
@@ -79,6 +91,41 @@ function vf_status_af(status) {
   return status || "";
 }
 
+async function vf_laai_name() {
+  try {
+    const data = await vf_vra("kry-begunstigdes");
+    (data.begunstigdes || data || []).forEach((b) => {
+      const kode = String((b && b.subrekening_kode) || "").trim();
+      if (kode && b.naam) VF_NAME.set(kode, String(b.naam));
+    });
+  } catch (fout) {
+    // NIE FATAAL NIE. Sonder ons eie name val die lys terug op Paystack s'n.
+    console.error("Kon nie die begunstigdes se name laai nie:", fout);
+  }
+
+  try {
+    const data = await vf_vra("kry-instellings");
+    VF_HOOF_NAAM = String((data.maatskappy && data.maatskappy.naam) || "");
+  } catch (fout) {
+    console.error("Kon nie die maatskappy se naam laai nie:", fout);
+  }
+}
+
+// Die naam wat op die ry staan, en die naam wat daaronder staan.
+//
+// Vir die hoofrekening: die maatskappy se naam uit Instellings, want
+// "Hoofrekening" sê nie aan wie die geld gegaan het nie.
+// Vir 'n subrekening: die rekeninghouer se naam uit die begunstigderegister.
+function vf_naam(v) {
+  if (v.is_hoofrekening) {
+    return { groot: VF_HOOF_NAAM || vf_t("vf_hoofrekening", "Hoofrekening"), klein: "" };
+  }
+  const myne = VF_NAME.get(v.ontvanger_kode);
+  const paystack = v.ontvanger_naam || v.ontvanger_kode;
+  if (!myne) return { groot: paystack, klein: v.ontvanger_kode };
+  return { groot: myne, klein: myne === paystack ? v.ontvanger_kode : paystack };
+}
+
 async function vf_vra(pad) {
   const resp = await fetch(`/.netlify/functions/${pad}`, {
     headers: await identiteit_kop(),
@@ -87,50 +134,25 @@ async function vf_vra(pad) {
   return resp.json();
 }
 
-// DIE GROEP: die uitbetalings wat uit DIESELFDE betalings kom.
+// DIE GROEP: die uitbetalings van EEN DAG.
 //
-// Een betaling van R35,00 word in drie stukke: Paystack se fooi, die
-// hoofrekening se deel en die begunstigde se deel. Paystack betaal elke deel
-// as sy eie uitbetaling uit, en hulle staan as aparte rye in hierdie lys.
+// Een betaling van R35,00 word in stukke: Paystack se fooi, die hoofrekening
+// se deel en die begunstigde se deel. Paystack betaal elke deel as sy eie
+// uitbetaling uit, en hulle staan as aparte rye in hierdie lys.
 //
 // SONDER DIE GROEP VRA 'n MENS "waar is die res van die geld heen". Die
 // antwoord staan 'n ry laer, met dieselfde datum, maar niks sê dit nie.
 //
-// Die band tussen hulle is die transaksieverwysing: albei uitbetalings noem
-// dieselfde betaling. Dit is 'n vereniging van stelle -- deel twee
-// uitbetalings een verwysing, is hulle een groep.
+// DIE BAND IS DIE DATUM, NIE DIE VERWYSINGS NIE. Die eerste weergawe het die
+// uitbetalings deur hul gedeelde transaksieverwysings gekoppel. Dit werk nie:
+// /settlement/:id/transactions gee NIKS terug vir 'n subrekening se
+// uitbetaling nie, net vir die hoofrekening s'n. Die gevolg was 'n prentjie
+// waarin R35,00 betaal is, R18,00 uitgegaan het, en R17,00 nêrens verskyn nie.
+//
+// Paystack betaal een keer per dag per ontvanger, dus is die datum die band.
 function vf_bou_groepe(alles) {
-  const groep_van = new Map(); // sleutel -> groepnommer
-  const per_verwysing = new Map();
-
-  alles.forEach((v) => {
-    (v.verwysings || []).forEach((r) => {
-      if (!per_verwysing.has(r)) per_verwysing.set(r, []);
-      per_verwysing.get(r).push(v.sleutel);
-    });
-  });
-
-  let volgende = 0;
-  alles.forEach((v) => {
-    if (groep_van.has(v.sleutel)) return;
-
-    // Alles wat aan hierdie een hang, en alles wat aan die hang.
-    const nommer = volgende++;
-    const stapel = [v.sleutel];
-    while (stapel.length) {
-      const sleutel = stapel.pop();
-      if (groep_van.has(sleutel)) continue;
-      groep_van.set(sleutel, nommer);
-
-      const my = alles.find((x) => x.sleutel === sleutel);
-      (my ? my.verwysings || [] : []).forEach((r) => {
-        (per_verwysing.get(r) || []).forEach((ander) => {
-          if (!groep_van.has(ander)) stapel.push(ander);
-        });
-      });
-    }
-  });
-
+  const groep_van = new Map();
+  alles.forEach((v) => groep_van.set(v.sleutel, v.datum));
   return groep_van;
 }
 
@@ -180,7 +202,17 @@ function vf_teken() {
   lys.innerHTML = alles
     .map((v) => {
       const oop = VF_OOP === v.sleutel;
-      const verwysings = v.verwysings || [];
+      const naam = vf_naam(v);
+
+      // DIE FAKTURE VAN DIE HELE GROEP. Paystack noem hulle net op die
+      // hoofrekening se uitbetaling, maar dit is dieselfde betalings wat die
+      // begunstigde se deel gemaak het, dus hoort hulle op albei rye.
+      const groep_nou = alles.filter(
+        (x) => groep_van.get(x.sleutel) === groep_van.get(v.sleutel)
+      );
+      const verwysings = [
+        ...new Set(groep_nou.flatMap((x) => x.verwysings || [])),
+      ];
 
       const kop = `
         <button type="button" class="vf-ry${oop ? " oop" : ""}" data-sleutel="${vf_ontsnap(v.sleutel)}"
@@ -191,8 +223,8 @@ function vf_teken() {
                die ry oop is, sodat die toestand ook sigbaar is. -->
           <span class="vf-pyl" aria-hidden="true">›</span>
           <span class="vf-dat">${vf_ontsnap(vf_datum_af(v.datum))}</span>
-          <span class="vf-wie">${vf_ontsnap(v.ontvanger_naam)}${
-            v.is_hoofrekening ? "" : `<small>${vf_ontsnap(v.ontvanger_kode)}</small>`
+          <span class="vf-wie">${vf_ontsnap(naam.groot)}${
+            naam.klein ? `<small>${vf_ontsnap(naam.klein)}</small>` : ""
           }</span>
           <span class="vf-fooi">${v.fooi_sent ? `\u2212 ${vf_rand(v.fooi_sent)}` : ""}</span>
           <span class="vf-net">${vf_rand(v.netto_sent)}</span>
@@ -235,7 +267,7 @@ function vf_teken() {
       // DIE VOLLE PRENTJIE: wat die kliënte betaal het, wat Paystack gehou het,
       // en wat elke ontvanger gekry het. Die ry se eie ontvanger word gemerk,
       // sodat 'n mens sien waar in die prentjie hierdie ry sit.
-      const groep = alles.filter((x) => groep_van.get(x.sleutel) === groep_van.get(v.sleutel));
+      const groep = groep_nou;
       const betaal = Math.max(...groep.map((x) => Number(x.verwerk_sent) || 0), 0);
       const fooie = groep.reduce((a, x) => a + (Number(x.fooi_sent) || 0), 0);
 
@@ -252,7 +284,7 @@ function vf_teken() {
           ${groep
             .map(
               (x) => `<tr${x.sleutel === v.sleutel ? ' class="vf-prent-hier"' : ""}>
-                <td>${vf_ontsnap(x.ontvanger_naam)}</td>
+                <td>${vf_ontsnap(vf_naam(x).groot)}</td>
                 <td>${vf_rand(x.netto_sent)}</td>
               </tr>`
             )
@@ -313,6 +345,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!VF_SESSIE) await new Promise((r) => setTimeout(r, 100));
   }
   if (!VF_SESSIE) return;
+
+  await vf_laai_name();
 
   ["jn-van", "jn-tot"].forEach((id) => {
     const el = document.getElementById(id);
