@@ -87,6 +87,53 @@ async function vf_vra(pad) {
   return resp.json();
 }
 
+// DIE GROEP: die uitbetalings wat uit DIESELFDE betalings kom.
+//
+// Een betaling van R35,00 word in drie stukke: Paystack se fooi, die
+// hoofrekening se deel en die begunstigde se deel. Paystack betaal elke deel
+// as sy eie uitbetaling uit, en hulle staan as aparte rye in hierdie lys.
+//
+// SONDER DIE GROEP VRA 'n MENS "waar is die res van die geld heen". Die
+// antwoord staan 'n ry laer, met dieselfde datum, maar niks sê dit nie.
+//
+// Die band tussen hulle is die transaksieverwysing: albei uitbetalings noem
+// dieselfde betaling. Dit is 'n vereniging van stelle -- deel twee
+// uitbetalings een verwysing, is hulle een groep.
+function vf_bou_groepe(alles) {
+  const groep_van = new Map(); // sleutel -> groepnommer
+  const per_verwysing = new Map();
+
+  alles.forEach((v) => {
+    (v.verwysings || []).forEach((r) => {
+      if (!per_verwysing.has(r)) per_verwysing.set(r, []);
+      per_verwysing.get(r).push(v.sleutel);
+    });
+  });
+
+  let volgende = 0;
+  alles.forEach((v) => {
+    if (groep_van.has(v.sleutel)) return;
+
+    // Alles wat aan hierdie een hang, en alles wat aan die hang.
+    const nommer = volgende++;
+    const stapel = [v.sleutel];
+    while (stapel.length) {
+      const sleutel = stapel.pop();
+      if (groep_van.has(sleutel)) continue;
+      groep_van.set(sleutel, nommer);
+
+      const my = alles.find((x) => x.sleutel === sleutel);
+      (my ? my.verwysings || [] : []).forEach((r) => {
+        (per_verwysing.get(r) || []).forEach((ander) => {
+          if (!groep_van.has(ander)) stapel.push(ander);
+        });
+      });
+    }
+  });
+
+  return groep_van;
+}
+
 function vf_teken() {
   const lys = document.getElementById("vf-lys");
   const leeg = document.getElementById("vf-leeg");
@@ -127,6 +174,8 @@ function vf_teken() {
     if (oppad) dele.push(`${vf_t("vf_som_oppad", "Nog oppad")}: ${vf_rand(oppad)}`);
     som.textContent = dele.join(" \u00B7 ");
   }
+
+  const groep_van = vf_bou_groepe(alles);
 
   lys.innerHTML = alles
     .map((v) => {
@@ -183,11 +232,36 @@ function vf_teken() {
         )}, ${vf_t("vf_verskil_van", "verskil")} ${vf_rand(v.verskil_sent)}.</p>`;
       }
 
+      // DIE VOLLE PRENTJIE: wat die kliënte betaal het, wat Paystack gehou het,
+      // en wat elke ontvanger gekry het. Die ry se eie ontvanger word gemerk,
+      // sodat 'n mens sien waar in die prentjie hierdie ry sit.
+      const groep = alles.filter((x) => groep_van.get(x.sleutel) === groep_van.get(v.sleutel));
+      const betaal = Math.max(...groep.map((x) => Number(x.verwerk_sent) || 0), 0);
+      const fooie = groep.reduce((a, x) => a + (Number(x.fooi_sent) || 0), 0);
+
+      const prentjie = `
+        <table class="vf-prent">
+          <tr>
+            <td>${vf_t("vf_betaal", "Kliënte het betaal")}</td>
+            <td>${vf_rand(betaal)}</td>
+          </tr>
+          <tr class="vf-prent-fooi">
+            <td>${vf_t("vf_paystack_fooi", "Paystack se fooi")}</td>
+            <td>− ${vf_rand(fooie)}</td>
+          </tr>
+          ${groep
+            .map(
+              (x) => `<tr${x.sleutel === v.sleutel ? ' class="vf-prent-hier"' : ""}>
+                <td>${vf_ontsnap(x.ontvanger_naam)}</td>
+                <td>${vf_rand(x.netto_sent)}</td>
+              </tr>`
+            )
+            .join("")}
+        </table>`;
+
       return `${kop}
         <div class="vf-binne">
-          <p class="vf-binne-kop">${vf_t("vf_verwerk", "Verwerk")}: ${vf_rand(
-        v.verwerk_sent
-      )} · ${vf_t("vf_bruto", "Hierdie ontvanger")}: ${vf_rand(v.bruto_sent)}</p>
+          ${prentjie}
           ${kontrole}
           ${binne}
         </div>`;

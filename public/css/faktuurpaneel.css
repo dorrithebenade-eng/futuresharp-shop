@@ -1247,6 +1247,24 @@ a.paneel-kieslys-item { text-decoration: none; }
   background: var(--lig, #f7f6f4);
 }
 
+/* DIE VOLLE PRENTJIE: wat betaal is, wat Paystack gehou het, en wat elke
+   ontvanger gekry het. 'n Tabel en nie 'n sin nie, want die bedrae moet onder
+   mekaar staan om nagetel te kan word. */
+.vf-prent {
+  margin: 0 0 10px;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+
+.vf-prent td { padding: 2px 0; }
+.vf-prent td:first-child { padding-right: 22px; color: var(--grys-teks, #5b5b5b); }
+.vf-prent td:last-child { text-align: right; font-variant-numeric: tabular-nums; }
+
+.vf-prent-fooi td { color: var(--koraal, #c0483a); }
+
+/* Die ry waarin 'n mens staan, sodat die prentjie en die lys aan mekaar vas is. */
+.vf-prent-hier td { font-weight: 600; color: var(--swart, #171717); }
+
 .vf-binne-kop {
   margin: 0 0 8px;
   font-size: 12px;

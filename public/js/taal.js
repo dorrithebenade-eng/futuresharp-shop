@@ -2092,6 +2092,8 @@ const WOORDEBOEK = {
     af: "Geen transaksies op hierdie uitbetaling nie.",
     en: "No transactions on this payout.",
   },
+  vf_betaal: { af: "Kliënte het betaal", en: "Customers paid" },
+  vf_paystack_fooi: { af: "Paystack se fooi", en: "Paystack's fee" },
   vf_verskil_kort: { af: "verskil", en: "difference" },
   vf_ontbreek_kort: { af: "onvolledig", en: "incomplete" },
   vf_verskil: {
