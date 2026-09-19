@@ -66,8 +66,20 @@ exports.handler = async (event, context) => {
     return { statusCode: 400, body: `Die bereik is ${dae} dae; die maksimum is ${MAKS_DAE}` };
   }
 
+  // 'N GEKOSE ONTVANGERLYS, vir 'n diagnose. Word dit weggelaat, loop die
+  // inhaal oor die hoofrekening en elke begunstigde met 'n subrekening, soos
+  // die skedule doen. 'n Kode van "" beteken: vra Paystack sonder die
+  // subrekening-filter.
+  //
+  //   body: { van, tot, ontvangers: [{ kode: "", naam: "alles" }] }
+  const ontvangers = Array.isArray(invoer.ontvangers)
+    ? invoer.ontvangers
+        .filter((o) => o && typeof o === "object")
+        .map((o) => ({ kode: String(o.kode == null ? "" : o.kode), naam: String(o.naam || o.kode || "alles") }))
+    : null;
+
   try {
-    const uitslag = await haal_vereffenings(van, tot);
+    const uitslag = await haal_vereffenings(van, tot, ontvangers);
     console.log(
       `Vereffening-inhaal ${van} tot ${tot} deur ${gebruiker.email || ""}: ` +
         `${uitslag.gehaal} gehaal, ${uitslag.geskryf} geskryf.`

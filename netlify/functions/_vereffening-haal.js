@@ -133,13 +133,28 @@ async function haal_vereffenings(van, tot, ontvangers) {
   let geskryf = 0;
   const foute = [];
 
+  // 'N TELLING PER ONTVANGER. Die eerste inhaal op 19 September het 17 van 31
+  // uitbetalings gekry, sonder 'n enkele fout: die hoofrekening s'n het gekom
+  // en die subrekeninge s'n nie. 'n Totaal alleen wys nie so iets nie, en 'n
+  // stil nul is die soort ding wat 'n mens eers maande later agterkom.
+  const per_ontvanger = [];
+
   for (const ontvanger of lys_ontvangers) {
     let blad = 1;
+    let o_gehaal = 0;
+    let o_geskryf = 0;
 
     while (blad <= MAKS_BLAAIE) {
+      // 'N LEE KODE BETEKEN: GEEN FILTER. Paystack se `subaccount` neem "none"
+      // vir die rekening self of 'n ACCT_-kode vir 'n subrekening. Word die
+      // parameter heeltemal weggelaat, gee Paystack alles wat hy sou gee. Dit
+      // is hoe 'n mens toets wat die filter self wegneem, sonder om te raai.
+      const filter = ontvanger.kode
+        ? `&subaccount=${encodeURIComponent(ontvanger.kode)}`
+        : "";
+
       const url =
-        `${PAYSTACK_VEREFFENINGS}?perPage=${PER_BLAD}&page=${blad}` +
-        `&subaccount=${encodeURIComponent(ontvanger.kode)}` +
+        `${PAYSTACK_VEREFFENINGS}?perPage=${PER_BLAD}&page=${blad}${filter}` +
         `&from=${encodeURIComponent(van_t)}&to=${encodeURIComponent(tot_t)}`;
 
       let data;
@@ -157,6 +172,7 @@ async function haal_vereffenings(van, tot, ontvangers) {
 
       const lys = Array.isArray(data.data) ? data.data : [];
       gehaal += lys.length;
+      o_gehaal += lys.length;
 
       for (const v of lys) {
         const verwysings = await haal_verwysings(v.id, foute);
@@ -179,6 +195,7 @@ async function haal_vereffenings(van, tot, ontvangers) {
         try {
           await store.setJSON(rekord.sleutel, rekord);
           geskryf++;
+          o_geskryf++;
         } catch (fout) {
           foute.push(`${ontvanger.naam}, ${v.id}: kon nie stoor nie -- ${fout.message || fout}`);
         }
@@ -188,9 +205,16 @@ async function haal_vereffenings(van, tot, ontvangers) {
       if (blad >= bladsye || !lys.length) break;
       blad++;
     }
+
+    per_ontvanger.push({
+      naam: ontvanger.naam,
+      kode: ontvanger.kode,
+      gehaal: o_gehaal,
+      geskryf: o_geskryf,
+    });
   }
 
-  return { gehaal, geskryf, ontvangers: lys_ontvangers.length, foute };
+  return { gehaal, geskryf, ontvangers: lys_ontvangers.length, per_ontvanger, foute };
 }
 
 // "Vandag min N dae", as YYYY-MM-DD in UTC.
