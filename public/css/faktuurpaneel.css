@@ -1299,6 +1299,17 @@ a.paneel-kieslys-item { text-decoration: none; }
 /* Die voorsiening is nie 'n bestemming nie, dus staan sy sagter. */
 .vf-fk-sag { color: var(--grys-teks, #5b5b5b); opacity: 0.75; font-size: 11.5px; }
 
+/* WAT IN FUTURE SHARP SE EIE REKENING BELAND, STAAN UIT.
+   Die lys wys drie soorte geld deurmekaar: die maatskappy s'n, die
+   begunstigdes s'n en Paystack se fooi. Die eerste is die een waarvoor 'n mens
+   die lys oopmaak, dus kry sy die teal. */
+.vf-ons,
+.vf-ons b,
+.vf-ons td {
+  color: var(--teal, #479f91);
+  font-weight: 600;
+}
+
 .vf-tr { padding: 4px 0; font-size: 13px; }
 .vf-tr small {
   display: block;

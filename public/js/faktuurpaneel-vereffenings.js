@@ -127,20 +127,22 @@ function vf_faktuur_blok(f) {
 
   (f.rye || []).forEach((r) => {
     const naam = VF_NAME.get(r.subrekening_kode) || r.naam || hoof;
+    const ons = !r.subrekening_kode || naam === hoof;
     if (r.waarvoor && r.waarvoor.length) {
       r.waarvoor.forEach((w) => {
-        reels.push({ naam, wat: w.reel, sent: w.bedrag_sent });
+        reels.push({ naam, wat: w.reel, sent: w.bedrag_sent, ons });
       });
     } else {
-      reels.push({ naam, wat: "", sent: r.bedrag_sent });
+      reels.push({ naam, wat: "", sent: r.bedrag_sent, ons });
     }
   });
 
+  // Die hosting en die oorskot bly altyd in die hoofrekening.
   if (f.hosting_sent) {
-    reels.push({ naam: hoof, wat: vf_t("vf_hosting", "hosting"), sent: f.hosting_sent });
+    reels.push({ naam: hoof, wat: vf_t("vf_hosting", "hosting"), sent: f.hosting_sent, ons: true });
   }
   if (f.oorskot_sent) {
-    reels.push({ naam: hoof, wat: vf_t("vf_oorskot", "oorskot"), sent: f.oorskot_sent });
+    reels.push({ naam: hoof, wat: vf_t("vf_oorskot", "oorskot"), sent: f.oorskot_sent, ons: true });
   }
 
   const gedemp = f.voorsiening_sent
@@ -158,7 +160,7 @@ function vf_faktuur_blok(f) {
       </div>
       ${reels
         .map(
-          (r) => `<div class="vf-fk-r">
+          (r) => `<div class="vf-fk-r${r.ons ? " vf-ons" : ""}">
             <span><b>${vf_ontsnap(r.naam)}</b>${r.wat ? ` · ${vf_ontsnap(r.wat)}` : ""}</span>
             <span>${vf_rand(r.sent)}</span>
           </div>`
@@ -308,11 +310,11 @@ function vf_teken() {
                die ry oop is, sodat die toestand ook sigbaar is. -->
           <span class="vf-pyl" aria-hidden="true">›</span>
           <span class="vf-dat">${vf_ontsnap(vf_datum_af(v.datum))}</span>
-          <span class="vf-wie">${vf_ontsnap(naam.groot)}${
+          <span class="vf-wie${v.is_hoofrekening ? " vf-ons" : ""}">${vf_ontsnap(naam.groot)}${
             naam.klein ? `<small>${vf_ontsnap(naam.klein)}</small>` : ""
           }</span>
           <span class="vf-fooi">${v.fooi_sent ? `\u2212 ${vf_rand(v.fooi_sent)}` : ""}</span>
-          <span class="vf-net">${vf_rand(v.netto_sent)}</span>
+          <span class="vf-net${v.is_hoofrekening ? " vf-ons" : ""}">${vf_rand(v.netto_sent)}</span>
           <span class="vf-stand${
             String(v.status).toLowerCase() === "success" ? " klaar" : ""
           }">${vf_ontsnap(vf_status_af(v.status))}${vf_merk(v)}</span>
@@ -369,7 +371,9 @@ function vf_teken() {
           </tr>
           ${groep
             .map(
-              (x) => `<tr${x.sleutel === v.sleutel ? ' class="vf-prent-hier"' : ""}>
+              (x) => `<tr class="${x.sleutel === v.sleutel ? "vf-prent-hier " : ""}${
+                x.is_hoofrekening ? "vf-ons" : ""
+              }">
                 <td>${vf_ontsnap(vf_naam(x).groot)}</td>
                 <td>${vf_rand(x.netto_sent)}</td>
               </tr>`
