@@ -2099,7 +2099,7 @@ const WOORDEBOEK = {
     en: "Shop order, not an invoice.",
   },
   vf_faktuur_toets: {
-    af: "Die faktuur bestaan nie meer nie. Sy was deel van die toetsfase en is uitgevee.",
+    af: "Die faktuur bestaan nie meer nie. Dit was deel van die toetsfase en is uitgevee.",
     en: "The invoice no longer exists. It was part of the test phase and has been deleted.",
   },
   vf_faktuur_weg: {

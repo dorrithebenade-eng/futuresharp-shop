@@ -104,7 +104,7 @@ function vf_faktuur_blok(f) {
         VF_DATA && VF_DATA.toetsfase
           ? vf_t(
               "vf_faktuur_toets",
-              "Die faktuur bestaan nie meer nie. Sy was deel van die toetsfase en is uitgevee."
+              "Die faktuur bestaan nie meer nie. Dit was deel van die toetsfase en is uitgevee."
             )
           : vf_t("vf_faktuur_weg", "Hierdie faktuur bestaan nie meer nie.");
     } else if (f.nommer) {
