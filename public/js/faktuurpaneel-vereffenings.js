@@ -83,6 +83,68 @@ function vf_merk(v) {
   return "";
 }
 
+// Een blok per faktuur: die nommer, die totaal, en dan waarheen elke deel
+// gegaan het.
+//
+// DIE VOORSIENING STAAN GEDEMP, want dit is nie 'n bestemming nie. Dit is wat
+// opsy gehou is vir Paystack se fooi, en wat daarvan oorbly, bly in die
+// hoofrekening. Sonder hom lyk dit of 'n deel van die faktuur verdwyn het.
+function vf_faktuur_blok(f) {
+  if (!f.nommer || !f.rye) {
+    // 'n Verwysing sonder faktuur: 'n winkelbestelling of iets anders.
+    return `
+      <div class="vf-fk">
+        <div class="vf-fk-kop"><span>${vf_ontsnap(f.nommer || f.verwysing)}</span><span></span></div>
+        <div class="vf-fk-r"><span class="vf-fk-sag">${vf_ontsnap(f.verwysing)}</span><span></span></div>
+      </div>`;
+  }
+
+  const hoof = VF_HOOF_NAAM || vf_t("vf_hoofrekening", "Hoofrekening");
+  const reels = [];
+
+  (f.rye || []).forEach((r) => {
+    const naam = VF_NAME.get(r.subrekening_kode) || r.naam || hoof;
+    if (r.waarvoor && r.waarvoor.length) {
+      r.waarvoor.forEach((w) => {
+        reels.push({ naam, wat: w.reel, sent: w.bedrag_sent });
+      });
+    } else {
+      reels.push({ naam, wat: "", sent: r.bedrag_sent });
+    }
+  });
+
+  if (f.hosting_sent) {
+    reels.push({ naam: hoof, wat: vf_t("vf_hosting", "hosting"), sent: f.hosting_sent });
+  }
+  if (f.oorskot_sent) {
+    reels.push({ naam: hoof, wat: vf_t("vf_oorskot", "oorskot"), sent: f.oorskot_sent });
+  }
+
+  const gedemp = f.voorsiening_sent
+    ? `<div class="vf-fk-r"><span class="vf-fk-sag">${vf_t(
+        "vf_voorsiening",
+        "Voorsiening vir Paystack se fooi"
+      )}</span><span class="vf-fk-sag">${vf_rand(f.voorsiening_sent)}</span></div>`
+    : "";
+
+  return `
+    <div class="vf-fk">
+      <div class="vf-fk-kop">
+        <span>${vf_ontsnap(f.nommer)}</span>
+        <span>${vf_rand(f.totaal_sent)}</span>
+      </div>
+      ${reels
+        .map(
+          (r) => `<div class="vf-fk-r">
+            <span><b>${vf_ontsnap(r.naam)}</b>${r.wat ? ` · ${vf_ontsnap(r.wat)}` : ""}</span>
+            <span>${vf_rand(r.sent)}</span>
+          </div>`
+        )
+        .join("")}
+      ${gedemp}
+    </div>`;
+}
+
 function vf_status_af(status) {
   const s = String(status || "").toLowerCase();
   if (s === "success") return vf_t("vf_status_klaar", "Uitbetaal");
@@ -235,16 +297,17 @@ function vf_teken() {
 
       if (!oop) return kop;
 
-      const binne = verwysings.length
-        ? verwysings
-            .map(
-              (r) => `
-          <div class="vf-tr">
-            <span class="vf-tr-nom">${vf_ontsnap(vf_faktuurnommer(r))}</span>
-            <small>${vf_ontsnap(r)}</small>
-          </div>`
-            )
-            .join("")
+      // DIE AFBREEK PER FAKTUUR. Die prentjie hierbo sê hoeveel elkeen gekry
+      // het; hierdie sê waarvoor. Die bedrae kom uit die faktuur se gevriesde
+      // verdeling, dus is dit wat op die dag van uitreiking besluit is.
+      const fakture = [
+        ...new Map(
+          groep_nou.flatMap((x) => (x.fakture || []).map((f) => [f.verwysing, f]))
+        ).values(),
+      ];
+
+      const binne = fakture.length
+        ? fakture.map((f) => vf_faktuur_blok(f)).join("")
         : `<p class="jn-leeg">${vf_t("vf_geen_transaksies", "Geen transaksies op hierdie uitbetaling nie.")}</p>`;
 
       // Die fooikontrole, in woorde. Klop dit, staan daar niks: 'n reël wat

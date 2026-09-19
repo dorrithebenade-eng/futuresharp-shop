@@ -1271,6 +1271,34 @@ a.paneel-kieslys-item { text-decoration: none; }
   color: var(--grys-teks, #5b5b5b);
 }
 
+/* Een blok per faktuur: wie kry wat, waarvoor. */
+.vf-fk { margin-top: 14px; }
+
+.vf-fk-kop {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--grys-lig, #e7e4de);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.vf-fk-r {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 90px;
+  gap: 12px;
+  padding: 3px 0;
+  font-size: 12.5px;
+  color: var(--grys-teks, #5b5b5b);
+}
+
+.vf-fk-r b { font-weight: 500; color: var(--swart, #171717); }
+.vf-fk-r span:last-child { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* Die voorsiening is nie 'n bestemming nie, dus staan sy sagter. */
+.vf-fk-sag { color: var(--grys-teks, #5b5b5b); opacity: 0.75; font-size: 11.5px; }
+
 .vf-tr { padding: 4px 0; font-size: 13px; }
 .vf-tr small {
   display: block;

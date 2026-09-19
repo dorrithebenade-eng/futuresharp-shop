@@ -17,6 +17,7 @@ const {
   kry_paystack_transaksies_store,
   skep_sleutel: transaksie_sleutel,
 } = require("./_paystack-transaksies");
+const { kry_fakture_store, nommer_na_sleutel } = require("./_fakture");
 
 const ROLLE = ["boekhouding"];
 
@@ -42,8 +43,76 @@ exports.handler = async (event, context) => {
   // groot, en die lys sou met 'n paar honderd vereffenings onhanteerbaar word.
   const wys_rou = String(vraag.rou || "") === "1";
 
+  const foute = [];
+
   const store = kry_vereffenings_store();
   const t_store = kry_paystack_transaksies_store();
+  const f_store = kry_fakture_store();
+
+  // ── DIE AFBREEK PER FAKTUUR ─────────────────────────────────────────────
+  //
+  // Die uitbetaling sê hoeveel elke ontvanger gekry het. Sy sê nie WAARVOOR
+  // nie, en dit is die vraag wat 'n mens werklik vra: watter reël van watter
+  // faktuur het daardie geld gemaak, en waar het die hosting heen gegaan.
+  //
+  // Die antwoord staan reeds op die faktuur. By uitreiking word die verdeling
+  // GEVRIES, met per ontvanger 'n `waarvoor`-lys van die reëls waaruit sy geld
+  // kom, plus die hosting, die voorsiening en die oorskot apart. Hier word dit
+  // net gelees; niks word hier herbereken nie.
+  //
+  // 'n VERWYSING SONDER FAKTUUR is 'n winkelbestelling of iets anders. Dan bly
+  // die verwysing alleen staan, sonder afbreek.
+  const faktuur_kas = new Map();
+
+  function nommer_uit_verwysing(verwysing) {
+    const dele = String(verwysing || "").split("-");
+    if (dele.length >= 2 && /^[A-Z]{2}$/.test(dele[0]) && /^\d+$/.test(dele[1])) {
+      return `${dele[0]}/${dele[1]}`;
+    }
+    return null;
+  }
+
+  async function kry_faktuur_afbreek(verwysing) {
+    if (faktuur_kas.has(verwysing)) return faktuur_kas.get(verwysing);
+
+    const nommer = nommer_uit_verwysing(verwysing);
+    let uit = { verwysing, nommer };
+
+    if (nommer) {
+      try {
+        const sleutel = nommer_na_sleutel(nommer);
+        const f = sleutel ? await f_store.get(sleutel, { type: "json" }) : null;
+        const g = f && f.verdeling_gevries;
+        if (g) {
+          uit = {
+            verwysing,
+            nommer,
+            totaal_sent: Number(g.totaal_sent) || 0,
+            hosting_sent: Number(g.hosting_sent) || 0,
+            voorsiening_sent: Number(g.voorsiening_sent) || 0,
+            oorskot_sent: Number(g.oorskot_sent) || 0,
+            rye: (g.rye || []).map((r) => ({
+              naam: r.naam || "",
+              subrekening_kode: r.subrekening_kode || "",
+              bedrag_sent: Number(r.bedrag_sent) || 0,
+              pad: r.pad || "",
+              waarvoor: (r.waarvoor || []).map((w) => ({
+                reel: w.reel || "",
+                bedrag_sent: Number(w.bedrag_sent) || 0,
+              })),
+            })),
+          };
+        }
+      } catch (fout) {
+        // 'n Faktuur wat nie gelees kan word nie, laat die verwysing kaal. Dit
+        // is beter as 'n halwe afbreek wat soos 'n volledige een lyk.
+        foute.push(`${nommer}: ${fout.message || fout}`);
+      }
+    }
+
+    faktuur_kas.set(verwysing, uit);
+    return uit;
+  }
 
   // DIE VERSKILKONTROLE.
   //
@@ -92,7 +161,6 @@ exports.handler = async (event, context) => {
   const jare = new Set([finansiele_jaar(van), finansiele_jaar(tot)].filter((j) => j != null));
 
   const vereffenings = [];
-  const foute = [];
 
   for (const jaar of jare) {
     let blobs = [];
@@ -125,6 +193,11 @@ exports.handler = async (event, context) => {
       }
       const ontbreek = (r.verwysings || []).length - gevind;
 
+      const fakture = [];
+      for (const verwysing of r.verwysings || []) {
+        fakture.push(await kry_faktuur_afbreek(verwysing));
+      }
+
       const uit = {
         sleutel: r.sleutel,
         paystack_id: r.paystack_id,
@@ -141,6 +214,7 @@ exports.handler = async (event, context) => {
         netto_sent: r.netto_sent,
         status: r.status,
         verwysings: r.verwysings || [],
+        fakture,
 
         // `verskil_sent` is die uitbetaling se fooi min wat die transaksies sê.
         // Nul beteken hulle klop.

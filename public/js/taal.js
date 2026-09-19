@@ -2094,6 +2094,12 @@ const WOORDEBOEK = {
   },
   vf_hoofrekening: { af: "Hoofrekening", en: "Main account" },
   vf_betaal: { af: "Kliënte het betaal", en: "Customers paid" },
+  vf_hosting: { af: "hosting", en: "hosting" },
+  vf_oorskot: { af: "oorskot", en: "surplus" },
+  vf_voorsiening: {
+    af: "Voorsiening vir Paystack se fooi",
+    en: "Provision for Paystack's fee",
+  },
   vf_paystack_fooi: { af: "Paystack se fooi", en: "Paystack's fee" },
   vf_verskil_kort: { af: "verskil", en: "difference" },
   vf_ontbreek_kort: { af: "onvolledig", en: "incomplete" },
