@@ -1228,6 +1228,19 @@ a.paneel-kieslys-item { text-decoration: none; }
 }
 .vf-stand.klaar { color: var(--teal, #479f91); }
 
+/* Die merk op die ry: klein, koraal, en net waar iets skeef is. */
+.vf-merk {
+  display: block;
+  font-size: 10.5px;
+  color: var(--koraal, #c0483a);
+}
+
+.vf-waarsku {
+  margin: 0 0 8px;
+  font-size: 12px;
+  color: var(--koraal, #c0483a);
+}
+
 .vf-binne {
   padding: 10px 6px 14px 106px;
   border-bottom: 1px solid var(--grys-lig, #e7e4de);

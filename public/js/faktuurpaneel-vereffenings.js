@@ -61,6 +61,16 @@ function vf_faktuurnommer(verwysing) {
   return String(verwysing || "");
 }
 
+// DIE VERSKILMERK. 'n Uitbetaling se fooi moet klop met die som van sy
+// transaksies se fooie. Klop dit nie, of ontbreek 'n transaksie in ons store,
+// staan dit op die ry en nie net binne-in nie: 'n mens maak nie dertig rye oop
+// om te sien of een skeef is nie.
+function vf_merk(v) {
+  if (v.ontbreek) return `<small class="vf-merk">${vf_t("vf_ontbreek_kort", "onvolledig")}</small>`;
+  if (v.verskil_sent) return `<small class="vf-merk">${vf_t("vf_verskil_kort", "verskil")}</small>`;
+  return "";
+}
+
 function vf_status_af(status) {
   const s = String(status || "").toLowerCase();
   if (s === "success") return vf_t("vf_status_klaar", "Uitbetaal");
@@ -139,7 +149,7 @@ function vf_teken() {
           <span class="vf-net">${vf_rand(v.netto_sent)}</span>
           <span class="vf-stand${
             String(v.status).toLowerCase() === "success" ? " klaar" : ""
-          }">${vf_ontsnap(vf_status_af(v.status))}</span>
+          }">${vf_ontsnap(vf_status_af(v.status))}${vf_merk(v)}</span>
         </button>`;
 
       if (!oop) return kop;
@@ -156,11 +166,29 @@ function vf_teken() {
             .join("")
         : `<p class="jn-leeg">${vf_t("vf_geen_transaksies", "Geen transaksies op hierdie uitbetaling nie.")}</p>`;
 
+      // Die fooikontrole, in woorde. Klop dit, staan daar niks: 'n reël wat
+      // elke keer "alles reg" sê, word na drie kere nie meer gelees nie.
+      let kontrole = "";
+      if (v.ontbreek) {
+        kontrole = `<p class="vf-waarsku">${vf_t(
+          "vf_ontbreek",
+          "Van hierdie uitbetaling se transaksies is nog nie afgehaal nie, dus kan die fooie nie vergelyk word nie."
+        )} (${v.ontbreek})</p>`;
+      } else if (v.verskil_sent) {
+        kontrole = `<p class="vf-waarsku">${vf_t(
+          "vf_verskil",
+          "Die fooi op hierdie uitbetaling klop nie met die transaksies s'n nie"
+        )}: ${vf_rand(v.fooi_sent)} ${vf_t("vf_teenoor", "teenoor")} ${vf_rand(
+          v.som_fooie_sent
+        )}, ${vf_t("vf_verskil_van", "verskil")} ${vf_rand(v.verskil_sent)}.</p>`;
+      }
+
       return `${kop}
         <div class="vf-binne">
           <p class="vf-binne-kop">${vf_t("vf_verwerk", "Verwerk")}: ${vf_rand(
         v.verwerk_sent
-      )} \u00B7 ${vf_t("vf_bruto", "Hierdie ontvanger")}: ${vf_rand(v.bruto_sent)}</p>
+      )} · ${vf_t("vf_bruto", "Hierdie ontvanger")}: ${vf_rand(v.bruto_sent)}</p>
+          ${kontrole}
           ${binne}
         </div>`;
     })

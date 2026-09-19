@@ -2092,6 +2092,18 @@ const WOORDEBOEK = {
     af: "Geen transaksies op hierdie uitbetaling nie.",
     en: "No transactions on this payout.",
   },
+  vf_verskil_kort: { af: "verskil", en: "difference" },
+  vf_ontbreek_kort: { af: "onvolledig", en: "incomplete" },
+  vf_verskil: {
+    af: "Die fooi op hierdie uitbetaling klop nie met die transaksies s'n nie",
+    en: "The fee on this payout does not match the transactions",
+  },
+  vf_teenoor: { af: "teenoor", en: "versus" },
+  vf_verskil_van: { af: "verskil", en: "difference" },
+  vf_ontbreek: {
+    af: "Van hierdie uitbetaling se transaksies is nog nie afgehaal nie, dus kan die fooie nie vergelyk word nie.",
+    en: "Some of this payout's transactions have not been fetched yet, so the fees cannot be compared.",
+  },
   // Een sleutel, twaalf afkortings. Mrt/Mar, Okt/Oct en Des/Dec verskil;
   // die res is dieselfde. Die kode split op die komma.
   fd_maande: {
