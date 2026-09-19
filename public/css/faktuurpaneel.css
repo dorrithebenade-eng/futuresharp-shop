@@ -1175,7 +1175,7 @@ a.paneel-kieslys-item { text-decoration: none; }
 
 .vf-ry {
   display: grid;
-  grid-template-columns: 96px minmax(0, 1fr) 90px 96px 84px;
+  grid-template-columns: 14px 96px minmax(0, 1fr) 90px 96px 84px;
   align-items: center;
   gap: 10px;
   width: 100%;
@@ -1190,6 +1190,16 @@ a.paneel-kieslys-item { text-decoration: none; }
 
 .vf-ry:hover { background: var(--lig, #f7f6f4); }
 .vf-ry.oop { background: var(--lig, #f7f6f4); }
+
+/* Die pyltjie draai 90 grade wanneer die ry oop is. Die oorgang is kort:
+   dit moet die oog lei, nie 'n vertoning wees nie. */
+.vf-pyl {
+  font-size: 15px;
+  line-height: 1;
+  color: var(--grys-teks, #5b5b5b);
+  transition: transform 0.12s ease;
+}
+.vf-ry.oop .vf-pyl { transform: rotate(90deg); }
 
 .vf-dat { font-size: 12.5px; color: var(--grys-teks, #5b5b5b); }
 
@@ -1234,8 +1244,8 @@ a.paneel-kieslys-item { text-decoration: none; }
 }
 
 @media (max-width: 720px) {
-  .vf-ry { grid-template-columns: minmax(0, 1fr) 88px; row-gap: 2px; }
-  .vf-dat { grid-column: 1 / -1; }
+  .vf-ry { grid-template-columns: 14px minmax(0, 1fr) 88px; row-gap: 2px; }
+  .vf-dat { grid-column: 2 / -1; }
   .vf-fooi, .vf-stand { grid-column: 1 / -1; text-align: left; }
   .vf-binne { padding-left: 6px; }
 }

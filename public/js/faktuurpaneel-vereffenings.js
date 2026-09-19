@@ -126,6 +126,11 @@ function vf_teken() {
       const kop = `
         <button type="button" class="vf-ry${oop ? " oop" : ""}" data-sleutel="${vf_ontsnap(v.sleutel)}"
                 aria-expanded="${oop ? "true" : "false"}">
+          <!-- DIE PYLTJIE SE DAT DIE RY OOPMAAK. Sonder hom lyk die lys soos 'n
+               tabel en bly die transaksies daaronder onontdek; dit het presies
+               so gebeur toe die blok die eerste keer gewys is. Hy draai wanneer
+               die ry oop is, sodat die toestand ook sigbaar is. -->
+          <span class="vf-pyl" aria-hidden="true">›</span>
           <span class="vf-dat">${vf_ontsnap(vf_datum_af(v.datum))}</span>
           <span class="vf-wie">${vf_ontsnap(v.ontvanger_naam)}${
             v.is_hoofrekening ? "" : `<small>${vf_ontsnap(v.ontvanger_kode)}</small>`
