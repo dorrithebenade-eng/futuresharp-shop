@@ -1,0 +1,216 @@
+// public/js/faktuurpaneel-vereffenings.js
+//
+// Paystack se uitbetalings, onder Joernaal.
+//
+// WAAROM DIT HIER SIT EN NIE IN 'N SEWENDE PIL NIE. Die Joernaal wys wat
+// gebeur het; hierdie lys wys waar daardie geld beland het. Die twee hoort
+// langs mekaar, en 'n mens vra die tweede vraag altyd net ná die eerste.
+//
+// DIE DATUMS IS DIE JOERNAAL S'N. Twee stelle datumvelde op een blad beteken
+// twee tydperke wat stilweg verskil, en dan vergelyk 'n mens Maart met April
+// sonder om dit te weet.
+//
+// WAT HIERDIE LYS NIE DOEN NIE: boek. Dit lees die store en wys hom. Die
+// joernaal se syfers kom van elders af en verander nie hierdeur nie.
+
+let VF_SESSIE = null;
+let VF_DATA = null;
+let VF_OOP = null; // die sleutel van die ry wat oop is, of null
+
+function vf_t(sleutel, verstek) {
+  const uit = window.t ? window.t(sleutel) : null;
+  return uit && uit !== sleutel ? uit : verstek;
+}
+
+function vf_ontsnap(teks) {
+  return String(teks == null ? "" : teks)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+// Presies soos jn_rand() in faktuurpaneel-joernaal.js: 'n harde spasie as
+// duisendskeier en 'n komma voor die sente, sodat 'n bedrag oral op die blad
+// dieselfde lyk.
+function vf_rand(sent) {
+  const n = Math.round(Math.abs(Number(sent) || 0));
+  const heel = String(Math.floor(n / 100)).replace(/\B(?=(\d{3})+(?!\d))/g, "\u00A0");
+  return "R" + heel + "," + String(n % 100).padStart(2, "0");
+}
+
+function vf_datum_af(iso) {
+  if (!iso) return "";
+  const maande = ["Jan", "Feb", "Mrt", "Apr", "Mei", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Des"];
+  const d = String(iso).split("-");
+  if (d.length !== 3) return String(iso);
+  return `${Number(d[2])} ${maande[Number(d[1]) - 1] || ""} ${d[0]}`;
+}
+
+// 'N VERWYSING DRA DIE FAKTUURNOMMER. _faktuur-uitreik.js bou hom as
+// FS-01964-1789656222742: die deel voor die tweede koppelteken is die nommer.
+//
+// 'n Verwysing sonder daardie vorm is 'n winkelbestelling of iets anders. Dan
+// word die verwysing self gewys, want 'n faktuurnommer belowe wat nie bestaan
+// nie, is erger as geen nommer.
+function vf_faktuurnommer(verwysing) {
+  const dele = String(verwysing || "").split("-");
+  if (dele.length >= 2 && /^[A-Z]{2}$/.test(dele[0]) && /^\d+$/.test(dele[1])) {
+    return `${dele[0]}/${dele[1]}`;
+  }
+  return String(verwysing || "");
+}
+
+function vf_status_af(status) {
+  const s = String(status || "").toLowerCase();
+  if (s === "success") return vf_t("vf_status_klaar", "Uitbetaal");
+  if (s === "processing") return vf_t("vf_status_oppad", "Oppad");
+  if (s === "pending") return vf_t("vf_status_wag", "Wag");
+  return status || "";
+}
+
+async function vf_vra(pad) {
+  const resp = await fetch(`/.netlify/functions/${pad}`, {
+    headers: await identiteit_kop(),
+  });
+  if (!resp.ok) throw new Error(await resp.text());
+  return resp.json();
+}
+
+function vf_teken() {
+  const lys = document.getElementById("vf-lys");
+  const leeg = document.getElementById("vf-leeg");
+  const som = document.getElementById("vf-som");
+  if (!lys) return;
+
+  const alles = (VF_DATA && VF_DATA.vereffenings) || [];
+
+  if (!alles.length) {
+    lys.innerHTML = "";
+    if (leeg) leeg.hidden = false;
+    if (som) som.textContent = "";
+    return;
+  }
+  if (leeg) leeg.hidden = true;
+
+  // DRIE SYFERS, NIE 'N TOTAAL NIE. Die hoofrekening se geld en 'n
+  // begunstigde se geld is nie dieselfde geld nie, en 'n som daarvan sou
+  // niks beteken nie. Wat nog oppad is, staan apart: dit het nog nie geland
+  // nie.
+  let hoof = 0;
+  let ander = 0;
+  let oppad = 0;
+  for (const v of alles) {
+    if (String(v.status).toLowerCase() !== "success") {
+      oppad += Number(v.netto_sent) || 0;
+      continue;
+    }
+    if (v.is_hoofrekening) hoof += Number(v.netto_sent) || 0;
+    else ander += Number(v.netto_sent) || 0;
+  }
+
+  if (som) {
+    const dele = [
+      `${vf_t("vf_som_hoof", "Na die hoofrekening")}: ${vf_rand(hoof)}`,
+      `${vf_t("vf_som_ander", "Na begunstigdes")}: ${vf_rand(ander)}`,
+    ];
+    if (oppad) dele.push(`${vf_t("vf_som_oppad", "Nog oppad")}: ${vf_rand(oppad)}`);
+    som.textContent = dele.join(" \u00B7 ");
+  }
+
+  lys.innerHTML = alles
+    .map((v) => {
+      const oop = VF_OOP === v.sleutel;
+      const verwysings = v.verwysings || [];
+
+      const kop = `
+        <button type="button" class="vf-ry${oop ? " oop" : ""}" data-sleutel="${vf_ontsnap(v.sleutel)}"
+                aria-expanded="${oop ? "true" : "false"}">
+          <span class="vf-dat">${vf_ontsnap(vf_datum_af(v.datum))}</span>
+          <span class="vf-wie">${vf_ontsnap(v.ontvanger_naam)}${
+            v.is_hoofrekening ? "" : `<small>${vf_ontsnap(v.ontvanger_kode)}</small>`
+          }</span>
+          <span class="vf-fooi">${v.fooi_sent ? `\u2212 ${vf_rand(v.fooi_sent)}` : ""}</span>
+          <span class="vf-net">${vf_rand(v.netto_sent)}</span>
+          <span class="vf-stand${
+            String(v.status).toLowerCase() === "success" ? " klaar" : ""
+          }">${vf_ontsnap(vf_status_af(v.status))}</span>
+        </button>`;
+
+      if (!oop) return kop;
+
+      const binne = verwysings.length
+        ? verwysings
+            .map(
+              (r) => `
+          <div class="vf-tr">
+            <span class="vf-tr-nom">${vf_ontsnap(vf_faktuurnommer(r))}</span>
+            <small>${vf_ontsnap(r)}</small>
+          </div>`
+            )
+            .join("")
+        : `<p class="jn-leeg">${vf_t("vf_geen_transaksies", "Geen transaksies op hierdie uitbetaling nie.")}</p>`;
+
+      return `${kop}
+        <div class="vf-binne">
+          <p class="vf-binne-kop">${vf_t("vf_verwerk", "Verwerk")}: ${vf_rand(
+        v.verwerk_sent
+      )} \u00B7 ${vf_t("vf_bruto", "Hierdie ontvanger")}: ${vf_rand(v.bruto_sent)}</p>
+          ${binne}
+        </div>`;
+    })
+    .join("");
+
+  lys.querySelectorAll("[data-sleutel]").forEach((knop) => {
+    knop.addEventListener("click", () => {
+      const sleutel = knop.getAttribute("data-sleutel");
+      VF_OOP = VF_OOP === sleutel ? null : sleutel;
+      vf_teken();
+    });
+  });
+}
+
+async function vf_laai() {
+  const van = (document.getElementById("jn-van") || {}).value;
+  const tot = (document.getElementById("jn-tot") || {}).value;
+  if (!van || !tot || van > tot) return;
+
+  try {
+    VF_DATA = await vf_vra(
+      `kry-vereffenings?van=${encodeURIComponent(van)}&tot=${encodeURIComponent(tot)}`
+    );
+    vf_teken();
+  } catch (fout) {
+    console.error("Kon nie die uitbetalings laai nie:", fout);
+    const leeg = document.getElementById("vf-leeg");
+    if (leeg) {
+      leeg.hidden = false;
+      leeg.textContent = vf_t("vf_laai_fout", "Kon nie die uitbetalings laai nie.");
+    }
+  }
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+  const blok = document.getElementById("vf-blok");
+  if (!blok) return;
+
+  // DIESELFDE WAG AS DIE JOERNAAL. Die sessie is nie dadelik daar nie, en 'n
+  // oproep sonder token kom as 403 terug met 'n leë lys wat soos 'n antwoord
+  // lyk.
+  for (let i = 0; i < 60 && !VF_SESSIE; i += 1) {
+    try {
+      VF_SESSIE = await identiteit_kry_huidige_sessie();
+    } catch {
+      VF_SESSIE = null;
+    }
+    if (!VF_SESSIE) await new Promise((r) => setTimeout(r, 100));
+  }
+  if (!VF_SESSIE) return;
+
+  ["jn-van", "jn-tot"].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener("change", vf_laai);
+  });
+
+  await vf_laai();
+});

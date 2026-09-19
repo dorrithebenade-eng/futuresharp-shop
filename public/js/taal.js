@@ -2069,6 +2069,29 @@ const WOORDEBOEK = {
   uit_naam_kontantboek: { af: "Kontantboek", en: "Cash-book" },
   uit_naam_fin_staat: { af: "Finansiele-staat", en: "Financial-statement" },
   uit_naam_tot: { af: "tot", en: "to" },
+
+  // ── PAYSTACK SE UITBETALINGS, onder Joernaal ────────────────────────────
+  vf_kop: { af: "Uitbetalings", en: "Payouts" },
+  vf_leeg: {
+    af: "Geen uitbetalings in hierdie tydperk nie.",
+    en: "No payouts in this period.",
+  },
+  vf_laai_fout: {
+    af: "Kon nie die uitbetalings laai nie.",
+    en: "Could not load the payouts.",
+  },
+  vf_som_hoof: { af: "Na die hoofrekening", en: "To the main account" },
+  vf_som_ander: { af: "Na begunstigdes", en: "To beneficiaries" },
+  vf_som_oppad: { af: "Nog oppad", en: "Still on the way" },
+  vf_status_klaar: { af: "Uitbetaal", en: "Paid out" },
+  vf_status_oppad: { af: "Oppad", en: "On the way" },
+  vf_status_wag: { af: "Wag", en: "Pending" },
+  vf_verwerk: { af: "Verwerk", en: "Processed" },
+  vf_bruto: { af: "Hierdie ontvanger", en: "This recipient" },
+  vf_geen_transaksies: {
+    af: "Geen transaksies op hierdie uitbetaling nie.",
+    en: "No transactions on this payout.",
+  },
   // Een sleutel, twaalf afkortings. Mrt/Mar, Okt/Oct en Des/Dec verskil;
   // die res is dieselfde. Die kode split op die komma.
   fd_maande: {

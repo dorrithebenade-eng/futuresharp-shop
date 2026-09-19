@@ -526,6 +526,17 @@
             <button type="button" class="kaart-aksie stil" id="jn-wys-al" hidden></button>
           </div>
 
+          <!-- PAYSTACK SE UITBETALINGS. Die joernaal wys wat gebeur het; hierdie
+               lys wys waar daardie geld beland het. Die datums is die joernaal
+               s'n hierbo: twee stelle datumvelde op een blad beteken twee
+               tydperke wat stilweg verskil. -->
+          <div class="vf-blok" id="vf-blok">
+            <h3 class="jn-kop" data-i18n="vf_kop">Uitbetalings</h3>
+            <p class="vf-som" id="vf-som"></p>
+            <div class="vf-lys" id="vf-lys"></div>
+            <p class="jn-leeg" id="vf-leeg" hidden data-i18n="vf_leeg">Geen uitbetalings in hierdie tydperk nie.</p>
+          </div>
+
           <div class="jn-nuwe-blok">
             <h3 class="jn-kop" data-i18n="jn_teken_inskrywing">Teken 'n inskrywing aan</h3>
             <div class="jn-nuwe">
@@ -827,6 +838,7 @@
   <script src="js/faktuurpaneel-instellings.js"></script>
   <script src="js/faktuurpaneel-staat.js"></script>
   <script src="js/faktuurpaneel-joernaal.js"></script>
+  <script src="js/faktuurpaneel-vereffenings.js"></script>
   <!-- LAASTE, want hy roep die ander se laaifunksies aan en moet dus na
        hulle laai. Hy wysig niks; hy verfris net wat hulle teken. -->
   <script src="js/faktuurpaneel-verfris.js"></script>

@@ -1159,3 +1159,83 @@ a.paneel-kieslys-item { text-decoration: none; }
   flex: none;
   cursor: pointer;
 }
+
+/* ── Paystack se uitbetalings, onder Joernaal ─────────────────────────────
+   Dieselfde rytipe as die wag-lys hierbo: 'n ry wat oopmaak, nie 'n tabel
+   nie. 'n Uitbetaling dra min velde en 'n tabel sou vier leë kolomme gee. */
+.vf-blok { margin-top: 28px; }
+
+.vf-som {
+  margin: 0 0 10px;
+  font-size: 12.5px;
+  color: var(--grys-teks, #5b5b5b);
+}
+
+.vf-lys { display: flex; flex-direction: column; }
+
+.vf-ry {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr) 90px 96px 84px;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 6px;
+  border: 0;
+  border-bottom: 1px solid var(--grys-lig, #e7e4de);
+  background: none;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.vf-ry:hover { background: var(--lig, #f7f6f4); }
+.vf-ry.oop { background: var(--lig, #f7f6f4); }
+
+.vf-dat { font-size: 12.5px; color: var(--grys-teks, #5b5b5b); }
+
+.vf-wie { font-size: 13.5px; min-width: 0; }
+.vf-wie small {
+  display: block;
+  font-size: 11px;
+  color: var(--grys-teks, #5b5b5b);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Die fooi staan as 'n minus, want dit is wat weggeneem is. */
+.vf-fooi { font-size: 12.5px; color: var(--koraal, #c0483a); text-align: right; }
+.vf-net { font-size: 13.5px; font-weight: 500; text-align: right; }
+
+.vf-stand {
+  font-size: 11px;
+  text-align: right;
+  color: var(--grys-teks, #5b5b5b);
+}
+.vf-stand.klaar { color: var(--teal, #479f91); }
+
+.vf-binne {
+  padding: 10px 6px 14px 106px;
+  border-bottom: 1px solid var(--grys-lig, #e7e4de);
+  background: var(--lig, #f7f6f4);
+}
+
+.vf-binne-kop {
+  margin: 0 0 8px;
+  font-size: 12px;
+  color: var(--grys-teks, #5b5b5b);
+}
+
+.vf-tr { padding: 4px 0; font-size: 13px; }
+.vf-tr small {
+  display: block;
+  font-size: 11px;
+  color: var(--grys-teks, #5b5b5b);
+}
+
+@media (max-width: 720px) {
+  .vf-ry { grid-template-columns: minmax(0, 1fr) 88px; row-gap: 2px; }
+  .vf-dat { grid-column: 1 / -1; }
+  .vf-fooi, .vf-stand { grid-column: 1 / -1; text-align: left; }
+  .vf-binne { padding-left: 6px; }
+}
