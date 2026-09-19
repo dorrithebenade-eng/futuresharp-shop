@@ -1194,9 +1194,13 @@ a.paneel-kieslys-item { text-decoration: none; }
 /* Die pyltjie draai 90 grade wanneer die ry oop is. Die oorgang is kort:
    dit moet die oog lei, nie 'n vertoning wees nie. */
 .vf-pyl {
-  font-size: 15px;
+  font-size: 17px;
+  font-weight: 700;
   line-height: 1;
-  color: var(--grys-teks, #5b5b5b);
+  /* TEAL, NIE GRYS NIE. 'n Grys pyltjie in 'n ry vol grys byskrifte lees soos
+     versiering; teal is die kleur wat op hierdie blad oral "hier kan jy klik"
+     beteken. */
+  color: var(--teal, #479f91);
   transition: transform 0.12s ease;
 }
 .vf-ry.oop .vf-pyl { transform: rotate(90deg); }
