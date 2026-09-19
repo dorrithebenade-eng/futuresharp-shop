@@ -2094,6 +2094,10 @@ const WOORDEBOEK = {
   },
   vf_hoofrekening: { af: "Hoofrekening", en: "Main account" },
   vf_betaal: { af: "Kliënte het betaal", en: "Customers paid" },
+  vf_winkelbestelling: {
+    af: "Winkelbestelling, nie 'n faktuur nie.",
+    en: "Shop order, not an invoice.",
+  },
   vf_faktuur_weg: {
     af: "Hierdie faktuur bestaan nie meer nie.",
     en: "This invoice no longer exists.",

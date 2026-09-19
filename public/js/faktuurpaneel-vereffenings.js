@@ -97,7 +97,9 @@ function vf_faktuur_blok(f) {
     //   * sy bestaan, maar sonder gevriesde verdeling: uitgereik voordat die
     //     stelsel begin vries het.
     let rede = "";
-    if (f.nommer && f.faktuur_gevind === false) {
+    if (f.soort === "winkel") {
+      rede = vf_t("vf_winkelbestelling", "Winkelbestelling, nie 'n faktuur nie.");
+    } else if (f.nommer && f.faktuur_gevind === false) {
       rede = vf_t("vf_faktuur_weg", "Hierdie faktuur bestaan nie meer nie.");
     } else if (f.nommer) {
       rede = vf_t(

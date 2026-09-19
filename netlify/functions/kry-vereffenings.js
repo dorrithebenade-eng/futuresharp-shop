@@ -64,19 +64,30 @@ exports.handler = async (event, context) => {
   // die verwysing alleen staan, sonder afbreek.
   const faktuur_kas = new Map();
 
-  function nommer_uit_verwysing(verwysing) {
+  // 'N WINKELBESTELLING LYK BAIE SOOS 'N FAKTUUR, en dit was 'n fout.
+  //
+  //   faktuur:          FS-01961-1789656222742   nommer, dan 'n tydstempel
+  //   winkelbestelling: FS-2026-816741           jaar, dan ses ewekansige syfers
+  //
+  // Albei begin met FS en albei het twee koppeltekens. Die eerste weergawe het
+  // die middelste deel blindelings as die faktuurnommer gelees, en toe op die
+  // skerm gesê dat "faktuur FS/2026" nie bestaan nie. Sy het nooit bestaan nie.
+  //
+  // Die middelste deel is die onderskeid: 'n jaartal beteken winkel.
+  function soort_uit_verwysing(verwysing) {
     const dele = String(verwysing || "").split("-");
-    if (dele.length >= 2 && /^[A-Z]{2}$/.test(dele[0]) && /^\d+$/.test(dele[1])) {
-      return `${dele[0]}/${dele[1]}`;
+    if (dele.length < 3 || !/^[A-Z]{2}$/.test(dele[0]) || !/^\d+$/.test(dele[1])) {
+      return { soort: "ander", nommer: null };
     }
-    return null;
+    if (/^(19|20)\d\d$/.test(dele[1])) return { soort: "winkel", nommer: null };
+    return { soort: "faktuur", nommer: `${dele[0]}/${dele[1]}` };
   }
 
   async function kry_faktuur_afbreek(verwysing) {
     if (faktuur_kas.has(verwysing)) return faktuur_kas.get(verwysing);
 
-    const nommer = nommer_uit_verwysing(verwysing);
-    let uit = { verwysing, nommer };
+    const { soort, nommer } = soort_uit_verwysing(verwysing);
+    let uit = { verwysing, nommer, soort };
 
     if (nommer) {
       try {
@@ -95,6 +106,7 @@ exports.handler = async (event, context) => {
           uit = {
             verwysing,
             nommer,
+            soort,
             faktuur_gevind: true,
             totaal_sent: Number(g.totaal_sent) || 0,
             hosting_sent: Number(g.hosting_sent) || 0,
