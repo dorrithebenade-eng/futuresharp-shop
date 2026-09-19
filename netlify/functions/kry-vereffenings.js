@@ -17,7 +17,7 @@ const {
   kry_paystack_transaksies_store,
   skep_sleutel: transaksie_sleutel,
 } = require("./_paystack-transaksies");
-const { kry_fakture_store, nommer_na_sleutel } = require("./_fakture");
+const { kry_fakture_store, nommer_na_sleutel, is_toetsfase } = require("./_fakture");
 
 const ROLLE = ["boekhouding"];
 
@@ -256,9 +256,21 @@ exports.handler = async (event, context) => {
   // Nuutste eerste, soos elke ander lys in die paneel.
   vereffenings.sort((a, b) => (a.datum < b.datum ? 1 : a.datum > b.datum ? -1 : 0));
 
+  // DIE TOETSFASE VERANDER HOE 'N ONTBREKENDE FAKTUUR LEES. 'n Uitbetaling wat
+  // na 'n faktuur wys wat nie meer bestaan nie, is tydens die toetsfase bykans
+  // altyd 'n uitgeveede toetsfaktuur. Daarna is dit iets wat 'n mens moet
+  // ondersoek. Die skerm kan die twee nie self uitmekaar hou nie, dus word die
+  // toestand saamgestuur in plaas daarvan dat die woorde raai.
   return {
     statusCode: 200,
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ van, tot, aantal: vereffenings.length, vereffenings, foute }),
+    body: JSON.stringify({
+      van,
+      tot,
+      toetsfase: is_toetsfase(),
+      aantal: vereffenings.length,
+      vereffenings,
+      foute,
+    }),
   };
 };

@@ -100,7 +100,13 @@ function vf_faktuur_blok(f) {
     if (f.soort === "winkel") {
       rede = vf_t("vf_winkelbestelling", "Winkelbestelling, nie 'n faktuur nie.");
     } else if (f.nommer && f.faktuur_gevind === false) {
-      rede = vf_t("vf_faktuur_weg", "Hierdie faktuur bestaan nie meer nie.");
+      rede =
+        VF_DATA && VF_DATA.toetsfase
+          ? vf_t(
+              "vf_faktuur_toets",
+              "Die faktuur bestaan nie meer nie. Sy was deel van die toetsfase en is uitgevee."
+            )
+          : vf_t("vf_faktuur_weg", "Hierdie faktuur bestaan nie meer nie.");
     } else if (f.nommer) {
       rede = vf_t(
         "vf_geen_verdeling",
