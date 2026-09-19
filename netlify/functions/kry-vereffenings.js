@@ -83,10 +83,19 @@ exports.handler = async (event, context) => {
         const sleutel = nommer_na_sleutel(nommer);
         const f = sleutel ? await f_store.get(sleutel, { type: "json" }) : null;
         const g = f && f.verdeling_gevries;
+
+        // DRIE TOESTANDE, NIE TWEE NIE. Die faktuur kan bestaan met 'n
+        // gevriesde verdeling, bestaan sonder een (uitgereik voordat die
+        // stelsel begin vries het), of glad nie meer bestaan nie omdat sy
+        // uitgevee is. Die skerm moet die drie uitmekaar kan hou, anders lyk
+        // 'n uitgeveede toetsfaktuur soos 'n fout in die afbreek.
+        uit.faktuur_gevind = Boolean(f);
+
         if (g) {
           uit = {
             verwysing,
             nommer,
+            faktuur_gevind: true,
             totaal_sent: Number(g.totaal_sent) || 0,
             hosting_sent: Number(g.hosting_sent) || 0,
             voorsiening_sent: Number(g.voorsiening_sent) || 0,

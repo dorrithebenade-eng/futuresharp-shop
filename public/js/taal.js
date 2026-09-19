@@ -2094,6 +2094,14 @@ const WOORDEBOEK = {
   },
   vf_hoofrekening: { af: "Hoofrekening", en: "Main account" },
   vf_betaal: { af: "Kliënte het betaal", en: "Customers paid" },
+  vf_faktuur_weg: {
+    af: "Hierdie faktuur bestaan nie meer nie.",
+    en: "This invoice no longer exists.",
+  },
+  vf_geen_verdeling: {
+    af: "Hierdie faktuur dra geen gevriesde verdeling nie, dus kan die afbreek nie gewys word nie.",
+    en: "This invoice carries no frozen split, so the breakdown cannot be shown.",
+  },
   vf_hosting: { af: "hosting", en: "hosting" },
   vf_oorskot: { af: "oorskot", en: "surplus" },
   vf_voorsiening: {

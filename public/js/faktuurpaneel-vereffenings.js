@@ -91,11 +91,26 @@ function vf_merk(v) {
 // hoofrekening. Sonder hom lyk dit of 'n deel van die faktuur verdwyn het.
 function vf_faktuur_blok(f) {
   if (!f.nommer || !f.rye) {
-    // 'n Verwysing sonder faktuur: 'n winkelbestelling of iets anders.
+    // DRIE REDES WAAROM DIE AFBREEK ONTBREEK, en hulle lees verskillend:
+    //   * geen faktuurnommer: 'n winkelbestelling of iets anders;
+    //   * die faktuur bestaan nie meer nie: sy is uitgevee;
+    //   * sy bestaan, maar sonder gevriesde verdeling: uitgereik voordat die
+    //     stelsel begin vries het.
+    let rede = "";
+    if (f.nommer && f.faktuur_gevind === false) {
+      rede = vf_t("vf_faktuur_weg", "Hierdie faktuur bestaan nie meer nie.");
+    } else if (f.nommer) {
+      rede = vf_t(
+        "vf_geen_verdeling",
+        "Hierdie faktuur dra geen gevriesde verdeling nie, dus kan die afbreek nie gewys word nie."
+      );
+    }
+
     return `
       <div class="vf-fk">
         <div class="vf-fk-kop"><span>${vf_ontsnap(f.nommer || f.verwysing)}</span><span></span></div>
         <div class="vf-fk-r"><span class="vf-fk-sag">${vf_ontsnap(f.verwysing)}</span><span></span></div>
+        ${rede ? `<div class="vf-fk-r"><span class="vf-fk-sag">${rede}</span><span></span></div>` : ""}
       </div>`;
   }
 
