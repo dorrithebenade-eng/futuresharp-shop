@@ -145,7 +145,10 @@
 .fsp-b-geel { display: flex; flex-direction: column; gap: 6px; }
 .fsp-b-geel i { background: var(--fsp-amber); flex: 1; }
 .fsp-b-geel b { background: #111; width: 45%; aspect-ratio: 1; }
-.fsp-kop-teks h1 { font-family: var(--font-opskrif); font-weight: 800; color: var(--fsp-navy); font-size: clamp(20px, 3vw, 28px); margin: 0 0 4px; }
+.fsp-kop-teks { min-width: 0; }
+/* Die lang woord breek by die sagte koppelteken in die HTML, nooit buite die kaart nie. */
+.fsp-kop-teks h1 { font-family: var(--font-opskrif); font-weight: 800; color: var(--fsp-navy); font-size: clamp(19px, 5.2vw, 28px);
+  margin: 0 0 4px; hyphens: manual; overflow-wrap: break-word; line-height: 1.15; }
 .fsp-kop-teks p { margin: 0; color: var(--grys-teks); font-size: 14px; }
 @media (max-width: 620px) {
   .fsp-kop { flex-direction: column; align-items: stretch; gap: 12px; }

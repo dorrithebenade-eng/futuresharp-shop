@@ -54,10 +54,12 @@
       if (!anker) return null;
       return { area: "admin", anker, waar: "na" };
     }
-    // Die Future Sharp-area (futuresharp.html): die ry staan bo sy
-    // afdelingspille, soos op Boekhouding.
+    // Die Future Sharp-area (futuresharp.html): op 'n foon staan die ry BO
+    // die kop met die logo-blokke, sodat die area-keuse bo-aan bly soos op
+    // die ander twee bladsye.
     if (document.getElementById("fsp-kieslys")) {
-      return { area: "futuresharp", anker: document.getElementById("fsp-kieslys"), waar: "voor" };
+      const kop = document.querySelector(".fsp-kop");
+      return { area: "futuresharp", anker: kop || document.getElementById("fsp-kieslys"), waar: "voor" };
     }
     if (document.getElementById("fp-kieslys")) {
       const anker = document.getElementById("fp-kieslys");
