@@ -1031,7 +1031,9 @@ body.fv-toe #fv-bo .bo-vee {
   display: flex;
   gap: 8px;
   align-items: flex-start;
-  margin-top: 14px;
+  /* In die verdelingskaart staan sy DIREK BO die fooi, dus onder toe ruimte
+     en nie bo toe nie. */
+  margin: 0 0 10px;
   font-size: 12.5px;
   cursor: pointer;
 }

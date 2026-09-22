@@ -455,6 +455,18 @@
               <div class="bo-titel" id="bo-verdeling-kop" data-i18n="bo_verdeling">Verdeling van die faktuurtotaal</div>
             </div>
 
+            <!-- WORD MET DIE HAND BETAAL. Die keuse staan DIREK BO die fooi
+                 wat sy wegneem. Sy het eers by die afslag gestaan, en daar kon
+                 'n mens nie sien wat sy doen nie: 'n mens kyk na die fooi en
+                 die blokkie was 'n halwe skerm laer. -->
+            <label class="bo-merk" for="f-handmatig">
+              <input type="checkbox" id="f-handmatig">
+              <span>
+                <b data-i18n="bo_handmatig">Word met die hand betaal</b>
+                <span class="bo-lei" data-i18n="bo_handmatig_lei">Geen fooivoorsiening en geen betaalskakel nie. Die dokument dra die bankbesonderhede, en die uitbetalings word self gedoen.</span>
+              </span>
+            </label>
+
             <!-- Paystack is NIE 'n ontvanger nie. Hy is 'n geslote, berekende
                  ry — nie 'n besluit nie, dus nie 'n keuse nie. -->
             <div class="vd-slot">
@@ -533,17 +545,6 @@
                  die verdelingsblok hierbo: 'n aanbieding dra 5%, 'n reel wat
                  iemand se petrol terugbetaal dra niks. -->
           </div>
-          <!-- WORD MET DIE HAND BETAAL. Die keuse hoort hier, by die ander
-               dinge wat aan die geld raak, en nie by die dokument nie: sy
-               verander die SOM, nie net hoe die bladsy lyk nie. -->
-          <label class="bo-merk" for="f-handmatig">
-            <input type="checkbox" id="f-handmatig">
-            <span>
-              <b data-i18n="bo_handmatig">Word met die hand betaal</b>
-              <span class="bo-lei" data-i18n="bo_handmatig_lei">Geen fooivoorsiening en geen betaalskakel nie. Die dokument dra die bankbesonderhede, en die uitbetalings word self gedoen.</span>
-            </span>
-          </label>
-
           <p class="bo-lei" style="margin:10px 0 0" data-i18n="bo_afslag_lei">
             Afslag verminder die verdeelbare bedrag. Skenking bly buite die verdeling.
           </p>
