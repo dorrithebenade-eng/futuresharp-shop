@@ -178,6 +178,12 @@ function fp_teken_fakture(fakture) {
         : `<span class="fp-datum">${fp_datum_kort(f.geskep_op)}</span>` +
           (klient ? " · " + klient : "");
 
+      // 'n FAKTUUR WAT MET DIE HAND BETAAL WORD, MOET DIT SE. Sonder die merk
+      // wag 'n mens op 'n betaling wat nooit outomaties gaan aankom nie, want
+      // daar is geen betaalskakel en dus ook geen webhook nie.
+      const hand = f.handmatig
+        ? `<span class="fp-hand">${fp_t("fp_handmatig", "Met die hand")}</span>`
+        : "";
       const stempel = f.toets
         ? `<span class="fp-toets">${fp_t("fp_toetsdata", "Toetsdata")}</span>`
         : "";
@@ -196,6 +202,7 @@ function fp_teken_fakture(fakture) {
             <span class="fp-klient">${onder}</span>
           </span>
           <span class="fp-ry-syfers">
+            ${hand}
             ${stempel}
             <span class="fp-stand fp-stand-${f.stand}">${stand}</span>
             <span class="fp-bedrag">${fp_rand(f.totaal_sent)}</span>

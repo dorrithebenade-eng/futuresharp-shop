@@ -1073,6 +1073,16 @@ function bo_vul_velde() {
   stel("f-afslag", veld_sent(V.afslag_sent));
   stel("f-skenking", veld_sent(V.skenking_sent));
   stel("f-koepon", V.koepon_kode || "");
+
+  // Word met die hand betaal. Die merkblokkie word slegs op 'n konsep gewys:
+  // by uitreiking word die keuse saam met die verdeling gevries.
+  const hm = document.getElementById("f-handmatig");
+  if (hm) {
+    hm.checked = V.handmatig === true;
+    hm.disabled = V.stand !== "konsep";
+  }
+  const hm_ry = hm && hm.closest(".bo-merk");
+  if (hm_ry) hm_ry.classList.toggle("dood", V.stand !== "konsep");
   // GEEN f-hosting MEER NIE. Hosting leef op elke reël, in die verdelingsblok.
 }
 
@@ -1243,6 +1253,20 @@ document.addEventListener("DOMContentLoaded", () => {
   bind("f-afslag", (w) => { V.afslag_sent = na_sent(w); });
   bind("f-skenking", (w) => { V.skenking_sent = na_sent(w); });
   bind("f-koepon", (w) => { V.koepon_kode = w.trim().toUpperCase() || null; });
+
+  // DIE MERKBLOKKIE VERANDER DIE SOM, nie net die bladsy nie: sonder
+  // voorsiening is die volle bedrag verdeelbaar. Daarom word alles herteken,
+  // net soos by die afslag.
+  const handmatig = document.getElementById("f-handmatig");
+  if (handmatig) {
+    handmatig.addEventListener("change", () => {
+      if (V.stand !== "konsep") return;
+      V.handmatig = handmatig.checked === true;
+      bo_teken();
+      teken_somme();
+      merk_vuil();
+    });
+  }
 
   const voeg_koste = document.getElementById("bt-voeg");
   if (voeg_koste) {

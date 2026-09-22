@@ -128,6 +128,8 @@ const V = {
   dokument_nota: "",
   afslag_sent: 0,
   skenking_sent: 0,
+  // Word met die hand betaal: geen fooivoorsiening, geen betaalskakel.
+  handmatig: false,
   koepon_kode: null,
   // Die backoffice s'n. Hulle leef HIER, in een toestand, want die
   // faktuurtotaal en die verdeling is een som — nie twee skerms wat mekaar
@@ -789,7 +791,16 @@ function teken_dok_taal() {
   // skakel is die R0-faktuur: daar bly niks in die blok oor nie, dus
   // verdwyn hy. 'n Konsep wys hom met 'n dooie knoppie.
   const blok = document.getElementById("d-betaalblok");
-  if (blok) blok.classList.toggle("sonder-skakel", Boolean(V.nommer) && !V.betaalskakel);
+  if (blok) {
+    // 'n HANDMATIGE FAKTUUR WYS DIE BANKBLOK IN PLAAS VAN DIE SKAKEL. Sy kry
+    // nooit 'n betaalskakel nie, dus sou die blok leeg bly, en die klient moet
+    // weet waarheen om te betaal.
+    blok.classList.toggle(
+      "sonder-skakel",
+      V.handmatig === true || (Boolean(V.nommer) && !V.betaalskakel)
+    );
+  }
+  teken_bankblok();
 
   teken_maatskappy();
   teken_titel();
@@ -817,6 +828,37 @@ function teken_titel() {
     ? String(V.nommer).replace(/\//g, "-")
     : dt("fd_stand_konsep", "Konsep");
   document.title = nommer + " — " + naam;
+}
+
+/* DIE BANKBLOK, net vir 'n faktuur wat met die hand betaal word.
+
+   Die besonderhede kom uit Instellings. Ontbreek een, staan daar 'n streep:
+   dan sien 'n mens dat die instelling leeg is, in plaas van 'n halwe reel. */
+function teken_bankblok() {
+  const blok = document.getElementById("d-bankblok");
+  if (!blok) return;
+
+  const wys = V.handmatig === true && !IS_KW;
+  blok.hidden = !wys;
+  if (!wys) return;
+
+  const m = MAATSKAPPY || {};
+  const streep = (waarde) => (String(waarde || "").trim() ? String(waarde).trim() : "—");
+
+  const kop = document.getElementById("d-bank-kop");
+  if (kop) kop.textContent = dt("fd_bank_kop", "Bankoorbetaling");
+
+  const reels = [
+    String(m.bank || "").trim(),
+    String(m.bank_rekeningnaam || m.naam || "").trim(),
+    `${dt("fd_rekening", "Rekening")}: ${streep(m.bank_rekeningnommer)}`,
+    `${dt("fd_takkode", "Takkode")}: ${streep(m.bank_takkode)}`,
+    String(m.bank_rekeningtipe || "").trim(),
+    `${dt("fd_verwysing", "Verwysing")}: ${V.nommer || dt("fd_stand_konsep", "Konsep")}`,
+  ].filter((r) => r);
+
+  const uit = document.getElementById("d-bank-reels");
+  if (uit) uit.innerHTML = reels.map((r) => ontsnap(r)).join("<br>");
 }
 
 function teken_maatskappy() {
@@ -1298,6 +1340,9 @@ function liggaam() {
       ? { geldig_tot: V.geldig_tot || "" }
       : { betaalbaar_teen: V.betaalbaar_teen || "" }),
     koste: V.koste,
+    // 'n Kwotasie ken die veld nie, en 'n veld wat deurgaan na 'n Function wat
+    // hom nie ken nie, val stil weg. Sien die nota by geldig_tot hierbo.
+    ...(IS_KW ? {} : { handmatig: V.handmatig === true }),
     afslag_sent: V.afslag_sent,
     skenking_sent: V.skenking_sent,
     koepon_kode: V.koepon_kode || "",
@@ -1394,6 +1439,7 @@ async function laai_faktuur(vraag) {
   V.dokument_nota = f.dokument_nota || "";
   V.afslag_sent = f.afslag_sent || 0;
   V.skenking_sent = f.skenking_sent || 0;
+  V.handmatig = f.handmatig === true;
   V.koepon_kode = f.koepon_kode || null;
   V.koste = Array.isArray(f.koste) ? f.koste : [];
   V.betaalbaar_teen = f.betaalbaar_teen || null;

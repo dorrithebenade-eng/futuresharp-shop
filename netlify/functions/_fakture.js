@@ -442,6 +442,16 @@ function nuwe_faktuur(wie) {
     // daarna nooit — 'n faktuur wat as toetsdata begin het, bly dit.
     toets: is_toetsfase(),
 
+    // WORD MET DIE HAND BETAAL (22 Sep 2026). Julle weet vooraf dat hierdie
+    // een per bankoorbetaling kom: geen fooivoorsiening, geen Paystack en geen
+    // betaalskakel, en die dokument dra die bankbesonderhede. Die verdeling op
+    // die skerm is dan presies die betaallys vir wie die oorbetalings doen.
+    //
+    // Die keuse word op die KONSEP gemaak en is by uitreiking gevries, saam
+    // met die verdeling waarop sy staat maak. Verander die prentjie daarna,
+    // word die faktuur gekanselleer en 'n nuwe een uitgereik.
+    handmatig: false,
+
     // Hoe betaal is. Sien BETAALMETODES.
     betaling: {
       metode: null,

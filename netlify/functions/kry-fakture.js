@@ -72,6 +72,7 @@ exports.handler = async (event, context) => {
       // skrap-faktuur.js dwing dit af. DIE ANTWOORD WORD VELD VIR VELD GEBOU —
       // 'n nuwe veld op die rekord kom nie vanself hier deur nie.
       toets: rekord.toets === true,
+      handmatig: rekord.handmatig === true,
       betaal_metode: (rekord.betaling && rekord.betaling.metode) || null,
       // Betaal is nie die einde nie — die verslag moet nog uitgaan. Dit is
       // GEEN stand nie; die stande gaan oor geld.

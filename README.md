@@ -608,6 +608,46 @@ geslaag).
 
 ---
 
+## Faktuur wat met die hand betaal word (Sep 2026)
+
+'n Handvol fakture word vooraf as bankoorbetalings beplan: die klient betaal
+in Future Sharp se rekening, en die uitbetalings na die begunstigdes word self
+gedoen. Op die konsep is daar 'n merkblokkie, **Word met die hand betaal**.
+
+**Wat dit verander.**
+
+* **Geen fooivoorsiening nie.** `faktuur-som.js` kry `sonder_fooi` en stel die
+  3,5% + R1,30 op nul. Daar is geen Paystack-transaksie nie, dus is daar geen
+  fooi om voor te maak. Sou die voorsiening tog afkom, kry elke begunstigde
+  minder as wat hom toekom: op R3 000 sowat R106.
+* **Geen Paystack en geen betaalskakel nie.** `_faktuur-uitreik.js` slaan die
+  split en die initialize oor, soos by die R0-faktuur, maar die stand bly
+  `gestuur`: die geld moet nog kom. Niemand mag hierdie een aanlyn betaal nie,
+  want daar is niks om 'n fooi mee te dek nie.
+* **Die dokument dra die bankbesonderhede.** Dit is die enigste uitsondering
+  op die reel van 17 September dat geen dokument bankbesonderhede dra nie. Daar
+  was die rede dat 'n bankoorbetaling die verdeling omseil; hier is die
+  omseiling die bedoeling.
+* **Die keuse is by uitreiking gevries**, saam met die verdeling waarop sy
+  staat maak. Verander die prentjie daarna, word die faktuur gekanselleer en 'n
+  nuwe een uitgereik.
+* Die faktuurlys wys 'n amber merk, sodat niemand op 'n outomatiese betaling
+  wag wat nooit gaan kom nie.
+
+Die betaling word met **Teken betaling aan** aangeteken. Die verdeling op die
+skerm is dan presies die betaallys vir die oorbetalings.
+
+**'n GEWONE FAKTUUR WAT TOG MET DIE HAND BETAAL WORD** word nie geskakel nie.
+Die faktuur bly presies soos sy uitgereik is; die klient hou die dokument wat
+hy gekry het. Haar voorsiening is egter nooit bestee nie, en daardie bedrag le
+dan in die hoofrekening sonder 'n naam.
+
+Die besluit van 22 September: **die onbenutte voorsiening tel as hosting.** Die
+voorsiening is Future Sharp se risikodekking; realiseer die risiko nie, is dit
+deel van wat Future Sharp vir die diens verdien. `kry-joernaal.js` tel dit by
+`hosting_ingebring_sent` wanneer die betaalmetode `bankoorbetaling` is. Sonder
+daardie reel bly dit 'n stil bedrag wat niemand later kan verklaar nie.
+
 ## Oop items (nie afgehandel nie)
 
 **Nuwe bou-werk:**

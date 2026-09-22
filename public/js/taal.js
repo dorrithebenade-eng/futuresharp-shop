@@ -1876,6 +1876,12 @@ const WOORDEBOEK = {
   bo_koepon: { af: "Koeponkode", en: "Coupon code" },
   bo_skenking: { af: "Skenking (R)", en: "Donation (R)" },
   bo_hosting_pct: { af: "Hosting (%)", en: "Hosting (%)" },
+  bo_handmatig: { af: "Word met die hand betaal", en: "Paid manually" },
+  bo_handmatig_lei: {
+    af: "Geen fooivoorsiening en geen betaalskakel nie. Die dokument dra die bankbesonderhede, en die uitbetalings word self gedoen.",
+    en: "No fee provision and no payment link. The document carries the bank details, and the payouts are made by hand.",
+  },
+  fp_handmatig: { af: "Met die hand", en: "By hand" },
   bo_afslag_lei: {
     af: "Afslag verminder die verdeelbare bedrag. Skenking bly buite die verdeling.",
     en: "A discount reduces the distributable amount. A donation stays outside the split.",

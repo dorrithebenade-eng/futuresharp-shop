@@ -481,6 +481,50 @@ async function bou_faktuur_pdf(rekord, maatskappy, opsies) {
   const betaalskakel =
     rekord.betaalskakel || (rekord.paystack && rekord.paystack.authorization_url) || null;
 
+  /* DIE HANDMATIGE FAKTUUR KRY DIE BANKBESONDERHEDE (22 Sep 2026).
+     Sy het doelbewus geen betaalskakel nie, want haar verdeling is sonder
+     fooivoorsiening gevries en niemand mag haar aanlyn betaal nie. Sonder die
+     besonderhede weet die klient egter nie waarheen om te betaal nie, dus is
+     sy die een uitsondering op die reel dat geen dokument bankbesonderhede
+     dra nie. */
+  if (rekord.handmatig === true) {
+    // 'n Leë veld druk as 'n streep, nie as niks nie: dan sien 'n mens dat die
+    // besonderheid in Instellings ontbreek in plaas van 'n halwe reel.
+    const streep = (waarde) => (String(waarde || "").trim() ? String(waarde).trim() : "—");
+
+    const bankreels = [];
+    if (String(m.bank || "").trim()) bankreels.push(m.bank.trim());
+    bankreels.push(String(m.bank_rekeningnaam || m.naam || "").trim());
+    bankreels.push(`${t_in("fd_rekening", taal)}: ${streep(m.bank_rekeningnommer)}`);
+    bankreels.push(`${t_in("fd_takkode", taal)}: ${streep(m.bank_takkode)}`);
+    if (String(m.bank_rekeningtipe || "").trim()) bankreels.push(m.bank_rekeningtipe.trim());
+    bankreels.push(`${t_in("fd_verwysing", taal)}: ${rekord.nommer || ""}`);
+
+    const skoon = bankreels.filter((r) => String(r || "").trim());
+    const b_hoogte = 20 + 14 + skoon.length * 11 + 16;
+    const b_bo = y;
+
+    bl.drawRectangle({
+      x: KANT,
+      y: b_bo - b_hoogte,
+      width: REGS - KANT,
+      height: b_hoogte,
+      color: LIG,
+      borderColor: LYN,
+      borderWidth: 0.7,
+    });
+
+    let byy = b_bo - 20;
+    skryf(t_in("fd_bank_kop", taal), KANT + 16, byy, { grootte: 9, vet: true });
+    byy -= 14;
+    skoon.forEach((r) => {
+      skryf(r, KANT + 16, byy, { grootte: 8.5, kleur: GRYS });
+      byy -= 11;
+    });
+
+    return pdf.save();
+  }
+
   /* GEEN SKAKEL, GEEN BLOK.
      Sonder skakel (die R0-faktuur) bly daar niks oor om te druk nie. 'n Leë
      raam lyk of iets vergeet is. */

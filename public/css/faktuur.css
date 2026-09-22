@@ -1024,6 +1024,23 @@ body.fv-toe #fv-bo .bo-vee {
 }
 .bo-titel { font-family: var(--font-opskrif); font-size: 13.5px; font-weight: 600; }
 .bo-lei { font-size: 11.5px; color: var(--grys-teks); }
+
+/* Die merkblokkie "word met die hand betaal". Hy staan by die ander dinge wat
+   aan die geld raak, want hy verander die SOM en nie net die bladsy nie. */
+.bo-merk {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin-top: 14px;
+  font-size: 12.5px;
+  cursor: pointer;
+}
+.bo-merk input { margin-top: 2px; }
+.bo-merk .bo-lei { display: block; margin-top: 2px; }
+
+/* Na uitreiking is die keuse gevries saam met die verdeling waarop sy staat
+   maak. Sy bly sigbaar, want 'n mens moet kan sien wat gekies is. */
+.bo-merk.dood { opacity: .55; cursor: default; }
 .bo-rooster { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
 /* ── Die begroting ──────────────────────────────────────────────────────

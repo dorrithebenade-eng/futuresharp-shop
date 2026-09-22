@@ -242,6 +242,19 @@ a.paneel-kieslys-item { text-decoration: none; }
   color: #6b4a8f;
 }
 
+/* 'n Faktuur wat met die hand betaal word. Amber, want dit is 'n toestand om
+   van te weet en nie 'n fout nie: daar kom geen outomatiese betaling nie. */
+.fp-hand {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .6px;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #FBF0DC;
+  color: #8a6520;
+}
+
 /* Die skrap-knoppie sit BUITE die oopmaak-knoppie, met sy eie ruimte. */
 .fp-ry-rand {
   display: flex;

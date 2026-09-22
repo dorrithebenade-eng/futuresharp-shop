@@ -346,6 +346,25 @@ exports.handler = async (event, context) => {
         // herberekening uit die persentasie nie.
         hosting_ingebring_sent +=
           Number(f.verdeling_gevries && f.verdeling_gevries.hosting_sent) || 0;
+
+        // DIE ONBENUTTE FOOIVOORSIENING TEL AS HOSTING (besluit 22 Sep 2026).
+        //
+        // 'n Faktuur wat met die hand betaal is, het geen Paystack-transaksie
+        // nie, dus is die fooi nooit gehef nie. Die voorsiening wat by
+        // uitreiking van bo af weggeneem is, le dan in die hoofrekening sonder
+        // 'n naam: sy kom in as deel van die ontvangs en niks gaan uit nie.
+        //
+        // Die voorsiening is Future Sharp se risikodekking. Realiseer die
+        // risiko nie, is daardie bedrag deel van wat Future Sharp vir die diens
+        // verdien, en dit is hosting. Sonder hierdie reel bly dit 'n stil
+        // bedrag wat niemand ooit weer kan verklaar nie.
+        //
+        // 'n HANDMATIGE FAKTUUR (rekord.handmatig) het van die begin af geen
+        // voorsiening nie, dus is hierdie bedrag daar nul en verander niks.
+        if (f.betaling && f.betaling.metode === "bankoorbetaling") {
+          hosting_ingebring_sent +=
+            Number(f.verdeling_gevries && f.verdeling_gevries.voorsiening_sent) || 0;
+        }
       }
 
       // Elke uitbetaling wat werklik gebeur het

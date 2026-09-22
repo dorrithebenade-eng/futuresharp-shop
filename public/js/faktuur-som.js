@@ -63,14 +63,24 @@ const FS_BLY_IN_HOOFREKENING = ["Hosting", "Future Sharp"];
 //                       hê. Die reël se bedrag word bereken, en die totaal wat
 //                       die kliënt moet betaal, word daaruit opgelos.
 //
-// invoer = { reels, rigting, rond }
+// invoer = { reels, rigting, rond, sonder_fooi }
 //   reels: [{ soort: "verkoop" | "koste", beskrywing, bedrag,
 //             verdeling: [{ ontvanger, tipe: "pct" | "vas", waarde }] }]
+//
+// sonder_fooi — die faktuur word met die hand betaal (22 Sep 2026). Daar is
+//   geen Paystack-transaksie nie, dus is daar geen fooi om voor te maak. Die
+//   voorsiening word nul en die volle bedrag is verdeelbaar. Sou sy tog afkom,
+//   kry elke begunstigde minder as wat hom toekom.
 function fs_bereken(invoer) {
   const inv = invoer || {};
   const reels = inv.reels || [];
   const rond = Number(inv.rond) || 0;
   const terugwaarts = inv.rigting === "bedrae";
+
+  // Die twee koerse loop deur die hele som. By 'n handmatige faktuur is albei
+  // nul, en dan bly elke formule hieronder net soos sy is.
+  const ps_pct = inv.sonder_fooi === true ? 0 : FS_PS_PCT;
+  const ps_vas = inv.sonder_fooi === true ? 0 : FS_PS_VAS;
 
   let P, P_rou;
 
@@ -82,7 +92,7 @@ function fs_bereken(invoer) {
     reels.forEach((rl) => {
       basisSom += fs_basis_uit_rye(rl);
     });
-    P = basisSom > 0 ? (basisSom + FS_PS_VAS) / (1 - FS_PS_PCT / 100) : 0;
+    P = basisSom > 0 ? (basisSom + ps_vas) / (1 - ps_pct / 100) : 0;
     P_rou = P;
     if (rond > 0 && P > 0) P = Math.ceil(P / rond) * rond;
     P = Math.ceil(P * 100) / 100;
@@ -98,7 +108,7 @@ function fs_bereken(invoer) {
   // en dit is presies waar 'n sent verlore raak.
   const totaalSent = Math.round(P * 100);
   const paystackSent =
-    P > 0 ? Math.round(((FS_PS_PCT / 100) * P + FS_PS_VAS) * 100) : 0;
+    P > 0 ? Math.round(((ps_pct / 100) * P + ps_vas) * 100) : 0;
   const verdeelbaarSent = totaalSent - paystackSent;
 
   // Wat elke reël aan die totaal bydra. Die fooi word na verhouding oor die
@@ -417,7 +427,7 @@ function fs_invoer_uit_faktuur(faktuur, het_subrekening) {
     };
   });
 
-  return { rigting: "totaal", rond: 0, reels };
+  return { rigting: "totaal", rond: 0, reels, sonder_fooi: f.handmatig === true };
 }
 
 // Node kan dit ook laai, sodat die som getoets kan word sonder 'n blaaier —

@@ -174,6 +174,7 @@ exports.handler = async (event, context) => {
     afslag_sent: rekord.afslag_sent || 0,
     koepon_kode: rekord.koepon_kode || null,
     skenking_sent: rekord.skenking_sent || 0,
+    handmatig: rekord.handmatig === true,
     totaal_sent: rekord.totaal_sent || 0,
 
     btw_koers: rekord.btw_koers || 0,

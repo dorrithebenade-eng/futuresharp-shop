@@ -182,8 +182,18 @@ async function reik_faktuur_uit(store, sleutel, rekord, wie) {
   // bankoorbetaling, is die fooi nooit gehef nie en word niks herbereken nie:
   // die ontvangers kry presies wat hier gevries word, en die onbestede
   // voorsiening val na die oorskot en bly in die hoofrekening.
+  //
+  // 'N HANDMATIGE FAKTUUR HET GEEN VOORSIENING NIE (22 Sep 2026). Julle weet
+  // vooraf dat hierdie een per bankoorbetaling betaal word, dus is daar geen
+  // Paystack-fooi om voor te maak. Sou die voorsiening tog afkom, kry elke
+  // begunstigde minder as wat hom toekom en hou Future Sharp geld wat nie syne
+  // is nie -- op R3 000 sowat R106.
+  const handmatig = rekord.handmatig === true;
+
   const voorsiening_sent =
-    totaal_sent > 0 ? Math.round((FS_PS_PCT / 100) * totaal_sent + FS_PS_VAS * 100) : 0;
+    totaal_sent > 0 && !handmatig
+      ? Math.round((FS_PS_PCT / 100) * totaal_sent + FS_PS_VAS * 100)
+      : 0;
 
   const hosting_sent = Math.round(u.hosting * 100);
 
@@ -304,7 +314,16 @@ async function reik_faktuur_uit(store, sleutel, rekord, wie) {
   // `totaal_sent === 0`-tak is die patroon.
   const gratis = totaal_sent === 0;
 
-  if (!gratis) {
+  // 'N HANDMATIGE FAKTUUR ROEP PAYSTACK OOK NIE.
+  //
+  // Geen split en geen transaksie, dus ook geen betaalskakel nie. Dit is
+  // doelbewus: met 'n voorsiening van nul is daar niks om 'n fooi mee te dek
+  // nie, dus mag niemand hierdie een aanlyn kan betaal nie. Die dokument dra
+  // in die plek daarvan die bankbesonderhede, en die betaling word met "Teken
+  // betaling aan" aangeteken.
+  //
+  // Anders as die R0-tak bly die stand `gestuur`: die geld moet nog kom.
+  if (!gratis && !handmatig) {
     /* DIE PAYSTACK-VERWYSING IS NIE DIE FAKTUURNOMMER NIE.
 
        Paystack weier 'n transaksie met 'n verwysing wat reeds bestaan, en sy
@@ -621,6 +640,25 @@ async function stuur_proforma(rekord, sleutel, gratis) {
         en
           ? "Nothing is payable on this invoice."
           : "Daar is niks op hierdie faktuur betaalbaar nie."
+      );
+    } else if (rekord.handmatig === true) {
+      // DIE HANDMATIGE FAKTUUR IS DIE EEN UITSONDERING OP 17 SEPTEMBER SE
+      // REEL. Bankbesonderhede is van elke dokument af weggehaal omdat 'n
+      // bankoorbetaling die verdeling omseil. Hier IS die omseiling die
+      // bedoeling: daar is geen betaalskakel nie, en sonder die besonderhede
+      // weet die klient nie waarheen om te betaal nie.
+      const m = maatskappy || {};
+      const bank = [
+        String(m.bank || "").trim(),
+        String(m.bank_rekeningnaam || m.naam || "").trim(),
+        `${t_in("fd_rekening", en ? "en" : "af")}: ${String(m.bank_rekeningnommer || "").trim()}`,
+        `${t_in("fd_takkode", en ? "en" : "af")}: ${String(m.bank_takkode || "").trim()}`,
+        `${t_in("fd_verwysing", en ? "en" : "af")}: ${nommer}`,
+      ].filter((r) => r && !r.endsWith(": "));
+
+      reels.push(
+        `<b>${ontsnap(t_in("fd_bank_kop", en ? "en" : "af"))}</b><br>` +
+          bank.map((r) => ontsnap(r)).join("<br>")
       );
     } else {
       // GEEN BANKBESONDERHEDE NIE (17 Sep 2026). Alles loop deur die skakel,

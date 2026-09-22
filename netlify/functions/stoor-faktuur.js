@@ -283,6 +283,11 @@ exports.handler = async (event, context) => {
   // nog stuur, word hier stilweg geignoreer — 'n faktuurvlak-verdeling sou
   // NAAS die reëls s'n loop en dieselfde geld twee keer uitbetaal.
 
+  // Word met die hand betaal. Slegs op 'n konsep: die uitreiking vries die
+  // keuse saam met die verdeling, en stoor-faktuur.js raak nooit 'n
+  // uitgereikte faktuur nie.
+  if (invoer.handmatig !== undefined) rekord.handmatig = invoer.handmatig === true;
+
   if (invoer.afslag_sent !== undefined) rekord.afslag_sent = sent(invoer.afslag_sent);
   if (invoer.skenking_sent !== undefined) rekord.skenking_sent = sent(invoer.skenking_sent);
   if (invoer.koepon_kode !== undefined) {

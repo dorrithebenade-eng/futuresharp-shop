@@ -391,6 +391,19 @@
           </div>
         </div>
 
+        <!-- DIE BANKBLOK. Slegs vir 'n faktuur wat met die hand betaal word (22
+             Sep 2026). Sy het geen betaalskakel nie, want haar verdeling is
+             sonder fooivoorsiening gevries; sonder die besonderhede weet die
+             klient nie waarheen om te betaal nie. Vir elke ander faktuur bly die
+             reel van 17 September: geen bankbesonderhede op 'n dokument nie. -->
+        <div class="dok-betaal" id="d-bankblok" hidden>
+          <div>
+            <h3 id="d-bank-kop">Bankoorbetaling</h3>
+            <p id="d-bank-reels"></p>
+          </div>
+        </div>
+
+
       </div>
 
       <!-- DIE HANDVATSEL tussen die twee kolomme. Sleep om die verhouding te
@@ -520,6 +533,17 @@
                  die verdelingsblok hierbo: 'n aanbieding dra 5%, 'n reel wat
                  iemand se petrol terugbetaal dra niks. -->
           </div>
+          <!-- WORD MET DIE HAND BETAAL. Die keuse hoort hier, by die ander
+               dinge wat aan die geld raak, en nie by die dokument nie: sy
+               verander die SOM, nie net hoe die bladsy lyk nie. -->
+          <label class="bo-merk" for="f-handmatig">
+            <input type="checkbox" id="f-handmatig">
+            <span>
+              <b data-i18n="bo_handmatig">Word met die hand betaal</b>
+              <span class="bo-lei" data-i18n="bo_handmatig_lei">Geen fooivoorsiening en geen betaalskakel nie. Die dokument dra die bankbesonderhede, en die uitbetalings word self gedoen.</span>
+            </span>
+          </label>
+
           <p class="bo-lei" style="margin:10px 0 0" data-i18n="bo_afslag_lei">
             Afslag verminder die verdeelbare bedrag. Skenking bly buite die verdeling.
           </p>
