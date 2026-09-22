@@ -113,8 +113,16 @@ function bo_som() {
 
   // Paystack hef op die VOLLE transaksie. Die verskil tussen die fooi op die
   // faktuur alleen en die fooi op alles, is wat die skenking self kos.
+  //
+  // BY 'N HANDMATIGE FAKTUUR IS DIE FOOI NUL, hier ook. Hierdie een plek het
+  // die koerse self gebruik in plaas van die som s'n, en die gevolg was dat die
+  // fooireel op R0,00 gaan staan het terwyl die kop "Oorbestee met R211,30"
+  // gewys het -- presies die ou fooi, van 'n bedrag afgetrek wat nooit gehef
+  // word nie.
   const volleFooi =
-    betaal > 0 ? Math.round(((FS_PS_PCT / 100) * betaal + FS_PS_VAS) * 100) / 100 : 0;
+    betaal > 0 && V.handmatig !== true
+      ? Math.round(((FS_PS_PCT / 100) * betaal + FS_PS_VAS) * 100) / 100
+      : 0;
   const skenkingFooi = Math.round((volleFooi - u.paystack) * 100) / 100;
 
   const oorskot = Math.round((u.oorskot + skenking - skenkingFooi) * 100) / 100;
