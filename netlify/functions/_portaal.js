@@ -79,9 +79,10 @@ async function koppel_klient({ registrasie, naam, epos, selfoon }) {
   if (!e) throw new Error("Geen e-pos nie");
   const store = kry_kliente_store();
 
+  // Al die kliënte gelyktydig, nie een ná die ander nie.
   const lys = await store.list({ prefix: "K" });
-  for (const b of lys.blobs || []) {
-    const rekord = await store.get(b.key, { type: "json" }).catch(() => null);
+  const rekords = await Promise.all((lys.blobs || []).map((b) => store.get(b.key, { type: "json" }).catch(() => null)));
+  for (const rekord of rekords) {
     if (rekord && skoon_epos(rekord.epos) === e) {
       voeg_geskiedenis_by(rekord, "portaal_gekoppel", "portaal", "Registrasie " + (registrasie || ""));
       rekord.bygewerk_op = new Date().toISOString();

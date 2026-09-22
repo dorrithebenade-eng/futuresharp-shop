@@ -134,6 +134,13 @@
       const data = await portaal({ aksie: "lys" });
       LYS = data.registrasies || [];
       REGSKAKEL = data.registrasieskakel || "";
+      // Die vraelyste en die adres kom saam met die lys: een oproep, nie twee nie.
+      if (Array.isArray(data.instrumente)) {
+        INSTR = data.instrumente;
+        ADRES = data.adres || "";
+        $("#fsp-adres").value = ADRES;
+        teken_instr();
+      }
       $("#fsp-reg-skakel").textContent = REGSKAKEL;
       teken_lys();
     } catch (f) {
@@ -177,7 +184,7 @@
       const kons = r.kons
         ? '<div class="fsp-ry-kons">Konsultasie ' + esc(kort(r.kons.op)) + (r.kons.wyse === "aanlyn" ? ", aanlyn" : ", in persoon") + "</div>"
         : '<div class="fsp-ry-kons leeg">Konsultasie nog nie gereël nie</div>';
-      return '<div class="fsp-ry" data-no="' + esc(r.no) + '" tabindex="0" role="button">' +
+      return '<div class="fsp-ry" data-stand="' + st + '" data-no="' + esc(r.no) + '" tabindex="0" role="button">' +
         '<div class="fsp-ry-no">' + esc(r.no) + "</div>" +
         '<div><div class="fsp-ry-naam">' + (r.gesien ? "" : '<span class="fsp-nuut" title="Nog nie oopgemaak nie"></span>') + esc(r.naam + " " + r.van) + "</div>" +
         '<div class="fsp-ry-sub">' + esc([r.graad, (r.ouderdom != null ? r.ouderdom + " jaar" : ""), r.taal === "en" ? "Engels" : "Afrikaans"].filter(Boolean).join(", ")) + "</div>" + kons + "</div>" +
@@ -621,6 +628,6 @@
       } catch (f) { kennis(f.message); }
     };
 
-    await Promise.all([laai_lys(), laai_instellings()]);
+    await laai_lys();
   });
 })();

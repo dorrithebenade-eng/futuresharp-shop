@@ -127,3 +127,55 @@
 .fsp-kennis { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); background: var(--swart); color: var(--wit);
   padding: 10px 16px; border-radius: 8px; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity .2s; z-index: 50; max-width: 90vw; }
 .fsp-kennis.wys { opacity: 1; }
+
+/* ---------------------------------------------------------------------------
+   KLEUR (September 2026). Die area het somber gelyk: swart pille, grys ryke.
+   Die logo se vier kleure dra nou betekenis: die kop wys die blokke, en elke
+   ry kry 'n kleurrand volgens sy stand, sodat 'n mens in een oogopslag sien
+   wat aandag vra.
+   --------------------------------------------------------------------------- */
+:root { --fsp-teal: #00A291; --fsp-amber: #FCBA10; --fsp-koraal: #FF491B; --fsp-teal-lig: #E3F5F2; --fsp-navy-lig: #E8EEF5; }
+
+.fsp-kop { display: flex; align-items: center; gap: 20px; background: var(--wit); border-radius: 14px;
+  padding: 16px 18px; margin: 0 0 20px; border: 3px solid var(--fsp-navy); }
+.fsp-kop-blokke { display: grid; grid-template-columns: 1.7fr 1fr .6fr; gap: 6px; width: 250px; flex: none; height: 74px; }
+.fsp-b-koraal { background: var(--fsp-koraal); color: #fff; font-family: var(--font-opskrif); font-weight: 800; font-size: 15px;
+  line-height: 1.05; padding: 10px; display: flex; align-items: center; }
+.fsp-b-teal { background: var(--fsp-teal); }
+.fsp-b-geel { display: flex; flex-direction: column; gap: 6px; }
+.fsp-b-geel i { background: var(--fsp-amber); flex: 1; }
+.fsp-b-geel b { background: #111; width: 45%; aspect-ratio: 1; }
+.fsp-kop-teks h1 { font-family: var(--font-opskrif); font-weight: 800; color: var(--fsp-navy); font-size: clamp(20px, 3vw, 28px); margin: 0 0 4px; }
+.fsp-kop-teks p { margin: 0; color: var(--grys-teks); font-size: 14px; }
+@media (max-width: 620px) {
+  .fsp-kop { flex-direction: column; align-items: stretch; gap: 12px; }
+  .fsp-kop-blokke { width: 100%; height: 64px; }
+}
+
+.fsp-pil.aktief { background: var(--fsp-navy); border-color: var(--fsp-navy); }
+
+.fsp-strook { border-left-color: var(--fsp-teal); background: var(--fsp-teal-lig); }
+.fsp-strook code { background: var(--wit); }
+.fsp-strook .fsp-knop-lig { background: var(--fsp-teal); color: #fff; border-color: var(--fsp-teal); }
+
+.fsp-filter.aan { background: var(--fsp-navy); color: #fff; border-color: var(--fsp-navy); }
+.fsp-filter.aan b { color: var(--fsp-amber); }
+
+.fsp-ry { border-left: 5px solid var(--fsp-lyn); box-shadow: 0 2px 8px rgba(22,61,100,.06); }
+.fsp-ry[data-stand="nuut"] { border-left-color: var(--fsp-koraal); }
+.fsp-ry[data-stand="gereel"] { border-left-color: var(--fsp-navy); }
+.fsp-ry[data-stand="gestuur"], .fsp-ry[data-stand="deels"] { border-left-color: var(--fsp-amber); }
+.fsp-ry[data-stand="voltooi"] { border-left-color: var(--fsp-teal); }
+.fsp-ry[data-stand="verval"] { border-left-color: #B9B6AF; }
+.fsp-ry:hover { background: #FBFCFE; }
+
+.fsp-stand.nuut { background: var(--fsp-koraal); color: #fff; }
+.fsp-stand.gereel { background: var(--fsp-navy); color: #fff; }
+.fsp-stand.gestuur, .fsp-stand.deels { background: var(--fsp-amber); color: var(--fsp-navy); }
+.fsp-stand.voltooi { background: var(--fsp-teal); color: #fff; }
+.fsp-stand.toets { background: var(--fsp-navy-lig); color: var(--fsp-navy); }
+
+.fsp-kaart { border-top: 4px solid var(--fsp-teal); }
+.fsp-kaart h3 { color: var(--fsp-navy); }
+.fsp-knop-hoof { background: var(--fsp-teal); }
+.fsp-knop-hoof:hover { background: #008C7D; }
