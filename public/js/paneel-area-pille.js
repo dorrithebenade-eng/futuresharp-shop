@@ -54,6 +54,11 @@
       if (!anker) return null;
       return { area: "admin", anker, waar: "na" };
     }
+    // Die Future Sharp-area (futuresharp.html): die ry staan bo sy
+    // afdelingspille, soos op Boekhouding.
+    if (document.getElementById("fsp-kieslys")) {
+      return { area: "futuresharp", anker: document.getElementById("fsp-kieslys"), waar: "voor" };
+    }
     if (document.getElementById("fp-kieslys")) {
       const anker = document.getElementById("fp-kieslys");
       return { area: "boekhouding", anker, waar: "voor" };
@@ -94,32 +99,47 @@
     const het_admin = het_een_van(gebruiker, ADMIN_ROLLE);
     const het_boekhouding = identiteit_het_rol(gebruiker, BOEKHOUDING_ROL);
 
+    // DIE FUTURE SHARP-AREA (September 2026) volg die boekhouding-rol: dit
+    // is Dorrithé en Ignatius s'n, en portaal.js dwing dieselfde rol af.
+    const het_futuresharp = het_boekhouding;
+
     // MINDER AS TWEE AREAS: GEEN RY. Een pil wat 'n area benoem terwyl daar
     // net een is, sê niks en neem plek. Dieselfde reël as die groepopskrifte
     // wat hy vervang.
-    if (!het_admin || !het_boekhouding) return true;
+    const tel = [het_admin, het_boekhouding, het_futuresharp].filter(Boolean).length;
+    if (tel < 2) return true;
 
     const ry = document.createElement("nav");
     ry.id = "paneel-area-kieslys";
     ry.className = "paneel-area-kieslys";
     ry.setAttribute("aria-label", woord("paneel_area_kieslys", "Areas"));
 
-    ry.appendChild(
-      bou_pil(
-        woord("paneel_kieslys_groep_admin", "Admin"),
-        bladsy.area === "admin",
-        "paneelbord.html",
-        "admin"
-      )
-    );
-    ry.appendChild(
-      bou_pil(
-        woord("fp_titel", "Boekhouding"),
-        bladsy.area === "boekhouding",
-        "faktuurpaneel.html",
-        "boekhouding"
-      )
-    );
+    if (het_admin) {
+      ry.appendChild(
+        bou_pil(
+          woord("paneel_kieslys_groep_admin", "Admin"),
+          bladsy.area === "admin",
+          "paneelbord.html",
+          "admin"
+        )
+      );
+    }
+    if (het_boekhouding) {
+      ry.appendChild(
+        bou_pil(
+          woord("fp_titel", "Boekhouding"),
+          bladsy.area === "boekhouding",
+          "faktuurpaneel.html",
+          "boekhouding"
+        )
+      );
+    }
+    if (het_futuresharp) {
+      // Die naam is 'n eienaam en word nie vertaal nie.
+      ry.appendChild(
+        bou_pil("Future Sharp", bladsy.area === "futuresharp", "futuresharp.html", "futuresharp")
+      );
+    }
 
     // WAAR DIE RY STAAN, HANG VAN DIE SKERM AF.
     //

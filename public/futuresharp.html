@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="af">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex,nofollow">
+  <title>Future Sharp · Paneel</title>
+  <meta name="theme-color" content="#171717">
+  <link rel="apple-touch-icon" href="/icons/paneel-apple-touch-ikoon.png">
+  <link rel="stylesheet" href="css/styl.css" />
+  <link rel="stylesheet" href="css/paneel-breedte.css" />
+  <link rel="stylesheet" href="css/paneel-area-pille.css">
+  <link rel="stylesheet" href="css/futuresharp-paneel.css">
+  <link rel="icon" href="/icons/paneel-ikoon-32.png" sizes="32x32" type="image/png">
+  <link rel="icon" href="/icons/paneel-ikoon-16.png" sizes="16x16" type="image/png">
+</head>
+<body>
+
+  <!--
+    DIE FUTURE SHARP-AREA: studievaardigheidskonsultasies.
+
+    Die derde paneel naas Admin en Boekhouding. Dit deel die paneel-sessie
+    (identiteit.js se PANEEL_BLADSYE sluit hierdie bladsy in): een aanmelding
+    vir al drie.
+
+    Die data leef NIE in die winkel nie, maar in die registrasieportaal
+    (future-sharp-vraelyste), 'n aparte werf. Alles loop deur die Function
+    portaal.js, wat die boekhouding-rol afdwing en dan met die portaal se
+    geheime sleutel deurstuur. Die blaaier sien die sleutel nooit.
+
+    NIKS WORD GELEEN NIE. Elke klas van hierdie bladsy dra die voorvoegsel
+    `fsp-`. styl.css laai vir die kop, die palet en die lettertipes.
+  -->
+  <header class="mini-kop">
+   <div class="mini-kop-inner">
+    <a href="index.html" class="mini-kop-merk">
+      <span class="merk-sharp">Future Sharp</span>
+      <span class="merk-skeier">—</span>
+      <span class="merk-shop">Future Shop</span>
+    </a>
+    <div class="mini-kop-regs">
+      <div class="paneel-aanmeld-blok">
+        <span id="paneel-gebruiker-epos" class="paneel-gebruiker-epos"></span>
+        <a href="paneelbord.html" class="mini-kop-mandjie">Paneelbord</a>
+      </div>
+    </div>
+   </div>
+  </header>
+
+  <main class="paneel-wrap fsp-wrap" id="fsp-hoof" style="visibility:hidden;">
+
+    <h1 class="mandjie-titel" id="fsp-titel">Future Sharp</h1>
+
+    <section id="fsp-geen-toegang" class="fsp-geen-toegang" style="display:none;">
+      <p id="fsp-geen-toegang-teks">Hierdie bladsy is vir Future Sharp. Meld by die paneelbord aan.</p>
+      <a href="paneelbord.html" class="kaart-aksie">Gaan na die paneelbord</a>
+    </section>
+
+    <div id="fsp-paneel" style="display:none;">
+      <p class="fsp-onder">Studievaardigheidskonsultasies: registrasies, datums en die vraelyste ter voorbereiding.</p>
+
+      <nav class="fsp-kieslys" id="fsp-kieslys" aria-label="Afdelings">
+        <button type="button" class="fsp-pil aktief" data-gaan="leerders">Leerders</button>
+        <button type="button" class="fsp-pil" data-gaan="vraelyste">Vraelyste</button>
+      </nav>
+
+      <!-- ===== LEERDERS: LYS ===== -->
+      <section class="fsp-afdeling wys" data-afdeling="leerders" id="fsp-lys-afd">
+        <div class="fsp-strook">
+          <div class="fsp-strook-titel">Registrasievorm-skakel</div>
+          <code id="fsp-reg-skakel">…</code>
+          <button type="button" class="fsp-knop fsp-knop-lig" data-kopieer="#fsp-reg-skakel">Kopieer</button>
+        </div>
+
+        <div class="fsp-filters">
+          <input type="search" id="fsp-soek" placeholder="Soek op naam, nommer of e-pos" aria-label="Soek">
+        </div>
+        <div class="fsp-filters" id="fsp-filterknoppe" role="group" aria-label="Filter volgens stand"></div>
+        <div class="fsp-lys" id="fsp-lys"><p class="fsp-leeg">Word gelaai …</p></div>
+        <div class="fsp-toets-blok" id="fsp-toets-blok" hidden>
+          <button type="button" class="fsp-knop fsp-knop-lig" id="fsp-skrap-toets">Skrap alle toetsregistrasies</button>
+        </div>
+      </section>
+
+      <!-- ===== LEERDERS: EEN ===== -->
+      <section class="fsp-afdeling" data-afdeling="een" id="fsp-een-afd">
+        <button type="button" class="fsp-terug" id="fsp-terug">← Terug na die lys</button>
+        <div id="fsp-een"></div>
+      </section>
+
+      <!-- ===== VRAELYSTE ===== -->
+      <section class="fsp-afdeling" data-afdeling="vraelyste">
+        <div class="fsp-kaart">
+          <h2>Vraelyste op LearnWorlds</h2>
+          <p class="fsp-hulp fsp-hulp-bo">Die lys waaruit julle kies wanneer julle vir 'n leerder of ouer 'n bladsy skep. Verander 'n skakel hier, en elke persoonlike bladsy gebruik dadelik die nuwe een, ook bladsye wat reeds uitgestuur is.</p>
+          <div id="fsp-instrumente"><p class="fsp-leeg">Word gelaai …</p></div>
+          <div class="fsp-aksies">
+            <button type="button" class="fsp-knop fsp-knop-lig" id="fsp-nuwe-instr">+ Voeg 'n vraelys by</button>
+            <button type="button" class="fsp-knop fsp-knop-hoof" id="fsp-stoor-instr">Stoor die vraelyste</button>
+          </div>
+          <p class="fsp-hulp">'n Vraelys word nie geskrap nie, net gedeaktiveer. Dan verskyn hy nie meer as keuse nie, maar bladsye wat hom reeds dra, werk steeds.</p>
+        </div>
+
+        <div class="fsp-kaart">
+          <h2>Besigheidsadres</h2>
+          <p class="fsp-hulp fsp-hulp-bo">Vul vanself in by 'n konsultasie in persoon.</p>
+          <div class="fsp-ry-knop">
+            <input type="text" id="fsp-adres" class="fsp-invoer" maxlength="300">
+            <button type="button" class="fsp-knop fsp-knop-hoof" id="fsp-stoor-adres">Stoor</button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div class="fsp-kennis" id="fsp-kennis" role="status"></div>
+
+  <script src="js/taal.js"></script>
+  <script src="js/identiteit.js"></script>
+  <script src="js/sessie-verval.js"></script>
+  <script src="js/futuresharp-paneel.js"></script>
+  <script src="js/paneel-area-pille.js"></script>
+</body>
+</html>

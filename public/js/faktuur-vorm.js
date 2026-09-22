@@ -1652,6 +1652,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       // gebeur wanneer daar iets is om te stoor.
       V.geskep_op = new Date().toISOString();
       V.reels = [nuwe_reel()];
+      // VANUIT DIE FUTURE SHARP-PANEEL (September 2026): ?reel= gee die eerste
+      // reel se beskrywing, sodat die leerder se naam en registrasienommer op
+      // die faktuur staan. Die kliënt (?klient=) word hieronder gekies, nadat
+      // die register gelaai het.
+      const vooraf_reel = params.get("reel");
+      if (vooraf_reel) V.reels[0].beskrywing = String(vooraf_reel).slice(0, 300);
     }
   } catch (fout) {
     console.error("Kon nie die faktuur laai nie:", fout);
@@ -1843,6 +1849,15 @@ document.addEventListener("DOMContentLoaded", async () => {
       teken_afdeling();
       merk_vuil();
     });
+  }
+
+  // ?klient= uit die Future Sharp-paneel: kies hom soos 'n mens sou, sodat
+  // dieselfde kode die kliënt se besonderhede op die dokument sit. Net vir 'n
+  // vars konsep; 'n bestaande faktuur hou sy eie kliënt.
+  const vooraf_klient = params.get("klient");
+  if (vooraf_klient && !sleutel && !nommer && kies && KLIENTE.some((k) => k.nommer === vooraf_klient)) {
+    kies.value = vooraf_klient;
+    kies.dispatchEvent(new Event("change"));
   }
 
   teken_alles();

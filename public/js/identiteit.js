@@ -33,7 +33,9 @@
 // net paneelbord.html, sou 'n mens wat op die paneelbord aangemeld is,
 // op die faktuurpaneel uitgeteken wees — dit sou die winkel se sleutel
 // gekry het. Elke nuwe personeel-kant bladsy kom hier by.
-const PANEEL_BLADSYE = ["paneelbord.html", "faktuurpaneel.html", "faktuur.html"];
+// futuresharp.html (September 2026): die Future Sharp-area deel dieselfde
+// aanmelding as die ander twee panele.
+const PANEEL_BLADSYE = ["paneelbord.html", "faktuurpaneel.html", "faktuur.html", "futuresharp.html"];
 
 function kry_sessie_sleutel() {
   const pad = window.location.pathname;

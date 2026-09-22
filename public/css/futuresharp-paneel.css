@@ -1,0 +1,129 @@
+/* public/css/futuresharp-paneel.css
+ *
+ * Die Future Sharp-area (futuresharp.html). ELKE KLAS DRA `fsp-`: niks word
+ * uit Boekhouding of die paneelbord geleen nie, want 'n geleende klas dra sy
+ * eie aannames saam.
+ *
+ * Die area se kleur is die portaal se navy, #163D64. Admin is koraal en
+ * Boekhouding teal; die derde area kry sy eie kleur sodat 'n skermskoot sê
+ * waar 'n mens is.
+ */
+:root { --fsp-navy: #163D64; --fsp-lyn: #E4E2DD; }
+
+.fsp-wrap { max-width: 1000px; }
+.fsp-onder { color: var(--grys-teks); margin: -6px 0 18px; font-size: 14px; }
+.fsp-geen-toegang { text-align: center; padding: 30px 0; }
+.fsp-geen-toegang p { color: var(--grys-teks); margin-bottom: 18px; }
+
+/* Afdelingspille */
+.fsp-kieslys { display: flex; gap: 8px; flex-wrap: wrap; margin: 0 0 18px; }
+.fsp-pil { border: 1px solid var(--fsp-lyn); background: var(--wit); border-radius: 999px; padding: 8px 16px;
+  font-family: var(--font-liggaam); font-size: 14px; cursor: pointer; color: var(--grys-teks); }
+.fsp-pil.aktief { background: var(--swart); color: var(--wit); border-color: var(--swart); }
+.fsp-afdeling { display: none; }
+.fsp-afdeling.wys { display: block; }
+
+/* Kaarte en teks */
+.fsp-kaart { background: var(--wit); border-radius: 12px; padding: 18px; margin-bottom: 16px; box-shadow: 0 2px 10px rgba(23,23,23,.05); }
+.fsp-kaart h2 { font-family: var(--font-opskrif); font-weight: 700; font-size: 17px; margin: 0 0 10px; }
+.fsp-kaart h3 { font-family: var(--font-opskrif); font-weight: 700; font-size: 15px; margin: 0 0 10px; color: var(--fsp-navy); }
+.fsp-hulp { font-size: 13px; color: var(--grys-teks); margin: 8px 0 0; }
+.fsp-hulp-bo { margin: -4px 0 14px; }
+.fsp-leeg { color: var(--grys-teks); font-size: 14px; padding: 12px 0; }
+
+/* Skakelstrook, soos die Kliëntvorm-skakel */
+.fsp-strook { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; background: var(--wit); border-radius: 12px;
+  padding: 14px 16px; margin-bottom: 16px; border-left: 5px solid var(--fsp-navy); }
+.fsp-strook-titel { font-family: var(--font-opskrif); font-weight: 700; font-size: 13.5px; flex: 1 0 100%; }
+.fsp-strook code { flex: 1 1 260px; background: var(--grys-lig); border-radius: 6px; padding: 8px 10px; font-size: 13px;
+  overflow-x: auto; white-space: nowrap; font-family: var(--font-liggaam); }
+
+/* Knoppies */
+.fsp-knop { border: 0; border-radius: 8px; padding: 9px 14px; font-weight: 600; font-size: 14px; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 6px; text-decoration: none; font-family: var(--font-liggaam); }
+.fsp-knop-hoof { background: var(--fsp-navy); color: var(--wit); }
+.fsp-knop-lig { background: var(--wit); color: var(--swart); border: 1px solid var(--fsp-lyn); }
+.fsp-knop-wa { background: #1F8F55; color: var(--wit); }
+.fsp-knop:disabled { opacity: .45; cursor: not-allowed; }
+.fsp-aksies { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+
+/* Filters en lys */
+.fsp-filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 12px; }
+.fsp-filters input { flex: 1 1 220px; padding: 9px 12px; border: 1px solid var(--fsp-lyn); border-radius: 8px; background: var(--wit); font-family: var(--font-liggaam); font-size: 14px; }
+.fsp-filter { border: 1px solid var(--fsp-lyn); background: var(--wit); border-radius: 999px; padding: 6px 12px; font-size: 13px; cursor: pointer; font-family: var(--font-liggaam); }
+.fsp-filter.aan { border-color: var(--fsp-navy); color: var(--fsp-navy); font-weight: 600; background: rgba(22,61,100,.06); }
+.fsp-lys { display: flex; flex-direction: column; gap: 8px; }
+.fsp-ry { display: grid; grid-template-columns: 130px 1fr auto; gap: 12px; align-items: center; background: var(--wit);
+  border-radius: 10px; padding: 12px 14px; cursor: pointer; border: 1px solid transparent; }
+.fsp-ry:hover, .fsp-ry:focus-visible { border-color: var(--fsp-lyn); }
+.fsp-ry-no { font-family: var(--font-opskrif); font-weight: 700; font-size: 13.5px; color: var(--fsp-navy); }
+.fsp-ry-naam { font-weight: 600; }
+.fsp-ry-naam .fsp-nuut { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--koraal); margin-right: 6px; vertical-align: middle; }
+.fsp-ry-sub { font-size: 13px; color: var(--grys-teks); }
+.fsp-ry-kons { font-size: 13px; font-weight: 600; color: var(--fsp-navy); margin-top: 2px; }
+.fsp-ry-kons.leeg { color: #B8451F; font-weight: 500; }
+@media (max-width: 560px) { .fsp-ry { grid-template-columns: 1fr auto; } .fsp-ry-no { grid-column: 1 / -1; } }
+.fsp-toets-blok { margin-top: 18px; }
+
+.fsp-stand { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; white-space: nowrap; }
+.fsp-stand.nuut { background: rgba(236,88,50,.13); color: #B8451F; }
+.fsp-stand.gereel { background: rgba(22,61,100,.10); color: var(--fsp-navy); }
+.fsp-stand.gestuur { background: rgba(241,189,67,.2); color: #7A5A0A; }
+.fsp-stand.deels { background: rgba(241,189,67,.3); color: #7A5A0A; }
+.fsp-stand.voltooi { background: rgba(71,159,145,.16); color: #2F6B60; }
+.fsp-stand.verval { background: #EDEBE6; color: #6B6B6B; }
+.fsp-stand.toets { background: var(--swart); color: var(--wit); margin-right: 6px; }
+
+/* Een registrasie */
+.fsp-terug { display: inline-block; font-size: 14px; color: var(--grys-teks); margin-bottom: 14px; cursor: pointer; background: none; border: 0; padding: 0; font-family: var(--font-liggaam); }
+.fsp-kop-ry { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: flex-start; }
+.fsp-kop-ry h2 { font-size: 22px; margin: 2px 0 0; }
+.fsp-rooster { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 760px) { .fsp-rooster { grid-template-columns: 1fr; } }
+.fsp-dl { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; margin: 0; font-size: 14px; }
+.fsp-dl dt { color: var(--grys-teks); }
+.fsp-dl dd { margin: 0; word-break: break-word; }
+.fsp-klientskakel { display: inline-block; margin-top: 10px; font-size: 13.5px; font-weight: 600; color: #2F6B60; }
+.fsp-waarsku { color: #B8451F; font-size: 13.5px; margin-top: 10px; }
+
+.fsp-veld { margin-bottom: 14px; }
+.fsp-et { display: block; font-weight: 500; font-size: 14px; margin-bottom: 5px; }
+.fsp-invoer, .fsp-veld input[type=date], .fsp-veld input[type=time], .fsp-kaart select {
+  padding: 9px 10px; border: 1px solid var(--fsp-lyn); border-radius: 8px; background: var(--wit); font-family: var(--font-liggaam); font-size: 14px; }
+.fsp-invoer { width: 100%; }
+.fsp-tyd { display: flex; gap: 8px; flex-wrap: wrap; }
+.fsp-merkies { display: flex; flex-direction: column; gap: 6px; }
+.fsp-merkies.ry { flex-direction: row; gap: 18px; }
+.fsp-merkies label { display: flex; gap: 8px; align-items: center; font-size: 14px; }
+.fsp-merkies input { width: 18px; height: 18px; accent-color: var(--fsp-navy); }
+.fsp-sper { background: rgba(22,61,100,.07); border-radius: 8px; padding: 8px 12px; font-size: 14px; margin: 0 0 12px; }
+.fsp-sper.fout { background: rgba(236,88,50,.12); color: #B8451F; }
+.fsp-ry-knop { display: flex; gap: 8px; }
+.fsp-ry-knop .fsp-invoer { flex: 1; }
+
+.fsp-vraelys { border: 1px solid var(--fsp-lyn); border-radius: 10px; padding: 12px 14px; margin-bottom: 10px;
+  display: flex; justify-content: space-between; gap: 10px; align-items: center; flex-wrap: wrap; }
+.fsp-vraelys b { font-weight: 600; }
+.fsp-status { font-size: 13px; }
+.fsp-status.klaar { color: #2F6B60; font-weight: 600; }
+.fsp-boodskap { width: 100%; min-height: 150px; border: 1px solid var(--fsp-lyn); border-radius: 8px; padding: 10px;
+  font-size: 14px; background: var(--grys-lig); resize: vertical; font-family: var(--font-liggaam); }
+.fsp-wie { font-size: 13px; color: var(--grys-teks); margin: 8px 0 0; }
+
+.fsp-toestem { font-size: 13.5px; border-top: 1px solid var(--fsp-lyn); padding: 8px 0; }
+.fsp-toestem:first-of-type { border-top: 0; }
+.fsp-toestem summary { cursor: pointer; color: var(--fsp-navy); font-size: 13px; margin-top: 4px; }
+.fsp-toestem blockquote { margin: 6px 0 0; padding: 8px 10px; background: var(--grys-lig); border-radius: 6px; font-size: 13px; white-space: pre-wrap; }
+
+/* Vraelyste */
+.fsp-instrument { display: grid; gap: 10px; border: 1px solid var(--fsp-lyn); border-radius: 10px; padding: 14px; margin-bottom: 12px; }
+.fsp-instrument.onaktief { opacity: .6; background: var(--grys-lig); }
+.fsp-instr-kop { display: flex; justify-content: space-between; gap: 10px; align-items: center; }
+.fsp-twee { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+@media (max-width: 560px) { .fsp-twee { grid-template-columns: 1fr; } }
+.fsp-klein-et { font-size: 12.5px; color: var(--grys-teks); display: block; margin-bottom: 3px; }
+.fsp-instr-onder { display: flex; justify-content: space-between; align-items: flex-end; gap: 10px; flex-wrap: wrap; }
+
+.fsp-kennis { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); background: var(--swart); color: var(--wit);
+  padding: 10px 16px; border-radius: 8px; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity .2s; z-index: 50; max-width: 90vw; }
+.fsp-kennis.wys { opacity: 1; }

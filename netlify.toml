@@ -40,3 +40,22 @@
 # gestel (nie hierdie lêer nie): "Oop registrasie" aan, standaard-rol by
 # registrasie = "koper" (via 'n Identity-triggerfunksie, sien
 # netlify/functions/identity-registrasie.js hieronder).
+
+# DIE REGISTRASIEPORTAAL (September 2026).
+#
+# futureshop.futuresharp.co.za/portaal/* word STIL deurgestuur na die portaal
+# se eie werf (future-sharp-vraelyste). Status 200 beteken die blaaier sien
+# steeds hierdie adres: geen DNS-werk by Afrihost nodig nie. Die portaal leef
+# ook op sy eie werf onder /portaal/, dus werk dieselfde paaie op albei.
+#
+# force = true, sodat niks in public/ ooit die pad kan oorskadu nie.
+[[redirects]]
+  from = "/portaal"
+  to = "/portaal/registreer"
+  status = 301
+
+[[redirects]]
+  from = "/portaal/*"
+  to = "https://future-sharp-vraelyste.netlify.app/portaal/:splat"
+  status = 200
+  force = true

@@ -158,3 +158,24 @@ body.paneel-area-pille-aan #paneel-boekhouding-skakel { display: none; }
     padding: 10px 17px;
   }
 }
+
+
+/* DIE DERDE AREA: FUTURE SHARP (September 2026). Dieselfde vorm as Admin en
+   Boekhouding, met sy eie kleur: die registrasieportaal se navy. Die reels
+   staan hier en nie in futuresharp-paneel.css nie, want die pil verskyn ook
+   op die ander twee bladsye. */
+.paneel-area-pil-futuresharp { color: #163D64; }
+.paneel-area-pil-futuresharp.aktief {
+  background: #163D64;
+  border-color: #163D64;
+  color: var(--wit);
+}
+.paneel-area-kieslys.in-kop .paneel-area-pil-futuresharp {
+  border-color: #6F8FB2;
+  color: #9DB5CF;
+}
+.paneel-area-kieslys.in-kop .paneel-area-pil-futuresharp.aktief {
+  background: #163D64;
+  border-color: #6F8FB2;
+  color: var(--wit);
+}
