@@ -18,7 +18,10 @@
 
   const as_app = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
   const weggewys = () => { try { return localStorage.getItem(WEG) === "ja"; } catch { return false; } };
-  const is_iphone = /iphone|ipad|ipod/i.test(navigator.userAgent) && !/crios|fxios/i.test(navigator.userAgent);
+  // Enige blaaier op 'n iPhone: sedert iOS 16.4 kan Chrome ook "Voeg by
+  // tuisskerm" doen, via sy eie Deel-knoppie.
+  const is_iphone = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const is_android = /android/i.test(navigator.userAgent);
 
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("/futuresharp-sw.js", { scope: "/futuresharp" }).catch(() => {});
@@ -27,8 +30,7 @@
   function wys(modus) {
     const s = strook();
     if (!s || as_app || weggewys()) return;
-    s.querySelector("[data-modus='android']").hidden = modus !== "android";
-    s.querySelector("[data-modus='iphone']").hidden = modus !== "iphone";
+    for (const el of s.querySelectorAll("[data-modus]")) el.hidden = el.dataset.modus !== modus;
     s.hidden = false;
   }
 
@@ -47,6 +49,12 @@
     const s = strook();
     if (!s) return;
     if (is_iphone) wys("iphone");
+
+    // ANDROID: Chrome gee die installeer-geleentheid eers ná 'n rukkie op die
+    // bladsy (sy eie reëls), of glad nie as die app reeds geïnstalleer is.
+    // Kom dit nie binne 'n paar sekondes nie, wys ons die handmatige pad deur
+    // Chrome se kieslys. Kom dit later tog, word dit die knoppie.
+    if (is_android) setTimeout(() => { if (!geleentheid) wys("android-kieslys"); }, 3000);
 
     s.querySelector("#fsp-installeer-knop").addEventListener("click", async () => {
       if (!geleentheid) return;
