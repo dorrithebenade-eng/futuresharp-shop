@@ -61,6 +61,12 @@
   to = "/portaal/registreer"
   status = 301
 
+# Die Engelse ingang: dieselfde vorm, Engelse voorskou op WhatsApp.
+[[redirects]]
+  from = "/register"
+  to = "/portaal/register"
+  status = 301
+
 [[redirects]]
   from = "/portaal/*"
   to = "https://future-sharp-vraelyste.netlify.app/portaal/:splat"

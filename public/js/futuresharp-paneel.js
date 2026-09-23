@@ -142,6 +142,8 @@
         teken_instr();
       }
       $("#fsp-reg-skakel").textContent = REGSKAKEL;
+      // Die Engelse ingang wys 'n Engelse voorskou op WhatsApp.
+      $("#fsp-reg-skakel-en").textContent = data.registrasieskakel_en || REGSKAKEL.replace(/\/registreer$/, "/register");
       teken_lys();
     } catch (f) {
       $("#fsp-lys").innerHTML = '<p class="fsp-leeg">Kon nie die registrasies laai nie: ' + esc(f.message) + "</p>";
