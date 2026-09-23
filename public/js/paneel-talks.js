@@ -147,6 +147,7 @@ function pt_bou_skelet() {
 
         <fieldset class="paneel-formaat-blok">
           <legend class="paneel-formaat-titel">Video</legend>
+          <div id="pt-video"></div>
           <label class="paneel-wisselaar"><input type="checkbox" id="pt-beskikbaar" checked> <span>Beskikbaar</span></label>
           <div class="pt-ry">
             <div>
@@ -238,6 +239,14 @@ function pt_kategorie_name(ids) {
   return (ids || []).map((id) => (FST_KATEGORIEE.find((k) => k.id === id) || {}).naam).filter(Boolean).join(", ");
 }
 
+function pt_video_merk(t) {
+  const s = (t.video_stand && t.video_stand.stand) || "geen";
+  if (s === "gereed") return " · video gereed";
+  if (s === "wag_vir_oplaai" || s === "verwerk") return " · video word verwerk";
+  if (s === "fout") return " · video-fout";
+  return " · nog geen video";
+}
+
 function pt_teken_lys() {
   const lys = document.getElementById("pt-lys");
   if (!pt.talks.length) {
@@ -253,7 +262,7 @@ function pt_teken_lys() {
         <div class="pt-inligting">
           <strong>${pt_esc(t.titel)}</strong>
           <span>${pt_esc(t.spreker)}</span>
-          <span class="pt-meta">${pt_esc(pt_kategorie_name(t.kategoriee))} · ${pt_rand(v.prys_sent || 0)}${v.duur_sekondes ? " · " + pt_sekondes_na_duur(v.duur_sekondes) : ""}${aktief ? "" : " · onaktief"}${v.beskikbaar ? "" : " · nie beskikbaar nie"}</span>
+          <span class="pt-meta">${pt_esc(pt_kategorie_name(t.kategoriee))} · ${pt_rand(v.prys_sent || 0)}${v.duur_sekondes ? " · " + pt_sekondes_na_duur(v.duur_sekondes) : ""}${aktief ? "" : " · onaktief"}${v.beskikbaar ? "" : " · nie beskikbaar nie"}${pt_video_merk(t)}</span>
         </div>
         <div class="pt-aksies">
           <button type="button" class="terug-skakel" data-pt-wysig="${pt_esc(t.slug)}">Wysig</button>
@@ -312,6 +321,8 @@ function pt_open_vorm(talk) {
   pt_teken_verdelings();
   pt_wys_omslag();
   pt_foute("");
+  // Die video-oplaai (Fase 4) leef in paneel-talk-video.js.
+  if (typeof ptv_open === "function") ptv_open(talk);
 
   document.getElementById("pt-vorm-blok").style.display = "block";
   document.getElementById("pt-vorm-blok").scrollIntoView({ behavior: "smooth", block: "start" });
@@ -690,9 +701,19 @@ async function pt_stoor(e) {
     const talk = await resp.json();
 
     // Plaaslik bywerk: Blobs se list() kan 'n oomblik agter wees.
+    const was_nuut = !pt.wysig_slug;
+    talk.video_stand = (pt.talks.find((t) => t.slug === talk.slug) || {}).video_stand || { stand: "geen" };
     pt.talks = [talk, ...pt.talks.filter((t) => t.slug !== talk.slug)];
     pt_teken_lys();
-    pt_sluit_vorm();
+    if (was_nuut) {
+      // 'n Nuwe talk bly oop, nou in wysig-modus, sodat die video dadelik
+      // opgelaai kan word (dit het 'n gestoorde talk nodig).
+      pt_open_vorm(talk);
+      pt_foute("");
+      document.getElementById("pt-video").scrollIntoView({ behavior: "smooth", block: "center" });
+    } else {
+      pt_sluit_vorm();
+    }
   } catch (fout) {
     console.error("Kon nie talk stoor nie:", fout);
     pt_foute(`Kon nie stoor nie: ${fout.message}`);

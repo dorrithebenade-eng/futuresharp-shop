@@ -16,10 +16,20 @@ exports.handler = async (event, context) => {
   }
 
   const store = kry_store("talks");
+  const video_store = kry_store("talk-video");
   const { blobs } = await store.list();
   const talks = (await Promise.all(blobs.map((b) => store.get(b.key, { type: "json" }))))
     .filter(Boolean)
     .sort((a, b) => String(b.geskep_op || "").localeCompare(String(a.geskep_op || "")));
+
+  // Die video se stand (Fase 4) leef in 'n eie store; die paneel wys dit in
+  // die lys. Net die velde wat die paneel nodig het.
+  await Promise.all(talks.map(async (t) => {
+    const v = await video_store.get(t.slug, { type: "json" });
+    t.video_stand = v
+      ? { stand: v.stand, duur_sekondes: v.duur_sekondes || null, fout: v.fout || null, speel_nog_ou: Boolean(v.speel_playback_id) }
+      : { stand: "geen" };
+  }));
 
   return {
     statusCode: 200,

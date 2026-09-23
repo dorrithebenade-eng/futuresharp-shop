@@ -161,3 +161,29 @@
   line-height: 1.7;
 }
 .pt-waarskuwing { color: #b3261e; }
+
+/* ---------- Die video-blok (Fase 4) ---------- */
+#pt-video { margin-bottom: 18px; padding-bottom: 16px; border-bottom: 1px solid #e8e6e1; }
+.ptv-nota { margin: 8px 0 0; }
+.ptv-stand { font-weight: 600; font-size: 14px; margin: 4px 0 8px; }
+.ptv-ok { color: #2f7d5b; }
+.ptv-fout { color: #b3261e; }
+.ptv-gereed { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
+.ptv-oplaai {
+  border: 2px dashed #cfcac0;
+  border-radius: 8px;
+  padding: 22px;
+  text-align: center;
+  background: #fbfaf8;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.ptv-oplaai p { margin: 0 0 12px; }
+.ptv-oor { border-color: var(--teal); background: rgba(71, 159, 145, 0.08); }
+.ptv-kies { display: inline-block; cursor: pointer; }
+.ptv-of { text-align: center; color: #888; font-size: 12px; margin: 12px 0 0; }
+.ptv-skakel-ry { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; }
+.ptv-balk { height: 8px; background: #eeece7; border-radius: 4px; overflow: hidden; }
+.ptv-balk i { display: block; height: 100%; width: 0; background: var(--teal); transition: width 0.2s ease; }
+.ptv-balk-besig i { width: 35%; animation: ptv-heen-en-weer 1.4s ease-in-out infinite alternate; }
+@keyframes ptv-heen-en-weer { from { margin-left: 0; } to { margin-left: 65%; } }
+@media (prefers-reduced-motion: reduce) { .ptv-balk-besig i { animation: none; width: 100%; opacity: 0.4; } }

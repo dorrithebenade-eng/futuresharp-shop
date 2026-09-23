@@ -1,4 +1,4 @@
-// Personeel-beskermd — skrap 'n talk permanent, saam met sy omslag.
+// Personeel-beskermd — skrap 'n talk permanent, saam met sy omslag en video.
 // FutureSharp Talks.
 //
 // Om 'n talk net van die FST-blad af te haal, gebruik Deaktiveer (die
@@ -12,6 +12,7 @@
 
 const { kry_store } = require("./_blob-store");
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
+const { skrap_mux_bate } = require("./_mux");
 
 // Die omslag se sleutel uit die pad wat laai-omslag-op.js teruggee:
 // /.netlify/functions/kry-omslag?bestand=<sleutel>
@@ -57,11 +58,22 @@ exports.handler = async (event, context) => {
     }
   }
 
+  // Die video by Mux (Fase 4): die huidige, en 'n ou een wat nog sou speel.
+  const video_store = kry_store("talk-video");
+  const video = await video_store.get(slug, { type: "json" });
+  let video_geskrap = false;
+  if (video) {
+    const eerste = await skrap_mux_bate(video.asset_id);
+    const tweede = await skrap_mux_bate(video.speel_asset_id);
+    video_geskrap = eerste && tweede;
+    await video_store.delete(slug);
+  }
+
   await store.delete(slug);
 
   return {
     statusCode: 200,
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ geskrap: slug, omslag_geskrap }),
+    body: JSON.stringify({ geskrap: slug, omslag_geskrap, video_geskrap }),
   };
 };

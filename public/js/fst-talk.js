@@ -46,7 +46,6 @@ function fst_talk_teken(talk, kategoriee) {
         <div class="fst-koop-meta">${fst_esc(kat)}${v.duur_sekondes ? ` · ${fst_esc(fst_duur(v.duur_sekondes))}` : ""}</div>
         <div class="fst-koop-prys">${fst_esc(fst_prys(v.prys_sent))}</div>
         <button type="button" class="fst-knop" disabled>${fst_esc(knop_teks)}</button>
-        <p class="fst-koop-nota">${fst_esc(t("fst_binnekort_nota"))}</p>
       </aside>
     </div>`;
 }
