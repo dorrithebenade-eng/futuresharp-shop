@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="css/paneel-area-pille.css">
   <link rel="stylesheet" href="css/paneel-breedte.css">
   <link rel="stylesheet" href="css/paneel-spreker-uit-outeur.css">
+  <link rel="stylesheet" href="css/paneel-talks.css">
   <script src="js/identiteit.js"></script>
 
   <!-- PWA: Future Shop Paneelbord-app (aparte omvang, net hierdie bladsy) -->
@@ -175,6 +176,7 @@
           <button type="button" class="paneel-kieslys-item rol-personeel" data-afdeling="outeurs" data-i18n="paneel_outeurs_titel">Outeurs</button>
           <button type="button" class="paneel-kieslys-item rol-personeel" data-afdeling="printing">Printing</button>
           <button type="button" class="paneel-kieslys-item rol-personeel" data-afdeling="sprekers">Sprekers</button>
+          <button type="button" class="paneel-kieslys-item rol-personeel" data-afdeling="talks">Talks</button>
           <button type="button" class="paneel-kieslys-item rol-personeel" data-afdeling="uitnodigings" data-i18n="paneel_nav_uitnodigings">Uitnodigings</button>
           <button type="button" class="paneel-kieslys-item rol-personeel" data-afdeling="vennote">Vennote (direkteure)</button>
           <button type="button" class="paneel-kieslys-item rol-personeel" data-afdeling="verdeling-rekenaar" data-i18n="paneel_verdeling_rekenaar_titel">Verdeling-rekenaar</button>
@@ -483,6 +485,10 @@
             <button type="button" id="paneel-sprekers-vorm-kanselleer" class="terug-skakel paneel-vorm-kanselleer">✕ Kanselleer</button>
           </form>
         </div>
+      </section>
+
+      <section class="paneel-afdeling" data-afdeling-inhoud="talks">
+        <div id="paneel-talks-wortel"></div>
       </section>
 
       <section class="paneel-afdeling" data-afdeling-inhoud="aflewering">
@@ -1118,6 +1124,8 @@
   <script src="js/paneel-ooreenkoms.js"></script>
   <script src="js/paneel-registers.js"></script>
   <script src="js/paneel-spreker-uit-outeur.js"></script>
+  <script src="js/talk-omslag.js"></script>
+  <script src="js/paneel-talks.js"></script>
   <script src="js/dokumente.js"></script>
   <script src="js/paneel-vennoot.js"></script>
   <script src="js/paneel-katalogus-soek.js"></script>

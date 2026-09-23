@@ -1,0 +1,160 @@
+/* paneel-talks.css — die Talks-afdeling in die paneelbord (FutureSharp Talks).
+   Eie klasse met die pt-voorvoegsel; geen geleende uitlegklasse nie. */
+
+.pt-ry-talk {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #e8e6e1;
+}
+.pt-onaktief { opacity: 0.55; }
+.pt-duimnael {
+  width: 112px;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  display: block;
+  background: #2f3332;
+}
+.pt-duimnael-leeg { border: 1px dashed #c9c6bf; background: transparent; }
+.pt-inligting { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.pt-inligting strong { font-family: var(--font-opskrif); font-size: 15px; }
+.pt-meta { font-size: 12.5px; color: var(--grys-teks); }
+.pt-aksies { display: flex; gap: 14px; flex-wrap: wrap; justify-content: flex-end; }
+.pt-aksies .terug-skakel { margin-bottom: 0; background: none; border: 0; cursor: pointer; padding: 0; }
+@media (max-width: 640px) {
+  .pt-ry-talk { grid-template-columns: 88px minmax(0, 1fr); }
+  .pt-duimnael { width: 88px; }
+  .pt-aksies { grid-column: 1 / -1; justify-content: flex-start; }
+}
+
+.pt-vorm-blok { margin-top: 28px; }
+
+.pt-ry { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 560px) { .pt-ry { grid-template-columns: 1fr; } }
+.pt-halwe { max-width: 50%; }
+@media (max-width: 560px) { .pt-halwe { max-width: none; } }
+
+.pt-skakel {
+  background: none;
+  border: 0;
+  padding: 0;
+  margin-top: 10px;
+  color: var(--teal);
+  font-family: var(--font-liggaam);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+}
+.pt-x {
+  background: none;
+  border: 0;
+  color: var(--grys-teks);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+.pt-spreker-ry { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: center; margin-top: 8px; }
+.pt-verdeling-ry {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr 0.7fr 0.8fr auto;
+  gap: 8px;
+  align-items: center;
+  margin-top: 8px;
+}
+@media (max-width: 640px) { .pt-verdeling-ry { grid-template-columns: 1fr 1fr; } }
+
+.pt-kategoriee { display: flex; flex-wrap: wrap; gap: 8px; }
+.pt-kat {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #d8d6d1;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 13px;
+  cursor: pointer;
+}
+.pt-kat input { accent-color: var(--teal); }
+.pt-kat-aan { border-color: var(--teal); background: rgba(71, 159, 145, 0.1); }
+.pt-hoof {
+  font-size: 11px;
+  background: var(--teal);
+  color: var(--wit);
+  border-radius: 999px;
+  padding: 1px 8px;
+}
+
+.pt-sleutels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  border: 1px solid #d8d6d1;
+  background: var(--wit);
+  padding: 6px;
+}
+.pt-sleutels input {
+  flex: 1 1 140px;
+  border: 0;
+  outline: 0;
+  font-family: var(--font-liggaam);
+  font-size: 14px;
+  padding: 6px;
+  background: transparent;
+}
+.pt-sleutel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--grys-lig);
+  border-radius: 999px;
+  padding: 4px 6px 4px 12px;
+  font-size: 12.5px;
+}
+.pt-sleutel button {
+  border: 0;
+  background: #dcdad4;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  line-height: 18px;
+  padding: 0;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.pt-omslag { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 680px) { .pt-omslag { grid-template-columns: 1fr; } }
+.pt-omslag-raam canvas,
+.pt-omslag-raam img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  display: block;
+  background: #2f3332;
+}
+.pt-knoppe { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.pt-knoppe .kaart-aksie { padding: 10px 20px; font-size: 14px; }
+.pt-knop-twee {
+  display: inline-block;
+  padding: 10px 20px;
+  border: 1px solid #d8d6d1;
+  border-radius: 999px;
+  font-family: var(--font-liggaam);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  background: var(--wit);
+}
+
+.pt-som {
+  margin-top: 14px;
+  background: var(--grys-lig);
+  padding: 12px 14px;
+  font-size: 13px;
+  line-height: 1.7;
+}
+.pt-waarskuwing { color: #b3261e; }
