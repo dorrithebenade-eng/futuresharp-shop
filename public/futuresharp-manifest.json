@@ -1,0 +1,18 @@
+{
+  "id": "/futuresharp.html",
+  "name": "Future Sharp Studievaardighede",
+  "short_name": "Future Sharp",
+  "description": "Studievaardigheidskonsultasies: registrasies, datums en die vraelyste ter voorbereiding.",
+  "start_url": "/futuresharp.html",
+  "scope": "/futuresharp",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#FFFFFF",
+  "theme_color": "#163D64",
+  "lang": "af",
+  "icons": [
+    { "src": "/icons/futuresharp-ikoon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/futuresharp-ikoon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/futuresharp-ikoon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
