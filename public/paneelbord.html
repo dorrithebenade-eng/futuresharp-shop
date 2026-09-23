@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="css/paneel-ooreenkoms.css">
   <link rel="stylesheet" href="css/paneel-area-pille.css">
   <link rel="stylesheet" href="css/paneel-breedte.css">
+  <link rel="stylesheet" href="css/paneel-spreker-uit-outeur.css">
   <script src="js/identiteit.js"></script>
 
   <!-- PWA: Future Shop Paneelbord-app (aparte omvang, net hierdie bladsy) -->
@@ -426,9 +427,21 @@
       <section class="paneel-afdeling" data-afdeling-inhoud="sprekers">
         <div class="paneel-afdeling-kop">
           <h2 class="paneel-afdeling-titel">Sprekers</h2>
-          <button id="paneel-voeg-sprekers-by-knoppie" class="kaart-aksie paneel-voeg-by-knoppie" type="button">+ Voeg spreker by</button>
+          <div class="suo-kop-knoppies">
+            <button id="paneel-sprekers-uit-outeurs-knoppie" class="kaart-aksie paneel-voeg-by-knoppie" type="button">+ Uit outeurs</button>
+            <button id="paneel-voeg-sprekers-by-knoppie" class="kaart-aksie paneel-voeg-by-knoppie" type="button">+ Voeg spreker by</button>
+          </div>
         </div>
         <p class="paneel-hulp-teks">Die sprekers van FutureSharp Talks. Voeg elke spreker hier een keer by (naam en Paystack-subrekening-kode) en kies hom daarna uit 'n lys wanneer 'n talk se verdeling opgestel word.</p>
+        <div id="suo-blok" class="suo-blok" style="display:none;">
+          <p class="suo-hulp">Kies 'n outeur om ook as spreker te registreer. Sy naam, subrekening, kontak- en bankbesonderhede kom oor. Sy dokumente en outeursooreenkoms bly by die outeur.</p>
+          <div class="suo-ry">
+            <select id="suo-kieser" class="veld-invoer" aria-label="Outeur"></select>
+            <button type="button" id="suo-registreer" class="kaart-aksie" disabled>Registreer as spreker</button>
+            <button type="button" id="suo-kanselleer" class="terug-skakel">✕ Kanselleer</button>
+          </div>
+          <p id="suo-boodskap" class="suo-boodskap" style="display:none;"></p>
+        </div>
         <div id="paneel-sprekers-lys">
           <p class="stelsel-boodskap">Sprekers word gelaai …</p>
         </div>
@@ -1104,6 +1117,7 @@
   <script src="js/paneelbord.js"></script>
   <script src="js/paneel-ooreenkoms.js"></script>
   <script src="js/paneel-registers.js"></script>
+  <script src="js/paneel-spreker-uit-outeur.js"></script>
   <script src="js/dokumente.js"></script>
   <script src="js/paneel-vennoot.js"></script>
   <script src="js/paneel-katalogus-soek.js"></script>

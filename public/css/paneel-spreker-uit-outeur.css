@@ -1,0 +1,36 @@
+/* paneel-spreker-uit-outeur.css — die "+ Uit outeurs"-blok in Sprekers. */
+.suo-blok {
+  margin: 0 0 18px;
+  padding: 16px;
+  border: 1px solid #e3e1db;
+  border-radius: 8px;
+  background: #fafaf8;
+}
+.suo-ry {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+.suo-ry select {
+  flex: 1 1 260px;
+  min-width: 0;
+}
+.suo-hulp {
+  margin: 0 0 10px;
+  font-size: 0.9em;
+  color: #5b5b5b;
+}
+.suo-boodskap {
+  margin: 10px 0 0;
+  font-size: 0.9em;
+  color: #5b5b5b;
+}
+.suo-boodskap--fout {
+  color: #b3261e;
+}
+.suo-kop-knoppies {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
