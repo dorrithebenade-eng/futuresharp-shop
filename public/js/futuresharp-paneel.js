@@ -108,6 +108,19 @@
     return data;
   }
 
+  // ---------- Skrap met die woorde as slot ----------
+  const SKRAP_WOORDE = "SKRAP TOETSREGISTRASIES";
+  function skrap_blok(id, knopteks) {
+    return '<div class="fsp-skrap-ry"><input type="text" class="fsp-invoer" id="' + id + '-woorde" placeholder="Tik: ' + SKRAP_WOORDE + '" autocomplete="off" autocapitalize="characters">' +
+      '<button type="button" class="fsp-knop fsp-knop-gevaar" id="' + id + '" disabled>' + esc(knopteks) + "</button></div>";
+  }
+  function bind_skrap(id, doen) {
+    const inp = $("#" + id + "-woorde"), knop = $("#" + id);
+    if (!inp || !knop) return;
+    inp.oninput = () => { knop.disabled = inp.value.trim() !== SKRAP_WOORDE; };
+    knop.onclick = async () => { if (inp.value.trim() !== SKRAP_WOORDE) return; knop.disabled = true; try { await doen(); } catch (f) { kennis(f.message); knop.disabled = false; } };
+  }
+
   // ---------- Stande ----------
   const STANDE = {
     nuut: "Nuut", gereel: "Konsultasie gereël", gestuur: "Vraelys gestuur",
@@ -293,9 +306,22 @@
     const volle_naam = l.naam + " " + l.van;
     let h = "";
 
-    // Kop
+    // Kop, met die nommer se aksies: wysig, en (net vir toetse) skrap
     h += '<div class="fsp-kaart"><div class="fsp-kop-ry"><div><div class="fsp-ry-no" style="font-size:15px">' + esc(reg.no) + "</div><h2>" + esc(volle_naam) + "</h2></div>" +
-      "<div>" + (reg.toets ? '<span class="fsp-stand toets">Toets</span>' : "") + '<span class="fsp-stand ' + st + '">' + STANDE[st] + "</span></div></div></div>";
+      "<div>" + (reg.toets ? '<span class="fsp-stand toets">Toets</span>' : "") + '<span class="fsp-stand ' + st + '">' + STANDE[st] + "</span></div></div>" +
+      '<div class="fsp-aksies"><button type="button" class="fsp-knop fsp-knop-lig" id="nr-wysig">Wysig die nommer</button>' +
+      "</div>" +
+      (reg.toets ? '<div class="fsp-toets-skrap"><b>Skrap hierdie toetsregistrasie</b>' +
+        '<p class="fsp-hulp">Die registrasie en sy persoonlike bladsye word permanent uitgevee. Tik <b>SKRAP TOETSREGISTRASIES</b> om te bevestig.</p>' +
+        skrap_blok("nr-skrap", "Skrap hierdie toetsregistrasie") + "</div>" : "") +
+      '<div id="nr-vorm" hidden style="margin-top:12px">' +
+        '<label class="fsp-et" for="nr-nuut">Nuwe nommer</label>' +
+        '<div class="fsp-ry-knop"><input type="text" id="nr-nuut" class="fsp-invoer" value="' + esc(reg.no) + '" autocomplete="off" autocapitalize="characters">' +
+        '<button type="button" class="fsp-knop fsp-knop-hoof" id="nr-stoor">Stoor</button></div>' +
+        '<p class="fsp-hulp">' + (reg.toets
+          ? "Haal TOETS- weg om dit 'n regte registrasie te maak, of maak die blokkie leeg vir die volgende vrye regte nommer. Die rekeningpligtige gaan dan ook na die kliënteregister."
+          : "Sit TOETS- voor die nommer om dit as toetsregistrasie te merk; daarna kan dit geskrap word. 'n Regte nommer wat al ooit uitgegee is, kan nie weer gebruik word nie.") + "</p></div>" +
+      "</div>";
 
     // Die konsultasie
     const kv = invoer_waardes(reg.kons && reg.kons.op);
@@ -395,6 +421,30 @@
   }
 
   function bind_een(reg, bladsye) {
+    $("#nr-wysig").onclick = () => { const v = $("#nr-vorm"); v.hidden = !v.hidden; if (!v.hidden) $("#nr-nuut").focus(); };
+    $("#nr-stoor").onclick = async (e) => {
+      const nuwe = $("#nr-nuut").value.trim().toUpperCase();
+      if (nuwe === reg.no) { kennis("Die nommer is nie verander nie"); return; }
+      if (!nuwe && !reg.toets) { kennis("Tik die nuwe nommer"); return; }
+      if (!confirm(nuwe ? "Verander " + reg.no + " na " + nuwe.toUpperCase() + "?" : "Maak van " + reg.no + " 'n regte registrasie met die volgende vrye nommer?")) return;
+      e.target.disabled = true;
+      try {
+        const uit = await portaal({ aksie: "hernommer", no: reg.no, nuwe });
+        kennis("Die nommer is nou " + uit.no);
+        await laai_lys();
+        await wys_een(uit.no);
+      } catch (f) { kennis(f.message); e.target.disabled = false; }
+    };
+    if (reg.toets) {
+      bind_skrap("nr-skrap", async () => {
+        await portaal({ aksie: "skrap", no: reg.no });
+        kennis(reg.no + " is geskrap");
+        HUIDIG = null;
+        wys_afdeling("leerders");
+        await laai_lys();
+      });
+    }
+
     for (const rb of $$('input[name="k-wyse"]')) {
       rb.onchange = () => {
         const a = $('input[name="k-wyse"]:checked').value === "aanlyn";
@@ -625,14 +675,12 @@
       teken_lys();
     });
 
-    $("#fsp-skrap-toets").onclick = async () => {
-      if (!confirm("Skrap alle toetsregistrasies en hul bladsye? Die regte registrasies bly staan.")) return;
-      try {
-        const uit = await portaal({ aksie: "skrap_toets" });
-        kennis(uit.geskrap + " toetsregistrasie(s) geskrap");
-        await laai_lys();
-      } catch (f) { kennis("Kon nie: " + f.message); }
-    };
+    bind_skrap("fsp-skrap-toets", async () => {
+      const uit = await portaal({ aksie: "skrap_toets" });
+      kennis(uit.geskrap + " toetsregistrasie(s) geskrap");
+      $("#fsp-skrap-toets-woorde").value = "";
+      await laai_lys();
+    });
 
     $("#fsp-nuwe-instr").onclick = () => {
       lees_instr();

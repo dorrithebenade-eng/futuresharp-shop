@@ -201,3 +201,18 @@
 .fsp-aanmeld { max-width: 420px; margin: 0 auto 20px; }
 .fsp-bly { display: flex; gap: 8px; align-items: center; font-size: 14px; margin: 4px 0 6px; }
 .fsp-bly input { width: 18px; height: 18px; accent-color: var(--fsp-navy); }
+
+/* Skrap: rooi omlyn, sodat dit nie per ongeluk soos 'n gewone knoppie lyk nie */
+.fsp-knop-gevaar { color: #B8451F; border-color: #E8B4A3; }
+
+/* Toetsregistrasies: omskakel en skrap */
+.fsp-toets-kaart { border-top-color: var(--fsp-amber); }
+.fsp-toets-deel { padding: 10px 0; }
+.fsp-toets-deel + .fsp-toets-deel { border-top: 1px solid var(--fsp-lyn); margin-top: 6px; padding-top: 14px; }
+.fsp-gevaar b { color: #B8451F; }
+.fsp-kaart.fsp-gevaar { border-top-color: var(--koraal); }
+.fsp-skrap-ry { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.fsp-skrap-ry .fsp-invoer { flex: 1 1 240px; }
+.fsp-knop-gevaar { background: #B8451F; color: #fff; }
+.fsp-toets-skrap { border-top: 1px solid var(--fsp-lyn); margin-top: 14px; padding-top: 12px; }
+.fsp-toets-skrap b { color: #B8451F; }
