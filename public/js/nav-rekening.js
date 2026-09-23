@@ -305,3 +305,28 @@ async function nav_is_outeur(sessie) {
     }
   }
 })();
+
+// --- 4. AF/EN langs die handelsnaam (September 2026) ---
+// 'n Aangemelde outeur het die meeste items in die kop, en regs het AF/EN
+// dan na 'n tweede ry gespring terwyl die ruimte langs die handelsnaam leeg
+// staan. Die wisselaar skuif dus links, reg langs "Future Sharp — Future
+// Shop". Op 'n foon verander niks: die hamburger-afdeling hierbo het reeds
+// 'n kloon in die mobiele balk gesit, en styl.css verskuil hierdie een
+// onder 640px (.mini-kop-links .taal-wisselaar).
+//
+// Loop NA afdeling 1, want die kloon word van die oorspronklike gemaak.
+// taal.js koppel die knoppies eers by DOMContentLoaded, dus werk hulle ook
+// op hul nuwe plek.
+(function () {
+  const inner = document.querySelector(".mini-kop-inner");
+  const regs = document.querySelector(".mini-kop-regs");
+  const merk = inner && inner.querySelector(".mini-kop-merk");
+  const taal = regs && regs.querySelector(".taal-wisselaar");
+  if (!inner || !merk || !taal || inner.querySelector(".mini-kop-links")) return;
+
+  const links = document.createElement("div");
+  links.className = "mini-kop-links";
+  merk.parentNode.insertBefore(links, merk);
+  links.appendChild(merk);
+  links.appendChild(taal);
+})();

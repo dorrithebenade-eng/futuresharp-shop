@@ -3818,3 +3818,22 @@ body.vennoot-modus .paneel-dokument-skrap-knoppie {
   opacity: 0.85;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
+
+/* ---------- AF/EN langs die handelsnaam (September 2026) ----------
+   nav-rekening.js (afdeling 4) skuif die taal-wisselaar uit .mini-kop-regs
+   na 'n groep links, langs die handelsnaam. Regs is daar dan een item
+   minder, en die spasies daar is effens kleiner, sodat 'n aangemelde
+   outeur se kop op een ry pas. */
+.mini-kop-links {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-shrink: 0;
+}
+.mini-kop-merk { white-space: nowrap; }
+@media (min-width: 641px) {
+  .mini-kop-regs { gap: 10px clamp(12px, 1.6vw, 20px); }
+}
+@media (max-width: 640px) {
+  .mini-kop-links .taal-wisselaar { display: none; }
+}
