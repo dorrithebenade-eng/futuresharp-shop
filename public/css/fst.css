@@ -1,0 +1,203 @@
+/* fst.css — FutureSharp Talks: die FST-blad en die talk-bladsy.
+   Ontwerp A (Verhoog): 'n donker saal met 'n goue kollig. Eie klasse met die
+   fst-voorvoegsel; die kleure en lettertipes kom uit styl.css se tokens. */
+
+.fst-liggaam {
+  --fst-bg: #171717;
+  --fst-bg2: #222524;
+  --fst-kaart: #1f2221;
+  --fst-teks: #f3f2ee;
+  --fst-sag: #a9adab;
+  --fst-lyn: #2e3231;
+  --fst-gloed: #f1bd43;
+  margin: 0;
+  background: var(--fst-bg);
+  color: var(--fst-teks);
+  font-family: var(--font-liggaam);
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+.fst-liggaam a { color: inherit; }
+.fst-liggaam :focus-visible { outline: 2px solid var(--amber); outline-offset: 3px; }
+
+/* ---------- kop ---------- */
+.fst-kop {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: rgba(23, 23, 23, 0.94);
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid var(--fst-lyn);
+  padding-top: env(safe-area-inset-top, 0px);
+}
+.fst-kop-in {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.fst-terug { color: var(--fst-sag) !important; text-decoration: none; font-size: 14px; white-space: nowrap; }
+.fst-terug:hover { color: var(--fst-teks) !important; }
+.fst-kop-merk { text-decoration: none; }
+.fst-taal { margin-left: auto; }
+
+/* ---------- woordmerk ---------- */
+.fst-wm { display: inline-flex; align-items: flex-start; }
+.fst-wm-naam { font-family: var(--font-opskrif); font-weight: 800; color: var(--fst-teks); letter-spacing: 0.01em; }
+.fst-wm-blokwrap { display: inline-flex; flex-direction: column; }
+.fst-wm-blokke { display: flex; gap: var(--g); position: relative; }
+.fst-wm-blokke b {
+  width: var(--s);
+  height: var(--s);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-opskrif);
+  font-weight: 800;
+  font-size: calc(var(--s) * 0.56);
+}
+.fst-wm-vloer { height: var(--v); background: var(--amber); margin-top: calc(var(--g) * 1.5); }
+.fst-b-t { background: #479f91; color: #fff; }
+.fst-b-g { background: #f1bd43; color: #171717; }
+.fst-b-k { background: #ec5832; color: #fff; }
+
+.fst-wm-klein { --s: 19px; --g: 2px; --v: 2px; flex-direction: row; align-items: center; gap: 8px; }
+.fst-wm-klein .fst-wm-naam { font-size: 15px; margin-bottom: 4px; }
+.fst-wm-klein .fst-wm-blokwrap { margin-top: 9px; }
+.fst-wm-klein .fst-wm-kamera { position: absolute; width: 18px; top: -12px; left: 63px; transform: rotate(-6deg); }
+
+.fst-wm-groot { --s: clamp(46px, 9vw, 84px); --g: 5px; --v: 3px; flex-direction: column; margin-top: calc(var(--s) * 0.55); }
+.fst-wm-groot .fst-wm-naam { font-size: clamp(14px, 2vw, 20px); margin-bottom: 10px; }
+.fst-wm-groot .fst-wm-kamera { position: absolute; width: calc(var(--s) * 1.05); left: calc(var(--s) * 3.15); top: calc(var(--s) * -0.66); transform: rotate(-6deg); }
+.fst-wm-groot .fst-wm-klap { position: absolute; width: calc(var(--s) * 0.72); left: calc(var(--s) * 5 + var(--g) * 4 + 4px); bottom: 0; transform: rotate(8deg); transform-origin: bottom left; }
+
+/* ---------- held ---------- */
+.fst-held { max-width: 1180px; margin: 0 auto; padding: 48px 20px 30px; position: relative; }
+.fst-held::before {
+  content: "";
+  position: absolute;
+  inset: -40px 10% auto 10%;
+  height: 420px;
+  background: radial-gradient(ellipse at 50% 0, rgba(241, 189, 67, 0.16), transparent 65%);
+  pointer-events: none;
+}
+.fst-held h1 { position: absolute; left: -9999px; }
+.fst-held-sub { font-family: var(--font-opskrif); font-weight: 600; font-size: clamp(18px, 2.4vw, 26px); color: var(--fst-sag); margin: 18px 0 0; }
+.fst-held-lei { max-width: 58ch; margin: 18px 0 0; line-height: 1.65; color: var(--fst-sag); }
+
+/* ---------- filter ---------- */
+.fst-filter { max-width: 1180px; margin: 0 auto; padding: 0 20px 18px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.fst-filter-pille { display: flex; flex-wrap: wrap; gap: 8px; }
+.fst-pil {
+  border: 1px solid var(--fst-lyn);
+  background: transparent;
+  color: var(--fst-teks);
+  border-radius: 999px;
+  padding: 7px 15px;
+  font-family: var(--font-liggaam);
+  font-size: 13.5px;
+  cursor: pointer;
+}
+.fst-pil[aria-pressed="true"] { background: var(--fst-teks); color: var(--fst-bg); border-color: var(--fst-teks); }
+.fst-soek {
+  flex: 1 1 240px;
+  min-width: 0;
+  background: var(--fst-bg2);
+  border: 1px solid var(--fst-lyn);
+  color: var(--fst-teks);
+  border-radius: 999px;
+  padding: 9px 16px;
+  font-family: var(--font-liggaam);
+  font-size: 14px;
+}
+.fst-soek:focus { outline: none; border-color: var(--amber); }
+
+/* ---------- rooster en kaarte ---------- */
+.fst-rooster {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 6px 20px 72px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 30px 22px;
+}
+.fst-kaart { display: block; text-decoration: none; }
+.fst-omslag { position: relative; display: block; aspect-ratio: 16 / 9; border-radius: 6px; overflow: hidden; background: var(--fst-bg2); }
+.fst-omslag img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.25s ease; }
+.fst-kaart:hover .fst-omslag img { transform: scale(1.03); }
+@media (prefers-reduced-motion: reduce) { .fst-kaart:hover .fst-omslag img { transform: none; } }
+.fst-duur { position: absolute; right: 10px; bottom: 10px; background: rgba(0, 0, 0, 0.62); color: #fff; font-size: 12px; padding: 2px 8px; border-radius: 3px; }
+.fst-etiket { position: absolute; left: 10px; bottom: 10px; font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; }
+.fst-etiket-amber { background: var(--amber); color: #171717; }
+.fst-etiket-koraal { background: var(--koraal); color: #fff; }
+.fst-etiket-teal { background: var(--teal); color: #fff; }
+.fst-etiket-swart { background: #000; color: #fff; }
+.fst-kaart-titel { display: block; font-family: var(--font-opskrif); font-weight: 700; font-size: 17px; line-height: 1.25; margin: 12px 0 4px; }
+.fst-kaart-wie { display: block; font-size: 13.5px; color: var(--fst-sag); }
+.fst-kaart-meta { display: block; font-size: 12.5px; color: var(--fst-sag); margin-top: 6px; }
+.fst-boodskap { grid-column: 1 / -1; color: var(--fst-sag); padding: 30px 0; }
+.fst-boodskap a { color: var(--amber); }
+
+/* ---------- talk-bladsy ---------- */
+.fst-talk-saal { position: relative; overflow: hidden; }
+.fst-talk-saal::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -120px;
+  width: 90%;
+  height: 520px;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse at 50% 30%, var(--fst-gloed), transparent 62%);
+  opacity: 0.22;
+  filter: blur(40px);
+  pointer-events: none;
+}
+.fst-profiel {
+  position: relative;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 36px 20px 80px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  gap: 44px;
+}
+@media (max-width: 840px) { .fst-profiel { grid-template-columns: 1fr; gap: 28px; } }
+.fst-omslag-groot { border-radius: 8px; box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5); }
+.fst-profiel-titel { font-family: var(--font-opskrif); font-weight: 800; font-size: clamp(28px, 4.4vw, 46px); line-height: 1.06; letter-spacing: -0.02em; margin: 28px 0 8px; }
+.fst-profiel-wie { font-size: 16px; color: var(--fst-sag); margin: 0 0 18px; }
+.fst-profiel h2 { font-family: var(--font-opskrif); font-size: 15px; font-weight: 700; margin: 28px 0 10px; }
+.fst-teks p { line-height: 1.75; max-width: 64ch; margin: 0 0 12px; }
+.fst-sleutels { display: flex; flex-wrap: wrap; gap: 6px; }
+.fst-sleutels a { font-size: 12.5px; border: 1px solid var(--fst-lyn); border-radius: 999px; padding: 4px 11px; color: var(--fst-sag) !important; text-decoration: none; }
+.fst-sleutels a:hover { border-color: var(--amber); color: var(--fst-teks) !important; }
+.fst-koop {
+  align-self: start;
+  position: sticky;
+  top: 84px;
+  background: var(--fst-kaart);
+  border: 1px solid var(--fst-lyn);
+  border-radius: 10px;
+  padding: 24px;
+}
+.fst-koop-meta { font-size: 13px; color: var(--fst-sag); }
+.fst-koop-prys { font-family: var(--font-opskrif); font-weight: 800; font-size: 36px; margin: 12px 0 16px; }
+.fst-knop {
+  display: block;
+  width: 100%;
+  border: 0;
+  border-radius: 999px;
+  padding: 13px 18px;
+  background: var(--amber);
+  color: #171717;
+  font-family: var(--font-liggaam);
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+}
+.fst-knop:disabled { background: #3a3e3d; color: var(--fst-sag); cursor: default; }
+.fst-koop-nota { font-size: 13px; line-height: 1.55; color: var(--fst-sag); margin: 14px 0 0; }
+
+.fst-taal .taal-knoppie { color: var(--fst-sag); }

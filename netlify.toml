@@ -72,3 +72,20 @@
   to = "https://future-sharp-vraelyste.netlify.app/portaal/:splat"
   status = 200
   force = true
+
+# FUTURESHARP TALKS (September 2026).
+#
+# /talks is die FST-blad. /talks/<slug> is 'n talk se eie bladsy; dit word
+# deur die Function talk-bladsy bedien, wat die talk se titel, oorsig en
+# omslag in die kop sit sodat 'n gedeelde skakel op WhatsApp en LinkedIn 'n
+# eie voorskou kry. futuresharp.co.za/talks en /talks/<slug> kom via die
+# .htaccess op Afrihost hierheen.
+[[redirects]]
+  from = "/talks"
+  to = "/talks.html"
+  status = 200
+
+[[redirects]]
+  from = "/talks/*"
+  to = "/.netlify/functions/talk-bladsy?slug=:splat"
+  status = 200

@@ -1,0 +1,31 @@
+/* fst-pil.css — die FutureSharp Talks-pil in die winkel se (swart) kop. */
+.fst-winkel-pil {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px 6px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 999px;
+  text-decoration: none;
+  color: var(--wit);
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.fst-winkel-pil:hover { border-color: var(--amber); background: rgba(241, 189, 67, 0.08); }
+.fst-winkel-pil:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+.fst-winkel-pil-naam { font-family: var(--font-opskrif); font-weight: 800; font-size: 13.5px; letter-spacing: 0.01em; }
+.fst-winkel-pil-blokwrap { display: inline-flex; flex-direction: column; }
+.fst-winkel-pil-blokke { display: flex; gap: 2px; }
+.fst-winkel-pil-blokke b {
+  width: 16px;
+  height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-opskrif);
+  font-weight: 800;
+  font-size: 9.5px;
+}
+.fst-winkel-pil-vloer { height: 2px; background: var(--amber); margin-top: 3px; }
+.fst-wp-t { background: #479f91; color: #fff; }
+.fst-wp-g { background: #f1bd43; color: #171717; }
+.fst-wp-k { background: #ec5832; color: #fff; }

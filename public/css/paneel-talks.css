@@ -20,7 +20,10 @@
 .pt-duimnael-leeg { border: 1px dashed #c9c6bf; background: transparent; }
 .pt-inligting { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .pt-inligting strong { font-family: var(--font-opskrif); font-size: 15px; }
-.pt-meta { font-size: 12.5px; color: var(--grys-teks); }
+/* Uitdruklik, want 'n algemene reël in die paneelbord het die spreker se
+   naam groter as die titel gemaak. */
+.pt-inligting span { font-size: 13.5px; line-height: 1.4; }
+.pt-inligting .pt-meta { font-size: 12.5px; color: var(--grys-teks); }
 .pt-aksies { display: flex; gap: 14px; flex-wrap: wrap; justify-content: flex-end; }
 .pt-aksies .terug-skakel { margin-bottom: 0; background: none; border: 0; cursor: pointer; padding: 0; }
 @media (max-width: 640px) {
