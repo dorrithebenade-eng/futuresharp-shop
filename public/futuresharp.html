@@ -76,6 +76,31 @@
       </div>
     </div>
 
+    <!-- EIE AANMELDING (September 2026). As app op die foon moet die paneel
+         self kan aanmeld: die paneelbord se aanmelding stuur iemand na die
+         Admin-area, en die winkel se aanmelding na die boekwinkel, en dan
+         beland 'n mens nooit terug hier nie. Dieselfde identiteit.js en
+         dieselfde sessie as die ander panele. -->
+    <section id="fsp-aanmeld" class="fsp-kaart fsp-aanmeld" style="display:none;">
+      <h2>Meld aan</h2>
+      <form id="fsp-aanmeld-vorm" novalidate>
+        <div class="fsp-veld">
+          <label class="fsp-et" for="fsp-aanmeld-epos">E-posadres</label>
+          <input type="email" id="fsp-aanmeld-epos" class="fsp-invoer" autocomplete="username" inputmode="email" required>
+        </div>
+        <div class="fsp-veld">
+          <label class="fsp-et" for="fsp-aanmeld-wagwoord">Wagwoord</label>
+          <input type="password" id="fsp-aanmeld-wagwoord" class="fsp-invoer" autocomplete="current-password" required>
+        </div>
+        <label class="fsp-bly"><input type="checkbox" id="fsp-aanmeld-bly" checked> Bly aangemeld op hierdie toestel</label>
+        <p class="fsp-waarsku" id="fsp-aanmeld-fout" hidden></p>
+        <div class="fsp-aksies">
+          <button type="submit" class="fsp-knop fsp-knop-hoof" id="fsp-aanmeld-knop">Meld aan</button>
+          <a class="fsp-knop fsp-knop-lig" href="paneelbord.html">Wagwoord vergeet?</a>
+        </div>
+      </form>
+    </section>
+
     <section id="fsp-geen-toegang" class="fsp-geen-toegang" style="display:none;">
       <p id="fsp-geen-toegang-teks">Hierdie bladsy is vir Future Sharp. Meld by die paneelbord aan.</p>
       <a href="paneelbord.html" class="kaart-aksie">Gaan na die paneelbord</a>

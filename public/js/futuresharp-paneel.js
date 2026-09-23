@@ -562,7 +562,28 @@
 
     let sessie = null;
     try { sessie = await identiteit_kry_huidige_sessie(); } catch { sessie = null; }
-    if (!sessie) { geen_toegang(null); wys(); return; }
+    if (!sessie) {
+      // Nie aangemeld nie: meld hier aan, sodat 'n mens op hierdie bladsy bly.
+      $("#fsp-aanmeld").style.display = "";
+      wys();
+      $("#fsp-aanmeld-epos").focus();
+      $("#fsp-aanmeld-vorm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const fout = $("#fsp-aanmeld-fout");
+        const knop = $("#fsp-aanmeld-knop");
+        fout.hidden = true;
+        knop.disabled = true;
+        try {
+          await identiteit_meld_aan($("#fsp-aanmeld-epos").value.trim(), $("#fsp-aanmeld-wagwoord").value, $("#fsp-aanmeld-bly").checked);
+          window.location.reload();
+        } catch (f) {
+          fout.textContent = "Kon nie aanmeld nie: " + f.message;
+          fout.hidden = false;
+          knop.disabled = false;
+        }
+      });
+      return;
+    }
 
     const epos = $("#paneel-gebruiker-epos");
     if (epos && sessie.gebruiker) epos.textContent = sessie.gebruiker.email;
