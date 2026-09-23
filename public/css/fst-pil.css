@@ -3,7 +3,7 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 14px 6px 12px;
+  padding: 7px 11px;
   border: 1px solid rgba(255, 255, 255, 0.28);
   border-radius: 999px;
   text-decoration: none;
@@ -12,20 +12,67 @@
 }
 .fst-winkel-pil:hover { border-color: var(--amber); background: rgba(241, 189, 67, 0.08); }
 .fst-winkel-pil:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
-.fst-winkel-pil-naam { font-family: var(--font-opskrif); font-weight: 800; font-size: 13.5px; letter-spacing: 0.01em; }
+/* Die woord FutureSharp staan reeds links in die kop; in die pil sou dit die
+   kop te breed maak (die handelsnaam het op twee reëls gebreek en AF/EN het
+   na 'n tweede ry gespring). Die pil wys dus net die vyf blokkies; die
+   skakel se aria-label sê steeds "FutureSharp Talks". */
+.fst-winkel-pil-naam { display: none; }
 .fst-winkel-pil-blokwrap { display: inline-flex; flex-direction: column; }
 .fst-winkel-pil-blokke { display: flex; gap: 2px; }
 .fst-winkel-pil-blokke b {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-family: var(--font-opskrif);
   font-weight: 800;
-  font-size: 9.5px;
+  font-size: 10.5px;
 }
 .fst-winkel-pil-vloer { height: 2px; background: var(--amber); margin-top: 3px; }
 .fst-wp-t { background: #479f91; color: #fff; }
 .fst-wp-g { background: #f1bd43; color: #171717; }
 .fst-wp-k { background: #ec5832; color: #fff; }
+
+/* Die handelsnaam links mag nooit deur die regterkant se items saamgedruk
+   word nie. Hierdie lêer laai net waar die pil verskyn. */
+.mini-kop-merk { flex-shrink: 0; white-space: nowrap; }
+
+/* ---------- Die aankondigingspil bo-aan die teal-band ----------
+   Op 'n foon skuif die kop se pil agter die hamburger in; hierdie een is
+   dan die eerste ding wat 'n besoeker sien. Op die rekenaar is dit die
+   tweede, meer opvallende ingang. */
+.fst-aank {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(23, 23, 23, 0.88);
+  color: var(--wit);
+  text-decoration: none;
+  border-radius: 999px;
+  padding: 7px 14px 7px 8px;
+  margin: 0 0 16px;
+  font-family: var(--font-liggaam);
+  font-size: 13.5px;
+  font-weight: 600;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+  transition: background 0.15s ease;
+}
+.fst-aank:hover { background: var(--swart); }
+.fst-aank:focus-visible { outline: 2px solid var(--amber); outline-offset: 3px; }
+.fst-aank-nuut {
+  background: var(--amber);
+  color: var(--swart);
+  border-radius: 999px;
+  padding: 2px 9px;
+  font-size: 12px;
+  font-weight: 700;
+}
+.fst-aank-naam { font-family: var(--font-opskrif); font-weight: 800; }
+.fst-aank .fst-winkel-pil-blokke b { width: 15px; height: 15px; font-size: 9px; }
+.fst-aank-pyl { opacity: 0.8; }
+/* Die eyebrow onder die pil begin op 'n eie reël. */
+.kop-inhoud > .fst-aank + .kop-eyebrow { display: table; }
+@media (max-width: 640px) {
+  .kop-inhoud > .fst-aank + .kop-eyebrow { margin-left: auto; margin-right: auto; }
+}
