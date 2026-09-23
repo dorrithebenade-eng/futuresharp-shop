@@ -102,4 +102,37 @@ async function koppel_klient({ registrasie, naam, epos, selfoon }) {
   return { nommer: rekord.nommer, gekoppel: false };
 }
 
-module.exports = { sleutel_klop, portaal_admin, koppel_klient };
+// DIE FAKTUURSLOT.
+//
+// Is daar al 'n faktuur UITGEREIK met hierdie registrasienommer in een van sy
+// reëls, het die kliënt die diens gehad en is die registrasie deel van die
+// boeke. Dan mag die nommer nie meer verander nie en die registrasie nie
+// geskrap word nie: die faktuur se reël sou na niks verwys, en die
+// toestemmings is die bewys agter die rekening.
+//
+// 'n KONSEP tel nie: dit is nog net 'n kwotasie, en 'n kliënt kan kanselleer
+// of nie opdaag nie. 'n Gekanselleerde faktuur tel WEL: dit was uitgereik en
+// bly 'n rekord. Kwotasies (eie sleutels in dieselfde store) word oorgeslaan.
+async function fakture_vir(nommers) {
+  const { kry_fakture_store } = require("./_fakture");
+  const { is_kwotasie_sleutel } = require("./_kwotasies");
+  const soek = (nommers || []).filter(Boolean).map((n) => String(n).toUpperCase());
+  const uit = {};
+  if (!soek.length) return uit;
+  const store = kry_fakture_store();
+  const lys = await store.list();
+  const sleutels = (lys.blobs || []).map((b) => b.key).filter((s) => !is_kwotasie_sleutel(s));
+  const rekords = await Promise.all(sleutels.map((s) => store.get(s, { type: "json" }).catch(() => null)));
+  for (const f of rekords) {
+    if (!f || !f.stand || f.stand === "konsep") continue;
+    const teks = (f.reels || []).map((r) => String((r && r.beskrywing) || "")).join("\n").toUpperCase();
+    for (const n of soek) {
+      // Die nommer as 'n heel woord: FS-2026-0158 mag nie op FS-2026-01580 pas nie.
+      const patroon = new RegExp("(^|[^0-9A-Z-])" + n.replace(/[-]/g, "\\-") + "(?![0-9])");
+      if (patroon.test(teks)) (uit[n] = uit[n] || []).push({ nommer: f.nommer, stand: f.stand });
+    }
+  }
+  return uit;
+}
+
+module.exports = { sleutel_klop, portaal_admin, koppel_klient, fakture_vir };

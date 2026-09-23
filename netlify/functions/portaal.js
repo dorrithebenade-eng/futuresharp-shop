@@ -13,7 +13,7 @@
 // natuurlike plek om dit reg te maak: iemand kyk juis nou.
 
 const { kry_gebruiker_en_rol_uitslag } = require("./_rol-kontrole");
-const { portaal_admin, koppel_klient } = require("./_portaal");
+const { portaal_admin, koppel_klient, fakture_vir } = require("./_portaal");
 
 const JSON_KOP = { "Content-Type": "application/json", "Cache-Control": "no-store" };
 const AKSIES = [
@@ -42,7 +42,27 @@ exports.handler = async (event, context) => {
   if (!AKSIES.includes(invoer.aksie)) return antwoord(400, { fout: "Onbekende aksie" });
 
   try {
+    // DIE FAKTUURSLOT: 'n gefaktureerde registrasie se nommer mag nie verander
+    // en die registrasie nie geskrap word nie. Sien fakture_vir in _portaal.js.
+    if (invoer.aksie === "hernommer" || invoer.aksie === "skrap") {
+      const f = (await fakture_vir([invoer.no]))[String(invoer.no || "").toUpperCase()];
+      if (f && f.length) {
+        return antwoord(409, { fout: "Hierdie registrasie is gefaktureer (" + f.map((x) => x.nommer).join(", ") + ") en kan nie meer gewysig of geskrap word nie." });
+      }
+    }
+    if (invoer.aksie === "skrap_toets") {
+      const lys = await portaal_admin({ aksie: "lys" });
+      const toets = (lys.registrasies || []).filter((r) => r.toets).map((r) => r.no);
+      const f = await fakture_vir(toets);
+      invoer.behalwe = Object.keys(f);
+    }
+
     const data = await portaal_admin(invoer);
+
+    if (invoer.aksie === "een" && data.registrasie) {
+      const f = (await fakture_vir([data.registrasie.no]))[String(data.registrasie.no).toUpperCase()];
+      data.gefaktureer = f || [];
+    }
 
     if (invoer.aksie === "lys" && Array.isArray(data.registrasies)) {
       for (const r of data.registrasies) {

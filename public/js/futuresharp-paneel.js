@@ -304,12 +304,16 @@
     const en = l.voorkeurtaal === "en";
     const ouderdom = reg.ouderdom_by_registrasie;
     const volle_naam = l.naam + " " + l.van;
+    // Is daar al 'n uitgereikte faktuur met hierdie nommer, is die registrasie gesluit.
+    const gefaktureer = HUIDIG.gefaktureer || [];
     let h = "";
 
     // Kop, met die nommer se aksies: wysig, en (net vir toetse) skrap
     h += '<div class="fsp-kaart"><div class="fsp-kop-ry"><div><div class="fsp-ry-no" style="font-size:15px">' + esc(reg.no) + "</div><h2>" + esc(volle_naam) + "</h2></div>" +
       "<div>" + (reg.toets ? '<span class="fsp-stand toets">Toets</span>' : "") + '<span class="fsp-stand ' + st + '">' + STANDE[st] + "</span></div></div>" +
-      '<div class="fsp-aksies"><button type="button" class="fsp-knop fsp-knop-lig" id="nr-wysig">Wysig die nommer</button>' +
+      (gefaktureer.length
+        ? '<p class="fsp-slot">Hierdie registrasie is gefaktureer (' + esc(gefaktureer.map((f) => f.nommer).join(", ")) + ') en kan nie meer gewysig of geskrap word nie.</p>'
+        : (      '<div class="fsp-aksies"><button type="button" class="fsp-knop fsp-knop-lig" id="nr-wysig">Wysig die nommer</button>' +
       "</div>" +
       (reg.toets ? '<div class="fsp-toets-skrap"><b>Skrap hierdie toetsregistrasie</b>' +
         '<p class="fsp-hulp">Die registrasie en sy persoonlike bladsye word permanent uitgevee. Tik <b>SKRAP TOETSREGISTRASIES</b> om te bevestig.</p>' +
@@ -320,7 +324,8 @@
         '<button type="button" class="fsp-knop fsp-knop-hoof" id="nr-stoor">Stoor</button></div>' +
         '<p class="fsp-hulp">' + (reg.toets
           ? "Haal TOETS- weg om dit 'n regte registrasie te maak, of maak die blokkie leeg vir die volgende vrye regte nommer. Die rekeningpligtige gaan dan ook na die kliënteregister."
-          : "Sit TOETS- voor die nommer om dit as toetsregistrasie te merk; daarna kan dit geskrap word. 'n Regte nommer wat al ooit uitgegee is, kan nie weer gebruik word nie.") + "</p></div>" +
+          : "Sit TOETS- voor die nommer om dit as toetsregistrasie te merk; daarna kan dit geskrap word. 'n Regte nommer wat al ooit uitgegee is, kan nie weer gebruik word nie.") + "</p></div>"
+        )) +
       "</div>";
 
     // Die konsultasie
@@ -421,8 +426,9 @@
   }
 
   function bind_een(reg, bladsye) {
-    $("#nr-wysig").onclick = () => { const v = $("#nr-vorm"); v.hidden = !v.hidden; if (!v.hidden) $("#nr-nuut").focus(); };
-    $("#nr-stoor").onclick = async (e) => {
+    // By 'n gefaktureerde registrasie bestaan hierdie knoppies nie.
+    if ($("#nr-wysig")) $("#nr-wysig").onclick = () => { const v = $("#nr-vorm"); v.hidden = !v.hidden; if (!v.hidden) $("#nr-nuut").focus(); };
+    if ($("#nr-stoor")) $("#nr-stoor").onclick = async (e) => {
       const nuwe = $("#nr-nuut").value.trim().toUpperCase();
       if (nuwe === reg.no) { kennis("Die nommer is nie verander nie"); return; }
       if (!nuwe && !reg.toets) { kennis("Tik die nuwe nommer"); return; }

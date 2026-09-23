@@ -216,3 +216,4 @@
 .fsp-knop-gevaar { background: #B8451F; color: #fff; }
 .fsp-toets-skrap { border-top: 1px solid var(--fsp-lyn); margin-top: 14px; padding-top: 12px; }
 .fsp-toets-skrap b { color: #B8451F; }
+.fsp-slot { margin: 12px 0 0; font-size: 13.5px; color: var(--fsp-navy); background: var(--fsp-navy-lig); border-radius: 8px; padding: 8px 12px; }
