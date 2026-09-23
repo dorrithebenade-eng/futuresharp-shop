@@ -54,6 +54,13 @@
   to = "/portaal/registreer"
   status = 301
 
+# DIE KORT SKAKEL wat julle uitstuur: futureshop.futuresharp.co.za/registreer.
+# Dieselfde vorm, 'n adres wat 'n mens kan onthou en wat nie vreemd lyk nie.
+[[redirects]]
+  from = "/registreer"
+  to = "/portaal/registreer"
+  status = 301
+
 [[redirects]]
   from = "/portaal/*"
   to = "https://future-sharp-vraelyste.netlify.app/portaal/:splat"
