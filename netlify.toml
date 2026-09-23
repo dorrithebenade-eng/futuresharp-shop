@@ -54,10 +54,10 @@
   to = "/portaal/registreer"
   status = 301
 
-# DIE KORT SKAKEL wat julle uitstuur: futureshop.futuresharp.co.za/registreer.
-# Dieselfde vorm, 'n adres wat 'n mens kan onthou en wat nie vreemd lyk nie.
+# DIE KORT SKAKELS wat julle uitstuur: /registrasie (Afrikaans) en /register
+# (Engels). Dieselfde vorm; elkeen wys sy eie voorskou op WhatsApp.
 [[redirects]]
-  from = "/registreer"
+  from = "/registrasie"
   to = "/portaal/registreer"
   status = 301
 
