@@ -201,3 +201,74 @@
 .fst-koop-nota { font-size: 13px; line-height: 1.55; color: var(--fst-sag); margin: 14px 0 0; }
 
 .fst-taal .taal-knoppie { color: var(--fst-sag); }
+
+/* ---------- Fase 4: My Teater-skakel in die kop ---------- */
+.fst-kop-teater {
+  margin-left: auto;
+  color: var(--fst-sag) !important;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  border: 1px solid var(--fst-lyn);
+  border-radius: 999px;
+  padding: 6px 14px;
+}
+.fst-kop-teater:hover { color: var(--fst-teks) !important; border-color: var(--amber); }
+.fst-kop-teater-aan { color: var(--fst-bg) !important; background: var(--fst-teks); border-color: var(--fst-teks); }
+.fst-kop-teater + .fst-taal { margin-left: 12px; }
+@media (max-width: 560px) {
+  .fst-kop-in { flex-wrap: wrap; gap: 10px 14px; }
+  .fst-terug { display: none; }
+}
+
+/* ---------- Fase 4: koopblok ---------- */
+.fst-koop-fout { color: #f0a38f; font-size: 13px; margin: 12px 0 0; }
+.fst-knop-inlyn { display: inline-block; width: auto; text-decoration: none; margin-top: 8px; padding: 11px 22px; }
+
+/* ---------- Fase 4: My Teater ---------- */
+.fst-teater-liggaam { background: #0c0d0d; }
+.fst-teater { padding-bottom: 72px; }
+.fst-teater-boodskap { max-width: 1100px; margin: 28px auto 0; padding: 0 20px; color: var(--fst-sag); }
+.fst-teater-boodskap p { margin: 0 0 8px; }
+.fst-saal { position: relative; max-width: 1100px; margin: 0 auto; padding: 34px 20px 8px; }
+.fst-saal::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -40px;
+  width: 70%;
+  height: 140px;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse at 50% 0, rgba(241, 189, 67, 0.22), transparent 70%);
+  pointer-events: none;
+}
+.fst-saal-gloed {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 85%;
+  background: radial-gradient(ellipse at 50% 45%, var(--fst-gloed), transparent 62%);
+  opacity: 0.35;
+  filter: blur(70px);
+  pointer-events: none;
+}
+.fst-skerm {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
+}
+.fst-skerm mux-player { display: block; width: 100%; height: 100%; --media-object-fit: contain; }
+.fst-skerm-voor { width: 100%; height: 100%; object-fit: cover; opacity: 0.35; display: block; }
+.fst-skerm-fout { position: absolute; inset: auto 0 16px 0; text-align: center; color: #f0a38f; margin: 0; }
+.fst-onder { max-width: 1100px; margin: 0 auto; padding: 18px 20px 4px; position: relative; }
+.fst-onder h1 { font-family: var(--font-opskrif); font-weight: 800; font-size: clamp(22px, 3.2vw, 32px); margin: 0 0 4px; }
+.fst-onder-wie { color: var(--fst-sag); margin: 0; font-size: 14px; }
+.fst-program { max-width: 1100px; margin: 0 auto; padding: 26px 20px 0; }
+.fst-program h2 { font-family: var(--font-opskrif); font-size: 15px; font-weight: 700; margin: 0 0 12px; color: var(--fst-sag); }
+.fst-strook { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 8px; }
+.fst-program-kaart { flex: 0 0 220px; background: none; border: 0; padding: 0; color: inherit; text-align: left; cursor: pointer; }
+.fst-program-kaart .fst-kaart-titel { font-size: 14px; }
+.fst-program-aktief .fst-omslag { outline: 2px solid var(--amber); outline-offset: 3px; }

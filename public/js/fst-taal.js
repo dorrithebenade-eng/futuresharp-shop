@@ -32,4 +32,20 @@ Object.assign(WOORDEBOEK, {
   fst_beskikbaar_vanaf: { af: "Beskikbaar vanaf", en: "Available from" },
   fst_nie_gevind: { af: "Hierdie talk bestaan nie of is nie meer beskikbaar nie.", en: "This talk does not exist or is no longer available." },
   fst_min: { af: "min", en: "min" },
+  // Fase 4: koop en die Teater
+  fst_koop_vir: { af: "Koop vir", en: "Buy for" },
+  fst_kry_gratis: { af: "Voeg by My Teater", en: "Add to My Theatre" },
+  fst_kyk_in_teater: { af: "Kyk in My Teater", en: "Watch in My Theatre" },
+  fst_my_teater: { af: "My Teater", en: "My Theatre" },
+  fst_besig: { af: "Besig …", en: "Working …" },
+  fst_koop_fout: { af: "Kon nie die betaling begin nie. Probeer weer.", en: "Could not start the payment. Please try again." },
+  fst_bevestig: { af: "Jou betaling word bevestig …", en: "Confirming your payment …" },
+  fst_bevestig_stadig: {
+    af: "Die bevestiging neem langer as gewoonlik. Herlaai die bladsy oor 'n minuut; die talk verskyn sodra Paystack dit bevestig.",
+    en: "Confirmation is taking longer than usual. Reload the page in a minute; the talk appears as soon as Paystack confirms it.",
+  },
+  fst_teater_leeg: { af: "Jou Teater is nog leeg.", en: "Your Theatre is still empty." },
+  fst_na_talks: { af: "Kyk na die talks", en: "Browse the talks" },
+  fst_program: { af: "Jou program", en: "Your programme" },
+  fst_speler_fout: { af: "Kon nie die video laai nie. Herlaai die bladsy.", en: "Could not load the video. Reload the page." },
 });

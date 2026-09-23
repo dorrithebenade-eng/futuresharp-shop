@@ -5,10 +5,8 @@
 // aktief-veld via wysig-talk.js). Skrap is vir 'n talk wat nooit moes
 // bestaan het nie.
 //
-// FASE 4 MOET HIER 'N KONTROLE BYVOEG: sodra talks gekoop kan word, hang 'n
-// koper se toegang in My Teater van hierdie rekord af, en dan moet skrap
-// geweier word wanneer daar 'n betaalde bestelling is, soos by
-// verwyder-produk.js.
+// Sodra 'n talk gekoop is ("talk-verkope"), word skrap geweier: die koper
+// se Teater hang van hierdie rekord af.
 
 const { kry_store } = require("./_blob-store");
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
@@ -43,6 +41,16 @@ exports.handler = async (event, context) => {
   const talk = slug ? await store.get(slug, { type: "json" }) : null;
   if (!talk) {
     return { statusCode: 404, body: `Geen talk met die slug "${slug}" nie` };
+  }
+
+  // Sodra iemand die talk gekoop het, hang sy Teater daarvan af: dan word
+  // skrap geweier, en Deaktiveer is die weg om dit van die FST-blad af te haal.
+  const verkope = await kry_store("talk-verkope").get(slug, { type: "json" });
+  if (verkope && verkope.aantal > 0) {
+    return {
+      statusCode: 409,
+      body: `Hierdie talk is al ${verkope.aantal} keer gekoop en kan nie geskrap word nie. Gebruik Deaktiveer om dit van die FST-blad af te haal.`,
+    };
   }
 
   // Die omslag eerste, die rekord laaste: misluk die omslag, staan die

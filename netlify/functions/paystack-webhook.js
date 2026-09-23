@@ -9,6 +9,7 @@
 
 const crypto = require("crypto");
 const { hanteer_faktuur_betaling } = require("./_faktuur-betaling");
+const { hanteer_talk_betaling } = require("./_talk-betaling");
 const { kry_store } = require("./_blob-store");
 const { stuur_outeur_kennisgewings } = require("./_kennisgewing-outeur");
 const { stuur_koper_bevestiging } = require("./_kennisgewing-koper");
@@ -110,6 +111,13 @@ exports.handler = async (event) => {
   // hierdie lêer nie hoef te weet hoe 'n faktuur werk nie.
   if (data.metadata && data.metadata.faktuur_sleutel) {
     return await hanteer_faktuur_betaling(data, new Date().toISOString());
+  }
+
+  // 'N FUTURESHARP TALK (September 2026). begin-talk-betaling.js stuur
+  // `fst_bestelnommer` in die metadata saam. Die hele talk-kant leef in
+  // _talk-betaling.js, net soos die fakture hierbo.
+  if (data.metadata && data.metadata.fst_bestelnommer) {
+    return await hanteer_talk_betaling(data);
   }
 
   // 'N KURSUS VAN DIE CHECKOUT-WERF. NIE ONS S'N NIE, EN DIT IS REG SO.

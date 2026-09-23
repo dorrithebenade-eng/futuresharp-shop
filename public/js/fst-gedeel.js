@@ -64,6 +64,7 @@ function fst_kop(met_terug_na_alle) {
   return `<header class="fst-kop"><div class="fst-kop-in">
     ${terug}
     <a class="fst-kop-merk" href="/talks">${fst_woordmerk_klein()}</a>
+    <a class="fst-kop-teater${window.location.pathname.startsWith("/teater") ? " fst-kop-teater-aan" : ""}" href="/teater">${fst_esc(t("fst_my_teater"))}</a>
     <div class="taal-wisselaar fst-taal" role="group" aria-label="Taal / Language">
       <button type="button" class="taal-knoppie" data-taal="af">AF</button>
       <button type="button" class="taal-knoppie" data-taal="en">EN</button>
