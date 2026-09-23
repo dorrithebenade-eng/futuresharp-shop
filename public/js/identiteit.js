@@ -38,10 +38,12 @@
 const PANEEL_BLADSYE = ["paneelbord.html", "faktuurpaneel.html", "faktuur.html", "futuresharp.html"];
 
 function kry_sessie_sleutel() {
-  const pad = window.location.pathname;
-  const is_paneel = PANEEL_BLADSYE.some(
-    (bladsy) => pad.endsWith(`/${bladsy}`) || pad.endsWith(bladsy)
-  );
+  // Die pad kan met of sonder ".html" kom; albei is dieselfde bladsy.
+  const pad = window.location.pathname.replace(/\/+$/, "");
+  const is_paneel = PANEEL_BLADSYE.some((bladsy) => {
+    const kaal = bladsy.replace(/\.html$/, "");
+    return pad.endsWith(`/${bladsy}`) || pad.endsWith(bladsy) || pad.endsWith(`/${kaal}`);
+  });
   return is_paneel ? "future_shop_identiteit_sessie_paneel" : "future_shop_identiteit_sessie_winkel";
 }
 

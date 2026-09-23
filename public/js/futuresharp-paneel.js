@@ -589,7 +589,21 @@
     if (epos && sessie.gebruiker) epos.textContent = sessie.gebruiker.email;
 
     if (!identiteit_het_rol(sessie.gebruiker, "boekhouding")) {
-      geen_toegang("Hierdie rekening het nie toegang tot die Future Sharp-area nie. Is die rol pas bygesit, meld een keer af en weer aan.");
+      // Wys MET WATTER REKENING, want die gewone oorsaak is 'n ander rekening
+      // op die toestel (byvoorbeeld 'n koperrekening in die winkel). Een tik
+      // meld dit af en bring die aanmeldvorm hier terug.
+      geen_toegang("Jy is aangemeld as " + ((sessie.gebruiker && sessie.gebruiker.email) || "'n ander rekening") +
+        ". Hierdie rekening het nie toegang tot die Future Sharp-area nie.");
+      const knop = document.createElement("button");
+      knop.type = "button";
+      knop.className = "fsp-knop fsp-knop-hoof";
+      knop.textContent = "Meld af en meld aan met 'n ander rekening";
+      knop.style.marginTop = "12px";
+      knop.addEventListener("click", () => {
+        if (typeof identiteit_verwyder_sessie === "function") identiteit_verwyder_sessie();
+        window.location.reload();
+      });
+      $("#fsp-geen-toegang").appendChild(knop);
       wys();
       return;
     }
