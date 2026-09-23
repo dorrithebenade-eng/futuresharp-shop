@@ -1,5 +1,5 @@
 // paneel-registers.js
-// Hanteer die 5 nuwe registers: Vennote, Ontwerp/Admin, Printing, Aflewering
+// Hanteer die registers: Vennote, Ontwerp/Admin, Printing, Aflewering, Sprekers
 // — lys, byvoeg, WYSIG, en SKRAP (met 'n waarskuwing as die inskrywing
 // reeds op 'n boek se verdeling gebruik word — sien paneel_register_skrap).
 // Presies dieselfde patroon as die Outeurs-register in paneelbord.js.
@@ -81,6 +81,24 @@ const PANEEL_REGISTERS = [
     fout_teks: "Kon nie laai nie.",
     knoppie_teks: "+ Voeg by",
     kontak_velde: ["epos", "selfoon", "dekkingsarea", ...BANK_KONTAK_VELDE],
+  },
+  // FutureSharp Talks: die sesde register. Die kontakvelde is dieselfde as
+  // die outeur s'n (id_nommer en adres ingesluit), want 'n spreker word op
+  // dieselfde manier betaal en teken later sy eie ooreenkoms.
+  {
+    sleutel: "sprekers",
+    rol_tipe: "spreker",
+    idveld: "spreker_id",
+    kry_endpoint: "/.netlify/functions/kry-sprekers",
+    skep_endpoint: "/.netlify/functions/skep-spreker",
+    wysig_endpoint: "/.netlify/functions/wysig-spreker",
+    skrap_endpoint: "/.netlify/functions/skrap-spreker",
+    respons_veld: "sprekers",
+    laai_teks: "Sprekers word gelaai …",
+    leeg_teks: "Nog geen sprekers bygevoeg nie.",
+    fout_teks: "Kon nie sprekers laai nie.",
+    knoppie_teks: "+ Voeg spreker by",
+    kontak_velde: ["epos", "selfoon", "id_nommer", "adres", ...BANK_KONTAK_VELDE],
   },
 ];
 

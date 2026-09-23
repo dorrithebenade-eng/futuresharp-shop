@@ -173,6 +173,7 @@
           <button type="button" class="paneel-kieslys-item rol-personeel" data-afdeling="ontwerp-admin">Ontwerp/Admin</button>
           <button type="button" class="paneel-kieslys-item rol-personeel" data-afdeling="outeurs" data-i18n="paneel_outeurs_titel">Outeurs</button>
           <button type="button" class="paneel-kieslys-item rol-personeel" data-afdeling="printing">Printing</button>
+          <button type="button" class="paneel-kieslys-item rol-personeel" data-afdeling="sprekers">Sprekers</button>
           <button type="button" class="paneel-kieslys-item rol-personeel" data-afdeling="uitnodigings" data-i18n="paneel_nav_uitnodigings">Uitnodigings</button>
           <button type="button" class="paneel-kieslys-item rol-personeel" data-afdeling="vennote">Vennote (direkteure)</button>
           <button type="button" class="paneel-kieslys-item rol-personeel" data-afdeling="verdeling-rekenaar" data-i18n="paneel_verdeling_rekenaar_titel">Verdeling-rekenaar</button>
@@ -418,6 +419,55 @@
 
             <button type="submit" id="paneel-printing-vorm-indien" class="kaart-aksie paneel-vorm-indien">+ Voeg by</button>
             <button type="button" id="paneel-printing-vorm-kanselleer" class="terug-skakel paneel-vorm-kanselleer">✕ Kanselleer</button>
+          </form>
+        </div>
+      </section>
+
+      <section class="paneel-afdeling" data-afdeling-inhoud="sprekers">
+        <div class="paneel-afdeling-kop">
+          <h2 class="paneel-afdeling-titel">Sprekers</h2>
+          <button id="paneel-voeg-sprekers-by-knoppie" class="kaart-aksie paneel-voeg-by-knoppie" type="button">+ Voeg spreker by</button>
+        </div>
+        <p class="paneel-hulp-teks">Die sprekers van FutureSharp Talks. Voeg elke spreker hier een keer by (naam en Paystack-subrekening-kode) en kies hom daarna uit 'n lys wanneer 'n talk se verdeling opgestel word.</p>
+        <div id="paneel-sprekers-lys">
+          <p class="stelsel-boodskap">Sprekers word gelaai …</p>
+        </div>
+
+        <div id="paneel-sprekers-vorm-afdeling" style="display:none;">
+          <form id="paneel-sprekers-vorm">
+            <label class="veld-etiket" for="sprekers-vorm-naam"><span>Naam</span> <span class="veld-verplig">(verplig)</span></label>
+            <input type="text" id="sprekers-vorm-naam" class="veld-invoer" required>
+
+            <label class="veld-etiket" for="sprekers-vorm-subrekening"><span>Subrekening-kode (ACCT_...)</span> <span class="veld-opsioneel">(opsioneel, later byvoegbaar)</span></label>
+            <input type="text" id="sprekers-vorm-subrekening" class="veld-invoer" placeholder="ACCT_xxxxxxxxxx">
+
+            <label class="veld-etiket" for="sprekers-vorm-epos"><span>E-pos</span> <span class="veld-opsioneel">(opsioneel)</span></label>
+            <input type="email" id="sprekers-vorm-epos" class="veld-invoer">
+            <label class="veld-etiket" for="sprekers-vorm-selfoon"><span>Selfoonnommer</span> <span class="veld-opsioneel">(opsioneel)</span></label>
+            <input type="tel" id="sprekers-vorm-selfoon" class="veld-invoer">
+            <label class="veld-etiket" for="sprekers-vorm-id_nommer"><span>ID-nommer</span> <span class="veld-opsioneel">(opsioneel)</span></label>
+            <input type="text" id="sprekers-vorm-id_nommer" class="veld-invoer">
+            <label class="veld-etiket" for="sprekers-vorm-adres"><span>Adres</span> <span class="veld-opsioneel">(opsioneel)</span></label>
+            <input type="text" id="sprekers-vorm-adres" class="veld-invoer">
+            <label class="veld-etiket" for="sprekers-vorm-bank_rekeninghouer"><span>Rekeninghouer</span> <span class="veld-opsioneel">(opsioneel)</span></label>
+            <input type="text" id="sprekers-vorm-bank_rekeninghouer" class="veld-invoer">
+            <label class="veld-etiket" for="sprekers-vorm-bank_naam"><span>Bank</span> <span class="veld-opsioneel">(opsioneel)</span></label>
+            <input type="text" id="sprekers-vorm-bank_naam" class="veld-invoer">
+            <label class="veld-etiket" for="sprekers-vorm-bank_rekeningnommer"><span>Rekeningnommer</span> <span class="veld-opsioneel">(opsioneel)</span></label>
+            <input type="text" id="sprekers-vorm-bank_rekeningnommer" class="veld-invoer">
+            <label class="veld-etiket" for="sprekers-vorm-bank_tak_kode"><span>Taknommer</span> <span class="veld-opsioneel">(opsioneel)</span></label>
+            <input type="text" id="sprekers-vorm-bank_tak_kode" class="veld-invoer">
+            <label class="veld-etiket" for="sprekers-vorm-bank_tipe"><span>Rekeningtipe</span> <span class="veld-opsioneel">(opsioneel)</span></label>
+            <select id="sprekers-vorm-bank_tipe" class="veld-invoer">
+              <option value="">Kies …</option>
+              <option value="Tjekrekening">Tjekrekening</option>
+              <option value="Spaarrekening">Spaarrekening</option>
+              <option value="Transmissierekening">Transmissierekening</option>
+            </select>
+            <div id="paneel-sprekers-vorm-foute" class="vb-foute" style="display:none;"></div>
+
+            <button type="submit" id="paneel-sprekers-vorm-indien" class="kaart-aksie paneel-vorm-indien">+ Voeg spreker by</button>
+            <button type="button" id="paneel-sprekers-vorm-kanselleer" class="terug-skakel paneel-vorm-kanselleer">✕ Kanselleer</button>
           </form>
         </div>
       </section>
