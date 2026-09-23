@@ -3827,12 +3827,15 @@ body.vennoot-modus .paneel-dokument-skrap-knoppie {
 .mini-kop-links {
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 14px;
   flex-shrink: 0;
 }
 .mini-kop-merk { white-space: nowrap; }
 @media (min-width: 641px) {
-  .mini-kop-regs { gap: 10px clamp(12px, 1.6vw, 20px); }
+  /* Die Afrikaanse woorde (Outeurspaneel, Mandjie, Kursusse) is langer as
+     die Engelse; by 20px het die kop in Afrikaans nog na 'n tweede ry
+     gespring. */
+  .mini-kop-regs { gap: 10px clamp(10px, 1vw, 14px); }
 }
 @media (max-width: 640px) {
   .mini-kop-links .taal-wisselaar { display: none; }
