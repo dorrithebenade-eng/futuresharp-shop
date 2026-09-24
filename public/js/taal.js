@@ -408,21 +408,21 @@ const WOORDEBOEK = {
   // Dankie-bladsy
   dankie_titel: { af: "Dankie vir jou bestelling!", en: "Thank you for your order!" },
   dankie_teks: {
-    af: 'Ons bevestig jou betaling tans bediener-kant. Sodra dit voltooi is, sal jou e-boeke onmiddellik in "My Boeke" beskikbaar wees, en jy sal die status van enige harde-kopie-items daar kan volg.',
-    en: 'We\'re confirming your payment server-side. Once that\'s done, your e-books will immediately be available in "My Books", and you\'ll be able to track the status of any hard-copy items there.',
+    af: 'Ons bevestig jou betaling tans bediener-kant. Sodra dit voltooi is, sal jou e-boeke onmiddellik in "My Leeskamer" beskikbaar wees, en jy sal die status van enige harde-kopie-items daar kan volg.',
+    en: 'We\'re confirming your payment server-side. Once that\'s done, your e-books will immediately be available in "My Reading Room", and you\'ll be able to track the status of any hard-copy items there.',
   },
   dankie_titel_aankoop: { af: "Dankie vir jou aankoop!", en: "Thank you for your purchase!" },
   dankie_teks_eboek_alleen: {
-    af: 'Jou e-boek is nou beskikbaar in "My Boeke", gereed om te lees.',
-    en: 'Your e-book is now available in "My Books", ready to read.',
+    af: 'Jou e-boek is nou beskikbaar in "My Leeskamer", gereed om te lees.',
+    en: 'Your e-book is now available in "My Reading Room", ready to read.',
   },
   dankie_teks_bevat_harde_kopie: {
-    af: 'Ons bevestig jou betaling tans bediener-kant. Sodra dit voltooi is, sal enige e-boeke onmiddellik in "My Boeke" beskikbaar wees, en jy sal die status van jou harde-kopie-item(s) daar kan volg.',
-    en: 'We\'re confirming your payment server-side. Once that\'s done, any e-books will immediately be available in "My Books", and you\'ll be able to track the status of your hard-copy item(s) there.',
+    af: 'Ons bevestig jou betaling tans bediener-kant. Sodra dit voltooi is, sal enige e-boeke onmiddellik in "My Leeskamer" beskikbaar wees, en jy sal die status van jou harde-kopie-item(s) daar kan volg.',
+    en: 'We\'re confirming your payment server-side. Once that\'s done, any e-books will immediately be available in "My Reading Room", and you\'ll be able to track the status of your hard-copy item(s) there.',
   },
-  gaan_na_my_boeke: { af: "Gaan na My Boeke", en: "Go to My Books" },
+  gaan_na_my_boeke: { af: "Gaan na My Leeskamer", en: "Go to My Reading Room" },
 
-  // -- 'n Harde kopie in "My Boeke" ---------------------------------------
+  // -- 'n Harde kopie in "My Leeskamer" ---------------------------------------
   // 'n Gedrukte boek het nog altyd deur die drukker- en afleweringsvloei
   // geloop en NERENS vir die koper gewys nie. Hy het betaal en toe niks meer
   // gehoor nie, terwyl merk-bestelling-gestuur.js die datum, die verskaffer
@@ -476,8 +476,8 @@ const WOORDEBOEK = {
   // Instant EFT wat nog nie deur is nie, lyk soos 'n mislukte een, en 'n
   // dubbele betaling verg 'n terugbetaling wat die winkel nie het nie.
   ds_teks_loop: {
-    af: 'Die transaksie is geïnisieer, maar die bank het dit nog nie bevestig nie. Moenie weer bestel nie — jou boeke verskyn in "My Boeke" sodra dit deurgaan.',
-    en: 'The transaction has been initiated, but the bank has not confirmed it yet. Do not order again — your books will appear in "My Books" once it clears.',
+    af: 'Die transaksie is geïnisieer, maar die bank het dit nog nie bevestig nie. Moenie weer bestel nie — jou boeke verskyn in "My Leeskamer" sodra dit deurgaan.',
+    en: 'The transaction has been initiated, but the bank has not confirmed it yet. Do not order again — your books will appear in "My Reading Room" once it clears.',
   },
 
   ds_kop_oop: { af: "Betaling nie voltooi nie", en: "Payment not completed" },
@@ -488,8 +488,8 @@ const WOORDEBOEK = {
 
   ds_kop_onbekend: { af: "Betalingstatus onbevestig", en: "Payment status unconfirmed" },
   ds_teks_onbekend: {
-    af: 'Ons kon die transaksie se status nie nou bevestig nie. Het die betaling deurgegaan, verskyn jou boeke in "My Boeke". Kontak ons gerus met die bestelnommer hierbo.',
-    en: 'We could not confirm the status of the transaction right now. If the payment cleared, your books will appear in "My Books". Please contact us with the order number above.',
+    af: 'Ons kon die transaksie se status nie nou bevestig nie. Het die betaling deurgegaan, verskyn jou boeke in "My Leeskamer". Kontak ons gerus met die bestelnommer hierbo.',
+    en: 'We could not confirm the status of the transaction right now. If the payment cleared, your books will appear in "My Reading Room". Please contact us with the order number above.',
   },
 
   // Die mandjiereël onder die knoppies. Sy staan NET by die onbetaalde
@@ -990,7 +990,7 @@ const WOORDEBOEK = {
   paneel_kon_nie_herstel_stuur: { af: "Kon nie herstel-epos stuur nie: ", en: "Could not send reset email: " },
 
   // My Boeke
-  my_boeke_titel: { af: "My Boeke", en: "My Books" },
+  my_boeke_titel: { af: "My Leeskamer", en: "My Reading Room" },
   // NIE MEER NET E-BOEKE NIE. 'n Harde kopie staan nou ook op hierdie rak,
   // met 'n bestel- of gestuur-pil. "Al jou gekoopte e-boeke" was 'n leuen
   // sodra die eerste gedrukte boek verskyn het.
@@ -1023,7 +1023,7 @@ const WOORDEBOEK = {
   leen_opgradering_afslag_suffix: { af: "afslag", en: "off" },
 
   // Leser-bladsy
-  terug_na_my_boeke: { af: "← My Boeke", en: "← My Books" },
+  terug_na_my_boeke: { af: "← My Leeskamer", en: "← My Reading Room" },
   leser_geen_boek: { af: "Geen boek gespesifiseer nie.", en: "No book specified." },
   leser_laai_tans: { af: "Jou boek word gelaai …", en: "Your book is loading …" },
   leser_nie_gekoop: { af: "Jy het nie hierdie e-boek gekoop nie.", en: "You haven't purchased this e-book." },
@@ -1149,6 +1149,7 @@ const WOORDEBOEK = {
   ob_staat_titel: { af: "Staat van verkope en besigtigings", en: "Statement of sales and views" },
   ob_staat_teks: { af: "'n Opsomming van jou boeke se verkope en besigtigings oor die tydperk.", en: "A summary of your books' sales and views over the period." },
   ob_staat_af: { af: "Moenie stuur nie", en: "Do not send" },
+  ob_staat_weekliks: { af: "Weekliks", en: "Weekly" },
   ob_staat_maandeliks: { af: "Maandeliks", en: "Monthly" },
   ob_verkoop_teks: {
     af: "'n E-pos elke keer as een van jou boeke as e-boek verkoop of uitgeleen word. Skakel dit af as jy eerder net af en toe wil gaan kyk.",
