@@ -4,7 +4,7 @@
   "short_name": "Boekhouding",
   "description": "Stel fakture op, hou die registers by, en sien wat uitstaande is.",
   "start_url": "/faktuurpaneel.html",
-  "scope": "/faktuur",
+  "scope": "/faktuurpaneel.html",
   "display": "standalone",
   "orientation": "any",
   "background_color": "#FFFFFF",
@@ -12,19 +12,19 @@
   "lang": "af",
   "icons": [
     {
-      "src": "/icons/paneel-ikoon-192.png",
+      "src": "/icons/boekhouding-ikoon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icons/paneel-ikoon-512.png",
+      "src": "/icons/boekhouding-ikoon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icons/paneel-ikoon-maskable-512.png",
+      "src": "/icons/boekhouding-ikoon-maskable-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"

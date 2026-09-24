@@ -6,7 +6,13 @@
   <title>Boekhouding — Future Shop</title>
   <link rel="manifest" href="/boekhouding-manifest.json">
   <meta name="theme-color" content="#171717">
-  <link rel="apple-touch-icon" href="/icons/paneel-apple-touch-ikoon.png">
+  <link rel="apple-touch-icon" href="/icons/boekhouding-apple-touch-ikoon.png">
+  <!-- DIE OORTJIE SE IKOON. Chrome lees die manifest NIE vir die oortjie nie;
+       dit soek <link rel="icon">. Sonder hierdie twee reels wys die oortjie
+       die leë bladsy-ikoon, hoe volledig die manifest ook al is. Dieselfde
+       twee reels staan in paneelbord.html. -->
+  <link rel="icon" href="/icons/boekhouding-ikoon-32.png" sizes="32x32" type="image/png">
+  <link rel="icon" href="/icons/boekhouding-ikoon-16.png" sizes="16x16" type="image/png">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -99,6 +105,18 @@
            opskrif. Op die paneelbord maak die titel sin omdat die afdelings
            onder mekaar lê; hier herhaal hy net die pil. -->
       <section class="paneel-afdeling fp-afdeling wys" data-afdeling="fakture">
+
+        <!-- DIT KEER NIKS. 'n Faktuur met 'n betaalskakel werk sonder
+             bankbesonderhede; die skakel is die hoofpad. Maar die
+             besonderhede druk STILWEG as strepies, en 'n mens sien dit eers
+             op 'n dokument wat reeds by 'n klient is. Dieselfde gewig as die
+             duplikaat-strook op die Registers-blad: 'n versoek om te
+             kontroleer, nie 'n fout nie. -->
+        <div class="fp-let-op" id="fp-bank-waarskuwing" hidden>
+          <span data-i18n="in_bank_waarsku">Die bankbesonderhede ontbreek — hulle druk as strepies op elke faktuur.</span>
+          <button type="button" class="fp-let-op-knop" id="fp-bank-gaan"
+                  data-i18n="in_bank_gaan">Vul hulle in</button>
+        </div>
 
         <!-- Geen parameter agter faktuur.html nie: dit is 'n vars konsep. Die
              nommer word by STUUR toegeken, anders le daar gate in die reeks
@@ -526,17 +544,6 @@
             <button type="button" class="kaart-aksie stil" id="jn-wys-al" hidden></button>
           </div>
 
-          <!-- PAYSTACK SE UITBETALINGS. Die joernaal wys wat gebeur het; hierdie
-               lys wys waar daardie geld beland het. Die datums is die joernaal
-               s'n hierbo: twee stelle datumvelde op een blad beteken twee
-               tydperke wat stilweg verskil. -->
-          <div class="vf-blok" id="vf-blok">
-            <h3 class="jn-kop" data-i18n="vf_kop">Uitbetalings</h3>
-            <p class="vf-som" id="vf-som"></p>
-            <div class="vf-lys" id="vf-lys"></div>
-            <p class="jn-leeg" id="vf-leeg" hidden data-i18n="vf_leeg">Geen uitbetalings in hierdie tydperk nie.</p>
-          </div>
-
           <div class="jn-nuwe-blok">
             <h3 class="jn-kop" data-i18n="jn_teken_inskrywing">Teken 'n inskrywing aan</h3>
             <div class="jn-nuwe">
@@ -838,7 +845,6 @@
   <script src="js/faktuurpaneel-instellings.js"></script>
   <script src="js/faktuurpaneel-staat.js"></script>
   <script src="js/faktuurpaneel-joernaal.js"></script>
-  <script src="js/faktuurpaneel-vereffenings.js"></script>
   <!-- LAASTE, want hy roep die ander se laaifunksies aan en moet dus na
        hulle laai. Hy wysig niks; hy verfris net wat hulle teken. -->
   <script src="js/faktuurpaneel-verfris.js"></script>
