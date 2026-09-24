@@ -27,6 +27,7 @@
   <link rel="stylesheet" href="css/paneel-breedte.css" />
   <link rel="stylesheet" href="css/paneel-area-pille.css">
   <link rel="stylesheet" href="css/faktuurpaneel-projekte.css" />
+  <link rel="stylesheet" href="css/faktuurpaneel-bankstate.css" />
   <link rel="icon" href="/icons/paneel-ikoon-32.png" sizes="32x32" type="image/png">
   <link rel="icon" href="/icons/paneel-ikoon-16.png" sizes="16x16" type="image/png"></head>
 <body>
@@ -97,6 +98,7 @@
         <button type="button" class="fp-pil" data-gaan="registers" data-i18n="fp_nav_registers">Registers</button>
         <button type="button" class="fp-pil" data-gaan="state" data-i18n="fp_nav_state">State</button>
         <button type="button" class="fp-pil" data-gaan="joernaal" data-i18n="fp_nav_joernaal">Joernaal</button>
+        <button type="button" class="fp-pil" data-gaan="bankstate" data-i18n="fp_nav_bankstate">Bankstate</button>
         <!-- 'n EIE PIL, nie 'n blok op die Registers-blad nie. Registers hou
              lyste van BAIE dinge; dit is EEN rekord. -->
         <button type="button" class="fp-pil" data-gaan="instellings" data-i18n="fp_nav_instellings">Instellings</button>
@@ -672,6 +674,19 @@
         </div>
       </section>
 
+      <!-- ═══ Bankstate ═══
+           Eerste deel: 'n FNB-staat word in die blaaier gelees, gekontroleer
+           en voorgeskou. Niks word gestoor nie. Sien bankstaat-fnb.js en
+           faktuurpaneel-bankstate.js. -->
+      <section class="paneel-afdeling fp-afdeling" data-afdeling="bankstate">
+        <div class="bs-oplaai">
+          <label class="kaart-aksie" for="bs-leer" data-i18n="bs_kies">Laai 'n FNB-staat op (PDF)</label>
+          <input type="file" id="bs-leer" accept="application/pdf,.pdf">
+          <p class="bs-lei" data-i18n="bs_lei">Die PDF word op hierdie rekenaar gelees en nie opgelaai nie.</p>
+        </div>
+        <div id="bs-uitslag"></div>
+      </section>
+
       <section class="paneel-afdeling fp-afdeling" data-afdeling="instellings">
         <div class="in-wrap">
 
@@ -945,6 +960,8 @@
   <script src="js/faktuurpaneel-fin-kategoriee.js"></script>
   <script src="js/faktuurpaneel-projekte.js"></script>
   <script src="js/faktuurpaneel-toetse.js"></script>
+  <script src="js/bankstaat-fnb.js"></script>
+  <script src="js/faktuurpaneel-bankstate.js"></script>
   <script src="js/faktuurpaneel-fin-staat.js"></script>
   <script src="js/faktuurpaneel-staat-pdf.js"></script>
   <script src="js/paneel-area-pille.js"></script>

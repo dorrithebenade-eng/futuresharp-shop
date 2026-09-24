@@ -1,0 +1,55 @@
+/* public/css/faktuurpaneel-bankstate.css
+   Die Bankstate-pil. Die tabel leen die joernaal se .jn-tabel. */
+
+.bs-oplaai { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 18px; }
+.bs-oplaai input[type="file"] { display: none; }
+.bs-lei { font-size: 0.85rem; color: var(--grys-teks); margin: 0; }
+
+.bs-kop {
+  display: flex; flex-wrap: wrap; gap: 8px 28px;
+  font-size: 0.9rem; margin-bottom: 14px;
+}
+.bs-kop-etiket {
+  font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--grys-teks); margin-right: 6px;
+}
+
+.bs-kontroles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.bs-kontrole {
+  border-radius: 8px; padding: 10px 12px; font-size: 0.82rem;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.bs-kontrole.ok { background: #EFF5F3; color: #2E7D6F; }
+.bs-kontrole.fout { background: #FDF1EC; color: #a8351a; }
+.bs-kontrole-kop { font-weight: 600; }
+.bs-kontrole-detail { color: var(--grys-teks); }
+
+.bs-opsom { font-size: 0.88rem; margin: 0 0 14px; }
+.bs-opsom.fout { color: #a8351a; }
+.bs-foutboodskap { color: #a8351a; }
+
+.bs-tabel-hou { overflow-x: auto; }
+.bs-tabel { min-width: 760px; }
+.bs-w-bed { width: 105px; }
+.bs-w-sal { width: 120px; }
+.bs-w-st { width: 190px; }
+.bs-tabel td { vertical-align: top; }
+.bs-beskr { display: block; }
+.bs-verw { display: block; font-size: 12px; color: var(--grys-teks); }
+.bs-uit { color: var(--koraal); }
+.bs-info td { color: var(--grys-teks); }
+
+.bs-stand {
+  display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 999px;
+}
+.bs-stand.voorstel { background: #EFF5F3; color: #2E7D6F; }
+.bs-stand.oop { background: #FDF3E3; color: #8a5a1a; }
+.bs-stand.leeg { background: #FDF1EC; color: #a8351a; }
+.bs-stand.info { background: #EFEDE9; color: #6b6660; }
+
+.bs-nota { font-size: 0.8rem; color: var(--grys-teks); margin-top: 14px; }
