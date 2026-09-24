@@ -70,6 +70,14 @@ const {
 // by die winkel.
 const KURSUS_KATEGORIE = "learnworlds-kursusse";
 
+// FUTURESHARP TALKS (September 2026). 'n Talk-betaling het geen faktuur of
+// winkelbestelling nie en word dus in tak 4 uit die Paystack-transaksie
+// geboek, met Paystack se werklike verdeling en fooi. Die spreker se deel
+// raak nooit die bank nie; wat in die hoofrekening bly (hosting plus die
+// direkteure se deel), boek onder hierdie kategorie. Die kategorie word in
+// die paneelbord geskep met die naam "FutureSharp Talks".
+const TALKS_KATEGORIE = "futuresharp-talks";
+
 function dag(iso) {
   return String(iso || "").slice(0, 10);
 }
@@ -601,9 +609,24 @@ exports.handler = async (event, context) => {
           }
         }
 
-        const naam =
-          (t.metadata && t.metadata.course_name) || t.kursus_slak || t.verwysing;
-        const besk = `Paystack \u2014 ${naam}`;
+        // 'n Talk: die titel uit die talk-bestelling, en sy hosting tel saam
+        // met die winkel s'n.
+        const talk_nommer = t.metadata && t.metadata.fst_bestelnommer;
+        let talk_titel = "";
+        if (talk_nommer) {
+          try {
+            const tb = await kry_store("talk-bestellings").get(String(talk_nommer), { type: "json" });
+            if (tb) {
+              talk_titel = tb.titel || "";
+              hosting_ingebring_sent += Number(tb.hosting_totaal_sent) || 0;
+            }
+          } catch { /* die beskrywing val dan terug op die verwysing */ }
+        }
+
+        const naam = talk_nommer
+          ? `FutureSharp Talks \u2014 ${talk_titel || talk_nommer}`
+          : (t.metadata && t.metadata.course_name) || t.kursus_slak || t.verwysing;
+        const besk = talk_nommer ? naam : `Paystack \u2014 ${naam}`;
 
         // TWEE TOETSE, EN ALBEI MOET SLAAG VOOR DIT 'N KURSUSVERKOOP IS.
         //
@@ -615,8 +638,9 @@ exports.handler = async (event, context) => {
         //   2. Geen verdeling nie. Is daar een, is wat behou word die fooi
         //      plus die hosting -- 'n heffing, nie 'n verkoop nie, want die
         //      kursus self is deur die ontwikkelaar verkoop.
-        const kategorie =
-          t.kursus_slak && !verdeel ? KURSUS_KATEGORIE : "diensinkomste";
+        const kategorie = talk_nommer
+          ? TALKS_KATEGORIE
+          : t.kursus_slak && !verdeel ? KURSUS_KATEGORIE : "diensinkomste";
 
         if (behou > 0 && pas({ beskrywing: besk })) {
           inskrywings.push({

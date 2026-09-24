@@ -40,7 +40,17 @@ function maak_bestelnommer() {
 // Bereken elke subrekening se deel in sent. Rye sonder 'n subrekening
 // (bv. 'n spreker wat nog "wag vir subrekening") bly by die hoofrekening en
 // word in `nota` aangeteken.
-async function bereken_verdeling(verdelings, prys_sent) {
+// Hosting soos by die boeke (begin-betaling.js): 'n persentasie of vaste
+// bedrag van die verkoopprys wat in die hoofrekening bly, apart gemerk sodat
+// dit nie vir 'n spreker beskikbaar gestel word nie.
+function bereken_hosting(hosting, prys_sent) {
+  if (!hosting || !prys_sent) return 0;
+  return hosting.tipe === "vaste_bedrag"
+    ? Math.min(Math.round(hosting.waarde), prys_sent)
+    : Math.round((prys_sent * hosting.waarde) / 100);
+}
+
+async function bereken_verdeling(verdelings, prys_sent, hosting_sent) {
   const per_subrekening = {};
   const nota = [];
   for (const v of verdelings || []) {
@@ -56,9 +66,10 @@ async function bereken_verdeling(verdelings, prys_sent) {
     per_subrekening[kode] = (per_subrekening[kode] || 0) + bedrag;
   }
 
-  // Laaste vangnet: die hoofrekening moet Paystack se fooi kan dra.
+  // Laaste vangnet: die hoofrekening moet Paystack se fooi kan dra, en die
+  // hosting bly daarbo in die hoofrekening (soos by die boeke).
   const totaal = Object.values(per_subrekening).reduce((a, b) => a + b, 0);
-  const maks = kry_maks_verdeling_sent(prys_sent);
+  const maks = kry_maks_verdeling_sent(prys_sent) - (hosting_sent || 0);
   if (totaal > maks && totaal > 0) {
     const faktor = Math.max(maks, 0) / totaal;
     for (const kode of Object.keys(per_subrekening)) {
@@ -162,7 +173,8 @@ exports.handler = async (event, context) => {
     };
   }
 
-  const { per_subrekening, nota } = await bereken_verdeling(talk.formate.video.verdelings, prys_sent);
+  const hosting_totaal_sent = bereken_hosting(talk.formate.video.hosting, prys_sent);
+  const { per_subrekening, nota } = await bereken_verdeling(talk.formate.video.verdelings, prys_sent, hosting_totaal_sent);
   const { split_code, split_fout } = await skep_split(bestelnommer, per_subrekening, prys_sent);
 
   const bestelling = {
@@ -174,6 +186,7 @@ exports.handler = async (event, context) => {
     lys_prys_sent,
     prys_sent,
     totaal_sent: prys_sent,
+    hosting_totaal_sent,
     koepon_kode,
     verdeling: Object.keys(per_subrekening).length ? per_subrekening : null,
     verdeling_nota: nota,

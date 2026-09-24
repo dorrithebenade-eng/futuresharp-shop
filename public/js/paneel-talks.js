@@ -165,6 +165,15 @@ function pt_bou_skelet() {
           <label class="veld-etiket">Verdeling</label>
           <div id="pt-verdelings"></div>
           <button type="button" id="pt-voeg-verdeling" class="pt-skakel">+ Voeg verdeling by</button>
+
+          <label class="paneel-wisselaar pt-hosting-wissel"><input type="checkbox" id="pt-hosting-aan"> <span>Hosting (bly heeltemal by die hoofrekening, soos by die boeke)</span></label>
+          <div id="pt-hosting-velde" class="pt-ry" style="display:none;">
+            <select id="pt-hosting-tipe" class="veld-invoer" aria-label="Hosting-tipe">
+              <option value="persentasie">Persentasie (%)</option>
+              <option value="vaste_bedrag">Vaste bedrag (R)</option>
+            </select>
+            <input type="number" id="pt-hosting-waarde" class="veld-invoer" min="0" step="0.01" aria-label="Hosting-waarde">
+          </div>
           <div id="pt-som" class="pt-som"></div>
         </fieldset>
 
@@ -196,6 +205,14 @@ function pt_bou_skelet() {
   document.getElementById("pt-sleutel-invoer").addEventListener("keydown", pt_sleutel_toets);
   document.getElementById("pt-sleutel-invoer").addEventListener("blur", () => pt_voeg_sleutel_by(true));
   document.getElementById("pt-prys").addEventListener("input", pt_bereken);
+  document.getElementById("pt-hosting-aan").addEventListener("change", () => {
+    document.getElementById("pt-hosting-velde").style.display = document.getElementById("pt-hosting-aan").checked ? "grid" : "none";
+    pt_bereken();
+  });
+  ["pt-hosting-tipe", "pt-hosting-waarde"].forEach((id) => {
+    document.getElementById(id).addEventListener("input", pt_bereken);
+    document.getElementById(id).addEventListener("change", pt_bereken);
+  });
   document.getElementById("pt-genereer").addEventListener("click", () => pt_genereer_en_laai_op());
   document.getElementById("pt-eie-leer").addEventListener("change", pt_laai_eie_beeld_op);
   document.getElementById("pt-vorm").addEventListener("submit", pt_stoor);
@@ -299,6 +316,16 @@ function pt_open_vorm(talk) {
   document.getElementById("pt-prys").value = talk ? ((v.prys_sent || 0) / 100).toFixed(2) : "100";
   document.getElementById("pt-duur").value = talk ? pt_sekondes_na_duur(v.duur_sekondes) : "";
   document.getElementById("pt-vrystelling").value = (talk && v.vrystelling_datum) || "";
+
+  // Hosting soos by die boeke. 'n Nuwe talk begin met 5%, dieselfde as die
+  // Verdeling-rekenaar se verstek; 'n bestaande talk wys wat gestoor is.
+  const hosting = talk ? v.hosting : { tipe: "persentasie", waarde: 5 };
+  document.getElementById("pt-hosting-aan").checked = !!hosting;
+  document.getElementById("pt-hosting-velde").style.display = hosting ? "grid" : "none";
+  document.getElementById("pt-hosting-tipe").value = (hosting && hosting.tipe) || "persentasie";
+  document.getElementById("pt-hosting-waarde").value = hosting
+    ? hosting.tipe === "vaste_bedrag" ? (hosting.waarde / 100).toFixed(2) : hosting.waarde
+    : "";
 
   const etiket = talk && talk.etiket;
   const voorafgestel = etiket ? Object.keys(PT_ETIKETTE).find((k) => PT_ETIKETTE[k].teks_af === etiket.teks_af) : "";
@@ -493,8 +520,20 @@ function pt_teken_verdelings() {
 
 // Dieselfde getalle as _paystack-koste.js: die fooi om te wys, die minimum
 // om af te dwing. Die bediener besluit; dit is net die waarskuwing vooraf.
+// Die hosting uit die vorm, in dieselfde vorm as wat gestoor word.
+function pt_hosting() {
+  if (!document.getElementById("pt-hosting-aan").checked) return null;
+  const tipe = document.getElementById("pt-hosting-tipe").value;
+  const getal = parseFloat(document.getElementById("pt-hosting-waarde").value) || 0;
+  if (getal <= 0) return null;
+  return { tipe, waarde: tipe === "vaste_bedrag" ? Math.round(getal * 100) : getal };
+}
+
 function pt_bereken() {
   const prys_sent = Math.round((parseFloat(document.getElementById("pt-prys").value) || 0) * 100);
+  const hosting = pt_hosting();
+  const hosting_sent = !hosting || !prys_sent ? 0
+    : hosting.tipe === "vaste_bedrag" ? Math.min(hosting.waarde, prys_sent) : Math.round((prys_sent * hosting.waarde) / 100);
   let uit = 0, spreker = 0;
   pt.verdelings.forEach((v) => {
     const bedrag = v.tipe === "vaste_bedrag" ? v.waarde : (prys_sent * v.waarde) / 100;
@@ -504,11 +543,13 @@ function pt_bereken() {
   const fooi = prys_sent ? Math.round((0.029 * prys_sent + 100) * 1.15) : 0;
   const minimum = prys_sent ? Math.ceil(0.035 * prys_sent) + 130 : 0;
   const fs = prys_sent - uit;
+  const direkteure = Math.max(0, fs - hosting_sent - fooi);
   const som = document.getElementById("pt-som");
   som.innerHTML =
-    `Koper betaal <strong>${pt_rand(prys_sent)}</strong> · spreker(s) ontvang <strong>${pt_rand(Math.round(spreker))}</strong> · ` +
-    `Future Sharp hou <strong>${pt_rand(Math.round(fs))}</strong>, waaruit Paystack se fooi van sowat ${pt_rand(fooi)} kom.` +
-    (prys_sent && fs < minimum ? `<br><span class="pt-waarskuwing">Die hoofrekening hou minder as die vereiste ${pt_rand(minimum)}. Die stoor sal dit weier.</span>` : "");
+    `Koper betaal <strong>${pt_rand(prys_sent)}</strong> · spreker(s) ontvang <strong>${pt_rand(Math.round(spreker))}</strong>` +
+    (uit - spreker > 0 ? ` · Ontwerp/Admin <strong>${pt_rand(Math.round(uit - spreker))}</strong>` : "") +
+    `<br>Die hoofrekening hou <strong>${pt_rand(Math.round(fs))}</strong>: hosting ${pt_rand(hosting_sent)}, Paystack se fooi sowat ${pt_rand(fooi)}, en die direkteure se deel sowat ${pt_rand(Math.round(direkteure))}.` +
+    (prys_sent && fs - hosting_sent < minimum ? `<br><span class="pt-waarskuwing">Ná hosting hou die hoofrekening minder as die vereiste ${pt_rand(minimum)} vir Paystack se fooi. Die stoor sal dit weier.</span>` : "");
 }
 
 // ---------------------------------------------------------------- omslag
@@ -683,7 +724,7 @@ async function pt_stoor(e) {
           duur_sekondes: pt_duur_na_sekondes(document.getElementById("pt-duur").value),
           vrystelling_datum: document.getElementById("pt-vrystelling").value || null,
           verdelings: pt.verdelings,
-          hosting: null,
+          hosting: pt_hosting(),
         },
       },
     };
