@@ -43,11 +43,15 @@ exports.handler = async (event, context) => {
   }
 
   const tipe = invoer.tipe === "afslag" ? "afslag" : "gratis";
-  const formaat_beperking = ["eboek", "harde_kopie", "leen", "albei"].includes(invoer.formaat_beperking)
+  // "video" = 'n FutureSharp Talks-koepon (sien _talk-koepon.js); die boeke
+  // se betaling aanvaar dit nooit.
+  const formaat_beperking = ["eboek", "harde_kopie", "leen", "albei", "video"].includes(invoer.formaat_beperking)
     ? invoer.formaat_beperking
     : "albei";
   const produk_slug = invoer.produk_slug ? String(invoer.produk_slug).trim() : null; // null = enige boek
   const outeur_id = invoer.outeur_id ? String(invoer.outeur_id).trim() : null;
+  // Net vir talk-koepons: beperk tot die talks van een spreker.
+  const spreker_id = formaat_beperking === "video" && invoer.spreker_id ? String(invoer.spreker_id).trim() : null;
   // Bind hierdie kode aan net EEN spesifieke koper (gebruik vir outomaties-
   // gegenereerde leen-na-koop-opgradering-koepons). Leeg/null = enigeen mag
   // dit verlos (die normale geval vir personeel-geskepte koepons).
@@ -142,6 +146,7 @@ exports.handler = async (event, context) => {
     verval_op,
     aktief: true,
     outeur_id,
+    spreker_id,
     nota,
     geskep_deur: gebruiker.email,
     geskep_op: new Date().toISOString(),

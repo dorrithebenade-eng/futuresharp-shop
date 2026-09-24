@@ -48,4 +48,16 @@ Object.assign(WOORDEBOEK, {
   fst_na_talks: { af: "Kyk na die talks", en: "Browse the talks" },
   fst_program: { af: "Jou program", en: "Your programme" },
   fst_speler_fout: { af: "Kon nie die video laai nie. Herlaai die bladsy.", en: "Could not load the video. Reload the page." },
+  // Fase 4c: koepons
+  fst_koepon_vraag: { af: "Het jy 'n koeponkode?", en: "Have a coupon code?" },
+  fst_koepon_pas_toe: { af: "Pas toe", en: "Apply" },
+  fst_koepon_plek: { af: "KOEPONKODE", en: "COUPON CODE" },
+  fst_koepon_aanvaar: { af: "Koepon aanvaar", en: "Coupon accepted" },
+  fst_koepon_ONBEKEND: { af: "Hierdie kode bestaan nie.", en: "This code does not exist." },
+  fst_koepon_ONAKTIEF: { af: "Hierdie koepon is nie meer aktief nie.", en: "This coupon is no longer active." },
+  fst_koepon_VERVAL: { af: "Hierdie koepon het verval.", en: "This coupon has expired." },
+  fst_koepon_VOLGEBRUIK: { af: "Hierdie koepon is klaar gebruik.", en: "This coupon has been used up." },
+  fst_koepon_NIE_JOUNE: { af: "Hierdie koepon is nie vir jou rekening nie.", en: "This coupon is not for your account." },
+  fst_koepon_GEEN_TOEPASSING: { af: "Hierdie koepon geld nie vir hierdie talk nie.", en: "This coupon does not apply to this talk." },
+  fst_koepon_REEDS_GEBRUIK: { af: "Jy het hierdie koepon reeds vir hierdie talk gebruik.", en: "You have already used this coupon for this talk." },
 });

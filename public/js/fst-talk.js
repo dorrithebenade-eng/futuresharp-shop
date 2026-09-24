@@ -50,11 +50,78 @@ function fst_talk_teken(talk, kategoriee) {
         <div class="fst-koop-prys">${fst_esc(fst_prys(v.prys_sent))}</div>
         <button type="button" class="fst-knop" id="fst-koop-knop" disabled>${fst_esc(knop_teks)}</button>
         <p class="fst-koop-fout" id="fst-koop-fout" hidden></p>
+        <button type="button" class="fst-koepon-skakel" id="fst-koepon-skakel" hidden>${fst_esc(t("fst_koepon_vraag"))}</button>
+        <div class="fst-koepon-ry" id="fst-koepon-ry" hidden>
+          <input type="text" id="fst-koepon-kode" maxlength="24" autocomplete="off" placeholder="${fst_esc(t("fst_koepon_plek"))}" aria-label="${fst_esc(t("fst_koepon_vraag"))}">
+          <button type="button" id="fst-koepon-toe">${fst_esc(t("fst_koepon_pas_toe"))}</button>
+        </div>
+        <p class="fst-koepon-stand" id="fst-koepon-stand" hidden></p>
       </aside>
     </div>`;
 }
 
 // ------------------------------------------------------------ koop (Fase 4)
+
+// Die koepon wat die koper toegepas het (Fase 4c). Die bediener toets dit
+// weer by die betaling; hier is dit net vir die prys op die knoppie.
+const fst_talk_koepon = { kode: null, prys_na_sent: null };
+
+function fst_talk_knop_teks(talk) {
+  const lys = (talk.video && talk.video.prys_sent) || 0;
+  const prys = fst_talk_koepon.kode ? fst_talk_koepon.prys_na_sent : lys;
+  return prys ? `${t("fst_koop_vir")} ${fst_prys(prys)}` : t("fst_kry_gratis");
+}
+
+function fst_talk_koepon_opstel(talk, knop) {
+  const skakel = document.getElementById("fst-koepon-skakel");
+  const ry = document.getElementById("fst-koepon-ry");
+  const invoer = document.getElementById("fst-koepon-kode");
+  const stand = document.getElementById("fst-koepon-stand");
+  const prys_el = document.querySelector(".fst-koop-prys");
+  if (!skakel) return;
+  skakel.hidden = false;
+  skakel.onclick = () => { skakel.hidden = true; ry.hidden = false; invoer.focus(); };
+
+  const pas_toe = async () => {
+    const kode = invoer.value.trim().toUpperCase();
+    if (!kode) return;
+    stand.hidden = true;
+    stand.classList.remove("fst-koepon-fout");
+
+    const sessie = await identiteit_kry_huidige_sessie().catch(() => null);
+    if (!sessie) {
+      window.location.href = `/aanmeld.html?terug=${encodeURIComponent(`/talks/${talk.slug}`)}`;
+      return;
+    }
+    try {
+      const resp = await fetch("/.netlify/functions/verifieer-talk-koepon", {
+        method: "POST",
+        headers: await identiteit_kop({ "Content-Type": "application/json" }),
+        body: JSON.stringify({ slug: talk.slug, kode }),
+      });
+      const data = await resp.json().catch(() => ({}));
+      if (!resp.ok || !data.geldig) {
+        fst_talk_koepon.kode = null;
+        stand.textContent = t(`fst_koepon_${data.fout_kode || "ONBEKEND"}`);
+        stand.classList.add("fst-koepon-fout");
+        stand.hidden = false;
+      } else {
+        fst_talk_koepon.kode = data.kode;
+        fst_talk_koepon.prys_na_sent = data.prys_na_sent;
+        stand.textContent = t("fst_koepon_aanvaar");
+        stand.hidden = false;
+        if (prys_el) {
+          prys_el.innerHTML = `${fst_esc(fst_prys(data.prys_na_sent))} <span class="fst-koop-prys-oud">${fst_esc(fst_prys(data.oorspronklik_sent))}</span>`;
+        }
+      }
+      knop.textContent = fst_talk_knop_teks(talk);
+    } catch (e) {
+      console.error("Kon nie koepon toets nie:", e);
+    }
+  };
+  document.getElementById("fst-koepon-toe").onclick = pas_toe;
+  invoer.onkeydown = (e) => { if (e.key === "Enter") { e.preventDefault(); pas_toe(); } };
+}
 
 async function fst_talk_besit(slug) {
   if (typeof identiteit_kry_huidige_sessie !== "function") return false;
@@ -85,10 +152,10 @@ async function fst_talk_knoppie(talk) {
 
   if (!talk.koopbaar) return; // bly "Binnekort beskikbaar" of "Beskikbaar vanaf …"
 
-  const prys_sent = (talk.video && talk.video.prys_sent) || 0;
   knop.disabled = false;
-  knop.textContent = prys_sent ? `${t("fst_koop_vir")} ${fst_prys(prys_sent)}` : t("fst_kry_gratis");
+  knop.textContent = fst_talk_knop_teks(talk);
   knop.onclick = () => fst_talk_koop(talk, knop);
+  fst_talk_koepon_opstel(talk, knop);
 }
 
 async function fst_talk_koop(talk, knop) {
@@ -109,13 +176,27 @@ async function fst_talk_koop(talk, knop) {
     const resp = await fetch("/.netlify/functions/begin-talk-betaling", {
       method: "POST",
       headers: await identiteit_kop({ "Content-Type": "application/json" }),
-      body: JSON.stringify({ slug: talk.slug }),
+      body: JSON.stringify({ slug: talk.slug, koepon_kode: fst_talk_koepon.kode }),
     });
     if (resp.status === 401) {
       window.location.href = `/aanmeld.html?terug=${encodeURIComponent(`/talks/${talk.slug}`)}`;
       return;
     }
-    if (!resp.ok) throw new Error(await resp.text());
+    if (!resp.ok) {
+      // 'n Koepon wat intussen verval of opgebruik is: sê presies wat.
+      const data = await resp.json().catch(() => null);
+      if (data && data.fout_kode) {
+        const stand = document.getElementById("fst-koepon-stand");
+        stand.textContent = t(`fst_koepon_${data.fout_kode}`);
+        stand.classList.add("fst-koepon-fout");
+        stand.hidden = false;
+        fst_talk_koepon.kode = null;
+        knop.disabled = false;
+        knop.textContent = fst_talk_knop_teks(talk);
+        return;
+      }
+      throw new Error("Status " + resp.status);
+    }
     const data = await resp.json();
     window.location.href = data.authorization_url || data.teater;
   } catch (e) {

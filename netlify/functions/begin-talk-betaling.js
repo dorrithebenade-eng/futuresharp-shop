@@ -13,14 +13,17 @@
 // Die bestelling leef in "talk-bestellings". Die webhook (via
 // _talk-betaling.js) merk dit as betaal en gee toegang.
 //
-// 'n Talk met prys R0 word sonder Paystack dadelik toegeken.
-// (Koepons kom in Fase 4c.)
+// 'n Talk met prys R0 (of R0 ná 'n gratis-koepon) word sonder Paystack
+// dadelik toegeken. 'n Koepon word hier opnuut getoets, nooit uit die
+// blaaier geglo nie; die gebruik word eers aangeteken wanneer die talk
+// werklik toegeken is.
 
 const { kry_store } = require("./_blob-store");
 const { kry_gebruiker_en_rol_uitslag } = require("./_rol-kontrole");
 const { kry_maks_verdeling_sent } = require("./_paystack-koste.js");
 const { talk_koopbaar } = require("./_talk-koopbaar");
 const { besit_talk, gee_toegang } = require("./_talk-besit");
+const { toets_talk_koepon, merk_talk_koepon_gebruik } = require("./_talk-koepon");
 
 const PUBLIEKE_WERF = "https://futureshop.futuresharp.co.za";
 const REGISTER_VIR_ROL = { spreker: "sprekers", ontwerp_admin: "ontwerp-admin" };
@@ -129,7 +132,17 @@ exports.handler = async (event, context) => {
     };
   }
 
-  const prys_sent = Math.round((talk.formate.video.prys_sent) || 0);
+  const lys_prys_sent = Math.round((talk.formate.video.prys_sent) || 0);
+  let prys_sent = lys_prys_sent;
+  let koepon_kode = null;
+  if (invoer.koepon_kode) {
+    const k = await toets_talk_koepon(invoer.koepon_kode, gebruiker, talk);
+    if (k.fout_kode) {
+      return { statusCode: 400, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ fout_kode: k.fout_kode }) };
+    }
+    prys_sent = k.prys_na_sent;
+    koepon_kode = k.koepon.kode;
+  }
   const bestelnommer = maak_bestelnommer();
   const nou = new Date().toISOString();
   const koper = { netlify_identity_id: gebruiker.id, epos: gebruiker.email };
@@ -137,10 +150,11 @@ exports.handler = async (event, context) => {
   // 'n Gratis talk: dadelik toegeken, sonder Paystack.
   if (prys_sent === 0) {
     await kry_store("talk-bestellings").setJSON(bestelnommer, {
-      bestelnommer, slug, titel: talk.titel, koper, prys_sent: 0, totaal_sent: 0,
-      status: "Betaal", betaal_op: nou, geskep_op: nou, gratis: true,
+      bestelnommer, slug, titel: talk.titel, koper, lys_prys_sent, prys_sent: 0, totaal_sent: 0,
+      koepon_kode, status: "Betaal", betaal_op: nou, geskep_op: nou, gratis: true,
     });
-    await gee_toegang({ identity_id: gebruiker.id, slug, bestelnommer, bron: "gratis", bedrag_sent: 0 });
+    await gee_toegang({ identity_id: gebruiker.id, slug, bestelnommer, bron: koepon_kode ? "koepon" : "gratis", bedrag_sent: 0 });
+    if (koepon_kode) await merk_talk_koepon_gebruik(koepon_kode, gebruiker.id, slug, bestelnommer);
     return {
       statusCode: 200,
       headers: { "Content-Type": "application/json" },
@@ -157,8 +171,10 @@ exports.handler = async (event, context) => {
     titel: talk.titel,
     spreker_ids: talk.spreker_ids || [],
     koper,
+    lys_prys_sent,
     prys_sent,
     totaal_sent: prys_sent,
+    koepon_kode,
     verdeling: Object.keys(per_subrekening).length ? per_subrekening : null,
     verdeling_nota: nota,
     split_code,

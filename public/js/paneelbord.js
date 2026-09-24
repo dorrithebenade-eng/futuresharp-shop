@@ -531,9 +531,11 @@ function wys_koepons_lys(koepons) {
   wrap.innerHTML = koepons
     .map((koepon) => {
       const produk = produkte_kas.find((p) => p.slug === koepon.produk_slug);
+      // 'n Talk-koepon (FutureSharp Talks) se produk_slug is 'n talk se slug.
+      const is_talk = koepon.formaat_beperking === "video";
       const boek_teks = koepon.produk_slug
         ? (produk ? produk.titel : koepon.produk_slug)
-        : t("paneel_koepon_enige_boek");
+        : is_talk ? "Enige talk" : t("paneel_koepon_enige_boek");
       const tipe_teks =
         koepon.tipe === "afslag"
           ? koepon.afslag_tipe === "vaste_bedrag"
@@ -547,6 +549,8 @@ function wys_koepons_lys(koepons) {
           ? t("paneel_koepon_formaat_hardekopie")
           : koepon.formaat_beperking === "leen"
           ? t("paneel_koepon_formaat_leen")
+          : is_talk
+          ? `Talk${koepon.spreker_id ? ` (spreker: ${koepon.spreker_id})` : ""}`
           : t("paneel_koepon_formaat_albei");
 
       return `

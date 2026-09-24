@@ -11,6 +11,7 @@
 
 const { kry_store } = require("./_blob-store");
 const { gee_toegang } = require("./_talk-besit");
+const { merk_talk_koepon_gebruik } = require("./_talk-koepon");
 
 async function voltooi_talk_bestelling(bestelnommer, paystack_data) {
   const store = kry_store("talk-bestellings");
@@ -50,6 +51,11 @@ async function voltooi_talk_bestelling(bestelnommer, paystack_data) {
     bron: "koop",
     bedrag_sent: bestelling.totaal_sent,
   });
+
+  // 'n Afslag-koepon tel eers as gebruik wanneer die betaling deur is.
+  if (bestelling.koepon_kode) {
+    await merk_talk_koepon_gebruik(bestelling.koepon_kode, bestelling.koper.netlify_identity_id, bestelling.slug, bestelnommer);
+  }
 
   return { ok: true };
 }
