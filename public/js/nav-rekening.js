@@ -207,6 +207,25 @@ function nav_outeur_kas_waarde(sessie, is_outeur) {
 // 'n NEE kan binne minute verander (die koper koop sy eerste talk en kom
 // terug na die winkel), dus word dit elke keer opnuut gevra.
 const NAV_TEATER_SLEUTEL = "future_shop_nav_teater";
+// Is hierdie gebruiker 'n spreker? Net 'n JA word vir die sessie onthou.
+const NAV_SPREKER_SLEUTEL = "future_shop_nav_spreker";
+async function nav_is_spreker(sessie) {
+  const ja = `${sessie.gebruiker.email}|ja`;
+  try {
+    if (sessionStorage.getItem(NAV_SPREKER_SLEUTEL) === ja) return true;
+  } catch { /* vra net */ }
+  try {
+    const resp = await fetch("/.netlify/functions/kry-my-spreker?kort=1", {
+      headers: { Authorization: `Bearer ${sessie.access_token}` },
+    });
+    if (!resp.ok) return false;
+    try { sessionStorage.setItem(NAV_SPREKER_SLEUTEL, ja); } catch { /* nie krities nie */ }
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 async function nav_het_talks(sessie) {
   const ja = `${sessie.gebruiker.email}|ja`;
   try {
@@ -317,7 +336,8 @@ async function nav_is_outeur(sessie) {
   // Die outeurspaneel-skakel kom NA die kop geteken is, want dit wag op 'n
   // bediener-antwoord. Hy word voor "My Boeke" ingevoeg: die outeur se eie
   // werk staan voor sy aankope.
-  if (await nav_is_outeur(sessie)) {
+  const is_outeur = await nav_is_outeur(sessie);
+  if (is_outeur) {
     const groep = document.querySelector(".nav-rekening-groep");
     const my_boeke = groep && groep.querySelector('a[href="my-boeke.html"]');
     if (groep) {
@@ -325,6 +345,21 @@ async function nav_is_outeur(sessie) {
       skakel.href = "outeur.html";
       skakel.className = "nav-rekening-skakel";
       skakel.textContent = window.t ? window.t("nav_outeurspaneel") : "Outeurspaneel";
+      groep.insertBefore(skakel, my_boeke);
+    }
+  }
+
+  // "Sprekerspaneel" (FutureSharp Talks) net vir wie spreker is maar NIE
+  // outeur nie. Wie albei is, gaan via die Outeurspaneel en skakel daar oor
+  // (paneel-rol-skakelaar.js), sodat die kop nie nog 'n item kry nie.
+  if (!is_outeur && (await nav_is_spreker(sessie))) {
+    const groep = document.querySelector(".nav-rekening-groep");
+    const my_boeke = groep && groep.querySelector('a[href="my-boeke.html"]');
+    if (groep && !groep.querySelector('a[href="spreker.html"]')) {
+      const skakel = document.createElement("a");
+      skakel.href = "spreker.html";
+      skakel.className = "nav-rekening-skakel";
+      skakel.textContent = window.t ? window.t("nav_sprekerspaneel") : "Sprekerspaneel";
       groep.insertBefore(skakel, my_boeke);
     }
   }

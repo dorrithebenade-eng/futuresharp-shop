@@ -1569,6 +1569,7 @@ const WOORDEBOEK = {
   pio_merk_fout: { af: "Die boek is geskep, maar die indiening kon nie as opgestel gemerk word nie.", en: "The book was created, but the submission could not be marked as set up." },
   nav_outeurspaneel: { af: "Outeurspaneel", en: "Author panel" },
   nav_my_teater: { af: "My Teater", en: "My Theatre" },
+  nav_sprekerspaneel: { af: "Sprekerspaneel", en: "Speaker panel" },
   // -- Die faktuurvorm se backoffice --------------------------------------
   // Die begroting, die verdeling en die som. Niks hiervan verskyn op die
   // dokument nie, dus loop alles met t() op die platform se taal.
