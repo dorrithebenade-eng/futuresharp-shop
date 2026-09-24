@@ -120,7 +120,7 @@ function mb_vul(data) {
   // Geen inskrywing beteken aan: die pos is die verstek, en 'n outeur wat
   // nog nooit gekies het nie, hoor van sy verkope.
   mb_gestoor.by_verkoop = kennisgewings.by_verkoop !== false;
-  mb_gestoor.staat_frekwensie = kennisgewings.staat_frekwensie || MB_STAAT_VERSTEK;
+  mb_gestoor.staat_frekwensie = ["af", "maandeliks"].includes(kennisgewings.staat_frekwensie) ? kennisgewings.staat_frekwensie : MB_STAAT_VERSTEK;
   mb_gestoor.selfoon = kontak.selfoon || "";
   mb_gestoor.adres = kontak.adres || "";
 
@@ -276,7 +276,7 @@ async function mb_stoor(deel) {
     if (antwoord.kennisgewings) {
       mb_gestoor.by_verkoop = antwoord.kennisgewings.by_verkoop !== false;
       mb_gestoor.staat_frekwensie =
-        antwoord.kennisgewings.staat_frekwensie || MB_STAAT_VERSTEK;
+        ["af", "maandeliks"].includes(antwoord.kennisgewings.staat_frekwensie) ? antwoord.kennisgewings.staat_frekwensie : MB_STAAT_VERSTEK;
       if (merk) merk.checked = mb_gestoor.by_verkoop;
       if (staat) staat.value = mb_gestoor.staat_frekwensie;
     }

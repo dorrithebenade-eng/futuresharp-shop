@@ -32,7 +32,7 @@ const MAKS_LENGTE = 200;
 // tussen iemand wat afgeskakel het en iemand wat nog nooit gekies het nie.
 // Die verstek staan by die leser, nie hier nie; hierdie lêer stoor net wat
 // gekies is.
-const STAAT_FREKWENSIES = ["af", "weekliks", "maandeliks"];
+const STAAT_FREKWENSIES = ["af", "maandeliks"];
 
 // Leeg is 'n geldige waarde: 'n outeur wat 'n ou selfoonnommer uitvee, moet
 // dit kan doen sonder om die ou een te laat staan. Daarom trim-en-snit ons

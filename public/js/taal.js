@@ -1149,7 +1149,6 @@ const WOORDEBOEK = {
   ob_staat_titel: { af: "Staat van verkope en besigtigings", en: "Statement of sales and views" },
   ob_staat_teks: { af: "'n Opsomming van jou boeke se verkope en besigtigings oor die tydperk.", en: "A summary of your books' sales and views over the period." },
   ob_staat_af: { af: "Moenie stuur nie", en: "Do not send" },
-  ob_staat_weekliks: { af: "Weekliks", en: "Weekly" },
   ob_staat_maandeliks: { af: "Maandeliks", en: "Monthly" },
   ob_verkoop_teks: {
     af: "'n E-pos elke keer as een van jou boeke as e-boek verkoop of uitgeleen word. Skakel dit af as jy eerder net af en toe wil gaan kyk.",
