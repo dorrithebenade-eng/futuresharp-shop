@@ -1,13 +1,15 @@
 /* public/css/fsp-foto.css — die leerder se foto in die Future Sharp-paneel. Eie lêer. */
-.fsp-foto { flex: none; width: 76px; height: 76px; border-radius: 50%; border: 3px solid #00A291; padding: 0; overflow: hidden;
+.fsp-foto { flex: none; width: 128px; height: 128px; border-radius: 50%; border: 3px solid #00A291; padding: 0; overflow: hidden;
   background: #E3F5F2; cursor: pointer; margin-right: 14px; display: inline-flex; align-items: center; justify-content: center; }
 .fsp-foto img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .fsp-foto-leeg { display: flex; flex-direction: column; align-items: center; line-height: 1.1; color: #163D64; }
-.fsp-foto-leeg b { font-family: var(--font-opskrif); font-weight: 800; font-size: 20px; }
-.fsp-foto-leeg small { font-size: 11px; color: #00A291; font-weight: 600; margin-top: 2px; }
+.fsp-foto-leeg b { font-family: var(--font-opskrif); font-weight: 800; font-size: 34px; }
+.fsp-foto-leeg small { font-size: 13px; color: #00A291; font-weight: 600; margin-top: 2px; }
 .fsp-foto.besig { opacity: .5; }
 .fsp-kop-ry { align-items: center; }
 .fsp-kop-ry > .fsp-foto + div { flex: 1 1 auto; min-width: 0; }
 .fsp-foto-groot { position: fixed; inset: 0; background: rgba(0,0,0,.75); z-index: 60; display: flex; align-items: center; justify-content: center; padding: 20px; }
 .fsp-foto-houer { background: #fff; border-radius: 14px; padding: 14px; max-width: 420px; width: 100%; }
 .fsp-foto-houer img { width: 100%; border-radius: 10px; display: block; }
+/* Op 'n foon effens kleiner, sodat die naam steeds langsaan pas. */
+@media (max-width: 560px) { .fsp-foto { width: 104px; height: 104px; margin-right: 12px; } .fsp-foto-leeg b { font-size: 28px; } }
