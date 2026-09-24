@@ -15,7 +15,7 @@
 
   const WOORDE = "SKRAP TOETSE";
   const IS_TOETS = /^\s*TOETS\b/;
-  const STAAT = { projekte: 0, kliente: 0 };
+  const STAAT = { projekte: 0, kliente: 0, befondsers: 0, soorte: 0 };
 
   function t(sleutel, verstek) {
     const uit = window.t ? window.t(sleutel) : null;
@@ -59,11 +59,12 @@
   }
 
   function teken() {
-    const tel = STAAT.projekte + STAAT.kliente;
-    const hulp = t("ts_hulp",
-      "{p} toetsprojek(te) en {k} toetskliënt(e): alles waarvan die naam met TOETS begin. " +
-      "'n Toetskliënt met 'n faktuur of kwotasie, of op 'n regte projek, bly staan. Tik {w} om te bevestig.")
-      .replace("{p}", STAAT.projekte).replace("{k}", STAAT.kliente).replace("{w}", WOORDE);
+    const tel = STAAT.projekte + STAAT.kliente + STAAT.befondsers + STAAT.soorte;
+    const hulp = t("ts_hulp2",
+      "Alles waarvan die naam met TOETS begin: {p} projek(te), {k} kliënt(e), {b} befondser(s) of skenker(s), " +
+      "{s} befondsingsoort(e). 'n Toetskliënt met 'n faktuur of kwotasie, of op 'n regte projek, bly staan. Tik {w} om te bevestig.")
+      .replace("{p}", STAAT.projekte).replace("{k}", STAAT.kliente)
+      .replace("{b}", STAAT.befondsers).replace("{s}", STAAT.soorte).replace("{w}", WOORDE);
     document.querySelectorAll(".ts-blok").forEach((d) => {
       d.hidden = tel === 0 && d.querySelector(".ts-uitslag").hidden;
       d.querySelector(".ts-hulp").textContent = hulp;
@@ -98,8 +99,9 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ woorde: WOORDE }),
       });
-      let teks = t("ts_klaar", "{p} projek(te) en {k} kliënt(e) uitgevee.")
-        .replace("{p}", uit.projekte).replace("{k}", uit.kliente);
+      let teks = t("ts_klaar2", "Uitgevee: {p} projek(te), {k} kliënt(e), {b} befondser(s) of skenker(s), {s} befondsingsoort(e).")
+        .replace("{p}", uit.projekte).replace("{k}", uit.kliente)
+        .replace("{b}", uit.befondsers || 0).replace("{s}", uit.soorte || 0);
       if (uit.bly && uit.bly.length) teks += " " + t("ts_bly", "Bly staan:") + " " + uit.bly.join("; ") + ".";
       if (uit.foute && uit.foute.length) teks += " " + t("ts_fout", "Kon nie uitvee nie:") + " " + uit.foute.join(", ") + ".";
       document.querySelectorAll(".ts-uitslag").forEach((p) => { p.textContent = teks; p.hidden = false; });
@@ -107,6 +109,8 @@
 
       if (typeof pj_laai === "function") await pj_laai();
       if (typeof fk_laai === "function") await fk_laai();
+      if (typeof window.bf_laai === "function") await window.bf_laai();
+      if (typeof window.bo_laai === "function") await window.bo_laai();
       await Promise.all([tel_kliente(), tel_projekte()]);
       teken();
     } catch (fout) {
@@ -114,6 +118,15 @@
       knop.disabled = false;
     }
   }
+
+  document.addEventListener("bf-gelaai", (ev) => {
+    STAAT.befondsers = (ev.detail || []).filter((b) => IS_TOETS.test(b.naam || "")).length;
+    teken();
+  });
+  document.addEventListener("bo-gelaai", (ev) => {
+    STAAT.soorte = (ev.detail || []).filter((s) => IS_TOETS.test(s.naam || "")).length;
+    teken();
+  });
 
   document.addEventListener("pj-gelaai", (ev) => {
     STAAT.projekte = (ev.detail || []).filter((p) => IS_TOETS.test(p.naam || "")).length;
@@ -128,6 +141,9 @@
 
     bou_blok("fk-lys", "ts-blok-kliente");
     bou_blok("pj-lys", "ts-blok-projekte");
+    bou_blok("bf-lys-befondser", "ts-blok-befondsers");
+    bou_blok("bf-lys-skenker", "ts-blok-skenkers");
+    bou_blok("bo-lys", "ts-blok-soorte");
     await tel_kliente();
     teken();
   });

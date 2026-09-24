@@ -1,6 +1,7 @@
 // netlify/functions/skrap-toetse.js
 //
-// Vee ALLE toetsprojekte en toetskliënte in een handeling uit. Rol: boekhouding.
+// Vee ALLE toetsprojekte, toetskliënte, toetsbefondsers en -skenkers en
+// toetsbefondsingsoorte in een handeling uit. Rol: boekhouding.
 //
 // DIESELFDE PATROON AS DIE STUDIEVAARDIGHEIDSPANEEL SE "Skrap alle
 // toetsregistrasies": 'n toets is 'n bewuste merk op die rekord self, die knoppie
@@ -26,6 +27,8 @@ const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 const { kry_kliente_store } = require("./_kliente");
 const { kry_fakture_store } = require("./_fakture");
 const { kry_projekte_store, lees_almal, is_toets_naam } = require("./_projekte");
+const { kry_befondsers_store, lees_almal: lees_befondsers } = require("./_befondsers");
+const { kry_soorte_store, SAAD_SLEUTEL } = require("./_befondsingsoorte");
 
 const ROLLE = ["boekhouding"];
 const WOORDE = "SKRAP TOETSE";
@@ -53,9 +56,19 @@ exports.handler = async (event, context) => {
   const pstore = kry_projekte_store();
   const kstore = kry_kliente_store();
 
-  let projekte, kliente, gefaktureer;
+  const bstore = kry_befondsers_store();
+  const sstore = kry_soorte_store();
+
+  let projekte, kliente, gefaktureer, befondsers, soorte;
   try {
     projekte = await lees_almal(pstore);
+    befondsers = await lees_befondsers(bstore);
+    // Net die GESTOORDE soorte: 'n voorgelaaide soort is nooit 'n toets nie.
+    const { blobs: sblobs } = await sstore.list();
+    soorte = (
+      await Promise.all((sblobs || []).filter((b) => b.key !== SAAD_SLEUTEL)
+        .map((b) => sstore.get(b.key, { type: "json" })))
+    ).filter(Boolean);
 
     const { blobs } = await kstore.list({ prefix: "K" });
     kliente = (
@@ -95,7 +108,28 @@ exports.handler = async (event, context) => {
 
   let projekte_weg = 0;
   let kliente_weg = 0;
+  let befondsers_weg = 0;
+  let soorte_weg = 0;
   const foute = [];
+
+  for (const b of befondsers.filter((x) => is_toets_naam(x.naam))) {
+    try {
+      await bstore.delete(b.nommer);
+      befondsers_weg += 1;
+    } catch (fout) {
+      console.error(`Kon nie toetsbefondser ${b.nommer} uitvee nie:`, fout);
+      foute.push(`${b.nommer} ${b.naam}`);
+    }
+  }
+  for (const s of soorte.filter((x) => is_toets_naam(x.naam))) {
+    try {
+      await sstore.delete(s.id);
+      soorte_weg += 1;
+    } catch (fout) {
+      console.error(`Kon nie toetssoort "${s.id}" uitvee nie:`, fout);
+      foute.push(s.naam);
+    }
+  }
 
   for (const p of toetsprojekte) {
     try {
@@ -117,12 +151,16 @@ exports.handler = async (event, context) => {
   }
 
   console.log(
-    `Toetse geskrap deur ${gebruiker.email || ""}: ${projekte_weg} projekte, ${kliente_weg} kliënte`
+    `Toetse geskrap deur ${gebruiker.email || ""}: ${projekte_weg} projekte, ${kliente_weg} kliënte, ` +
+    `${befondsers_weg} befondsers en skenkers, ${soorte_weg} befondsingsoorte`
   );
 
   return {
     statusCode: 200,
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ projekte: projekte_weg, kliente: kliente_weg, bly, foute }),
+    body: JSON.stringify({
+      projekte: projekte_weg, kliente: kliente_weg,
+      befondsers: befondsers_weg, soorte: soorte_weg, bly, foute,
+    }),
   };
 };

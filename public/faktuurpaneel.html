@@ -28,6 +28,7 @@
   <link rel="stylesheet" href="css/paneel-area-pille.css">
   <link rel="stylesheet" href="css/faktuurpaneel-projekte.css" />
   <link rel="stylesheet" href="css/faktuurpaneel-bankstate.css" />
+  <link rel="stylesheet" href="css/faktuurpaneel-befondsers.css" />
   <link rel="icon" href="/icons/paneel-ikoon-32.png" sizes="32x32" type="image/png">
   <link rel="icon" href="/icons/paneel-ikoon-16.png" sizes="16x16" type="image/png"></head>
 <body>
@@ -173,10 +174,13 @@
              kom, en gryp dan die verkeerde een. -->
         <div class="fk-sub" id="fr-sub">
           <button type="button" class="fr-sub-knop aan" data-reg="kliente" data-i18n="fk_titel">Kliente</button>
+          <button type="button" class="fr-sub-knop" data-reg="befondsers" data-i18n="bf_titel_befondsers">Befondsers</button>
+          <button type="button" class="fr-sub-knop" data-reg="skenkers" data-i18n="bf_titel_skenkers">Skenkers</button>
           <button type="button" class="fr-sub-knop" data-reg="begunstigdes" data-i18n="bg_titel">Begunstigdes</button>
           <button type="button" class="fr-sub-knop" data-reg="werk" data-i18n="wi_titel">Werk en uitgawes</button>
           <button type="button" class="fr-sub-knop" data-reg="kategoriee" data-i18n="kt_titel">Kategorieë</button>
           <button type="button" class="fr-sub-knop" data-reg="projekte" data-i18n="pj_titel">Projekte</button>
+          <button type="button" class="fr-sub-knop" data-reg="befondsingsoorte" data-i18n="bso_titel">Befondsingsoorte</button>
         </div>
 
         <!-- ═══ Kliënte ═══ -->
@@ -291,6 +295,46 @@
           <p class="fk-hulp" id="pj-hulp"></p>
 
           <div id="pj-lys">
+            <p class="stelsel-boodskap" data-i18n="fp_laai">Word gelaai …</p>
+          </div>
+        </div>
+
+        <!-- Befondsers en skenkers: een stoor, twee oortjies. Sien
+             faktuurpaneel-befondsers.js en _befondsers.js. -->
+        <div class="fk-reg" data-reg="befondsers">
+          <div class="fk-soekbalk">
+            <input type="text" class="veld-invoer" id="bf-soek-befondser"
+                   data-i18n-placeholder="bf_soek_plek" placeholder="Soek op naam, kontak of nommer">
+            <button type="button" class="kaart-aksie" id="bf-nuut-befondser" data-i18n="bf_nuwe_befondser_knop">+ Nuwe befondser</button>
+          </div>
+          <p class="fk-hulp" id="bf-hulp-befondser"></p>
+          <div id="bf-lys-befondser">
+            <p class="stelsel-boodskap" data-i18n="fp_laai">Word gelaai …</p>
+          </div>
+        </div>
+
+        <div class="fk-reg" data-reg="skenkers">
+          <div class="fk-soekbalk">
+            <input type="text" class="veld-invoer" id="bf-soek-skenker"
+                   data-i18n-placeholder="bf_soek_plek" placeholder="Soek op naam, kontak of nommer">
+            <button type="button" class="kaart-aksie" id="bf-nuut-skenker" data-i18n="bf_nuwe_skenker_knop">+ Nuwe skenker</button>
+          </div>
+          <p class="fk-hulp" id="bf-hulp-skenker"></p>
+          <div id="bf-lys-skenker">
+            <p class="stelsel-boodskap" data-i18n="fp_laai">Word gelaai …</p>
+          </div>
+        </div>
+
+        <!-- Befondsingsoorte: wat elke soort befondsing vra. Sien
+             faktuurpaneel-befondsingsoorte.js en _befondsingsoorte.js. -->
+        <div class="fk-reg" data-reg="befondsingsoorte">
+          <div class="fk-soekbalk">
+            <input type="text" class="veld-invoer" id="bo-soek"
+                   data-i18n-placeholder="bso_soek_plek" placeholder="Soek op naam">
+            <button type="button" class="kaart-aksie" id="bo-nuut" data-i18n="bso_nuwe_knop">+ Nuwe soort</button>
+          </div>
+          <p class="fk-hulp" id="bo-hulp"></p>
+          <div id="bo-lys">
             <p class="stelsel-boodskap" data-i18n="fp_laai">Word gelaai …</p>
           </div>
         </div>
@@ -416,6 +460,102 @@
           <div class="fk-knoppies">
             <button type="button" class="kaart-aksie wi-stil" id="pj-kanselleer" data-i18n="pj_kanselleer">Kanselleer</button>
             <button type="button" class="kaart-aksie" id="pj-stoor" data-i18n="pj_stoor">Stoor</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Die vorm vir 'n befondser of skenker. -->
+      <div class="fk-oorlegsel" id="bf-vorm">
+        <div class="fk-venster">
+          <h2 id="bf-vorm-titel">Nuwe befondser</h2>
+          <p class="fk-lei" data-i18n="bf_lei">Die velde wat 'n Art. 18A-sertifikaat vra, is opsioneel. Die lys wys wat ontbreek.</p>
+          <div class="bf-twee">
+            <div class="fk-veld">
+              <label class="veld-etiket" for="bf-soort" data-i18n="bf_v_soort">Soort</label>
+              <select class="veld-invoer" id="bf-soort">
+                <option value="maatskappy" data-i18n="bf_soort_maatskappy">Maatskappy</option>
+                <option value="trust" data-i18n="bf_soort_trust">Trust</option>
+                <option value="organisasie" data-i18n="bf_soort_organisasie">Organisasie</option>
+                <option value="persoon" data-i18n="bf_soort_persoon">Persoon</option>
+              </select>
+            </div>
+            <div class="fk-veld">
+              <label class="veld-etiket" for="bf-naam"><span data-i18n="bf_v_naam">Naam</span></label>
+              <input type="text" class="veld-invoer" id="bf-naam" maxlength="160">
+            </div>
+            <div class="fk-veld">
+              <label class="veld-etiket" for="bf-handelsnaam"><span data-i18n="bf_v_handelsnaam">Handelsnaam</span> <span class="veld-opsioneel" data-i18n="bf_opsioneel">— opsioneel</span></label>
+              <input type="text" class="veld-invoer" id="bf-handelsnaam" maxlength="160">
+            </div>
+            <div class="fk-veld">
+              <label class="veld-etiket" for="bf-registrasienommer"><span data-i18n="bf_v_reg">Registrasie- of ID-nommer</span> <span class="veld-opsioneel" data-i18n="bf_opsioneel">— opsioneel</span></label>
+              <input type="text" class="veld-invoer" id="bf-registrasienommer" maxlength="40">
+            </div>
+            <div class="fk-veld">
+              <label class="veld-etiket" for="bf-belastingnommer"><span data-i18n="bf_v_belasting">Belastingnommer</span> <span class="veld-opsioneel" data-i18n="bf_opsioneel">— opsioneel</span></label>
+              <input type="text" class="veld-invoer" id="bf-belastingnommer" maxlength="40">
+            </div>
+            <div class="fk-veld">
+              <label class="veld-etiket" for="bf-kontakpersoon"><span data-i18n="bf_v_kontak">Kontakpersoon</span> <span class="veld-opsioneel" data-i18n="bf_opsioneel">— opsioneel</span></label>
+              <input type="text" class="veld-invoer" id="bf-kontakpersoon" maxlength="120">
+            </div>
+            <div class="fk-veld">
+              <label class="veld-etiket" for="bf-epos"><span data-i18n="bf_v_epos">E-pos</span> <span class="veld-opsioneel" data-i18n="bf_opsioneel">— opsioneel</span></label>
+              <input type="email" class="veld-invoer" id="bf-epos" maxlength="160">
+            </div>
+            <div class="fk-veld">
+              <label class="veld-etiket" for="bf-telefoon"><span data-i18n="bf_v_telefoon">Telefoon</span> <span class="veld-opsioneel" data-i18n="bf_opsioneel">— opsioneel</span></label>
+              <input type="text" class="veld-invoer" id="bf-telefoon" maxlength="40">
+            </div>
+          </div>
+          <div class="fk-veld">
+            <label class="veld-etiket" for="bf-adres"><span data-i18n="bf_v_adres">Adres</span> <span class="veld-opsioneel" data-i18n="bf_opsioneel">— opsioneel</span></label>
+            <textarea class="veld-invoer" id="bf-adres" rows="3" maxlength="500"></textarea>
+          </div>
+          <div class="fk-veld">
+            <label class="veld-etiket" for="bf-nota"><span data-i18n="bf_v_nota">Aantekening</span> <span class="veld-opsioneel" data-i18n="bf_opsioneel">— opsioneel</span></label>
+            <input type="text" class="veld-invoer" id="bf-nota" maxlength="500">
+            <p class="fk-veldhulp" data-i18n="bf_toets_hulp">Begin die naam met TOETS om dit as toets te merk.</p>
+          </div>
+          <p class="fk-fout" id="bf-vorm-fout" style="display:none"></p>
+          <div class="fk-knoppies">
+            <button type="button" class="kaart-aksie wi-stil" id="bf-kanselleer" data-i18n="bf_kanselleer">Kanselleer</button>
+            <button type="button" class="kaart-aksie" id="bf-stoor" data-i18n="bf_stoor">Stoor</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Die vorm vir 'n befondsingsoort, met sy twee wysigbare lyste. -->
+      <div class="fk-oorlegsel" id="bo-vorm">
+        <div class="fk-venster">
+          <h2 id="bo-vorm-titel">Nuwe befondsingsoort</h2>
+          <p class="fk-lei" data-i18n="bso_lei">'n Toekenning kry 'n afskrif van hierdie lyste. 'n Latere wysiging verander nie 'n bestaande toekenning se lys nie.</p>
+          <div class="fk-veld">
+            <label class="veld-etiket" for="bo-naam" data-i18n="bso_v_naam">Naam</label>
+            <input type="text" class="veld-invoer" id="bo-naam" maxlength="120">
+          </div>
+          <div class="fk-veld">
+            <label class="wi-merk"><input type="checkbox" id="bo-18a"> <span data-i18n="bso_v_18a">Vereis Art. 18A-goedkeuring</span></label>
+          </div>
+          <div class="fk-veld">
+            <span class="veld-etiket" data-i18n="bso_v_uitreik">Wat Future Sharp uitreik</span>
+            <div class="bo-lys" id="bo-uitreik"></div>
+            <button type="button" class="pj-nk-skakel" id="bo-voeg-uitreik" data-i18n="bso_voeg_by">+ Voeg by</button>
+          </div>
+          <div class="fk-veld">
+            <span class="veld-etiket" data-i18n="bso_v_rekords">Rekords wat gehou moet word</span>
+            <div class="bo-lys" id="bo-rekords"></div>
+            <button type="button" class="pj-nk-skakel" id="bo-voeg-rekords" data-i18n="bso_voeg_by">+ Voeg by</button>
+            <p class="fk-veldhulp" data-i18n="bso_dok_hulp">Merk Dokument waar 'n opgelaaide lêer as bewys vereis word.</p>
+          </div>
+          <div class="fk-veld">
+            <label class="veld-etiket" for="bo-nota"><span data-i18n="bso_v_nota">Aantekening</span> <span class="veld-opsioneel" data-i18n="bf_opsioneel">— opsioneel</span></label>
+            <input type="text" class="veld-invoer" id="bo-nota" maxlength="500">
+          </div>
+          <p class="fk-fout" id="bo-vorm-fout" style="display:none"></p>
+          <div class="fk-knoppies">
+            <button type="button" class="kaart-aksie wi-stil" id="bo-kanselleer" data-i18n="bf_kanselleer">Kanselleer</button>
+            <button type="button" class="kaart-aksie" id="bo-stoor" data-i18n="bf_stoor">Stoor</button>
           </div>
         </div>
       </div>
@@ -959,6 +1099,8 @@
   <script src="js/faktuurpaneel-werk.js"></script>
   <script src="js/faktuurpaneel-fin-kategoriee.js"></script>
   <script src="js/faktuurpaneel-projekte.js"></script>
+  <script src="js/faktuurpaneel-befondsers.js"></script>
+  <script src="js/faktuurpaneel-befondsingsoorte.js"></script>
   <script src="js/faktuurpaneel-toetse.js"></script>
   <script src="js/bankstaat-fnb.js"></script>
   <script src="js/faktuurpaneel-bankstate.js"></script>

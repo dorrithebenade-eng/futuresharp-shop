@@ -1,0 +1,26 @@
+/* public/css/faktuurpaneel-befondsers.css
+   Befondsers, skenkers en befondsingsoorte. Die rye, vorms en merkies leen
+   die fk-klasse; hier staan net wat nuut is. */
+
+.bf-twee {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 14px;
+}
+@media (max-width: 620px) { .bf-twee { grid-template-columns: 1fr; } }
+
+.bf-ontbreek { color: #8a5a1a; }
+
+.bo-lys { display: flex; flex-direction: column; gap: 6px; margin: 6px 0 4px; }
+.bo-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 8px;
+  align-items: center;
+}
+.bo-item .bo-dok { font-size: 0.8rem; white-space: nowrap; margin: 0; }
+.bo-item-weg {
+  border: 0; background: transparent; color: var(--grys-teks);
+  font-size: 1.1rem; line-height: 1; cursor: pointer; padding: 0 4px;
+}
+.bo-item-weg:hover { color: var(--koraal); }
