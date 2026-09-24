@@ -1,0 +1,62 @@
+/* public/css/faktuurpaneel-projekte.css
+   Die projekteregister. Die rye, die oorlegsel en die velde gebruik die
+   bestaande fk-klasse; hier staan net die befondserkeuse. */
+
+.pj-geen { color: var(--grys-teks); font-style: italic; }
+
+.pj-kies-ry {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.pj-befondsers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.pj-befondser {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px 4px 10px;
+  border-radius: 6px;
+  background: #E8F3F0;
+  color: #2f6b60;
+  font-size: 0.85rem;
+}
+
+.pj-befondser-weg {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+.pj-nk-skakel {
+  margin-top: 6px;
+  border: 0;
+  background: transparent;
+  color: var(--teal);
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 0;
+}
+
+.pj-nk {
+  display: none;
+  margin-top: 10px;
+  padding: 12px;
+  border: 1px solid #E3E0DA;
+  border-radius: 8px;
+  background: var(--grys-lig);
+}
+.pj-nk.oop { display: block; }
+.pj-nk .fk-veld:last-of-type { margin-bottom: 8px; }

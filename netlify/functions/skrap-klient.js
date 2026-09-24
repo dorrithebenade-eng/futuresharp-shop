@@ -26,6 +26,7 @@
 
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 const { kry_kliente_store } = require("./_kliente");
+const { kry_projekte_store, lees_almal } = require("./_projekte");
 const {
   kry_fakture_store,
   is_konsep_sleutel,
@@ -110,6 +111,33 @@ exports.handler = async (event, context) => {
         gevind.konsepte === 1
           ? "Daar is 'n konsep vir hierdie kliënt. Skrap eers die konsep."
           : `Daar is ${gevind.konsepte} konsepte vir hierdie kliënt. Skrap eers die konsepte.`,
+    };
+  }
+
+  // 'N BEFONDSER GAAN OOK NIE WEG NIE (24 September 2026).
+  //
+  // 'n Projek dra net die kliëntnommer. Verdwyn die kliënt, kan 'n kwitansie
+  // of sertifikaat later nie meer aan hom uitgereik word nie. Kan ons die
+  // projekte nie lees nie, weier ons, om dieselfde rede as by die fakture.
+  let projekte;
+  try {
+    projekte = (await lees_almal(kry_projekte_store()))
+      .filter((p) => Array.isArray(p.befondsers) && p.befondsers.includes(nommer))
+      .map((p) => p.naam || p.id);
+  } catch (fout) {
+    console.error("Kon nie die projekte nagaan nie:", fout);
+    return {
+      statusCode: 503,
+      body: "Kon nie die projekte nagaan nie. Probeer weer — die kliënt is nie geskrap nie.",
+    };
+  }
+
+  if (projekte.length) {
+    return {
+      statusCode: 409,
+      body:
+        `Hierdie kliënt is befondser van ${projekte.length === 1 ? "die projek" : "die projekte"} ` +
+        `${projekte.join(", ")}. Haal hom eers daar af.`,
     };
   }
 

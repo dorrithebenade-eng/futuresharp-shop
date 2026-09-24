@@ -26,6 +26,7 @@
   <link rel="stylesheet" href="css/faktuurpaneel-skrap-klient.css" />
   <link rel="stylesheet" href="css/paneel-breedte.css" />
   <link rel="stylesheet" href="css/paneel-area-pille.css">
+  <link rel="stylesheet" href="css/faktuurpaneel-projekte.css" />
   <link rel="icon" href="/icons/paneel-ikoon-32.png" sizes="32x32" type="image/png">
   <link rel="icon" href="/icons/paneel-ikoon-16.png" sizes="16x16" type="image/png"></head>
 <body>
@@ -173,6 +174,7 @@
           <button type="button" class="fr-sub-knop" data-reg="begunstigdes" data-i18n="bg_titel">Begunstigdes</button>
           <button type="button" class="fr-sub-knop" data-reg="werk" data-i18n="wi_titel">Werk en uitgawes</button>
           <button type="button" class="fr-sub-knop" data-reg="kategoriee" data-i18n="kt_titel">Kategorieë</button>
+          <button type="button" class="fr-sub-knop" data-reg="projekte" data-i18n="pj_titel">Projekte</button>
         </div>
 
         <!-- ═══ Kliënte ═══ -->
@@ -274,6 +276,23 @@
           </div>
         </div>
 
+        <!-- Die register van PROJEKTE — waarvoor geld ontvang en bestee is.
+             'n Tweede as naas die kategorie; befondsers kom uit die
+             kliënteregister. Sien faktuurpaneel-projekte.js. -->
+        <div class="fk-reg" data-reg="projekte">
+          <div class="fk-soekbalk">
+            <input type="text" class="veld-invoer" id="pj-soek"
+                   data-i18n-placeholder="pj_soek_plek"
+                   placeholder="Soek op naam, befondser of aantekening">
+            <button type="button" class="kaart-aksie" id="pj-nuut" data-i18n="pj_nuwe_knop">+ Nuwe projek</button>
+          </div>
+          <p class="fk-hulp" id="pj-hulp"></p>
+
+          <div id="pj-lys">
+            <p class="stelsel-boodskap" data-i18n="fp_laai">Word gelaai …</p>
+          </div>
+        </div>
+
       </section>
 
       <!-- Die vorm vir 'n kategorie. Buite die afdeling, soos die werk-item
@@ -324,6 +343,76 @@
           <div class="fk-knoppies">
             <button type="button" class="kaart-aksie wi-stil" id="kt-kanselleer" data-i18n="kt_kanselleer">Kanselleer</button>
             <button type="button" class="kaart-aksie" id="kt-stoor" data-i18n="kt_stoor">Stoor</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Die vorm vir 'n projek. Buite die afdeling, soos die ander
+           registers se vorms. -->
+      <div class="fk-oorlegsel" id="pj-vorm">
+        <div class="fk-venster">
+          <h2 id="pj-vorm-titel">Nuwe projek</h2>
+          <p class="fk-lei" data-i18n="pj_lei">'n Projek wat reeds deur inskrywings gebruik word, word gedeaktiveer, nie uitgevee nie.</p>
+
+          <div class="fk-veld">
+            <label class="veld-etiket" for="pj-naam" data-i18n="pj_veld_naam">Naam</label>
+            <input type="text" class="veld-invoer" id="pj-naam" maxlength="120">
+          </div>
+
+          <div class="fk-veld">
+            <label class="veld-etiket" for="pj-befondser-kies">
+              <span data-i18n="pj_veld_befondsers">Befondsers</span>
+              <span class="veld-opsioneel" data-i18n="pj_opsioneel">— opsioneel</span>
+            </label>
+            <div class="pj-kies-ry">
+              <select class="veld-invoer" id="pj-befondser-kies"></select>
+              <button type="button" class="kaart-aksie wi-stil" id="pj-befondser-voeg" data-i18n="pj_voeg_by">Voeg by</button>
+            </div>
+            <button type="button" class="pj-nk-skakel" id="pj-nk-oop" data-i18n="pj_nk_oop">+ Nuwe kliënt</button>
+
+            <div class="pj-nk" id="pj-nk">
+              <div class="fk-veld">
+                <label class="veld-etiket" for="pj-nk-naam" data-i18n="pj_nk_naam">Naam van die kliënt</label>
+                <input type="text" class="veld-invoer" id="pj-nk-naam" maxlength="160">
+              </div>
+              <div class="fk-veld">
+                <label class="veld-etiket" for="pj-nk-soort" data-i18n="pj_nk_soort">Soort</label>
+                <select class="veld-invoer" id="pj-nk-soort">
+                  <option value="instansie" data-i18n="pj_nk_instansie">Instansie</option>
+                  <option value="privaat" data-i18n="pj_nk_privaat">Privaat</option>
+                </select>
+              </div>
+              <div class="fk-veld">
+                <label class="veld-etiket" for="pj-nk-epos">
+                  <span data-i18n="pj_nk_epos">E-pos</span>
+                  <span class="veld-opsioneel" data-i18n="pj_opsioneel">— opsioneel</span>
+                </label>
+                <input type="email" class="veld-invoer" id="pj-nk-epos" maxlength="160">
+              </div>
+              <p class="fk-veldhulp" data-i18n="pj_nk_hulp">Die ander besonderhede word later in die kliënteregister aangevul.</p>
+              <p class="fk-fout" id="pj-nk-fout" style="display:none"></p>
+              <div class="fk-knoppies">
+                <button type="button" class="kaart-aksie wi-stil" id="pj-nk-kanselleer" data-i18n="pj_kanselleer">Kanselleer</button>
+                <button type="button" class="kaart-aksie" id="pj-nk-skep" data-i18n="pj_nk_skep">Skep en voeg by</button>
+              </div>
+            </div>
+
+            <div class="pj-befondsers" id="pj-befondsers"></div>
+          </div>
+
+          <div class="fk-veld">
+            <label class="veld-etiket" for="pj-nota">
+              <span data-i18n="pj_veld_nota">Aantekening</span>
+              <span class="veld-opsioneel" data-i18n="pj_opsioneel">— opsioneel</span>
+            </label>
+            <input type="text" class="veld-invoer" id="pj-nota" maxlength="500">
+          </div>
+
+          <p class="fk-fout" id="pj-vorm-fout" style="display:none"></p>
+
+          <div class="fk-knoppies">
+            <button type="button" class="kaart-aksie wi-stil" id="pj-kanselleer" data-i18n="pj_kanselleer">Kanselleer</button>
+            <button type="button" class="kaart-aksie" id="pj-stoor" data-i18n="pj_stoor">Stoor</button>
           </div>
         </div>
       </div>
@@ -853,6 +942,7 @@
   <script src="js/faktuurpaneel-registers.js"></script>
   <script src="js/faktuurpaneel-werk.js"></script>
   <script src="js/faktuurpaneel-fin-kategoriee.js"></script>
+  <script src="js/faktuurpaneel-projekte.js"></script>
   <script src="js/faktuurpaneel-fin-staat.js"></script>
   <script src="js/faktuurpaneel-staat-pdf.js"></script>
   <script src="js/paneel-area-pille.js"></script>
