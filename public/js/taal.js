@@ -1568,6 +1568,7 @@ const WOORDEBOEK = {
   pio_geen_outeur: { af: "Hierdie outeur het nog geen inskrywing in die Outeurs-oortjie nie.", en: "This author does not yet have an entry in the Authors tab." },
   pio_merk_fout: { af: "Die boek is geskep, maar die indiening kon nie as opgestel gemerk word nie.", en: "The book was created, but the submission could not be marked as set up." },
   nav_outeurspaneel: { af: "Outeurspaneel", en: "Author panel" },
+  nav_my_teater: { af: "My Teater", en: "My Theatre" },
   // -- Die faktuurvorm se backoffice --------------------------------------
   // Die begroting, die verdeling en die som. Niks hiervan verskyn op die
   // dokument nie, dus loop alles met t() op die platform se taal.

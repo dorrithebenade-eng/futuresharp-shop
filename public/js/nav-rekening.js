@@ -203,6 +203,30 @@ function nav_outeur_kas_waarde(sessie, is_outeur) {
   return `${is_outeur ? "ja" : "nee"}:${wie}`;
 }
 
+// Besit hierdie koper al 'n talk? Net 'n JA word vir die sessie onthou:
+// 'n NEE kan binne minute verander (die koper koop sy eerste talk en kom
+// terug na die winkel), dus word dit elke keer opnuut gevra.
+const NAV_TEATER_SLEUTEL = "future_shop_nav_teater";
+async function nav_het_talks(sessie) {
+  const ja = `${sessie.gebruiker.email}|ja`;
+  try {
+    if (sessionStorage.getItem(NAV_TEATER_SLEUTEL) === ja) return true;
+  } catch { /* sessionStorage geblokkeer: vra net */ }
+  try {
+    const resp = await fetch("/.netlify/functions/kry-my-talks", {
+      headers: { Authorization: `Bearer ${sessie.access_token}` },
+    });
+    if (!resp.ok) return false;
+    const het = ((await resp.json()).talks || []).length > 0;
+    if (het) {
+      try { sessionStorage.setItem(NAV_TEATER_SLEUTEL, ja); } catch { /* nie krities nie */ }
+    }
+    return het;
+  } catch {
+    return false;
+  }
+}
+
 async function nav_is_outeur(sessie) {
   const verwag_ja = nav_outeur_kas_waarde(sessie, true);
   const verwag_nee = nav_outeur_kas_waarde(sessie, false);
@@ -302,6 +326,20 @@ async function nav_is_outeur(sessie) {
       skakel.className = "nav-rekening-skakel";
       skakel.textContent = window.t ? window.t("nav_outeurspaneel") : "Outeurspaneel";
       groep.insertBefore(skakel, my_boeke);
+    }
+  }
+
+  // "My Teater" (FutureSharp Talks) verskyn net vir wie al 'n talk besit,
+  // direk ná "My Leeskamer".
+  if (await nav_het_talks(sessie)) {
+    const groep = document.querySelector(".nav-rekening-groep");
+    const my_boeke = groep && groep.querySelector('a[href="my-boeke.html"]');
+    if (groep && !groep.querySelector('a[href="/teater"]')) {
+      const skakel = document.createElement("a");
+      skakel.href = "/teater";
+      skakel.className = "nav-rekening-skakel";
+      skakel.textContent = window.t ? window.t("nav_my_teater") : "My Teater";
+      groep.insertBefore(skakel, my_boeke ? my_boeke.nextSibling : null);
     }
   }
 })();
