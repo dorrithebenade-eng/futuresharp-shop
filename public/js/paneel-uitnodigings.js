@@ -10,6 +10,7 @@ function kry_rol_etiket_paneel(rol_tipe) {
     ontwerp_admin: "rol_ontwerp_admin",
     printing: "rol_printing",
     aflewering: "rol_aflewering",
+    spreker: "rol_spreker",
   };
   return sleutels[rol_tipe] ? t(sleutels[rol_tipe]) : rol_tipe;
 }

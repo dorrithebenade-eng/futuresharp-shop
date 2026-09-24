@@ -8,6 +8,7 @@ const ROL_ETIKETTE = {
   ontwerp_admin: "Ontwerp/Admin",
   printing: "Printing",
   aflewering: "Aflewering",
+  spreker: "Spreker",
 };
 
 // Rol-spesifieke kontak-/bankvelde — id moet 'n sleutel in KONTAK_VELDE
@@ -305,7 +306,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Laai daardie lêer om enige rede nie, STOP dit hier. Terugval na
     // hierdie vorm sou 'n outeur laat registreer sonder om te teken, en
     // dit is presies die ding wat nie mag gebeur nie.
-    if (data.rol_tipe === "outeur") {
+    // Die spreker (FutureSharp Talks) teken ook 'n ooreenkoms en loop
+    // dieselfde vier stappe.
+    if (data.rol_tipe === "outeur" || data.rol_tipe === "spreker") {
       if (typeof uo_begin !== "function") {
         console.error("uitnodiging-outeur.js het nie gelaai nie");
         wys_status("Hierdie bladsy kon nie ten volle laai nie. Herlaai die bladsy, of kontak Future Sharp.", true);

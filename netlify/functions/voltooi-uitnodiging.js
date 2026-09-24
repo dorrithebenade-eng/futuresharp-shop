@@ -26,23 +26,30 @@ const ROL_KONFIG = {
   ontwerp_admin: { store: "ontwerp-admin", idveld: "ontwerp_admin_id" },
   printing: { store: "printing", idveld: "printing_id" },
   aflewering: { store: "aflewering", idveld: "aflewering_id" },
+  // FutureSharp Talks. Dieselfde pad as die outeur: ooreenkoms, dokumente,
+  // rekening.
+  spreker: { store: "sprekers", idveld: "spreker_id" },
 };
 
 // Net hierdie twee rolle kry outomaties 'n koper-tipe Identity-rekening —
 // Printing/Aflewering/Ontwerp-Admin het geen rede om by die winkel/leser
 // aan te meld nie.
-const ROLLE_MET_REKENING = ["outeur", "vennoot"];
+const ROLLE_MET_REKENING = ["outeur", "vennoot", "spreker"];
 
 // Slegs die outeur teken 'n Outeursooreenkoms. 'n Vennoot is 'n
 // direkteur, en Printing/Aflewering/Ontwerp-Admin het elk hul eie
 // reëling — 'n merkblokkie wat na 'n dokument verwys wat vir hulle nie
 // bestaan nie, is erger as geen merkblokkie.
-const ROLLE_MET_OOREENKOMS = ["outeur"];
+const ROLLE_MET_OOREENKOMS = ["outeur", "spreker"];
 
 // Die weergawe van die ooreenkoms wat tans op die werf staan. Die BEDIENER
 // besluit dit, nie die klient nie — anders teken iemand 'n weergawe wat hy
 // self benoem het. Verander ooreenkoms-en.html, verander hierdie getal ook.
 const OOREENKOMS_WEERGAWE = "1.0";
+// Elke rol se eie ooreenkoms het sy eie weergawe. Die sprekersooreenkoms
+// (ooreenkoms-spreker-en.html) is 'n konsep tot die direkteure dit
+// finaliseer; verander dit, verander hierdie getal ook.
+const OOREENKOMS_WEERGAWES = { outeur: OOREENKOMS_WEERGAWE, spreker: "0.1" };
 const OOREENKOMS_TAAL = "en";
 
 // Die twee aanhegsels wat klousule 6 vereis.
@@ -190,7 +197,7 @@ exports.handler = async (event) => {
 
   if (vereis_ooreenkoms) {
     if (invoer.ooreenkoms_aanvaar !== true) {
-      return { statusCode: 400, body: "Die outeursooreenkoms moet bevestig word voordat die vorm ingedien kan word" };
+      return { statusCode: 400, body: "Die ooreenkoms moet bevestig word voordat die vorm ingedien kan word" };
     }
     if (!handtekening) {
       return { statusCode: 400, body: "Die ooreenkoms moet onderteken word" };
@@ -252,7 +259,7 @@ exports.handler = async (event) => {
     inskrywing.ooreenkoms = {
       handtekening,
       aanvaar_op: new Date().toISOString(),
-      weergawe: OOREENKOMS_WEERGAWE,
+      weergawe: OOREENKOMS_WEERGAWES[uitnodiging.rol_tipe] || OOREENKOMS_WEERGAWE,
       taal: OOREENKOMS_TAAL,
       // Future Sharp se kant. Dit bly leeg totdat die registrasie bevestig
       // word — daardie oomblik IS Future Sharp se ondertekening, ingevolge

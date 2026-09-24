@@ -23,6 +23,10 @@
 // slot nie.
 
 const UO_OOREENKOMS_PAD = "/ooreenkoms-outeur-en.html";
+// FutureSharp Talks: 'n spreker loop dieselfde vier stappe, met sy eie
+// ooreenkoms en 'n paar eie woorde (sien taal.js, uo_*_spreker).
+const UO_OOREENKOMS_PAD_SPREKER = "/ooreenkoms-spreker-en.html";
+const UO_SPREKER_SLEUTELS = ["uo_kop_sub", "uo_s2_titel", "uo_s4_lei", "uo_op_weergawe"];
 const UO_STUK_GREPE = 3 * 1024 * 1024; // 3MB per stuk, soos die indienvorm
 const UO_MAKS_LEER = 5 * 1024 * 1024;
 const UO_SOORTE = ["bankbrief", "idafskrif"];
@@ -274,11 +278,19 @@ function uo_wissel_taal(taal) {
 
 async function uo_begin(token, data) {
   uo_token = token;
+  const is_spreker = data && data.rol_tipe === "spreker";
+  if (is_spreker) {
+    // Die spreker se woorde vervang die outeur s'n vir hierdie bladsy.
+    UO_SPREKER_SLEUTELS.forEach((sleutel) => {
+      if (WOORDEBOEK[`${sleutel}_spreker`]) WOORDEBOEK[sleutel] = WOORDEBOEK[`${sleutel}_spreker`];
+    });
+    if (typeof pas_i18n_toe === "function") pas_i18n_toe();
+  }
 
   // Die ooreenkoms leef in sy eie lêer, nie in taal.js nie: dit is inhoud,
   // nie koppelvlakteks nie, en die weergawe op die rekord verwys daarna.
   try {
-    const resp = await fetch(UO_OOREENKOMS_PAD);
+    const resp = await fetch(is_spreker ? UO_OOREENKOMS_PAD_SPREKER : UO_OOREENKOMS_PAD);
     if (!resp.ok) throw new Error(`Status ${resp.status}`);
     uo_el("uo-ooreenkoms").innerHTML = await resp.text();
   } catch (fout) {

@@ -11,7 +11,7 @@ const { kry_store } = require("./_blob-store");
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 const { nuwe_verval_op } = require("./_uitnodiging-geldig");
 
-const GELDIGE_ROLLE = ["outeur", "vennoot", "ontwerp_admin", "printing", "aflewering"];
+const GELDIGE_ROLLE = ["outeur", "vennoot", "ontwerp_admin", "printing", "aflewering", "spreker"];
 
 exports.handler = async (event, context) => {
   if (event.httpMethod !== "POST") {
