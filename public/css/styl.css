@@ -3831,6 +3831,10 @@ body.vennoot-modus .paneel-dokument-skrap-knoppie {
   flex-shrink: 0;
 }
 .mini-kop-merk { white-space: nowrap; }
+/* Die kop mag breër wees as die bladsy se inhoud (1200px): op 'n wye
+   skerm staan daar anders baie leë ruimte weerskante terwyl die items
+   regs na 'n tweede ry gedruk word. */
+.mini-kop-inner { max-width: 1440px; }
 @media (min-width: 641px) {
   /* Die Afrikaanse woorde (Outeurspaneel, Mandjie, Kursusse) is langer as
      die Engelse; by 20px het die kop in Afrikaans nog na 'n tweede ry
