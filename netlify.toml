@@ -16,6 +16,12 @@
 [functions."leen-herinnering"]
   schedule = "0 4 * * *"
 
+# outeur-staat-herinnering: die eerste van elke maand, en dit gaan oor die
+# maand wat pas klaar is. Nie oor die huidige nie -- 'n staat vir 'n maand
+# wat pas begin het, is leeg.
+[functions."outeur-staat-herinnering"]
+  schedule = "0 4 1 * *"
+
 # haal-paystack: haal Paystack se transaksielys vir die afgelope sewe dae en
 # skryf elke geslaagde transaksie na die store. Die joernaal lei sy
 # inskrywings daaruit af; niks word in die joernaal se store geskryf nie.

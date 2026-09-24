@@ -28,18 +28,37 @@ const FORMAAT_ETIKETTE = {
 
 // --- Kieslys ---
 
+function wys_afdeling(doel) {
+  const knoppie = document.querySelector(`.outeur-pil[data-gaan="${doel}"]`);
+  if (!knoppie) return false;
+
+  document.querySelectorAll(".outeur-pil").forEach((k) => k.classList.remove("aktief"));
+  knoppie.classList.add("aktief");
+
+  document.querySelectorAll(".outeur-afdeling").forEach((afdeling) => {
+    afdeling.classList.toggle("wys", afdeling.getAttribute("data-afdeling") === doel);
+  });
+  return true;
+}
+
 function stel_kieslys_op() {
   document.querySelectorAll(".outeur-pil").forEach((knoppie) => {
     knoppie.addEventListener("click", () => {
-      document.querySelectorAll(".outeur-pil").forEach((k) => k.classList.remove("aktief"));
-      knoppie.classList.add("aktief");
-
-      const doel = knoppie.getAttribute("data-gaan");
-      document.querySelectorAll(".outeur-afdeling").forEach((afdeling) => {
-        afdeling.classList.toggle("wys", afdeling.getAttribute("data-afdeling") === doel);
-      });
+      wys_afdeling(knoppie.getAttribute("data-gaan"));
     });
   });
+
+  // 'N URL KAN 'N AFDELING OOPMAAK: outeur.html#staat.
+  //
+  // Die maandelikse staat-pos stuur die outeur hierheen. Sonder hierdie
+  // reels beland hy op die oorsig en moet hy self die regte pil soek -- en
+  // 'n knoppie in 'n pos wat "Sien jou staat" se en jou elders laat land,
+  // is 'n gebroke belofte.
+  //
+  // 'n Onbekende hash word GEIGNOREER: wys_afdeling() gee vals terug as die
+  // pil nie bestaan nie, en dan bly die oorsig staan soos altyd.
+  const uit_url = (location.hash || "").replace("#", "").trim();
+  if (uit_url) wys_afdeling(uit_url);
 }
 
 // --- Die vier syfers op die oorsig ---
