@@ -191,7 +191,11 @@ function pj_nk_wissel(oop) {
   blok.classList.toggle("oop", oop);
   document.getElementById("pj-nk-fout").style.display = "none";
   if (oop) {
-    document.getElementById("pj-nk-naam").value = "";
+    // IN 'N TOETSPROJEK IS DIE NUWE KLIENT OOK 'N TOETS. Die TOETS staan reeds
+    // in die veld; 'n mens tik net die res. So gaan hy saam met die projek weg
+    // wanneer die toetse opgeruim word.
+    const projeknaam = document.getElementById("pj-naam").value;
+    document.getElementById("pj-nk-naam").value = /^\s*TOETS\b/.test(projeknaam) ? "TOETS " : "";
     document.getElementById("pj-nk-epos").value = "";
     document.getElementById("pj-nk-soort").value = "instansie";
     document.getElementById("pj-nk-naam").focus();
@@ -356,6 +360,8 @@ async function pj_laai() {
     const data = await pj_vra("kry-projekte");
     PJ.projekte = Array.isArray(data.projekte) ? data.projekte : [];
     pj_teken_lys();
+    // faktuurpaneel-toetse.js luister hierna om sy blok te wys of te versteek.
+    document.dispatchEvent(new CustomEvent("pj-gelaai", { detail: PJ.projekte }));
   } catch (fout) {
     console.error("Kon nie die projekte laai nie:", fout);
     if (plek) {

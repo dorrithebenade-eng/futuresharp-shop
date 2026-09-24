@@ -23,13 +23,30 @@
 // regte befondser uitgereik word nie. Daardie reel woon by die joernaal, nie
 // hier nie.
 //
-// SKRAP HET TWEE UITKOMSTE, soos by die kategoriee: ongebruik of met die
-// toetsstempel word uitgevee; gebruik word gedeaktiveer. Sien skrap-projek.js.
+// SKRAP HET TWEE UITKOMSTE, soos by die kategoriee: ongebruik of 'n toets
+// word uitgevee; gebruik word gedeaktiveer. Sien skrap-projek.js.
+//
+// 'N TOETS IS 'N NAAM WAT MET "TOETS" BEGIN (25 September 2026).
+//
+// Dieselfde patroon as die studievaardigheidsregistrasies se TOETS-nommer: 'n
+// bewuste keuse per rekord, nie iets wat die stelsel uit TOETSFASE aflei nie.
+// Die eerste weergawe het elke projek as toets gemerk solank TOETSFASE aan
+// was, en dan sou die REGTE projekte van die terugwerkende invoer ook
+// uitveebaar gewees het. Haal 'n mens TOETS uit die naam, is dit 'n regte
+// projek.
+//
+// Hoofletters en 'n woordgrens: "TOETS Skole", "TOETS-2" en "TOETS" tel;
+// "Toetsafnemers" en "TOETSING" nie. Dieselfde reel geld vir kliënte; sien
+// skrap-toetse.js.
 
 const { kry_store } = require("./_blob-store");
-const { is_toetsfase, maak_slug } = require("./_fin-kategoriee");
+const { maak_slug } = require("./_fin-kategoriee");
 
 const STORE_NAAM = "projekte";
+
+function is_toets_naam(naam) {
+  return /^\s*TOETS\b/.test(String(naam || ""));
+}
 
 function kry_projekte_store() {
   return kry_store(STORE_NAAM);
@@ -44,7 +61,7 @@ function nuwe_projek() {
     // 'n Rekord van voor hierdie veld bestaan nie, maar dieselfde reel as die
     // kategoriee geld: elke leser toets `aktief !== false`.
     aktief: true,
-    toets: is_toetsfase(),
+    toets: false,         // altyd is_toets_naam(naam); by elke stoor herbereken
     nota: "",
     geskep_op: nou,
     geskep_deur: "",
@@ -80,5 +97,5 @@ module.exports = {
   skoon_befondsers,
   lees_almal,
   maak_slug,
-  is_toetsfase,
+  is_toets_naam,
 };

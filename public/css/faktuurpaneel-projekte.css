@@ -60,3 +60,22 @@
 }
 .pj-nk.oop { display: block; }
 .pj-nk .fk-veld:last-of-type { margin-bottom: 8px; }
+
+/* Skrap alle toetse: onderaan Kliënte en Projekte. Sien faktuurpaneel-toetse.js. */
+.ts-blok {
+  margin-top: 20px;
+  padding: 14px 16px;
+  border: 1px solid #F3C6B8;
+  border-radius: 8px;
+  background: #FDF1EC;
+}
+.ts-blok b { color: #a8351a; font-weight: 600; }
+.ts-hulp, .ts-uitslag { font-size: 0.85rem; color: var(--grys-teks); margin: 6px 0 10px; }
+.ts-uitslag { color: var(--swart); margin-bottom: 0; }
+.ts-ry {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+}
+.ts-knop { background: var(--koraal); border-color: var(--koraal); color: #fff; }
+.ts-knop:disabled { opacity: 0.45; cursor: not-allowed; }

@@ -15,7 +15,7 @@
 
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 const { kry_kliente_store } = require("./_kliente");
-const { kry_projekte_store, lees_almal } = require("./_projekte");
+const { kry_projekte_store, lees_almal, is_toets_naam } = require("./_projekte");
 
 const ROLLE = ["boekhouding"];
 
@@ -57,6 +57,9 @@ exports.handler = async (event, context) => {
   const projekte = almal.map((p) => ({
     ...p,
     aktief: p.aktief !== false,
+    // UIT DIE NAAM, NIE UIT DIE STOOR NIE. 'n Projek wat onder die eerste
+    // weergawe gestoor is, dra dalk toets: true van TOETSFASE af.
+    toets: is_toets_naam(p.naam),
     befondsers: (p.befondsers || []).map((n) => {
       const k = kliente.get(n);
       return k

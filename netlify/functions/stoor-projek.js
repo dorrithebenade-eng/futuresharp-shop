@@ -18,6 +18,7 @@ const {
   nuwe_projek,
   skoon_befondsers,
   maak_slug,
+  is_toets_naam,
 } = require("./_projekte");
 
 const ROLLE = ["boekhouding"];
@@ -104,6 +105,7 @@ exports.handler = async (event, context) => {
     naam,
     befondsers,
     nota,
+    toets: is_toets_naam(naam),
     bygewerk_op: nou,
   };
   if (!bestaande) {

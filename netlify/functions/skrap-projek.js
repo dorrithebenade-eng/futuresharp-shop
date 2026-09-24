@@ -4,7 +4,7 @@
 //
 // DIESELFDE TWEE UITKOMSTE AS skrap-fin-kategorie.js:
 //
-//   geen verwysing, of die toetsstempel  -> uitgevee
+//   geen verwysing, of TOETS voor die naam  -> uitgevee
 //   verwysings buite die toetsfase       -> gedeaktiveer
 //
 // Gedeaktiveer beteken `aktief: false`: die rekord bly, elke inskrywing wat
@@ -19,7 +19,7 @@
 
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 const { kry_store } = require("./_blob-store");
-const { kry_projekte_store, is_toetsfase } = require("./_projekte");
+const { kry_projekte_store, is_toets_naam } = require("./_projekte");
 
 const ROLLE = ["boekhouding"];
 
@@ -74,7 +74,7 @@ exports.handler = async (event, context) => {
     };
   }
 
-  const dra_stempel = projek.toets === true && is_toetsfase();
+  const dra_stempel = is_toets_naam(projek.naam);
   if (!dra_stempel && verwysings > 0) {
     try {
       await store.setJSON(id, {

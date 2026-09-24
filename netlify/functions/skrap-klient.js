@@ -26,7 +26,7 @@
 
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 const { kry_kliente_store } = require("./_kliente");
-const { kry_projekte_store, lees_almal } = require("./_projekte");
+const { kry_projekte_store, lees_almal, is_toets_naam } = require("./_projekte");
 const {
   kry_fakture_store,
   is_konsep_sleutel,
@@ -119,9 +119,13 @@ exports.handler = async (event, context) => {
   // 'n Projek dra net die kliëntnommer. Verdwyn die kliënt, kan 'n kwitansie
   // of sertifikaat later nie meer aan hom uitgereik word nie. Kan ons die
   // projekte nie lees nie, weier ons, om dieselfde rede as by die fakture.
+  //
+  // 'n TOETSPROJEK KEER NIE. Dit word self uitgevee, en 'n befondser wat intussen
+  // weg is, wys daar as "bestaan nie meer" in plaas van om te verdwyn.
   let projekte;
   try {
     projekte = (await lees_almal(kry_projekte_store()))
+      .filter((p) => !is_toets_naam(p.naam))
       .filter((p) => Array.isArray(p.befondsers) && p.befondsers.includes(nommer))
       .map((p) => p.naam || p.id);
   } catch (fout) {
