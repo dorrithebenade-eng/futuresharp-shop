@@ -613,14 +613,31 @@ exports.handler = async (event, context) => {
         // met die winkel s'n.
         const talk_nommer = t.metadata && t.metadata.fst_bestelnommer;
         let talk_titel = "";
+        let talk_bestelling = null;
         if (talk_nommer) {
           try {
-            const tb = await kry_store("talk-bestellings").get(String(talk_nommer), { type: "json" });
-            if (tb) {
-              talk_titel = tb.titel || "";
-              hosting_ingebring_sent += Number(tb.hosting_totaal_sent) || 0;
+            talk_bestelling = await kry_store("talk-bestellings").get(String(talk_nommer), { type: "json" });
+            if (talk_bestelling) {
+              talk_titel = talk_bestelling.titel || "";
+              hosting_ingebring_sent += Number(talk_bestelling.hosting_totaal_sent) || 0;
             }
           } catch { /* die beskrywing val dan terug op die verwysing */ }
+        }
+
+        // 'N TALK SE VERDELING KOM UIT DIE TALK-BESTELLING, NIE UIT
+        // `fees_split` NIE. Talks betaal met 'n Paystack Split (split_code),
+        // en dan vul Paystack `fees_split` nie in nie: dit is net daar by 'n
+        // enkele subrekening. Sonder hierdie reël is die spreker se deel as
+        // Future Sharp se inkomste geboek (24 September 2026: R20,00 in plaas
+        // van R6,00 op die Super Seniors-aankoop). Die bestelling dra die
+        // bedrag per subrekening; het die split misluk (geen split_code nie),
+        // het alles in die hoofrekening beland en is daar niks om af te trek nie.
+        if (talk_bestelling && talk_bestelling.split_code && talk_bestelling.verdeling && !verdeel) {
+          const na_sprekers = Object.values(talk_bestelling.verdeling).reduce((a, v) => a + (Number(v) || 0), 0);
+          if (na_sprekers > 0) {
+            verdeel = true;
+            behou = Math.max(0, bedrag - na_sprekers);
+          }
         }
 
         const naam = talk_nommer
