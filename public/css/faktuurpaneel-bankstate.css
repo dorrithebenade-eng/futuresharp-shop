@@ -90,3 +90,12 @@
 .bs-nk .veld-invoer { height: 32px; font-size: 0.82rem; padding: 2px 8px; }
 .bs-nk-knoppe { display: flex; gap: 6px; }
 .bs-nk-fout { color: #a8351a; font-size: 0.78rem; margin: 0; }
+
+/* Die twee aansigte en die maandopsomming. */
+.bs-aansigte { margin-bottom: 18px; }
+.ms-balk { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 14px; }
+.ms-balk .veld-etiket { margin: 0; }
+.ms-balk select { width: auto; min-width: 110px; }
+.ms-tabel { min-width: 900px; }
+.ms-tabel tfoot td { border-top: 1px solid #B8B2A8; padding-top: 8px; }
+.ms-verskil { color: #8a5a1a; }

@@ -819,6 +819,14 @@
            en elke reel verklaar. Sien bankstaat-fnb.js,
            faktuurpaneel-bankstate.js en _bankstate.js. -->
       <section class="paneel-afdeling fp-afdeling" data-afdeling="bankstate">
+        <!-- Twee aansigte. Die knoppies leen die Registers se voorkoms; hul
+             binding is tot #fr-sub beperk, so hierdie houer bots nie. -->
+        <div class="fk-sub bs-aansigte">
+          <button type="button" class="fr-sub-knop aan" data-bs-aansig="reels" data-i18n="ms_aansig_reels">State en re&euml;ls</button>
+          <button type="button" class="fr-sub-knop" data-bs-aansig="maande" data-i18n="ms_aansig_maande">Maandopsomming</button>
+        </div>
+
+        <div id="bs-aansig-reels">
         <div class="bs-oplaai">
           <label class="kaart-aksie" for="bs-leer" data-i18n="bs_kies">Laai 'n FNB-staat op (PDF)</label>
           <input type="file" id="bs-leer" accept="application/pdf,.pdf">
@@ -827,6 +835,18 @@
         <div id="bs-uitslag"></div>
         <div id="bs-staat"></div>
         <div id="bs-state"></div>
+        </div>
+
+        <!-- Die maandopsomming en die werkboek vir die rekenmeester. Sien
+             faktuurpaneel-maandopsomming.js en kry-bankmaande.js. -->
+        <div id="bs-aansig-maande" hidden>
+          <div class="ms-balk">
+            <label class="veld-etiket" for="ms-jaar" data-i18n="ms_boekjaar">Boekjaar</label>
+            <select class="veld-invoer" id="ms-jaar"></select>
+            <button type="button" class="kaart-aksie" id="ms-boekjaar-af" data-i18n="ms_laai_boekjaar">Laai boekjaar af (Excel)</button>
+          </div>
+          <div id="ms-tabel"></div>
+        </div>
       </section>
 
       <section class="paneel-afdeling fp-afdeling" data-afdeling="instellings">
@@ -1106,6 +1126,7 @@
   <script src="js/faktuurpaneel-toetse.js"></script>
   <script src="js/bankstaat-fnb.js"></script>
   <script src="js/faktuurpaneel-bankstate.js"></script>
+  <script src="js/faktuurpaneel-maandopsomming.js"></script>
   <script src="js/faktuurpaneel-fin-staat.js"></script>
   <script src="js/faktuurpaneel-staat-pdf.js"></script>
   <script src="js/paneel-area-pille.js"></script>
