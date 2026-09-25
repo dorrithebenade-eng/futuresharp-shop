@@ -15,7 +15,7 @@
 
   const WOORDE = "SKRAP TOETSE";
   const IS_TOETS = /^\s*TOETS\b/;
-  const STAAT = { projekte: 0, kliente: 0, befondsers: 0, soorte: 0 };
+  const STAAT = { projekte: 0, kliente: 0, befondsers: 0, soorte: 0, state: 0 };
 
   function t(sleutel, verstek) {
     const uit = window.t ? window.t(sleutel) : null;
@@ -59,12 +59,13 @@
   }
 
   function teken() {
-    const tel = STAAT.projekte + STAAT.kliente + STAAT.befondsers + STAAT.soorte;
+    const tel = STAAT.projekte + STAAT.kliente + STAAT.befondsers + STAAT.soorte + STAAT.state;
     const hulp = t("ts_hulp2",
       "Alles waarvan die naam met TOETS begin: {p} projek(te), {k} kliënt(e), {b} befondser(s) of skenker(s), " +
       "{s} befondsingsoort(e). 'n Toetskliënt met 'n faktuur of kwotasie, of op 'n regte projek, bly staan. Tik {w} om te bevestig.")
       .replace("{p}", STAAT.projekte).replace("{k}", STAAT.kliente)
-      .replace("{b}", STAAT.befondsers).replace("{s}", STAAT.soorte).replace("{w}", WOORDE);
+      .replace("{b}", STAAT.befondsers).replace("{s}", STAAT.soorte).replace("{w}", WOORDE) +
+      (STAAT.state ? " " + t("ts_state", "Ook {n} toetsstaat of -state met hul inskrywings.").replace("{n}", STAAT.state) : "");
     document.querySelectorAll(".ts-blok").forEach((d) => {
       d.hidden = tel === 0 && d.querySelector(".ts-uitslag").hidden;
       d.querySelector(".ts-hulp").textContent = hulp;
@@ -111,6 +112,7 @@
       if (typeof fk_laai === "function") await fk_laai();
       if (typeof window.bf_laai === "function") await window.bf_laai();
       if (typeof window.bo_laai === "function") await window.bo_laai();
+      if (typeof window.bs_laai === "function") await window.bs_laai();
       await Promise.all([tel_kliente(), tel_projekte()]);
       teken();
     } catch (fout) {
@@ -121,6 +123,10 @@
 
   document.addEventListener("bf-gelaai", (ev) => {
     STAAT.befondsers = (ev.detail || []).filter((b) => IS_TOETS.test(b.naam || "")).length;
+    teken();
+  });
+  document.addEventListener("bs-gelaai", (ev) => {
+    STAAT.state = (ev.detail || []).filter((s) => s.toets).length;
     teken();
   });
   document.addEventListener("bo-gelaai", (ev) => {
@@ -144,6 +150,7 @@
     bou_blok("bf-lys-befondser", "ts-blok-befondsers");
     bou_blok("bf-lys-skenker", "ts-blok-skenkers");
     bou_blok("bo-lys", "ts-blok-soorte");
+    bou_blok("bs-state", "ts-blok-state");
     await tel_kliente();
     teken();
   });

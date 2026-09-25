@@ -1,22 +1,32 @@
 // public/js/faktuurpaneel-bankstate.js
 //
-// Die Bankstate-pil, eerste deel: 'n FNB-staat oplaai, lees, die drie kontroles
-// wys en die reels voorskou. NIKS WORD GESTOOR NIE. Die invoer in die boeke
-// kom in 'n volgende stap, wanneer die lees self vertrou word.
+// Die Bankstate-pil: 'n FNB-staat oplaai, lees en kontroleer, invoer, en elke
+// reel verklaar.
 //
 // DIE PDF VERLAAT NOOIT DIE REKENAAR NIE. pdf.js lees dit in die blaaier;
-// bankstaat-fnb.js haal die reels uit. Net wat later ingevoer word, sal na die
-// bediener gaan, en dit is net datum, beskrywing, bedrag en saldo.
+// bankstaat-fnb.js haal die reels uit. By die invoer gaan net die reels na
+// die bediener, wat die saldo-ketting van voor af nagaan.
 //
-// pdf.js WORD LUI GELAAI, eers wanneer 'n staat gekies word, en dieselfde
-// weergawe as die paneelbord (2.6.347). Niemand wat nooit 'n staat oplaai nie,
-// laai 'n megagreep JavaScript nie.
+// DRIE DELE OP DIE BLAD
+//
+//   Oplaai en voorskou   die drie kontroles; "Voer in" net as al drie klop
+//   Een staat oop        elke reel met sy stand, en die toewysing
+//   Ingevoerde state     die lys, nuutste eerste
+//
+// 'N REEL SE STAND (sien _bankstate.js): oop, voorstel, gepas, toegewys,
+// oordrag, inligting. Toewys skep 'n joernaalinskrywing met die bron "bank";
+// ontdoen vee dit weer uit. Die joernaal self wys daardie inskrywings as
+// leesalleen.
+//
+// pdf.js WORD LUI GELAAI, eers wanneer 'n staat gekies word.
 
 (function () {
   "use strict";
 
   const PDFJS = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/";
-  const BS = { kategoriee: [], resultaat: null };
+  const BS = { kategoriee: [], resultaat: null, state: [], oop: null, net_oop: false };
+  const EIE = ["2857"];
+  const OORDRAG = "__oordrag";
 
   function t(sleutel, verstek) {
     const uit = window.t ? window.t(sleutel) : null;
@@ -45,10 +55,21 @@
     return String(iso || "").replace(/-/g, "/");
   }
 
-  async function vra(naam) {
-    const resp = await fetch("/.netlify/functions/" + naam, { headers: await identiteit_kop() });
-    if (!resp.ok) throw new Error(await resp.text().catch(() => String(resp.status)));
+  async function vra(naam, opsies) {
+    const resp = await fetch("/.netlify/functions/" + naam, {
+      ...(opsies || {}),
+      headers: { ...((opsies && opsies.headers) || {}), ...(await identiteit_kop()) },
+    });
+    if (!resp.ok) throw new Error((await resp.text().catch(() => "")) || String(resp.status));
     return resp.json();
+  }
+
+  function pos(naam, liggaam) {
+    return vra(naam, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(liggaam),
+    });
   }
 
   function laai_pdfjs() {
@@ -192,7 +213,275 @@
           <tbody>${rye}</tbody>
         </table>
       </div>
+      ${invoer_blok(r)}
       <p class="bs-nota">${ontsnap(t("bs_niks_gestoor", "Niks is gestoor nie. Die staat is net in die blaaier gelees."))}</p>`;
+
+    const knop = document.getElementById("bs-voer-in");
+    if (knop) knop.addEventListener("click", voer_in);
+  }
+
+  function invoer_blok(r) {
+    if (!r.ok) return "";
+    const rek4 = r.rekening ? String(r.rekening.nommer).slice(-4) : "";
+    const eie = EIE.includes(rek4);
+    return `<div class="bs-invoer">
+      <label class="wi-merk"><input type="checkbox" id="bs-toets"${eie ? "" : " checked disabled"}>
+        <span>${ontsnap(t("bs_toetsstaat", "Toetsstaat"))}</span></label>
+      <button type="button" class="kaart-aksie" id="bs-voer-in">${ontsnap(t("bs_voer_in", "Voer in"))}</button>
+      <p class="bs-lei">${ontsnap(eie
+        ? t("bs_invoer_lei", "Reels wat die stelsel reeds ken, word gepas; die res wag op toewysing.")
+        : t("bs_ander_rek", "Hierdie staat is nie van Future Sharp se rekening nie en kan net as toetsstaat ingevoer word."))}</p>
+    </div>`;
+  }
+
+  async function voer_in() {
+    const knop = document.getElementById("bs-voer-in");
+    const r = BS.resultaat;
+    if (!r || !r.ok) return;
+    knop.disabled = true;
+    try {
+      const uit = await pos("voer-bankstaat-in", {
+        toets: document.getElementById("bs-toets").checked,
+        staat: {
+          rekening: r.rekening, tydperk: r.tydperk,
+          opening_sent: r.opening_sent, sluit_sent: r.sluit_sent,
+          transaksies: r.transaksies.map((x) => ({
+            datum: x.datum, beskrywing: x.beskrywing, verwysing: x.verwysing,
+            bedrag_sent: x.bedrag_sent, rigting: x.rigting, saldo_sent: x.saldo_sent,
+            fnb_fooi: x.fnb_fooi === true,
+          })),
+        },
+      });
+      BS.resultaat = null;
+      document.getElementById("bs-uitslag").innerHTML = "";
+      await laai_state();
+      maak_staat_oop(uit.staat);
+    } catch (f) {
+      window.alert(String(f.message || f));
+      knop.disabled = false;
+    }
+  }
+
+  /* ═══ ingevoerde state ═══ */
+
+  function tel_merkies(tel) {
+    const l = [];
+    if (tel.oop) l.push(`<span class="bs-stand leeg">${tel.oop} ${ontsnap(t("bs_t_oop", "oop"))}</span>`);
+    if (tel.voorstel) l.push(`<span class="bs-stand oop">${tel.voorstel} ${ontsnap(t("bs_t_voorstel", "voorgestel"))}</span>`);
+    const klaar = (tel.gepas || 0) + (tel.toegewys || 0) + (tel.oordrag || 0);
+    if (klaar) l.push(`<span class="bs-stand voorstel">${klaar} ${ontsnap(t("bs_t_klaar", "verklaar"))}</span>`);
+    return l.join(" ");
+  }
+
+  function teken_state() {
+    const plek = document.getElementById("bs-state");
+    if (!plek) return;
+    if (!BS.state.length) {
+      plek.innerHTML = `<p class="stelsel-boodskap">${ontsnap(t("bs_geen_state", "Nog geen state ingevoer nie."))}</p>`;
+    } else {
+      plek.innerHTML = `<h3 class="bs-kop3">${ontsnap(t("bs_ingevoer", "Ingevoerde state"))}</h3>` +
+        BS.state.map((s) => `
+        <div class="fk-ry fk-ry-twee">
+          <button type="button" class="fk-ry-oop" data-bs="${ontsnap(s.sleutel)}">
+            <span class="fk-ry-naam">${ontsnap(s.bank)} \u2026${ontsnap(s.rekening4)} \u00b7 ${datum(s.van)} ${ontsnap(t("bs_tot", "tot"))} ${datum(s.tot)}${
+              s.toets ? `<span class="fk-merkie">${ontsnap(t("bs_toets", "Toets"))}</span>` : ""}</span>
+            <span class="fk-ry-onder">${tel_merkies(s.tel || {})}</span>
+          </button>
+        </div>`).join("");
+      plek.querySelectorAll("[data-bs]").forEach((k) =>
+        k.addEventListener("click", () => laai_staat(k.getAttribute("data-bs"))));
+    }
+    document.dispatchEvent(new CustomEvent("bs-gelaai", { detail: BS.state }));
+  }
+
+  async function laai_state() {
+    try {
+      const data = await vra("kry-bankstate");
+      BS.state = Array.isArray(data.state) ? data.state : [];
+    } catch (f) {
+      console.error("Kon nie die bankstate laai nie:", f);
+      BS.state = [];
+    }
+    teken_state();
+  }
+  window.bs_laai = async () => {
+    await laai_state();
+    if (BS.oop && !BS.state.some((s) => s.sleutel === BS.oop.sleutel)) maak_staat_toe();
+  };
+
+  async function laai_staat(sleutel) {
+    try {
+      const data = await vra("kry-bankstate?sleutel=" + encodeURIComponent(sleutel));
+      maak_staat_oop(data.staat);
+    } catch (f) {
+      window.alert(String(f.message || f));
+    }
+  }
+
+  /* ═══ een staat oop ═══ */
+
+  function kat_naam(id) {
+    const k = BS.kategoriee.find((x) => x.id === id);
+    return k ? (k.pad || k.naam) : id;
+  }
+
+  function keuse(r) {
+    const opsies = BS.kategoriee
+      .filter((k) => k.aktief !== false && (k.rigting === "in" ? "in" : "uit") === r.rigting)
+      .map((k) => `<option value="${ontsnap(k.id)}">${ontsnap(k.pad || k.naam)}</option>`).join("");
+    return `<select class="veld-invoer bs-kies" data-nr="${r.nr}">
+      <option value="">${ontsnap(t("bs_kies_kat", "Kies kategorie \u2026"))}</option>
+      ${opsies}
+      <option value="${OORDRAG}">${ontsnap(t("bs_oordrag", "Oordrag tussen eie rekeninge"))}</option>
+    </select>`;
+  }
+
+  function stand_sel(r) {
+    const ontdoen = `<button type="button" class="bs-ontdoen" data-ontdoen="${r.nr}">${ontsnap(t("bs_ontdoen", "Ontdoen"))}</button>`;
+    switch (r.stand) {
+      case "inligting":
+        return `<span class="bs-stand info">${ontsnap(t("bs_st_info", "Inligting, word nie ingevoer nie"))}</span>`;
+      case "gepas":
+        return `<span class="bs-stand voorstel">${ontsnap(r.pas && r.pas.soort === "vereffening"
+          ? t("bs_st_paystack", "Verklaar deur Paystack")
+          : t("bs_st_joernaal", "Reeds in die joernaal"))}</span> ${ontdoen}`;
+      case "toegewys":
+        return `<span class="bs-stand voorstel">${ontsnap(kat_naam(r.kategorie_id))}</span> ${ontdoen}`;
+      case "oordrag":
+        return `<span class="bs-stand info">${ontsnap(t("bs_oordrag", "Oordrag tussen eie rekeninge"))}</span> ${ontdoen}`;
+      case "voorstel":
+        if (r.voorstel_kategorie) {
+          const naam = r.voorstel_kategorie === "oordrag"
+            ? t("bs_oordrag", "Oordrag tussen eie rekeninge") : kat_naam(r.voorstel_kategorie);
+          return `<span class="bs-stand oop">${ontsnap(t("bs_st_voorstel", "Voorstel:"))} ${ontsnap(naam)}</span>
+            <button type="button" class="bs-bevestig" data-bevestig="${r.nr}" aria-label="${ontsnap(t("bs_bevestig", "Bevestig"))}">&#10003;</button>
+            ${keuse(r)}`;
+        }
+        return `<span class="bs-stand oop">${ontsnap(t("bs_bk_naam", "Bankkoste"))} ${ontsnap(t("bs_bk_bestaan_nie", "(kategorie bestaan nog nie)"))}</span> ${keuse(r)}`;
+      default:
+        return keuse(r);
+    }
+  }
+
+  function teken_staat() {
+    const plek = document.getElementById("bs-staat");
+    const s = BS.oop;
+    if (!plek) return;
+    if (!s) { plek.innerHTML = ""; return; }
+
+    const tel = { oop: 0, voorstel: 0, gepas: 0, toegewys: 0, oordrag: 0, inligting: 0 };
+    s.reels.forEach((r) => { tel[r.stand] = (tel[r.stand] || 0) + 1; });
+    const voorstelle = s.reels.filter((r) => r.stand === "voorstel" && r.voorstel_kategorie).length;
+    const wys = BS.net_oop ? s.reels.filter((r) => r.stand === "oop" || r.stand === "voorstel") : s.reels;
+
+    plek.innerHTML = `
+      <div class="bs-staat-kop">
+        <div><b>${ontsnap(s.bank)} \u2026${ontsnap(s.rekening4)}</b> \u00b7 ${datum(s.van)} ${ontsnap(t("bs_tot", "tot"))} ${datum(s.tot)}
+          ${s.toets ? `<span class="fk-merkie">${ontsnap(t("bs_toets", "Toets"))}</span>` : ""}
+          <div class="bs-staat-tel">${tel_merkies(tel)}</div></div>
+        <div class="bs-staat-knoppe">
+          ${voorstelle ? `<button type="button" class="kaart-aksie" id="bs-al-voorstelle">${ontsnap(
+            t("bs_al_voorstelle", "Bevestig al {n} voorstelle").replace("{n}", voorstelle))}</button>` : ""}
+          <button type="button" class="kaart-aksie wi-stil" id="bs-maak-toe">${ontsnap(t("bs_maak_toe", "Maak toe"))}</button>
+        </div>
+      </div>
+      <label class="wi-merk bs-filter"><input type="checkbox" id="bs-net-oop"${BS.net_oop ? " checked" : ""}>
+        <span>${ontsnap(t("bs_net_oop", "Wys net reels wat nog verklaar moet word"))}</span></label>
+      <div class="bs-tabel-hou">
+        <table class="jn-tabel bs-tabel">
+          <thead><tr>
+            <th class="jn-w-dat">${ontsnap(t("bs_h_datum", "Datum"))}</th>
+            <th>${ontsnap(t("bs_h_beskr", "Beskrywing"))}</th>
+            <th class="n bs-w-bed">${ontsnap(t("bs_h_in", "In"))}</th>
+            <th class="n bs-w-bed">${ontsnap(t("bs_h_uit", "Uit"))}</th>
+            <th class="bs-w-toe">${ontsnap(t("bs_h_stand", "Stand"))}</th>
+          </tr></thead>
+          <tbody>${wys.map((r) => `
+            <tr class="${r.stand === "inligting" ? "bs-info" : ""}">
+              <td>${datum(r.datum)}</td>
+              <td><span class="bs-beskr">${ontsnap(r.beskrywing || "\u2014")}</span>${
+                r.verwysing ? `<span class="bs-verw">${ontsnap(r.verwysing)}</span>` : ""}</td>
+              <td class="n">${r.rigting === "in" && r.stand !== "inligting" ? rand(r.bedrag_sent) : ""}</td>
+              <td class="n bs-uit">${r.rigting === "uit" && r.stand !== "inligting" ? rand(r.bedrag_sent) : ""}</td>
+              <td class="bs-toe">${stand_sel(r)}</td>
+            </tr>`).join("")}</tbody>
+        </table>
+      </div>
+      <div class="bs-skrap-ry">
+        <button type="button" class="fp-skrap" id="bs-skrap-staat">${ontsnap(t("bs_skrap_staat", "Skrap hierdie staat"))}</button>
+      </div>`;
+
+    plek.querySelectorAll(".bs-kies").forEach((k) => k.addEventListener("change", () => {
+      const nr = Number(k.getAttribute("data-nr"));
+      if (!k.value) return;
+      wys_toe([k.value === OORDRAG ? { nr, aksie: "oordrag" } : { nr, aksie: "kategorie", kategorie_id: k.value }]);
+    }));
+    plek.querySelectorAll("[data-bevestig]").forEach((k) => k.addEventListener("click", () => {
+      const r = s.reels.find((x) => x.nr === Number(k.getAttribute("data-bevestig")));
+      wys_toe([opdrag_vir_voorstel(r)]);
+    }));
+    plek.querySelectorAll("[data-ontdoen]").forEach((k) => k.addEventListener("click", () =>
+      wys_toe([{ nr: Number(k.getAttribute("data-ontdoen")), aksie: "ontdoen" }])));
+    const al = document.getElementById("bs-al-voorstelle");
+    if (al) al.addEventListener("click", () =>
+      wys_toe(s.reels.filter((r) => r.stand === "voorstel" && r.voorstel_kategorie).map(opdrag_vir_voorstel)));
+    document.getElementById("bs-net-oop").addEventListener("change", (ev) => {
+      BS.net_oop = ev.target.checked;
+      teken_staat();
+    });
+    document.getElementById("bs-maak-toe").addEventListener("click", maak_staat_toe);
+    document.getElementById("bs-skrap-staat").addEventListener("click", skrap_staat);
+  }
+
+  function opdrag_vir_voorstel(r) {
+    return r.voorstel_kategorie === "oordrag"
+      ? { nr: r.nr, aksie: "oordrag" }
+      : { nr: r.nr, aksie: "kategorie", kategorie_id: r.voorstel_kategorie };
+  }
+
+  async function wys_toe(reels) {
+    if (!BS.oop || !reels.length) return;
+    try {
+      const uit = await pos("wys-bankreel-toe", { sleutel: BS.oop.sleutel, reels });
+      BS.oop = uit.staat;
+      const i = BS.state.findIndex((x) => x.sleutel === uit.staat.sleutel);
+      if (i >= 0) {
+        const tel = { oop: 0, voorstel: 0, gepas: 0, toegewys: 0, oordrag: 0, inligting: 0 };
+        uit.staat.reels.forEach((r) => { tel[r.stand] = (tel[r.stand] || 0) + 1; });
+        BS.state[i].tel = tel;
+        teken_state();
+      }
+    } catch (f) {
+      window.alert(String(f.message || f));
+    }
+    teken_staat();
+  }
+
+  function maak_staat_oop(staat) {
+    BS.oop = staat;
+    teken_staat();
+    const plek = document.getElementById("bs-staat");
+    if (plek && plek.scrollIntoView) plek.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function maak_staat_toe() {
+    BS.oop = null;
+    teken_staat();
+  }
+
+  async function skrap_staat() {
+    const s = BS.oop;
+    if (!s) return;
+    const woorde = window.prompt(t("bs_skrap_vra",
+      "Die staat en die joernaalinskrywings wat uit sy reels geskep is, word uitgevee. Tik SKRAP STAAT om te bevestig."));
+    if (woorde == null) return;
+    try {
+      await pos("skrap-bankstaat", { sleutel: s.sleutel, woorde: woorde.trim() });
+      maak_staat_toe();
+      await laai_state();
+    } catch (f) {
+      window.alert(String(f.message || f));
+    }
   }
 
   async function verwerk(lêer) {
@@ -232,5 +521,6 @@
     } catch (fout) {
       console.error("Kon nie die kategoriee laai nie:", fout);
     }
+    await laai_state();
   });
 })();

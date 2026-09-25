@@ -29,6 +29,8 @@ const { kry_fakture_store } = require("./_fakture");
 const { kry_projekte_store, lees_almal, is_toets_naam } = require("./_projekte");
 const { kry_befondsers_store, lees_almal: lees_befondsers } = require("./_befondsers");
 const { kry_soorte_store, SAAD_SLEUTEL } = require("./_befondsingsoorte");
+const { kry_bankstate_store } = require("./_bankstate");
+const { kry_joernaal_store } = require("./_joernaal");
 
 const ROLLE = ["boekhouding"];
 const WOORDE = "SKRAP TOETSE";
@@ -110,7 +112,28 @@ exports.handler = async (event, context) => {
   let kliente_weg = 0;
   let befondsers_weg = 0;
   let soorte_weg = 0;
+  let state_weg = 0;
   const foute = [];
+
+  // TOETSSTATE, saam met die joernaalinskrywings wat uit hul reels geskep is.
+  // Hul sleutels begin met B-T; 'n regte staat se sleutel nie.
+  try {
+    const bs = kry_bankstate_store();
+    const js = kry_joernaal_store();
+    const { blobs } = await bs.list({ prefix: "B-T" });
+    for (const b of blobs || []) {
+      const staat = await bs.get(b.key, { type: "json" });
+      if (!staat || staat.toets !== true) continue;
+      for (const r of staat.reels || []) {
+        if (r.stand === "toegewys" && r.joernaal_sleutel) await js.delete(r.joernaal_sleutel);
+      }
+      await bs.delete(b.key);
+      state_weg += 1;
+    }
+  } catch (fout) {
+    console.error("Kon nie die toetsstate uitvee nie:", fout);
+    foute.push("toetsstate");
+  }
 
   for (const b of befondsers.filter((x) => is_toets_naam(x.naam))) {
     try {
@@ -152,7 +175,7 @@ exports.handler = async (event, context) => {
 
   console.log(
     `Toetse geskrap deur ${gebruiker.email || ""}: ${projekte_weg} projekte, ${kliente_weg} kliënte, ` +
-    `${befondsers_weg} befondsers en skenkers, ${soorte_weg} befondsingsoorte`
+    `${befondsers_weg} befondsers en skenkers, ${soorte_weg} befondsingsoorte, ${state_weg} toetsstate`
   );
 
   return {
@@ -160,7 +183,7 @@ exports.handler = async (event, context) => {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       projekte: projekte_weg, kliente: kliente_weg,
-      befondsers: befondsers_weg, soorte: soorte_weg, bly, foute,
+      befondsers: befondsers_weg, soorte: soorte_weg, state: state_weg, bly, foute,
     }),
   };
 };

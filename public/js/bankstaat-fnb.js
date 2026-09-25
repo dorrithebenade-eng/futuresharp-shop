@@ -75,6 +75,22 @@
     return reels;
   }
 
+  // Voeg teksitems saam met 'n spasie NET WAAR DAAR 'N GAPING IS. pdf.js gee
+  // soms een woord in twee stukke ("W" en "orldremit"); die stukke raak mekaar,
+  // en 'n blinde spasie maak "W orldremit".
+  function saamvoeg(items) {
+    let uit = "";
+    let vorige = null;
+    items.forEach((i) => {
+      const t = String(i.s).trim();
+      if (!t) return;
+      const gaping = vorige ? i.x - (vorige.x + (vorige.w || 0)) : 0;
+      uit += (vorige && gaping > 1.5 ? " " : "") + t;
+      vorige = i;
+    });
+    return uit.replace(/\s+/g, " ").trim();
+  }
+
   function teks_van(items) {
     return items.map((i) => String(i.s).trim()).join(" ").replace(/\s+/g, " ").trim();
   }
@@ -170,7 +186,7 @@
         r.items.slice(1).forEach((i) => {
           const t = String(i.s).trim();
           if (regs(i) <= kolomme.bedrag - 15) {
-            (i.x < 250 ? beskr : verw).push(t);
+            (i.x < 250 ? beskr : verw).push(i);
           } else if (regs(i) <= kolomme.saldo - 1) {
             bedr.push(t);
           } else if (regs(i) <= fooi_x - 1) {
@@ -188,8 +204,8 @@
         transaksies.push({
           bladsy: bladsy_nr + 1,
           datum: `${jaar}-${String(maand).padStart(2, "0")}-${String(+dm[1]).padStart(2, "0")}`,
-          beskrywing: beskr.join(" ").replace(/\s+/g, " ").trim(),
-          verwysing: verw.join(" ").replace(/\s+/g, " ").trim(),
+          beskrywing: saamvoeg(beskr),
+          verwysing: saamvoeg(verw),
           bedrag_sent: bedrag,
           rigting: /Cr$/.test(b) ? "in" : "uit",
           saldo_sent: saldo,

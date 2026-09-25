@@ -53,3 +53,31 @@
 .bs-stand.info { background: #EFEDE9; color: #6b6660; }
 
 .bs-nota { font-size: 0.8rem; color: var(--grys-teks); margin-top: 14px; }
+
+/* Invoer, een staat oop, en die lys van state. */
+.bs-invoer {
+  display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+  margin-top: 16px; padding: 12px 14px; border-radius: 8px; background: var(--grys-lig);
+}
+.bs-invoer .wi-merk { margin: 0; }
+.bs-kop3 { font-size: 1rem; margin: 26px 0 8px; }
+.bs-staat-kop {
+  display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px;
+  align-items: flex-start; margin: 22px 0 10px; font-size: 0.92rem;
+}
+.bs-staat-kop b { font-weight: 600; }
+.bs-staat-tel { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 6px; }
+.bs-staat-knoppe { display: flex; flex-wrap: wrap; gap: 8px; }
+.bs-filter { font-size: 0.85rem; margin: 0 0 10px; }
+.bs-w-toe { width: 290px; }
+.bs-toe { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.bs-toe .bs-kies { height: 32px; font-size: 0.82rem; padding: 2px 8px; max-width: 280px; }
+.bs-bevestig, .bs-ontdoen {
+  border: 1px solid #E3E0DA; background: #fff; border-radius: 6px;
+  font-size: 0.78rem; padding: 2px 8px; cursor: pointer; color: var(--grys-teks);
+}
+.bs-bevestig { color: #2E7D6F; border-color: #BFDDD6; }
+.bs-bevestig:hover { background: #EFF5F3; }
+.bs-ontdoen:hover { color: var(--koraal); }
+.bs-skrap-ry { display: flex; justify-content: flex-end; margin-top: 12px; }
+.bs-stand { white-space: normal; }

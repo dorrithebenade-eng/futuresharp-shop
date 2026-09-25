@@ -261,7 +261,12 @@ exports.handler = async (event, context) => {
         bedrag_sent: Number(r.bedrag_sent) || 0,
         rigting: r.rigting === "in" ? "in" : "uit",
         kategorie_id: r.kategorie_id || "",
-        bron: "hand",
+        // 'n Inskrywing wat uit 'n bankreel geskep is, dra die bron "bank" en
+        // die verwysing na sy reel. Die joernaalskerm wys enige bron behalwe
+        // "hand" as leesalleen, sodat die koppeling nie daar breek nie; 'n
+        // toewysing word in die Bankstate-pil ontdoen.
+        bron: r.bron === "bank" ? "bank" : "hand",
+        bankreel: r.bankreel || "",
       });
     });
   } catch (fout) {
