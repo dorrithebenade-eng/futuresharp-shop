@@ -84,3 +84,9 @@
 
 .bs-melding { font-size: 0.85rem; color: #2E7D6F; background: #EFF5F3; border-radius: 8px; padding: 8px 12px; margin: 0 0 10px; }
 .bs-kies-klaar { background: #EFF5F3; border-color: #BFDDD6; }
+
+/* 'n Nuwe kategorie binne die reel. */
+.bs-nk { display: grid; gap: 6px; width: 100%; max-width: 290px; }
+.bs-nk .veld-invoer { height: 32px; font-size: 0.82rem; padding: 2px 8px; }
+.bs-nk-knoppe { display: flex; gap: 6px; }
+.bs-nk-fout { color: #a8351a; font-size: 0.78rem; margin: 0; }

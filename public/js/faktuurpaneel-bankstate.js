@@ -27,6 +27,7 @@
   const BS = { kategoriee: [], resultaat: null, state: [], oop: null, net_oop: false };
   const EIE = ["2857"];
   const OORDRAG = "__oordrag";
+  const NUUT = "__nuut";
 
   function t(sleutel, verstek) {
     const uit = window.t ? window.t(sleutel) : null;
@@ -334,7 +335,64 @@
       ${huidig ? "" : `<option value="">${ontsnap(t("bs_kies_kat", "Kies kategorie \u2026"))}</option>`}
       ${opsies}
       <option value="${OORDRAG}"${gekies(OORDRAG)}>${ontsnap(t("bs_oordrag", "Oordrag tussen eie rekeninge"))}</option>
+      <option value="${NUUT}">${ontsnap(t("bs_nuwe_kat", "+ Nuwe kategorie \u2026"))}</option>
     </select>`;
+  }
+
+  /* ═══ 'n nuwe kategorie binne die reel ═══
+     Dieselfde patroon as "+ Nuwe kliënt" in die faktuurvorm: 'n register word
+     aangevul waar dit nodig is, sonder om die blad te verlaat. Die rigting is
+     die reel s'n en kan nie verkeerd gekies word nie; die register se eie
+     stoor (stoor-fin-kategorie.js) doen al sy kontroles soos altyd. */
+  function nuwe_kat_vorm(sel) {
+    const nr = Number(sel.getAttribute("data-nr"));
+    const r = BS.oop.reels.find((x) => x.nr === nr);
+    const sel_td = sel.closest("td");
+    const ouers = BS.kategoriee
+      .filter((k) => k.aktief !== false && (k.rigting === "in" ? "in" : "uit") === r.rigting)
+      .map((k) => `<option value="${ontsnap(k.id)}">${ontsnap(k.pad || k.naam)}</option>`).join("");
+    sel_td.innerHTML = `<div class="bs-nk">
+      <input type="text" class="veld-invoer bs-nk-naam" maxlength="120"
+             placeholder="${ontsnap(r.rigting === "in" ? t("bs_nk_plek_in", "Naam van die inkomstekategorie") : t("bs_nk_plek_uit", "Naam van die uitgawekategorie"))}">
+      <select class="veld-invoer bs-nk-onder">
+        <option value="">${ontsnap(t("bs_nk_bo", "Op die boonste vlak"))}</option>${ouers}
+      </select>
+      <div class="bs-nk-knoppe">
+        <button type="button" class="bs-bevestig bs-nk-skep">${ontsnap(t("bs_nk_skep", "Skep en wys toe"))}</button>
+        <button type="button" class="bs-ontdoen bs-nk-weg">${ontsnap(t("bs_nk_kanselleer", "Kanselleer"))}</button>
+      </div>
+      <p class="bs-nk-fout" hidden></p>
+    </div>`;
+    const naam = sel_td.querySelector(".bs-nk-naam");
+    naam.focus();
+    sel_td.querySelector(".bs-nk-weg").addEventListener("click", teken_staat);
+    const skep = async () => {
+      const fout = sel_td.querySelector(".bs-nk-fout");
+      const n = naam.value.trim();
+      if (!n) {
+        fout.textContent = t("bs_nk_naam_kort", "Die naam is verpligtend.");
+        fout.hidden = false;
+        return;
+      }
+      const onder = sel_td.querySelector(".bs-nk-onder").value;
+      const knop = sel_td.querySelector(".bs-nk-skep");
+      knop.disabled = true;
+      try {
+        const uit = await pos("stoor-fin-kategorie", { naam: n, onder, rigting: r.rigting });
+        const k = uit.kategorie;
+        const ouer = BS.kategoriee.find((x) => x.id === onder);
+        k.pad = ouer ? `${ouer.pad || ouer.naam} / ${k.naam}` : k.naam;
+        BS.kategoriee.push(k);
+        BS.kategoriee.sort((a, b) => String(a.pad || a.naam).localeCompare(String(b.pad || b.naam), "af-ZA"));
+        await wys_toe([{ nr, aksie: "kategorie", kategorie_id: k.id }], r.stand !== "toegewys" && r.stand !== "oordrag");
+      } catch (f) {
+        fout.textContent = String(f.message || f);
+        fout.hidden = false;
+        knop.disabled = false;
+      }
+    };
+    sel_td.querySelector(".bs-nk-skep").addEventListener("click", skep);
+    naam.addEventListener("keydown", (ev) => { if (ev.key === "Enter") skep(); if (ev.key === "Escape") teken_staat(); });
   }
 
   function stand_sel(r) {
@@ -418,6 +476,7 @@
     plek.querySelectorAll(".bs-kies").forEach((k) => k.addEventListener("change", () => {
       const nr = Number(k.getAttribute("data-nr"));
       if (!k.value) return;
+      if (k.value === NUUT) { nuwe_kat_vorm(k); return; }
       wys_toe([k.value === OORDRAG ? { nr, aksie: "oordrag" } : { nr, aksie: "kategorie", kategorie_id: k.value }], true);
     }));
     plek.querySelectorAll("[data-bevestig]").forEach((k) => k.addEventListener("click", () => {
