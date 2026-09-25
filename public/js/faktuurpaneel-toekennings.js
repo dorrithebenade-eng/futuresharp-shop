@@ -1,5 +1,6 @@
 // public/js/faktuurpaneel-toekennings.js
-// Weergawe 3 (25 September 2026): joernaalinskrywings word aan 'n toekenning
+// Weergawe 4 (25 September 2026): die koppel-lys wys die hele boekjaar.
+// Weergawe 3: joernaalinskrywings word aan 'n toekenning
 // gekoppel (fase D). Die kop wys ontvang en bestee; die toekenning self lys wat
 // gekoppel is, en "Koppel inskrywings" wys die joernaal vir die tydperk.
 // Weergawe 2: bewysstukke by elke item (oplaai, aflaai, verwyder), en die
@@ -245,10 +246,12 @@
   }
 
   async function maak_kies_oop(tk) {
+    // Die hele boekjaar waarin die toekenning begin, nie net vanaf sy
+    // begindatum nie: geld kom dikwels in voordat 'n toekenning formeel begin.
     const vandag = new Date().toISOString().slice(0, 10);
     const bj = boekjaar(tk.van || vandag);
-    const van = tk.van || bj.van;
-    const tot = tk.tot || boekjaar(tk.van || vandag).tot;
+    const van = bj.van;
+    const tot = tk.tot && tk.tot > bj.tot ? tk.tot : bj.tot;
     try {
       const data = await vra(`kry-joernaal?van=${van}&tot=${tot}`);
       const lys = (data.inskrywings || []).filter((r) => !String(r.bankreel || "").startsWith("B-T"));
