@@ -1,4 +1,7 @@
 // netlify/functions/stoor-projek.js
+// Weergawe 2 (25 September 2026): soort en "vir wie"; die befondsers-veld is
+// vervang deur toekennings (sien stoor-toekenning.js) en bly net staan vir
+// projekte wat dit reeds het.
 //
 // Boekhouding-beskermd -- skep of wysig een projek.
 //
@@ -48,8 +51,9 @@ exports.handler = async (event, context) => {
     return { statusCode: 400, body: "Kon nie 'n geldige ID van die naam aflei nie" };
   }
 
-  const befondsers = skoon_befondsers(invoer.befondsers);
   const nota = String(invoer.nota || "").trim().slice(0, 500);
+  const soort = String(invoer.soort || "").trim().slice(0, 60);
+  const vir_wie = String(invoer.vir_wie || "").trim().slice(0, 20);
 
   const store = kry_projekte_store();
 
@@ -66,6 +70,23 @@ exports.handler = async (event, context) => {
   }
   if (invoer.id && !bestaande) {
     return { statusCode: 404, body: "Projek nie gevind nie" };
+  }
+
+  // Die ou befondsers-veld: die vorm stuur dit nie meer nie. Dan bly wat daar
+  // was; net 'n uitdruklike lys vervang dit.
+  const befondsers = invoer.befondsers === undefined
+    ? ((bestaande && bestaande.befondsers) || [])
+    : skoon_befondsers(invoer.befondsers);
+
+  // "Vir wie" moet 'n bestaande kliënt wees, tensy dit dieselfde is as wat
+  // reeds daar was.
+  if (vir_wie && !(bestaande && bestaande.vir_wie === vir_wie)) {
+    try {
+      const k = await kry_kliente_store().get(vir_wie, { type: "json" });
+      if (!k) return { statusCode: 400, body: `Kliënt bestaan nie: ${vir_wie}` };
+    } catch (fout) {
+      return { statusCode: 503, body: "Kon nie die kliënt nagaan nie. Die projek is nie gestoor nie." };
+    }
   }
 
   // Elke befondser moet bestaan. 'n Leesfout weier die stoor: 'n verwysing
@@ -104,6 +125,8 @@ exports.handler = async (event, context) => {
     id,
     naam,
     befondsers,
+    soort,
+    vir_wie,
     nota,
     toets: is_toets_naam(naam),
     bygewerk_op: nou,

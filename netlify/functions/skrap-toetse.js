@@ -1,4 +1,6 @@
 // netlify/functions/skrap-toetse.js
+// Weergawe 2 (25 September 2026): toekennings op toetsprojekte gaan saam, en
+// 'n toetsbefondser met 'n toekenning op 'n regte projek bly staan.
 //
 // Vee ALLE toetsprojekte, toetskliënte, toetsbefondsers en -skenkers en
 // toetsbefondsingsoorte in een handeling uit. Rol: boekhouding.
@@ -30,6 +32,7 @@ const { kry_projekte_store, lees_almal, is_toets_naam } = require("./_projekte")
 const { kry_befondsers_store, lees_almal: lees_befondsers } = require("./_befondsers");
 const { kry_soorte_store, SAAD_SLEUTEL } = require("./_befondsingsoorte");
 const { kry_bankstate_store } = require("./_bankstate");
+const { kry_toekennings_store, lees_almal: lees_toekennings } = require("./_toekennings");
 const { kry_joernaal_store } = require("./_joernaal");
 
 const ROLLE = ["boekhouding"];
@@ -135,7 +138,27 @@ exports.handler = async (event, context) => {
     foute.push("toetsstate");
   }
 
+  // Toekennings: die op toetsprojekte gaan weg. 'n Toetsbefondser met 'n
+  // toekenning op 'n REGTE projek bly staan; iemand het 'n regte projek aan 'n
+  // toets gekoppel, en dit is 'n vraag vir 'n mens.
+  const toetsprojek_ids = new Set(projekte.filter((p) => is_toets_naam(p.naam)).map((p) => p.id));
+  const bf_op_regte = new Set();
+  try {
+    const tstore = kry_toekennings_store();
+    for (const t of await lees_toekennings(tstore)) {
+      if (toetsprojek_ids.has(t.projek_id)) await tstore.delete(t.id);
+      else bf_op_regte.add(t.befondser);
+    }
+  } catch (fout) {
+    console.error("Kon nie die toekennings van toetsprojekte uitvee nie:", fout);
+    foute.push("toekennings");
+  }
+
   for (const b of befondsers.filter((x) => is_toets_naam(x.naam))) {
+    if (bf_op_regte.has(b.nommer)) {
+      bly.push(`${b.nommer} ${b.naam}: befondser op 'n regte projek`);
+      continue;
+    }
     try {
       await bstore.delete(b.nommer);
       befondsers_weg += 1;

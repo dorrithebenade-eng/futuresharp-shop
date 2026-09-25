@@ -1,23 +1,28 @@
 // public/js/faktuurpaneel-projekte.js
+// Weergawe 2 (25 September 2026).
 //
 // Die register van projekte, op Boekhouding se Registers-blad.
 //
-// 'N NUWE LEER, dieselfde patroon as faktuurpaneel-fin-kategoriee.js: sy eie
-// sessie, sy eie rolkontrole, sy eie oorlegsel. Die voorvoegsel is `PJ` en
-// `pj_`; faktuurpaneel-kliente.js dra reeds `FK`, en twee lêers met dieselfde
-// `const` op een bladsy laat albei nie laai nie.
+// WAT 'N PROJEK DRA (fase B, 25 September 2026)
 //
-// BEFONDSERS KOM UIT DIE KLIENTEREGISTER. Die vorm kies uit bestaande kliënte,
-// en 'n nuwe kliënt kan hier geskep word sonder om die vorm te verlaat. Blobs
-// se list() loop sowat vier sekondes agter; die nuwe kliënt word dus uit die
-// stoor-antwoord in die lys gesit, nie uit 'n herlaai nie.
+//   soort      vrye teks, met voorstelle uit die bestaande projekte: julle bou
+//              die lys self op deur 'n nuwe soort in te tik
+//   vir wie    die skool of instansie waarvoor die projek is, uit die
+//              kliënteregister. Nie "begunstigde" nie: die Begunstigdes-register
+//              is reeds wie Paystack-uitbetalings kry.
+//   toekennings  die befondsing, elk met sy kontrolelys. Hulle word in 'n eie
+//              venster bestuur; sien faktuurpaneel-toekennings.js.
+//
+// Die ou befondsers-veld (kliëntnommers) word nie meer op die vorm gewys nie.
+// 'n Projek wat dit reeds dra, hou dit, en die lys noem dit.
+//
+// Voorvoegsel `PJ` / `pj_`.
 
 const PJ = {
   projekte: [],
   kliente: [],        // { nommer, naam, soort }
   sessie: null,
-  wysig: null,        // die id wat gewysig word, of null vir 'n nuwe een
-  befondsers: [],     // die vorm se huidige keuse, as kliëntnommers
+  wysig: null,
 };
 
 function pj_t(sleutel, verstek) {
@@ -27,19 +32,20 @@ function pj_t(sleutel, verstek) {
 
 function pj_ontsnap(teks) {
   return String(teks == null ? "" : teks)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+function pj_rand(sent) {
+  const n = Math.round(Math.abs(Number(sent) || 0));
+  const heel = String(Math.floor(n / 100)).replace(/\B(?=(\d{3})+(?!\d))/g, "\u00A0");
+  return "R" + heel + "," + String(n % 100).padStart(2, "0");
 }
 
 async function pj_vra(naam, opsies) {
   const resp = await fetch("/.netlify/functions/" + naam, {
     ...(opsies || {}),
-    headers: {
-      ...((opsies && opsies.headers) || {}),
-      ...(await identiteit_kop()),
-    },
+    headers: { ...((opsies && opsies.headers) || {}), ...(await identiteit_kop()) },
   });
   if (!resp.ok) {
     const teks = await resp.text().catch(() => "");
@@ -48,21 +54,12 @@ async function pj_vra(naam, opsies) {
   return resp.json();
 }
 
-function pj_klient(nommer) {
-  return PJ.kliente.find((k) => k.nommer === nommer) || null;
-}
-
 /* ═══ die lys ═══ */
 
 function pj_pas(p, soek) {
   if (!soek) return true;
-  return [p.naam, p.nota]
-    .concat((p.befondsers || []).map((b) => b.naam))
-    .filter(Boolean)
-    .join(" ")
-    .toLowerCase()
-    .replace(/\s+/g, "")
-    .includes(soek);
+  return [p.naam, p.nota, p.soort, p.vir_wie_naam]
+    .filter(Boolean).join(" ").toLowerCase().replace(/\s+/g, "").includes(soek);
 }
 
 function pj_teken_lys() {
@@ -70,9 +67,7 @@ function pj_teken_lys() {
   if (!plek) return;
 
   const soekveld = document.getElementById("pj-soek");
-  const soek = (soekveld ? soekveld.value || "" : "")
-    .trim().toLowerCase().replace(/\s+/g, "");
-
+  const soek = (soekveld ? soekveld.value || "" : "").trim().toLowerCase().replace(/\s+/g, "");
   const pas = PJ.projekte.filter((p) => pj_pas(p, soek));
 
   const hulp = document.getElementById("pj-hulp");
@@ -96,31 +91,32 @@ function pj_teken_lys() {
 
   plek.innerHTML = pas.map((p) => {
     const merkies = [
-      p.aktief === false
-        ? `<span class="fk-merkie kt-onaktief">${pj_t("pj_onaktief", "Onaktief")}</span>` : "",
-      p.toets
-        ? `<span class="fk-merkie">${pj_t("pj_toets", "Toets")}</span>` : "",
+      p.aktief === false ? `<span class="fk-merkie kt-onaktief">${pj_t("pj_onaktief", "Onaktief")}</span>` : "",
+      p.toets ? `<span class="fk-merkie">${pj_t("pj_toets", "Toets")}</span>` : "",
     ].join("");
+    const eerste = [
+      p.soort ? pj_ontsnap(p.soort) : "",
+      p.vir_wie ? `${pj_ontsnap(pj_t("pj_vir", "vir"))} ${pj_ontsnap(p.vir_wie_naam || p.vir_wie)}` : "",
+    ].filter(Boolean).join(" \u00b7 ");
+    const tk = p.toekennings
+      ? pj_t("pj_tk_tel", "{n} toekenning(s), {r} toegesê").replace("{n}", p.toekennings).replace("{r}", pj_rand(p.toegese_sent))
+      : pj_t("pj_tk_geen", "Nog geen toekenning nie");
+    const oud = (p.befondsers || []).length
+      ? `<span class="fk-ry-onder pj-oud">${pj_ontsnap(pj_t("pj_oud_bf", "Ou befondsersveld:"))} ${
+          (p.befondsers || []).map((b) => pj_ontsnap(b.naam || b.nommer)).join(", ")}</span>` : "";
 
-    /* DIE TWEEDE REEL DRA DIE BEFONDSERS. 'n Befondser wat nie meer bestaan
-       nie, word by sy nommer genoem en gemerk; hy val nie stil weg nie. */
-    const bf = (p.befondsers || []).map((b) => b.weg
-      ? `${pj_ontsnap(b.nommer)} (${pj_t("pj_weg", "bestaan nie meer")})`
-      : `${pj_ontsnap(b.nommer)} · ${pj_ontsnap(b.naam)}`).join(", ");
-    const onder = bf || `<span class="pj-geen">${pj_t("pj_geen_befondser", "Geen befondser")}</span>`;
-
-    const rand = p.aktief === false
-      ? `<button type="button" class="fp-skrap kt-aktiveer" data-pj-aktiveer="${pj_ontsnap(p.id)}"
-                >${pj_t("pj_aktiveer", "Aktiveer")}</button>`
-      : `<button type="button" class="fp-skrap" data-pj-skrap="${pj_ontsnap(p.id)}"
-                >${pj_t("pj_skrap", "Skrap")}</button>`;
+    const rand = (p.aktief === false
+      ? `<button type="button" class="fp-skrap kt-aktiveer" data-pj-aktiveer="${pj_ontsnap(p.id)}">${pj_t("pj_aktiveer", "Aktiveer")}</button>`
+      : `<button type="button" class="pj-tk-knop" data-pj-tk="${pj_ontsnap(p.id)}">${pj_t("pj_tk_knop", "Toekennings")}</button>
+         <button type="button" class="fp-skrap" data-pj-skrap="${pj_ontsnap(p.id)}">${pj_t("pj_skrap", "Skrap")}</button>`);
 
     return `
       <div class="fk-ry fk-ry-twee${p.aktief === false ? " kt-ry-onaktief" : ""}">
         <button type="button" class="fk-ry-oop" data-pj="${pj_ontsnap(p.id)}">
           <span class="fk-ry-naam">${pj_ontsnap(p.naam)}${merkies}</span>
-          <span class="fk-ry-onder">${onder}</span>
-          ${p.nota ? `<span class="fk-ry-onder">${pj_ontsnap(p.nota)}</span>` : ""}
+          ${eerste ? `<span class="fk-ry-onder">${eerste}</span>` : ""}
+          <span class="fk-ry-onder">${pj_ontsnap(tk)}</span>
+          ${oud}
         </button>
         <span class="fk-ry-rand">${rand}</span>
       </div>`;
@@ -132,126 +128,45 @@ function pj_teken_lys() {
     b.addEventListener("click", () => pj_skrap(b.getAttribute("data-pj-skrap"))));
   plek.querySelectorAll("[data-pj-aktiveer]").forEach((b) =>
     b.addEventListener("click", () => pj_aktiveer(b.getAttribute("data-pj-aktiveer"))));
-}
-
-/* ═══ die befondsers in die vorm ═══ */
-
-function pj_teken_befondsers() {
-  const plek = document.getElementById("pj-befondsers");
-  if (!plek) return;
-
-  plek.innerHTML = PJ.befondsers.length
-    ? PJ.befondsers.map((n) => {
-        const k = pj_klient(n);
-        const etiket = k
-          ? `${pj_ontsnap(n)} · ${pj_ontsnap(k.naam)}`
-          : `${pj_ontsnap(n)} (${pj_t("pj_weg", "bestaan nie meer")})`;
-        return `<span class="pj-befondser">${etiket}<button type="button"
-                  class="pj-befondser-weg" data-pj-haal="${pj_ontsnap(n)}"
-                  aria-label="${pj_t("pj_haal_af", "Haal af")}">&#215;</button></span>`;
-      }).join("")
-    : `<p class="fk-veldhulp">${pj_t("pj_befondser_leeg", "Geen befondser nie. Dit is geldig vir Future Sharp se eie werk.")}</p>`;
-
-  plek.querySelectorAll("[data-pj-haal]").forEach((b) =>
+  plek.querySelectorAll("[data-pj-tk]").forEach((b) =>
     b.addEventListener("click", () => {
-      const n = b.getAttribute("data-pj-haal");
-      PJ.befondsers = PJ.befondsers.filter((x) => x !== n);
-      pj_teken_befondsers();
-      pj_teken_kies();
+      const p = PJ.projekte.find((x) => x.id === b.getAttribute("data-pj-tk"));
+      if (p && typeof window.tk_maak_oop === "function") window.tk_maak_oop(p);
     }));
-}
-
-// Die keuselys wys net kliënte wat nog NIE befondsers van hierdie projek is
-// nie. 'n Kliënt kan nie twee keer gekies word nie.
-function pj_teken_kies() {
-  const kies = document.getElementById("pj-befondser-kies");
-  if (!kies) return;
-  const gekies = new Set(PJ.befondsers);
-  const oor = PJ.kliente.filter((k) => !gekies.has(k.nommer));
-  kies.innerHTML =
-    `<option value="">${pj_t("pj_kies_klient", "Kies 'n kliënt")}</option>` +
-    oor.map((k) => `<option value="${pj_ontsnap(k.nommer)}">${
-      pj_ontsnap(k.nommer)} · ${pj_ontsnap(k.naam)}</option>`).join("");
-}
-
-function pj_voeg_befondser_by() {
-  const kies = document.getElementById("pj-befondser-kies");
-  const n = kies ? kies.value : "";
-  if (!n || PJ.befondsers.includes(n)) return;
-  PJ.befondsers.push(n);
-  pj_teken_befondsers();
-  pj_teken_kies();
-}
-
-/* ═══ nuwe kliënt binne die vorm ═══ */
-
-function pj_nk_wissel(oop) {
-  const blok = document.getElementById("pj-nk");
-  if (!blok) return;
-  blok.classList.toggle("oop", oop);
-  document.getElementById("pj-nk-fout").style.display = "none";
-  if (oop) {
-    // IN 'N TOETSPROJEK IS DIE NUWE KLIENT OOK 'N TOETS. Die TOETS staan reeds
-    // in die veld; 'n mens tik net die res. So gaan hy saam met die projek weg
-    // wanneer die toetse opgeruim word.
-    const projeknaam = document.getElementById("pj-naam").value;
-    document.getElementById("pj-nk-naam").value = /^\s*TOETS\b/.test(projeknaam) ? "TOETS " : "";
-    document.getElementById("pj-nk-epos").value = "";
-    document.getElementById("pj-nk-soort").value = "instansie";
-    document.getElementById("pj-nk-naam").focus();
-  }
-}
-
-async function pj_nk_skep() {
-  const naam = document.getElementById("pj-nk-naam").value.trim();
-  const fout = document.getElementById("pj-nk-fout");
-  if (!naam) {
-    fout.textContent = pj_t("pj_naam_kort", "Die naam is verpligtend.");
-    fout.style.display = "";
-    return;
-  }
-  const soort = document.getElementById("pj-nk-soort").value === "privaat" ? "privaat" : "instansie";
-  const epos = document.getElementById("pj-nk-epos").value.trim();
-
-  const knop = document.getElementById("pj-nk-skep");
-  knop.disabled = true;
-  try {
-    const uit = await pj_vra("stoor-klient", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ naam, soort, epos }),
-    });
-    // Uit die antwoord, nie uit 'n herlaai nie: list() loop agter.
-    PJ.kliente.push({ nommer: uit.nommer, naam, soort });
-    PJ.kliente.sort((a, b) => a.naam.localeCompare(b.naam, "af-ZA"));
-    PJ.befondsers.push(uit.nommer);
-    pj_teken_befondsers();
-    pj_teken_kies();
-    pj_nk_wissel(false);
-  } catch (f) {
-    fout.textContent = String(f.message || f);
-    fout.style.display = "";
-  } finally {
-    knop.disabled = false;
-  }
 }
 
 /* ═══ die vorm ═══ */
 
+function pj_vul_keuses(p) {
+  // Soorte: wat die bestaande projekte reeds gebruik, alfabeties.
+  const soorte = [...new Set(PJ.projekte.map((x) => x.soort).filter(Boolean))]
+    .sort((a, b) => a.localeCompare(b, "af-ZA"));
+  document.getElementById("pj-soorte").innerHTML =
+    soorte.map((s) => `<option value="${pj_ontsnap(s)}"></option>`).join("");
+
+  // Vir wie: die kliënte; 'n kliënt wat intussen weg is, bly sigbaar gekies.
+  const kies = document.getElementById("pj-vir-wie");
+  const huidig = p ? p.vir_wie || "" : "";
+  const opsies = PJ.kliente.map((k) =>
+    `<option value="${pj_ontsnap(k.nommer)}"${k.nommer === huidig ? " selected" : ""}>${
+      pj_ontsnap(k.nommer)} \u00b7 ${pj_ontsnap(k.naam)}</option>`);
+  if (huidig && !PJ.kliente.some((k) => k.nommer === huidig)) {
+    opsies.unshift(`<option value="${pj_ontsnap(huidig)}" selected>${pj_ontsnap(huidig)} (${pj_t("pj_weg", "bestaan nie meer")})</option>`);
+  }
+  kies.innerHTML = `<option value="">${pj_t("pj_vir_wie_geen", "Nie vir een instansie nie")}</option>` + opsies.join("");
+}
+
 function pj_maak_vorm_oop(id) {
   const p = id ? PJ.projekte.find((x) => x.id === id) : null;
   PJ.wysig = p ? p.id : null;
-  PJ.befondsers = p ? (p.befondsers || []).map((b) => b.nommer) : [];
 
   document.getElementById("pj-vorm-titel").textContent = p
     ? pj_t("pj_wysig_titel", "Wysig projek")
     : pj_t("pj_nuwe_titel", "Nuwe projek");
   document.getElementById("pj-naam").value = p ? p.naam : "";
+  document.getElementById("pj-soort").value = p ? p.soort || "" : "";
   document.getElementById("pj-nota").value = p ? p.nota || "" : "";
-
-  pj_teken_befondsers();
-  pj_teken_kies();
-  pj_nk_wissel(false);
+  pj_vul_keuses(p);
 
   document.getElementById("pj-vorm-fout").style.display = "none";
   document.getElementById("pj-vorm").classList.add("oop");
@@ -261,7 +176,6 @@ function pj_maak_vorm_oop(id) {
 function pj_maak_vorm_toe() {
   document.getElementById("pj-vorm").classList.remove("oop");
   PJ.wysig = null;
-  PJ.befondsers = [];
 }
 
 function pj_wys_fout(boodskap) {
@@ -276,7 +190,6 @@ async function pj_stoor() {
     pj_wys_fout(pj_t("pj_naam_kort", "Die naam is verpligtend."));
     return;
   }
-
   const knop = document.getElementById("pj-stoor");
   knop.disabled = true;
   try {
@@ -286,14 +199,14 @@ async function pj_stoor() {
       body: JSON.stringify({
         id: PJ.wysig || undefined,
         naam,
-        befondsers: PJ.befondsers,
+        soort: document.getElementById("pj-soort").value.trim(),
+        vir_wie: document.getElementById("pj-vir-wie").value,
         nota: document.getElementById("pj-nota").value.trim(),
       }),
     });
     pj_maak_vorm_toe();
     await pj_laai();
   } catch (fout) {
-    // Die bediener se woorde, nie 'n eie vertaling nie: hy se watter reel val.
     pj_wys_fout(String(fout.message || fout));
   } finally {
     knop.disabled = false;
@@ -307,7 +220,6 @@ async function pj_skrap(id) {
     pj_t("pj_skrap_vra",
       "Vee hierdie projek uit? Word dit reeds deur inskrywings gebruik, " +
       "word dit gedeaktiveer in plaas van uitgevee.") + "\n\n" + p.naam)) return;
-
   try {
     const uitslag = await pj_vra("skrap-projek", {
       method: "POST",
@@ -316,12 +228,10 @@ async function pj_skrap(id) {
     });
     await pj_laai();
     if (uitslag && uitslag.gedeaktiveer) {
-      const n = Number(uitslag.verwysings) || 0;
-      window.alert(
-        pj_t("pj_gedeaktiveer",
-          "Hierdie projek word deur {n} inskrywings gebruik en is gedeaktiveer. " +
-          "Bestaande inskrywings bly onveranderd; die projek verskyn nie meer in keuselyste nie.")
-          .replace("{n}", n));
+      window.alert(pj_t("pj_gedeaktiveer",
+        "Hierdie projek word deur {n} inskrywings gebruik en is gedeaktiveer. " +
+        "Bestaande inskrywings bly onveranderd; die projek verskyn nie meer in keuselyste nie.")
+        .replace("{n}", Number(uitslag.verwysings) || 0));
     }
   } catch (fout) {
     window.alert(String(fout.message || fout));
@@ -347,7 +257,8 @@ async function pj_laai_kliente() {
   try {
     const data = await pj_vra("kry-kliente");
     PJ.kliente = (Array.isArray(data.kliente) ? data.kliente : [])
-      .map((k) => ({ nommer: k.nommer, naam: k.naam || "", soort: k.soort || "instansie" }));
+      .map((k) => ({ nommer: k.nommer, naam: k.naam || "", soort: k.soort || "instansie" }))
+      .sort((a, b) => a.naam.localeCompare(b.naam, "af-ZA"));
   } catch (fout) {
     console.error("Kon nie die kliënte laai nie:", fout);
     PJ.kliente = [];
@@ -360,16 +271,15 @@ async function pj_laai() {
     const data = await pj_vra("kry-projekte");
     PJ.projekte = Array.isArray(data.projekte) ? data.projekte : [];
     pj_teken_lys();
-    // faktuurpaneel-toetse.js luister hierna om sy blok te wys of te versteek.
     document.dispatchEvent(new CustomEvent("pj-gelaai", { detail: PJ.projekte }));
   } catch (fout) {
     console.error("Kon nie die projekte laai nie:", fout);
     if (plek) {
-      plek.innerHTML = `<p class="stelsel-boodskap">${pj_t(
-        "pj_laai_fout", "Kon nie die projekte laai nie.")}</p>`;
+      plek.innerHTML = `<p class="stelsel-boodskap">${pj_t("pj_laai_fout", "Kon nie die projekte laai nie.")}</p>`;
     }
   }
 }
+window.pj_herlaai = pj_laai;
 
 document.addEventListener("DOMContentLoaded", async () => {
   if (!document.getElementById("pj-lys")) return;
@@ -384,18 +294,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("pj-nuut").addEventListener("click", () => pj_maak_vorm_oop(null));
   const soekveld = document.getElementById("pj-soek");
   if (soekveld) soekveld.addEventListener("input", pj_teken_lys);
-
   document.getElementById("pj-stoor").addEventListener("click", pj_stoor);
   document.getElementById("pj-kanselleer").addEventListener("click", pj_maak_vorm_toe);
-  document.getElementById("pj-befondser-voeg").addEventListener("click", pj_voeg_befondser_by);
-  document.getElementById("pj-nk-oop").addEventListener("click", () => pj_nk_wissel(true));
-  document.getElementById("pj-nk-kanselleer").addEventListener("click", () => pj_nk_wissel(false));
-  document.getElementById("pj-nk-skep").addEventListener("click", pj_nk_skep);
 
   const oorlegsel = document.getElementById("pj-vorm");
-  oorlegsel.addEventListener("click", (ev) => {
-    if (ev.target === oorlegsel) pj_maak_vorm_toe();
-  });
+  oorlegsel.addEventListener("click", (ev) => { if (ev.target === oorlegsel) pj_maak_vorm_toe(); });
   document.addEventListener("keydown", (ev) => {
     if (ev.key === "Escape" && oorlegsel.classList.contains("oop")) pj_maak_vorm_toe();
   });

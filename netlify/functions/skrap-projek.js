@@ -1,4 +1,6 @@
 // netlify/functions/skrap-projek.js
+// Weergawe 2 (25 September 2026): toekennings tel ook as gebruik. 'n
+// Toetsprojek neem sy toekennings saam.
 //
 // Vee een projek uit, of deaktiveer dit. Rol: boekhouding.
 //
@@ -20,6 +22,7 @@
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 const { kry_store } = require("./_blob-store");
 const { kry_projekte_store, is_toets_naam } = require("./_projekte");
+const { kry_toekennings_store, lees_almal: lees_toekennings } = require("./_toekennings");
 
 const ROLLE = ["boekhouding"];
 
@@ -29,7 +32,9 @@ async function tel_verwysings(id) {
   const items = (
     await Promise.all((blobs || []).map((b) => jn_store.get(b.key, { type: "json" })))
   ).filter(Boolean);
-  return items.filter((r) => r && r.projek_id === id).length;
+  const jn = items.filter((r) => r && r.projek_id === id).length;
+  const tk = (await lees_toekennings(kry_toekennings_store())).filter((t) => t.projek_id === id);
+  return { tel: jn + tk.length, toekennings: tk };
 }
 
 exports.handler = async (event, context) => {
@@ -74,6 +79,8 @@ exports.handler = async (event, context) => {
     };
   }
 
+  const toekennings = verwysings.toekennings;
+  verwysings = verwysings.tel;
   const dra_stempel = is_toets_naam(projek.naam);
   if (!dra_stempel && verwysings > 0) {
     try {
@@ -94,6 +101,8 @@ exports.handler = async (event, context) => {
   }
 
   try {
+    const tstore = kry_toekennings_store();
+    for (const t of toekennings) await tstore.delete(t.id);
     await store.delete(id);
   } catch (fout) {
     console.error(`Kon nie projek "${id}" uitvee nie:`, fout);

@@ -79,3 +79,35 @@
 }
 .ts-knop { background: var(--koraal); border-color: var(--koraal); color: #fff; }
 .ts-knop:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* Fase B: projekte met soort en "vir wie", en die toekenningsvenster. */
+.pj-tk-knop {
+  border: 1px solid #BFDDD6; background: #EFF5F3; color: #2E7D6F;
+  border-radius: 6px; font: inherit; font-size: 0.8rem; padding: 3px 10px; cursor: pointer;
+}
+.pj-tk-knop:hover { background: #E1EFEB; }
+.pj-oud { color: #8a5a1a; }
+.fk-venster.tk-venster { max-width: 760px; }
+.tk-kaart { border: 1px solid #E3E0DA; border-radius: 10px; margin-bottom: 10px; background: #fff; }
+.tk-kop {
+  display: flex; justify-content: space-between; gap: 12px; width: 100%;
+  border: 0; background: transparent; font: inherit; text-align: left; padding: 12px 14px; cursor: pointer;
+}
+.tk-kop-links, .tk-kop-regs { display: flex; flex-direction: column; gap: 4px; }
+.tk-kop-regs { align-items: flex-end; text-align: right; }
+.tk-sub { font-size: 0.8rem; color: var(--grys-teks); }
+.tk-lyf { padding: 0 14px 14px; border-top: 1px solid #EFEDE9; }
+.tk-nota { font-size: 0.85rem; color: var(--grys-teks); margin: 10px 0 0; }
+.tk-lyskop { font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--grys-teks); margin: 14px 0 6px; }
+.tk-items { list-style: none; margin: 0; padding: 0; }
+.tk-item { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 6px 0; border-top: 1px solid #F3F1ED; font-size: 0.88rem; }
+.tk-item.klaar .tk-merk span { color: var(--grys-teks); text-decoration: line-through; }
+.tk-merk { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.tk-item-rand { display: flex; align-items: center; gap: 8px; }
+.tk-datum { font-size: 0.78rem; color: var(--grys-teks); }
+.tk-leeg { font-size: 0.82rem; color: var(--grys-teks); padding: 4px 0; }
+.tk-eie { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 6px; margin-top: 12px; }
+.tk-eie .veld-invoer { height: 32px; font-size: 0.82rem; padding: 2px 8px; }
+.tk-knoppe { display: flex; justify-content: space-between; margin-top: 14px; }
+.tk-vorm { border-top: 1px solid #E3E0DA; margin-top: 14px; padding-top: 14px; }
+.tk-vw { margin-top: 26px; }

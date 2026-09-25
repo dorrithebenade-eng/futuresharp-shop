@@ -407,44 +407,23 @@
           </div>
 
           <div class="fk-veld">
-            <label class="veld-etiket" for="pj-befondser-kies">
-              <span data-i18n="pj_veld_befondsers">Befondsers</span>
-              <span class="veld-opsioneel" data-i18n="pj_opsioneel">— opsioneel</span>
+            <label class="veld-etiket" for="pj-soort">
+              <span data-i18n="pj_veld_soort">Soort projek</span>
+              <span class="veld-opsioneel" data-i18n="pj_opsioneel">&mdash; opsioneel</span>
             </label>
-            <div class="pj-kies-ry">
-              <select class="veld-invoer" id="pj-befondser-kies"></select>
-              <button type="button" class="kaart-aksie wi-stil" id="pj-befondser-voeg" data-i18n="pj_voeg_by">Voeg by</button>
-            </div>
-            <button type="button" class="pj-nk-skakel" id="pj-nk-oop" data-i18n="pj_nk_oop">+ Nuwe kliënt</button>
+            <input type="text" class="veld-invoer" id="pj-soort" maxlength="60" list="pj-soorte"
+                   data-i18n-placeholder="pj_soort_plek" placeholder="Byvoorbeeld Skool of Geleentheid">
+            <datalist id="pj-soorte"></datalist>
+            <p class="fk-veldhulp" data-i18n="pj_soort_hulp">Kies een wat reeds gebruik is, of tik 'n nuwe soort.</p>
+          </div>
 
-            <div class="pj-nk" id="pj-nk">
-              <div class="fk-veld">
-                <label class="veld-etiket" for="pj-nk-naam" data-i18n="pj_nk_naam">Naam van die kliënt</label>
-                <input type="text" class="veld-invoer" id="pj-nk-naam" maxlength="160">
-              </div>
-              <div class="fk-veld">
-                <label class="veld-etiket" for="pj-nk-soort" data-i18n="pj_nk_soort">Soort</label>
-                <select class="veld-invoer" id="pj-nk-soort">
-                  <option value="instansie" data-i18n="pj_nk_instansie">Instansie</option>
-                  <option value="privaat" data-i18n="pj_nk_privaat">Privaat</option>
-                </select>
-              </div>
-              <div class="fk-veld">
-                <label class="veld-etiket" for="pj-nk-epos">
-                  <span data-i18n="pj_nk_epos">E-pos</span>
-                  <span class="veld-opsioneel" data-i18n="pj_opsioneel">— opsioneel</span>
-                </label>
-                <input type="email" class="veld-invoer" id="pj-nk-epos" maxlength="160">
-              </div>
-              <p class="fk-veldhulp" data-i18n="pj_nk_hulp">Die ander besonderhede word later in die kliënteregister aangevul.</p>
-              <p class="fk-fout" id="pj-nk-fout" style="display:none"></p>
-              <div class="fk-knoppies">
-                <button type="button" class="kaart-aksie wi-stil" id="pj-nk-kanselleer" data-i18n="pj_kanselleer">Kanselleer</button>
-                <button type="button" class="kaart-aksie" id="pj-nk-skep" data-i18n="pj_nk_skep">Skep en voeg by</button>
-              </div>
-            </div>
-
-            <div class="pj-befondsers" id="pj-befondsers"></div>
+          <div class="fk-veld">
+            <label class="veld-etiket" for="pj-vir-wie">
+              <span data-i18n="pj_veld_vir_wie">Vir wie</span>
+              <span class="veld-opsioneel" data-i18n="pj_opsioneel">&mdash; opsioneel</span>
+            </label>
+            <select class="veld-invoer" id="pj-vir-wie"></select>
+            <p class="fk-veldhulp" data-i18n="pj_vir_wie_hulp">Die skool of instansie waarvoor die projek is, uit die kli&euml;nteregister. Die befondsing kom by die toekennings.</p>
           </div>
 
           <div class="fk-veld">
@@ -460,6 +439,62 @@
           <div class="fk-knoppies">
             <button type="button" class="kaart-aksie wi-stil" id="pj-kanselleer" data-i18n="pj_kanselleer">Kanselleer</button>
             <button type="button" class="kaart-aksie" id="pj-stoor" data-i18n="pj_stoor">Stoor</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Die toekennings van een projek, met hul kontrolelyste. Sien
+           faktuurpaneel-toekennings.js en _toekennings.js. -->
+      <div class="fk-oorlegsel" id="tk-venster">
+        <div class="fk-venster tk-venster">
+          <h2 id="tk-titel">Toekennings</h2>
+          <p class="fk-lei" data-i18n="tk_lei">Elke toekenning kry by die skep 'n afskrif van die befondsingsoort se kontrolelys. Merk items af soos hulle afgehandel word.</p>
+          <div id="tk-lys"></div>
+
+          <div class="tk-vorm" id="tk-vorm" hidden>
+            <div class="bf-twee">
+              <div class="fk-veld">
+                <label class="veld-etiket" for="tk-befondser" data-i18n="tk_v_befondser">Befondser</label>
+                <select class="veld-invoer" id="tk-befondser"></select>
+              </div>
+              <div class="fk-veld">
+                <label class="veld-etiket" for="tk-soort" data-i18n="tk_v_soort">Soort befondsing</label>
+                <select class="veld-invoer" id="tk-soort"></select>
+              </div>
+              <div class="fk-veld">
+                <label class="veld-etiket" for="tk-bedrag" data-i18n="tk_v_bedrag">Bedrag toeges&ecirc;</label>
+                <input type="text" class="veld-invoer" id="tk-bedrag" inputmode="decimal" placeholder="25 000,00">
+              </div>
+              <div class="fk-veld">
+                <label class="wi-merk tk-vw"><input type="checkbox" id="tk-voorwaardes"> <span data-i18n="tk_v_voorwaardes">Met voorwaardes (net vir hierdie doel)</span></label>
+              </div>
+              <div class="fk-veld">
+                <label class="veld-etiket" for="tk-van" data-i18n="tk_v_van">Van</label>
+                <input type="date" class="veld-invoer" id="tk-van">
+              </div>
+              <div class="fk-veld">
+                <label class="veld-etiket" for="tk-tot" data-i18n="tk_v_tot">Tot</label>
+                <input type="date" class="veld-invoer" id="tk-tot">
+              </div>
+            </div>
+            <div class="fk-veld">
+              <label class="veld-etiket" for="tk-nota">
+                <span data-i18n="tk_v_nota">Aantekening</span>
+                <span class="veld-opsioneel" data-i18n="pj_opsioneel">&mdash; opsioneel</span>
+              </label>
+              <input type="text" class="veld-invoer" id="tk-nota" maxlength="500">
+            </div>
+            <p class="fk-veldhulp" data-i18n="tk_v_hulp">Die befondser en die soort bepaal die kontrolelys en kan na die skep nie verander word nie.</p>
+            <p class="fk-fout" id="tk-fout" style="display:none"></p>
+            <div class="fk-knoppies">
+              <button type="button" class="kaart-aksie wi-stil" id="tk-kanselleer" data-i18n="pj_kanselleer">Kanselleer</button>
+              <button type="button" class="kaart-aksie" id="tk-stoor">Skep toekenning</button>
+            </div>
+          </div>
+
+          <div class="fk-knoppies">
+            <button type="button" class="kaart-aksie wi-stil" id="tk-toe" data-i18n="tk_toe">Maak toe</button>
+            <button type="button" class="kaart-aksie" id="tk-nuut" data-i18n="tk_nuut">+ Nuwe toekenning</button>
           </div>
         </div>
       </div>
@@ -1121,6 +1156,7 @@
   <script src="js/faktuurpaneel-werk.js"></script>
   <script src="js/faktuurpaneel-fin-kategoriee.js"></script>
   <script src="js/faktuurpaneel-projekte.js"></script>
+  <script src="js/faktuurpaneel-toekennings.js"></script>
   <script src="js/faktuurpaneel-befondsers.js"></script>
   <script src="js/faktuurpaneel-befondsingsoorte.js"></script>
   <script src="js/faktuurpaneel-toetse.js"></script>

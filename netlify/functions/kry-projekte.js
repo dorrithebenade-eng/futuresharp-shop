@@ -1,4 +1,6 @@
 // netlify/functions/kry-projekte.js
+// Weergawe 2 (25 September 2026): ook "vir wie" se naam, en per projek die
+// getal toekennings en die totaal toegese.
 //
 // Boekhouding-beskermd -- lys die projekte, met elke befondser se naam.
 //
@@ -16,6 +18,7 @@
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 const { kry_kliente_store } = require("./_kliente");
 const { kry_projekte_store, lees_almal, is_toets_naam } = require("./_projekte");
+const { kry_toekennings_store, lees_almal: lees_toekennings } = require("./_toekennings");
 
 const ROLLE = ["boekhouding"];
 
@@ -40,6 +43,21 @@ exports.handler = async (event, context) => {
   // Net die kliënte wat werklik befonds, word gelees.
   const nommers = new Set();
   almal.forEach((p) => (p.befondsers || []).forEach((n) => nommers.add(n)));
+  almal.forEach((p) => { if (p.vir_wie) nommers.add(p.vir_wie); });
+
+  // Die toekennings per projek. 'n Leesfout laat die lys leeg eerder as om die
+  // projekte self te verloor.
+  const per_projek = new Map();
+  try {
+    (await lees_toekennings(kry_toekennings_store())).forEach((t) => {
+      const x = per_projek.get(t.projek_id) || { tel: 0, sent: 0 };
+      x.tel += 1;
+      x.sent += Number(t.bedrag_sent) || 0;
+      per_projek.set(t.projek_id, x);
+    });
+  } catch (fout) {
+    console.error("Kon nie die toekennings lees nie:", fout);
+  }
 
   const kliente = new Map();
   if (nommers.size) {
@@ -60,6 +78,11 @@ exports.handler = async (event, context) => {
     // UIT DIE NAAM, NIE UIT DIE STOOR NIE. 'n Projek wat onder die eerste
     // weergawe gestoor is, dra dalk toets: true van TOETSFASE af.
     toets: is_toets_naam(p.naam),
+    soort: p.soort || "",
+    vir_wie: p.vir_wie || "",
+    vir_wie_naam: p.vir_wie && kliente.get(p.vir_wie) ? kliente.get(p.vir_wie).naam || "" : "",
+    toekennings: (per_projek.get(p.id) || { tel: 0 }).tel,
+    toegese_sent: (per_projek.get(p.id) || { sent: 0 }).sent,
     befondsers: (p.befondsers || []).map((n) => {
       const k = kliente.get(n);
       return k
