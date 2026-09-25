@@ -325,14 +325,15 @@
     return k ? (k.pad || k.naam) : id;
   }
 
-  function keuse(r) {
+  function keuse(r, huidig) {
+    const gekies = (v) => (v === huidig ? " selected" : "");
     const opsies = BS.kategoriee
-      .filter((k) => k.aktief !== false && (k.rigting === "in" ? "in" : "uit") === r.rigting)
-      .map((k) => `<option value="${ontsnap(k.id)}">${ontsnap(k.pad || k.naam)}</option>`).join("");
-    return `<select class="veld-invoer bs-kies" data-nr="${r.nr}">
-      <option value="">${ontsnap(t("bs_kies_kat", "Kies kategorie \u2026"))}</option>
+      .filter((k) => (k.aktief !== false || k.id === huidig) && (k.rigting === "in" ? "in" : "uit") === r.rigting)
+      .map((k) => `<option value="${ontsnap(k.id)}"${gekies(k.id)}>${ontsnap(k.pad || k.naam)}</option>`).join("");
+    return `<select class="veld-invoer bs-kies${huidig ? " bs-kies-klaar" : ""}" data-nr="${r.nr}">
+      ${huidig ? "" : `<option value="">${ontsnap(t("bs_kies_kat", "Kies kategorie \u2026"))}</option>`}
       ${opsies}
-      <option value="${OORDRAG}">${ontsnap(t("bs_oordrag", "Oordrag tussen eie rekeninge"))}</option>
+      <option value="${OORDRAG}"${gekies(OORDRAG)}>${ontsnap(t("bs_oordrag", "Oordrag tussen eie rekeninge"))}</option>
     </select>`;
   }
 
@@ -345,10 +346,12 @@
         return `<span class="bs-stand voorstel">${ontsnap(r.pas && r.pas.soort === "vereffening"
           ? t("bs_st_paystack", "Verklaar deur Paystack")
           : t("bs_st_joernaal", "Reeds in die joernaal"))}</span> ${ontdoen}`;
+      // 'n Toegewysde reel hou sy keuselys, met die huidige keuse gekies: 'n
+      // ander keuse vervang die inskrywing in een stap.
       case "toegewys":
-        return `<span class="bs-stand voorstel">${ontsnap(kat_naam(r.kategorie_id))}</span> ${ontdoen}`;
+        return `${keuse(r, r.kategorie_id)} ${ontdoen}`;
       case "oordrag":
-        return `<span class="bs-stand info">${ontsnap(t("bs_oordrag", "Oordrag tussen eie rekeninge"))}</span> ${ontdoen}`;
+        return `${keuse(r, OORDRAG)} ${ontdoen}`;
       case "voorstel":
         if (r.voorstel_kategorie) {
           const naam = r.voorstel_kategorie === "oordrag"
@@ -385,6 +388,7 @@
           <button type="button" class="kaart-aksie wi-stil" id="bs-maak-toe">${ontsnap(t("bs_maak_toe", "Maak toe"))}</button>
         </div>
       </div>
+      ${BS.melding ? `<p class="bs-melding">${ontsnap(BS.melding)}</p>` : ""}
       <label class="wi-merk bs-filter"><input type="checkbox" id="bs-net-oop"${BS.net_oop ? " checked" : ""}>
         <span>${ontsnap(t("bs_net_oop", "Wys net reels wat nog verklaar moet word"))}</span></label>
       <div class="bs-tabel-hou">
@@ -414,7 +418,7 @@
     plek.querySelectorAll(".bs-kies").forEach((k) => k.addEventListener("change", () => {
       const nr = Number(k.getAttribute("data-nr"));
       if (!k.value) return;
-      wys_toe([k.value === OORDRAG ? { nr, aksie: "oordrag" } : { nr, aksie: "kategorie", kategorie_id: k.value }]);
+      wys_toe([k.value === OORDRAG ? { nr, aksie: "oordrag" } : { nr, aksie: "kategorie", kategorie_id: k.value }], true);
     }));
     plek.querySelectorAll("[data-bevestig]").forEach((k) => k.addEventListener("click", () => {
       const r = s.reels.find((x) => x.nr === Number(k.getAttribute("data-bevestig")));
@@ -439,11 +443,14 @@
       : { nr: r.nr, aksie: "kategorie", kategorie_id: r.voorstel_kategorie };
   }
 
-  async function wys_toe(reels) {
+  async function wys_toe(reels, soortgelyk) {
     if (!BS.oop || !reels.length) return;
     try {
-      const uit = await pos("wys-bankreel-toe", { sleutel: BS.oop.sleutel, reels });
+      const uit = await pos("wys-bankreel-toe", { sleutel: BS.oop.sleutel, reels, soortgelyk: soortgelyk === true });
       BS.oop = uit.staat;
+      BS.melding = uit.ekstra
+        ? t("bs_soortgelyk", "Ook {n} soortgelyke reël(s) het dieselfde kategorie gekry.").replace("{n}", uit.ekstra)
+        : "";
       const i = BS.state.findIndex((x) => x.sleutel === uit.staat.sleutel);
       if (i >= 0) {
         const tel = { oop: 0, voorstel: 0, gepas: 0, toegewys: 0, oordrag: 0, inligting: 0 };
@@ -459,6 +466,7 @@
 
   function maak_staat_oop(staat) {
     BS.oop = staat;
+    BS.melding = "";
     teken_staat();
     const plek = document.getElementById("bs-staat");
     if (plek && plek.scrollIntoView) plek.scrollIntoView({ behavior: "smooth", block: "start" });

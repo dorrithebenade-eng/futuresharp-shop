@@ -81,3 +81,6 @@
 .bs-ontdoen:hover { color: var(--koraal); }
 .bs-skrap-ry { display: flex; justify-content: flex-end; margin-top: 12px; }
 .bs-stand { white-space: normal; }
+
+.bs-melding { font-size: 0.85rem; color: #2E7D6F; background: #EFF5F3; border-radius: 8px; padding: 8px 12px; margin: 0 0 10px; }
+.bs-kies-klaar { background: #EFF5F3; border-color: #BFDDD6; }

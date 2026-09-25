@@ -2,13 +2,22 @@
 //
 // Wys bankreels toe, of ontdoen 'n toewysing. Rol: boekhouding.
 //
-// Invoer: { sleutel, reels: [{ nr, aksie, kategorie_id?, nota? }] }
+// Invoer: { sleutel, reels: [{ nr, aksie, kategorie_id?, nota? }], soortgelyk? }
 //
 //   aksie "kategorie"  skep 'n joernaalinskrywing (bron "bank") met hierdie
-//                      kategorie, gekoppel aan die reel
+//                      kategorie, gekoppel aan die reel. Is die reel reeds
+//                      toegewys, word die ou inskrywing in dieselfde stap
+//                      vervang: 'n regstelling sonder eers te ontdoen.
 //   aksie "oordrag"    tussen eie rekeninge; geen joernaalinskrywing nie
 //   aksie "ontdoen"    terug na oop; 'n inskrywing wat hiervoor geskep is, word
 //                      uitgevee, en 'n pas word losgemaak
+//
+// SOORTGELYKE REELS (25 September 2026). Met `soortgelyk: true` kry elke ander
+// reel in dieselfde staat wat nog OOP of net VOORGESTEL is, met dieselfde
+// rigting en dieselfde patroon (die beskrywing sonder syfers), dieselfde aksie.
+// Wat reeds gepas of toegewys is, word nie aangeraak nie; en 'n REGSTELLING
+// van 'n toegewysde reel versprei nie, sodat dit nie ongemerk ander reels
+// verander nie.
 //
 // DIE KATEGORIE SE RIGTING MOET DIE REEL S'N WEES. 'n Debiet onder 'n
 // inkomstekategorie verskyn op die staat aan die verkeerde kant.
@@ -33,7 +42,7 @@ exports.handler = async (event, context) => {
     return { statusCode: 400, body: "Ongeldige JSON" };
   }
   const sleutel = String(invoer.sleutel || "");
-  const opdragte = Array.isArray(invoer.reels) ? invoer.reels.slice(0, 1000) : [];
+  let opdragte = Array.isArray(invoer.reels) ? invoer.reels.slice(0, 1000) : [];
   if (!sleutel || !opdragte.length) return { statusCode: 400, body: "Niks om toe te wys nie" };
 
   const store = B.kry_bankstate_store();
@@ -54,6 +63,29 @@ exports.handler = async (event, context) => {
   }
   if (!staat) return { statusCode: 404, body: "Staat nie gevind nie" };
 
+  // ── Soortgelyke reels byvoeg ───────────────────────────────────────
+  let ekstra = 0;
+  if (invoer.soortgelyk === true) {
+    const gedek = new Set(opdragte.map((o) => Number(o.nr)));
+    const by = [];
+    opdragte.forEach((o) => {
+      if (o.aksie !== "kategorie" && o.aksie !== "oordrag") return;
+      const r = (staat.reels || []).find((x) => x.nr === Number(o.nr));
+      if (!r || r.stand === "toegewys" || r.stand === "oordrag") return;   // 'n regstelling versprei nie
+      const p = B.patroon(r.beskrywing);
+      if (!p) return;
+      (staat.reels || []).forEach((x) => {
+        if (gedek.has(x.nr)) return;
+        if (x.stand !== "oop" && x.stand !== "voorstel") return;
+        if (x.rigting !== r.rigting || B.patroon(x.beskrywing) !== p) return;
+        gedek.add(x.nr);
+        by.push({ ...o, nr: x.nr });
+      });
+    });
+    ekstra = by.length;
+    opdragte = opdragte.concat(by);
+  }
+
   // ── Nagaan ─────────────────────────────────────────────────────────
   const plan = [];
   for (const o of opdragte) {
@@ -61,7 +93,7 @@ exports.handler = async (event, context) => {
     if (!r) return { statusCode: 400, body: `Reël ${o.nr} bestaan nie` };
     if (r.stand === "inligting") return { statusCode: 400, body: `Reël ${o.nr} is 'n inligtingsreël en word nie geboek nie` };
     if (o.aksie === "kategorie") {
-      if (r.stand === "toegewys" || r.stand === "gepas") {
+      if (r.stand === "gepas") {
         return { statusCode: 409, body: `Reël ${o.nr} is reeds verklaar. Ontdoen dit eers.` };
       }
       const k = kats.get(String(o.kategorie_id || ""));
@@ -74,7 +106,7 @@ exports.handler = async (event, context) => {
       }
       plan.push({ r, o, k });
     } else if (o.aksie === "oordrag") {
-      if (r.stand === "toegewys" || r.stand === "gepas") {
+      if (r.stand === "gepas") {
         return { statusCode: 409, body: `Reël ${o.nr} is reeds verklaar. Ontdoen dit eers.` };
       }
       plan.push({ r, o });
@@ -90,6 +122,11 @@ exports.handler = async (event, context) => {
   const nou = new Date().toISOString();
   try {
     for (const { r, o, k } of plan) {
+      // 'n Regstelling: die ou inskrywing gaan eers weg.
+      if ((o.aksie === "kategorie" || o.aksie === "oordrag") && r.stand === "toegewys" && r.joernaal_sleutel) {
+        await jstore.delete(r.joernaal_sleutel);
+        r.joernaal_sleutel = "";
+      }
       if (o.aksie === "kategorie") {
         const inskrywing = {
           ...nuwe_inskrywing(),
@@ -134,6 +171,6 @@ exports.handler = async (event, context) => {
   return {
     statusCode: 200,
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ staat }),
+    body: JSON.stringify({ staat, ekstra }),
   };
 };

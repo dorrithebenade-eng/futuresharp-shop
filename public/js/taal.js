@@ -3071,6 +3071,7 @@ const WOORDEBOEK = {
   bs_skrap_staat: { af: "Skrap hierdie staat", en: "Delete this statement" },
   bs_skrap_vra: { af: "Die staat en die joernaalinskrywings wat uit sy re\u00ebls geskep is, word uitgevee. Tik SKRAP STAAT om te bevestig.", en: "The statement and the journal entries created from its lines are deleted. Type SKRAP STAAT to confirm." },
   ts_state: { af: "Ook {n} toetsstaat of -state met hul inskrywings.", en: "Also {n} test statement(s) with their entries." },
+  bs_soortgelyk: { af: "Ook {n} soortgelyke re\u00ebl(s) het dieselfde kategorie gekry.", en: "{n} similar line(s) also received the same category." },
   kt_titel: { af: "Kategorie\u00eb", en: "Categories" },
   kt_nuwe_knop: { af: "+ Nuwe kategorie", en: "+ New category" },
   kt_nuwe_titel: { af: "Nuwe kategorie", en: "New category" },
