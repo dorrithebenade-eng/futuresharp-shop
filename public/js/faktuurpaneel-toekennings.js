@@ -1,5 +1,6 @@
 // public/js/faktuurpaneel-toekennings.js
-// Weergawe 1 (25 September 2026).
+// Weergawe 2 (25 September 2026): bewysstukke by elke item (oplaai, aflaai,
+// verwyder), en die aanbod wanneer die soort nuwe items gekry het.
 //
 // Die toekennings van een projek, in 'n eie venster wat uit die projektelys
 // oopgemaak word (window.tk_maak_oop). Voorvoegsel `TK` / `tk_`.
@@ -10,8 +11,10 @@
 // items kan per toekenning bygevoeg en weer verwyder word; die soort se items
 // bly, want hulle is die afspraak met die befondser.
 //
-// Dokumente oplaai by 'n item is fase C; die merk "Dokument" se nou net dat
-// een verwag word.
+// BEWYSSTUKKE (fase C). Elke item kan leers dra: PDF, foto, Word of Excel, tot
+// 4 MB elk. 'n Item met die merk "Dokument" wys "Dokument ontbreek" tot daar een
+// is. Oplaai merk die item nie outomaties af nie. Aflaai gaan deur die joernaal
+// se jn_stuur_af(), soos die werkboeke.
 
 (function () {
   "use strict";
@@ -48,15 +51,26 @@
 
   /* ═══ die lys ═══ */
 
+  const AANVAAR = ".pdf,.jpg,.jpeg,.png,.webp,.doc,.docx,.xls,.xlsx";
+
   function item_ry(tk, i) {
+    const doks = i.dokumente || [];
+    const dok_lys = doks.map((d) => `<span class="tk-dok">
+        <button type="button" class="tk-dok-naam" data-tk-dok="${ontsnap(tk.id)}" data-item="${ontsnap(i.id)}" data-sleutel="${ontsnap(d.sleutel)}" title="${ontsnap(t("tk_dok_af", "Laai af"))}">${ontsnap(d.naam)}</button>
+        <button type="button" class="tk-dok-weg" data-tk-dok-weg="${ontsnap(tk.id)}" data-item="${ontsnap(i.id)}" data-sleutel="${ontsnap(d.sleutel)}" aria-label="${ontsnap(t("tk_verwyder", "Verwyder"))}">&#215;</button>
+      </span>`).join("");
     return `<li class="tk-item${i.klaar ? " klaar" : ""}">
+      <div class="tk-item-bo">
       <label class="tk-merk"><input type="checkbox" data-tk-merk="${ontsnap(tk.id)}" data-item="${ontsnap(i.id)}"${i.klaar ? " checked" : ""}>
         <span>${ontsnap(i.naam)}</span></label>
       <span class="tk-item-rand">
-        ${i.dokument ? `<span class="bs-stand info">${ontsnap(t("tk_dokument", "Dokument"))}</span>` : ""}
+        ${i.dokument && !doks.length ? `<span class="bs-stand leeg">${ontsnap(t("tk_dok_ontbreek", "Dokument ontbreek"))}</span>` : ""}
+        <label class="tk-laai">${ontsnap(t("tk_laai_op", "Laai op"))}<input type="file" hidden accept="${AANVAAR}" data-tk-laai="${ontsnap(tk.id)}" data-item="${ontsnap(i.id)}"></label>
         ${i.klaar ? `<span class="tk-datum">${datum(i.datum)}</span>` : ""}
         ${i.eie ? `<button type="button" class="bs-ontdoen" data-tk-weg="${ontsnap(tk.id)}" data-item="${ontsnap(i.id)}">${ontsnap(t("tk_verwyder", "Verwyder"))}</button>` : ""}
       </span>
+      </div>
+      ${doks.length ? `<div class="tk-doks">${dok_lys}</div>` : ""}
     </li>`;
   }
 
@@ -86,6 +100,9 @@
         </button>
         ${oop ? `<div class="tk-lyf">
           ${tk.nota ? `<p class="tk-nota">${ontsnap(tk.nota)}</p>` : ""}
+          ${(tk.nuwe_items || []).length ? `<p class="tk-aanbod">${ontsnap(t("tk_aanbod",
+            "Die soort het sedert die skep {n} nuwe item(s) gekry: {l}.").replace("{n}", tk.nuwe_items.length).replace("{l}", tk.nuwe_items.join(", ")))}
+            <button type="button" class="bs-bevestig" data-tk-neem="${ontsnap(tk.id)}">${ontsnap(t("tk_neem_oor", "Voeg by"))}</button></p>` : ""}
           <p class="tk-lyskop">${ontsnap(t("tk_uitreik", "Wat Future Sharp uitreik"))}</p>
           <ul class="tk-items">${items.filter((i) => i.lys === "uitreik").map((i) => item_ry(tk, i)).join("") ||
             `<li class="tk-leeg">${ontsnap(t("tk_niks", "Niks nie"))}</li>`}</ul>
@@ -124,6 +141,16 @@
       const lys = plek.querySelector(`[data-tk-eie-lys="${id}"]`).value;
       if (naam) wysig({ aksie: "voeg_by", id, naam, lys, dokument: false });
     }));
+    plek.querySelectorAll("[data-tk-neem]").forEach((k) => k.addEventListener("click", async () => {
+      await wysig({ aksie: "neem_oor", id: k.getAttribute("data-tk-neem") });
+      await laai();
+    }));
+    plek.querySelectorAll("[data-tk-laai]").forEach((k) => k.addEventListener("change", () =>
+      laai_op(k.getAttribute("data-tk-laai"), k.getAttribute("data-item"), k.files && k.files[0], k)));
+    plek.querySelectorAll("[data-tk-dok]").forEach((k) => k.addEventListener("click", () =>
+      laai_af(k.getAttribute("data-sleutel"), k.textContent.trim())));
+    plek.querySelectorAll("[data-tk-dok-weg]").forEach((k) => k.addEventListener("click", () =>
+      skrap_dok(k.getAttribute("data-tk-dok-weg"), k.getAttribute("data-item"), k.getAttribute("data-sleutel"))));
     plek.querySelectorAll("[data-tk-wysig]").forEach((k) => k.addEventListener("click", () =>
       maak_vorm_oop(TK.lys.find((x) => x.id === k.getAttribute("data-tk-wysig")))));
     plek.querySelectorAll("[data-tk-skrap]").forEach((k) => k.addEventListener("click", () =>
@@ -135,6 +162,65 @@
       const uit = await pos("wysig-kontrolelys", liggaam);
       const i = TK.lys.findIndex((x) => x.id === uit.toekenning.id);
       if (i >= 0) TK.lys[i] = { ...TK.lys[i], ...uit.toekenning };
+    } catch (f) {
+      window.alert(String(f.message || f));
+    }
+    teken();
+  }
+
+  /* ═══ bewysstukke ═══ */
+
+  function vervang(tk) {
+    const i = TK.lys.findIndex((x) => x.id === tk.id);
+    if (i >= 0) TK.lys[i] = { ...TK.lys[i], ...tk };
+  }
+
+  function lees_base64(leer) {
+    return new Promise((ja, nee) => {
+      const r = new FileReader();
+      r.onload = () => ja(String(r.result).split(",")[1] || "");
+      r.onerror = () => nee(new Error(t("tk_dok_lees", "Kon nie die lêer lees nie.")));
+      r.readAsDataURL(leer);
+    });
+  }
+
+  async function laai_op(tk_id, item_id, leer, invoer) {
+    if (!leer) return;
+    if (leer.size > 4 * 1024 * 1024) {
+      window.alert(t("tk_dok_groot", "Die lêer is groter as 4 MB. Maak dit eers kleiner."));
+      invoer.value = "";
+      return;
+    }
+    const etiket = invoer.closest(".tk-laai");
+    if (etiket) etiket.classList.add("besig");
+    try {
+      const uit = await pos("laai-bewys-op", {
+        toekenning: tk_id, item: item_id, leernaam: leer.name,
+        inhoud_tipe: leer.type, data_base64: await lees_base64(leer),
+      });
+      vervang(uit.toekenning);
+    } catch (f) {
+      window.alert(String(f.message || f));
+    }
+    teken();
+  }
+
+  async function laai_af(sleutel, naam) {
+    try {
+      const resp = await fetch("/.netlify/functions/kry-bewys?sleutel=" + encodeURIComponent(sleutel),
+        { headers: await identiteit_kop() });
+      if (!resp.ok) throw new Error((await resp.text().catch(() => "")) || String(resp.status));
+      jn_stuur_af(await resp.blob(), naam);
+    } catch (f) {
+      window.alert(String(f.message || f));
+    }
+  }
+
+  async function skrap_dok(tk_id, item_id, sleutel) {
+    if (!window.confirm(t("tk_dok_skrap_vra", "Vee hierdie bewysstuk uit?"))) return;
+    try {
+      const uit = await pos("skrap-bewys", { toekenning: tk_id, item: item_id, sleutel });
+      vervang(uit.toekenning);
     } catch (f) {
       window.alert(String(f.message || f));
     }

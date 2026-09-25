@@ -1,5 +1,6 @@
 // netlify/functions/wysig-kontrolelys.js
-// Weergawe 1 (25 September 2026).
+// Weergawe 2 (25 September 2026): aksie "neem_oor" voeg die items by wat die
+// soort sedert die skep gekry het. Bestaande items en hul afmerk bly net so.
 //
 // Boekhouding-beskermd -- een toekenning se kontrolelys.
 //
@@ -11,7 +12,8 @@
 //                     items bly, want hulle is die afspraak met die befondser
 
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
-const { kry_toekennings_store } = require("./_toekennings");
+const { kry_toekennings_store, kontrolelys_uit_soort } = require("./_toekennings");
+const { kry_soorte_store, lees_almal: lees_soorte } = require("./_befondsingsoorte");
 
 exports.handler = async (event, context) => {
   if (event.httpMethod !== "POST") return { statusCode: 405, body: "Metode nie toegelaat nie" };
@@ -52,6 +54,16 @@ exports.handler = async (event, context) => {
       lys, naam, dokument: lys === "rekords" && invoer.dokument === true,
       klaar: false, datum: "", deur: "", nota: "", eie: true,
     });
+  } else if (invoer.aksie === "neem_oor") {
+    let soort;
+    try {
+      soort = (await lees_soorte(kry_soorte_store())).find((s) => s.id === t.soort);
+    } catch (fout) {
+      return { statusCode: 500, body: "Kon nie die soort befondsing laai nie" };
+    }
+    if (!soort) return { statusCode: 404, body: "Die soort befondsing bestaan nie meer nie." };
+    const het = new Set(t.kontrolelys.map((i) => i.id));
+    kontrolelys_uit_soort(soort).forEach((i) => { if (!het.has(i.id)) t.kontrolelys.push(i); });
   } else if (invoer.aksie === "verwyder") {
     const i = t.kontrolelys.find((x) => x.id === invoer.item);
     if (!i) return { statusCode: 404, body: "Item nie gevind nie" };

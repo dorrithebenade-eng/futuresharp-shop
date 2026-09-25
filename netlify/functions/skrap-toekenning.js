@@ -1,5 +1,5 @@
 // netlify/functions/skrap-toekenning.js
-// Weergawe 1 (25 September 2026).
+// Weergawe 2 (25 September 2026): die bewysstukke gaan saam weg.
 //
 // Boekhouding-beskermd -- vee een toekenning uit, saam met sy kontrolelys.
 // Vir 'n toekenning wat verkeerd opgestel is. Joernaal- en bankreels wat
@@ -9,6 +9,7 @@
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 const { kry_store } = require("./_blob-store");
 const { kry_toekennings_store } = require("./_toekennings");
+const { vee_uit_vir } = require("./_bewysstukke");
 
 exports.handler = async (event, context) => {
   if (event.httpMethod !== "POST") return { statusCode: 405, body: "Metode nie toegelaat nie" };
@@ -34,6 +35,7 @@ exports.handler = async (event, context) => {
     if (gebruik) {
       return { statusCode: 409, body: `Hierdie toekenning word deur ${gebruik} joernaalinskrywing(s) gebruik en kan nie uitgevee word nie.` };
     }
+    await vee_uit_vir(t);
     await store.delete(id);
   } catch (fout) {
     console.error("Kon nie die toekenning uitvee nie:", fout);

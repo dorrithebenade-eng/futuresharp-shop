@@ -1,5 +1,7 @@
 // netlify/functions/kry-toekennings.js
-// Weergawe 1 (25 September 2026).
+// Weergawe 2 (25 September 2026): elke toekenning dra ook `nuwe_items`, die
+// items wat die soort sedert die skep gekry het. Die skerm bied hulle aan; hulle
+// word nie outomaties bygevoeg nie (sien wysig-kontrolelys.js, "neem_oor").
 //
 // Boekhouding-beskermd. ?projek=<id> gee daardie projek se toekennings; sonder
 // projek almal. Die befondser en die soort se name word hier opgesoek, nie
@@ -41,6 +43,11 @@ exports.handler = async (event, context) => {
       const b = befondsers.get(t.befondser);
       const s = soorte.find((x) => x.id === t.soort);
       const items = t.kontrolelys || [];
+      const het = new Set(items.map((i) => i.id));
+      const nuwe_items = s ? [
+        ...(s.uitreik || []).filter((i) => !het.has("u-" + i.id)).map((i) => i.naam),
+        ...(s.rekords || []).filter((i) => !het.has("r-" + i.id)).map((i) => i.naam),
+      ] : [];
       return {
         ...t,
         befondser_naam: b ? b.naam : "",
@@ -48,6 +55,7 @@ exports.handler = async (event, context) => {
         soort_naam: s ? s.naam : t.soort_naam || t.soort,
         klaar_tel: items.filter((i) => i.klaar).length,
         items_tel: items.length,
+        nuwe_items,
       };
     })
     .sort((a, b) => String(a.van || "").localeCompare(String(b.van || "")) ||

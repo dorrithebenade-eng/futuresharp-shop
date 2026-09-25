@@ -116,3 +116,19 @@
 .pj-deel2 { margin-top: 8px; font-size: 0.85rem; }
 .pj-baat-ry { margin-top: 8px; }
 .pj-klein { display: flex; flex-direction: column; gap: 4px; font-size: 0.8rem; color: var(--grys-teks); }
+
+/* Fase C: bewysstukke by die kontrolelys-items. */
+.tk-item { flex-direction: column; align-items: stretch; }
+.tk-item-bo { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.tk-laai {
+  border: 1px solid #E3E0DA; background: #fff; border-radius: 6px;
+  font-size: 0.78rem; padding: 2px 8px; cursor: pointer; color: var(--grys-teks);
+}
+.tk-laai:hover { color: var(--teal); border-color: var(--teal); }
+.tk-laai.besig { opacity: 0.5; pointer-events: none; }
+.tk-doks { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 2px 26px; }
+.tk-dok { display: inline-flex; align-items: center; gap: 2px; background: #EFF5F3; border-radius: 6px; padding: 2px 4px 2px 8px; }
+.tk-dok-naam { border: 0; background: transparent; color: #2E7D6F; font: inherit; font-size: 0.8rem; cursor: pointer; padding: 0; text-decoration: underline; }
+.tk-dok-weg { border: 0; background: transparent; color: var(--grys-teks); font-size: 0.95rem; line-height: 1; cursor: pointer; padding: 0 4px; }
+.tk-dok-weg:hover { color: var(--koraal); }
+.tk-aanbod { font-size: 0.85rem; background: #FDF3E3; color: #8a5a1a; border-radius: 8px; padding: 8px 12px; margin: 10px 0 0; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }

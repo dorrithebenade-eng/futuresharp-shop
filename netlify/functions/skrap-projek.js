@@ -1,5 +1,6 @@
 // netlify/functions/skrap-projek.js
-// Weergawe 2 (25 September 2026): toekennings tel ook as gebruik. 'n
+// Weergawe 3 (25 September 2026): die toekennings se bewysstukke gaan saam weg.
+// Weergawe 2: toekennings tel ook as gebruik. 'n
 // Toetsprojek neem sy toekennings saam.
 //
 // Vee een projek uit, of deaktiveer dit. Rol: boekhouding.
@@ -23,6 +24,7 @@ const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 const { kry_store } = require("./_blob-store");
 const { kry_projekte_store, is_toets_naam } = require("./_projekte");
 const { kry_toekennings_store, lees_almal: lees_toekennings } = require("./_toekennings");
+const { vee_uit_vir } = require("./_bewysstukke");
 
 const ROLLE = ["boekhouding"];
 
@@ -102,7 +104,10 @@ exports.handler = async (event, context) => {
 
   try {
     const tstore = kry_toekennings_store();
-    for (const t of toekennings) await tstore.delete(t.id);
+    for (const t of toekennings) {
+      await vee_uit_vir(t);
+      await tstore.delete(t.id);
+    }
     await store.delete(id);
   } catch (fout) {
     console.error(`Kon nie projek "${id}" uitvee nie:`, fout);
