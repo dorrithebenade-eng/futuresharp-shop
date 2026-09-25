@@ -1,5 +1,6 @@
 // netlify/functions/stoor-toekenning.js
-// Weergawe 1 (25 September 2026).
+// Weergawe 2 (25 September 2026): 'n 18A-soort mag net op 'n projek wat onder
+// Deel II van die Negende Bylae val (sien die projek se PBA-merk).
 //
 // Boekhouding-beskermd -- skep of wysig een toekenning.
 //
@@ -90,6 +91,12 @@ exports.handler = async (event, context) => {
   if (!projek || projek.aktief === false) return { statusCode: 400, body: "Die projek bestaan nie of is onaktief." };
   if (!bf || bf.aktief === false) return { statusCode: 400, body: "Die befondser bestaan nie of is onaktief." };
   if (!soort || soort.aktief === false) return { statusCode: 400, body: "Die soort befondsing bestaan nie of is onaktief." };
+  if (soort.vereis_18a && projek.pba_deel2 !== true) {
+    return {
+      statusCode: 409,
+      body: `"${soort.naam}" mag net op 'n projek wat onder Deel II val (18A-kwalifiserend). Merk dit eers by die projek.`,
+    };
+  }
   if (soort.vereis_18a) {
     return {
       statusCode: 409,

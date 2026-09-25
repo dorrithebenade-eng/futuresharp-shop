@@ -427,6 +427,31 @@
           </div>
 
           <div class="fk-veld">
+            <label class="veld-etiket" for="pj-pba">
+              <span data-i18n="pj_veld_pba">Openbare-voordeel-aktiwiteit (PBA)</span>
+              <span class="veld-opsioneel" data-i18n="pj_opsioneel">&mdash; opsioneel</span>
+            </label>
+            <input type="text" class="veld-invoer" id="pj-pba" maxlength="120" list="pj-pbas"
+                   data-i18n-placeholder="pj_pba_plek" placeholder="Byvoorbeeld Onderwys en ontwikkeling">
+            <datalist id="pj-pbas"></datalist>
+            <label class="wi-merk pj-deel2"><input type="checkbox" id="pj-pba-deel2"> <span data-i18n="pj_deel2">Val onder Deel II (18A-kwalifiserend)</span></label>
+            <p class="fk-veldhulp" data-i18n="pj_pba_hulp">Die aktiwiteit in die Negende Bylae waaronder die projek val. Bevestig met die rekenmeester of dit onder Deel II val.</p>
+          </div>
+
+          <div class="fk-veld">
+            <span class="veld-etiket" data-i18n="pj_veld_baat">Wie baat vind</span>
+            <input type="text" class="veld-invoer" id="pj-baat-beskrywing" maxlength="160"
+                   data-i18n-placeholder="pj_baat_plek" placeholder="Byvoorbeeld Graad 10-leerders">
+            <div class="bf-twee pj-baat-ry">
+              <label class="pj-klein"><span data-i18n="pj_baat_getal">Getal deelnemers</span>
+                <input type="number" class="veld-invoer" id="pj-baat-getal" min="0" step="1"></label>
+              <label class="pj-klein"><span data-i18n="pj_baat_swart">Persentasie swart</span>
+                <input type="text" class="veld-invoer" id="pj-baat-pct" inputmode="decimal" maxlength="5" placeholder="75"></label>
+            </div>
+            <p class="fk-veldhulp" data-i18n="pj_baat_hulp">Totale, nie name nie. B-BBEE-befondsers vra dat minstens 75% van die deelnemers swart is.</p>
+          </div>
+
+          <div class="fk-veld">
             <label class="veld-etiket" for="pj-nota">
               <span data-i18n="pj_veld_nota">Aantekening</span>
               <span class="veld-opsioneel" data-i18n="pj_opsioneel">— opsioneel</span>

@@ -1,5 +1,6 @@
 // public/js/faktuurpaneel-projekte.js
-// Weergawe 2 (25 September 2026).
+// Weergawe 3 (25 September 2026): ook die openbare-voordeel-aktiwiteit (PBA)
+// met sy Deel II-merk, en wie baat vind. Sien stoor-projek.js.
 //
 // Die register van projekte, op Boekhouding se Registers-blad.
 //
@@ -98,6 +99,11 @@ function pj_teken_lys() {
       p.soort ? pj_ontsnap(p.soort) : "",
       p.vir_wie ? `${pj_ontsnap(pj_t("pj_vir", "vir"))} ${pj_ontsnap(p.vir_wie_naam || p.vir_wie)}` : "",
     ].filter(Boolean).join(" \u00b7 ");
+    const baat = [
+      p.pba ? pj_ontsnap(p.pba) + (p.pba_deel2 ? " (" + pj_ontsnap(pj_t("pj_deel2_kort", "Deel II")) + ")" : "") : "",
+      p.baat_getal != null ? pj_ontsnap(pj_t("pj_baat_tel", "{n} deelnemers").replace("{n}", p.baat_getal)) +
+        (p.baat_swart_pct != null ? pj_ontsnap(pj_t("pj_baat_pct", ", {p}% swart").replace("{p}", String(p.baat_swart_pct).replace(".", ","))) : "") : "",
+    ].filter(Boolean).join(" \u00b7 ");
     const tk = p.toekennings
       ? pj_t("pj_tk_tel", "{n} toekenning(s), {r} toegesê").replace("{n}", p.toekennings).replace("{r}", pj_rand(p.toegese_sent))
       : pj_t("pj_tk_geen", "Nog geen toekenning nie");
@@ -115,6 +121,7 @@ function pj_teken_lys() {
         <button type="button" class="fk-ry-oop" data-pj="${pj_ontsnap(p.id)}">
           <span class="fk-ry-naam">${pj_ontsnap(p.naam)}${merkies}</span>
           ${eerste ? `<span class="fk-ry-onder">${eerste}</span>` : ""}
+          ${baat ? `<span class="fk-ry-onder">${baat}</span>` : ""}
           <span class="fk-ry-onder">${pj_ontsnap(tk)}</span>
           ${oud}
         </button>
@@ -143,6 +150,10 @@ function pj_vul_keuses(p) {
     .sort((a, b) => a.localeCompare(b, "af-ZA"));
   document.getElementById("pj-soorte").innerHTML =
     soorte.map((s) => `<option value="${pj_ontsnap(s)}"></option>`).join("");
+  const pbas = [...new Set(PJ.projekte.map((x) => x.pba).filter(Boolean))]
+    .sort((a, b) => a.localeCompare(b, "af-ZA"));
+  document.getElementById("pj-pbas").innerHTML =
+    pbas.map((s) => `<option value="${pj_ontsnap(s)}"></option>`).join("");
 
   // Vir wie: die kliënte; 'n kliënt wat intussen weg is, bly sigbaar gekies.
   const kies = document.getElementById("pj-vir-wie");
@@ -165,6 +176,11 @@ function pj_maak_vorm_oop(id) {
     : pj_t("pj_nuwe_titel", "Nuwe projek");
   document.getElementById("pj-naam").value = p ? p.naam : "";
   document.getElementById("pj-soort").value = p ? p.soort || "" : "";
+  document.getElementById("pj-pba").value = p ? p.pba || "" : "";
+  document.getElementById("pj-pba-deel2").checked = Boolean(p && p.pba_deel2);
+  document.getElementById("pj-baat-beskrywing").value = p ? p.baat_beskrywing || "" : "";
+  document.getElementById("pj-baat-getal").value = p && p.baat_getal != null ? p.baat_getal : "";
+  document.getElementById("pj-baat-pct").value = p && p.baat_swart_pct != null ? String(p.baat_swart_pct).replace(".", ",") : "";
   document.getElementById("pj-nota").value = p ? p.nota || "" : "";
   pj_vul_keuses(p);
 
@@ -201,6 +217,11 @@ async function pj_stoor() {
         naam,
         soort: document.getElementById("pj-soort").value.trim(),
         vir_wie: document.getElementById("pj-vir-wie").value,
+        pba: document.getElementById("pj-pba").value.trim(),
+        pba_deel2: document.getElementById("pj-pba-deel2").checked,
+        baat_beskrywing: document.getElementById("pj-baat-beskrywing").value.trim(),
+        baat_getal: document.getElementById("pj-baat-getal").value.trim(),
+        baat_swart_pct: document.getElementById("pj-baat-pct").value.trim().replace(",", "."),
         nota: document.getElementById("pj-nota").value.trim(),
       }),
     });

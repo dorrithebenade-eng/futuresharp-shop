@@ -1,5 +1,7 @@
 // netlify/functions/stoor-projek.js
-// Weergawe 2 (25 September 2026): soort en "vir wie"; die befondsers-veld is
+// Weergawe 3 (25 September 2026): ook die openbare-voordeel-aktiwiteit (PBA)
+// met sy Deel II-merk, en wie baat vind (beskrywing, getal, persentasie swart).
+// Weergawe 2: soort en "vir wie"; die befondsers-veld is
 // vervang deur toekennings (sien stoor-toekenning.js) en bly net staan vir
 // projekte wat dit reeds het.
 //
@@ -54,6 +56,21 @@ exports.handler = async (event, context) => {
   const nota = String(invoer.nota || "").trim().slice(0, 500);
   const soort = String(invoer.soort || "").trim().slice(0, 60);
   const vir_wie = String(invoer.vir_wie || "").trim().slice(0, 20);
+
+  // PBA en wie baat vind. Totale, nie name nie: 'n befondser en SARS vra
+  // hoeveel en watter persentasie swart, nie wie nie.
+  const pba = String(invoer.pba || "").trim().slice(0, 120);
+  const pba_deel2 = invoer.pba_deel2 === true;
+  const baat_beskrywing = String(invoer.baat_beskrywing || "").trim().slice(0, 160);
+  const getal = (w) => (w === "" || w === null || w === undefined ? null : Number(w));
+  const baat_getal = getal(invoer.baat_getal);
+  const baat_swart_pct = getal(invoer.baat_swart_pct);
+  if (baat_getal !== null && (!Number.isInteger(baat_getal) || baat_getal < 0)) {
+    return { statusCode: 400, body: "Die getal deelnemers moet 'n heelgetal van 0 of meer wees." };
+  }
+  if (baat_swart_pct !== null && (!Number.isFinite(baat_swart_pct) || baat_swart_pct < 0 || baat_swart_pct > 100)) {
+    return { statusCode: 400, body: "Die persentasie swart deelnemers moet tussen 0 en 100 wees." };
+  }
 
   const store = kry_projekte_store();
 
@@ -127,6 +144,11 @@ exports.handler = async (event, context) => {
     befondsers,
     soort,
     vir_wie,
+    pba,
+    pba_deel2,
+    baat_beskrywing,
+    baat_getal,
+    baat_swart_pct,
     nota,
     toets: is_toets_naam(naam),
     bygewerk_op: nou,

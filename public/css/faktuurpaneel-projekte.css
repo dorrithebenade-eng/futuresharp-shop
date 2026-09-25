@@ -111,3 +111,8 @@
 .tk-knoppe { display: flex; justify-content: space-between; margin-top: 14px; }
 .tk-vorm { border-top: 1px solid #E3E0DA; margin-top: 14px; padding-top: 14px; }
 .tk-vw { margin-top: 26px; }
+
+/* Fase B2: PBA en wie baat vind. */
+.pj-deel2 { margin-top: 8px; font-size: 0.85rem; }
+.pj-baat-ry { margin-top: 8px; }
+.pj-klein { display: flex; flex-direction: column; gap: 4px; font-size: 0.8rem; color: var(--grys-teks); }
