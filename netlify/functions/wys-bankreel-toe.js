@@ -28,6 +28,9 @@
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 const { kry_store } = require("./_blob-store");
 const { kry_joernaal_store, skep_sleutel, nuwe_inskrywing } = require("./_joernaal");
+// Weergawe 3 (25 September 2026): 'n inskrywing wat hier weggaan, neem sy
+// koppeling aan 'n toekenning saam (sien _koppelings.js).
+const { vee_uit_vir_inskrywing } = require("./_koppelings");
 const B = require("./_bankstate");
 
 exports.handler = async (event, context) => {
@@ -125,6 +128,7 @@ exports.handler = async (event, context) => {
       // 'n Regstelling: die ou inskrywing gaan eers weg.
       if ((o.aksie === "kategorie" || o.aksie === "oordrag") && r.stand === "toegewys" && r.joernaal_sleutel) {
         await jstore.delete(r.joernaal_sleutel);
+        await vee_uit_vir_inskrywing(r.joernaal_sleutel);
         r.joernaal_sleutel = "";
       }
       if (o.aksie === "kategorie") {
@@ -151,7 +155,10 @@ exports.handler = async (event, context) => {
         r.stand = "oordrag";
         r.kategorie_id = "";
       } else {
-        if (r.stand === "toegewys" && r.joernaal_sleutel) await jstore.delete(r.joernaal_sleutel);
+        if (r.stand === "toegewys" && r.joernaal_sleutel) {
+          await jstore.delete(r.joernaal_sleutel);
+          await vee_uit_vir_inskrywing(r.joernaal_sleutel);
+        }
         r.stand = "oop";
         r.pas = null;
         r.kategorie_id = "";

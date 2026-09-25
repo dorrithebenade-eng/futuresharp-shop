@@ -1,5 +1,6 @@
 // netlify/functions/skrap-toetse.js
-// Weergawe 3 (25 September 2026): hul bewysstukke gaan ook saam weg.
+// Weergawe 4 (25 September 2026): en hul koppelings.
+// Weergawe 3: hul bewysstukke gaan ook saam weg.
 // Weergawe 2: toekennings op toetsprojekte gaan saam, en
 // 'n toetsbefondser met 'n toekenning op 'n regte projek bly staan.
 //
@@ -35,6 +36,7 @@ const { kry_soorte_store, SAAD_SLEUTEL } = require("./_befondsingsoorte");
 const { kry_bankstate_store } = require("./_bankstate");
 const { kry_toekennings_store, lees_almal: lees_toekennings } = require("./_toekennings");
 const { vee_uit_vir } = require("./_bewysstukke");
+const { kry_koppelings_store, lees_almal: lees_koppelings, sleutel_van } = require("./_koppelings");
 const { kry_joernaal_store } = require("./_joernaal");
 
 const ROLLE = ["boekhouding"];
@@ -146,6 +148,10 @@ exports.handler = async (event, context) => {
   const toetsprojek_ids = new Set(projekte.filter((p) => is_toets_naam(p.naam)).map((p) => p.id));
   const bf_op_regte = new Set();
   try {
+    const kstore = kry_koppelings_store();
+    for (const k of await lees_koppelings(kstore)) {
+      if (toetsprojek_ids.has(k.projek_id)) await kstore.delete(sleutel_van(k.id));
+    }
     const tstore = kry_toekennings_store();
     for (const t of await lees_toekennings(tstore)) {
       if (toetsprojek_ids.has(t.projek_id)) {

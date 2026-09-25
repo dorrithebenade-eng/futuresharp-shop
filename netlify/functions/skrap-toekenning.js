@@ -1,5 +1,7 @@
 // netlify/functions/skrap-toekenning.js
-// Weergawe 2 (25 September 2026): die bewysstukke gaan saam weg.
+// Weergawe 3 (25 September 2026): gekoppelde joernaalinskrywings (fase D) keer
+// die skrap; maak hulle eers los.
+// Weergawe 2: die bewysstukke gaan saam weg.
 //
 // Boekhouding-beskermd -- vee een toekenning uit, saam met sy kontrolelys.
 // Vir 'n toekenning wat verkeerd opgestel is. Joernaal- en bankreels wat
@@ -10,6 +12,7 @@ const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 const { kry_store } = require("./_blob-store");
 const { kry_toekennings_store } = require("./_toekennings");
 const { vee_uit_vir } = require("./_bewysstukke");
+const { kry_koppelings_store, lees_almal: lees_koppelings } = require("./_koppelings");
 
 exports.handler = async (event, context) => {
   if (event.httpMethod !== "POST") return { statusCode: 405, body: "Metode nie toegelaat nie" };
@@ -28,10 +31,7 @@ exports.handler = async (event, context) => {
   try {
     const t = await store.get(id, { type: "json" });
     if (!t) return { statusCode: 404, body: "Toekenning nie gevind nie" };
-    const js = kry_store("joernaal");
-    const { blobs } = await js.list();
-    const items = (await Promise.all((blobs || []).map((b) => js.get(b.key, { type: "json" })))).filter(Boolean);
-    const gebruik = items.filter((r) => r.toekenning === id).length;
+    const gebruik = (await lees_koppelings(kry_koppelings_store())).filter((k) => k.toekenning === id).length;
     if (gebruik) {
       return { statusCode: 409, body: `Hierdie toekenning word deur ${gebruik} joernaalinskrywing(s) gebruik en kan nie uitgevee word nie.` };
     }

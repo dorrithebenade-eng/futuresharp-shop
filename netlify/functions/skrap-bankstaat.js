@@ -9,6 +9,8 @@
 
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 const { kry_joernaal_store } = require("./_joernaal");
+// Weergawe 2 (25 September 2026): die inskrywings se koppelings gaan saam weg.
+const { vee_uit_vir_inskrywing } = require("./_koppelings");
 const B = require("./_bankstate");
 
 const WOORDE = "SKRAP STAAT";
@@ -43,6 +45,7 @@ exports.handler = async (event, context) => {
     for (const r of staat.reels || []) {
       if (r.stand === "toegewys" && r.joernaal_sleutel) {
         await jstore.delete(r.joernaal_sleutel);
+        await vee_uit_vir_inskrywing(r.joernaal_sleutel);
         weg += 1;
       }
     }

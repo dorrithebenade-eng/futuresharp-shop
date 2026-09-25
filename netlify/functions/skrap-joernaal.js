@@ -1,4 +1,6 @@
 // netlify/functions/skrap-joernaal.js
+// Weergawe 2 (25 September 2026): 'n geskrapte inskrywing neem sy koppeling
+// aan 'n toekenning saam (sien _koppelings.js).
 //
 // Skrap 'n joernaalinskrywing. Rol: boekhouding.
 //
@@ -13,6 +15,7 @@
 
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 const { kry_joernaal_store } = require("./_joernaal");
+const { vee_uit_vir_inskrywing } = require("./_koppelings");
 
 exports.handler = async (event, context) => {
   if (event.httpMethod !== "POST") {
@@ -49,6 +52,7 @@ exports.handler = async (event, context) => {
 
   try {
     await store.delete(sleutel);
+    await vee_uit_vir_inskrywing(sleutel);
   } catch (fout) {
     console.error(`Kon nie joernaalinskrywing ${sleutel} skrap nie:`, fout);
     return { statusCode: 500, body: "Kon nie die inskrywing skrap nie" };

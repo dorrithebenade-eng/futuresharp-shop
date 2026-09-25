@@ -1,5 +1,7 @@
 // netlify/functions/kry-toekennings.js
-// Weergawe 2 (25 September 2026): elke toekenning dra ook `nuwe_items`, die
+// Weergawe 3 (25 September 2026): elke toekenning dra ook `ontvang_sent`,
+// `bestee_sent` en `koppelings`, uit die gekoppelde joernaalinskrywings.
+// Weergawe 2: elke toekenning dra ook `nuwe_items`, die
 // items wat die soort sedert die skep gekry het. Die skerm bied hulle aan; hulle
 // word nie outomaties bygevoeg nie (sien wysig-kontrolelys.js, "neem_oor").
 //
@@ -11,6 +13,7 @@ const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 const { kry_toekennings_store, lees_almal } = require("./_toekennings");
 const { kry_befondsers_store } = require("./_befondsers");
 const { kry_soorte_store, lees_almal: lees_soorte } = require("./_befondsingsoorte");
+const { kry_koppelings_store, lees_almal: lees_koppelings } = require("./_koppelings");
 
 exports.handler = async (event, context) => {
   if (event.httpMethod !== "GET") return { statusCode: 405, body: "Metode nie toegelaat nie" };
@@ -27,6 +30,18 @@ exports.handler = async (event, context) => {
   } catch (fout) {
     console.error("Kon nie die toekennings lees nie:", fout);
     return { statusCode: 500, body: "Kon nie die toekennings laai nie" };
+  }
+
+  // Die koppelings per toekenning. 'n Leesfout laat die bedrae nul eerder as
+  // om die toekennings self te verloor.
+  const per_tk = new Map();
+  try {
+    (await lees_koppelings(kry_koppelings_store())).forEach((k) => {
+      if (!per_tk.has(k.toekenning)) per_tk.set(k.toekenning, []);
+      per_tk.get(k.toekenning).push(k);
+    });
+  } catch (fout) {
+    console.error("Kon nie die koppelings lees nie:", fout);
   }
 
   const bstore = kry_befondsers_store();
@@ -56,6 +71,9 @@ exports.handler = async (event, context) => {
         klaar_tel: items.filter((i) => i.klaar).length,
         items_tel: items.length,
         nuwe_items,
+        koppelings: (per_tk.get(t.id) || []).sort((a, b) => String(a.datum).localeCompare(String(b.datum))),
+        ontvang_sent: (per_tk.get(t.id) || []).filter((k) => k.rigting === "in").reduce((a, k) => a + k.bedrag_sent, 0),
+        bestee_sent: (per_tk.get(t.id) || []).filter((k) => k.rigting === "uit").reduce((a, k) => a + k.bedrag_sent, 0),
       };
     })
     .sort((a, b) => String(a.van || "").localeCompare(String(b.van || "")) ||

@@ -1,4 +1,8 @@
 // netlify/functions/kry-joernaal.js
+// Weergawe 2 (25 September 2026): elke inskrywing dra 'n vaste `id`, en as sy
+// aan 'n toekenning gekoppel is, ook `toekenning` en `projek_id`. Sien
+// _koppelings.js. 'n Leesfout by die koppelings laat hulle weg; die joernaal
+// self bly volledig.
 //
 // Die joernaal vir een finansiele jaar. Rol: boekhouding.
 //
@@ -58,6 +62,7 @@ const {
 } = require("./_joernaal");
 const { kry_store } = require("./_blob-store");
 const { kry_paystack_fooi_sent } = require("./_paystack-koste");
+const { kry_koppelings_store, inskrywing_id, lees_almal: lees_koppelings } = require("./_koppelings");
 const {
   kry_paystack_transaksies_store,
   jaar_voorvoegsel: ps_jaar_voorvoegsel,
@@ -718,6 +723,22 @@ exports.handler = async (event, context) => {
   }
 
   // Nuutste eerste.
+  // Identiteit en koppeling.
+  let koppelings = new Map();
+  try {
+    koppelings = new Map((await lees_koppelings(kry_koppelings_store())).map((k) => [k.id, k]));
+  } catch (fout) {
+    console.error("Kon nie die koppelings lees nie:", fout);
+  }
+  inskrywings.forEach((r) => {
+    r.id = inskrywing_id(r);
+    const k = koppelings.get(r.id);
+    if (k) {
+      r.toekenning = k.toekenning;
+      r.projek_id = k.projek_id;
+    }
+  });
+
   inskrywings.sort((a, b) => String(b.datum).localeCompare(String(a.datum)));
   nie_geboek.sort((a, b) => String(b.datum).localeCompare(String(a.datum)));
   debiteure.sort((a, b) => String(a.datum).localeCompare(String(b.datum)));

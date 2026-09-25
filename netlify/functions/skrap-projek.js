@@ -1,5 +1,7 @@
 // netlify/functions/skrap-projek.js
-// Weergawe 3 (25 September 2026): die toekennings se bewysstukke gaan saam weg.
+// Weergawe 4 (25 September 2026): gekoppelde joernaalinskrywings tel as
+// gebruik; 'n toetsprojek maak sy koppelings los.
+// Weergawe 3: die toekennings se bewysstukke gaan saam weg.
 // Weergawe 2: toekennings tel ook as gebruik. 'n
 // Toetsprojek neem sy toekennings saam.
 //
@@ -25,6 +27,7 @@ const { kry_store } = require("./_blob-store");
 const { kry_projekte_store, is_toets_naam } = require("./_projekte");
 const { kry_toekennings_store, lees_almal: lees_toekennings } = require("./_toekennings");
 const { vee_uit_vir } = require("./_bewysstukke");
+const { kry_koppelings_store, lees_almal: lees_koppelings, sleutel_van } = require("./_koppelings");
 
 const ROLLE = ["boekhouding"];
 
@@ -36,7 +39,8 @@ async function tel_verwysings(id) {
   ).filter(Boolean);
   const jn = items.filter((r) => r && r.projek_id === id).length;
   const tk = (await lees_toekennings(kry_toekennings_store())).filter((t) => t.projek_id === id);
-  return { tel: jn + tk.length, toekennings: tk };
+  const kp = (await lees_koppelings(kry_koppelings_store())).filter((k) => k.projek_id === id);
+  return { tel: jn + tk.length + kp.length, toekennings: tk, koppelings: kp };
 }
 
 exports.handler = async (event, context) => {
@@ -82,6 +86,7 @@ exports.handler = async (event, context) => {
   }
 
   const toekennings = verwysings.toekennings;
+  const koppelings = verwysings.koppelings;
   verwysings = verwysings.tel;
   const dra_stempel = is_toets_naam(projek.naam);
   if (!dra_stempel && verwysings > 0) {
@@ -103,6 +108,8 @@ exports.handler = async (event, context) => {
   }
 
   try {
+    const kstore = kry_koppelings_store();
+    for (const k of koppelings) await kstore.delete(sleutel_van(k.id));
     const tstore = kry_toekennings_store();
     for (const t of toekennings) {
       await vee_uit_vir(t);

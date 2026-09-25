@@ -1,6 +1,9 @@
 // public/js/faktuurpaneel-toekennings.js
-// Weergawe 2 (25 September 2026): bewysstukke by elke item (oplaai, aflaai,
-// verwyder), en die aanbod wanneer die soort nuwe items gekry het.
+// Weergawe 3 (25 September 2026): joernaalinskrywings word aan 'n toekenning
+// gekoppel (fase D). Die kop wys ontvang en bestee; die toekenning self lys wat
+// gekoppel is, en "Koppel inskrywings" wys die joernaal vir die tydperk.
+// Weergawe 2: bewysstukke by elke item (oplaai, aflaai, verwyder), en die
+// aanbod wanneer die soort nuwe items gekry het.
 //
 // Die toekennings van een projek, in 'n eie venster wat uit die projektelys
 // oopgemaak word (window.tk_maak_oop). Voorvoegsel `TK` / `tk_`.
@@ -19,7 +22,8 @@
 (function () {
   "use strict";
 
-  const TK = { projek: null, lys: [], befondsers: [], soorte: [], oop: new Set(), wysig: null };
+  const TK = { projek: null, lys: [], befondsers: [], soorte: [], oop: new Set(), wysig: null,
+    kies: null };   // { tk, inskrywings, gekies: Set, soek } wanneer die koppel-lys oop is
 
   function t(sleutel, verstek) {
     const uit = window.t ? window.t(sleutel) : null;
@@ -94,6 +98,7 @@
           </span>
           <span class="tk-kop-regs">
             <b>${rand(tk.bedrag_sent)}</b>
+            <span class="tk-sub">${ontsnap(t("tk_ontvang", "Ontvang"))} ${rand(tk.ontvang_sent)} \u00b7 ${ontsnap(t("tk_bestee", "Bestee"))} ${rand(tk.bestee_sent)}</span>
             <span class="bs-stand ${klaar === items.length && items.length ? "voorstel" : "oop"}">${
               ontsnap(t("tk_afgehandel", "{k} van {n} afgehandel").replace("{k}", klaar).replace("{n}", items.length))}</span>
           </span>
@@ -109,6 +114,7 @@
           <p class="tk-lyskop">${ontsnap(t("tk_rekords", "Rekords wat gehou moet word"))}</p>
           <ul class="tk-items">${items.filter((i) => i.lys === "rekords").map((i) => item_ry(tk, i)).join("") ||
             `<li class="tk-leeg">${ontsnap(t("tk_niks", "Niks nie"))}</li>`}</ul>
+          ${koppel_blok(tk)}
           <div class="tk-eie">
             <input type="text" class="veld-invoer" maxlength="160" data-tk-eie-naam="${ontsnap(tk.id)}"
                    placeholder="${ontsnap(t("tk_eie_plek", "Item net vir hierdie toekenning"))}">
@@ -141,6 +147,30 @@
       const lys = plek.querySelector(`[data-tk-eie-lys="${id}"]`).value;
       if (naam) wysig({ aksie: "voeg_by", id, naam, lys, dokument: false });
     }));
+    plek.querySelectorAll("[data-tk-koppel]").forEach((k) => k.addEventListener("click", () =>
+      maak_kies_oop(TK.lys.find((x) => x.id === k.getAttribute("data-tk-koppel")))));
+    plek.querySelectorAll("[data-tk-los]").forEach((k) => k.addEventListener("click", () => {
+      const tk = TK.lys.find((x) => x.id === k.getAttribute("data-tk-los"));
+      const kp = (tk.koppelings || []).find((x) => x.id === k.getAttribute("data-id"));
+      if (kp) koppel(tk.id, "ontkoppel", [kp]);
+    }));
+    plek.querySelectorAll("[data-tk-kies]").forEach((k) => k.addEventListener("change", () => {
+      const id = k.getAttribute("data-tk-kies");
+      if (k.checked) TK.kies.gekies.add(id); else TK.kies.gekies.delete(id);
+      const knop = document.getElementById("tk-kies-koppel");
+      if (knop) knop.textContent = t("tk_koppel_gekose", "Koppel gekose ({n})").replace("{n}", TK.kies.gekies.size);
+    }));
+    const kies_soek = document.getElementById("tk-kies-soek");
+    if (kies_soek) kies_soek.addEventListener("change", () => { TK.kies.soek = kies_soek.value; teken(); });
+    const kies_toe = document.getElementById("tk-kies-toe");
+    if (kies_toe) kies_toe.addEventListener("click", () => { TK.kies = null; teken(); });
+    const kies_koppel = document.getElementById("tk-kies-koppel");
+    if (kies_koppel) kies_koppel.addEventListener("click", () => {
+      const lys = TK.kies.inskrywings.filter((r) => TK.kies.gekies.has(r.id));
+      if (lys.length) koppel(TK.kies.tk, "koppel", lys.map((r) => ({
+        id: r.id, datum: r.datum, beskrywing: r.beskrywing, bedrag_sent: r.bedrag_sent, rigting: r.rigting, bron: r.bron,
+      })));
+    });
     plek.querySelectorAll("[data-tk-neem]").forEach((k) => k.addEventListener("click", async () => {
       await wysig({ aksie: "neem_oor", id: k.getAttribute("data-tk-neem") });
       await laai();
@@ -166,6 +196,78 @@
       window.alert(String(f.message || f));
     }
     teken();
+  }
+
+  /* ═══ gekoppelde joernaalinskrywings (fase D) ═══ */
+
+  function koppel_blok(tk) {
+    const kp = tk.koppelings || [];
+    const ry = (k, knop) => `<li class="tk-kp">
+        <span class="tk-kp-dat">${datum(k.datum)}</span>
+        <span class="tk-kp-besk">${ontsnap(k.beskrywing)}</span>
+        <span class="tk-kp-bed${k.rigting === "uit" ? " bs-uit" : ""}">${k.rigting === "uit" ? "\u2212" : ""}${rand(k.bedrag_sent)}</span>
+        ${knop}</li>`;
+    const gekoppel = kp.length
+      ? `<ul class="tk-items">${kp.map((k) => ry(k, `<button type="button" class="bs-ontdoen" data-tk-los="${ontsnap(tk.id)}" data-id="${ontsnap(k.id)}">${ontsnap(t("tk_ontkoppel", "Ontkoppel"))}</button>`)).join("")}</ul>`
+      : `<p class="tk-leeg">${ontsnap(t("tk_geen_kp", "Nog geen inskrywing gekoppel nie."))}</p>`;
+    let kies = "";
+    if (TK.kies && TK.kies.tk === tk.id) {
+      const soek = (TK.kies.soek || "").toLowerCase();
+      const lys = TK.kies.inskrywings.filter((r) => r.toekenning !== tk.id &&
+        (!soek || String(r.beskrywing).toLowerCase().includes(soek)));
+      kies = `<div class="tk-kies">
+        <input type="text" class="veld-invoer" id="tk-kies-soek" placeholder="${ontsnap(t("tk_kies_soek", "Soek in die joernaal"))}" value="${ontsnap(TK.kies.soek || "")}">
+        <ul class="tk-items tk-kies-lys">${lys.length ? lys.map((r) => {
+          const elders = r.toekenning && r.toekenning !== tk.id;
+          return `<li class="tk-kp${elders ? " tk-elders" : ""}">
+            <input type="checkbox" data-tk-kies="${ontsnap(r.id)}"${TK.kies.gekies.has(r.id) ? " checked" : ""}${elders ? " disabled" : ""}>
+            <span class="tk-kp-dat">${datum(r.datum)}</span>
+            <span class="tk-kp-besk">${ontsnap(r.beskrywing)}${elders ? ` <em>(${ontsnap(t("tk_elders", "by 'n ander toekenning"))})</em>` : ""}</span>
+            <span class="tk-kp-bed${r.rigting === "uit" ? " bs-uit" : ""}">${r.rigting === "uit" ? "\u2212" : ""}${rand(r.bedrag_sent)}</span>
+          </li>`;
+        }).join("") : `<li class="tk-leeg">${ontsnap(t("tk_kies_leeg", "Geen inskrywings in hierdie tydperk nie."))}</li>`}</ul>
+        <div class="tk-knoppe">
+          <button type="button" class="bs-ontdoen" id="tk-kies-toe">${ontsnap(t("pj_kanselleer", "Kanselleer"))}</button>
+          <button type="button" class="bs-bevestig" id="tk-kies-koppel">${ontsnap(t("tk_koppel_gekose", "Koppel gekose ({n})").replace("{n}", TK.kies.gekies.size))}</button>
+        </div>
+      </div>`;
+    }
+    return `<p class="tk-lyskop">${ontsnap(t("tk_kp_kop", "Gekoppelde inskrywings"))}</p>
+      ${gekoppel}
+      ${kies || `<button type="button" class="pj-nk-skakel" data-tk-koppel="${ontsnap(tk.id)}">${ontsnap(t("tk_koppel", "+ Koppel inskrywings uit die joernaal"))}</button>`}`;
+  }
+
+  function boekjaar(iso) {
+    const [j, m] = String(iso).split("-").map(Number);
+    const b = m >= 3 ? j : j - 1;
+    const feb = new Date(Date.UTC(b + 1, 2, 0)).getUTCDate();
+    return { van: `${b}-03-01`, tot: `${b + 1}-02-${String(feb).padStart(2, "0")}` };
+  }
+
+  async function maak_kies_oop(tk) {
+    const vandag = new Date().toISOString().slice(0, 10);
+    const bj = boekjaar(tk.van || vandag);
+    const van = tk.van || bj.van;
+    const tot = tk.tot || boekjaar(tk.van || vandag).tot;
+    try {
+      const data = await vra(`kry-joernaal?van=${van}&tot=${tot}`);
+      const lys = (data.inskrywings || []).filter((r) => !String(r.bankreel || "").startsWith("B-T"));
+      TK.kies = { tk: tk.id, inskrywings: lys, gekies: new Set(), soek: "" };
+    } catch (f) {
+      window.alert(String(f.message || f));
+    }
+    teken();
+  }
+
+  async function koppel(tk_id, aksie, inskrywings) {
+    try {
+      await pos("koppel-inskrywings", { aksie, toekenning: tk_id, inskrywings });
+      TK.kies = null;
+      await laai();
+    } catch (f) {
+      window.alert(String(f.message || f));
+      teken();
+    }
   }
 
   /* ═══ bewysstukke ═══ */
