@@ -98,7 +98,7 @@ exports.handler = async (event, context) => {
   for (const o of opdragte) {
     const r = (staat.reels || []).find((x) => x.nr === Number(o.nr));
     if (!r) return { statusCode: 400, body: `Transaksie ${o.nr} bestaan nie` };
-    if (r.stand === "inligting") return { statusCode: 400, body: `Transaksie ${o.nr} is 'n inligtingstransaksie en word nie geboek nie` };
+    if (r.stand === "inligting") return { statusCode: 400, body: `Transaksie ${o.nr} is 'n kennisgewing van die bank en word nie geboek nie` };
     if (o.aksie === "kategorie") {
       if (r.stand === "gepas") {
         return { statusCode: 409, body: `Transaksie ${o.nr} is reeds verklaar. Ontdoen dit eers.` };

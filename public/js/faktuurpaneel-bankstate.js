@@ -165,7 +165,7 @@
     const rye = r.transaksies.map((x) => {
       let stand;
       if (x.inligting) {
-        stand = `<span class="bs-stand info">${ontsnap(t("bs_st_info", "Inligting, word nie ingevoer nie"))}</span>`;
+        stand = `<span class="bs-stand info">${ontsnap(t("bs_st_info", "Kennisgewing van die bank"))}</span>`;
       } else if (x.fnb_fooi) {
         stand = `<span class="bs-stand voorstel">${ontsnap(t("bs_st_voorstel", "Voorstel:"))} ${
           ontsnap(kat ? kat.pad || kat.naam : t("bs_bk_naam", "Bankkoste"))}${
@@ -205,7 +205,7 @@
       <p class="bs-opsom ${r.ok ? "" : "fout"}">${ontsnap(r.ok
         ? t("bs_aanvaar", "Die staat is volledig gelees.")
         : t("bs_nie_aanvaar", "Die staat is nie aanvaar nie: een of meer kontroles klop nie."))}
-        ${ontsnap(t("bs_tel", "{n} transaksies: {o} om toe te wys, {f} FNB-bankkoste, {i} inligting.")
+        ${ontsnap(t("bs_tel", "{n} transaksies: {o} om toe te wys, {f} FNB-bankkoste, {i} kennisgewing(s) van die bank.")
           .replace("{n}", r.transaksies.length).replace("{o}", tel_oop)
           .replace("{f}", tel_fooi).replace("{i}", tel_info))}</p>
       ${invoer_blok(r)}
@@ -407,7 +407,7 @@
     const ontdoen = `<button type="button" class="bs-ontdoen" data-ontdoen="${r.nr}">${ontsnap(t("bs_ontdoen", "Ontdoen"))}</button>`;
     switch (r.stand) {
       case "inligting":
-        return `<span class="bs-stand info">${ontsnap(t("bs_st_info", "Inligting, word nie ingevoer nie"))}</span>`;
+        return `<span class="bs-stand info">${ontsnap(t("bs_st_info", "Kennisgewing van die bank"))}</span>`;
       case "gepas":
         return `<span class="bs-stand voorstel">${ontsnap(r.pas && r.pas.soort === "vereffening"
           ? t("bs_st_paystack", "Verklaar deur Paystack")

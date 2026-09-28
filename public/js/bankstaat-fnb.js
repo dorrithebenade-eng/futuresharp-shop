@@ -267,7 +267,7 @@
       if (bankkoste.ok) t.beskrywing = "FNB-bankkoste";
     });
     transaksies.filter((t) => t.inligting && !t.beskrywing)
-      .forEach((t) => { t.beskrywing = "FNB-inligtingstransaksie"; });
+      .forEach((t) => { t.beskrywing = "FNB-kennisgewing"; });
 
     return {
       ok: ketting.ok && omset.ok && bankkoste.ok,
