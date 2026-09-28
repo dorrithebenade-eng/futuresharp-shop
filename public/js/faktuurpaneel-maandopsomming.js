@@ -107,7 +107,7 @@
   function stand(r) {
     if (!r.gedek) return { klas: "info", teks: t("ms_geen_staat", "Geen staat") };
     if (r.gedek < r.dae) return { klas: "oop", teks: t("ms_gedeeltelik", "Gedeeltelik gedek") };
-    if (r.oop_tel) return { klas: "leeg", teks: t("ms_oop", "{n} reëls oop").replace("{n}", r.oop_tel) };
+    if (r.oop_tel) return { klas: "leeg", teks: t("ms_oop", "{n} transaksies oop").replace("{n}", r.oop_tel) };
     return { klas: "voorstel", teks: t("ms_klaar", "Klaar") };
   }
 
@@ -160,7 +160,7 @@
         </table>
       </div>
       <p class="bs-nota">${ontsnap(t("ms_verskil_nota",
-        "Verskil: die joernaal se netto min die bankreëls wat gepas of toegewys is. Paystack-geld wat oor 'n maandgrens oppad was, en betalings wat nie deur die bank geloop het nie, veroorsaak 'n verskil; die werkboek lys die joernaalinskrywings wat nie aan 'n bankreël gekoppel is nie."))}</p>
+        "Verskil: die joernaal se netto min die banktransaksies wat gepas of toegewys is. Paystack-geld wat oor 'n maandgrens oppad was, en betalings wat nie deur die bank geloop het nie, veroorsaak 'n verskil; die werkboek lys die joernaalinskrywings wat nie aan 'n banktransaksie gekoppel is nie."))}</p>
       ${toetse ? `<p class="bs-nota">${ontsnap(t("ms_toetse_uit", "{n} inskrywing(s) uit 'n toetsstaat is uitgesluit.").replace("{n}", toetse))}</p>` : ""}`;
 
     plek.querySelectorAll("[data-ms-maand]").forEach((k) =>
@@ -231,7 +231,7 @@
 
     // 1. Opsomming
     const b1 = blad(wb, "Opsomming", "Future Sharp NPC \u2014 Maandopsomming", tydperk,
-      ["Maand", "Dekking (dae)", "Opening", "In", "Uit", "Sluit", "Reëls oop",
+      ["Maand", "Dekking (dae)", "Opening", "In", "Uit", "Sluit", "Transaksies oop",
         "Joernaal in", "Joernaal uit", "Joernaal netto", "Verskil"],
       [18, 14, 16, 16, 16, 16, 11, 16, 16, 16, 16]);
     maande.forEach((x) => {
@@ -244,7 +244,7 @@
     b1.addRow([]);
     const nota = [
       "Opening en sluit is die banksaldo; 'n negatiewe bedrag is oortrokke.",
-      "Verskil = die joernaal se netto min die bankreëls wat gepas of toegewys is.",
+      "Verskil = die joernaal se netto min die banktransaksies wat gepas of toegewys is.",
       "Paystack-geld wat oor 'n maandgrens oppad was, en betalings wat nie deur die bank geloop het nie, veroorsaak 'n verskil. Sien die blad 'Nie teen die bank gepas nie'.",
       "Die finansiële staat in die paneel bly die gesaghebbende staat per kategorie.",
     ];
@@ -272,7 +272,7 @@
 
     // 3. Kontantboek
     const b3 = blad(wb, "Kontantboek", "Kontantboek (die joernaal)", tydperk,
-      ["Datum", "Beskrywing", "Kategorie", "Bron", "Bankreël", "In", "Uit"],
+      ["Datum", "Beskrywing", "Kategorie", "Bron", "Banktransaksie", "In", "Uit"],
       [12, 46, 34, 12, 24, 14, 14]);
     jn.slice().sort((a, b) => String(a.datum).localeCompare(String(b.datum))).forEach((r) => {
       const b = Number(r.bedrag_sent) / 100;
@@ -283,7 +283,7 @@
     // 4. Bankreels
     const breels = (MS.bank.reels || []).filter((r) => in_tyd(r.datum) && r.stand !== "inligting");
     const STAND = { oop: "Oop", voorstel: "Voorgestel", gepas: "Gepas", toegewys: "Toegewys", oordrag: "Oordrag" };
-    const b4 = blad(wb, "Bankreëls", "Bankreëls uit die ingevoerde state", tydperk,
+    const b4 = blad(wb, "Banktransaksies", "Banktransaksies uit die ingevoerde state", tydperk,
       ["Datum", "Beskrywing", "Verwysing", "In", "Uit", "Saldo", "Stand", "Verklaring"],
       [12, 40, 22, 14, 14, 16, 12, 36]);
     breels.forEach((r) => {
@@ -301,7 +301,7 @@
       .filter((r) => r.stand === "gepas" && r.pas && r.pas.soort === "joernaal").map((r) => r.pas.ref));
     const los = jn.filter((r) => r.bron !== "bank" && !(r.sleutel && gepas.has(r.sleutel)));
     const b5 = blad(wb, "Nie teen die bank gepas nie",
-      "Joernaalinskrywings sonder 'n bankreël",
+      "Joernaalinskrywings sonder 'n banktransaksie",
       "Paystack-inkomste word as vereffening gepas, nie per inskrywing nie; betalings uit eie sak loop nie deur die bank nie.",
       ["Datum", "Beskrywing", "Kategorie", "Bron", "In", "Uit"], [12, 46, 34, 12, 14, 14]);
     los.slice().sort((a, b) => String(a.datum).localeCompare(String(b.datum))).forEach((r) => {

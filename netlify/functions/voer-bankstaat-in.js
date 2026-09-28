@@ -90,11 +90,11 @@ exports.handler = async (event, context) => {
     const saldo = heel(l.saldo_sent);
     const rigting = l.rigting === "in" ? "in" : "uit";
     if (bedrag === null || bedrag < 0 || saldo === null || !/^\d{4}-\d{2}-\d{2}$/.test(String(l.datum))) {
-      return { statusCode: 400, body: `Reël ${n + 1} is onvolledig.` };
+      return { statusCode: 400, body: `Transaksie ${n + 1} is onvolledig.` };
     }
     loop += rigting === "in" ? bedrag : -bedrag;
     if (Math.abs(loop) !== saldo) {
-      return { statusCode: 409, body: `Die saldo-ketting klop nie by reël ${n + 1}. Niks is gestoor nie.` };
+      return { statusCode: 409, body: `Die saldo-ketting klop nie by transaksie ${n + 1}. Niks is gestoor nie.` };
     }
     reels.push({
       nr: n + 1,
@@ -114,7 +114,7 @@ exports.handler = async (event, context) => {
     });
   }
   if (loop !== sluit) {
-    return { statusCode: 409, body: "Die reëls tel nie tot die sluitsaldo op nie. Niks is gestoor nie." };
+    return { statusCode: 409, body: "Die transaksies tel nie tot die sluitsaldo op nie. Niks is gestoor nie." };
   }
 
   const store = B.kry_bankstate_store();

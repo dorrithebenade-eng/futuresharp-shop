@@ -97,24 +97,24 @@ exports.handler = async (event, context) => {
   const plan = [];
   for (const o of opdragte) {
     const r = (staat.reels || []).find((x) => x.nr === Number(o.nr));
-    if (!r) return { statusCode: 400, body: `Reël ${o.nr} bestaan nie` };
-    if (r.stand === "inligting") return { statusCode: 400, body: `Reël ${o.nr} is 'n inligtingsreël en word nie geboek nie` };
+    if (!r) return { statusCode: 400, body: `Transaksie ${o.nr} bestaan nie` };
+    if (r.stand === "inligting") return { statusCode: 400, body: `Transaksie ${o.nr} is 'n inligtingstransaksie en word nie geboek nie` };
     if (o.aksie === "kategorie") {
       if (r.stand === "gepas") {
-        return { statusCode: 409, body: `Reël ${o.nr} is reeds verklaar. Ontdoen dit eers.` };
+        return { statusCode: 409, body: `Transaksie ${o.nr} is reeds verklaar. Ontdoen dit eers.` };
       }
       const k = kats.get(String(o.kategorie_id || ""));
-      if (!k) return { statusCode: 400, body: `Kies 'n kategorie vir reël ${o.nr}` };
+      if (!k) return { statusCode: 400, body: `Kies 'n kategorie vir transaksie ${o.nr}` };
       if ((k.rigting === "in" ? "in" : "uit") !== r.rigting) {
         return {
           statusCode: 409,
-          body: `Reël ${o.nr} is ${r.rigting === "in" ? "'n inbetaling" : "'n uitbetaling"}, maar die kategorie is ${k.rigting === "in" ? "inkomste" : "'n uitgawe"}.`,
+          body: `Transaksie ${o.nr} is ${r.rigting === "in" ? "'n inbetaling" : "'n uitbetaling"}, maar die kategorie is ${k.rigting === "in" ? "inkomste" : "'n uitgawe"}.`,
         };
       }
       plan.push({ r, o, k });
     } else if (o.aksie === "oordrag") {
       if (r.stand === "gepas") {
-        return { statusCode: 409, body: `Reël ${o.nr} is reeds verklaar. Ontdoen dit eers.` };
+        return { statusCode: 409, body: `Transaksie ${o.nr} is reeds verklaar. Ontdoen dit eers.` };
       }
       plan.push({ r, o });
     } else if (o.aksie === "ontdoen") {
@@ -190,7 +190,7 @@ exports.handler = async (event, context) => {
     // Die staat word laaste geskryf. Misluk dit, kan 'n joernaalinskrywing
     // sonder sy reel bestaan; die log se watter een.
     console.error("Toewysing onvolledig:", fout);
-    return { statusCode: 500, body: "Die toewysing is nie volledig gestoor nie. Herlaai en kyk na die stand van die reëls." };
+    return { statusCode: 500, body: "Die toewysing is nie volledig gestoor nie. Herlaai en kyk na die stand van die transaksies." };
   }
 
   return {

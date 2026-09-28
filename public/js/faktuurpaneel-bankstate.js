@@ -1,4 +1,7 @@
 // public/js/faktuurpaneel-bankstate.js
+// Weergawe 3 (28 September 2026): die invoerblok (Toetsstaat, Voer in) staan bo
+// die voorskou-tabel, nie onder nie; en "reels" heet op die skerm nou
+// "transaksies".
 // Weergawe 2 (28 September 2026): 'n toegewysde reel kan bewyse kry (foto of
 // leer; sien bewys.js). Hulle leef op die joernaalinskrywing en word na die
 // reel gespieel as `dokumente`. Ontdoen, of 'n verandering na oordrag, vee
@@ -136,9 +139,9 @@
     const nommer = r.rekening ? "\u2026" + String(r.rekening.nommer).slice(-4) : "";
 
     const ketting_detail = k.ketting.ok
-      ? t("bs_ketting_ok", "Elke reël se saldo klop, van {o} tot {s}.")
+      ? t("bs_ketting_ok", "Elke transaksie se saldo klop, van {o} tot {s}.")
           .replace("{o}", saldo(r.opening_sent)).replace("{s}", saldo(r.sluit_sent))
-      : t("bs_ketting_fout", "{n} reël(s) se saldo klop nie. Die staat is nie volledig gelees nie.")
+      : t("bs_ketting_fout", "{n} transaksie(s) se saldo klop nie. Die staat is nie volledig gelees nie.")
           .replace("{n}", k.ketting.foute.length || 1);
 
     const om = k.omset;
@@ -152,11 +155,11 @@
 
     const bk = k.bankkoste;
     const bankkoste_detail = bk.reels === 0
-      ? t("bs_bk_geen", "Geen reëls sonder beskrywing nie.")
+      ? t("bs_bk_geen", "Geen transaksies sonder beskrywing nie.")
       : bk.ok
-        ? t("bs_bk_ok", "{n} fooireëls van {r} klop met die bankkoste-blok.")
+        ? t("bs_bk_ok", "{n} fooitransaksies van {r} klop met die bankkoste-blok.")
             .replace("{n}", bk.reels).replace("{r}", rand(bk.sent))
-        : t("bs_bk_fout", "{n} reëls sonder beskrywing ({r}) klop nie met die bankkoste-blok ({b}). Hulle bly sonder kategorie.")
+        : t("bs_bk_fout", "{n} transaksies sonder beskrywing ({r}) klop nie met die bankkoste-blok ({b}). Hulle bly sonder kategorie.")
             .replace("{n}", bk.reels).replace("{r}", rand(bk.sent)).replace("{b}", rand(bk.blok_sent));
 
     const rye = r.transaksies.map((x) => {
@@ -202,9 +205,11 @@
       <p class="bs-opsom ${r.ok ? "" : "fout"}">${ontsnap(r.ok
         ? t("bs_aanvaar", "Die staat is volledig gelees.")
         : t("bs_nie_aanvaar", "Die staat is nie aanvaar nie: een of meer kontroles klop nie."))}
-        ${ontsnap(t("bs_tel", "{n} reëls: {o} om toe te wys, {f} FNB-bankkoste, {i} inligting.")
+        ${ontsnap(t("bs_tel", "{n} transaksies: {o} om toe te wys, {f} FNB-bankkoste, {i} inligting.")
           .replace("{n}", r.transaksies.length).replace("{o}", tel_oop)
           .replace("{f}", tel_fooi).replace("{i}", tel_info))}</p>
+      ${invoer_blok(r)}
+      <p class="bs-nota">${ontsnap(t("bs_niks_gestoor", "Niks is gestoor nie. Die staat is net in die blaaier gelees."))}</p>
       <div class="bs-tabel-hou">
         <table class="jn-tabel bs-tabel">
           <thead><tr>
@@ -218,8 +223,7 @@
           <tbody>${rye}</tbody>
         </table>
       </div>
-      ${invoer_blok(r)}
-      <p class="bs-nota">${ontsnap(t("bs_niks_gestoor", "Niks is gestoor nie. Die staat is net in die blaaier gelees."))}</p>`;
+`;
 
     const knop = document.getElementById("bs-voer-in");
     if (knop) knop.addEventListener("click", voer_in);
@@ -234,7 +238,7 @@
         <span>${ontsnap(t("bs_toetsstaat", "Toetsstaat"))}</span></label>
       <button type="button" class="kaart-aksie" id="bs-voer-in">${ontsnap(t("bs_voer_in", "Voer in"))}</button>
       <p class="bs-lei">${ontsnap(eie
-        ? t("bs_invoer_lei", "Reels wat die stelsel reeds ken, word gepas; die res wag op toewysing.")
+        ? t("bs_invoer_lei", "Transaksies wat die stelsel reeds ken, word gepas; die res wag op toewysing.")
         : t("bs_ander_rek", "Hierdie staat is nie van Future Sharp se rekening nie en kan net as toetsstaat ingevoer word."))}</p>
     </div>`;
   }
@@ -539,7 +543,7 @@
   function bewyse_mag_weg(nr) {
     const r = BS.oop && BS.oop.reels.find((x) => x.nr === nr);
     if (!r || !(r.dokumente || []).length) return true;
-    return window.confirm(t("bw_ontdoen_vra", "Die bewyse by hierdie reël word saam uitgevee. Gaan voort?"));
+    return window.confirm(t("bw_ontdoen_vra", "Die bewyse by hierdie transaksie word saam uitgevee. Gaan voort?"));
   }
 
   // Die spieel op die reel, plaaslik bygewerk na 'n oplaai of verwydering.
@@ -561,7 +565,7 @@
       const uit = await pos("wys-bankreel-toe", { sleutel: BS.oop.sleutel, reels, soortgelyk: soortgelyk === true });
       BS.oop = uit.staat;
       BS.melding = uit.ekstra
-        ? t("bs_soortgelyk", "Ook {n} soortgelyke reël(s) het dieselfde kategorie gekry.").replace("{n}", uit.ekstra)
+        ? t("bs_soortgelyk", "Ook {n} soortgelyke transaksie(s) het dieselfde kategorie gekry.").replace("{n}", uit.ekstra)
         : "";
       const i = BS.state.findIndex((x) => x.sleutel === uit.staat.sleutel);
       if (i >= 0) {
