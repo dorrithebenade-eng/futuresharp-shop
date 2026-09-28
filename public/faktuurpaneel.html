@@ -29,6 +29,7 @@
   <link rel="stylesheet" href="css/faktuurpaneel-projekte.css" />
   <link rel="stylesheet" href="css/faktuurpaneel-bankstate.css" />
   <link rel="stylesheet" href="css/faktuurpaneel-befondsers.css" />
+  <link rel="stylesheet" href="css/bewys.css" />
   <link rel="icon" href="/icons/paneel-ikoon-32.png" sizes="32x32" type="image/png">
   <link rel="icon" href="/icons/paneel-ikoon-16.png" sizes="16x16" type="image/png"></head>
 <body>
@@ -867,6 +868,14 @@
                 </div>
               </div>
             </div>
+            <!-- Bewys: foto of l&ecirc;er, meer as een op 'n slag. Word n&aacute; die
+                 stoor van die inskrywing opgelaai. Sien bewys.js. -->
+            <div class="jn-bewys-ry">
+              <label class="tk-laai bw-knop"><span data-i18n="bw_bewys">Bewys</span><input type="file" id="jn-bewys" hidden multiple accept="image/*,.pdf,.doc,.docx,.xls,.xlsx"></label>
+              <span class="bw-gekies" id="jn-bewys-gekies"></span>
+              <button type="button" class="tk-dok-weg" id="jn-bewys-weg" hidden aria-label="Verwyder">&#215;</button>
+              <p class="bw-wenk" data-i18n="bw_wenk">Op 'n foon kan 'n foto geneem word. Foto's word verklein, en meer as een word een PDF. Vir 'n dokument van meer bladsye gee die foon se skandeerder (L&ecirc;ers of Google Drive) die beste PDF.</p>
+            </div>
             <p class="jn-fout" id="jn-fout" hidden></p>
             <button type="button" class="kaart-aksie" id="jn-voeg" disabled
                     data-i18n="jn_teken_aan">Teken aan</button>
@@ -1171,6 +1180,7 @@
   <script src="js/faktuurpaneel-wagkamer.js"></script>
   <script src="js/faktuurpaneel-instellings.js"></script>
   <script src="js/faktuurpaneel-staat.js"></script>
+  <script src="js/bewys.js"></script>
   <script src="js/faktuurpaneel-joernaal.js"></script>
   <!-- LAASTE, want hy roep die ander se laaifunksies aan en moet dus na
        hulle laai. Hy wysig niks; hy verfris net wat hulle teken. -->

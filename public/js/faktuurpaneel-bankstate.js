@@ -1,4 +1,8 @@
 // public/js/faktuurpaneel-bankstate.js
+// Weergawe 2 (28 September 2026): 'n toegewysde reel kan bewyse kry (foto of
+// leer; sien bewys.js). Hulle leef op die joernaalinskrywing en word na die
+// reel gespieel as `dokumente`. Ontdoen, of 'n verandering na oordrag, vee
+// hulle uit; die skerm vra eers.
 //
 // Die Bankstate-pil: 'n FNB-staat oplaai, lees en kontroleer, invoer, en elke
 // reel verklaar.
@@ -407,7 +411,9 @@
       // 'n Toegewysde reel hou sy keuselys, met die huidige keuse gekies: 'n
       // ander keuse vervang die inskrywing in een stap.
       case "toegewys":
-        return `${keuse(r, r.kategorie_id)} ${ontdoen}`;
+        return `${keuse(r, r.kategorie_id)} ${ontdoen}${
+          r.joernaal_sleutel && window.bw_knoppie ? " " + window.bw_knoppie(`data-bs-bewys="${ontsnap(r.joernaal_sleutel)}"`) : ""}${
+          r.joernaal_sleutel && window.bw_lys ? window.bw_lys(r.dokumente, r.joernaal_sleutel, "bs-doks") : ""}`;
       case "oordrag":
         return `${keuse(r, OORDRAG)} ${ontdoen}`;
       case "voorstel":
@@ -477,14 +483,47 @@
       const nr = Number(k.getAttribute("data-nr"));
       if (!k.value) return;
       if (k.value === NUUT) { nuwe_kat_vorm(k); return; }
+      if (k.value === OORDRAG && !bewyse_mag_weg(nr)) { teken_staat(); return; }
       wys_toe([k.value === OORDRAG ? { nr, aksie: "oordrag" } : { nr, aksie: "kategorie", kategorie_id: k.value }], true);
     }));
     plek.querySelectorAll("[data-bevestig]").forEach((k) => k.addEventListener("click", () => {
       const r = s.reels.find((x) => x.nr === Number(k.getAttribute("data-bevestig")));
       wys_toe([opdrag_vir_voorstel(r)]);
     }));
-    plek.querySelectorAll("[data-ontdoen]").forEach((k) => k.addEventListener("click", () =>
-      wys_toe([{ nr: Number(k.getAttribute("data-ontdoen")), aksie: "ontdoen" }])));
+    plek.querySelectorAll("[data-ontdoen]").forEach((k) => k.addEventListener("click", () => {
+      const nr = Number(k.getAttribute("data-ontdoen"));
+      if (!bewyse_mag_weg(nr)) return;
+      wys_toe([{ nr, aksie: "ontdoen" }]);
+    }));
+
+    // Bewyse by 'n toegewysde reel.
+    plek.querySelectorAll("[data-bs-bewys]").forEach((k) => k.addEventListener("change", async () => {
+      if (!k.files || !k.files.length) return;
+      const etiket = k.closest(".tk-laai");
+      if (etiket) etiket.classList.add("besig");
+      const sleutel = k.getAttribute("data-bs-bewys");
+      try {
+        const uit = await window.bw_laai_op({ inskrywing: sleutel }, k.files);
+        stel_bewyse(sleutel, uit && uit.inskrywing && uit.inskrywing.dokumente);
+      } catch (f) {
+        window.alert(String(f.message || f));
+      }
+      teken_staat();
+    }));
+    plek.querySelectorAll("[data-bw-af]").forEach((k) => k.addEventListener("click", () =>
+      window.bw_laai_af(k.getAttribute("data-bw-af"), k.getAttribute("data-bw-naam"))
+        .catch((f) => window.alert(String(f.message || f)))));
+    plek.querySelectorAll("[data-bw-weg]").forEach((k) => k.addEventListener("click", async () => {
+      if (!window.confirm(t("bw_skrap_vra", "Vee hierdie bewys uit?"))) return;
+      const sleutel = k.getAttribute("data-bw-eienaar");
+      try {
+        const uit = await window.bw_skrap({ inskrywing: sleutel }, k.getAttribute("data-bw-weg"));
+        stel_bewyse(sleutel, uit && uit.inskrywing && uit.inskrywing.dokumente);
+      } catch (f) {
+        window.alert(String(f.message || f));
+      }
+      teken_staat();
+    }));
     const al = document.getElementById("bs-al-voorstelle");
     if (al) al.addEventListener("click", () =>
       wys_toe(s.reels.filter((r) => r.stand === "voorstel" && r.voorstel_kategorie).map(opdrag_vir_voorstel)));
@@ -494,6 +533,20 @@
     });
     document.getElementById("bs-maak-toe").addEventListener("click", maak_staat_toe);
     document.getElementById("bs-skrap-staat").addEventListener("click", skrap_staat);
+  }
+
+  // Het die reel bewyse, vra eers: ontdoen en oordrag vee hulle uit.
+  function bewyse_mag_weg(nr) {
+    const r = BS.oop && BS.oop.reels.find((x) => x.nr === nr);
+    if (!r || !(r.dokumente || []).length) return true;
+    return window.confirm(t("bw_ontdoen_vra", "Die bewyse by hierdie reël word saam uitgevee. Gaan voort?"));
+  }
+
+  // Die spieel op die reel, plaaslik bygewerk na 'n oplaai of verwydering.
+  function stel_bewyse(joernaal_sleutel, dokumente) {
+    if (!BS.oop || !Array.isArray(dokumente)) return;
+    const r = BS.oop.reels.find((x) => x.joernaal_sleutel === joernaal_sleutel);
+    if (r) r.dokumente = dokumente;
   }
 
   function opdrag_vir_voorstel(r) {

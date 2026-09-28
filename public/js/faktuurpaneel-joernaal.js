@@ -1,4 +1,8 @@
 // public/js/faktuurpaneel-joernaal.js
+// Weergawe 2 (28 September 2026): bewyse. Die vorm het 'n bewysveld (foto of
+// leer, meer as een op 'n slag; sien bewys.js), wat na die stoor van die
+// inskrywing opgelaai word. Elke hand- en bankinskrywing in die lys wys sy
+// bewyse en kan nog kry.
 //
 // Die joernaal: inkomste en uitgawes wat NIE deur die faktuurmodule loop nie.
 //
@@ -34,6 +38,9 @@ let JN_DATA = null;
 let JN_KATEGORIEE = [];
 let JN_RIGTING = "uit";
 let JN_ALMAL = false;
+
+// Die leers wat in die vorm gekies is, tot die inskrywing gestoor is.
+let JN_BEWYS = [];
 
 function jn_t(sleutel, verstek) {
   const uit = window.t ? window.t(sleutel) : null;
@@ -148,8 +155,16 @@ function jn_teken() {
       // Net 'n handinskrywing kan herhaal of geskrap word. 'n Faktuur se
       // ontvangs en 'n uitbetaling kom uit die fakture; hulle bestaan nie in
       // die joernaal se store nie en het geen sleutel nie.
+      //
+      // 'n Bewys kan by 'n hand- en 'n bankinskrywing: albei leef in die
+      // joernaal se store en het 'n sleutel.
+      const met_bewys = (r.bron === "hand" || r.bron === "bank") && r.sleutel && window.bw_knoppie;
+      const bewys_knop = met_bewys
+        ? window.bw_knoppie(`data-jn-bewys="${jn_ontsnap(r.sleutel)}"`)
+        : "";
       const aksies =
-        r.bron === "hand"
+        bewys_knop +
+        (r.bron === "hand"
           ? `<button type="button" class="jn-herhaal" data-herhaal="${ix}">${jn_t(
               "jn_herhaal",
               "herhaal"
@@ -157,14 +172,15 @@ function jn_teken() {
             `<button type="button" class="jn-vee" data-skrap="${jn_ontsnap(
               r.sleutel
             )}" title="${jn_t("jn_verwyder", "Verwyder")}">&times;</button>`
-          : "";
+          : "");
+      const doks = met_bewys ? window.bw_lys(r.dokumente, r.sleutel, "jn-doks") : "";
 
       return `
       <tr>
         <td>${jn_ontsnap(jn_datum_af(r.datum))}</td>
         <td>${jn_ontsnap(r.beskrywing)}${merk}${
           r.wie ? `<span class="jn-wie">${jn_ontsnap(r.wie)}</span>` : ""
-        }</td>
+        }${doks}</td>
         <td class="n${uit ? " jn-uit" : ""}">${uit ? "\u2212 " : ""}${jn_rand(
         r.bedrag_sent
       )}</td>
@@ -294,6 +310,37 @@ function jn_koppel_lys() {
     });
   });
 
+  // BEWYSE by 'n bestaande inskrywing.
+  document.querySelectorAll("[data-jn-bewys]").forEach((k) => {
+    k.addEventListener("change", async () => {
+      if (!k.files || !k.files.length) return;
+      const etiket = k.closest(".tk-laai");
+      if (etiket) etiket.classList.add("besig");
+      try {
+        await window.bw_laai_op({ inskrywing: k.getAttribute("data-jn-bewys") }, k.files);
+      } catch (fout) {
+        window.alert(String(fout.message || fout));
+      }
+      await jn_laai();
+    });
+  });
+  document.querySelectorAll("#jn-lys [data-bw-af]").forEach((b) => {
+    b.addEventListener("click", () =>
+      window.bw_laai_af(b.getAttribute("data-bw-af"), b.getAttribute("data-bw-naam"))
+        .catch((fout) => window.alert(String(fout.message || fout))));
+  });
+  document.querySelectorAll("#jn-lys [data-bw-weg]").forEach((b) => {
+    b.addEventListener("click", async () => {
+      if (!window.confirm(jn_t("bw_skrap_vra", "Vee hierdie bewys uit?"))) return;
+      try {
+        await window.bw_skrap({ inskrywing: b.getAttribute("data-bw-eienaar") }, b.getAttribute("data-bw-weg"));
+      } catch (fout) {
+        window.alert(String(fout.message || fout));
+      }
+      await jn_laai();
+    });
+  });
+
   document.querySelectorAll("[data-skrap]").forEach((b) => {
     b.addEventListener("click", async () => {
       b.disabled = true;
@@ -337,6 +384,23 @@ function jn_wys_fout(teks) {
   if (!p) return;
   p.textContent = teks || "";
   p.hidden = !teks;
+}
+
+// Die bewysveld in die vorm: wat gekies is, en die x om dit weer weg te neem.
+function jn_stel_bewys(leers) {
+  JN_BEWYS = Array.from(leers || []);
+  const invoer = document.getElementById("jn-bewys");
+  if (invoer && !JN_BEWYS.length) invoer.value = "";
+  const gekies = document.getElementById("jn-bewys-gekies");
+  const weg = document.getElementById("jn-bewys-weg");
+  if (gekies) {
+    gekies.textContent = !JN_BEWYS.length
+      ? ""
+      : JN_BEWYS.length === 1
+        ? JN_BEWYS[0].name
+        : jn_t("bw_gekies", "{n} l\u00eaers gekies").replace("{n}", JN_BEWYS.length);
+  }
+  if (weg) weg.hidden = !JN_BEWYS.length;
 }
 
 async function jn_laai_kategoriee() {
@@ -400,7 +464,7 @@ async function jn_teken_aan() {
   knop.textContent = jn_t("jn_besig", "Besig \u2026");
 
   try {
-    await jn_vra("stoor-joernaal", {
+    const gestoor = await jn_vra("stoor-joernaal", {
       method: "POST",
       body: JSON.stringify({
         datum,
@@ -416,6 +480,21 @@ async function jn_teken_aan() {
     document.getElementById("jn-wie").value = "";
     document.getElementById("jn-bedrag").value = "";
 
+    // DIE BEWYS NA DIE INSKRYWING. Die inskrywing is reeds gestoor; misluk
+    // die oplaai, bly sy staan en die bewys kan in die lys bygevoeg word.
+    const bewyse = JN_BEWYS;
+    jn_stel_bewys([]);
+    let bewys_fout = "";
+    if (bewyse.length && gestoor && gestoor.sleutel) {
+      knop.textContent = jn_t("bw_besig", "Word opgelaai \u2026");
+      try {
+        await window.bw_laai_op({ inskrywing: gestoor.sleutel }, bewyse);
+      } catch (fout) {
+        bewys_fout = jn_t("bw_gestoor_nie", "Die inskrywing is gestoor, maar die bewys nie: {f}")
+          .replace("{f}", String(fout.message || fout));
+      }
+    }
+
     // DIE TYDPERK REK OM DIE NUWE INSKRYWING IN TE SLUIT. Teken 'n mens iets
     // van buite die gekose tydperk aan, sou dit andersins verdwyn -- en dan
     // lyk dit of dit nie gestoor is nie.
@@ -425,6 +504,7 @@ async function jn_teken_aan() {
     if (datum > tot.value) tot.value = datum;
 
     await jn_laai();
+    if (bewys_fout) jn_wys_fout(bewys_fout);
     document.getElementById("jn-besk").focus();
   } catch (fout) {
     console.error("Kon nie die inskrywing stoor nie:", fout);
@@ -739,6 +819,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("jn-r-in").addEventListener("click", () => jn_stel_rigting("in"));
   document.getElementById("jn-r-uit").addEventListener("click", () => jn_stel_rigting("uit"));
   document.getElementById("jn-voeg").addEventListener("click", jn_teken_aan);
+  const jn_bewys = document.getElementById("jn-bewys");
+  if (jn_bewys) jn_bewys.addEventListener("change", () => jn_stel_bewys(jn_bewys.files));
+  const jn_bewys_weg = document.getElementById("jn-bewys-weg");
+  if (jn_bewys_weg) jn_bewys_weg.addEventListener("click", () => jn_stel_bewys([]));
   document.getElementById("jn-uitvoer").addEventListener("click", jn_voer_uit);
   document.getElementById("jn-herstel").addEventListener("click", jn_herstel);
   ["jn-van", "jn-tot"].forEach((id) => {

@@ -1,4 +1,7 @@
 // netlify/functions/wys-bankreel-toe.js
+// Weergawe 4 (28 September 2026): bewyse. 'n Regstelling na 'n ander
+// kategorie neem die bewyse na die nuwe inskrywing oor; ontdoen, of 'n
+// regstelling na oordrag (wat geen inskrywing het nie), vee hulle uit.
 //
 // Wys bankreels toe, of ontdoen 'n toewysing. Rol: boekhouding.
 //
@@ -32,6 +35,7 @@ const { kry_joernaal_store, skep_sleutel, nuwe_inskrywing } = require("./_joerna
 // koppeling aan 'n toekenning saam (sien _koppelings.js).
 const { vee_uit_vir_inskrywing } = require("./_koppelings");
 const B = require("./_bankstate");
+const { vee_lys_uit, vee_uit_vir_joernaal, kort_lys } = require("./_bewysstukke");
 
 exports.handler = async (event, context) => {
   if (event.httpMethod !== "POST") return { statusCode: 405, body: "Metode nie toegelaat nie" };
@@ -66,7 +70,7 @@ exports.handler = async (event, context) => {
   }
   if (!staat) return { statusCode: 404, body: "Staat nie gevind nie" };
 
-  // ── Soortgelyke reels byvoeg ───────────────────────────────────────
+  // -- Soortgelyke reels byvoeg ---------------------------------------
   let ekstra = 0;
   if (invoer.soortgelyk === true) {
     const gedek = new Set(opdragte.map((o) => Number(o.nr)));
@@ -89,7 +93,7 @@ exports.handler = async (event, context) => {
     opdragte = opdragte.concat(by);
   }
 
-  // ── Nagaan ─────────────────────────────────────────────────────────
+  // -- Nagaan ---------------------------------------------------------
   const plan = [];
   for (const o of opdragte) {
     const r = (staat.reels || []).find((x) => x.nr === Number(o.nr));
@@ -120,13 +124,21 @@ exports.handler = async (event, context) => {
     }
   }
 
-  // ── Skryf ──────────────────────────────────────────────────────────
+  // -- Skryf ----------------------------------------------------------
   const jstore = kry_joernaal_store();
   const nou = new Date().toISOString();
   try {
     for (const { r, o, k } of plan) {
-      // 'n Regstelling: die ou inskrywing gaan eers weg.
+      // 'n Regstelling: die ou inskrywing gaan eers weg. Sy bewyse word eers
+      // gelees, sodat 'n nuwe kategorie hulle kan oorneem.
+      let ou_bewyse = [];
       if ((o.aksie === "kategorie" || o.aksie === "oordrag") && r.stand === "toegewys" && r.joernaal_sleutel) {
+        try {
+          const ou = await jstore.get(r.joernaal_sleutel, { type: "json" });
+          ou_bewyse = (ou && Array.isArray(ou.dokumente)) ? ou.dokumente : [];
+        } catch (fout) {
+          console.error(`Kon nie die bewyse van ${r.joernaal_sleutel} lees nie:`, fout);
+        }
         await jstore.delete(r.joernaal_sleutel);
         await vee_uit_vir_inskrywing(r.joernaal_sleutel);
         r.joernaal_sleutel = "";
@@ -145,17 +157,22 @@ exports.handler = async (event, context) => {
           bron: "bank",
           bankreel: B.verw(staat.sleutel, r.nr),
           toets: staat.toets === true,
+          dokumente: ou_bewyse,
         };
         await jstore.setJSON(inskrywing.sleutel, inskrywing);
         r.stand = "toegewys";
         r.kategorie_id = k.id;
         r.joernaal_sleutel = inskrywing.sleutel;
         r.nota = inskrywing.nota;
+        r.dokumente = kort_lys(ou_bewyse);
       } else if (o.aksie === "oordrag") {
+        await vee_lys_uit(ou_bewyse);
         r.stand = "oordrag";
         r.kategorie_id = "";
+        r.dokumente = [];
       } else {
         if (r.stand === "toegewys" && r.joernaal_sleutel) {
+          await vee_uit_vir_joernaal(jstore, r.joernaal_sleutel);
           await jstore.delete(r.joernaal_sleutel);
           await vee_uit_vir_inskrywing(r.joernaal_sleutel);
         }
@@ -163,6 +180,7 @@ exports.handler = async (event, context) => {
         r.pas = null;
         r.kategorie_id = "";
         r.joernaal_sleutel = "";
+        r.dokumente = [];
       }
       r.bygewerk_op = nou;
       r.bygewerk_deur = gebruiker.email || "";

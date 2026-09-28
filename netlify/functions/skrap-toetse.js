@@ -1,4 +1,5 @@
 // netlify/functions/skrap-toetse.js
+// Weergawe 5 (28 September 2026): toetsstate se inskrywings neem hul bewyse saam.
 // Weergawe 4 (25 September 2026): en hul koppelings.
 // Weergawe 3: hul bewysstukke gaan ook saam weg.
 // Weergawe 2: toekennings op toetsprojekte gaan saam, en
@@ -35,7 +36,7 @@ const { kry_befondsers_store, lees_almal: lees_befondsers } = require("./_befond
 const { kry_soorte_store, SAAD_SLEUTEL } = require("./_befondsingsoorte");
 const { kry_bankstate_store } = require("./_bankstate");
 const { kry_toekennings_store, lees_almal: lees_toekennings } = require("./_toekennings");
-const { vee_uit_vir } = require("./_bewysstukke");
+const { vee_uit_vir, vee_uit_vir_joernaal } = require("./_bewysstukke");
 const { kry_koppelings_store, lees_almal: lees_koppelings, sleutel_van } = require("./_koppelings");
 const { kry_joernaal_store } = require("./_joernaal");
 
@@ -132,7 +133,10 @@ exports.handler = async (event, context) => {
       const staat = await bs.get(b.key, { type: "json" });
       if (!staat || staat.toets !== true) continue;
       for (const r of staat.reels || []) {
-        if (r.stand === "toegewys" && r.joernaal_sleutel) await js.delete(r.joernaal_sleutel);
+        if (r.stand === "toegewys" && r.joernaal_sleutel) {
+          await vee_uit_vir_joernaal(js, r.joernaal_sleutel);
+          await js.delete(r.joernaal_sleutel);
+        }
       }
       await bs.delete(b.key);
       state_weg += 1;

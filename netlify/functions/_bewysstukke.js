@@ -1,4 +1,9 @@
 // netlify/functions/_bewysstukke.js
+// Weergawe 2 (28 September 2026): bewyse ook by joernaalinskrywings (met die
+// hand, en die wat uit 'n bankreel geskep is). Die lys leef op die inskrywing
+// self as `dokumente`, dieselfde vorm as by 'n kontrolelys-item. By 'n
+// bankinskrywing word die lys na die bankreel gespieel, sodat die Bankstate-pil
+// dit kan wys sonder om die joernaal te lees. Die joernaal bly die bron.
 // Weergawe 1 (25 September 2026).
 //
 // BEWYSSTUKKE by 'n toekenning se kontrolelys-items: die getekende ooreenkoms,
@@ -56,4 +61,58 @@ async function vee_uit_vir(toekenning) {
   }
 }
 
-module.exports = { STORE_NAAM, MAKS_GREPE, TIPES, kry_bewys_store, skep_sleutel, vee_uit_vir };
+// Vee 'n lys bewyse uit die store uit. Soos hierbo: een fout keer nie die res nie.
+async function vee_lys_uit(dokumente) {
+  const store = kry_bewys_store();
+  for (const d of dokumente || []) {
+    if (!d || !d.sleutel) continue;
+    try {
+      await store.delete(d.sleutel);
+    } catch (fout) {
+      console.error(`Kon nie bewysstuk ${d.sleutel} uitvee nie:`, fout);
+    }
+  }
+}
+
+// Vee die bewyse van een joernaalinskrywing uit, VOOR die inskrywing self weg
+// is: die lys leef op die rekord. 'n Leesfout word gelog en laat die skrap
+// van die inskrywing deurgaan; daar bly dan hoogstens 'n wees in die store.
+async function vee_uit_vir_joernaal(jstore, sleutel) {
+  if (!sleutel) return;
+  try {
+    const rekord = await jstore.get(sleutel, { type: "json" });
+    if (rekord) await vee_lys_uit(rekord.dokumente);
+  } catch (fout) {
+    console.error(`Kon nie die bewyse van ${sleutel} lees nie:`, fout);
+  }
+}
+
+// Die kort lys wat na 'n bankreel gespieel word: net wat nodig is om te wys
+// en af te laai.
+function kort_lys(dokumente) {
+  return (dokumente || []).map((d) => ({ sleutel: d.sleutel, naam: d.naam }));
+}
+
+// Spieel 'n bankinskrywing se bewyse na sy reel. Beste poging: misluk dit,
+// wys die Bankstate-pil 'n verouderde lys, maar die joernaal is reg.
+async function spieel_na_bankreel(rekord) {
+  if (!rekord || rekord.bron !== "bank" || !rekord.bankreel) return;
+  const { kry_bankstate_store } = require("./_bankstate");
+  const [sleutel, nr] = String(rekord.bankreel).split("#");
+  try {
+    const store = kry_bankstate_store();
+    const staat = await store.get(sleutel, { type: "json" });
+    if (!staat) return;
+    const r = (staat.reels || []).find((x) => x.nr === Number(nr));
+    if (!r || r.joernaal_sleutel !== rekord.sleutel) return;
+    r.dokumente = kort_lys(rekord.dokumente);
+    await store.setJSON(sleutel, staat);
+  } catch (fout) {
+    console.error(`Kon nie die bewyse na bankreel ${rekord.bankreel} spieel nie:`, fout);
+  }
+}
+
+module.exports = {
+  STORE_NAAM, MAKS_GREPE, TIPES, kry_bewys_store, skep_sleutel, vee_uit_vir,
+  vee_lys_uit, vee_uit_vir_joernaal, kort_lys, spieel_na_bankreel,
+};

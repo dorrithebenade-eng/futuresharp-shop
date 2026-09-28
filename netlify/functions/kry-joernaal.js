@@ -1,4 +1,6 @@
 // netlify/functions/kry-joernaal.js
+// Weergawe 3 (28 September 2026): hand- en bankinskrywings dra hul bewyse
+// (`dokumente`: sleutel en naam).
 // Weergawe 2 (25 September 2026): elke inskrywing dra 'n vaste `id`, en as sy
 // aan 'n toekenning gekoppel is, ook `toekenning` en `projek_id`. Sien
 // _koppelings.js. 'n Leesfout by die koppelings laat hulle weg; die joernaal
@@ -241,7 +243,7 @@ exports.handler = async (event, context) => {
   const debiteure = [];
   const krediteure = [];
 
-  // ── 1. Wat met die hand aangeteken is ────────────────────────────────
+  // -- 1. Wat met die hand aangeteken is --------------------------------
   //
   // Die jaar staan in die sleutel, dus lees een prefix die hele jaar sonder
   // om elke ander jaar se inskrywings oop te maak.
@@ -272,6 +274,10 @@ exports.handler = async (event, context) => {
         // toewysing word in die Bankstate-pil ontdoen.
         bron: r.bron === "bank" ? "bank" : "hand",
         bankreel: r.bankreel || "",
+        // Die bewyse (28 September 2026), net naam en sleutel.
+        dokumente: Array.isArray(r.dokumente)
+          ? r.dokumente.map((d) => ({ sleutel: d.sleutel, naam: d.naam }))
+          : [],
       });
     });
   } catch (fout) {
@@ -294,7 +300,7 @@ exports.handler = async (event, context) => {
   let fakture_gelees = false;
   let bestellings_gelees = false;
 
-  // ── 2. Wat uit die fakture kom ───────────────────────────────────────
+  // -- 2. Wat uit die fakture kom ---------------------------------------
   try {
     const store = kry_fakture_store();
     const lys = await store.list();
@@ -450,7 +456,7 @@ exports.handler = async (event, context) => {
     return { statusCode: 500, body: "Kon nie die fakture laai nie" };
   }
 
-  // ── 3. Wat uit die winkel kom ────────────────────────────────────────
+  // -- 3. Wat uit die winkel kom ----------------------------------------
   try {
     const store = kry_store("bestellings");
     const lys = await store.list();
@@ -534,7 +540,7 @@ exports.handler = async (event, context) => {
     console.error("Kon nie die bestellings vir die joernaal lees nie:", fout);
   }
 
-  // ── 4. Elke ander Paystack-transaksie ────────────────────────────────
+  // -- 4. Elke ander Paystack-transaksie --------------------------------
   //
   // DIE AFHAAL IS DIE BRON, NIE DIE WEBHOOK NIE. haal-paystack.js skryf die
   // ROU transaksie na sy eie store; hier word besluit wat daarvan inkomste is.

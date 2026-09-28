@@ -1,0 +1,36 @@
+/* public/css/bewys.css
+   Weergawe 1 (28 September 2026). Die gedeelde bewysknoppie (bewys.js).
+   Die knoppie en die lys leen .tk-laai en .tk-dok uit
+   faktuurpaneel-projekte.css; hier net wat anders is. */
+
+.bw-knop { white-space: nowrap; display: inline-block; }
+
+/* Die vorm in die Joernaal. */
+.jn-bewys-ry {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 14px 0 0;
+}
+.bw-gekies { font-size: 0.8rem; color: var(--grys-teks); }
+.bw-wenk {
+  flex-basis: 100%;
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--grys-teks);
+  max-width: 62ch;
+}
+
+/* Die lys onder 'n inskrywing of 'n bankreel: nie ingekeep soos by die
+   kontrolelys nie. */
+.jn-doks,
+.bs-doks { margin: 5px 0 0; }
+
+.jn-aks .bw-knop { margin-right: 8px; vertical-align: middle; }
+.bs-toe .bw-knop { margin-left: 4px; }
+
+/* Op 'n foon is 'n groter teiken makliker. */
+@media (max-width: 700px) {
+  .bw-knop { padding: 6px 12px; font-size: 0.85rem; }
+}

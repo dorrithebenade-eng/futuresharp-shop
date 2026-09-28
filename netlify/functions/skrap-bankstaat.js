@@ -1,4 +1,5 @@
 // netlify/functions/skrap-bankstaat.js
+// Weergawe 3 (28 September 2026): en hul bewyse.
 //
 // Vee een ingevoerde staat uit, saam met die joernaalinskrywings wat uit sy
 // reels geskep is. Rol: boekhouding.
@@ -12,6 +13,7 @@ const { kry_joernaal_store } = require("./_joernaal");
 // Weergawe 2 (25 September 2026): die inskrywings se koppelings gaan saam weg.
 const { vee_uit_vir_inskrywing } = require("./_koppelings");
 const B = require("./_bankstate");
+const { vee_uit_vir_joernaal } = require("./_bewysstukke");
 
 const WOORDE = "SKRAP STAAT";
 
@@ -44,6 +46,7 @@ exports.handler = async (event, context) => {
   try {
     for (const r of staat.reels || []) {
       if (r.stand === "toegewys" && r.joernaal_sleutel) {
+        await vee_uit_vir_joernaal(jstore, r.joernaal_sleutel);
         await jstore.delete(r.joernaal_sleutel);
         await vee_uit_vir_inskrywing(r.joernaal_sleutel);
         weg += 1;

@@ -1,4 +1,7 @@
 // public/js/faktuurpaneel-toekennings.js
+// Weergawe 5 (28 September 2026): die oplaaiknoppie is die gedeelde een uit
+// bewys.js: meer as een leer op 'n slag, 'n foto met die foon se kamera, en
+// foto's wat verklein en tot een PDF saamgevoeg word.
 // Weergawe 4 (25 September 2026): die koppel-lys wys die hele boekjaar.
 // Weergawe 3: joernaalinskrywings word aan 'n toekenning
 // gekoppel (fase D). Die kop wys ontvang en bestee; die toekenning self lys wat
@@ -56,8 +59,6 @@
 
   /* ═══ die lys ═══ */
 
-  const AANVAAR = ".pdf,.jpg,.jpeg,.png,.webp,.doc,.docx,.xls,.xlsx";
-
   function item_ry(tk, i) {
     const doks = i.dokumente || [];
     const dok_lys = doks.map((d) => `<span class="tk-dok">
@@ -70,7 +71,7 @@
         <span>${ontsnap(i.naam)}</span></label>
       <span class="tk-item-rand">
         ${i.dokument && !doks.length ? `<span class="bs-stand leeg">${ontsnap(t("tk_dok_ontbreek", "Dokument ontbreek"))}</span>` : ""}
-        <label class="tk-laai">${ontsnap(t("tk_laai_op", "Laai op"))}<input type="file" hidden accept="${AANVAAR}" data-tk-laai="${ontsnap(tk.id)}" data-item="${ontsnap(i.id)}"></label>
+        ${window.bw_knoppie(`data-tk-laai="${ontsnap(tk.id)}" data-item="${ontsnap(i.id)}"`, t("tk_laai_op", "Laai op"))}
         ${i.klaar ? `<span class="tk-datum">${datum(i.datum)}</span>` : ""}
         ${i.eie ? `<button type="button" class="bs-ontdoen" data-tk-weg="${ontsnap(tk.id)}" data-item="${ontsnap(i.id)}">${ontsnap(t("tk_verwyder", "Verwyder"))}</button>` : ""}
       </span>
@@ -177,7 +178,7 @@
       await laai();
     }));
     plek.querySelectorAll("[data-tk-laai]").forEach((k) => k.addEventListener("change", () =>
-      laai_op(k.getAttribute("data-tk-laai"), k.getAttribute("data-item"), k.files && k.files[0], k)));
+      laai_op(k.getAttribute("data-tk-laai"), k.getAttribute("data-item"), k.files, k)));
     plek.querySelectorAll("[data-tk-dok]").forEach((k) => k.addEventListener("click", () =>
       laai_af(k.getAttribute("data-sleutel"), k.textContent.trim())));
     plek.querySelectorAll("[data-tk-dok-weg]").forEach((k) => k.addEventListener("click", () =>
@@ -280,30 +281,15 @@
     if (i >= 0) TK.lys[i] = { ...TK.lys[i], ...tk };
   }
 
-  function lees_base64(leer) {
-    return new Promise((ja, nee) => {
-      const r = new FileReader();
-      r.onload = () => ja(String(r.result).split(",")[1] || "");
-      r.onerror = () => nee(new Error(t("tk_dok_lees", "Kon nie die lêer lees nie.")));
-      r.readAsDataURL(leer);
-    });
-  }
-
-  async function laai_op(tk_id, item_id, leer, invoer) {
-    if (!leer) return;
-    if (leer.size > 4 * 1024 * 1024) {
-      window.alert(t("tk_dok_groot", "Die lêer is groter as 4 MB. Maak dit eers kleiner."));
-      invoer.value = "";
-      return;
-    }
+  // Die leers gaan deur bewys.js: foto's verklein, meer as een foto word een
+  // PDF, en die 4 MB-grens word daar getoets.
+  async function laai_op(tk_id, item_id, leers, invoer) {
+    if (!leers || !leers.length) return;
     const etiket = invoer.closest(".tk-laai");
     if (etiket) etiket.classList.add("besig");
     try {
-      const uit = await pos("laai-bewys-op", {
-        toekenning: tk_id, item: item_id, leernaam: leer.name,
-        inhoud_tipe: leer.type, data_base64: await lees_base64(leer),
-      });
-      vervang(uit.toekenning);
+      const uit = await window.bw_laai_op({ toekenning: tk_id, item: item_id }, leers);
+      if (uit && uit.toekenning) vervang(uit.toekenning);
     } catch (f) {
       window.alert(String(f.message || f));
     }
