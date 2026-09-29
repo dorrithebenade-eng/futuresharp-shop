@@ -54,6 +54,7 @@ const { PDFDocument, StandardFonts, PDFString, PDFName, rgb } = require("pdf-lib
 const qrcode = require("../../public/js/qrcode.js");
 const { t_in, t_rand } = require("../../public/js/taal.js");
 const { datum_dokument } = require("./_fakture");
+const { bou_betaal_url } = require("./_betaal-url");
 
 // ── palet, uit styl.css se :root ──
 const TEAL = rgb(0x47 / 255, 0x9f / 255, 0x91 / 255);
@@ -475,11 +476,14 @@ async function bou_faktuur_pdf(rekord, maatskappy, opsies) {
   // verdeling altyd gebeur. Links die opskrif, die sin en die knoppie; regs
   // die QR. Tot vandag het die regterhelfte die bankbesonderhede gedra.
   //
-  /* DIE SKAKEL LEEF OP `paystack.authorization_url`.
-     `betaalskakel` is die SKERM se naam daarvoor — sien kry-faktuur.js. Hy
-     bly eerste as terugval, ingeval iets die veld ooit wel op die rekord stel. */
+  /* DIE SKAKEL IS ONS EIE ADRES, nie Paystack se authorization_url nie.
+     Sien _betaal-url.js: 'n PDF word maande later oopgemaak en gedruk, en 'n
+     Paystack-adres daarin is teen daardie tyd lankal dood.
+
+     `rekord.betaalskakel` bly eerste as terugval, ingeval 'n aanroeper die
+     veld reeds gestel het. */
   const betaalskakel =
-    rekord.betaalskakel || (rekord.paystack && rekord.paystack.authorization_url) || null;
+    rekord.betaalskakel || bou_betaal_url(rekord) || null;
 
   /* DIE HANDMATIGE FAKTUUR KRY DIE BANKBESONDERHEDE (22 Sep 2026).
      Sy het doelbewus geen betaalskakel nie, want haar verdeling is sonder

@@ -59,6 +59,7 @@ const { kry_maatskappy } = require("./_instellings");
 const { bou_faktuur_pdf } = require("./_faktuur-pdf");
 const { stuur_epos, ontsnap } = require("./_stuur-epos");
 const { stuur_kwitansie, stuur_kennisgewing } = require("./_faktuur-betaling");
+const { bou_betaal_url } = require("./_betaal-url");
 // Dieselfde formateerder as die skerm en die PDF. Die desimaalteken verskil
 // per taal — R25 500,00 teenoor R25 500.00 — en dit is die konvensie waarteen
 // 'n debiteureklerk lees, nie 'n voorkeur nie.
@@ -569,7 +570,11 @@ async function reik_faktuur_uit(store, sleutel, rekord, wie) {
       nommer,
       stand: rekord.stand,
       totaal_sent,
-      betaalskakel: authorization_url,
+      // ONS EIE ADRES, sodat die strook en die QR op die skerm dieselfde
+      // string dra as die pos en die PDF. Paystack se authorization_url bly
+      // op die rekord vir die webhook en vir 'n navraag; hy hoort nie op 'n
+      // skerm nie.
+      betaalskakel: bou_betaal_url(rekord, nuwe_sleutel),
       gratis,
       verdeling_gevries,
       // Die skerm sê eerlik of die pos uitgegaan het. 'n Stil mislukking laat
@@ -668,17 +673,25 @@ async function stuur_proforma(rekord, sleutel, gratis) {
       reels.push(ontsnap(t_in("fd_eft_lei_epos", en ? "en" : "af")));
     }
 
+    const betaal_url = bou_betaal_url(rekord, sleutel);
+
     return await stuur_epos({
       merk: "faktuur",
       aan,
       onderwerp: en ? `Proforma invoice ${nommer}` : `Proforma-faktuur ${nommer}`,
       opskrif: en ? "Proforma invoice" : "Proforma-faktuur",
       reels,
+      // DIE KNOPPIE WYS NA ONS EIE ADRES, nie na Paystack se authorization_url
+      // nie. Sien _betaal-url.js.
+      //
+      // Hierdie pos le maande in 'n inboks. 'n Paystack-adres daarin is teen
+      // daardie tyd dood, en die klient sien "We could not start this
+      // transaction" op 'n rekening wat hy wil betaal.
       knoppie:
-        !gratis && rekord.paystack && rekord.paystack.authorization_url
+        !gratis && betaal_url
           ? {
               teks: en ? `Pay ${nommer}` : `Betaal ${nommer}`,
-              url: rekord.paystack.authorization_url,
+              url: betaal_url,
             }
           : undefined,
       aanhegsels,

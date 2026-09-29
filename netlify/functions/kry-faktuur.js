@@ -20,6 +20,7 @@
 
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 const { kry_fakture_store, is_konsep_sleutel, nommer_na_sleutel } = require("./_fakture");
+const { bou_betaal_url } = require("./_betaal-url");
 
 exports.handler = async (event, context) => {
   if (event.httpMethod !== "GET") {
@@ -190,10 +191,13 @@ exports.handler = async (event, context) => {
     // lewende lys nie.
     verdeling_gevries: rekord.verdeling_gevries || null,
 
-    // Die betaalskakel is die authorization_url wat Paystack teruggee. Die
-    // sleutels self bly hier uit — hulle leef in Netlify se
-    // omgewingsveranderlikes en het op geen skerm iets te soeke nie.
-    betaalskakel: paystack.authorization_url || null,
+    // DIE BETAALSKAKEL IS ONS EIE ADRES, nie Paystack se authorization_url
+    // nie. Sien _betaal-url.js vir waarom. Die skerm, die QR, die PDF en die
+    // proforma-pos dra almal hierdie een string.
+    //
+    // Paystack se sleutels en sy authorization_url bly hier uit: hulle het op
+    // geen skerm iets te soeke nie.
+    betaalskakel: bou_betaal_url(rekord, sleutel),
 
     betaling: {
       metode: betaling.metode || null,

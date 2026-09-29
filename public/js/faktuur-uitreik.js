@@ -764,18 +764,24 @@ function fu_koppel_hernu() {
       if (!resp.ok) throw new Error(teks || `Status ${resp.status}`);
 
       const data = JSON.parse(teks);
-      V.betaalskakel = data.betaalskakel;
 
-      // Alles wat die ou string gedra het, word saam nuut.
-      fu_teken_strook();
-      fu_teken_qr();
-
+      // DIE STROOK SE SKAKEL BLY STAAN, en dit is doelbewus.
+      //
+      // Sedert die betaalbladsy bestaan, dra die strook, die QR, die pos en
+      // die PDF almal ONS eie adres, wat nie verval nie. Daardie adres bly
+      // dieselfde; hier verander niks aan hom nie.
+      //
+      // Hierdie knoppie is vir die fakture wat REEDS UIT IS met Paystack se
+      // ou adres in hul e-pos. Vir daardie gevalle het Dorrithe die nuwe
+      // PAYSTACK-adres nodig om met die hand te stuur, en dit verskyn dus in
+      // die nota hieronder in plaas van in die strook.
       const nuwe_nota = document.getElementById("fu-hernu-nota");
       if (nuwe_nota) {
-        nuwe_nota.textContent = fu_t(
-          "fu_hernu_klaar",
-          "Die skakel is hernu. Die ou een werk nie meer nie; stuur hierdie een vir die kliënt."
-        );
+        nuwe_nota.textContent =
+          fu_t(
+            "fu_hernu_klaar",
+            "Die skakel is hernu. Die ou een werk nie meer nie; stuur hierdie een vir die kliënt."
+          ) + " " + (data.betaalskakel || "");
         nuwe_nota.hidden = false;
       }
     } catch (fout) {
