@@ -594,7 +594,9 @@ async function reik_faktuur_uit(store, sleutel, rekord, wie) {
 
    'n R0-faktuur kry nie 'n proforma nie. Sy is klaar betaal; wat daar hoort,
    is 'n kwitansie, en die R0-tak stuur hom. */
-async function stuur_proforma(rekord, sleutel, gratis) {
+// `herstuur` is waar wanneer stuur-proforma-weer.js hierdie pos stuur. Dit
+// voeg een sin bo-aan by, en verander niks anders nie.
+async function stuur_proforma(rekord, sleutel, gratis, herstuur) {
   try {
     const aan = String((rekord.klient && rekord.klient.epos) || "").trim();
     if (!aan) return { ok: false, fout: "Geen kliënt-e-pos" };
@@ -627,7 +629,28 @@ async function stuur_proforma(rekord, sleutel, gratis) {
       console.error(`Proforma: kon nie die PDF bou vir ${sleutel} nie:`, fout);
     }
 
-    const reels = [
+    const reels = [];
+
+    // DIE HERSTUUR-SIN, EN NET BY 'N HERSTUUR.
+    //
+    // Sy se nie WAAROM die vorige skakel dalk nie werk nie, en dit is
+    // doelbewus. Op 24 September 2026 was die rede dat Paystack se adres
+    // verval het; sedert die betaalbladsy bestaan, verval niks meer nie en
+    // is die enigste rede dat 'n ou pos 'n ou dokument dra. 'n Sin wat die
+    // rede noem, sou oor 'n maand 'n klient vertel van 'n probleem wat nie
+    // bestaan nie.
+    //
+    // "Moontlik nie meer nie" is dus die presiese sterkte: waar in albei
+    // gevalle, en dit verplig niemand om iets te verstaan nie.
+    if (herstuur) {
+      reels.push(
+        en
+          ? `This is a resend of invoice <b>${ontsnap(nommer)}</b>. Please use the link in this email; a link from an earlier email may no longer work.`
+          : `Hierdie is 'n herstuur van faktuur <b>${ontsnap(nommer)}</b>. Gebruik gerus die skakel in hierdie pos; 'n skakel uit 'n vroeëre pos werk moontlik nie meer nie.`
+      );
+    }
+
+    reels.push(
       en
         ? `Please find the proforma invoice for <b>${ontsnap(nommer)}</b> attached.`
         : `Hierby die proforma-faktuur <b>${ontsnap(nommer)}</b>.`,
@@ -637,8 +660,8 @@ async function stuur_proforma(rekord, sleutel, gratis) {
           ? `<br>${en ? "Payable by" : "Betaalbaar teen"}: ${ontsnap(
               datum_dokument(rekord.betaalbaar_teen)
             )}`
-          : ""),
-    ];
+          : "")
+    );
 
     if (gratis) {
       reels.push(
@@ -703,4 +726,8 @@ async function stuur_proforma(rekord, sleutel, gratis) {
 }
 
 
-module.exports = { reik_faktuur_uit, GEEN_EPOS };
+// stuur_proforma word uitgevoer sodat stuur-proforma-weer.js DIESELFDE pos kan
+// stuur as die uitreiking. 'n Tweede kopie van hierdie funksie sou beteken die
+// kliënt kry 'n ander dokument as die een wat hy oorspronklik gekry het, en
+// dan verskil die twee sonder dat iemand dit agterkom.
+module.exports = { reik_faktuur_uit, stuur_proforma, GEEN_EPOS };

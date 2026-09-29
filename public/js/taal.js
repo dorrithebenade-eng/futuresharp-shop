@@ -2444,6 +2444,10 @@ const WOORDEBOEK = {
   fu_hernu: { af: "Hernu", en: "Renew" },
   fu_hernu_klaar: { af: "Die skakel is hernu. Die ou een werk nie meer nie; stuur hierdie een vir die kliënt.", en: "The link has been renewed. The old one no longer works; send this one to the client." },
   fu_hernu_fout: { af: "Kon nie die betaalskakel hernu nie.", en: "Could not renew the payment link." },
+  fu_stuur_weer: { af: "Stuur weer", en: "Send again" },
+  fu_stuur_weer_vra: { af: "Stuur die proforma weer aan", en: "Send the proforma again to" },
+  fu_stuur_weer_klaar: { af: "Die proforma is weer gestuur aan", en: "The proforma has been sent again to" },
+  fu_stuur_weer_fout: { af: "Kon nie die proforma weer stuur nie.", en: "Could not send the proforma again." },
   fu_deel: { af: "Deel", en: "Share" },
 
   // ── Instellings: die maatskappy se kop en die bankbesonderhede ───────

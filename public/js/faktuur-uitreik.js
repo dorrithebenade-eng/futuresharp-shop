@@ -690,6 +690,10 @@ function fu_teken_strook() {
         "fu_hernu",
         "Hernu"
       )}</button>
+      <button type="button" class="fu-mini" id="fu-stuur-weer">${fu_t(
+        "fu_stuur_weer",
+        "Stuur weer"
+      )}</button>
     </div>
     <p class="fu-strook-teks" id="fu-hernu-nota" hidden></p>
   </div>`;
@@ -720,6 +724,7 @@ function fu_teken_strook() {
   }
 
   fu_koppel_hernu();
+  fu_koppel_stuur_weer();
 }
 
 /* ═══ Hernu ═══
@@ -792,6 +797,65 @@ function fu_koppel_hernu() {
           fu_t("fu_hernu_fout", "Kon nie die betaalskakel hernu nie.");
         nota.hidden = false;
       }
+      knop.disabled = false;
+      knop.textContent = oud;
+    }
+  });
+}
+
+/* ═══ Stuur weer ═══
+
+   stuur-faktuur.js werk slegs op 'n KONSEP, want 'n uitreiking gebeur een
+   keer. Daar was dus geen manier om 'n faktuur se dokument weer te stuur nie,
+   en dit is nie 'n randgeval nie: 'n klient verloor sy pos, vra dat dit na 'n
+   kollega gaan, of het 'n herinnering nodig voor die vervaldatum.
+
+   DIT REIK NIKS UIT NIE. Geen nuwe nommer, geen nuwe verdeling, geen nuwe
+   transaksie. Net dieselfde dokument, met 'n vars PDF wat die betaalbladsy se
+   adres dra. */
+function fu_koppel_stuur_weer() {
+  const knop = document.getElementById("fu-stuur-weer");
+  const nota = document.getElementById("fu-hernu-nota");
+  if (!knop) return;
+
+  knop.addEventListener("click", async () => {
+    // DIE BEVESTIGING IS NIE SEREMONIE NIE. Hierdie knoppie stuur 'n pos aan
+    // 'n klient, en 'n pos kan nie teruggetrek word nie.
+    const aan = (V.klient && V.klient.epos) || "";
+    const vraag = fu_t("fu_stuur_weer_vra", "Stuur die proforma weer aan") + " " + aan + "?";
+    if (!window.confirm(vraag)) return;
+
+    if (nota) nota.hidden = true;
+    knop.disabled = true;
+    const oud = knop.textContent;
+    knop.textContent = fu_t("fu_besig", "Besig …");
+
+    try {
+      const resp = await fetch("/.netlify/functions/stuur-proforma-weer", {
+        method: "POST",
+        headers: await identiteit_kop({ "Content-Type": "application/json" }),
+        body: JSON.stringify({ sleutel: V.sleutel }),
+      });
+
+      const teks = await resp.text();
+      if (!resp.ok) throw new Error(teks || `Status ${resp.status}`);
+
+      const data = JSON.parse(teks);
+      if (nota) {
+        nota.textContent =
+          fu_t("fu_stuur_weer_klaar", "Die proforma is weer gestuur aan") +
+          " " + (data.aan || aan) + ".";
+        nota.hidden = false;
+      }
+    } catch (fout) {
+      console.error("Kon nie die proforma weer stuur nie:", fout);
+      if (nota) {
+        nota.textContent =
+          String(fout.message || "").trim() ||
+          fu_t("fu_stuur_weer_fout", "Kon nie die proforma weer stuur nie.");
+        nota.hidden = false;
+      }
+    } finally {
       knop.disabled = false;
       knop.textContent = oud;
     }
