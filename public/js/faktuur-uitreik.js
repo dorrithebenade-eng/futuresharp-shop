@@ -686,7 +686,12 @@ function fu_teken_strook() {
         "Kopieer"
       )}</button>
       <button type="button" class="fu-mini" id="fu-deel" hidden>${fu_t("fu_deel", "Deel")}</button>
+      <button type="button" class="fu-mini" id="fu-hernu">${fu_t(
+        "fu_hernu",
+        "Hernu"
+      )}</button>
     </div>
+    <p class="fu-strook-teks" id="fu-hernu-nota" hidden></p>
   </div>`;
 
   const kopieer = document.getElementById("fu-kopieer");
@@ -713,6 +718,78 @@ function fu_teken_strook() {
         .catch(() => {});
     });
   }
+
+  fu_koppel_hernu();
+}
+
+/* ═══ Hernu ═══
+
+   PAYSTACK SE TOEGANGSKODE LEEF NIE SO LANK AS DIE BETAALTERMYN NIE. 'n
+   Faktuur met agt dae om te betaal kry 'n skakel wat vroeer doodgaan, en die
+   kliënt sien "We could not start this transaction". Op 22 September 2026 het
+   FS/01962 en FS/01963 albei so gestaan.
+
+   Die knoppie vra 'n VARS skakel vir DIESELFDE faktuur. Die alternatief was om
+   te kanselleer en 'n nuwe nommer uit te reik, en dit gee die kliënt 'n tweede
+   faktuur vir dieselfde werk.
+
+   DIE BEDRAG EN DIE VERDELING WORD NIE HERBEREKEN NIE. Dit gebeur bediener-kant
+   in hernu-betaalskakel.js, uit die gevriesde waardes; sien die nota daar.
+
+   Die skakel op die skerm, die QR en die string wat Kopieer en Deel gebruik,
+   kom almal uit V.betaalskakel. Die blok word dus heeltemal herteken in plaas
+   van die <code> se teks te verstel, anders wys die QR steeds die dooie een. */
+function fu_koppel_hernu() {
+  const knop = document.getElementById("fu-hernu");
+  const nota = document.getElementById("fu-hernu-nota");
+  if (!knop) return;
+
+  knop.addEventListener("click", async () => {
+    if (nota) nota.hidden = true;
+    knop.disabled = true;
+    const oud = knop.textContent;
+    knop.textContent = fu_t("fu_besig", "Besig …");
+
+    try {
+      const resp = await fetch("/.netlify/functions/hernu-betaalskakel", {
+        method: "POST",
+        // DIESELFDE KOP AS DIE ANDER OPROEPE op hierdie bladsy. identiteit_kop()
+        // verfris die teken as hy verval het; 'n met die hand gebonde token
+        // doen dit nie, en 'n faktuur bly soms lank oop.
+        headers: await identiteit_kop({ "Content-Type": "application/json" }),
+        body: JSON.stringify({ sleutel: V.sleutel }),
+      });
+
+      const teks = await resp.text();
+      if (!resp.ok) throw new Error(teks || `Status ${resp.status}`);
+
+      const data = JSON.parse(teks);
+      V.betaalskakel = data.betaalskakel;
+
+      // Alles wat die ou string gedra het, word saam nuut.
+      fu_teken_strook();
+      fu_teken_qr();
+
+      const nuwe_nota = document.getElementById("fu-hernu-nota");
+      if (nuwe_nota) {
+        nuwe_nota.textContent = fu_t(
+          "fu_hernu_klaar",
+          "Die skakel is hernu. Die ou een werk nie meer nie; stuur hierdie een vir die kliënt."
+        );
+        nuwe_nota.hidden = false;
+      }
+    } catch (fout) {
+      console.error("Kon nie die betaalskakel hernu nie:", fout);
+      if (nota) {
+        nota.textContent =
+          String(fout.message || "").trim() ||
+          fu_t("fu_hernu_fout", "Kon nie die betaalskakel hernu nie.");
+        nota.hidden = false;
+      }
+      knop.disabled = false;
+      knop.textContent = oud;
+    }
+  });
 }
 
 /* ═══ begin ═══ */
