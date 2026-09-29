@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="af">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Future Sharp</title>
+  <link rel="stylesheet" href="css/styl.css">
+  <link rel="stylesheet" href="css/betaal-klaar.css">
+  <!-- DIE F-MERK, NIE DIE WINKEL SE S NIE.
+       Hierdie bladsy dra Future Sharp se naam alleen -- geen "Future Sharp —
+       Future Shop"-woordmerk in die kop nie. Die ikoon-skrip van 4 September
+       2026 het elke bladsy in public/ die winkel se ikoon gegee sonder om te
+       vra aan watter kant sy behoort.
+       Die lers heet `paneel-ikoon-*` omdat hulle vir die paneel gebou is; die
+       merk self is Future Sharp s'n en dien albei. Een stel lers is beter as
+       twee eenderse stelle met verskillende name. -->
+  <link rel="icon" href="/icons/paneel-ikoon-32.png" sizes="32x32" type="image/png">
+  <link rel="icon" href="/icons/paneel-ikoon-16.png" sizes="16x16" type="image/png">
+  <link rel="apple-touch-icon" href="/icons/paneel-apple-touch-ikoon.png">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#3FB6A4"></head>
+<body>
+
+  <!--
+    DIE DEURGANG NA DIE BETALING.
+
+    Dit is die adres wat in die proforma-e-pos, die PDF en die QR staan:
+    betaal.html?f=<sleutel>&k=<kode>. Dit verwys net na 'n faktuur en kan dus
+    nie verval nie. Die Paystack-skakel word eers gevra wanneer iemand hier
+    land, en is dan sekondes oud.
+
+    Tot 24 September 2026 het daardie dokumente Paystack se eie adres gedra.
+    Daardie string gaan dood terwyl hy in die kliënt se inboks lê, en niks wat
+    ons aan ons kant doen, kan dit regmaak nie.
+
+    'n Publieke bladsy. Geen sessie, geen aanmelding, geen paneelkode — die
+    kliënt is 'n rekord, nie 'n rekening nie. taal.js laai omdat die bladsy in
+    die FAKTUUR se taal lees, met t_in(), nie in die blaaier se taal nie.
+  -->
+
+  <div class="bk-blad">
+    <div class="bk-merk">
+      <img src="images/future-sharp-logo.png" alt="Future Sharp">
+    </div>
+    <div class="bk-kaart" id="bk-kaart">
+      <div class="bk-besig">
+        <div><span class="bk-stip"></span><span class="bk-stip"></span><span class="bk-stip"></span></div>
+        <p id="bk-besig-teks"></p>
+      </div>
+    </div>
+  </div>
+
+  <p class="bk-voet" id="bk-voet"></p>
+
+  <script src="js/taal.js"></script>
+  <script src="js/betaal.js"></script>
+</body>
+</html>
