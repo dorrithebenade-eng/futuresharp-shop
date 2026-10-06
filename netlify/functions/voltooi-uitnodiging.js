@@ -46,7 +46,7 @@ const ROLLE_MET_OOREENKOMS = ["outeur", "spreker"];
 // Die weergawe van die ooreenkoms wat tans op die werf staan. Die BEDIENER
 // besluit dit, nie die klient nie — anders teken iemand 'n weergawe wat hy
 // self benoem het. Verander ooreenkoms-en.html, verander hierdie getal ook.
-const OOREENKOMS_WEERGAWE = "1.0";
+const OOREENKOMS_WEERGAWE = "1.1";
 // Elke rol se eie ooreenkoms het sy eie weergawe. Die sprekersooreenkoms
 // (ooreenkoms-spreker-en.html) is 'n konsep tot die direkteure dit
 // finaliseer; verander dit, verander hierdie getal ook.

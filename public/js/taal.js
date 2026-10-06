@@ -164,7 +164,7 @@ const WOORDEBOEK = {
   uo_op_kop: { af: "Wat aangeteken is", en: "What has been recorded" },
   uo_op_deur: { af: "Onderteken deur ", en: "Signed by " },
   uo_op_op: { af: "Op ", en: "On " },
-  uo_op_weergawe: { af: "Outeursooreenkoms weergawe 1.0 (Engels)", en: "Author agreement version 1.0 (English)" },
+  uo_op_weergawe: { af: "Outeursooreenkoms weergawe 1.1 (Engels)", en: "Author agreement version 1.1 (English)" },
   // FutureSharp Talks: dieselfde vorm vir 'n spreker, met hierdie woorde.
   uo_kop_sub_spreker: { af: "Sluit aan as spreker by FutureSharp Talks", en: "Join FutureSharp Talks as a speaker" },
   uo_s2_titel_spreker: { af: "Die sprekersooreenkoms", en: "The speaker agreement" },
