@@ -39,7 +39,10 @@ function dokument_vormateer_datum(iso) {
 }
 
 function dokument_aflaai_url(dok) {
-  return `/.netlify/functions/kry-dokument?sleutel=${encodeURIComponent(dok.bestand_sleutel)}&naam=${encodeURIComponent(dok.lêernaam || dok.naam)}`;
+  // v= verander wanneer die lêer vervang word, sodat die paneel nie 'n
+  // gekaste ou weergawe aflaai nie.
+  const v = dok.lêer_vervang_op ? `&v=${encodeURIComponent(dok.lêer_vervang_op)}` : "";
+  return `/.netlify/functions/kry-dokument?sleutel=${encodeURIComponent(dok.bestand_sleutel)}&naam=${encodeURIComponent(dok.lêernaam || dok.naam)}${v}`;
 }
 
 function dokument_volledige_aflaai_url(dok) {
@@ -237,6 +240,10 @@ function paneel_dokument_wysig_oop(dok) {
     <label style="display:block;font-size:13px;margin-bottom:6px;">Beskrywing (opsioneel)
       <input type="text" class="dok-wysig-beskrywing" maxlength="500" value="${dokument_ontsnap(dok.beskrywing)}" style="display:block;width:100%;margin-top:2px;">
     </label>
+    <label style="display:block;font-size:13px;margin-bottom:6px;">Vervang lêer (opsioneel)
+      <input type="file" class="dok-wysig-leer" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx" style="display:block;margin-top:2px;">
+      <span style="color:#777;">Huidig: ${dokument_ontsnap(dok.lêernaam || "")}. Die aflaaiskakel bly dieselfde.</span>
+    </label>
     <button type="button" class="terug-skakel dok-wysig-stoor">Stoor</button>
     <button type="button" class="terug-skakel dok-wysig-kanselleer">Kanselleer</button>
     <span class="dok-wysig-fout" style="color:#c0392b;font-size:13px;margin-left:8px;"></span>`;
@@ -253,19 +260,28 @@ function paneel_dokument_wysig_oop(dok) {
     const beskrywing = inligting.querySelector(".dok-wysig-beskrywing").value.trim();
     if (!naam) { fout.textContent = "Die naam mag nie leeg wees nie."; return; }
 
+    const lêer = inligting.querySelector(".dok-wysig-leer").files[0] || null;
+    if (lêer) {
+      if (!DOKUMENTE_TOEGELATE_TIPES.includes(lêer.type)) { fout.textContent = "Slegs Word-, PDF-, Excel- of PowerPoint-lêers."; return; }
+      if (lêer.size > DOKUMENTE_MAKS_GROOTTE) { fout.textContent = "Die lêer is groter as 4MB."; return; }
+    }
+
     knoppie.disabled = true;
     knoppie.textContent = "Besig …";
     try {
       const resp = await fetch(DOKUMENTE_WYSIG_ENDPOINT, {
         method: "POST",
         headers: { "Content-Type": "application/json", ...kry_outorisasie_kop() },
-        body: JSON.stringify({ id: dok.id, naam, beskrywing }),
+        body: JSON.stringify(Object.assign(
+          { id: dok.id, naam, beskrywing },
+          lêer ? { data_base64: await lees_lêer_as_base64(lêer), inhoud_tipe: lêer.type, lêernaam: lêer.name } : {}
+        )),
       });
       if (!resp.ok) throw new Error((await resp.text()) || `Status ${resp.status}`);
 
       // Blobs se lys loop agter; werk die plaaslike kas by en sorteer weer.
-      dok.naam = naam;
-      dok.beskrywing = beskrywing;
+      const uit = await resp.json();
+      Object.assign(dok, uit.dokument || { naam, beskrywing });
       dokumente_kas.sort((a, b) =>
         String(a.naam || "").localeCompare(String(b.naam || ""), "af", { sensitivity: "base", numeric: true })
       );

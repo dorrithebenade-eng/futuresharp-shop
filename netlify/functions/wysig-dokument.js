@@ -1,12 +1,25 @@
-// Personeel-beskermd — wysig 'n dokument se naam en beskrywing in die
-// "Dokumente"-afdeling.
+// Personeel-beskermd — wysig 'n dokument in die "Dokumente"-afdeling: die
+// naam, die beskrywing, en opsioneel die lêer self.
 //
-// NET DIE METADATA. Die lêer self en sy sleutel bly onaangeraak, sodat 'n
-// aflaaiskakel wat reeds per e-pos of WhatsApp gestuur is, steeds werk.
-// 'n Ander lêer is 'n nuwe oplaai.
+// VERVANG LÊER: die nuwe inhoud word onder DIESELFDE sleutel gestoor, sodat
+// 'n aflaaiskakel wat reeds per e-pos of WhatsApp gestuur is, voortaan die
+// nuwe weergawe gee. kry-dokument.js laat die blaaier 'n uur lank kas, dus
+// kan 'n ou skakel tot 'n uur lank nog die vorige weergawe wys.
 
 const { kry_store } = require("./_blob-store");
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
+
+// Dieselfde lys en perk as laai-dokument-op.js.
+const MAKS_GROOTTE_GREPE = 4 * 1024 * 1024;
+const TOEGELATE_TIPES = [
+  "application/pdf",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "application/vnd.ms-excel",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+  "application/vnd.ms-powerpoint",
+];
 
 exports.handler = async (event, context) => {
   if (event.httpMethod !== "POST") {
@@ -36,6 +49,24 @@ exports.handler = async (event, context) => {
     const store = kry_store("dokumente");
     const rekord = await store.get(id, { type: "json" });
     if (!rekord) return { statusCode: 404, body: "Hierdie dokument bestaan nie" };
+
+    // Die lêer eerste: misluk dit, bly die rekord soos hy was.
+    if (invoer.data_base64) {
+      const inhoud_tipe = String(invoer.inhoud_tipe || "");
+      if (!TOEGELATE_TIPES.includes(inhoud_tipe)) {
+        return { statusCode: 400, body: "Slegs Word-, PDF-, Excel- of PowerPoint-lêers word toegelaat" };
+      }
+      const buffer = Buffer.from(String(invoer.data_base64), "base64");
+      if (!buffer.length) return { statusCode: 400, body: "Die lêer is leeg" };
+      if (buffer.length > MAKS_GROOTTE_GREPE) {
+        return { statusCode: 413, body: "Lêer is te groot — maksimum 4MB" };
+      }
+      await kry_store("dokument-lêers").set(rekord.bestand_sleutel, buffer, { metadata: { inhoud_tipe } });
+      rekord.inhoud_tipe = inhoud_tipe;
+      rekord.grootte_grepe = buffer.length;
+      rekord.lêernaam = String(invoer.lêernaam || rekord.lêernaam).slice(0, 200);
+      rekord.lêer_vervang_op = new Date().toISOString();
+    }
 
     rekord.naam = naam;
     rekord.beskrywing = beskrywing;
