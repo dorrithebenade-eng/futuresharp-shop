@@ -43,12 +43,15 @@ exports.handler = async (event, context) => {
     return { statusCode: 400, body: "Ongeldige versoek" };
   }
 
-  const outeur_id = String(invoer.outeur_id || "").trim();
+  // Outeurs EN sprekers (FutureSharp Talks). Die veld in die versoek sê
+  // watter store bedoel word; die reël is vir albei dieselfde.
+  const is_spreker = invoer.spreker_id !== undefined;
+  const outeur_id = String((is_spreker ? invoer.spreker_id : invoer.outeur_id) || "").trim();
   if (!/^[a-z0-9-]{1,120}$/.test(outeur_id)) {
-    return { statusCode: 400, body: "Ongeldige outeur" };
+    return { statusCode: 400, body: is_spreker ? "Ongeldige spreker" : "Ongeldige outeur" };
   }
 
-  const store = kry_store("outeurs");
+  const store = kry_store(is_spreker ? "sprekers" : "outeurs");
 
   let outeur;
   try {
@@ -59,7 +62,7 @@ exports.handler = async (event, context) => {
   }
 
   if (!outeur) {
-    return { statusCode: 404, body: "Hierdie outeur bestaan nie" };
+    return { statusCode: 404, body: is_spreker ? "Hierdie spreker bestaan nie" : "Hierdie outeur bestaan nie" };
   }
 
   // Daar moet iets wees om te bevestig. 'n Outeur wat met die hand
@@ -68,7 +71,9 @@ exports.handler = async (event, context) => {
   if (!outeur.ooreenkoms || !outeur.ooreenkoms.aanvaar_op) {
     return {
       statusCode: 409,
-      body: "Hierdie outeur het nie 'n ondertekende ooreenkoms nie",
+      body: is_spreker
+        ? "Hierdie spreker het nie 'n ondertekende ooreenkoms nie"
+        : "Hierdie outeur het nie 'n ondertekende ooreenkoms nie",
     };
   }
 

@@ -103,6 +103,7 @@ const WOORDEBOEK = {
   po_bevestig_vra: { af: "Bevestig hierdie registrasie? Dit teken Future Sharp se aanvaarding van die ooreenkoms aan en kan nie ongedaan gemaak word nie.", en: "Confirm this registration? This records Future Sharp's acceptance of the agreement and cannot be undone." },
   po_besig: { af: "Besig …", en: "Working …" },
   po_geen: { af: "Hierdie outeur is met die hand bygevoeg en het nie deur die aansluitvorm geregistreer nie. Daar is geen ondertekende ooreenkoms of dokumente op die rekord nie.", en: "This author was added by hand and did not register through the joining form. There is no signed agreement or documents on the record." },
+  po_geen_spreker: { af: "Hierdie spreker het nie deur die aansluitvorm geregistreer nie (met die hand bygevoeg, of uit die outeurs oorgeneem). Daar is geen ondertekende sprekersooreenkoms of dokumente op die rekord nie.", en: "This speaker did not register through the joining form (added by hand, or taken over from the authors). There is no signed speaker agreement or documents on the record." },
   po_dok_fout: { af: "Kon nie die dokument oopmaak nie", en: "Could not open the document" },
   po_bevestig_fout: { af: "Kon nie bevestig nie", en: "Could not confirm" },
 

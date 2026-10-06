@@ -198,6 +198,11 @@ function paneel_register_open_vorm(reg, item) {
 
   document.getElementById(`paneel-${reg.sleutel}-vorm-foute`).style.display = "none";
 
+  // Sprekers kry dieselfde ooreenkoms-blok as outeurs (paneel-ooreenkoms.js).
+  if (reg.sleutel === "sprekers" && typeof window.po_wys_spreker === "function") {
+    window.po_wys_spreker(item);
+  }
+
   const indien_knoppie = document.getElementById(`paneel-${reg.sleutel}-vorm-indien`);
   indien_knoppie.textContent = item ? "Stoor wysigings" : reg.knoppie_teks;
 

@@ -42,6 +42,8 @@ const PO_TERUGVAL = {
     "Hierdie outeur is met die hand bygevoeg en het nie deur die aansluitvorm geregistreer nie. Daar is geen ondertekende ooreenkoms of dokumente op die rekord nie.",
   po_dok_fout: "Kon nie die dokument oopmaak nie",
   po_bevestig_fout: "Kon nie bevestig nie",
+  po_geen_spreker:
+    "Hierdie spreker het nie deur die aansluitvorm geregistreer nie (met die hand bygevoeg, of uit die outeurs oorgeneem). Daar is geen ondertekende sprekersooreenkoms of dokumente op die rekord nie.",
 };
 
 function po_t(sleutel) {
@@ -80,15 +82,30 @@ function po_ry(etiket, waarde, klas) {
   return ry;
 }
 
+// --- Twee blokke, een kode --------------------------------------------
+//
+// Dieselfde blok staan bo-aan die outeursvorm en bo-aan die sprekersvorm.
+// Die verskil is net die rekord se ID-veld en die elemente op die bladsy;
+// die bevestiging en die dokumente loop deur dieselfde twee Functions, wat
+// aan die ID-veld sien watter store bedoel word.
+
+const PO_SOORTE = {
+  outeur: { idveld: "outeur_id", blok: "po-blok", merk: "po-merk", lyf: "po-lyf", geen: "po_geen" },
+  spreker: { idveld: "spreker_id", blok: "po-blok-spreker", merk: "po-merk-spreker", lyf: "po-lyf-spreker", geen: "po_geen_spreker" },
+};
+
+const po_huidig = { outeur: null, spreker: null };
+
 // --- Die dokumente ------------------------------------------------------
 
-async function po_maak_dokument_oop(outeur_id, soort, knoppie) {
+async function po_maak_dokument_oop(soort_rekord, id, soort, knoppie) {
   const oud = knoppie.textContent;
   knoppie.disabled = true;
+  const idveld = PO_SOORTE[soort_rekord].idveld;
 
   try {
     const resp = await fetch(
-      `/.netlify/functions/kry-outeur-dokument?outeur_id=${encodeURIComponent(outeur_id)}&soort=${soort}`,
+      `/.netlify/functions/kry-outeur-dokument?${idveld}=${encodeURIComponent(id)}&soort=${soort}`,
       { headers: kry_outorisasie_kop() }
     );
     if (!resp.ok) throw new Error((await resp.text()) || `Status ${resp.status}`);
@@ -108,7 +125,7 @@ async function po_maak_dokument_oop(outeur_id, soort, knoppie) {
   }
 }
 
-function po_dokument_knoppie(outeur_id, soort, inskrywing) {
+function po_dokument_knoppie(soort_rekord, id, soort, inskrywing) {
   const knoppie = document.createElement("button");
   knoppie.type = "button";
   knoppie.className = "po-dok";
@@ -122,13 +139,13 @@ function po_dokument_knoppie(outeur_id, soort, inskrywing) {
 
   knoppie.appendChild(naam);
   knoppie.appendChild(fyn);
-  knoppie.addEventListener("click", () => po_maak_dokument_oop(outeur_id, soort, knoppie));
+  knoppie.addEventListener("click", () => po_maak_dokument_oop(soort_rekord, id, soort, knoppie));
   return knoppie;
 }
 
 // --- Die bevestiging ----------------------------------------------------
 
-async function po_bevestig(outeur_id, knoppie) {
+async function po_bevestig(soort_rekord, id, knoppie) {
   if (!confirm(po_t("po_bevestig_vra"))) return;
 
   knoppie.disabled = true;
@@ -138,7 +155,7 @@ async function po_bevestig(outeur_id, knoppie) {
     const resp = await fetch("/.netlify/functions/bevestig-outeur", {
       method: "POST",
       headers: { "Content-Type": "application/json", ...kry_outorisasie_kop() },
-      body: JSON.stringify({ outeur_id }),
+      body: JSON.stringify({ [PO_SOORTE[soort_rekord].idveld]: id }),
     });
     if (!resp.ok) throw new Error((await resp.text()) || `Status ${resp.status}`);
     const uitslag = await resp.json();
@@ -146,7 +163,15 @@ async function po_bevestig(outeur_id, knoppie) {
     // Plaaslik bywerk, nie herlaai nie: Blobs se list() is eventueel
     // konsekwent, dus sou 'n herlaai die ou stand kon terugwys en dit sou
     // lyk of die knoppie niks gedoen het nie.
-    po_teken(po_huidige_outeur_met(uitslag));
+    const rekord = po_huidig[soort_rekord];
+    po_teken_soort(soort_rekord, {
+      ...rekord,
+      ooreenkoms: {
+        ...(rekord.ooreenkoms || {}),
+        bevestig_op: uitslag.bevestig_op,
+        bevestig_deur: uitslag.bevestig_deur,
+      },
+    });
   } catch (fout) {
     console.error("Kon nie bevestig nie:", fout);
     alert(`${po_t("po_bevestig_fout")}: ${fout.message}`);
@@ -155,49 +180,38 @@ async function po_bevestig(outeur_id, knoppie) {
   }
 }
 
-let po_outeur = null;
-
-function po_huidige_outeur_met(uitslag) {
-  return {
-    ...po_outeur,
-    ooreenkoms: {
-      ...(po_outeur.ooreenkoms || {}),
-      bevestig_op: uitslag.bevestig_op,
-      bevestig_deur: uitslag.bevestig_deur,
-    },
-  };
-}
-
 // --- Teken ---------------------------------------------------------------
 
-function po_teken(outeur) {
-  po_outeur = outeur;
+function po_teken_soort(soort_rekord, rekord) {
+  const k = PO_SOORTE[soort_rekord];
+  po_huidig[soort_rekord] = rekord;
 
-  const blok = document.getElementById("po-blok");
-  const merk = document.getElementById("po-merk");
-  const lyf = document.getElementById("po-lyf");
+  const blok = document.getElementById(k.blok);
+  const merk = document.getElementById(k.merk);
+  const lyf = document.getElementById(k.lyf);
   if (!blok || !merk || !lyf) return;
 
   merk.textContent = "";
   merk.className = "";
   lyf.innerHTML = "";
 
-  // Geen outeur nie: die vorm staan op "voeg by".
-  if (!outeur || !outeur.outeur_id) {
+  // Geen rekord nie: die vorm staan op "voeg by".
+  const id = rekord && rekord[k.idveld];
+  if (!id) {
     blok.style.display = "none";
     return;
   }
 
   blok.style.display = "block";
 
-  const ooreenkoms = outeur.ooreenkoms || {};
-  const dokumente = outeur.dokumente || {};
+  const ooreenkoms = rekord.ooreenkoms || {};
+  const dokumente = rekord.dokumente || {};
 
-  // Met die hand bygevoeg — sê dit reguit in plaas van om leeg te lyk.
+  // Met die hand bygevoeg: se dit reguit in plaas van om leeg te lyk.
   if (!ooreenkoms.aanvaar_op) {
     const p = document.createElement("p");
     p.className = "po-leeg";
-    p.textContent = po_t("po_geen");
+    p.textContent = po_t(k.geen);
     lyf.appendChild(p);
     return;
   }
@@ -224,7 +238,7 @@ function po_teken(outeur) {
   dokRy.className = "po-dokumente";
   ["bankbrief", "idafskrif"].forEach((soort) => {
     if (dokumente[soort] && dokumente[soort].sleutel) {
-      dokRy.appendChild(po_dokument_knoppie(outeur.outeur_id, soort, dokumente[soort]));
+      dokRy.appendChild(po_dokument_knoppie(soort_rekord, id, soort, dokumente[soort]));
     }
   });
   if (dokRy.children.length) lyf.appendChild(dokRy);
@@ -241,7 +255,7 @@ function po_teken(outeur) {
     knoppie.type = "button";
     knoppie.className = "po-knoppie";
     knoppie.textContent = po_t("po_bevestig_knoppie");
-    knoppie.addEventListener("click", () => po_bevestig(outeur.outeur_id, knoppie));
+    knoppie.addEventListener("click", () => po_bevestig(soort_rekord, id, knoppie));
 
     voet.appendChild(lei);
     voet.appendChild(knoppie);
@@ -249,5 +263,7 @@ function po_teken(outeur) {
   }
 }
 
-// paneelbord.js roep dit aan wanneer die vorm oopmaak.
-window.po_wys = po_teken;
+// paneelbord.js roep die eerste aan wanneer die outeursvorm oopmaak;
+// paneel-registers.js die tweede wanneer die sprekersvorm oopmaak.
+window.po_wys = (outeur) => po_teken_soort("outeur", outeur);
+window.po_wys_spreker = (spreker) => po_teken_soort("spreker", spreker);

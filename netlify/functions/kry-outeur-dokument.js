@@ -40,7 +40,9 @@ exports.handler = async (event, context) => {
   }
 
   const vrae = event.queryStringParameters || {};
-  const outeur_id = String(vrae.outeur_id || "").trim();
+  // Outeurs EN sprekers (FutureSharp Talks): die parameter sê watter store.
+  const is_spreker = vrae.spreker_id !== undefined;
+  const outeur_id = String((is_spreker ? vrae.spreker_id : vrae.outeur_id) || "").trim();
   const soort = vrae.soort;
 
   // 'n Slug en niks anders nie. Dit gaan na store.get(), dus word dit
@@ -54,7 +56,7 @@ exports.handler = async (event, context) => {
 
   let outeur;
   try {
-    outeur = await kry_store("outeurs").get(outeur_id, { type: "json" });
+    outeur = await kry_store(is_spreker ? "sprekers" : "outeurs").get(outeur_id, { type: "json" });
   } catch (fout) {
     console.error("Kon nie die outeur lees nie:", fout);
     return { statusCode: 500, body: "Kon nie die dokument laai nie" };
