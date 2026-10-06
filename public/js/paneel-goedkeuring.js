@@ -420,6 +420,16 @@ function pg_besonderhede_html(rekord) {
       pg_ontsnap(pg_t("pg_terug_stuur", "Stuur terug")) + "</button></div>";
   }
 
+  // --- Uitvee ---
+  //
+  // Vir toetse en indienings wat nooit iets geword het nie. Nie vir 'n boek
+  // op die rak nie; die bediener weier dit in elk geval.
+  if (rekord.stand !== "op_rak" && rekord.stand !== "wysiging" && !rekord.produk_id) {
+    uit += '<div class="pg-aksies">' +
+      '<button type="button" class="kaart-aksie" id="pg-skrap">' +
+      pg_ontsnap(pg_t("pg_skrap", "Vee hierdie indiening uit")) + "</button></div>";
+  }
+
   return uit;
 }
 
@@ -451,6 +461,49 @@ async function pg_handeling(pad, liggaam, knoppie, besig_teks) {
     console.error("Die handeling het misluk:", fout);
     alert(String(fout.message || fout) || pg_t("pg_handeling_fout", "Die handeling het misluk."));
     if (knoppie) { knoppie.disabled = false; knoppie.textContent = oorspronklik; }
+  }
+}
+
+// Vee 'n indiening uit. Die vormnommer moet getik word; die bediener toets
+// dit weer.
+async function pg_skrap(knoppie) {
+  if (!PG_OOP) return;
+  const nommer = PG_OOP.nommer;
+  const getik = prompt(
+    pg_t("pg_skrap_vraag",
+      "Hierdie indiening en al sy l\u00eaers word permanent uitgevee. Tik die vormnommer om te bevestig:") +
+    "\n\n" + nommer
+  );
+  if (getik === null) return;
+  if (getik.trim().toUpperCase() !== nommer) {
+    alert(pg_t("pg_skrap_verkeerd", "Die vormnommer stem nie ooreen nie. Niks is uitgevee nie."));
+    return;
+  }
+
+  const oorspronklik = knoppie.textContent;
+  knoppie.disabled = true;
+  knoppie.textContent = pg_t("pg_besig", "Besig \u2026");
+
+  try {
+    const resp = await fetch("/.netlify/functions/skrap-indiening", {
+      method: "POST",
+      headers: Object.assign({ "Content-Type": "application/json" }, kry_outorisasie_kop()),
+      body: JSON.stringify({ nommer, bevestig: getik.trim() }),
+    });
+    if (!resp.ok) throw new Error(await resp.text());
+
+    // Blobs se list() loop agter; haal die ry plaaslik uit.
+    PG_INDIENINGS = PG_INDIENINGS.filter((r) => r.nommer !== nommer);
+    pg_teken_lys();
+    pg_maak_leser_toe();
+    const paneel = document.getElementById("pg-een");
+    if (paneel) paneel.style.display = "none";
+    PG_OOP = null;
+  } catch (fout) {
+    console.error("Uitvee het misluk:", fout);
+    alert(String(fout.message || fout) || pg_t("pg_handeling_fout", "Die handeling het misluk."));
+    knoppie.disabled = false;
+    knoppie.textContent = oorspronklik;
   }
 }
 
@@ -678,6 +731,12 @@ document.addEventListener("click", (e) => {
     }
     pg_handeling("stuur-terug", { nommer: PG_OOP.nommer, opmerking }, stuur,
       pg_t("pg_besig", "Besig \u2026"));
+    return;
+  }
+
+  const skrap = e.target.closest("#pg-skrap");
+  if (skrap) {
+    pg_skrap(skrap);
     return;
   }
 
