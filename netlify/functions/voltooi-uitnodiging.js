@@ -50,7 +50,7 @@ const OOREENKOMS_WEERGAWE = "1.1";
 // Elke rol se eie ooreenkoms het sy eie weergawe. Die sprekersooreenkoms
 // (ooreenkoms-spreker-en.html) is 'n konsep tot die direkteure dit
 // finaliseer; verander dit, verander hierdie getal ook.
-const OOREENKOMS_WEERGAWES = { outeur: OOREENKOMS_WEERGAWE, spreker: "0.1" };
+const OOREENKOMS_WEERGAWES = { outeur: OOREENKOMS_WEERGAWE, spreker: "0.2" };
 const OOREENKOMS_TAAL = "en";
 
 // Die twee aanhegsels wat klousule 6 vereis.

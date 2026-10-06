@@ -169,7 +169,7 @@ const WOORDEBOEK = {
   uo_kop_sub_spreker: { af: "Sluit aan as spreker by FutureSharp Talks", en: "Join FutureSharp Talks as a speaker" },
   uo_s2_titel_spreker: { af: "Die sprekersooreenkoms", en: "The speaker agreement" },
   uo_s4_lei_spreker: { af: "Kies 'n wagwoord waarmee jy by die winkel en jou sprekerspaneel aanmeld.", en: "Choose a password to sign in to the shop and your speaker panel." },
-  uo_op_weergawe_spreker: { af: "Sprekersooreenkoms weergawe 0.1 (Engels)", en: "Speaker agreement version 0.1 (English)" },
+  uo_op_weergawe_spreker: { af: "Sprekersooreenkoms weergawe 0.2 (Engels)", en: "Speaker agreement version 0.2 (English)" },
   uo_op_data: { af: "Bank- en kontakbesonderhede, bankbrief en ID-afskrif gestoor", en: "Banking and contact details, bank letter and ID copy stored" },
   uo_e_naam: { af: "Vul asseblief jou volle naam in.", en: "Please enter your full name." },
   uo_e_epos: { af: "Vul asseblief 'n geldige e-posadres in.", en: "Please enter a valid email address." },

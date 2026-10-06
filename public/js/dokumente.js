@@ -10,6 +10,7 @@
 const DOKUMENTE_KRY_ENDPOINT = "/.netlify/functions/kry-dokumente";
 const DOKUMENTE_OPLAAI_ENDPOINT = "/.netlify/functions/laai-dokument-op";
 const DOKUMENTE_SKRAP_ENDPOINT = "/.netlify/functions/skrap-dokument";
+const DOKUMENTE_WYSIG_ENDPOINT = "/.netlify/functions/wysig-dokument";
 const DOKUMENTE_MAKS_GROOTTE = 4 * 1024 * 1024;
 const DOKUMENTE_TOEGELATE_TIPES = [
   "application/pdf",
@@ -74,7 +75,7 @@ function paneel_dokumente_wys_lys(lys) {
   wrap.innerHTML = lys
     .map(
       (dok) => `
-        <div class="paneel-produk-ry">
+        <div class="paneel-produk-ry" data-dok-id="${dok.id}">
           <div class="paneel-produk-inligting">
             <strong>${dok.naam}</strong>
             <span class="paneel-produk-outeur">
@@ -85,6 +86,7 @@ function paneel_dokumente_wys_lys(lys) {
             <a class="terug-skakel" href="${dokument_aflaai_url(dok)}" download>⬇ Aflaai</a>
             <button class="terug-skakel paneel-dokument-epos-knoppie" data-id="${dok.id}">📧 E-pos</button>
             <button class="terug-skakel paneel-dokument-whatsapp-knoppie" data-id="${dok.id}">💬 WhatsApp</button>
+            <button class="terug-skakel paneel-dokument-wysig-knoppie" data-id="${dok.id}">✎ Wysig</button>
             <button class="terug-skakel paneel-skrap-knoppie paneel-dokument-skrap-knoppie" data-id="${dok.id}">Skrap</button>
           </div>
         </div>
@@ -103,6 +105,13 @@ function paneel_dokumente_wys_lys(lys) {
     knoppie.addEventListener("click", () => {
       const dok = lys.find((d) => d.id === knoppie.dataset.id);
       if (dok) dokument_stuur_whatsapp(dok);
+    });
+  });
+
+  wrap.querySelectorAll(".paneel-dokument-wysig-knoppie").forEach((knoppie) => {
+    knoppie.addEventListener("click", () => {
+      const dok = lys.find((d) => d.id === knoppie.dataset.id);
+      if (dok) paneel_dokument_wysig_oop(dok);
     });
   });
 
@@ -209,6 +218,65 @@ async function paneel_dokument_hanteer_indiening(gebeurtenis) {
     knoppie.disabled = false;
     knoppie.textContent = "+ Voeg by";
   }
+}
+
+function dokument_ontsnap(teks) {
+  return String(teks == null ? "" : teks).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+// Wysig in die ry self: die naam en beskrywing word invoervelde. Net die
+// metadata verander; die lêer en sy aflaaiskakel bly dieselfde.
+function paneel_dokument_wysig_oop(dok) {
+  const ry = document.querySelector(`[data-dok-id="${CSS.escape(dok.id)}"]`);
+  if (!ry) return;
+  const inligting = ry.querySelector(".paneel-produk-inligting");
+  inligting.innerHTML = `
+    <label style="display:block;font-size:13px;margin-bottom:4px;">Naam
+      <input type="text" class="dok-wysig-naam" maxlength="200" value="${dokument_ontsnap(dok.naam)}" style="display:block;width:100%;margin-top:2px;">
+    </label>
+    <label style="display:block;font-size:13px;margin-bottom:6px;">Beskrywing (opsioneel)
+      <input type="text" class="dok-wysig-beskrywing" maxlength="500" value="${dokument_ontsnap(dok.beskrywing)}" style="display:block;width:100%;margin-top:2px;">
+    </label>
+    <button type="button" class="terug-skakel dok-wysig-stoor">Stoor</button>
+    <button type="button" class="terug-skakel dok-wysig-kanselleer">Kanselleer</button>
+    <span class="dok-wysig-fout" style="color:#c0392b;font-size:13px;margin-left:8px;"></span>`;
+
+  const naam_veld = inligting.querySelector(".dok-wysig-naam");
+  naam_veld.focus();
+  naam_veld.select();
+
+  inligting.querySelector(".dok-wysig-kanselleer").addEventListener("click", () => paneel_dokumente_wys_lys(dokumente_kas));
+  inligting.querySelector(".dok-wysig-stoor").addEventListener("click", async (e) => {
+    const knoppie = e.currentTarget;
+    const fout = inligting.querySelector(".dok-wysig-fout");
+    const naam = naam_veld.value.trim();
+    const beskrywing = inligting.querySelector(".dok-wysig-beskrywing").value.trim();
+    if (!naam) { fout.textContent = "Die naam mag nie leeg wees nie."; return; }
+
+    knoppie.disabled = true;
+    knoppie.textContent = "Besig …";
+    try {
+      const resp = await fetch(DOKUMENTE_WYSIG_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...kry_outorisasie_kop() },
+        body: JSON.stringify({ id: dok.id, naam, beskrywing }),
+      });
+      if (!resp.ok) throw new Error((await resp.text()) || `Status ${resp.status}`);
+
+      // Blobs se lys loop agter; werk die plaaslike kas by en sorteer weer.
+      dok.naam = naam;
+      dok.beskrywing = beskrywing;
+      dokumente_kas.sort((a, b) =>
+        String(a.naam || "").localeCompare(String(b.naam || ""), "af", { sensitivity: "base", numeric: true })
+      );
+      paneel_dokumente_wys_lys(dokumente_kas);
+    } catch (f) {
+      console.error("Kon nie dokument wysig nie:", f);
+      fout.textContent = `Kon nie stoor nie: ${f.message}`;
+      knoppie.disabled = false;
+      knoppie.textContent = "Stoor";
+    }
+  });
 }
 
 async function paneel_dokument_skrap(dok, knoppie) {
