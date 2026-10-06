@@ -25,8 +25,11 @@ exports.handler = async (event, context) => {
       if (rekord) dokumente.push(rekord);
     }
 
-    // Nuutste eerste
-    dokumente.sort((a, b) => (b.opgelaai_op || "").localeCompare(a.opgelaai_op || ""));
+    // Alfabeties op naam. Hoof- en kleinletters en aksente tel nie, en
+    // getalle sorteer as getalle (2 voor 10).
+    dokumente.sort((a, b) =>
+      String(a.naam || "").localeCompare(String(b.naam || ""), "af", { sensitivity: "base", numeric: true })
+    );
 
     return {
       statusCode: 200,
