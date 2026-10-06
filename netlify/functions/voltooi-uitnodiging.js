@@ -19,6 +19,7 @@
 
 const { kry_store } = require("./_blob-store");
 const { is_verval } = require("./_uitnodiging-geldig");
+const { stuur_registrasie_kennisgewing } = require("./_kennisgewing-registrasie");
 
 const ROL_KONFIG = {
   outeur: { store: "outeurs", idveld: "outeur_id" },
@@ -303,6 +304,10 @@ exports.handler = async (event) => {
     geskepte_entiteit_id: entiteit_id,
     rekening_geskep: rekening_resultaat.geskep,
   });
+
+  // Kennisgewing aan die admin. Gooi nooit; 'n mislukte pos laat nie die
+  // registrasie misluk nie, want alles is reeds gestoor.
+  await stuur_registrasie_kennisgewing(naam, uitnodiging.rol_tipe);
 
   return {
     statusCode: 201,
