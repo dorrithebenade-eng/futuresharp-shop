@@ -42,6 +42,7 @@ const pt = {
   gekose_sprekers: [],
   kategoriee: [],
   sleutelwoorde: [],
+  sleutelwoorde_en: [],
   verdelings: [],
   omslag: "",
   omslag_gegenereer: false,
@@ -110,8 +111,10 @@ function pt_bou_skelet() {
         <label class="veld-etiket"><span>Kategorieë</span> <span class="veld-opsioneel">(die eerste gemerkte is die hoofkategorie en bepaal die omslag se kleur)</span></label>
         <div id="pt-kategoriee" class="pt-kategoriee"></div>
 
-        <label class="veld-etiket" for="pt-sleutel-invoer"><span>Sleutelwoorde</span> <span class="veld-opsioneel">(Enter of komma na elkeen)</span></label>
+        <label class="veld-etiket" for="pt-sleutel-invoer"><span>Sleutelwoorde (Afrikaans)</span> <span class="veld-opsioneel">(Enter of komma na elkeen)</span></label>
         <div id="pt-sleutels" class="pt-sleutels"><input type="text" id="pt-sleutel-invoer" maxlength="40" placeholder="neurowetenskap"></div>
+        <label class="veld-etiket" for="pt-sleutel-invoer-en"><span>Sleutelwoorde (Engels)</span> <span class="veld-opsioneel">(gewys wanneer die besoeker EN kies; die soektog kyk in albei)</span></label>
+        <div id="pt-sleutels-en" class="pt-sleutels"><input type="text" id="pt-sleutel-invoer-en" maxlength="40" placeholder="neuroscience"></div>
 
         <label class="veld-etiket" for="pt-oorsig">Oorsig <span class="veld-opsioneel">(op die kaart, sowat 100 woorde)</span></label>
         <textarea id="pt-oorsig" class="veld-invoer paneel-teksarea" rows="4" maxlength="2000"></textarea>
@@ -217,8 +220,11 @@ function pt_bou_skelet() {
     e.target.dataset.handmatig = "ja";
     pt_voorskou();
   });
-  document.getElementById("pt-sleutel-invoer").addEventListener("keydown", pt_sleutel_toets);
-  document.getElementById("pt-sleutel-invoer").addEventListener("blur", () => pt_voeg_sleutel_by(true));
+  for (const taal of ["af", "en"]) {
+    const invoer = document.getElementById(PT_SLEUTEL_VELDE[taal].invoer);
+    invoer.addEventListener("keydown", (e) => pt_sleutel_toets(e, taal));
+    invoer.addEventListener("blur", () => pt_voeg_sleutel_by(taal));
+  }
   document.getElementById("pt-prys").addEventListener("input", pt_bereken);
   document.getElementById("pt-net-koepon").addEventListener("change", (e) => {
     document.getElementById("pt-koepon-nota-velde").style.display = e.target.checked ? "block" : "none";
@@ -357,6 +363,7 @@ function pt_open_vorm(talk) {
   pt.gekose_sprekers = talk ? [...(talk.spreker_ids || [])] : [""];
   pt.kategoriee = talk ? [...(talk.kategoriee || [])] : [];
   pt.sleutelwoorde = talk ? [...(talk.sleutelwoorde || [])] : [];
+  pt.sleutelwoorde_en = talk ? [...(talk.sleutelwoorde_en || [])] : [];
   pt.verdelings = talk
     ? (v.verdelings || []).map((x) => ({ ...x }))
     : [{ rol_tipe: "spreker", entiteit_id: "", tipe: "persentasie", waarde: 70 }];
@@ -366,7 +373,8 @@ function pt_open_vorm(talk) {
 
   pt_teken_sprekers();
   pt_teken_kategoriee();
-  pt_teken_sleutels();
+  pt_teken_sleutels("af");
+  pt_teken_sleutels("en");
   pt_teken_verdelings();
   pt_wys_omslag();
   pt_foute("");
@@ -446,40 +454,53 @@ function pt_teken_kategoriee() {
   }));
 }
 
-function pt_teken_sleutels() {
-  const wrap = document.getElementById("pt-sleutels");
-  const invoer = document.getElementById("pt-sleutel-invoer");
+// Twee sleutelwoordlyste: Afrikaans (pt.sleutelwoorde, die oorspronklike
+// veld) en Engels (pt.sleutelwoorde_en). Dieselfde chips, elk met sy eie
+// invoerblok.
+const PT_SLEUTEL_VELDE = {
+  af: { wrap: "pt-sleutels", invoer: "pt-sleutel-invoer", lys: "sleutelwoorde" },
+  en: { wrap: "pt-sleutels-en", invoer: "pt-sleutel-invoer-en", lys: "sleutelwoorde_en" },
+};
+
+function pt_teken_sleutels(taal) {
+  const v = PT_SLEUTEL_VELDE[taal];
+  const lys = pt[v.lys];
+  const wrap = document.getElementById(v.wrap);
+  const invoer = document.getElementById(v.invoer);
   wrap.querySelectorAll(".pt-sleutel").forEach((el) => el.remove());
-  pt.sleutelwoorde.forEach((w, i) => {
+  lys.forEach((w, i) => {
     const el = document.createElement("span");
     el.className = "pt-sleutel";
     el.innerHTML = `${pt_esc(w)} <button type="button" aria-label="Verwyder ${pt_esc(w)}">✕</button>`;
     el.querySelector("button").addEventListener("click", () => {
-      pt.sleutelwoorde.splice(i, 1);
-      pt_teken_sleutels();
+      lys.splice(i, 1);
+      pt_teken_sleutels(taal);
     });
     wrap.insertBefore(el, invoer);
   });
 }
 
-function pt_voeg_sleutel_by() {
-  const invoer = document.getElementById("pt-sleutel-invoer");
+function pt_voeg_sleutel_by(taal) {
+  const v = PT_SLEUTEL_VELDE[taal];
+  const lys = pt[v.lys];
+  const invoer = document.getElementById(v.invoer);
   invoer.value.split(",").map((w) => w.trim()).filter(Boolean).forEach((w) => {
-    if (!pt.sleutelwoorde.some((x) => x.toLowerCase() === w.toLowerCase()) && pt.sleutelwoorde.length < 20) {
-      pt.sleutelwoorde.push(w.slice(0, 40));
+    if (!lys.some((x) => x.toLowerCase() === w.toLowerCase()) && lys.length < 20) {
+      lys.push(w.slice(0, 40));
     }
   });
   invoer.value = "";
-  pt_teken_sleutels();
+  pt_teken_sleutels(taal);
 }
 
-function pt_sleutel_toets(e) {
+function pt_sleutel_toets(e, taal) {
+  const lys = pt[PT_SLEUTEL_VELDE[taal].lys];
   if (e.key === "Enter" || e.key === ",") {
     e.preventDefault();
-    pt_voeg_sleutel_by();
-  } else if (e.key === "Backspace" && !e.target.value && pt.sleutelwoorde.length) {
-    pt.sleutelwoorde.pop();
-    pt_teken_sleutels();
+    pt_voeg_sleutel_by(taal);
+  } else if (e.key === "Backspace" && !e.target.value && lys.length) {
+    lys.pop();
+    pt_teken_sleutels(taal);
   }
 }
 
@@ -697,7 +718,8 @@ async function pt_laai_eie_beeld_op(e) {
 async function pt_stoor(e) {
   e.preventDefault();
   pt_foute("");
-  pt_voeg_sleutel_by();
+  pt_voeg_sleutel_by("af");
+  pt_voeg_sleutel_by("en");
 
   const titel = document.getElementById("pt-titel").value.trim();
   const slug = (pt.wysig_slug || document.getElementById("pt-slug").value.trim()).toLowerCase();
@@ -732,6 +754,7 @@ async function pt_stoor(e) {
       spreker_ids: sprekers,
       kategoriee: pt.kategoriee,
       sleutelwoorde: pt.sleutelwoorde,
+      sleutelwoorde_en: pt.sleutelwoorde_en,
       oorsig: document.getElementById("pt-oorsig").value,
       vol_beskrywing: document.getElementById("pt-vol").value,
       omslag: pt.omslag,

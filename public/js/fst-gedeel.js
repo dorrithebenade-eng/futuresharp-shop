@@ -72,3 +72,10 @@ function fst_kop(met_terug_na_alle) {
     </div>
   </div></header>`;
 }
+
+// Die sleutelwoorde in die gekose taal. 'n Talk sonder Engelse sleutelwoorde
+// wys in Engels die Afrikaanse eerder as niks.
+function fst_sleutelwoorde(talk) {
+  const en = talk.sleutelwoorde_en || [];
+  return kry_huidige_taal() === "en" && en.length ? en : talk.sleutelwoorde || [];
+}

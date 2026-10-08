@@ -22,6 +22,7 @@ function publiek(t, video) {
     spreker: t.spreker,
     kategoriee: t.kategoriee || [],
     sleutelwoorde: t.sleutelwoorde || [],
+    sleutelwoorde_en: t.sleutelwoorde_en || [],
     oorsig: t.oorsig || "",
     vol_beskrywing: t.vol_beskrywing || "",
     omslag: t.omslag || "",

@@ -44,9 +44,9 @@ function fst_talk_teken(talk, kategoriee) {
         <p class="fst-profiel-wie">${fst_esc(talk.spreker)}</p>
         <h2>${fst_esc(t("fst_oor_talk"))}</h2>
         <div class="fst-teks">${beskrywing}</div>
-        ${talk.sleutelwoorde.length ? `
+        ${fst_sleutelwoorde(talk).length ? `
           <h2>${fst_esc(t("fst_sleutelwoorde"))}</h2>
-          <div class="fst-sleutels">${talk.sleutelwoorde.map((w) => `<a href="/talks?soek=${encodeURIComponent(w)}">${fst_esc(w)}</a>`).join("")}</div>` : ""}
+          <div class="fst-sleutels">${fst_sleutelwoorde(talk).map((w) => `<a href="/talks?soek=${encodeURIComponent(w)}">${fst_esc(w)}</a>`).join("")}</div>` : ""}
       </div>
       <aside class="fst-koop">
         <div class="fst-koop-meta">${fst_esc(kat)}${v.duur_sekondes ? ` · ${fst_esc(fst_duur(v.duur_sekondes))}` : ""}</div>

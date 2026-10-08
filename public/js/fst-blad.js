@@ -44,7 +44,7 @@ function fst_blad_pas(talk) {
   const s = fst_blad.soek.trim().toLowerCase();
   if (!s) return true;
   const kat_name = talk.kategoriee.map((id) => fst_kategorie_naam(fst_blad.kategoriee, id));
-  return [talk.titel, talk.spreker, ...talk.sleutelwoorde, ...kat_name].join(" ").toLowerCase().includes(s);
+  return [talk.titel, talk.spreker, ...talk.sleutelwoorde, ...(talk.sleutelwoorde_en || []), ...kat_name].join(" ").toLowerCase().includes(s);
 }
 
 function fst_blad_rooster() {

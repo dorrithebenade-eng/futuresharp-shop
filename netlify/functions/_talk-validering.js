@@ -161,6 +161,8 @@ async function bou_talk(invoer, bestaande) {
     spreker_ids,
     kategoriee,
     sleutelwoorde: kry_geldige_sleutelwoorde(invoer.sleutelwoorde),
+    // Die Engelse sleutelwoorde, gewys wanneer die besoeker EN kies.
+    sleutelwoorde_en: kry_geldige_sleutelwoorde(invoer.sleutelwoorde_en),
     oorsig: teks(invoer.oorsig, 2000),
     vol_beskrywing: teks(invoer.vol_beskrywing, 10000),
     omslag: teks(invoer.omslag, 500),
