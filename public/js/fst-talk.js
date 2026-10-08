@@ -60,7 +60,7 @@ function fst_talk_teken(talk, kategoriee) {
         <p class="fst-koop-fout" id="fst-koop-fout" hidden></p>
         <button type="button" class="fst-koepon-skakel" id="fst-koepon-skakel" hidden>${fst_esc(t("fst_koepon_vraag"))}</button>
         <div class="fst-koepon-ry" id="fst-koepon-ry" hidden>
-          <input type="text" id="fst-koepon-kode" maxlength="24" autocomplete="off" placeholder="${fst_esc(t("fst_koepon_plek"))}" aria-label="${fst_esc(t("fst_koepon_vraag"))}">
+          <input type="text" id="fst-koepon-kode" maxlength="24" autocomplete="off" placeholder="${fst_esc(t(net_koepon ? "fst_toegangskode_plek" : "fst_koepon_plek"))}" aria-label="${fst_esc(t(net_koepon ? "fst_toegangskode_plek" : "fst_koepon_vraag"))}">
           <button type="button" id="fst-koepon-toe">${fst_esc(t(net_koepon ? "fst_koepon_ontsluit" : "fst_koepon_pas_toe"))}</button>
         </div>
         <p class="fst-koepon-stand" id="fst-koepon-stand" hidden></p>
@@ -170,7 +170,7 @@ function fst_talk_net_koepon_opstel(talk) {
         window.location.href = data.teater;
         return;
       }
-      stand.textContent = t(`fst_koepon_${data.fout_kode || "ONBEKEND"}`);
+      stand.textContent = t(`fst_kode_${data.fout_kode || "ONBEKEND"}`);
       stand.classList.add("fst-koepon-fout");
       stand.hidden = false;
     } catch (e) {

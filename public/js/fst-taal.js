@@ -60,9 +60,19 @@ Object.assign(WOORDEBOEK, {
   fst_koepon_NIE_JOUNE: { af: "Hierdie koepon is nie vir jou rekening nie.", en: "This coupon is not for your account." },
   fst_koepon_GEEN_TOEPASSING: { af: "Hierdie koepon geld nie vir hierdie talk nie.", en: "This coupon does not apply to this talk." },
   // Net met 'n koepon
-  fst_net_koepon: { af: "Toegang met koepon", en: "Access by coupon" },
-  fst_net_koepon_kort: { af: "Met koepon", en: "By coupon" },
+  // Vir besoekers heet dit 'n toegangskode, nie 'n koepon nie: hulle het
+  // niks gekoop nie, net 'n kode ontvang.
+  fst_net_koepon: { af: "Toegang slegs met kode", en: "Access by code only" },
+  fst_net_koepon_kort: { af: "Met toegangskode", en: "By access code" },
   fst_koepon_ontsluit: { af: "Kry toegang", en: "Get access" },
-  fst_koepon_KOEPON_NODIG: { af: "Tik jou koeponkode in.", en: "Enter your coupon code." },
+  fst_toegangskode_plek: { af: "TOEGANGSKODE", en: "ACCESS CODE" },
+  fst_kode_ONBEKEND: { af: "Hierdie kode bestaan nie.", en: "This code does not exist." },
+  fst_kode_ONAKTIEF: { af: "Hierdie kode is nie meer aktief nie.", en: "This code is no longer active." },
+  fst_kode_VERVAL: { af: "Hierdie kode het verval.", en: "This code has expired." },
+  fst_kode_VOLGEBRUIK: { af: "Hierdie kode is klaar gebruik.", en: "This code has been used up." },
+  fst_kode_NIE_JOUNE: { af: "Hierdie kode is nie vir jou rekening nie.", en: "This code is not for your account." },
+  fst_kode_GEEN_TOEPASSING: { af: "Hierdie kode geld nie vir hierdie video nie.", en: "This code is not valid for this video." },
+  fst_kode_REEDS_GEBRUIK: { af: "Jy het hierdie kode reeds vir hierdie video gebruik.", en: "You have already used this code for this video." },
+  fst_kode_KOEPON_NODIG: { af: "Tik jou toegangskode in.", en: "Enter your access code." },
   fst_koepon_REEDS_GEBRUIK: { af: "Jy het hierdie koepon reeds vir hierdie talk gebruik.", en: "You have already used this coupon for this talk." },
 });

@@ -30,8 +30,8 @@ const PT_ETIKETTE = {
 // Die verstek-nota vir 'n talk wat net met 'n koepon toeganklik is. Dit
 // staan in die vorm en kan per talk aangepas word.
 const PT_KOEPON_NOTA = {
-  af: "Hierdie video is 'n opname wat tydens 'n aanlyn werkswinkel gemaak is. Toegang word slegs met 'n koeponkode verleen. Kontak FutureSharp Talks direk vir meer inligting oor toegang tot die video.",
-  en: "This video is a recording made during an online workshop. Access is granted only with a coupon code. Contact FutureSharp Talks directly for more information about access to the video.",
+  af: "Hierdie video is 'n opname wat tydens 'n aanlyn werkswinkel gemaak is. Toegang word slegs met 'n toegangskode verleen. Kontak FutureSharp Talks direk vir meer inligting oor toegang tot die video.",
+  en: "This video is a recording made during an online workshop. Access is granted only with an access code. Contact FutureSharp Talks directly for more information about access to the video.",
 };
 
 const pt = {

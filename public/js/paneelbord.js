@@ -520,8 +520,15 @@ async function laai_koepons() {
   }
 }
 
+// Die koepons soos laas gelaai, sodat die Wysig-knoppie die rekord het.
+let koepons_kas = [];
+// Die kode van die koepon wat tans gewysig word; null = 'n nuwe koepon.
+// paneel-koepon-talks.js lees dit ook.
+let koepon_wysig_kode = null;
+
 function wys_koepons_lys(koepons) {
   const wrap = document.getElementById("paneel-koepons-lys");
+  koepons_kas = koepons;
 
   if (!koepons.length) {
     wrap.innerHTML = `<p class="stelsel-boodskap">${t("paneel_nog_geen_koepons")}</p>`;
@@ -561,6 +568,7 @@ function wys_koepons_lys(koepons) {
             ${koepon.nota ? `<span class="paneel-produk-outeur">${koepon.nota}</span>` : ""}
           </div>
           <div class="paneel-produk-aksies">
+            <button class="terug-skakel paneel-koepon-wysig-knoppie" data-kode="${koepon.kode}">Wysig</button>
             <button class="terug-skakel paneel-koepon-aktief-knoppie" data-kode="${koepon.kode}" data-aktief="${koepon.aktief}">
               ${koepon.aktief ? t("paneel_deaktiveer") : t("paneel_aktiveer")}
             </button>
@@ -569,6 +577,13 @@ function wys_koepons_lys(koepons) {
       `;
     })
     .join("");
+
+  wrap.querySelectorAll(".paneel-koepon-wysig-knoppie").forEach((knoppie) => {
+    knoppie.addEventListener("click", () => {
+      const koepon = koepons_kas.find((k) => k.kode === knoppie.dataset.kode);
+      if (koepon) open_koepon_vorm_vir_wysig(koepon);
+    });
+  });
 
   wrap.querySelectorAll(".paneel-koepon-aktief-knoppie").forEach((knoppie) => {
     knoppie.addEventListener("click", async () => {
@@ -608,8 +623,22 @@ function wys_verberg_afslag_velde() {
   document.getElementById("koepon-vorm-afslag-velde").style.display = tipe === "afslag" ? "block" : "none";
 }
 
+// Die vorm se stand: nuut (kode oop, "+ Voeg koepon by") of wysig (kode
+// vas, "Stoor wysigings").
+function stel_koepon_vorm_modus(wysig_kode) {
+  koepon_wysig_kode = wysig_kode || null;
+  const kode = document.getElementById("koepon-vorm-kode");
+  kode.readOnly = !!koepon_wysig_kode;
+  kode.title = koepon_wysig_kode ? "Die kode self kan nie verander nie" : "";
+  document.getElementById("koepon-vorm-genereer").style.display = koepon_wysig_kode ? "none" : "";
+  document.getElementById("paneel-koepon-vorm-indien").textContent = koepon_wysig_kode
+    ? "Stoor wysigings"
+    : t("paneel_voeg_koepon_by_knoppie");
+}
+
 function open_koepon_vorm() {
   document.getElementById("paneel-koepon-vorm").reset();
+  stel_koepon_vorm_modus(null);
   vul_koepon_dropdowns();
   wys_verberg_afslag_velde();
   document.getElementById("paneel-koepon-vorm-foute").style.display = "none";
@@ -619,6 +648,36 @@ function open_koepon_vorm() {
 
 function sluit_koepon_vorm() {
   document.getElementById("paneel-koepon-vorm-afdeling").style.display = "none";
+  stel_koepon_vorm_modus(null);
+}
+
+// Maak dieselfde vorm oop, ingevul met 'n bestaande koepon.
+async function open_koepon_vorm_vir_wysig(koepon) {
+  open_koepon_vorm();
+  stel_koepon_vorm_modus(koepon.kode);
+  const stel = (id, waarde) => { document.getElementById(id).value = waarde == null ? "" : waarde; };
+
+  stel("koepon-vorm-kode", koepon.kode);
+  stel("koepon-vorm-tipe", koepon.tipe === "afslag" ? "afslag" : "gratis");
+  stel("koepon-vorm-afslag-tipe", koepon.afslag_tipe || "persentasie");
+  // 'n Vaste bedrag is in sent gestoor; die vorm wys rand.
+  stel("koepon-vorm-afslag-waarde", koepon.afslag_waarde == null ? ""
+    : koepon.afslag_tipe === "vaste_bedrag" ? (koepon.afslag_waarde / 100).toFixed(2) : koepon.afslag_waarde);
+  wys_verberg_afslag_velde();
+  stel("koepon-vorm-maks-gebruike", koepon.maks_gebruike || 1);
+  stel("koepon-vorm-verval", koepon.verval_op ? String(koepon.verval_op).slice(0, 10) : "");
+  stel("koepon-vorm-nota", koepon.nota || "");
+  stel("koepon-vorm-formaat", koepon.formaat_beperking || "albei");
+
+  if (koepon.formaat_beperking === "video" && typeof pkt_pas_vorm_aan === "function") {
+    // Talk-koepon: wys die talk- en sprekerkeuses en wag tot hulle gelaai is.
+    await pkt_pas_vorm_aan();
+    stel("koepon-vorm-talk", koepon.produk_slug || "");
+    stel("koepon-vorm-spreker", koepon.spreker_id || "");
+  } else {
+    stel("koepon-vorm-produk", koepon.produk_slug || "");
+    stel("koepon-vorm-outeur", koepon.outeur_id || "");
+  }
 }
 
 function genereer_koepon_kode_voorskou() {
@@ -652,11 +711,17 @@ async function hanteer_koepon_vorm_indiening(gebeurtenis) {
   };
 
   const knoppie = document.getElementById("paneel-koepon-vorm-indien");
+  const knoppie_teks = knoppie.textContent;
   knoppie.disabled = true;
   knoppie.textContent = t("besig");
 
+  if (koepon_wysig_kode) {
+    liggaam.kode = koepon_wysig_kode;
+    liggaam.wysig = true;
+  }
+
   try {
-    const resp = await fetch(SKEP_KOEPON_ENDPOINT, {
+    const resp = await fetch(koepon_wysig_kode ? WYSIG_KOEPON_ENDPOINT : SKEP_KOEPON_ENDPOINT, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...kry_outorisasie_kop() },
       body: JSON.stringify(liggaam),
@@ -675,7 +740,7 @@ async function hanteer_koepon_vorm_indiening(gebeurtenis) {
     foutWrap.style.display = "block";
   } finally {
     knoppie.disabled = false;
-    knoppie.textContent = t("paneel_voeg_koepon_by_knoppie");
+    if (knoppie.textContent === t("besig")) knoppie.textContent = knoppie_teks;
   }
 }
 

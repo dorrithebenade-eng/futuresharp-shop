@@ -12,7 +12,7 @@
 // Hang af van paneelbord.js (kry_outorisasie_kop, sluit_koepon_vorm,
 // laai_koepons), wat vroeër laai.
 
-const PKT = { talks: [], sprekers: [], gelaai: false };
+const PKT = { talks: [], sprekers: [], gelaai: false, belofte: null };
 
 function pkt_esc(t) {
   return String(t == null ? "" : t).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -29,8 +29,15 @@ function pkt_wys(id, sigbaar) {
   if (etiket) etiket.style.display = sigbaar ? "" : "none";
 }
 
-async function pkt_laai() {
-  if (PKT.gelaai) return;
+// Laai die talks en sprekers een keer. Twee gelyktydige oproepe (die vorm
+// se reset en die Wysig-knoppie) deel dieselfde belofte, sodat die keuses
+// nie ná die invul weer oorgeteken word nie.
+function pkt_laai() {
+  if (!PKT.belofte) PKT.belofte = pkt_laai_nou();
+  return PKT.belofte;
+}
+
+async function pkt_laai_nou() {
   try {
     const kop = kry_outorisasie_kop();
     const [t, s] = await Promise.all([
@@ -42,6 +49,7 @@ async function pkt_laai() {
     PKT.gelaai = true;
   } catch (fout) {
     console.error("Kon nie talks of sprekers vir koepons laai nie:", fout);
+    PKT.belofte = null; // probeer weer by die volgende oopmaak
   }
   const talk = document.getElementById("koepon-vorm-talk");
   const spreker = document.getElementById("koepon-vorm-spreker");
@@ -56,12 +64,14 @@ function pkt_is_talk() {
   return formaat && formaat.value === "video";
 }
 
+// Gee 'n belofte terug sodat die Wysig-knoppie kan wag tot die talks en
+// sprekers gelaai is voordat dit die keuses invul.
 function pkt_pas_vorm_aan() {
   const talk = pkt_is_talk();
   pkt_wys("koepon-vorm-produk", !talk);
   pkt_wys("koepon-vorm-outeur", !talk);
   document.getElementById("pkt-talk-velde").style.display = talk ? "block" : "none";
-  if (talk) pkt_laai();
+  return talk ? pkt_laai() : Promise.resolve();
 }
 
 async function pkt_dien_in(e) {
@@ -85,11 +95,18 @@ async function pkt_dien_in(e) {
     nota: document.getElementById("koepon-vorm-nota").value.trim(),
   };
 
+  // Wysig 'n bestaande koepon (paneelbord.js se koepon_wysig_kode).
+  const wysig = typeof koepon_wysig_kode !== "undefined" && koepon_wysig_kode;
+  if (wysig) {
+    liggaam.kode = koepon_wysig_kode;
+    liggaam.wysig = true;
+  }
+
   const knoppie = document.getElementById("paneel-koepon-vorm-indien");
   const oud = knoppie.textContent;
   knoppie.disabled = true;
   try {
-    const resp = await fetch("/.netlify/functions/skep-koepon", {
+    const resp = await fetch(wysig ? "/.netlify/functions/wysig-koepon" : "/.netlify/functions/skep-koepon", {
       method: "POST",
       headers: { "Content-Type": "application/json", ...kry_outorisasie_kop() },
       body: JSON.stringify(liggaam),

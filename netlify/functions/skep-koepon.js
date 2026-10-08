@@ -12,6 +12,7 @@
 
 const { kry_store } = require("./_blob-store");
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
+const { bou_koepon_velde } = require("./_koepon-velde");
 
 function maak_koepon_kode() {
   // Leesbaar-genoeg vir 'n mens om oor die telefoon deur te gee, maar
@@ -42,66 +43,20 @@ exports.handler = async (event, context) => {
     return { statusCode: 400, body: JSON.stringify({ fout: "Ongeldige JSON" }) };
   }
 
-  const tipe = invoer.tipe === "afslag" ? "afslag" : "gratis";
-  // "video" = 'n FutureSharp Talks-koepon (sien _talk-koepon.js); die boeke
-  // se betaling aanvaar dit nooit.
-  const formaat_beperking = ["eboek", "harde_kopie", "leen", "albei", "video"].includes(invoer.formaat_beperking)
-    ? invoer.formaat_beperking
-    : "albei";
-  const produk_slug = invoer.produk_slug ? String(invoer.produk_slug).trim() : null; // null = enige boek
-  const outeur_id = invoer.outeur_id ? String(invoer.outeur_id).trim() : null;
-  // Net vir talk-koepons: beperk tot die talks van een spreker.
-  const spreker_id = formaat_beperking === "video" && invoer.spreker_id ? String(invoer.spreker_id).trim() : null;
+  // Die vormvelde se reëls leef in _koepon-velde.js (gedeel met
+  // wysig-koepon.js).
+  const gebou = bou_koepon_velde(invoer);
+  if (gebou.fout) {
+    return { statusCode: 400, body: JSON.stringify({ fout: gebou.fout }) };
+  }
+  const { velde } = gebou;
+
   // Bind hierdie kode aan net EEN spesifieke koper (gebruik vir outomaties-
   // gegenereerde leen-na-koop-opgradering-koepons). Leeg/null = enigeen mag
   // dit verlos (die normale geval vir personeel-geskepte koepons).
   const koper_id_beperking = invoer.koper_id_beperking
     ? String(invoer.koper_id_beperking).trim()
     : null;
-  const nota = invoer.nota ? String(invoer.nota).trim().slice(0, 300) : "";
-
-  const maks_gebruike = Number.isInteger(invoer.maks_gebruike) && invoer.maks_gebruike > 0
-    ? invoer.maks_gebruike
-    : 1;
-
-  let verval_op = null;
-  if (invoer.verval_op) {
-    const datum = new Date(invoer.verval_op);
-    if (Number.isNaN(datum.getTime())) {
-      return { statusCode: 400, body: JSON.stringify({ fout: "Ongeldige vervaldatum" }) };
-    }
-    verval_op = datum.toISOString();
-  }
-
-  let afslag_tipe = null;
-  let afslag_waarde = null;
-  if (tipe === "afslag") {
-    afslag_tipe = invoer.afslag_tipe === "vaste_bedrag" ? "vaste_bedrag" : "persentasie";
-    afslag_waarde = Number(invoer.afslag_waarde);
-
-    if (!Number.isFinite(afslag_waarde) || afslag_waarde <= 0) {
-      return { statusCode: 400, body: JSON.stringify({ fout: "Verpligte veld: afslag_waarde (groter as 0)" }) };
-    }
-    if (afslag_tipe === "persentasie" && afslag_waarde > 100) {
-      return { statusCode: 400, body: JSON.stringify({ fout: "Persentasie-afslag kan nie meer as 100 wees nie" }) };
-    }
-
-    // 'n Vaste bedrag word in RAND ingetik (die vorm se etiket lees
-    // "Vaste bedrag (R)") maar moet in SENT gestoor word. Dit is die
-    // eenheid wat begin-betaling.js en verifieer-koepon.js aftrek van
-    // `item_prys_sent`, en dieselfde eenheid wat paystack-webhook.js vir
-    // die leen-opgraderingskoepon skryf. Sonder hierdie omskakeling gee
-    // 'n koepon van R50 vir die kliënt 50 SENT afslag — die som misluk
-    // nie, hy is bloot honderd keer te klein, en niemand kla oor 'n
-    // afslag wat hulle nie verwag het nie.
-    //
-    // Dit gebeur bediener-kant sodat 'n versoek wat die paneelvorm
-    // omseil dit nie kan misloop nie. 'n Persentasie bly 'n gewone
-    // getal en word NIE omgereken nie.
-    if (afslag_tipe === "vaste_bedrag") {
-      afslag_waarde = Math.round(afslag_waarde * 100);
-    }
-  }
 
   const store = kry_store("koepons");
 
@@ -131,23 +86,23 @@ exports.handler = async (event, context) => {
 
   const koepon = {
     kode,
-    tipe,
-    afslag_tipe,
-    afslag_waarde,
-    produk_slug,
-    formaat_beperking,
+    tipe: velde.tipe,
+    afslag_tipe: velde.afslag_tipe,
+    afslag_waarde: velde.afslag_waarde,
+    produk_slug: velde.produk_slug,
+    formaat_beperking: velde.formaat_beperking,
     koper_id_beperking,
-    maks_gebruike,
+    maks_gebruike: velde.maks_gebruike,
     gebruike_tot_dusver: 0,
     // Onthou WIE reeds hierdie kode teen WATTER boek gebruik het, sodat ons
     // "een keer per boek per persoon" kan afdwing selfs by 'n
     // veelvuldig-herbruikbare kode.
     gebruike_geskiedenis: [],
-    verval_op,
+    verval_op: velde.verval_op,
     aktief: true,
-    outeur_id,
-    spreker_id,
-    nota,
+    outeur_id: velde.outeur_id,
+    spreker_id: velde.spreker_id,
+    nota: velde.nota,
     geskep_deur: gebruiker.email,
     geskep_op: new Date().toISOString(),
   };
