@@ -59,5 +59,10 @@ Object.assign(WOORDEBOEK, {
   fst_koepon_VOLGEBRUIK: { af: "Hierdie koepon is klaar gebruik.", en: "This coupon has been used up." },
   fst_koepon_NIE_JOUNE: { af: "Hierdie koepon is nie vir jou rekening nie.", en: "This coupon is not for your account." },
   fst_koepon_GEEN_TOEPASSING: { af: "Hierdie koepon geld nie vir hierdie talk nie.", en: "This coupon does not apply to this talk." },
+  // Net met 'n koepon
+  fst_net_koepon: { af: "Toegang met koepon", en: "Access by coupon" },
+  fst_net_koepon_kort: { af: "Met koepon", en: "By coupon" },
+  fst_koepon_ontsluit: { af: "Kry toegang", en: "Get access" },
+  fst_koepon_KOEPON_NODIG: { af: "Tik jou koeponkode in.", en: "Enter your coupon code." },
   fst_koepon_REEDS_GEBRUIK: { af: "Jy het hierdie koepon reeds vir hierdie talk gebruik.", en: "You have already used this coupon for this talk." },
 });

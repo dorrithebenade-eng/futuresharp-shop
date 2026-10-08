@@ -172,6 +172,13 @@ async function bou_talk(invoer, bestaande) {
         prys_sent,
         duur_sekondes,
         vrystelling_datum: kry_geldige_datum(video_in.vrystelling_datum),
+        // Net met 'n koepon: die talk staan in die katalogus, maar is nie te
+        // koop nie. Toegang kom slegs deur 'n koepon wat dit na R0 bring
+        // (sien _talk-koepon.js en begin-talk-betaling.js). Die nota word op
+        // die talk-bladsy gewys in die plek van die prys.
+        net_koepon: !!video_in.net_koepon,
+        koepon_nota_af: teks(video_in.koepon_nota_af, 800),
+        koepon_nota_en: teks(video_in.koepon_nota_en, 800),
         // Kom in Fase 4 (Bunny Stream). Die vorm stel dit nog nie; 'n
         // wysiging behou dus wat reeds daar is.
         bunny_video_id: vorige_video.bunny_video_id || null,

@@ -42,6 +42,11 @@ async function toets_talk_koepon(kode_rou, gebruiker, talk) {
   } else {
     prys_na_sent = Math.max(0, prys - Math.round((prys * koepon.afslag_waarde) / 100));
   }
+  // 'n Talk wat net met 'n koepon toeganklik is, is nie te koop nie: 'n
+  // afslag wat 'n bedrag laat oorbly, geld dus nie daarvoor nie.
+  if (talk.formate && talk.formate.video && talk.formate.video.net_koepon && prys_na_sent > 0) {
+    return { fout_kode: "GEEN_TOEPASSING" };
+  }
   return { koepon, prys_na_sent };
 }
 

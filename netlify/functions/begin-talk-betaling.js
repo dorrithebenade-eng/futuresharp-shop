@@ -143,6 +143,13 @@ exports.handler = async (event, context) => {
     };
   }
 
+  // Net met 'n koepon: sonder 'n kode is daar niks om te koop nie.
+  // toets_talk_koepon() aanvaar vir so 'n talk net 'n koepon wat dit na R0
+  // bring, dus kom hierdie talk nooit by Paystack uit nie.
+  if (talk.formate.video.net_koepon && !invoer.koepon_kode) {
+    return { statusCode: 400, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ fout_kode: "KOEPON_NODIG" }) };
+  }
+
   const lys_prys_sent = Math.round((talk.formate.video.prys_sent) || 0);
   let prys_sent = lys_prys_sent;
   let koepon_kode = null;

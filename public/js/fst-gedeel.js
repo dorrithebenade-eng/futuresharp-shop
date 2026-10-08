@@ -10,6 +10,7 @@ const FST_KLEURE = {
   besigheid: "#F1BD43",
   medisyne: "#EC5832",
   praktyk: "#479F91",
+  aanlyn: "#7C8CE0",
 };
 
 function fst_esc(t) {

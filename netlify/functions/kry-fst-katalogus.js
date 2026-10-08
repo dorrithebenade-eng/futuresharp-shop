@@ -32,6 +32,9 @@ function publiek(t, video) {
       prys_sent: v.prys_sent || 0,
       duur_sekondes: v.duur_sekondes || 0,
       vrystelling_datum: v.vrystelling_datum || null,
+      net_koepon: !!v.net_koepon,
+      koepon_nota_af: v.net_koepon ? v.koepon_nota_af || "" : "",
+      koepon_nota_en: v.net_koepon ? v.koepon_nota_en || "" : "",
     },
   };
 }

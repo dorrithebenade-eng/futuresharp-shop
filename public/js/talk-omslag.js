@@ -15,6 +15,7 @@ const FST_KATEGORIEE = [
   { id: "besigheid", naam: "Besigheid", c1: "#5A4410", c2: "#F1BD43" },
   { id: "medisyne", naam: "Medisyne", c1: "#7A2A15", c2: "#EC5832" },
   { id: "praktyk", naam: "Professionele praktyk", c1: "#26302E", c2: "#479F91" },
+  { id: "aanlyn", naam: "Aanlyn aanbiedings", c1: "#262B52", c2: "#7C8CE0" },
 ];
 
 const FST_OMSLAG_BREEDTE = 1280;

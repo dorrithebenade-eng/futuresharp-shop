@@ -13,6 +13,7 @@ const FST_KATEGORIEE = [
   { id: "besigheid", naam_af: "Besigheid", naam_en: "Business" },
   { id: "medisyne", naam_af: "Medisyne", naam_en: "Medicine" },
   { id: "praktyk", naam_af: "Professionele praktyk", naam_en: "Professional practice" },
+  { id: "aanlyn", naam_af: "Aanlyn aanbiedings", naam_en: "Online presentations" },
 ];
 
 const FST_KATEGORIE_IDS = FST_KATEGORIEE.map((k) => k.id);

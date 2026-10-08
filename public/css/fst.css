@@ -312,3 +312,11 @@
 .fst-koepon-stand { margin: 10px 0 0; font-size: 13px; color: #9fd8c3; }
 .fst-koepon-fout { color: #f0a38f; }
 .fst-koop-prys-oud { font-size: 20px; font-weight: 600; color: var(--fst-sag); text-decoration: line-through; margin-left: 8px; }
+
+/* ---------- Net met 'n koepon ---------- */
+.fst-koop-prys-koepon { font-size: 24px; }
+.fst-koepon-nota { font-size: 14px; line-height: 1.6; color: var(--fst-sag); margin: 0 0 4px; }
+.fst-koepon-nota p { margin: 0 0 10px; }
+.fst-koepon-nota a { color: var(--amber); text-decoration: underline; word-break: break-all; }
+/* hidden moet display: grid/block klop */
+.fst-koepon-ry[hidden], .fst-knop[hidden], .fst-koepon-nota[hidden] { display: none; }

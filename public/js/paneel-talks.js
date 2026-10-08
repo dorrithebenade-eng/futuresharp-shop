@@ -27,6 +27,13 @@ const PT_ETIKETTE = {
   spesiale_aanbod: { teks_af: "Spesiale aanbod", teks_en: "Special offer" },
 };
 
+// Die verstek-nota vir 'n talk wat net met 'n koepon toeganklik is. Dit
+// staan in die vorm en kan per talk aangepas word.
+const PT_KOEPON_NOTA = {
+  af: "Hierdie video is 'n opname wat tydens 'n aanlyn werkswinkel gemaak is. Toegang word slegs met 'n koeponkode verleen. Kontak FutureSharp Talks direk vir meer inligting oor toegang tot die video.",
+  en: "This video is a recording made during an online workshop. Access is granted only with a coupon code. Contact FutureSharp Talks directly for more information about access to the video.",
+};
+
 const pt = {
   talks: [],
   sprekers: [],
@@ -149,6 +156,14 @@ function pt_bou_skelet() {
           <legend class="paneel-formaat-titel">Video</legend>
           <div id="pt-video"></div>
           <label class="paneel-wisselaar"><input type="checkbox" id="pt-beskikbaar" checked> <span>Beskikbaar</span></label>
+          <label class="paneel-wisselaar"><input type="checkbox" id="pt-net-koepon"> <span>Net met 'n koepon (nie te koop nie)</span></label>
+          <div id="pt-koepon-nota-velde" style="display:none;">
+            <p class="paneel-hulp-teks">Die talk staan in die katalogus, maar sonder prys of koopknoppie. Toegang kom slegs deur 'n gratis talk-koepon vir hierdie talk (Koepons, formaat Talk). Die nota hieronder verskyn op die talk-bladsy, met 'n e-posskakel na admin@futuresharp.co.za daarna.</p>
+            <label class="veld-etiket" for="pt-koepon-nota-af">Nota (Afrikaans)</label>
+            <textarea id="pt-koepon-nota-af" class="veld-invoer" rows="3" maxlength="800"></textarea>
+            <label class="veld-etiket" for="pt-koepon-nota-en">Nota (Engels)</label>
+            <textarea id="pt-koepon-nota-en" class="veld-invoer" rows="3" maxlength="800"></textarea>
+          </div>
           <div class="pt-ry">
             <div>
               <label class="veld-etiket" for="pt-prys">Prys (R)</label>
@@ -205,6 +220,9 @@ function pt_bou_skelet() {
   document.getElementById("pt-sleutel-invoer").addEventListener("keydown", pt_sleutel_toets);
   document.getElementById("pt-sleutel-invoer").addEventListener("blur", () => pt_voeg_sleutel_by(true));
   document.getElementById("pt-prys").addEventListener("input", pt_bereken);
+  document.getElementById("pt-net-koepon").addEventListener("change", (e) => {
+    document.getElementById("pt-koepon-nota-velde").style.display = e.target.checked ? "block" : "none";
+  });
   document.getElementById("pt-hosting-aan").addEventListener("change", () => {
     document.getElementById("pt-hosting-velde").style.display = document.getElementById("pt-hosting-aan").checked ? "grid" : "none";
     pt_bereken();
@@ -279,7 +297,7 @@ function pt_teken_lys() {
         <div class="pt-inligting">
           <strong>${pt_esc(t.titel)}</strong>
           <span>${pt_esc(t.spreker)}</span>
-          <span class="pt-meta">${pt_esc(pt_kategorie_name(t.kategoriee))} · ${pt_rand(v.prys_sent || 0)}${v.duur_sekondes ? " · " + pt_sekondes_na_duur(v.duur_sekondes) : ""}${aktief ? "" : " · onaktief"}${v.beskikbaar ? "" : " · nie beskikbaar nie"}${pt_video_merk(t)}</span>
+          <span class="pt-meta">${pt_esc(pt_kategorie_name(t.kategoriee))} · ${v.net_koepon ? "net met koepon" : pt_rand(v.prys_sent || 0)}${v.duur_sekondes ? " · " + pt_sekondes_na_duur(v.duur_sekondes) : ""}${aktief ? "" : " · onaktief"}${v.beskikbaar ? "" : " · nie beskikbaar nie"}${pt_video_merk(t)}</span>
         </div>
         <div class="pt-aksies">
           <button type="button" class="terug-skakel" data-pt-wysig="${pt_esc(t.slug)}">Wysig</button>
@@ -313,6 +331,10 @@ function pt_open_vorm(talk) {
   document.getElementById("pt-oorsig").value = talk ? talk.oorsig || "" : "";
   document.getElementById("pt-vol").value = talk ? talk.vol_beskrywing || "" : "";
   document.getElementById("pt-beskikbaar").checked = talk ? !!v.beskikbaar : true;
+  document.getElementById("pt-net-koepon").checked = !!v.net_koepon;
+  document.getElementById("pt-koepon-nota-af").value = v.koepon_nota_af || PT_KOEPON_NOTA.af;
+  document.getElementById("pt-koepon-nota-en").value = v.koepon_nota_en || PT_KOEPON_NOTA.en;
+  document.getElementById("pt-koepon-nota-velde").style.display = v.net_koepon ? "block" : "none";
   document.getElementById("pt-prys").value = talk ? ((v.prys_sent || 0) / 100).toFixed(2) : "100";
   document.getElementById("pt-duur").value = talk ? pt_sekondes_na_duur(v.duur_sekondes) : "";
   document.getElementById("pt-vrystelling").value = (talk && v.vrystelling_datum) || "";
@@ -720,6 +742,9 @@ async function pt_stoor(e) {
       formate: {
         video: {
           beskikbaar: document.getElementById("pt-beskikbaar").checked,
+          net_koepon: document.getElementById("pt-net-koepon").checked,
+          koepon_nota_af: document.getElementById("pt-koepon-nota-af").value,
+          koepon_nota_en: document.getElementById("pt-koepon-nota-en").value,
           prys_sent: Math.round((parseFloat(document.getElementById("pt-prys").value) || 0) * 100),
           duur_sekondes: pt_duur_na_sekondes(document.getElementById("pt-duur").value),
           vrystelling_datum: document.getElementById("pt-vrystelling").value || null,
