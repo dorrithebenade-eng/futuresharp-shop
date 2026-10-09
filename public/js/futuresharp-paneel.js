@@ -359,7 +359,7 @@
     if (klient) {
       const reel = "Studievaardigheidskonsultasie: " + volle_naam + " (" + reg.no + ")";
       h += '<a class="fsp-klientskakel" href="faktuurpaneel.html#registers">Kliënt ' + esc(klient) + " in Boekhouding</a>" +
-        '<div class="fsp-aksies"><a class="fsp-knop fsp-knop-lig" href="faktuur.html?klient=' + encodeURIComponent(klient) + "&reel=" + encodeURIComponent(reel) + '">Skep \'n faktuur</a></div>' +
+        '<div class="fsp-aksies"><a class="fsp-knop fsp-knop-lig" href="faktuur.html?klient=' + encodeURIComponent(klient) + "&reel=" + encodeURIComponent(reel) + ((k) => (k && k.bedrae && k.bedrae.eerste ? "&prys=" + k.bedrae.eerste : ""))((reg.toestemmings || []).find((t) => t.soort === "koste")) + '">Skep \'n faktuur</a></div>' +
         '<p class="fsp-hulp">Die faktuur open met hierdie kliënt gekies en die eerste reël reeds ingevul: <i>' + esc(reel) + "</i>.</p>";
     } else if (reg.toets) {
       h += '<p class="fsp-hulp">Toetsregistrasie: nie in die kliënteregister nie.</p>';

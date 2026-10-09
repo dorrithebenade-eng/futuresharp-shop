@@ -1658,6 +1658,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       // die register gelaai het.
       const vooraf_reel = params.get("reel");
       if (vooraf_reel) V.reels[0].beskrywing = String(vooraf_reel).slice(0, 300);
+      // ?prys= gee die eenheidsprys in rand (die aanvaarde koste by registrasie).
+      const vooraf_prys = Number(params.get("prys"));
+      if (Number.isFinite(vooraf_prys) && vooraf_prys > 0 && vooraf_prys <= 100000) V.reels[0].prys_pp_sent = Math.round(vooraf_prys * 100);
     }
   } catch (fout) {
     console.error("Kon nie die faktuur laai nie:", fout);
