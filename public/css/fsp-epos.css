@@ -1,0 +1,7 @@
+/* public/css/fsp-epos.css — die e-pos met die registrasieskakel. Eie lêer. */
+.fsp-epos { background: #fff; border: 1px solid #D9DFE7; border-left: 4px solid #163D64; border-radius: 12px; padding: 14px 16px; margin: -4px 0 16px; }
+.fsp-epos-titel { font-family: var(--font-opskrif); font-weight: 700; font-size: 13.5px; }
+.fsp-epos-hulp { margin: 4px 0 10px; font-size: 13px; color: #5B6675; }
+.fsp-epos-ry { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 8px; }
+.fsp-epos .fsp-knop-lig { background: #fff; color: #163D64; border-color: #163D64; }
+@media (max-width: 560px) { .fsp-epos-ry .fsp-knop { flex: 1 1 auto; } }
