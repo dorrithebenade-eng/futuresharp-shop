@@ -1,0 +1,9 @@
+/* public/css/fsp-bevestig.css — bevestiging deur die rekeningpligtige. Eie lêer. */
+.fsp-stand.fsp-bv { margin-right: 6px; }
+.fsp-stand.fsp-bv.wag { background: #FFF6DB; color: #7A5600; }
+.fsp-stand.fsp-bv.nie-ek { background: #FDE7E1; color: #B23A1B; }
+.fsp-bv-kaart { border-left: 4px solid #FCBA10; }
+.fsp-bv-stand { margin: 0 0 10px; font-size: 14px; }
+.fsp-bv-stand.wag { color: #7A5600; }
+.fsp-bv-stand.nie-ek { color: #B23A1B; }
+.fsp-bv-ok { margin: 0; color: #00796B; font-weight: 600; }
