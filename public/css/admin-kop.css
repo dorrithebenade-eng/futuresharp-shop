@@ -1,0 +1,181 @@
+/* public/css/admin-kop.css
+ *
+ * DIE EENVORMIGE ADMIN-KOP. Opgestel 9 Okt 2026 in FS Integrated.
+ *
+ * Al die administratiewe panele van Future Sharp kry dieselfde vlootblou kop:
+ * die winkel se Admin, Boekhouding en Future Sharp, die Verslagpaneel (die
+ * katalogus se admin) en die Verslagstelsel (FSVS). Hierdie lêer is die
+ * winkel se deel daarvan.
+ *
+ * NET DIE ADMINBLADSYE LAAI HIERDIE LÊER. Die winkelfront gebruik dieselfde
+ * .mini-kop, maar laai dit nie, dus bly die swart kop daar onaangeraak. Die
+ * reëls hoef daarom nie op 'n klas op <body> te wag nie.
+ *
+ * DIE VORM: ry een dra die logo-blokkies, "Future Sharp", die area se naam en
+ * regs die e-pos, Meld af en AF/EN. Ry twee (.ak-ry2, deur admin-kop.js gebou)
+ * dra die area-pille as oortjies met 'n amber streep onder die een waar 'n
+ * mens is. Dieselfde vorm as die ander twee panele se koppe.
+ */
+
+:root { --ak-navy: #163D64; --ak-lyn: rgba(255, 255, 255, .14); }
+
+.mini-kop {
+  background: var(--ak-navy);
+  padding: 0 24px;
+  font-family: var(--font-liggaam);
+}
+.mini-kop-inner { padding: 12px 0; gap: 14px; }
+
+/* ---------- Die merk ---------- */
+.mini-kop-merk {
+  font-family: var(--font-liggaam);
+  font-size: 16px;
+  align-items: center;
+  gap: 12px;
+}
+/* Die logo-blokkies: teal, amber en koraal, net soos die logo self. Met CSS
+   geteken sodat daar geen prent hoef te laai nie. */
+.mini-kop-merk::before {
+  content: "";
+  flex: none;
+  width: 26px;
+  height: 30px;
+  background:
+    linear-gradient(var(--teal), var(--teal)) 0 0 / 15px 13px no-repeat,
+    linear-gradient(var(--amber), var(--amber)) 16px 0 / 10px 9px no-repeat,
+    linear-gradient(var(--koraal), var(--koraal)) 0 14px / 26px 16px no-repeat;
+}
+.merk-sharp { font-weight: 700; color: var(--wit); }
+.merk-skeier { display: none; }
+.merk-shop {
+  font-weight: 500;
+  font-size: 15px;
+  color: var(--wit);
+  border-left: 1px solid rgba(255, 255, 255, .35);
+  padding-left: 12px;
+}
+
+/* ---------- Regs: e-pos, Meld af, taal ---------- */
+.paneel-aanmeld-blok { display: flex; align-items: center; gap: 12px; }
+.paneel-gebruiker-epos { font-size: 13px; color: rgba(255, 255, 255, .75); }
+.mini-kop .paneel-aanmeld-knoppie {
+  background: none;
+  border: 1px solid rgba(255, 255, 255, .6);
+  border-radius: 999px;
+  padding: 5px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--wit);
+  cursor: pointer;
+}
+.mini-kop .paneel-aanmeld-knoppie:hover { border-color: var(--wit); }
+
+/* Die "Paneelbord"-skakel in die kop val weg sodra die oortjies staan: die
+   oortjie Admin doen dieselfde. Vir wie net een area het, bly hy. */
+body.paneel-area-pille-aan .paneel-aanmeld-blok a.mini-kop-mandjie { display: none; }
+
+.mini-kop .taal-wisselaar { border-color: rgba(255, 255, 255, .5); }
+.mini-kop .taal-knoppie { color: rgba(255, 255, 255, .85); font-size: 12px; padding: 5px 11px; }
+.mini-kop .taal-knoppie-aktief { background: var(--amber); color: var(--ak-navy); }
+
+/* ---------- Ry twee: die oortjies ---------- */
+.ak-ry2 { margin: 0 -24px; padding: 0 10px; border-top: 1px solid var(--ak-lyn); }
+.ak-ry2:empty { display: none; }
+
+.mini-kop .ak-ry2 .paneel-area-kieslys {
+  /* Die kop se binneste ry is 1440px breed (styl.css). Die oortjies kry 28px
+     ekstra, sodat die eerste oortjie se teks onder die logo begin. */
+  max-width: 1468px;
+  margin: 0 auto;
+  gap: 4px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.mini-kop .ak-ry2 .paneel-area-kieslys::-webkit-scrollbar { display: none; }
+
+.mini-kop .ak-ry2 .paneel-area-kieslys .paneel-area-pil {
+  background: none;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 11px 14px 10px;
+  font-size: 14.5px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, .8);
+  white-space: nowrap;
+  transform: none;
+}
+.mini-kop .ak-ry2 .paneel-area-kieslys .paneel-area-pil:hover { color: var(--wit); }
+.mini-kop .ak-ry2 .paneel-area-kieslys .paneel-area-pil.aktief {
+  background: none;
+  color: var(--wit);
+  font-weight: 600;
+  border-bottom-color: var(--amber);
+}
+
+/* "Vraelyste en verslae" staan ná 'n dun skeier en dra amber teks: hy is
+   nie 'n area nie, maar 'n kortpad na ander werwe. Oop, kry hy die streep. */
+.mini-kop .ak-ry2 .paneel-area-kieslys .paneel-area-pil-verslae {
+  position: relative;
+  margin-left: 17px;
+  color: #F6D27E;
+}
+.mini-kop .ak-ry2 .paneel-area-kieslys .paneel-area-pil-verslae::before {
+  content: "";
+  position: absolute;
+  left: -10px;
+  top: 10px;
+  bottom: 10px;
+  width: 1px;
+  background: rgba(255, 255, 255, .22);
+}
+.mini-kop .ak-ry2 .paneel-area-kieslys .paneel-area-pil-verslae.oop {
+  background: none;
+  color: var(--amber);
+  border-bottom-color: var(--amber);
+}
+
+/* Die onderry van "Vraelyste en verslae" lyn op met die kop. */
+.vv-ry { max-width: 1440px; box-sizing: content-box; }
+
+/* ---------- Die Future Sharp-bladsy ----------
+   Die logo staan nou in die kop, en die teal-strook val weg sodat die bladsy
+   lyk soos die ander twee. Die titel en die beskrywing bly. */
+.fsp-kop { background: none; border: 0; border-radius: 0; }
+.fsp-kop-bo { padding: 0; }
+.fsp-kop-logo, .fsp-kop-strook { display: none; }
+
+/* ---------- Foon ----------
+   styl.css skuif .mini-kop-regs op 'n foon agter 'n hamburger in. Die
+   adminbladsye het geen hamburger nie, dus bly die regterblok hier gewoon in
+   die kop staan, sonder die e-pos. */
+@media (max-width: 640px) {
+  .mini-kop .mini-kop-regs {
+    position: static;
+    transform: none;
+    width: auto;
+    max-width: none;
+    background: none;
+    flex-direction: row;
+    align-items: center;
+    padding: 0;
+    gap: 10px;
+    overflow: visible;
+    z-index: auto;
+  }
+  .mini-kop .mini-kop-regs .taal-wisselaar { display: flex; }
+  .paneel-gebruiker-epos { display: none; }
+}
+@media (max-width: 620px) {
+  .mini-kop { padding: 0 16px; }
+  .mini-kop-inner { padding: 10px 0; }
+  .ak-ry2 { margin: 0 -16px; padding: 0 5px; }
+  .mini-kop .ak-ry2 .paneel-area-kieslys .paneel-area-pil { font-size: 14px; padding: 11px 11px 10px; }
+  .vv-ry { padding: 0 16px; margin: 14px 0 4px; }
+}
+@media (max-width: 480px) {
+  .merk-sharp { display: inline; }
+  .merk-shop { display: none; }
+}
