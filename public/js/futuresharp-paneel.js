@@ -393,9 +393,11 @@
     // 'n Nuwe bladsy: opsioneel
     const het_leerder = bladsye.some((b) => b.wie === "leerder");
     const het_ouer = bladsye.some((b) => b.wie === "ouer");
-    const jonk = ouderdom < 10;
+    // Onder graad 4 voltooi net die ouer 'n vraelys (besluit 9 Okt 2026).
+    const jonk = l.soort === "leerder" && !(Number(l.graad) >= 4);
     const lo = !het_leerder && !jonk ? INSTR.filter((i) => i.aktief && i.vir === "leerder") : [];
-    const oo = !het_ouer && !reg.rp.self ? INSTR.filter((i) => i.aktief && i.vir === "ouer") : [];
+    // Studente se ouers kry geen vraelys nie (besluit 9 Okt 2026).
+    const oo = !het_ouer && !reg.rp.self && l.soort !== "student" ? INSTR.filter((i) => i.aktief && i.vir === "ouer") : [];
     if (lo.length || oo.length) {
       h += '<div class="fsp-kaart"><h3>' + (bladsye.length ? "Nog 'n vraelys ter voorbereiding" : "Vraelys ter voorbereiding") +
         ' <span style="font-weight:500;color:var(--grys-teks)">(opsioneel)</span></h3>' +
@@ -403,15 +405,15 @@
         (lo.length ? '<div class="fsp-veld"><span class="fsp-et">Vir ' + esc(l.naam) + '</span><div class="fsp-merkies">' +
           lo.map((i) => '<label><input type="checkbox" data-kies="' + esc(i.id) + '"> ' + esc(i.naam.af) + "</label>").join("") + "</div>" +
           '<div id="epos-nodig" hidden style="margin-top:10px"><label class="fsp-et" for="l-epos-nuut">' + esc(l.naam) + " se e-posadres</label>" +
-          '<input type="email" id="l-epos-nuut" class="fsp-invoer" placeholder="Nodig vir die profiel op futuresharp.co">' +
-          '<p class="fsp-hulp">' + esc(l.naam) + " skep met hierdie adres 'n profiel op futuresharp.co, sodat die antwoorde aan hom of haar gekoppel kan word.</p></div></div>" : "") +
-        (jonk && !het_leerder ? '<p class="fsp-hulp" style="margin:0 0 10px">' + esc(l.naam) + " is jonger as 10. Daar is tans geen vraelys vir hierdie ouderdom nie.</p>" : "") +
+          '<input type="email" id="l-epos-nuut" class="fsp-invoer" placeholder="Opsioneel">' +
+          '<p class="fsp-hulp">Opsioneel. Sonder e-posadres stuur jy die skakel per WhatsApp na ' + esc(l.naam) + " se selnommer, of na die ouer om aan te stuur.</p></div></div>" : "") +
+        (jonk && !het_leerder ? '<p class="fsp-hulp" style="margin:0 0 10px">' + esc(l.naam) + " is onder graad 4. Net die ouer voltooi 'n vraelys.</p>" : "") +
         (oo.length ? '<div class="fsp-veld"><span class="fsp-et">Vir die ouer (' + esc(reg.rp.naam + " " + reg.rp.van) + ')</span><div class="fsp-merkies">' +
           oo.map((i) => '<label><input type="checkbox" data-kies="' + esc(i.id) + '"> ' + esc(i.naam.af) + "</label>").join("") + "</div></div>" : "") +
         '<button type="button" class="fsp-knop fsp-knop-hoof" id="reik-uit"' + (reg.kons ? "" : " disabled") + ">Skep die persoonlike bladsy</button>" +
         '<p class="fsp-hulp">Elke bladsy is 30 dae geldig. Die boodskap om te stuur verskyn sodra dit geskep is.</p></div>';
     } else if (jonk && !bladsye.length) {
-      h += '<div class="fsp-kaart"><h3>Vraelys ter voorbereiding</h3><p style="margin:0;font-size:14px">' + esc(l.naam) + " is jonger as 10. Daar is tans geen vraelys vir hierdie ouderdom nie.</p></div>";
+      h += '<div class="fsp-kaart"><h3>Vraelys ter voorbereiding</h3><p style="margin:0;font-size:14px">' + esc(l.naam) + " is onder graad 4. Net die ouer voltooi 'n vraelys.</p></div>";
     }
 
     // Toestemming, met die presiese teks soos aanvaar
@@ -531,8 +533,8 @@
         const liggaam = { aksie: "skep_bladsy", no: reg.no, leerder, ouer };
         if (leerder.length && !reg.leerder.epos) {
           const e = ($("#l-epos-nuut").value || "").trim().toLowerCase();
-          if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e)) { kennis("Vul eers " + reg.leerder.naam + " se e-posadres in"); $("#l-epos-nuut").focus(); return; }
-          liggaam.leerder_epos = e;
+          if (e && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e)) { kennis(reg.leerder.naam + " se e-posadres lyk nie reg nie"); $("#l-epos-nuut").focus(); return; }
+          if (e) liggaam.leerder_epos = e;
         }
         knop.disabled = true;
         try {
