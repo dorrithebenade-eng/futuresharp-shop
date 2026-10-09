@@ -418,7 +418,7 @@
 
     // Toestemming, met die presiese teks soos aanvaar
     h += '<div class="fsp-kaart"><h3>Toestemming</h3>' + (reg.toestemmings || []).map((t) => {
-      const naam = { privaatheidsverklaring: "Privaatheidsverklaring gelees", popia: "POPIA-toestemming", vraelys_onder_12: "Toestemming vir 'n vraelys (onder 12)" }[t.soort] || t.soort;
+      const naam = { privaatheidsverklaring: "Privaatheidsverklaring gelees", popia: "POPIA-toestemming", vraelys_onder_12: "Toestemming vir 'n vraelys (onder 12)", popia_namens: "POPIA: namens die student geregistreer", popia_student: "POPIA-toestemming deur die student self", koste: "Koste aanvaar" }[t.soort] || t.soort;
       return '<div class="fsp-toestem">✓ ' + esc(naam) + " deur " + esc(t.deur) + ", " + esc(kort(t.aanvaar_op)) + " (weergawe " + esc(t.weergawe) + ", " + (t.taal === "en" ? "Engels" : "Afrikaans") + ")" +
         "<details><summary>Wys die presiese teks soos aanvaar</summary><blockquote>" + esc(t.teks) + "</blockquote></details></div>";
     }).join("") + "</div>";
