@@ -27,10 +27,33 @@
     { teks: "Verslagkatalogus", href: "https://futuresharp-katalogus.netlify.app", klas: "vv-kat" },
     { teks: "Verslagpaneel", href: "https://futuresharp-katalogus.netlify.app/admin", klas: "vv-kat" },
     null,
-    { teks: "Verslagstelsel", href: "https://fsvs-987325149652.europe-west1.run.app", klas: "vv-fsvs" },
+    { teks: "Verslagstelsel", href: "https://fsvs-987325149652.europe-west1.run.app/", klas: "vv-fsvs", een_aanmelding: true },
     null,
     { teks: "FS Vorms-bouer", href: "https://claude.ai/artifact/EEmGC9S3nnVmEtqK4ymJ91", klas: "vv-bouer" },
   ];
+
+  // EEN AANMELDING VIR DIE VERSLAGSTELSEL (9 Okt 2026). Oorgeneem uit die
+  // FSVS-gesprek se pil_verslagstelsel.js. FSVS lees die Netlify-sleutel uit
+  // die #-deel van die adres (roete /sessie-netlify) en meld die persoon aan
+  // sonder Google. Die #-deel gaan nie na enige bediener nie.
+  //
+  // Die oortjie word dadelik oopgemaak, anders keer die blaaier dit omdat die
+  // sleutel eers ná 'n oomblik kom. Die sleutel kom van
+  // identiteit_kry_huidige_sessie(), wat hom verfris as hy amper verval het.
+  // Lukkie dit nie, gaan die skakel gewoon oop en vra FSVS self aanmelding.
+  function met_aanmelding(e, adres) {
+    e.preventDefault();
+    const w = window.open("about:blank", "_blank");
+    identiteit_kry_huidige_sessie()
+      .then((sessie) => {
+        const sleutel = sessie && sessie.access_token;
+        const na = sleutel ? adres + "#ni=" + encodeURIComponent(sleutel) : adres;
+        if (w) { w.opener = null; w.location.href = na; } else { window.location.href = na; }
+      })
+      .catch(() => {
+        if (w) { w.opener = null; w.location.href = adres; } else { window.location.href = adres; }
+      });
+  }
 
   function bou_onderry() {
     const ry = document.createElement("nav");
@@ -57,6 +80,7 @@
       pyl.setAttribute("aria-hidden", "true");
       pyl.textContent = "↗";
       a.appendChild(pyl);
+      if (s.een_aanmelding) a.addEventListener("click", (e) => met_aanmelding(e, s.href));
       ry.appendChild(a);
     }
     return ry;
