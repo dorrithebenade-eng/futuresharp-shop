@@ -1,0 +1,59 @@
+/* public/css/paneel-verslae-pil.css
+ *
+ * Die pil "Vraelyste en verslae" en sy onderry. Sien paneel-verslae-pil.js.
+ * Opgestel 9 Okt 2026 in FS Integrated.
+ *
+ * Amber is die kleur van die pil, omdat hy nie 'n area in die winkel is nie
+ * maar 'n kortpad na ander werwe. In die onderry dra die katalogus en sy
+ * paneel dieselfde kleur (teal), want hulle werk saam; die verslagstelsel en
+ * die bouer dra elk hul eie.
+ */
+
+/* Die pil self: 'n <button>, dus moet die blaaier se knoppiestyl weg. */
+button.paneel-area-pil { font-family: var(--font-liggaam); line-height: inherit; }
+
+.paneel-area-pil-verslae { color: #8a6200; }
+.paneel-area-pil-verslae.oop { background: var(--amber); border-color: var(--amber); color: var(--swart); }
+
+.paneel-area-kieslys.in-kop .paneel-area-pil-verslae { border-color: var(--amber); color: #F6D27E; font-size: 12.5px; }
+.paneel-area-kieslys.in-kop .paneel-area-pil-verslae.oop { background: var(--amber); color: var(--swart); }
+
+.vv-pyltjie { display: inline-block; margin-left: 6px; font-size: .8em; transition: transform .15s; }
+.paneel-area-pil-verslae.oop .vv-pyltjie { transform: rotate(180deg); }
+
+/* Die onderry: dieselfde vorm as Boekhouding se .fp-pil. */
+.vv-ry { max-width: 1200px; margin: 18px auto 0; padding: 0 24px; display: flex; gap: 9px; flex-wrap: wrap; align-items: center; }
+.vv-ry[hidden] { display: none; }
+
+.vv-pil {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--wit);
+  border: 1px solid #E4E2DD;
+  border-radius: 999px;
+  padding: 11px 20px;
+  font-family: var(--font-liggaam);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  box-shadow: 0 2px 10px rgba(23, 23, 23, .07);
+}
+.vv-pil:hover { transform: translateY(-1px); }
+.vv-pyl { font-size: .85em; opacity: .6; }
+
+.vv-kat { color: #2F6B60; border-color: #9fd0c7; }
+.vv-kat:hover { border-color: var(--teal); }
+.vv-fsvs { color: #163D64; border-color: #a9bdd3; }
+.vv-fsvs:hover { border-color: #163D64; }
+.vv-bouer { color: #B8451F; border-color: #f2b9a3; }
+.vv-bouer:hover { border-color: var(--koraal); }
+
+.vv-skeier { width: 1px; align-self: stretch; background: #E4E2DD; margin: 4px 6px; }
+
+@media (max-width: 620px) {
+  .vv-ry { padding: 0; margin-top: 0; margin-bottom: 18px; }
+  .vv-pil { font-size: 13.5px; padding: 10px 17px; }
+  .vv-skeier { display: none; }
+}
