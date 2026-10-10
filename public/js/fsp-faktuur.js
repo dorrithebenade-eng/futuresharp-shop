@@ -10,11 +10,14 @@
 // (aksie "sessies"). Die datums kom NIE op die faktuur nie.
 //
 // DIE FAKTUUR bly eenvoudig. Julle merk watter sessies op die faktuur moet
-// kom, en die konsep open in Boekhouding met:
-//   - Studievaardigheidskonsultasie × die gemerkte sessies, teen die opvolgbedrag;
-//   - Vraelyste en verslag × 1, net as die eerste konsultasie gemerk is, teen
-//     die verskil tussen die eerste bedrag en die opvolgbedrag.
-// By R1 400 / R1 000 is dit R1 000 per konsultasie plus R400.
+// kom, en die konsep open in Boekhouding met, in hierdie volgorde:
+//   1. Studievaardigheidskonsultasie × 1 (die eerste konsultasie), teen die
+//      opvolgbedrag;
+//   2. Vraelyste en verslag × 1, teen die verskil tussen die eerste bedrag en
+//      die opvolgbedrag;
+//   3. Opvolgkonsultasie × die gemerkte opvolgsessies, teen die opvolgbedrag.
+// Reels 1 en 2 kom net as die eerste konsultasie gemerk is. By R1 400 / R1 000
+// is dit R1 000 per konsultasie plus R400.
 //
 // Die bedrae is dié wat by registrasie aanvaar is; anders die huidige bedrae
 // uit die koste-instellings. Die verdeling, die uitreiking en die stuur gebeur
@@ -34,8 +37,8 @@
   };
 
   const REEL = {
-    af: { kons: "Studievaardigheidskonsultasie", vrae: "Vraelyste en verslag" },
-    en: { kons: "Study skills consultation", vrae: "Questionnaires and report" },
+    af: { kons: "Studievaardigheidskonsultasie", vrae: "Vraelyste en verslag", opvolg: "Opvolgkonsultasie" },
+    en: { kons: "Study skills consultation", vrae: "Questionnaires and report", opvolg: "Follow-up consultation" },
   };
 
   async function portaal(liggaam) {
@@ -129,8 +132,9 @@
     }
 
     function totaal() {
-      const n = (S.eerste ? 1 : 0) + S.sessies.filter((s) => s.merk).length;
-      return { n, bedrag: pryse ? n * pryse.kons + (S.eerste ? pryse.vrae : 0) : 0 };
+      const opvolg = S.sessies.filter((s) => s.merk).length;
+      const n = (S.eerste ? 1 : 0) + opvolg;
+      return { n, opvolg, bedrag: pryse ? n * pryse.kons + (S.eerste ? pryse.vrae : 0) : 0 };
     }
 
     function skakel() {
@@ -139,16 +143,29 @@
       const taal = reg.vorm_taal === "en" ? "en" : "af";
       const naam = reg.leerder.naam + " " + reg.leerder.van;
       const agter = ": " + naam + " (" + reg.no + ")";
-      const q = new URLSearchParams({ klient, reel: REEL[taal].kons + agter, prys: String(pryse.kons), aantal: String(t.n), taal });
-      if (S.eerste && pryse.vrae > 0) { q.set("reel2", REEL[taal].vrae + agter); q.set("prys2", String(pryse.vrae)); }
+      // Die reels in volgorde: eerste konsultasie, vraelyste en verslag, opvolg.
+      const reels = [];
+      if (S.eerste) {
+        reels.push([REEL[taal].kons, pryse.kons, 1]);
+        if (pryse.vrae > 0) reels.push([REEL[taal].vrae, pryse.vrae, 1]);
+      }
+      if (t.opvolg) reels.push([REEL[taal].opvolg, pryse.kons, t.opvolg]);
+      const q = new URLSearchParams({ klient, taal });
+      reels.forEach(([besk, prys, aantal], i) => {
+        const s = i ? String(i + 1) : "";
+        q.set("reel" + s, besk + agter);
+        q.set("prys" + s, String(prys));
+        q.set("aantal" + s, String(aantal));
+      });
       return "faktuur.html?" + q.toString();
     }
 
     function opsom() {
       const t = totaal();
       const deel = [];
-      if (t.n) deel.push(t.n + " × konsultasie teen " + rand(pryse.kons));
+      if (S.eerste) deel.push("eerste konsultasie " + rand(pryse.kons));
       if (S.eerste && pryse.vrae > 0) deel.push("vraelyste en verslag " + rand(pryse.vrae));
+      if (t.opvolg) deel.push(t.opvolg + " × opvolgkonsultasie teen " + rand(pryse.kons));
       return t.n ? "Op die faktuur: " + deel.join(" plus ") + ". Totaal " + rand(t.bedrag) + "." : "Merk ten minste een sessie.";
     }
 

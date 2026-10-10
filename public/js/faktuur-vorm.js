@@ -1661,18 +1661,20 @@ document.addEventListener("DOMContentLoaded", async () => {
       // ?prys= gee die eenheidsprys in rand (die aanvaarde koste by registrasie).
       const vooraf_prys = Number(params.get("prys"));
       if (Number.isFinite(vooraf_prys) && vooraf_prys > 0 && vooraf_prys <= 100000) V.reels[0].prys_pp_sent = Math.round(vooraf_prys * 100);
-      // SESSIES (Oktober 2026): ?aantal= is die eerste reel se hoeveelheid
-      // (konsultasies), ?reel2= en ?prys2= 'n tweede reel (vraelyste en
-      // verslag), en ?taal= die dokument se taal. Sien fsp-faktuur.js.
-      const vooraf_aantal = Number(params.get("aantal"));
-      if (Number.isInteger(vooraf_aantal) && vooraf_aantal > 0 && vooraf_aantal <= 50) V.reels[0].hoeveelheid = vooraf_aantal;
-      const vooraf_reel2 = params.get("reel2");
-      if (vooraf_reel2) {
-        const r2 = nuwe_reel();
-        r2.beskrywing = String(vooraf_reel2).slice(0, 300);
-        const vooraf_prys2 = Number(params.get("prys2"));
-        if (Number.isFinite(vooraf_prys2) && vooraf_prys2 > 0 && vooraf_prys2 <= 100000) r2.prys_pp_sent = Math.round(vooraf_prys2 * 100);
-        V.reels.push(r2);
+      // SESSIES (Oktober 2026): ?aantal= is die eerste reel se hoeveelheid;
+      // ?reel2= tot ?reel5= (met prys2, aantal2 ...) is verdere reels, in
+      // daardie volgorde; ?taal= is die dokument se taal. Sien fsp-faktuur.js.
+      const aantal_uit = (w) => { const n = Number(w); return Number.isInteger(n) && n > 0 && n <= 50 ? n : 1; };
+      if (params.get("aantal")) V.reels[0].hoeveelheid = aantal_uit(params.get("aantal"));
+      for (let i = 2; i <= 5; i += 1) {
+        const besk = params.get("reel" + i);
+        if (!besk) break;
+        const ri = nuwe_reel();
+        ri.beskrywing = String(besk).slice(0, 300);
+        const pi = Number(params.get("prys" + i));
+        if (Number.isFinite(pi) && pi > 0 && pi <= 100000) ri.prys_pp_sent = Math.round(pi * 100);
+        ri.hoeveelheid = aantal_uit(params.get("aantal" + i));
+        V.reels.push(ri);
       }
       if (params.get("taal") === "en") V.taal = "en";
     }
