@@ -1661,6 +1661,20 @@ document.addEventListener("DOMContentLoaded", async () => {
       // ?prys= gee die eenheidsprys in rand (die aanvaarde koste by registrasie).
       const vooraf_prys = Number(params.get("prys"));
       if (Number.isFinite(vooraf_prys) && vooraf_prys > 0 && vooraf_prys <= 100000) V.reels[0].prys_pp_sent = Math.round(vooraf_prys * 100);
+      // SESSIES (Oktober 2026): ?aantal= is die eerste reel se hoeveelheid
+      // (konsultasies), ?reel2= en ?prys2= 'n tweede reel (vraelyste en
+      // verslag), en ?taal= die dokument se taal. Sien fsp-faktuur.js.
+      const vooraf_aantal = Number(params.get("aantal"));
+      if (Number.isInteger(vooraf_aantal) && vooraf_aantal > 0 && vooraf_aantal <= 50) V.reels[0].hoeveelheid = vooraf_aantal;
+      const vooraf_reel2 = params.get("reel2");
+      if (vooraf_reel2) {
+        const r2 = nuwe_reel();
+        r2.beskrywing = String(vooraf_reel2).slice(0, 300);
+        const vooraf_prys2 = Number(params.get("prys2"));
+        if (Number.isFinite(vooraf_prys2) && vooraf_prys2 > 0 && vooraf_prys2 <= 100000) r2.prys_pp_sent = Math.round(vooraf_prys2 * 100);
+        V.reels.push(r2);
+      }
+      if (params.get("taal") === "en") V.taal = "en";
     }
   } catch (fout) {
     console.error("Kon nie die faktuur laai nie:", fout);

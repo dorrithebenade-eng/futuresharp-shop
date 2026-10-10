@@ -19,7 +19,7 @@ const JSON_KOP = { "Content-Type": "application/json", "Cache-Control": "no-stor
 const AKSIES = [
   "lys", "een", "konsultasie", "skep_bladsy", "hernu",
   "instellings", "stoor_instrumente", "stoor_adres", "skrap_toets",
-  "skrap", "hernommer",
+  "skrap", "hernommer", "sessies",
 ];
 
 function antwoord(status, data) {

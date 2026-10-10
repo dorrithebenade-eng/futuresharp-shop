@@ -1,0 +1,19 @@
+/* public/css/fsp-faktuur.css — sessies en faktuur by 'n registrasie. Eie lêer. */
+.fsp-ff-reeds { margin: 0 0 6px; font-size: 13.5px; color: var(--fsp-navy); }
+.fsp-ff-bo { margin: 0 0 10px; }
+.fsp-ff-ry { display: grid; grid-template-columns: 22px 1fr 170px 28px; align-items: center; gap: 10px;
+  padding: 8px 4px; border-bottom: 1px solid var(--fsp-lyn); font-size: 14px; }
+.fsp-ff-ry input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--fsp-navy); margin: 0; }
+.fsp-ff-ry label { cursor: pointer; }
+.fsp-ff-ry input[type=date] { font-size: 13.5px; padding: 6px 8px; }
+.fsp-ff-datum { font-size: 13.5px; color: var(--grys-teks); }
+.fsp-ff-geen { font-style: italic; }
+.fsp-ff-weg { border: 0; background: none; color: var(--grys-teks); font-size: 20px; line-height: 1; cursor: pointer; padding: 2px; }
+.fsp-ff-weg:hover { color: #B8451F; }
+.fsp-ff-by { margin: 10px 0 0; width: 100%; padding: 8px 12px; border: 1px dashed var(--fsp-navy); border-radius: 8px;
+  background: var(--wit); color: var(--fsp-navy); font-weight: 600; font-size: 14px; cursor: pointer; }
+.fsp-ff-som { margin: 12px 0 0; font-size: 14px; font-weight: 600; }
+@media (max-width: 560px) {
+  .fsp-ff-ry { grid-template-columns: 22px 1fr 28px; }
+  .fsp-ff-ry input[type=date], .fsp-ff-datum { grid-column: 2 / 4; grid-row: 2; }
+}
