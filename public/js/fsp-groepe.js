@@ -52,10 +52,36 @@
   }
 
   // ---------- Die boodskap ----------
+  // VOLTOOI TEEN: 'n versoek, nie 'n slot nie. As dit gestel is, kom 'n sin
+  // vanself voor die skakel; die sjablone hoef nie te verander nie.
+  const DAE_L = { af: ["Sondag", "Maandag", "Dinsdag", "Woensdag", "Donderdag", "Vrydag", "Saterdag"], en: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"] };
+  const MAANDE_L = { af: ["Januarie", "Februarie", "Maart", "April", "Mei", "Junie", "Julie", "Augustus", "September", "Oktober", "November", "Desember"], en: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"] };
+  const sast = (iso) => new Date(new Date(iso).getTime() + 2 * 3600000); // Suid-Afrikaanse tyd, geen somertyd
+  function datum_tyd(iso, t) {
+    const d = sast(iso);
+    if (!Number.isFinite(d.getTime())) return "";
+    return DAE_L[t][d.getUTCDay()] + " " + d.getUTCDate() + " " + MAANDE_L[t][d.getUTCMonth()] + " " + d.getUTCFullYear() + (t === "af" ? " om " : " at ") + String(d.getUTCHours()).padStart(2, "0") + ":" + String(d.getUTCMinutes()).padStart(2, "0");
+  }
+  // Vir 'n datetime-local-veld: "2026-10-24T17:00" in Suid-Afrikaanse tyd.
+  const vir_veld = (iso) => (iso ? sast(iso).toISOString().slice(0, 16) : "");
+  const uit_veld = (w) => (w ? new Date(w + ":00+02:00").toISOString() : "");
+
+  function sper_sin(g, t) {
+    if (!g.voltooi_teen) return "";
+    const meer = g.vraelyste.length > 1;
+    return t === "en"
+      ? "Please complete the " + (meer ? "questionnaires" : "questionnaire") + " by " + datum_tyd(g.voltooi_teen, "en") + "."
+      : "Voltooi asseblief die " + (meer ? "vraelyste" : "vraelys") + " teen " + datum_tyd(g.voltooi_teen, "af") + ".";
+  }
+
   function boodskap(g) {
     const sj = (S.sjablone && S.sjablone[g.vir]) || {};
     return g.tale
-      .map((t) => String(sj[t] || "").replace(/\{skool\}/g, g.naam).replace(/\{skakel\}/g, g.skakel + (g.tale.length > 1 ? "?taal=" + t : "")))
+      .map((t) => {
+        const skakel = g.skakel + (g.tale.length > 1 ? "?taal=" + t : "");
+        const sin = sper_sin(g, t);
+        return String(sj[t] || "").replace(/\{skool\}/g, g.naam).replace(/\{skakel\}/g, (sin ? sin + "\n\n" : "") + skakel);
+      })
       .join("\n\n---\n\n");
   }
 
@@ -101,6 +127,7 @@
         '<div class="fsp-rooster fsp-gr-rooster2">' +
           '<div class="fsp-veld"><span class="fsp-et">Tale</span><div class="fsp-filters fsp-gr-tale"><button type="button" class="fsp-filter aan" data-taal="af">Afrikaans</button><button type="button" class="fsp-filter aan" data-taal="en">English</button></div></div>' +
           '<div class="fsp-veld"><label class="fsp-et" for="fsp-gr-voorskou">WhatsApp-voorskou</label><select id="fsp-gr-voorskou">' + voorskou_opsies(["af", "en"], "tw") + "</select></div>" +
+          '<div class="fsp-veld"><label class="fsp-et" for="fsp-gr-voltooi">Voltooi teen <span class="fsp-gr-opsie">(opsioneel)</span></label><input type="datetime-local" class="fsp-invoer" id="fsp-gr-voltooi"></div>' +
         "</div>" +
         '<div class="fsp-aksies"><button type="button" class="fsp-knop fsp-knop-hoof" id="fsp-gr-skep">Skep die skakel</button></div>' +
       "</div>" +
@@ -130,6 +157,7 @@
     afd.addEventListener("change", (e) => {
       if (e.target.id === "fsp-gr-vir" || e.target.id === "fsp-gr-soort") teken_vrae();
       if (e.target.id === "fsp-gr-vs") verander_voorskou(e.target);
+      if (e.target.id === "fsp-gr-vt") verander_voltooi(e.target);
     });
     $("#fsp-gr-soek").addEventListener("input", (e) => { S.soek = e.target.value; teken_lys(); });
     afd.addEventListener("input", (e) => {
@@ -182,10 +210,11 @@
     if (!tale.length) return kennis("Kies ten minste een taal");
     knop.disabled = true;
     try {
-      const d = await portaal({ aksie: "skep_groep", naam, soort: $("#fsp-gr-soort").value, vir: $("#fsp-gr-vir").value, vraelyste, tale, voorskou: $("#fsp-gr-voorskou").value });
+      const d = await portaal({ aksie: "skep_groep", naam, soort: $("#fsp-gr-soort").value, vir: $("#fsp-gr-vir").value, vraelyste, tale, voorskou: $("#fsp-gr-voorskou").value, voltooi_teen: uit_veld($("#fsp-gr-voltooi").value) });
       S.groepe.unshift(d.groep);
       S.filter = "oop";
       $("#fsp-gr-naam").value = "";
+      $("#fsp-gr-voltooi").value = "";
       kies(d.groep.slug);
       teken_lys();
       kennis("Groepskakel geskep");
@@ -214,6 +243,7 @@
       '<div class="fsp-epos fsp-gr-bod">' +
         '<div class="fsp-gr-beeld"><img src="' + esc(beeld) + '" alt="Voorskou"><div class="fsp-epos-hulp">Voorskou in WhatsApp</div>' +
           '<select id="fsp-gr-vs" aria-label="Taal van die voorskou">' + voorskou_opsies(g.tale, vs) + "</select></div>" +
+        '<div class="fsp-gr-vt"><label class="fsp-klein-et" for="fsp-gr-vt">Voltooi teen</label><input type="datetime-local" class="fsp-invoer" id="fsp-gr-vt" value="' + esc(vir_veld(g.voltooi_teen)) + '"></div>' +
         '<div class="fsp-epos-titel">Boodskap aan die ' + GEHOOR[g.vir][0] + "</div>" +
         '<div class="fsp-epos-hulp">Uit die sjabloon onder Vraelyste; net die naam en die skakel verander. Jy kan dit hier nog aanpas voor jy kopieer.</div>' +
         '<textarea class="fsp-invoer fsp-gr-teks" id="fsp-gr-teks" rows="14">' + esc(boodskap(g)) + "</textarea>" +
@@ -248,6 +278,19 @@
     } catch (f) {
       kennis(f.message);
       knop.disabled = false;
+    }
+  }
+
+  async function verander_voltooi(veld) {
+    const g = S.groepe.find((x) => x.slug === S.gekies);
+    if (!g) return;
+    try {
+      const d = await portaal({ aksie: "stel_voltooi", slug: g.slug, voltooi_teen: uit_veld(veld.value) });
+      Object.assign(g, d.groep);
+      $("#fsp-gr-teks").value = boodskap(g);
+      kennis(g.voltooi_teen ? "Voltooi teen " + datum_tyd(g.voltooi_teen, "af") : "Datum verwyder");
+    } catch (f) {
+      kennis(f.message);
     }
   }
 

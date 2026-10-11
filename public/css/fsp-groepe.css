@@ -4,7 +4,11 @@
 .fsp-gr-vraag input { width: 18px; height: 18px; accent-color: var(--fsp-navy); margin: 0; }
 .fsp-gr-vraag .fsp-hulp { margin: 0 0 0 auto; }
 .fsp-gr-tale { margin: 0; }
-.fsp-gr-rooster2 { grid-template-columns: 2fr 1fr; align-items: end; }
+.fsp-gr-rooster2 { grid-template-columns: 1.4fr 1fr 1fr; align-items: end; }
+.fsp-gr-opsie { font-weight: 400; color: var(--grys-teks); font-size: 13px; }
+.fsp-gr-vt { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
+.fsp-gr-vt label { margin: 0; white-space: nowrap; }
+.fsp-gr-vt input { width: auto; max-width: 230px; }
 .fsp-gr-beeld select { margin-top: 6px; width: 160px; }
 #fsp-gr-uit { margin-bottom: 16px; }
 .fsp-gr-beeld { float: right; margin: 0 0 10px 16px; text-align: center; }
