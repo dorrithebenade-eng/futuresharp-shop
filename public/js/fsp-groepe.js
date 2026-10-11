@@ -132,6 +132,11 @@
       if (e.target.id === "fsp-gr-vs") verander_voorskou(e.target);
     });
     $("#fsp-gr-soek").addEventListener("input", (e) => { S.soek = e.target.value; teken_lys(); });
+    afd.addEventListener("input", (e) => {
+      if (e.target.id !== "fsp-gr-skrap-naam") return;
+      const g = S.groepe.find((x) => x.slug === S.gekies);
+      $("#fsp-gr-skrap").disabled = !g || e.target.value.trim() !== g.naam;
+    });
     sj.addEventListener("click", klik_sj);
     sj.addEventListener("input", (e) => { if (e.target.classList.contains("fsp-gr-sj") && S.sjablone) S.sjablone[S.sj_gehoor][e.target.dataset.t] = e.target.value; });
     $('[data-gaan="vraelyste"]', nav).addEventListener("click", laai_sjablone);
@@ -218,6 +223,12 @@
           '<button type="button" class="fsp-knop ' + (g.oop ? "fsp-knop-gevaar" : "fsp-knop-lig") + '" id="fsp-gr-sluit">' + (g.oop ? "Deaktiveer die skakel" : "Aktiveer weer") + "</button>" +
         "</div>" +
         '<p class="fsp-hulp">' + vraelys_name(g) + " · " + g.tale.map((t) => (t === "af" ? "Afrikaans" : "English")).join(" en ") + " · " + (g.soort === "laer" ? "laerskool" : "hoërskool") + " · geskep " + kort(g.geskep_op) + (g.oop ? "" : " · gedeaktiveer " + kort(g.gesluit_op)) + "</p>" +
+        // Skrap: net 'n onaktiewe groep, met die naam as bevestiging.
+        (g.oop ? "" :
+          '<div class="fsp-toets-skrap"><b>Skrap hierdie groepskakel</b>' +
+          '<p class="fsp-hulp">Tik <b>' + esc(g.naam) + "</b> om te bevestig. Die antwoorde in FSF bly staan.</p>" +
+          '<div class="fsp-skrap-ry"><input type="text" class="fsp-invoer" id="fsp-gr-skrap-naam" autocomplete="off" placeholder="' + esc(g.naam) + '">' +
+          '<button type="button" class="fsp-knop fsp-knop-gevaar" id="fsp-gr-skrap" disabled>Skrap</button></div></div>') +
       "</div>";
     uit.hidden = false;
     uit.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -253,6 +264,23 @@
       kennis(f.message);
     } finally {
       sel.disabled = false;
+    }
+  }
+
+  async function skrap(knop) {
+    const g = S.groepe.find((x) => x.slug === S.gekies);
+    if (!g) return;
+    knop.disabled = true;
+    try {
+      await portaal({ aksie: "skrap_groep", slug: g.slug, naam: $("#fsp-gr-skrap-naam").value.trim() });
+      S.groepe = S.groepe.filter((x) => x.slug !== g.slug);
+      S.gekies = null;
+      $("#fsp-gr-uit").hidden = true;
+      teken_lys();
+      kennis("Groepskakel geskrap");
+    } catch (f) {
+      kennis(f.message);
+      knop.disabled = false;
     }
   }
 
@@ -293,6 +321,7 @@
     }
     if (b.id === "fsp-gr-skep") return skep(b);
     if (b.id === "fsp-gr-sluit") return sluit(b);
+    if (b.id === "fsp-gr-skrap") return skrap(b);
     if (b.id === "fsp-gr-pos") return pos();
     if (b.dataset.filter) { S.filter = b.dataset.filter; teken_lys(); return; }
     if (b.dataset.slug) kies(b.dataset.slug);
