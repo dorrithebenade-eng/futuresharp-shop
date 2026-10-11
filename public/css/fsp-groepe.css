@@ -1,0 +1,19 @@
+/* public/css/fsp-groepe.css — groepskakels vir skole. Eie lêer. */
+.fsp-gr-rooster { grid-template-columns: 2fr 1fr 1fr; }
+.fsp-gr-vraag { display: flex; gap: 10px; align-items: center; padding: 10px 14px; margin-bottom: 8px; cursor: pointer; }
+.fsp-gr-vraag input { width: 18px; height: 18px; accent-color: var(--fsp-navy); margin: 0; }
+.fsp-gr-vraag .fsp-hulp { margin: 0 0 0 auto; }
+.fsp-gr-tale { margin: 0; }
+#fsp-gr-uit { margin-bottom: 16px; }
+.fsp-gr-beeld { float: right; margin: 0 0 10px 16px; text-align: center; }
+.fsp-gr-beeld img { width: 160px; border-radius: 8px; border: 1px solid #D9DFE7; display: block; }
+.fsp-gr-beeld .fsp-epos-hulp { margin: 4px 0 0; }
+.fsp-gr-teks { width: calc(100% - 180px); font-size: 13.5px; line-height: 1.45; }
+.fsp-gr-bod .fsp-epos-ry { clear: both; }
+.fsp-gr-sj-twee textarea { font-size: 13.5px; line-height: 1.45; }
+#fsp-gr-lys .fsp-ry { cursor: pointer; }
+@media (max-width: 700px) {
+  .fsp-gr-rooster { grid-template-columns: 1fr; }
+  .fsp-gr-beeld { float: none; margin: 0 0 10px; }
+  .fsp-gr-teks { width: 100%; }
+}

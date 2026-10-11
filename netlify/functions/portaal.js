@@ -20,6 +20,7 @@ const AKSIES = [
   "lys", "een", "konsultasie", "skep_bladsy", "hernu",
   "instellings", "stoor_instrumente", "stoor_adres", "skrap_toets",
   "skrap", "hernommer", "sessies",
+  "groepe", "skep_groep", "sluit_groep", "stoor_sjablone",
 ];
 
 function antwoord(status, data) {
