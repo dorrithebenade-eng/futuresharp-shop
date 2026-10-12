@@ -135,6 +135,14 @@
         )
       );
     }
+    // Governance staan tussen Admin en Boekhouding (Dorrithé se keuse,
+    // 12 Okt 2026).
+    if (het_governance) {
+      // Die naam is Engels, soos die vouers in die area.
+      ry.appendChild(
+        bou_pil("Governance", bladsy.area === "governance", "governance.html", "governance")
+      );
+    }
     if (het_boekhouding) {
       ry.appendChild(
         bou_pil(
@@ -149,12 +157,6 @@
       // Die naam is 'n eienaam en word nie vertaal nie.
       ry.appendChild(
         bou_pil("Future Sharp", bladsy.area === "futuresharp", "futuresharp.html", "futuresharp")
-      );
-    }
-    if (het_governance) {
-      // Die naam is Engels, soos die vouers in die area.
-      ry.appendChild(
-        bou_pil("Governance", bladsy.area === "governance", "governance.html", "governance")
       );
     }
 
