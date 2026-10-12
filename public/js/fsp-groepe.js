@@ -197,8 +197,8 @@
     const lys = S.instr.filter((i) => i.aktief && i.vir === vir && ouderdom.includes(i.ouderdom || "alle"));
     $("#fsp-gr-vrae").innerHTML = lys.length
       ? lys.map((i) => '<label class="fsp-instrument fsp-gr-vraag"><input type="checkbox" value="' + esc(i.id) + '" checked><b>' + esc(i.naam.af) + '</b><span class="fsp-hulp">' + esc(i.naam.en) + "</span></label>").join("")
-      : '<p class="fsp-waarsku">Daar is nog geen aktiewe vraelys vir ' + GEHOOR[vir][0] + (vir === "leerder" ? (soort === "laer" ? " van 9 tot 13" : " van 13 en ouer") : "") + " nie. Voeg dit by onder <b>Vraelyste</b>.</p>";
-    $("#fsp-gr-vrae-hulp").innerHTML = "Net die aktiewe vraelyste vir " + GEHOOR[vir][0] + (soort === "laer" ? " by 'n laerskool (9 tot 13 en alle ouderdomme)" : " by 'n hoërskool (13 en ouer en alle ouderdomme)") + " word gewys. Die lys kom uit <b>Vraelyste</b>.";
+      : '<p class="fsp-waarsku">Daar is nog geen aktiewe vraelys vir ' + GEHOOR[vir][0] + (vir === "leerder" ? (soort === "laer" ? " by 'n laerskool" : " by 'n hoërskool") : "") + " nie. Voeg dit by onder <b>Vraelyste</b>.</p>";
+    $("#fsp-gr-vrae-hulp").innerHTML = "Net die aktiewe vraelyste vir " + GEHOOR[vir][0] + (soort === "laer" ? " by 'n laerskool" : " by 'n hoërskool") + " word gewys. Die lys kom uit <b>Vraelyste</b>.";
   }
 
   async function skep(knop) {

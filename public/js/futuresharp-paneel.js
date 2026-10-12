@@ -590,12 +590,13 @@
       '<option value="leerder"' + (i.vir === "leerder" ? " selected" : "") + ">Leerder of student</option>" +
       '<option value="ouer"' + (i.vir === "ouer" ? " selected" : "") + ">Ouer</option>" +
       '<option value="onderwyser"' + (i.vir === "onderwyser" ? " selected" : "") + ">Onderwyser</option></select></label>" +
-      // Ouderdomsgroep (Oktober 2026): by 'n groepskakel vir 'n laerskool wys
-      // net "9 tot 13" en "Alle ouderdomme".
-      '<label><span class="fsp-klein-et">Ouderdomsgroep</span><select data-v="ouderdom">' +
-      '<option value="alle"' + (!i.ouderdom || i.ouderdom === "alle" ? " selected" : "") + ">Alle ouderdomme</option>" +
-      '<option value="laer"' + (i.ouderdom === "laer" ? " selected" : "") + ">9 tot 13 (laerskool)</option>" +
-      '<option value="hoer"' + (i.ouderdom === "hoer" ? " selected" : "") + ">13 en ouer</option></select></label>" +
+      // Vir watter skole (Oktober 2026): by 'n groepskakel vir 'n laerskool wys
+      // net "Laerskool en hoërskool" en "Net laerskool". Die veld heet steeds
+      // `ouderdom` (alle, laer, hoer); net die woorde op die skerm het verander.
+      '<label><span class="fsp-klein-et">Vir watter skole</span><select data-v="ouderdom">' +
+      '<option value="alle"' + (!i.ouderdom || i.ouderdom === "alle" ? " selected" : "") + ">Laerskool en hoërskool</option>" +
+      '<option value="laer"' + (i.ouderdom === "laer" ? " selected" : "") + ">Net laerskool (tot Graad 7)</option>" +
+      '<option value="hoer"' + (i.ouderdom === "hoer" ? " selected" : "") + ">Net hoërskool en studente (Graad 8+)</option></select></label>" +
       '<button type="button" class="fsp-knop fsp-knop-lig" data-wissel="' + n + '">' + (i.aktief ? "Deaktiveer" : "Aktiveer weer") + "</button></div></div>"
     ).join("") || '<p class="fsp-leeg">Nog geen vraelyste nie.</p>';
     for (const bt of $$("[data-wissel]")) {
