@@ -172,3 +172,9 @@ body.paneel-area-pille-aan .paneel-aanmeld-blok a.mini-kop-mandjie { display: no
   .merk-sharp { display: inline; }
   .merk-shop { display: none; }
 }
+
+/* ---------- Governance (Oktober 2026) ----------
+   Die vierde area. Lila: koraal, teal, wit en amber is reeds deur die ander
+   pille geneem. Gevul, staan die vlootblou teks op die lila. */
+.mini-kop .ak-ry2 .paneel-area-kieslys .paneel-area-pil-governance { border-color: #B9A3E3; color: #D3C4F0; }
+.mini-kop .ak-ry2 .paneel-area-kieslys .paneel-area-pil-governance.aktief { background: #B9A3E3; border-color: #B9A3E3; color: var(--ak-navy); }

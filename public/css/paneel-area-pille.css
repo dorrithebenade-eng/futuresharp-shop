@@ -179,3 +179,9 @@ body.paneel-area-pille-aan #paneel-boekhouding-skakel { display: none; }
   border-color: #6F8FB2;
   color: var(--wit);
 }
+
+
+/* DIE VIERDE AREA: GOVERNANCE (Oktober 2026). Die kleur in die kop staan in
+   admin-kop.css; hierdie twee reels geld net buite die kop. */
+.paneel-area-pil-governance { color: #5E3B9A; }
+.paneel-area-pil-governance.aktief { background: #5E3B9A; border-color: #5E3B9A; color: var(--wit); }

@@ -61,6 +61,11 @@
       const kop = document.querySelector(".fsp-kop");
       return { area: "futuresharp", anker: kop || document.getElementById("fsp-kieslys"), waar: "voor" };
     }
+    // Die Governance-area (governance.html, Oktober 2026). admin-kop.js skuif
+    // die ry in elk geval na die kop; die anker is net die terugval.
+    if (document.getElementById("gov-hoof")) {
+      return { area: "governance", anker: document.getElementById("gov-hoof").firstElementChild, waar: "voor" };
+    }
     if (document.getElementById("fp-kieslys")) {
       const anker = document.getElementById("fp-kieslys");
       return { area: "boekhouding", anker, waar: "voor" };
@@ -105,10 +110,14 @@
     // is Dorrithé en Ignatius s'n, en portaal.js dwing dieselfde rol af.
     const het_futuresharp = het_boekhouding;
 
+    // DIE GOVERNANCE-AREA (Oktober 2026) volg ook die boekhouding-rol;
+    // _gov.js dwing dieselfde rol af.
+    const het_governance = het_boekhouding;
+
     // MINDER AS TWEE AREAS: GEEN RY. Een pil wat 'n area benoem terwyl daar
     // net een is, sê niks en neem plek. Dieselfde reël as die groepopskrifte
     // wat hy vervang.
-    const tel = [het_admin, het_boekhouding, het_futuresharp].filter(Boolean).length;
+    const tel = [het_admin, het_boekhouding, het_futuresharp, het_governance].filter(Boolean).length;
     if (tel < 2) return true;
 
     const ry = document.createElement("nav");
@@ -140,6 +149,12 @@
       // Die naam is 'n eienaam en word nie vertaal nie.
       ry.appendChild(
         bou_pil("Future Sharp", bladsy.area === "futuresharp", "futuresharp.html", "futuresharp")
+      );
+    }
+    if (het_governance) {
+      // Die naam is Engels, soos die vouers in die area.
+      ry.appendChild(
+        bou_pil("Governance", bladsy.area === "governance", "governance.html", "governance")
       );
     }
 

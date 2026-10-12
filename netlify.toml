@@ -42,6 +42,12 @@
 [functions."haal-vereffenings"]
   schedule = "45 3 * * *"
 
+# gov-herinnering (Oktober 2026): Governance se sperdatums. Een e-pos per
+# oggend met alles wat binne 'n herinneringsdrempel val. 04:20 UTC is 06:20
+# in Suid-Afrika, ná die ander geskeduleerde funksies.
+[functions."gov-herinnering"]
+  schedule = "20 4 * * *"
+
 # Netlify Identity registrasie-instellings word via die Netlify-kontrolepaneel
 # gestel (nie hierdie lêer nie): "Oop registrasie" aan, standaard-rol by
 # registrasie = "koper" (via 'n Identity-triggerfunksie, sien

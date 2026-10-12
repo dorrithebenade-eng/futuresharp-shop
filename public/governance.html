@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="af">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex,nofollow">
+  <title>Governance · Paneel</title>
+  <link rel="stylesheet" href="css/styl.css" />
+  <link rel="stylesheet" href="css/paneel-breedte.css" />
+  <link rel="stylesheet" href="css/paneel-area-pille.css">
+  <link rel="stylesheet" href="css/paneel-verslae-pil.css">
+  <link rel="stylesheet" href="css/governance.css">
+  <link rel="icon" href="/icons/futuresharp-ikoon-32.png?v=2" sizes="32x32" type="image/png">
+  <link rel="icon" href="/icons/futuresharp-ikoon-16.png?v=2" sizes="16x16" type="image/png">
+  <link rel="stylesheet" href="css/admin-kop.css">
+</head>
+<body>
+
+  <!--
+    DIE GOVERNANCE-AREA (Oktober 2026): Future Sharp NPC se bestuurs- en
+    nakomingsdokumente, volgens die Future Sharp Directory.
+
+    Die vierde paneel naas Admin, Boekhouding en Future Sharp. Dit deel die
+    paneel-sessie (identiteit.js se PANEEL_BLADSYE sluit hierdie bladsy in).
+
+    Alles loop deur drie Functions wat die boekhouding-rol afdwing:
+      gov            metadata (lys, skuif, argiveer, sperdatums, besluite, vouers)
+      gov-laai-op    'n lêer oplaai
+      gov-aflaai     'n lêer bekyk of aflaai (beskerm, anders as kry-dokument)
+
+    Elke klas van hierdie bladsy dra die voorvoegsel `gov-`. Die bladsy is
+    Afrikaans; die vouername is Engels, soos die Directory.
+  -->
+  <header class="mini-kop">
+   <div class="mini-kop-inner">
+    <a href="index.html" class="mini-kop-merk">
+      <span class="merk-sharp">Future Sharp</span>
+      <span class="merk-skeier">—</span>
+      <span class="merk-shop">Governance</span>
+    </a>
+    <div class="mini-kop-regs">
+      <div class="paneel-aanmeld-blok">
+        <span id="paneel-gebruiker-epos" class="paneel-gebruiker-epos"></span>
+        <a href="paneelbord.html" class="mini-kop-mandjie">Paneelbord</a>
+        <button type="button" class="paneel-aanmeld-knoppie" id="gov-meld-af" hidden>Meld af</button>
+      </div>
+    </div>
+   </div>
+  </header>
+
+  <main class="paneel-wrap gov-wrap" id="gov-hoof" style="visibility:hidden;">
+
+    <div class="gov-titel">
+      <h1>Governance</h1>
+      <p>Future Sharp NPC · Reg. nr. 2024/117444/08</p>
+    </div>
+
+    <section id="gov-aanmeld" class="gov-kaart gov-aanmeld" hidden>
+      <h2>Meld aan</h2>
+      <form id="gov-aanmeld-vorm" novalidate>
+        <div class="gov-veld">
+          <label for="gov-aanmeld-epos">E-posadres</label>
+          <input type="email" id="gov-aanmeld-epos" autocomplete="username" inputmode="email" required>
+        </div>
+        <div class="gov-veld">
+          <label for="gov-aanmeld-wagwoord">Wagwoord</label>
+          <input type="password" id="gov-aanmeld-wagwoord" autocomplete="current-password" required>
+        </div>
+        <label class="gov-bly"><input type="checkbox" id="gov-aanmeld-bly" checked> Bly aangemeld op hierdie toestel</label>
+        <p class="gov-waarsku" id="gov-aanmeld-fout" hidden></p>
+        <div class="gov-aksies">
+          <button type="submit" class="gov-knop gov-knop-hoof" id="gov-aanmeld-knop">Meld aan</button>
+          <a class="gov-knop gov-knop-lig" href="paneelbord.html">Wagwoord vergeet?</a>
+        </div>
+      </form>
+    </section>
+
+    <section id="gov-geen-toegang" class="gov-kaart gov-geen-toegang" hidden>
+      <p id="gov-geen-toegang-teks">Hierdie rekening het nie toegang tot Governance nie.</p>
+      <button type="button" class="gov-knop gov-knop-hoof" id="gov-ander-rekening">Meld af en meld aan met 'n ander rekening</button>
+    </section>
+
+    <div id="gov-paneel" hidden>
+      <section class="gov-sper-strook" id="gov-sper-strook" hidden>
+        <h2>Naderende sperdatums</h2>
+        <div class="gov-sper-items" id="gov-sper-items"></div>
+      </section>
+
+      <div class="gov-foon-keuse"><select id="gov-foon-keuse" aria-label="Vouer"></select></div>
+
+      <div class="gov-uitleg">
+        <aside class="gov-boom" id="gov-boom" aria-label="Vouers"></aside>
+        <section id="gov-inhoud"><p class="gov-leeg">Word gelaai …</p></section>
+      </div>
+    </div>
+  </main>
+
+  <!-- ===== Dialoog: laai op ===== -->
+  <div class="gov-agter" id="gov-d-oplaai" role="dialog" aria-modal="true" aria-labelledby="gov-d-oplaai-t">
+    <form class="gov-dialoog" id="gov-oplaai-vorm" novalidate>
+      <h3 id="gov-d-oplaai-t">Laai 'n dokument op</h3>
+      <label class="gov-sleep" id="gov-sleep">
+        <input type="file" id="gov-o-leer" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.csv,.jpg,.jpeg,.png" hidden>
+        <span id="gov-sleep-teks">Sleep 'n lêer hierheen of <u>kies 'n lêer</u></span>
+        <small>PDF, Word, Excel, PowerPoint, CSV, JPG of PNG · hoogstens 4 MB</small>
+      </label>
+      <div class="gov-veld"><label for="gov-o-naam">Naam</label><input id="gov-o-naam" maxlength="200" required></div>
+      <div class="gov-veld"><label for="gov-o-vouer">Vouer</label><select id="gov-o-vouer"></select></div>
+      <div class="gov-veld"><label for="gov-o-datum">Datum van die dokument</label><input type="date" id="gov-o-datum"></div>
+      <div class="gov-veld"><label for="gov-o-nota">Nota</label><textarea id="gov-o-nota" maxlength="1000"></textarea></div>
+      <p class="gov-waarsku" id="gov-o-fout" hidden></p>
+      <div class="gov-aksies gov-aksies-regs">
+        <button type="button" class="gov-knop gov-knop-lig" data-sluit>Kanselleer</button>
+        <button type="submit" class="gov-knop gov-knop-hoof" id="gov-o-stoor">Laai op</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- ===== Dialoog: wysig dokument ===== -->
+  <div class="gov-agter" id="gov-d-wysig" role="dialog" aria-modal="true" aria-labelledby="gov-d-wysig-t">
+    <form class="gov-dialoog" id="gov-wysig-vorm" novalidate>
+      <h3 id="gov-d-wysig-t">Dokument</h3>
+      <div class="gov-veld"><label for="gov-w-naam">Naam</label><input id="gov-w-naam" maxlength="200" required></div>
+      <div class="gov-veld"><label for="gov-w-datum">Datum van die dokument</label><input type="date" id="gov-w-datum"></div>
+      <div class="gov-veld"><label for="gov-w-nota">Nota</label><textarea id="gov-w-nota" maxlength="1000"></textarea></div>
+      <div class="gov-geskiedenis" id="gov-w-geskiedenis"></div>
+      <p class="gov-waarsku" id="gov-w-fout" hidden></p>
+      <div class="gov-aksies gov-aksies-regs">
+        <button type="button" class="gov-knop gov-knop-lig" data-sluit>Kanselleer</button>
+        <button type="submit" class="gov-knop gov-knop-hoof">Stoor</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- ===== Dialoog: skuif ===== -->
+  <div class="gov-agter" id="gov-d-skuif" role="dialog" aria-modal="true" aria-labelledby="gov-d-skuif-t">
+    <form class="gov-dialoog" id="gov-skuif-vorm" novalidate>
+      <h3 id="gov-d-skuif-t">Skuif dokument</h3>
+      <p class="gov-hulp gov-hulp-bo" id="gov-s-wat"></p>
+      <div class="gov-veld"><label for="gov-s-vouer">Na vouer</label><select id="gov-s-vouer"></select></div>
+      <p class="gov-waarsku" id="gov-s-fout" hidden></p>
+      <div class="gov-aksies gov-aksies-regs">
+        <button type="button" class="gov-knop gov-knop-lig" data-sluit>Kanselleer</button>
+        <button type="submit" class="gov-knop gov-knop-hoof">Skuif</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- ===== Dialoog: sperdatum ===== -->
+  <div class="gov-agter" id="gov-d-sper" role="dialog" aria-modal="true" aria-labelledby="gov-d-sper-t">
+    <form class="gov-dialoog" id="gov-sper-vorm" novalidate>
+      <h3 id="gov-d-sper-t">Sperdatum</h3>
+      <div class="gov-veld"><label for="gov-p-naam">Beskrywing</label><input id="gov-p-naam" maxlength="200" required></div>
+      <div class="gov-veld"><label for="gov-p-datum">Sperdatum</label><input type="date" id="gov-p-datum" required></div>
+      <div class="gov-veld"><label for="gov-p-herhaal">Herhaal</label>
+        <select id="gov-p-herhaal"><option value="">Eenmalig</option><option value="jaarliks">Jaarliks</option><option value="maandeliks">Maandeliks</option></select></div>
+      <div class="gov-veld"><label for="gov-p-herinner">Herinner per e-pos</label>
+        <select id="gov-p-herinner"><option value="30_7">30 en 7 dae vooraf, en op die dag</option><option value="14_3">14 en 3 dae vooraf, en op die dag</option><option value="geen">Geen herinnering</option></select></div>
+      <div class="gov-veld"><label for="gov-p-nota">Nota</label><textarea id="gov-p-nota" maxlength="1000"></textarea></div>
+      <p class="gov-waarsku" id="gov-p-fout" hidden></p>
+      <div class="gov-aksies gov-aksies-regs">
+        <button type="button" class="gov-knop gov-knop-lig gov-knop-gevaar" id="gov-p-skrap" hidden>Skrap</button>
+        <span class="gov-spasie"></span>
+        <button type="button" class="gov-knop gov-knop-lig" data-sluit>Kanselleer</button>
+        <button type="submit" class="gov-knop gov-knop-hoof">Stoor</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- ===== Dialoog: besluit ===== -->
+  <div class="gov-agter" id="gov-d-besluit" role="dialog" aria-modal="true" aria-labelledby="gov-d-besluit-t">
+    <form class="gov-dialoog" id="gov-besluit-vorm" novalidate>
+      <h3 id="gov-d-besluit-t">Besluit</h3>
+      <div class="gov-veld"><label for="gov-b-no">Nommer</label><input id="gov-b-no" disabled></div>
+      <div class="gov-veld"><label for="gov-b-datum">Datum</label><input type="date" id="gov-b-datum" required></div>
+      <div class="gov-veld"><label for="gov-b-teks">Besluit</label><textarea id="gov-b-teks" maxlength="4000" required></textarea></div>
+      <div class="gov-veld"><label for="gov-b-soort">Soort</label>
+        <select id="gov-b-soort"><option value="direksievergadering">Direksievergadering</option><option value="skriftelik">Skriftelike besluit (ronde-skrywe)</option><option value="lede">Lede se besluit</option></select></div>
+      <div class="gov-veld"><label for="gov-b-stand">Stand</label>
+        <select id="gov-b-stand"><option value="konsep">Konsep</option><option value="aanvaar">Aanvaar</option></select></div>
+      <div class="gov-veld"><label for="gov-b-dok">Gekoppelde dokument</label><select id="gov-b-dok"></select></div>
+      <p class="gov-hulp" id="gov-b-vas" hidden>'n Aanvaarde besluit staan vas. Slegs die gekoppelde dokument kan verander.</p>
+      <p class="gov-waarsku" id="gov-b-fout" hidden></p>
+      <div class="gov-aksies gov-aksies-regs">
+        <button type="button" class="gov-knop gov-knop-lig gov-knop-gevaar" id="gov-b-skrap" hidden>Skrap</button>
+        <span class="gov-spasie"></span>
+        <button type="button" class="gov-knop gov-knop-lig" data-sluit>Kanselleer</button>
+        <button type="submit" class="gov-knop gov-knop-hoof">Stoor</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- ===== Dialoog: vouernaam ===== -->
+  <div class="gov-agter" id="gov-d-vouer" role="dialog" aria-modal="true" aria-labelledby="gov-d-vouer-t">
+    <form class="gov-dialoog" id="gov-vouer-vorm" novalidate>
+      <h3 id="gov-d-vouer-t">Vouer</h3>
+      <div class="gov-veld"><label for="gov-v-titel">Naam</label><input id="gov-v-titel" maxlength="80" required></div>
+      <p class="gov-waarsku" id="gov-v-fout" hidden></p>
+      <div class="gov-aksies gov-aksies-regs">
+        <button type="button" class="gov-knop gov-knop-lig" data-sluit>Kanselleer</button>
+        <button type="submit" class="gov-knop gov-knop-hoof">Stoor</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="gov-kennis" id="gov-kennis" role="status"></div>
+
+  <script src="js/taal.js"></script>
+  <script src="js/identiteit.js"></script>
+  <script src="js/governance.js"></script>
+  <script src="js/paneel-area-pille.js"></script>
+  <script src="js/paneel-verslae-pil.js"></script>
+  <script src="js/admin-kop.js"></script>
+</body>
+</html>

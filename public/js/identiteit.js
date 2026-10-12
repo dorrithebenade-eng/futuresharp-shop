@@ -35,7 +35,8 @@
 // gekry het. Elke nuwe personeel-kant bladsy kom hier by.
 // futuresharp.html (September 2026): die Future Sharp-area deel dieselfde
 // aanmelding as die ander twee panele.
-const PANEEL_BLADSYE = ["paneelbord.html", "faktuurpaneel.html", "faktuur.html", "futuresharp.html"];
+// governance.html (Oktober 2026): die Governance-area, dieselfde aanmelding.
+const PANEEL_BLADSYE = ["paneelbord.html", "faktuurpaneel.html", "faktuur.html", "futuresharp.html", "governance.html"];
 
 function kry_sessie_sleutel() {
   // Die pad kan met of sonder ".html" kom; albei is dieselfde bladsy.
