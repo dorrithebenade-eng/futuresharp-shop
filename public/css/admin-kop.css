@@ -174,7 +174,8 @@ body.paneel-area-pille-aan .paneel-aanmeld-blok a.mini-kop-mandjie { display: no
 }
 
 /* ---------- Governance (Oktober 2026) ----------
-   Die vierde area. Lila: koraal, teal, wit en amber is reeds deur die ander
-   pille geneem. Gevul, staan die vlootblou teks op die lila. */
-.mini-kop .ak-ry2 .paneel-area-kieslys .paneel-area-pil-governance { border-color: #B9A3E3; color: #D3C4F0; }
-.mini-kop .ak-ry2 .paneel-area-kieslys .paneel-area-pil-governance.aktief { background: #B9A3E3; border-color: #B9A3E3; color: var(--ak-navy); }
+   Amber, die handelsmerk se geel (Dorrithé se keuse, 12 Okt 2026). Dieselfde
+   kleur as "Vraelyste en verslae", maar daardie pil staan heel regs ná 'n
+   skeier en is nie 'n area nie. Gevul, staan die vlootblou teks op amber. */
+.mini-kop .ak-ry2 .paneel-area-kieslys .paneel-area-pil-governance { border-color: var(--amber); color: #F6D27E; }
+.mini-kop .ak-ry2 .paneel-area-kieslys .paneel-area-pil-governance.aktief { background: var(--amber); border-color: var(--amber); color: var(--ak-navy); }

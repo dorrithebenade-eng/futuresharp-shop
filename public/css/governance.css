@@ -4,13 +4,15 @@
  * voorvoegsel gov-. styl.css laai vir die palet en die lettertipes;
  * admin-kop.css vir die kop.
  *
- * DIE AKSENT IS LILA, dieselfde familie as die area-pil in die kop.
+ * DIE KLEURE IS DIE HANDELSMERK S'N (Dorrithé se keuse, 12 Okt 2026): teal,
+ * amber en koraal wissel af op die kaarte en die knoppies. --gov is die donker
+ * teal vir teks en skakels; die aktiewe vouer dra amber, soos die area-pil.
  */
 
 :root {
-  --gov: #5E3B9A;
-  --gov-lig: #F3EEFB;
-  --gov-lila: #B9A3E3;
+  --gov: #2F6B60;
+  --gov-lig: #FDF6E3;
+  --gov-goud: #8C6410;
   --gov-lyn: #E4E2DD;
   --gov-rooi: #B8451F;
   --gov-groen: #2F6B60;
@@ -25,9 +27,13 @@ body { background: var(--grys-lig); }
 
 /* ---------- Kaarte, velde, knoppies ---------- */
 .gov-kaart { background: var(--wit); border-radius: 12px; padding: 18px; margin-bottom: 16px;
-  box-shadow: 0 2px 10px rgba(23,23,23,.05); border-top: 4px solid var(--gov-lila); }
+  box-shadow: 0 2px 10px rgba(23,23,23,.05); border-top: 4px solid var(--amber); }
 .gov-kaart-kop { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
 .gov-kaart-kop h2 { font-family: var(--font-opskrif); font-weight: 700; font-size: 17px; margin: 0; flex: 1 1 auto; }
+/* Die kaarte wissel af: teal, amber, koraal. */
+#gov-inhoud > .gov-kaart:nth-child(3n+1) { border-top-color: var(--teal); }
+#gov-inhoud > .gov-kaart:nth-child(3n+2) { border-top-color: var(--amber); }
+#gov-inhoud > .gov-kaart:nth-child(3n+3) { border-top-color: var(--koraal); }
 .gov-aanmeld, .gov-geen-toegang { max-width: 440px; }
 .gov-aanmeld h2 { font-family: var(--font-opskrif); font-size: 17px; margin: 0 0 12px; }
 .gov-geen-toegang p { margin: 0 0 12px; color: var(--grys-teks); }
@@ -44,10 +50,13 @@ body { background: var(--grys-lig); }
 .gov-knop { border: 0; border-radius: 8px; padding: 9px 14px; font-weight: 600; font-size: 13.5px; cursor: pointer;
   display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-liggaam); white-space: nowrap;
   text-decoration: none; }
-.gov-knop-hoof { background: var(--gov); color: var(--wit); }
-.gov-knop-hoof:hover { background: #4C2F80; }
+.gov-knop-hoof { background: var(--teal); color: var(--wit); }
+.gov-knop-hoof:hover { background: #3B8A7D; }
+/* "+ Laai op" is koraal: die hoofaksie van die area. */
+.gov-knop-hoof[data-oplaai] { background: var(--koraal); }
+.gov-knop-hoof[data-oplaai]:hover { background: #D44A27; }
 .gov-knop-lig { background: var(--wit); color: var(--swart); border: 1px solid var(--gov-lyn); }
-.gov-knop-lig:hover { border-color: var(--gov-lila); }
+.gov-knop-lig:hover { border-color: var(--amber); }
 .gov-knop-klein { padding: 5px 10px; font-size: 12.5px; font-weight: 500; }
 .gov-knop-gevaar { color: var(--gov-rooi); }
 .gov-knop:disabled { opacity: .45; cursor: not-allowed; }
@@ -63,12 +72,12 @@ body { background: var(--grys-lig); }
 
 /* ---------- Sperdatumstrook ---------- */
 .gov-sper-strook { background: var(--wit); border-radius: 12px; padding: 14px 16px; margin-bottom: 18px;
-  border-left: 5px solid var(--gov-lila); box-shadow: 0 2px 10px rgba(23,23,23,.05); }
+  border-left: 5px solid var(--amber); box-shadow: 0 2px 10px rgba(23,23,23,.05); }
 .gov-sper-strook h2 { font-family: var(--font-opskrif); font-size: 14px; margin: 0 0 8px; }
 .gov-sper-items { display: flex; gap: 10px; flex-wrap: wrap; }
 .gov-sper-item { flex: 1 1 230px; border: 1px solid var(--gov-lyn); border-radius: 10px; padding: 9px 12px; font-size: 13px;
   cursor: pointer; background: var(--wit); text-align: left; font-family: var(--font-liggaam); color: var(--swart); }
-.gov-sper-item:hover { border-color: var(--gov-lila); }
+.gov-sper-item:hover { border-color: var(--amber); }
 .gov-sper-item b { display: block; font-size: 13.5px; }
 .gov-dae { font-weight: 600; }
 .gov-dae.dringend { color: var(--gov-rooi); }
@@ -94,8 +103,8 @@ body { background: var(--grys-lig); }
 .gov-boom-sub { font-size: 13px; padding: 6px 8px; }
 .gov-boom-sub.wip { color: var(--grys-teks); font-style: italic; }
 .gov-boom-hoof:hover, .gov-boom-sub:hover { background: var(--grys-lig); }
-.gov-boom-sub.aktief, .gov-boom-hoof.aktief { background: var(--gov-lig); color: var(--gov); font-weight: 600; }
-.gov-boom-nuut { font-size: 12.5px; color: var(--gov); padding: 5px 8px; }
+.gov-boom-sub.aktief, .gov-boom-hoof.aktief { background: var(--gov-lig); color: var(--gov-goud); font-weight: 600; box-shadow: inset 3px 0 0 var(--amber); }
+.gov-boom-nuut { font-size: 12.5px; color: var(--koraal); padding: 5px 8px; }
 .gov-tel { margin-left: auto; font-size: 11.5px; color: var(--grys-teks); font-weight: 500; background: var(--grys-lig);
   border-radius: 999px; padding: 1px 7px; font-style: normal; }
 .gov-boom-sub.aktief .gov-tel { background: var(--wit); }
@@ -112,7 +121,7 @@ body { background: var(--grys-lig); }
 .gov-oorsig { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
 .gov-oorsig-kaart { background: var(--wit); border-radius: 12px; padding: 14px; cursor: pointer; border: 1px solid var(--gov-lyn);
   text-align: left; font-family: var(--font-liggaam); color: var(--swart); }
-.gov-oorsig-kaart:hover { border-color: var(--gov-lila); }
+.gov-oorsig-kaart:hover { border-color: var(--amber); }
 .gov-oorsig-kaart b { font-family: var(--font-opskrif); font-size: 14px; display: block; margin-bottom: 6px; }
 .gov-oorsig-kaart span { font-size: 12.5px; color: var(--grys-teks); }
 
@@ -171,8 +180,8 @@ body { background: var(--grys-lig); }
 .gov-sleep { display: block; border: 2px dashed var(--gov-lyn); border-radius: 10px; padding: 20px; text-align: center;
   font-size: 13px; color: var(--grys-teks); margin-bottom: 12px; cursor: pointer; }
 .gov-sleep small { display: block; margin-top: 4px; }
-.gov-sleep.oor, .gov-sleep:hover { border-color: var(--gov-lila); background: var(--gov-lig); }
-.gov-sleep.gekies { border-style: solid; border-color: var(--gov-lila); color: var(--swart); }
+.gov-sleep.oor, .gov-sleep:hover { border-color: var(--amber); background: var(--gov-lig); }
+.gov-sleep.gekies { border-style: solid; border-color: var(--amber); color: var(--swart); }
 
 .gov-kennis { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--swart); color: var(--wit);
   padding: 10px 18px; border-radius: 999px; font-size: 13.5px; opacity: 0; transition: opacity .2s; pointer-events: none;
