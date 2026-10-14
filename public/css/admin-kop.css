@@ -1,53 +1,64 @@
 /* public/css/admin-kop.css
  *
- * DIE EENVORMIGE ADMIN-KOP. Opgestel 9 Okt 2026 in FS Integrated.
+ * DIE KOP VAN DIE ADMIN-PANELE (Admin, Governance, Boekhouding, Future Sharp).
+ * Eers opgestel 9 Okt 2026 in FS Integrated; op 14 Okt 2026 oorgebou na die
+ * ontwerp wat Dorrithé goedgekeur het (soos die vraelyskatalogus se kop).
  *
- * Al die administratiewe panele van Future Sharp kry dieselfde vlootblou kop:
- * die winkel se Admin, Boekhouding en Future Sharp, die Verslagpaneel (die
- * katalogus se admin) en die Verslagstelsel (FSVS). Hierdie lêer is die
- * winkel se deel daarvan.
+ * NET DIE ADMINBLADSYE LAAI HIERDIE LÊER. Die winkelfront en Talks bly soos
+ * hulle is.
  *
- * NET DIE ADMINBLADSYE LAAI HIERDIE LÊER. Die winkelfront gebruik dieselfde
- * .mini-kop, maar laai dit nie, dus bly die swart kop daar onaangeraak. Die
- * reëls hoef daarom nie op 'n klas op <body> te wag nie.
+ * DIE VORM, van bo na onder, alles in een middernagblou band:
+ *   1. Boonste ry: die area-pille links (elk in sy logokleur), e-pos, Meld af
+ *      en AF/EN regs. Die area waarin 'n mens is, kry vet teks en 'n strepie
+ *      in sy eie kleur.
+ *   2. Die held: die area se naam as groot titel, die teal leusestrook wat van
+ *      die linkerrand af loop tot by die hand en die spiraal, en regs die logo
+ *      met 'n dun wit rand.
+ *   3. 'n Wit kaart (#ak-kaart, in <main>) oorvleuel die band se onderkant met
+ *      die afdeling waarin 'n mens is en die bladsy se afdelings.
+ * admin-kop.js bou die held en die kaart.
  *
- * DIE VORM: ry een dra die logo-blokkies, "Future Sharp", die area se naam en
- * regs die e-pos, Meld af en AF/EN. Ry twee (.ak-ry2, deur admin-kop.js gebou)
- * dra die area-pille as oortjies met 'n amber streep onder die een waar 'n
- * mens is. Dieselfde vorm as die ander twee panele se koppe.
+ * DIE KLEURE IS DIE LOGO SE PRESIESE KLEURE, uit future-sharp-logo.png
+ * gemeet. Op die adminbladsye vervang hulle styl.css se ouer skakerings.
  */
 
-:root { --ak-navy: #163D64; --ak-lyn: rgba(255, 255, 255, .14); }
+:root {
+  --ak-navy: #071630;
+  --teal: #00A291;
+  --amber: #FCBA10;
+  --koraal: #FF491B;
+  --ak-teal-lig: #E3F5F2;
+  --ak-lyn: rgba(255, 255, 255, .14);
+  --ak-breedte: 1200px;
+}
 
+/* ---------- Die band ---------- */
 .mini-kop {
   background: var(--ak-navy);
   padding: 0 24px;
   font-family: var(--font-liggaam);
+  overflow: hidden; /* die leusestrook loop tot by die skerm se rand */
+  /* Nie meer vas bo-aan nie: die band is nou hoog, en die kaart moet oor
+     sy onderkant kan lê. */
+  position: relative;
+  top: auto;
+  z-index: 1;
 }
-.mini-kop-inner { padding: 12px 0; gap: 14px; }
-
-/* ---------- Die merk ---------- */
-.mini-kop-merk {
-  font-family: var(--font-liggaam);
-  font-size: 16px;
+.mini-kop .mini-kop-inner {
+  max-width: var(--ak-breedte);
+  margin: 0 auto;
+  padding: 16px 0 0;
+  gap: 12px 16px;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 12px;
 }
-/* Die Future Sharp-logo, as SVG nageteken van images/future-sharp-logo.png
-   (dieselfde maten en kleure), op 'n wit teël met reguit hoeke, soos die
-   logo op papier lyk (Dorrithé se keuse, 10 Okt 2026). As data-URI ingebed: geen ekstra lêer om te laai nie. */
-.mini-kop-merk::before { content: ""; flex: none; width: 40px; height: 56px; background: #fff url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMjAgNTI1Ij48cmVjdCB3aWR0aD0iMTk0IiBoZWlnaHQ9IjE5NCIgZmlsbD0iIzAwQTI5MSIvPjxyZWN0IHg9IjIwNSIgd2lkdGg9IjExNSIgaGVpZ2h0PSIxMTUiIGZpbGw9IiNGQ0JBMTAiLz48cmVjdCB4PSIyMDUiIHk9IjEyNyIgd2lkdGg9IjM3IiBoZWlnaHQ9IjM2Ii8+PHJlY3QgeT0iMjA1IiB3aWR0aD0iMzIwIiBoZWlnaHQ9IjMyMCIgZmlsbD0iI0ZGNDkxQiIvPjxnIGZpbGw9IiNmZmYiIGZvbnQtZmFtaWx5PSJNb250c2VycmF0LFBvcHBpbnMsQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiPjxnIGZvbnQtd2VpZ2h0PSI1MDAiIGZvbnQtc2l6ZT0iNTIiPjx0ZXh0IHg9IjQwIiB5PSI0MzQiIHRleHRMZW5ndGg9IjIxOSIgbGVuZ3RoQWRqdXN0PSJzcGFjaW5nQW5kR2x5cGhzIj5GVVRVUkU8L3RleHQ+PHRleHQgeD0iNDAiIHk9IjQ4OCIgdGV4dExlbmd0aD0iMTg3IiBsZW5ndGhBZGp1c3Q9InNwYWNpbmdBbmRHbHlwaHMiPlNIQVJQPC90ZXh0PjwvZz48ZyBmb250LXNpemU9IjE5IiB0cmFuc2Zvcm09InRyYW5zbGF0ZSg1OCwzNzApIHJvdGF0ZSgtOTApIj48dGV4dCB0ZXh0TGVuZ3RoPSIxMDMiIGxlbmd0aEFkanVzdD0ic3BhY2luZ0FuZEdseXBocyI+TWFzdGVyaW5nPC90ZXh0Pjx0ZXh0IHk9IjI4IiB0ZXh0TGVuZ3RoPSIxMTYiIGxlbmd0aEFkanVzdD0ic3BhY2luZ0FuZEdseXBocyI+TWVhbmluZ2Z1bDwvdGV4dD48dGV4dCB5PSI1NiIgdGV4dExlbmd0aD0iNjAiIGxlbmd0aEFkanVzdD0ic3BhY2luZ0FuZEdseXBocyI+TGl2aW5nPC90ZXh0PjwvZz48L2c+PC9zdmc+Cg==") center / 30px 50px no-repeat; border-radius: 0; }
-.merk-sharp { font-weight: 700; color: var(--wit); }
-.merk-skeier { display: none; }
-.merk-shop {
-  font-weight: 500;
-  font-size: 15px;
-  color: var(--wit);
-  border-left: 1px solid rgba(255, 255, 255, .35);
-  padding-left: 12px;
-}
+
+/* Die ou merk (logo-teël en "Future Sharp | Future Shop") val weg: die logo
+   staan nou groot in die held. */
+.mini-kop .mini-kop-merk { display: none; }
 
 /* ---------- Regs: e-pos, Meld af, taal ---------- */
+.mini-kop .mini-kop-regs { margin-left: auto; }
 .paneel-aanmeld-blok { display: flex; align-items: center; gap: 12px; }
 .paneel-gebruiker-epos { font-size: 13px; color: rgba(255, 255, 255, .75); }
 .mini-kop .paneel-aanmeld-knoppie {
@@ -57,100 +68,259 @@
   padding: 5px 14px;
   font-size: 13px;
   font-weight: 500;
-  color: var(--wit);
+  color: #fff;
   cursor: pointer;
 }
-.mini-kop .paneel-aanmeld-knoppie:hover { border-color: var(--wit); }
-
-/* Die "Paneelbord"-skakel in die kop val weg sodra die oortjies staan: die
-   oortjie Admin doen dieselfde. Vir wie net een area het, bly hy. */
+.mini-kop .paneel-aanmeld-knoppie:hover { border-color: #fff; }
 body.paneel-area-pille-aan .paneel-aanmeld-blok a.mini-kop-mandjie { display: none; }
-
 .mini-kop .taal-wisselaar { border-color: rgba(255, 255, 255, .5); }
 .mini-kop .taal-knoppie { color: rgba(255, 255, 255, .85); font-size: 12px; padding: 5px 11px; }
 .mini-kop .taal-knoppie-aktief { background: var(--amber); color: var(--ak-navy); }
 
-/* ---------- Ry twee: die area-pille ----------
-   Elke area is 'n pil in sy eie kleur: Admin koraal, Boekhouding teal, Future
-   Sharp wit, en "Vraelyste en verslae" amber. Die pil waar 'n mens is, is
-   gevul. (Eers oortjies, op Dorrithé se versoek weer pille, 9 Okt 2026.) */
-.ak-ry2 { margin: 0 -24px; padding: 0 24px; border-top: 1px solid var(--ak-lyn); }
-.ak-ry2:empty { display: none; }
-
-.mini-kop .ak-ry2 .paneel-area-kieslys {
-  max-width: 1440px;
-  margin: 0 auto;
-  padding: 10px 0 12px;
-  gap: 8px;
+/* ---------- Die area-pille ---------- */
+body.ak-kop .mini-kop .paneel-area-kieslys {
+  display: flex;
   flex-wrap: wrap;
   align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 0 0 8px; /* plek vir die strepie onder die aktiewe pil */
+  max-width: none;
 }
-
-.mini-kop .ak-ry2 .paneel-area-kieslys .paneel-area-pil {
-  background: transparent;
-  border: 1px solid;
+body.ak-kop .mini-kop .paneel-area-kieslys .paneel-area-pil {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 14px;
+  border: 0;
   border-radius: 999px;
   box-shadow: none;
-  padding: 6px 15px;
-  font-size: 13.5px;
+  background: rgba(255, 255, 255, .14);
+  color: #fff;
+  font-family: var(--font-liggaam);
+  font-size: 13px;
   font-weight: 500;
   white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
 }
-.mini-kop .ak-ry2 .paneel-area-kieslys .paneel-area-pil:hover { transform: translateY(-1px); }
-.mini-kop .ak-ry2 .paneel-area-kieslys .paneel-area-pil.aktief:hover { transform: none; }
+body.ak-kop .mini-kop .paneel-area-kieslys .paneel-area-pil:hover { transform: translateY(-1px); }
+body.ak-kop .mini-kop .paneel-area-kieslys .paneel-area-pil.aktief:hover { transform: none; }
 
-.mini-kop .ak-ry2 .paneel-area-kieslys .paneel-area-pil-admin { border-color: var(--koraal); color: #F4A07F; }
-.mini-kop .ak-ry2 .paneel-area-kieslys .paneel-area-pil-admin.aktief { background: var(--koraal); color: var(--wit); }
-.mini-kop .ak-ry2 .paneel-area-kieslys .paneel-area-pil-boekhouding { border-color: var(--teal); color: #8FD0C3; }
-.mini-kop .ak-ry2 .paneel-area-kieslys .paneel-area-pil-boekhouding.aktief { background: var(--teal); color: var(--wit); }
-/* Future Sharp was vlootblou, maar dit verdwyn op die vlootblou kop. */
-.mini-kop .ak-ry2 .paneel-area-kieslys .paneel-area-pil-futuresharp { border-color: #9DB5CF; color: #BCD0E4; }
-.mini-kop .ak-ry2 .paneel-area-kieslys .paneel-area-pil-futuresharp.aktief { background: var(--wit); border-color: var(--wit); color: var(--ak-navy); }
+body.ak-kop .mini-kop .paneel-area-kieslys .paneel-area-pil-governance { background: var(--amber); color: #3a2a00; }
+body.ak-kop .mini-kop .paneel-area-kieslys .paneel-area-pil-boekhouding { background: var(--koraal); color: #fff; font-weight: 600; }
+body.ak-kop .mini-kop .paneel-area-kieslys .paneel-area-pil-futuresharp { background: var(--teal); color: #fff; }
+body.ak-kop .mini-kop .paneel-area-kieslys .paneel-area-pil-governance.aktief { background: var(--amber); color: #3a2a00; border: 0; }
+body.ak-kop .mini-kop .paneel-area-kieslys .paneel-area-pil-boekhouding.aktief { background: var(--koraal); color: #fff; border: 0; }
+body.ak-kop .mini-kop .paneel-area-kieslys .paneel-area-pil-futuresharp.aktief { background: var(--teal); color: #fff; border: 0; }
+body.ak-kop .mini-kop .paneel-area-kieslys .paneel-area-pil-admin.aktief { background: #fff; color: var(--ak-navy); }
 
-/* "Vraelyste en verslae" staan ná 'n dun skeier: hy is nie 'n area nie,
-   maar 'n kortpad na ander werwe. Oop, is hy gevul. */
-.mini-kop .ak-ry2 .paneel-area-kieslys .paneel-area-pil-verslae {
-  position: relative;
-  margin-left: 13px;
-  border-color: var(--amber);
-  color: #F6D27E;
+body.ak-kop .mini-kop .paneel-area-kieslys .paneel-area-pil.aktief { font-weight: 600; }
+body.ak-kop .mini-kop .paneel-area-kieslys .paneel-area-pil.aktief::after {
+  content: "";
+  position: absolute;
+  left: 20%;
+  right: 20%;
+  bottom: -7px;
+  height: 3px;
+  border-radius: 2px;
+  background: #fff;
 }
-.mini-kop .ak-ry2 .paneel-area-kieslys .paneel-area-pil-verslae::before {
+body.ak-kop .mini-kop .paneel-area-kieslys .paneel-area-pil-governance.aktief::after { background: var(--amber); }
+body.ak-kop .mini-kop .paneel-area-kieslys .paneel-area-pil-boekhouding.aktief::after { background: var(--koraal); }
+body.ak-kop .mini-kop .paneel-area-kieslys .paneel-area-pil-futuresharp.aktief::after { background: var(--teal); }
+
+/* "Vraelyste en verslae" staan ná 'n dun skeier: dit is 'n kortpad, nie 'n
+   area nie. Oop, is hy wit. */
+body.ak-kop .mini-kop .paneel-area-kieslys .paneel-area-pil-verslae { margin-left: 13px; }
+body.ak-kop .mini-kop .paneel-area-kieslys .paneel-area-pil-verslae::before {
   content: "";
   position: absolute;
   left: -12px;
-  top: 3px;
-  bottom: 3px;
+  top: 6px;
+  bottom: 6px;
   width: 1px;
-  background: rgba(255, 255, 255, .22);
+  background: rgba(255, 255, 255, .35);
 }
-.mini-kop .ak-ry2 .paneel-area-kieslys .paneel-area-pil-verslae.oop {
-  background: var(--amber);
+body.ak-kop .mini-kop .paneel-area-kieslys .paneel-area-pil-verslae.oop { background: #fff; color: var(--ak-navy); }
+
+/* Die onderry van "Vraelyste en verslae", binne die band. */
+.ak-vv-plek { max-width: var(--ak-breedte); margin: 0 auto; }
+.ak-vv-plek .vv-ry { max-width: none; margin: 10px 0 0; padding: 0; }
+.ak-vv-plek .vv-pil { background: #fff; }
+
+/* ---------- Die held ---------- */
+.ak-binne { max-width: var(--ak-breedte); margin: 0 auto; }
+.ak-held-ry {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 32px;
+  align-items: end;
+  padding: 20px 0 28px;
+}
+body.ak-kaart-aan .ak-held-ry { padding-bottom: 64px; }
+
+.ak-titel {
+  grid-column: 1;
+  grid-row: 1;
+  margin: 0 0 26px;
+  font-family: var(--font-opskrif);
+  font-weight: 800;
+  font-size: 36px;
+  line-height: 1.1;
+  letter-spacing: -.01em;
+  color: #fff;
+}
+
+.ak-leuse {
+  grid-column: 1;
+  grid-row: 2;
+  justify-self: start;
+  position: relative;
+  z-index: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--teal);
+  color: #fff;
+  font-family: var(--font-opskrif);
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 1.4;
+  padding: 12px 150px 12px 0;
+  white-space: nowrap;
+}
+/* Die strook loop van die skerm se linkerrand af. Een skaduwee vir die
+   geheel, sodat daar geen naat is nie. */
+.ak-leuse::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: calc(100% + 100vw);
+  z-index: -1;
+  background: var(--teal);
+  box-shadow: 0 12px 12px -8px rgba(0, 0, 0, .5);
+}
+.ak-hand {
+  position: absolute;
+  height: 172%;
+  width: auto;
+  right: -78px;
+  bottom: -10px;
+  pointer-events: none;
+}
+
+.ak-logo {
+  grid-column: 2;
+  grid-row: 1 / 3;
+  align-self: end;
+  position: relative;
+  z-index: 2;
+  display: block;
+  height: 132px;
+  width: auto;
+  border: 3px solid #fff;
+  background: #fff;
+}
+
+/* ---------- Die kaart ---------- */
+body.ak-kaart-aan main.paneel-wrap { margin-top: 0; padding-top: 0; }
+.ak-kaart {
+  position: relative;
+  z-index: 3;
+  /* Die kaart se rand staan 16px buite die teks, behalwe waar die bladsy so
+     breed is dat daar nie plek is nie; dan bly hy 16px van die skerm se rand. */
+  margin: -40px max(-16px, calc(16px - (100vw - var(--ak-breedte)) / 2)) 28px;
+  padding: 16px;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 4px 18px rgba(7, 22, 48, .08);
+}
+.ak-kaart[hidden] { display: none; }
+.ak-kaart-titel {
+  margin: 0;
+  font-family: var(--font-opskrif);
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--ak-navy);
+}
+.ak-kaart-besk { margin: 2px 0 0; font-size: 13px; color: #5F5E5A; }
+.ak-kaart-besk:empty { display: none; }
+
+.ak-oortjies {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin-top: 12px;
+  padding: 4px;
+  border-radius: 18px;
+  background: var(--ak-teal-lig);
+}
+.ak-oortjies:empty, .sonder-oortjies .ak-oortjies { display: none; }
+.ak-oortjie {
+  border: 0;
+  background: transparent;
+  border-radius: 999px;
+  padding: 7px 16px;
+  font-family: var(--font-liggaam);
+  font-size: 14px;
+  color: var(--ak-navy);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.ak-oortjie:hover { background: rgba(7, 22, 48, .06); }
+.ak-oortjie.op, .ak-oortjie.op:hover { background: var(--ak-navy); color: #fff; }
+body.ak-area-futuresharp .ak-oortjie.op { background: var(--teal); }
+body.ak-area-governance .ak-oortjie.op { background: var(--amber); color: #3a2a00; }
+body.ak-area-boekhouding .ak-oortjie.op { background: var(--koraal); }
+
+.ak-kies {
+  display: none;
+  width: 100%;
+  min-height: 42px;
+  margin-top: 12px;
+  padding: 0 12px;
+  border: 1px solid #cfd8d6;
+  border-radius: 10px;
+  background: var(--ak-teal-lig);
+  font-family: var(--font-liggaam);
+  font-size: 15px;
   color: var(--ak-navy);
 }
 
-/* Die onderry van "Vraelyste en verslae" lyn op met die kop. */
-.vv-ry { max-width: 1440px; box-sizing: content-box; }
+/* Die bladsye se eie titels en kieslyste wyk vir die kop en die kaart. Die
+   knoppies bly in die DOM; die kaart klik hulle. */
+body.ak-kop main > .mandjie-titel,
+body.ak-kop .gov-titel,
+body.ak-kop .fsp-kop { display: none; }
+body.ak-kaart-aan #paneel-sy-kieslys,
+body.ak-kaart-aan #paneel-kieslys-hamburger,
+body.ak-kaart-aan #paneel-kieslys-agtergrond,
+body.ak-kaart-aan #fp-kieslys,
+body.ak-kaart-aan #fsp-kieslys { display: none !important; }
+body.ak-kaart-aan .paneel-uitleg { display: block; }
+body.ak-kaart-aan .paneel-inhoud-kolom { width: 100%; max-width: none; }
+#gov-hoof.paneel-wrap { padding-top: 22px; }
+body.ak-kaart-aan #gov-hoof.paneel-wrap { padding-top: 0; }
 
-/* ---------- Die Future Sharp-bladsy ----------
-   Die logo staan nou in die kop, en die teal-strook val weg sodat die bladsy
-   lyk soos die ander twee. Die titel en die beskrywing bly. */
-.fsp-kop { background: none; border: 0; border-radius: 0; }
-.fsp-kop-bo { padding: 0; }
-.fsp-kop-logo, .fsp-kop-strook { display: none; }
-
-/* ---------- Foon ----------
-   styl.css skuif .mini-kop-regs op 'n foon agter 'n hamburger in. Die
-   adminbladsye het geen hamburger nie, dus bly die regterblok hier gewoon in
-   die kop staan, sonder die e-pos. */
+/* ---------- Foon ---------- */
 @media (max-width: 640px) {
+  .mini-kop { padding: 0 16px; }
+  .mini-kop .mini-kop-inner { padding-top: 12px; }
+  /* Meld af en die taal bo regs; die pille daaronder oor die volle breedte. */
   .mini-kop .mini-kop-regs {
+    order: -1;
     position: static;
     transform: none;
-    width: auto;
+    width: 100%;
     max-width: none;
+    margin-left: 0;
     background: none;
+    display: flex;
     flex-direction: row;
+    justify-content: flex-end;
     align-items: center;
     padding: 0;
     gap: 10px;
@@ -159,23 +329,26 @@ body.paneel-area-pille-aan .paneel-aanmeld-blok a.mini-kop-mandjie { display: no
   }
   .mini-kop .mini-kop-regs .taal-wisselaar { display: flex; }
   .paneel-gebruiker-epos { display: none; }
-}
-@media (max-width: 620px) {
-  .mini-kop { padding: 0 16px; }
-  .mini-kop-inner { padding: 10px 0; }
-  .ak-ry2 { margin: 0 -16px; padding: 0 16px; }
-  .mini-kop .ak-ry2 .paneel-area-kieslys .paneel-area-pil-verslae { margin-left: 0; }
-  .mini-kop .ak-ry2 .paneel-area-kieslys .paneel-area-pil-verslae::before { display: none; }
-  .vv-ry { padding: 0 16px; margin: 14px 0 4px; }
-}
-@media (max-width: 480px) {
-  .merk-sharp { display: inline; }
-  .merk-shop { display: none; }
-}
+  body.ak-kop .mini-kop .paneel-area-kieslys { width: 100%; gap: 6px; }
+  body.ak-kop .mini-kop .paneel-area-kieslys .paneel-area-pil { padding: 0 12px; font-size: 12px; }
+  body.ak-kop .mini-kop .paneel-area-kieslys .paneel-area-pil-verslae { margin-left: 0; }
+  body.ak-kop .mini-kop .paneel-area-kieslys .paneel-area-pil-verslae::before { display: none; }
 
-/* ---------- Governance (Oktober 2026) ----------
-   Amber, die handelsmerk se geel (Dorrithé se keuse, 12 Okt 2026). Dieselfde
-   kleur as "Vraelyste en verslae", maar daardie pil staan heel regs ná 'n
-   skeier en is nie 'n area nie. Gevul, staan die vlootblou teks op amber. */
-.mini-kop .ak-ry2 .paneel-area-kieslys .paneel-area-pil-governance { border-color: var(--amber); color: #F6D27E; }
-.mini-kop .ak-ry2 .paneel-area-kieslys .paneel-area-pil-governance.aktief { background: var(--amber); border-color: var(--amber); color: var(--ak-navy); }
+  .ak-held-ry { column-gap: 12px; padding: 16px 0 24px; }
+  body.ak-kaart-aan .ak-held-ry { padding-bottom: 56px; }
+  .ak-titel { grid-column: 1 / 3; font-size: 24px; margin-bottom: 18px; }
+  .ak-leuse { grid-row: 2; font-size: 12px; padding: 9px 46px 9px 0; }
+  .ak-hand { height: 72px; right: -48px; bottom: -8px; }
+  .ak-logo { grid-row: 2; height: 72px; border-width: 2px; }
+
+  .ak-kaart { margin: -36px -8px 20px; padding: 12px; }
+  .ak-oortjies { display: flex; }
+  .ak-oortjie { flex: 1; text-align: center; padding: 7px 6px; font-size: 13px; }
+  .ak-kaart.baie .ak-oortjies { display: none; }
+  .ak-kaart.baie .ak-kies { display: block; }
+}
+@media (max-width: 375px) {
+  .ak-leuse { font-size: 11.5px; padding-right: 40px; }
+  .ak-hand { height: 64px; right: -42px; }
+  .ak-logo { height: 58px; }
+}

@@ -92,6 +92,12 @@
   // 'n venster wat tussenin smal getrek is, steeds reg lyk.
   function plaas(onderry, area) {
     const kop = document.querySelector(".mini-kop");
+    // Die admin-kop (14 Okt 2026) hou 'n plek binne die blou band oop.
+    const plek = kop && kop.querySelector(".ak-vv-plek");
+    if (plek) {
+      if (onderry.parentNode !== plek) plek.appendChild(onderry);
+      return;
+    }
     if (area.classList.contains("in-kop") && kop) {
       kop.parentNode.insertBefore(onderry, kop.nextSibling);
     } else {
