@@ -10,7 +10,7 @@
 // WAT DIE PIL DOEN. Hy navigeer nie: hy maak 'n ry van vier skakels onder die
 // kop oop en toe, in dieselfde vorm as Boekhouding se afdelingspille. Die vier
 // skakels lei na ander werwe en gaan elk in 'n nuwe oortjie oop:
-//   Verslagkatalogus en Verslagpaneel  (saam, teal: die katalogus en sy admin)
+//   Verslagkatalogus en Vraelyspaneel  (saam, teal: die katalogus en sy admin)
 //   Verslagstelsel                     (vlootblou: FSVS)
 //   FS Vorms-bouer                     (koraal: die bouer)
 //
@@ -25,7 +25,7 @@
   const ROL = "verslae";
   const SKAKELS = [
     { teks: "Verslagkatalogus", href: "https://futuresharp-katalogus.netlify.app", klas: "vv-kat" },
-    { teks: "Verslagpaneel", href: "https://futuresharp-katalogus.netlify.app/admin", klas: "vv-kat" },
+    { teks: "Vraelyspaneel", href: "https://futuresharp-katalogus.netlify.app/admin", klas: "vv-kat" },
     null,
     { teks: "Verslagstelsel", href: "https://fsvs-987325149652.europe-west1.run.app/", klas: "vv-fsvs", een_aanmelding: true },
     null,
