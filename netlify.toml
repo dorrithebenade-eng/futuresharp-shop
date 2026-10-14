@@ -48,6 +48,11 @@
 [functions."gov-herinnering"]
   schedule = "20 4 * * *"
 
+# akk-herinnering (14 Okt 2026): Akkreditasies se sperdatums en hernuwings,
+# dieselfde patroon as gov-herinnering, vyf minute later.
+[functions."akk-herinnering"]
+  schedule = "25 4 * * *"
+
 # Netlify Identity registrasie-instellings word via die Netlify-kontrolepaneel
 # gestel (nie hierdie lêer nie): "Oop registrasie" aan, standaard-rol by
 # registrasie = "koper" (via 'n Identity-triggerfunksie, sien

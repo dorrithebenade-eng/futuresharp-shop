@@ -30,6 +30,7 @@
     governance: "governance",
     faktuurpaneel: "boekhouding",
     futuresharp: "futuresharp",
+    akkreditasies: "akkreditasies",
   };
   const AREA = AREA_VAN_BLADSY[BLADSY] || "admin";
 
@@ -38,6 +39,7 @@
     governance: { af: "Governance", en: "Governance" },
     boekhouding: { af: "Boekhouding", en: "Accounts" },
     futuresharp: { af: "Future Sharp", en: "Future Sharp" },
+    akkreditasies: { af: "Akkreditasies", en: "Accreditation" },
   };
 
   const LEUSE = {
@@ -118,6 +120,11 @@
       houer: "#gov-paneel",
       titel_uit: "#gov-inhoud .gov-kaart-kop h2",
       vaste_besk: "Future Sharp NPC · Reg. nr. 2024/117444/08",
+    },
+    akkreditasies: {
+      houer: "#gov-paneel",
+      titel_uit: "#gov-inhoud .gov-kaart-kop h2",
+      vaste_besk: "Aansoeke om akkreditasie van ons kursusse",
     },
   };
 

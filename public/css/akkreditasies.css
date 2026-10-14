@@ -1,0 +1,27 @@
+/* public/css/akkreditasies.css
+ *
+ * Die Akkreditasies-area (14 Okt 2026). Die bladsy gebruik governance.css se
+ * gov-klasse; hier staan net wat ekstra is: die stande in die aansoekregister
+ * en die register as kaartjies op 'n foon.
+ */
+
+.akk-stand { display: inline-block; white-space: nowrap; border-radius: 999px; padding: 2px 10px; font-size: 12px; font-weight: 500; }
+.akk-beplan { background: #F1EFEB; color: #5F5E5A; }
+.akk-ingedien { background: #E6F1FB; color: #0C447C; }
+.akk-in_behandeling { background: #FFF4D6; color: #6b4d00; }
+.akk-geakkrediteer { background: #E3F5F2; color: #0b5c52; }
+.akk-afgekeur { background: #FDE7E0; color: #9c2c0d; }
+.akk-verval { background: #EDEBE6; color: #6E6A63; text-decoration: line-through; }
+
+.akk-nuwe-instansie { border-style: dashed; }
+.akk-nuwe-instansie b { color: var(--teal); }
+
+/* Op 'n foon word elke aansoek 'n kaartjie, met die kolomnaam voor elke waarde. */
+@media (max-width: 700px) {
+  .akk-tabel, .akk-tabel tbody, .akk-tabel tr, .akk-tabel td { display: block; width: auto; }
+  .akk-tabel thead { display: none; }
+  .akk-tabel tr { border-bottom: 1px solid #E4E2DD; padding: 10px 0; }
+  .akk-tabel td { border: 0; padding: 2px 0; }
+  .akk-tabel td[data-l]::before { content: attr(data-l) ": "; color: #6E6A63; font-size: 12px; }
+  .akk-tabel td.gov-sel-aksies { padding-top: 6px; }
+}

@@ -115,6 +115,10 @@ body.ak-kop .mini-kop .paneel-area-kieslys .paneel-area-pil-governance.aktief { 
 body.ak-kop .mini-kop .paneel-area-kieslys .paneel-area-pil-boekhouding.aktief { background: var(--koraal); color: #fff; border: 0; }
 body.ak-kop .mini-kop .paneel-area-kieslys .paneel-area-pil-futuresharp.aktief { background: var(--teal); color: #fff; border: 0; }
 body.ak-kop .mini-kop .paneel-area-kieslys .paneel-area-pil-admin.aktief { background: #fff; color: var(--ak-navy); }
+/* Akkreditasies (14 Okt 2026): wit, soos Admin wanneer hy aktief is, want die
+   drie logokleure het elk reeds een betekenis. */
+body.ak-kop .mini-kop .paneel-area-kieslys .paneel-area-pil-akkreditasies,
+body.ak-kop .mini-kop .paneel-area-kieslys .paneel-area-pil-akkreditasies.aktief { background: #fff; color: var(--ak-navy); border: 0; }
 
 body.ak-kop .mini-kop .paneel-area-kieslys .paneel-area-pil.aktief { font-weight: 600; }
 body.ak-kop .mini-kop .paneel-area-kieslys .paneel-area-pil.aktief::after {

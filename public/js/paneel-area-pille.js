@@ -63,6 +63,11 @@
     }
     // Die Governance-area (governance.html, Oktober 2026). admin-kop.js skuif
     // die ry in elk geval na die kop; die anker is net die terugval.
+    // Die Akkreditasies-area (14 Okt 2026) is op Governance gebou en het
+    // dieselfde #gov-hoof; die bladsy se naam skei hulle.
+    if (document.getElementById("gov-hoof") && /akkreditasies(\.html)?$/.test(location.pathname)) {
+      return { area: "akkreditasies", anker: document.getElementById("gov-hoof").firstElementChild, waar: "voor" };
+    }
     if (document.getElementById("gov-hoof")) {
       return { area: "governance", anker: document.getElementById("gov-hoof").firstElementChild, waar: "voor" };
     }
@@ -157,6 +162,12 @@
       // Die naam is 'n eienaam en word nie vertaal nie.
       ry.appendChild(
         bou_pil("Future Sharp", bladsy.area === "futuresharp", "futuresharp.html", "futuresharp")
+      );
+    }
+    // Akkreditasies (14 Okt 2026): dieselfde rol as Governance.
+    if (het_boekhouding) {
+      ry.appendChild(
+        bou_pil("Akkreditasies", bladsy.area === "akkreditasies", "akkreditasies.html", "akkreditasies")
       );
     }
 

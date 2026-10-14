@@ -50,6 +50,9 @@ body { background: var(--grys-lig); }
 .gov-knop { border: 0; border-radius: 8px; padding: 9px 14px; font-weight: 600; font-size: 13.5px; cursor: pointer;
   display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-liggaam); white-space: nowrap;
   text-decoration: none; }
+/* 'n Knoppie met hidden (bv. Skrap in 'n nuwe rekord) moet weg wees; die
+   display hierbo sou dit andersins wys. */
+.gov-knop[hidden] { display: none; }
 .gov-knop-hoof { background: var(--teal); color: var(--wit); }
 .gov-knop-hoof:hover { background: #3B8A7D; }
 /* "+ Laai op" is koraal: die hoofaksie van die area. */
