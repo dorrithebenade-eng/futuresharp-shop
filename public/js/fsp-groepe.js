@@ -120,7 +120,7 @@
         '<p class="fsp-hulp fsp-hulp-bo">Een skakel vir \'n hele skool of groep. Die skool se naam gaan saam met elke antwoord na die vraelys, sodat julle die groep se antwoorde kan uitsorteer. Die skakel bly aktief tot julle dit deaktiveer.</p>' +
         '<div class="fsp-rooster fsp-gr-rooster">' +
           '<div class="fsp-veld"><label class="fsp-et" for="fsp-gr-naam">Skool of groep</label><input class="fsp-invoer" id="fsp-gr-naam" maxlength="120" placeholder="Bv. Paul Roos Gimnasium"></div>' +
-          '<div class="fsp-veld"><label class="fsp-et" for="fsp-gr-soort">Junior of Senior</label><select id="fsp-gr-soort"><option value="hoer">Senior (hoërskool en studente)</option><option value="laer">Junior (laerskool)</option></select></div>' +
+          '<div class="fsp-veld"><label class="fsp-et" for="fsp-gr-soort">Junior of Senior</label><select id="fsp-gr-soort"><option value="laer">Junior (laerskool)</option><option value="hoer">Senior (hoërskool en studente)</option></select></div>' +
           '<div class="fsp-veld"><label class="fsp-et" for="fsp-gr-vir">Vir wie</label><select id="fsp-gr-vir"><option value="ouer">Ouer</option><option value="leerder">Leerder of student</option><option value="onderwyser">Onderwyser</option></select></div>' +
         "</div>" +
         '<div class="fsp-veld"><span class="fsp-et">Vraelyste</span><div id="fsp-gr-vrae"></div><p class="fsp-hulp" id="fsp-gr-vrae-hulp"></p></div>' +
