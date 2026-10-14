@@ -590,13 +590,11 @@
       '<option value="leerder"' + (i.vir === "leerder" ? " selected" : "") + ">Leerder of student</option>" +
       '<option value="ouer"' + (i.vir === "ouer" ? " selected" : "") + ">Ouer</option>" +
       '<option value="onderwyser"' + (i.vir === "onderwyser" ? " selected" : "") + ">Onderwyser</option></select></label>" +
-      // Vir watter skole (Oktober 2026): by 'n groepskakel vir 'n laerskool wys
-      // net "Laerskool en hoërskool" en "Net laerskool". Die veld heet steeds
-      // `ouderdom` (alle, laer, hoer); net die woorde op die skerm het verander.
-      '<label><span class="fsp-klein-et">Vir watter skole</span><select data-v="ouderdom">' +
-      '<option value="alle"' + (!i.ouderdom || i.ouderdom === "alle" ? " selected" : "") + ">Laerskool en hoërskool</option>" +
-      '<option value="laer"' + (i.ouderdom === "laer" ? " selected" : "") + ">Net laerskool (tot Graad 7)</option>" +
-      '<option value="hoer"' + (i.ouderdom === "hoer" ? " selected" : "") + ">Net hoërskool en studente (Graad 8+)</option></select></label>" +
+      // Junior en Senior (Oktober 2026): twee merkies. Albei gemerk is "alle",
+      // net Junior "laer", net Senior "hoer". Die veld heet steeds `ouderdom`.
+      '<div class="fsp-js"><span class="fsp-klein-et">Vir</span>' +
+      '<label><input type="checkbox" data-js="laer"' + (i.ouderdom !== "hoer" ? " checked" : "") + "> Junior <small>(laerskool)</small></label>" +
+      '<label><input type="checkbox" data-js="hoer"' + (i.ouderdom !== "laer" ? " checked" : "") + "> Senior <small>(hoërskool en studente)</small></label></div>" +
       '<button type="button" class="fsp-knop fsp-knop-lig" data-wissel="' + n + '">' + (i.aktief ? "Deaktiveer" : "Aktiveer weer") + "</button></div></div>"
     ).join("") || '<p class="fsp-leeg">Nog geen vraelyste nie.</p>';
     for (const bt of $$("[data-wissel]")) {
@@ -612,6 +610,8 @@
         if (b) i[a][b] = inp.value.trim();
         else i[a] = inp.value;
       }
+      const j = $('[data-js="laer"]', k), s = $('[data-js="hoer"]', k);
+      if (j && s) i.ouderdom = j.checked && !s.checked ? "laer" : s.checked && !j.checked ? "hoer" : "alle";
     }
   }
 

@@ -23,3 +23,10 @@
   .fsp-gr-beeld { float: none; margin: 0 0 10px; }
   .fsp-gr-teks { width: 100%; }
 }
+
+/* Junior en Senior by 'n vraelys onder Vraelyste (Oktober 2026). */
+.fsp-js { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+.fsp-js .fsp-klein-et { margin: 0; }
+.fsp-js label { display: flex; gap: 6px; align-items: center; font-size: 14px; cursor: pointer; }
+.fsp-js input { width: 17px; height: 17px; accent-color: var(--fsp-navy); margin: 0; }
+.fsp-js small { color: var(--grys-teks); }

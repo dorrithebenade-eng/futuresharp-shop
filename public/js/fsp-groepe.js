@@ -120,7 +120,7 @@
         '<p class="fsp-hulp fsp-hulp-bo">Een skakel vir \'n hele skool of groep. Die skool se naam gaan saam met elke antwoord na die vraelys, sodat julle die groep se antwoorde kan uitsorteer. Die skakel bly aktief tot julle dit deaktiveer.</p>' +
         '<div class="fsp-rooster fsp-gr-rooster">' +
           '<div class="fsp-veld"><label class="fsp-et" for="fsp-gr-naam">Skool of groep</label><input class="fsp-invoer" id="fsp-gr-naam" maxlength="120" placeholder="Bv. Paul Roos Gimnasium"></div>' +
-          '<div class="fsp-veld"><label class="fsp-et" for="fsp-gr-soort">Soort skool</label><select id="fsp-gr-soort"><option value="hoer">Hoërskool</option><option value="laer">Laerskool</option></select></div>' +
+          '<div class="fsp-veld"><label class="fsp-et" for="fsp-gr-soort">Junior of Senior</label><select id="fsp-gr-soort"><option value="hoer">Senior (hoërskool en studente)</option><option value="laer">Junior (laerskool)</option></select></div>' +
           '<div class="fsp-veld"><label class="fsp-et" for="fsp-gr-vir">Vir wie</label><select id="fsp-gr-vir"><option value="ouer">Ouer</option><option value="leerder">Leerder of student</option><option value="onderwyser">Onderwyser</option></select></div>' +
         "</div>" +
         '<div class="fsp-veld"><span class="fsp-et">Vraelyste</span><div id="fsp-gr-vrae"></div><p class="fsp-hulp" id="fsp-gr-vrae-hulp"></p></div>' +
@@ -197,8 +197,8 @@
     const lys = S.instr.filter((i) => i.aktief && i.vir === vir && ouderdom.includes(i.ouderdom || "alle"));
     $("#fsp-gr-vrae").innerHTML = lys.length
       ? lys.map((i) => '<label class="fsp-instrument fsp-gr-vraag"><input type="checkbox" value="' + esc(i.id) + '" checked><b>' + esc(i.naam.af) + '</b><span class="fsp-hulp">' + esc(i.naam.en) + "</span></label>").join("")
-      : '<p class="fsp-waarsku">Daar is nog geen aktiewe vraelys vir ' + GEHOOR[vir][0] + (vir === "leerder" ? (soort === "laer" ? " by 'n laerskool" : " by 'n hoërskool") : "") + " nie. Voeg dit by onder <b>Vraelyste</b>.</p>";
-    $("#fsp-gr-vrae-hulp").innerHTML = "Net die aktiewe vraelyste vir " + GEHOOR[vir][0] + (soort === "laer" ? " by 'n laerskool" : " by 'n hoërskool") + " word gewys. Die lys kom uit <b>Vraelyste</b>.";
+      : '<p class="fsp-waarsku">Daar is nog geen aktiewe vraelys vir ' + GEHOOR[vir][0] + (vir === "leerder" ? (soort === "laer" ? " (Junior)" : " (Senior)") : "") + " nie. Voeg dit by onder <b>Vraelyste</b>.</p>";
+    $("#fsp-gr-vrae-hulp").innerHTML = "Net die aktiewe vraelyste vir " + GEHOOR[vir][0] + (soort === "laer" ? " (Junior)" : " (Senior)") + " word gewys. Die lys kom uit <b>Vraelyste</b>.";
   }
 
   async function skep(knop) {
@@ -252,7 +252,7 @@
           '<button type="button" class="fsp-knop fsp-knop-lig" id="fsp-gr-pos">Nuwe e-pos</button>' +
           '<button type="button" class="fsp-knop ' + (g.oop ? "fsp-knop-gevaar" : "fsp-knop-lig") + '" id="fsp-gr-sluit">' + (g.oop ? "Deaktiveer die skakel" : "Aktiveer weer") + "</button>" +
         "</div>" +
-        '<p class="fsp-hulp">' + vraelys_name(g) + " · " + g.tale.map((t) => (t === "af" ? "Afrikaans" : "English")).join(" en ") + " · " + (g.soort === "laer" ? "laerskool" : "hoërskool") + " · geskep " + kort(g.geskep_op) + (g.oop ? "" : " · gedeaktiveer " + kort(g.gesluit_op)) + "</p>" +
+        '<p class="fsp-hulp">' + vraelys_name(g) + " · " + g.tale.map((t) => (t === "af" ? "Afrikaans" : "English")).join(" en ") + " · " + (g.soort === "laer" ? "Junior" : "Senior") + " · geskep " + kort(g.geskep_op) + (g.oop ? "" : " · gedeaktiveer " + kort(g.gesluit_op)) + "</p>" +
         // Skrap: net 'n onaktiewe groep, met die naam as bevestiging.
         (g.oop ? "" :
           '<div class="fsp-toets-skrap"><b>Skrap hierdie groepskakel</b>' +
