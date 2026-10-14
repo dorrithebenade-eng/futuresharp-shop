@@ -97,7 +97,7 @@ function geldige_vouer_ids(vouers) {
 }
 
 function vouer_naam(vouers, id) {
-  if (id === ARGIEF) return "7. Archive";
+  if (id === ARGIEF) return "07 Archive";
   for (const g of vouers) {
     if (id === g.id + ".W") return g.id + " " + g.titel + " · Work in Progress";
     for (const s of g.subs) if (s.id === id) return s.id + " " + s.titel;

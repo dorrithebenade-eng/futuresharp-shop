@@ -100,7 +100,7 @@
 
   // ---------- Vouers ----------
   function vouer_naam(id) {
-    if (id === ARGIEF) return "7. Archive";
+    if (id === ARGIEF) return "07 Archive";
     for (const g of VOUERS) {
       if (id === g.id + ".W") return g.id + " " + g.titel + " · Work in Progress";
       for (const s of g.subs) if (s.id === id) return s.id + " " + s.titel;
@@ -112,7 +112,7 @@
     return id;
   }
   function kort_naam(id) {
-    if (id === ARGIEF) return "7. Archive";
+    if (id === ARGIEF) return "07 Archive";
     for (const g of VOUERS) {
       if (id === g.id + ".W") return "Work in Progress";
       for (const s of g.subs) if (s.id === id) return s.id + " " + s.titel;
@@ -200,7 +200,7 @@
       h += '<button type="button" class="gov-boom-sub gov-boom-nuut" data-nuwe-vouer="' + esc(g.id) + '">+ Subvouer</button>';
       h += "</div></div>";
     }
-    h += '<div class="gov-boom-skeier"></div><button type="button" class="gov-boom-hoof' + (huidig === ARGIEF ? " aktief" : "") + '" data-vouer="' + ARGIEF + '"><span class="gov-pyl"></span>7. Archive<span class="gov-tel">' + tel_in(ARGIEF) + "</span></button>";
+    h += '<div class="gov-boom-skeier"></div><button type="button" class="gov-boom-hoof' + (huidig === ARGIEF ? " aktief" : "") + '" data-vouer="' + ARGIEF + '"><span class="gov-pyl"></span>07 Archive<span class="gov-tel">' + tel_in(ARGIEF) + "</span></button>";
     $("#gov-boom").innerHTML = h;
 
     let o = '<option value="oorsig">Oorsig</option>';
@@ -209,7 +209,7 @@
       for (const s of g.subs) o += '<option value="' + esc(s.id) + '">' + esc(s.id + " " + s.titel) + " (" + tel_in(s.id) + ")</option>";
       o += '<option value="' + g.id + '.W">' + esc(g.id) + " Work in Progress (" + tel_in(g.id + ".W") + ")</option></optgroup>";
     }
-    o += '<option value="' + ARGIEF + '">7. Archive (' + tel_in(ARGIEF) + ")</option>";
+    o += '<option value="' + ARGIEF + '">07 Archive (' + tel_in(ARGIEF) + ")</option>";
     const keuse = $("#gov-foon-keuse");
     keuse.innerHTML = o;
     keuse.value = huidig;
@@ -267,7 +267,7 @@
     h += '<div class="gov-oorsig">' + VOUERS.map((g) =>
       '<button type="button" class="gov-oorsig-kaart" data-groep="' + esc(g.id) + '"><b>' + esc(g.id + " " + g.titel) + "</b><span>" +
       dok_tel(tel_in(g.id)) + " · " + tel_in(g.id + ".W") + " in Work in Progress</span></button>").join("") +
-      '<button type="button" class="gov-oorsig-kaart" data-vouer="' + ARGIEF + '"><b>7. Archive</b><span>' + dok_tel(tel_in(ARGIEF)) + "</span></button></div></div>";
+      '<button type="button" class="gov-oorsig-kaart" data-vouer="' + ARGIEF + '"><b>07 Archive</b><span>' + dok_tel(tel_in(ARGIEF)) + "</span></button></div></div>";
 
     const onlangs = DOKUMENTE.filter((d) => d.vouer !== ARGIEF)
       .sort((a, b) => String(b.opgelaai_op).localeCompare(String(a.opgelaai_op))).slice(0, 8);
@@ -504,7 +504,7 @@
       const data = await gov({ aksie: "dok_argiveer", id });
       vervang_dok(data.dokument);
       teken();
-      kennis("Na 7. Archive geskuif");
+      kennis("Na 07 Archive geskuif");
     } catch (f) { kennis(f.message); }
   }
   async function herstel(id) {
