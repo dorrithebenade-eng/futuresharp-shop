@@ -579,7 +579,9 @@
     $("#fsp-instrumente").innerHTML = INSTR.map((i, n) =>
       '<div class="fsp-instrument' + (i.aktief ? "" : " onaktief") + '" data-n="' + n + '">' +
       '<div class="fsp-instr-kop"><b>' + esc(i.naam.af || "Nuwe vraelys") + "</b>" +
-      '<span class="fsp-stand ' + (i.aktief ? "voltooi" : "verval") + '">' + (i.aktief ? "Aktief" : "Gedeaktiveer") + "</span></div>" +
+      '<span class="fsp-instr-regs"><span class="fsp-stand ' + (i.aktief ? "voltooi" : "verval") + '">' + (i.aktief ? "Aktief" : "Gedeaktiveer") + "</span>" +
+      '<button type="button" class="fsp-skuif" data-skuif="' + n + '" data-rig="-1" title="Skuif op"' + (n === 0 ? " disabled" : "") + ">&#9650;</button>" +
+      '<button type="button" class="fsp-skuif" data-skuif="' + n + '" data-rig="1" title="Skuif af"' + (n === INSTR.length - 1 ? " disabled" : "") + ">&#9660;</button></span></div>" +
       '<div class="fsp-twee">' +
       '<label><span class="fsp-klein-et">Naam in Afrikaans</span><input type="text" class="fsp-invoer" value="' + esc(i.naam.af) + '" data-v="naam.af"></label>' +
       '<label><span class="fsp-klein-et">Naam in Engels</span><input type="text" class="fsp-invoer" value="' + esc(i.naam.en) + '" data-v="naam.en"></label>' +
@@ -599,6 +601,18 @@
     ).join("") || '<p class="fsp-leeg">Nog geen vraelyste nie.</p>';
     for (const bt of $$("[data-wissel]")) {
       bt.onclick = () => { lees_instr(); const i = INSTR[+bt.dataset.wissel]; i.aktief = !i.aktief; teken_instr(); kennis(i.aktief ? "Weer aktief. Druk Stoor." : "Gedeaktiveer. Druk Stoor."); };
+    }
+    // Volgorde (Oktober 2026): die volgorde hier is die volgorde in die
+    // groepskakels se keuselys.
+    for (const bt of $$("[data-skuif]")) {
+      bt.onclick = () => {
+        lees_instr();
+        const n = +bt.dataset.skuif, m = n + +bt.dataset.rig;
+        if (m < 0 || m >= INSTR.length) return;
+        [INSTR[n], INSTR[m]] = [INSTR[m], INSTR[n]];
+        teken_instr();
+        kennis("Volgorde verander. Druk Stoor.");
+      };
     }
   }
 

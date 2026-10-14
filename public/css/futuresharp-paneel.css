@@ -217,3 +217,9 @@
 .fsp-toets-skrap { border-top: 1px solid var(--fsp-lyn); margin-top: 14px; padding-top: 12px; }
 .fsp-toets-skrap b { color: #B8451F; }
 .fsp-slot { margin: 12px 0 0; font-size: 13.5px; color: var(--fsp-navy); background: var(--fsp-navy-lig); border-radius: 8px; padding: 8px 12px; }
+
+/* Volgorde van vraelyste (Oktober 2026). */
+.fsp-instr-regs { display: flex; gap: 6px; align-items: center; }
+.fsp-skuif { width: 30px; height: 30px; border: 1px solid #D9DFE7; border-radius: 8px; background: #fff; color: var(--fsp-navy); font-size: 11px; cursor: pointer; padding: 0; }
+.fsp-skuif:hover:not(:disabled) { background: #F1F4F8; }
+.fsp-skuif:disabled { opacity: .35; cursor: default; }
