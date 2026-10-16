@@ -1,4 +1,14 @@
 // netlify/functions/wys-bankreel-toe.js
+// Weergawe 7 (16 Oktober 2026): WEESKINDERS. Netlify se stoor gee soms vir
+// 'n oomblik 'n ou weergawe van 'n staat terug. Is 'n reel intussen reeds
+// toegewys (bv. deur die soortgelyk-reel uit 'n ander staat) en bevestig
+// iemand dit op 'n skerm wat dit nog as oop wys, kon daar twee
+// joernaalinskrywings vir een bankreel ontstaan; die eerste het dan geen reel
+// meer nie en is dubbel getel (Junie 2025: FNB-bankkoste R23 twee keer). Elke
+// toewysing en ontdoening vee nou ook elke ander inskrywing uit wat na
+// dieselfde bankreel wys. Om 'n bestaande dubbeling reg te stel: ontdoen die
+// reel en wys dit weer toe.
+//
 // Weergawe 6 (16 Oktober 2026): SOORTGELYK OOR ALLE STATE. 'n Kategorie wat
 // met die hand gekies word (`soortgelyk: true`), gaan ook na elke oop of
 // voorgestelde transaksie in die ANDER state met dieselfde rigting en patroon,
@@ -40,7 +50,40 @@
 
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 const { kry_store } = require("./_blob-store");
-const { kry_joernaal_store, skep_sleutel, nuwe_inskrywing } = require("./_joernaal");
+const { kry_joernaal_store, skep_sleutel, nuwe_inskrywing, finansiele_jaar, jaar_voorvoegsel } = require("./_joernaal");
+
+// bankreel-verwysing -> [joernaalsleutels], per finansiele jaar een keer gelees.
+function maak_indeks(jstore) {
+  const jare = new Map();
+  async function vir(datum) {
+    const jaar = finansiele_jaar(datum);
+    if (!jare.has(jaar)) {
+      const kaart = new Map();
+      const { blobs } = await jstore.list({ prefix: jaar_voorvoegsel(jaar) });
+      const ink = await Promise.all((blobs || []).map((b) => jstore.get(b.key, { type: "json" })));
+      ink.filter((x) => x && x.bankreel).forEach((x) => {
+        const l = kaart.get(x.bankreel) || [];
+        l.push(x.sleutel);
+        kaart.set(x.bankreel, l);
+      });
+      jare.set(jaar, kaart);
+    }
+    return jare.get(jaar);
+  }
+  // Vee elke inskrywing vir `ref` uit behalwe `behou`.
+  async function vee_ander(datum, ref, behou) {
+    const kaart = await vir(datum);
+    const sleutels = (kaart.get(ref) || []).filter((k) => k !== behou);
+    for (const k of sleutels) {
+      await vee_uit_vir_joernaal(jstore, k);
+      await jstore.delete(k);
+      await vee_uit_vir_inskrywing(k);
+    }
+    kaart.set(ref, behou ? [behou] : []);
+    return sleutels.length;
+  }
+  return { vee_ander };
+}
 // Weergawe 3 (25 September 2026): 'n inskrywing wat hier weggaan, neem sy
 // koppeling aan 'n toekenning saam (sien _koppelings.js).
 const { vee_uit_vir_inskrywing } = require("./_koppelings");
@@ -140,6 +183,7 @@ exports.handler = async (event, context) => {
   const jstore = kry_joernaal_store();
   const nou = new Date().toISOString();
   try {
+    const indeks = maak_indeks(jstore);
     for (const { r, o, k } of plan) {
       // 'n Regstelling: die ou inskrywing gaan eers weg. Sy bewyse word eers
       // gelees, sodat 'n nuwe kategorie hulle kan oorneem.
@@ -196,6 +240,12 @@ exports.handler = async (event, context) => {
       }
       r.bygewerk_op = nou;
       r.bygewerk_deur = gebruiker.email || "";
+      try {
+        const weg = await indeks.vee_ander(r.datum, B.verw(staat.sleutel, r.nr), r.joernaal_sleutel || "");
+        if (weg) console.log(`${weg} weeskind(ers) vir ${staat.sleutel}#${r.nr} uitgevee`);
+      } catch (fout) {
+        console.error(`Kon nie weeskinders vir ${staat.sleutel}#${r.nr} nagaan nie:`, fout);
+      }
     }
     await store.setJSON(staat.sleutel, staat);
   } catch (fout) {
@@ -217,6 +267,7 @@ exports.handler = async (event, context) => {
   }
   if (versprei.length) {
     const soort = staat.toets === true;
+    const indeks2 = maak_indeks(jstore);
     for (const s2 of ander) {
       if ((s2.toets === true) !== soort) continue;
       let verander = false;
@@ -256,6 +307,7 @@ exports.handler = async (event, context) => {
           r.bygewerk_deur = gebruiker.email || "";
           verander = true;
           ekstra_ander += 1;
+          await indeks2.vee_ander(r.datum, B.verw(s2.sleutel, r.nr), r.joernaal_sleutel || "");
         } catch (fout) {
           console.error(`Kon nie ${s2.sleutel}#${r.nr} toewys nie:`, fout);
         }
