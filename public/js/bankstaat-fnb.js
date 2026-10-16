@@ -1,4 +1,8 @@
 // public/js/bankstaat-fnb.js
+// Weergawe 2 (16 Oktober 2026): 'n PDF met dieselfde staat twee keer daarin
+// (FNB se "Computer Generated Copy" saam met die oorspronklike, elk "Page 1
+// of 1") word as een staat gelees. Bevat die PDF twee VERSKILLENDE state,
+// word dit geweier.
 //
 // Lees 'n FNB-bankstaat (PDF) uit die teksitems wat pdf.js gee.
 //
@@ -119,7 +123,31 @@
     const fout = (boodskap) => ({ ok: false, fout: boodskap });
     if (!Array.isArray(bladsye) || !bladsye.length) return fout("Die PDF het geen bladsye nie.");
 
-    const alle_reels = bladsye.map((b) => reels_van(b.items || []));
+    let alle_reels = bladsye.map((b) => reels_van(b.items || []));
+
+    // ── Afskrifte ────────────────────────────────────────────────────────
+    // Elke "Page 1 of N" begin 'n nuwe dokument. Is daar meer as een, en dra
+    // hulle almal dieselfde staatnommer en tydperk, is dit afskrifte van een
+    // staat en word net die eerste gelees. Anders is dit twee state in een
+    // lêer, en dit word nie geraai nie.
+    const bladteks = alle_reels.map((rs) => rs.map((r) => teks_van(r.items)).join("\n"));
+    const begin = [];
+    bladteks.forEach((t, n) => { if (n === 0 || /Page\s+1\s+of\s+\d+/i.test(t)) begin.push(n); });
+    if (begin.length > 1) {
+      const dokumente = begin.map((b, k) => bladteks.slice(b, begin[k + 1]).join("\n"));
+      const merk = (t) => {
+        const nr = (t.match(/Statement Number\s*:\s*(\S+)/i) || [])[1] || "";
+        const per = (t.match(/Statement Period\s*:\s*([^\n]+?\d{4})\s+to\s+([^\n]+?\d{4})/i) || []).slice(1).join("|");
+        return nr + "#" + per;
+      };
+      const eerste = merk(dokumente[0]);
+      if (!eerste.endsWith("#") && dokumente.every((d) => merk(d) === eerste)) {
+        alle_reels = alle_reels.slice(0, begin[1]);
+      } else if (dokumente.some((d) => merk(d) !== eerste)) {
+        return fout("Die PDF bevat meer as een staat. Laai elke staat apart op.");
+      }
+    }
+
     const plat = [].concat(...alle_reels);
     const al_teks = plat.map((r) => teks_van(r.items)).join("\n");
 
