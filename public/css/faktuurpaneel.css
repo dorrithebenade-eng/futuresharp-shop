@@ -1347,3 +1347,6 @@ a.paneel-kieslys-item { text-decoration: none; }
 .fs-d-dat { white-space: nowrap; width: 82px; }
 .fs-d-bron { white-space: nowrap; width: 80px; }
 .fs-d-bed { text-align: right; white-space: nowrap; width: 100px; }
+.fs-d-kat td { border-bottom: 1px dotted #E7E4DE; padding-bottom: 6px; }
+.fs-d-kat label { display: flex; align-items: center; gap: 8px; font-size: 0.78rem; }
+.fs-d-kat select { max-width: 320px; height: 30px; font-size: 0.8rem; padding: 2px 6px; }

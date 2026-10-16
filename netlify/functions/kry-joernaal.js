@@ -119,12 +119,16 @@ function ontvangs_dele(f, ontvang_sent) {
 
   // Die gewig van elke reel is haar eie bedrag. Die skenking kry haar eie
   // gewig sodat sy nie oor die reels versprei nie.
-  const gewigte = reels.map((r) => {
+  const gewigte = reels.map((r, ix) => {
     const sent = Math.round((Number(r.hoeveelheid) || 0) * (Number(r.prys_pp_sent) || 0));
     return {
       sent: sent > 0 ? sent : 0,
       kategorie_id:
         r.soort === "koste" || !r.kategorie_id ? "diensinkomste" : r.kategorie_id,
+      // Watter reels hierdie deel dra (16 Okt 2026), sodat die staat 'n
+      // faktuur se kategorie kan regstel (stel-faktuur-kategorie.js). 'n
+      // Kostereel word nie verander nie.
+      ix: r.soort === "koste" ? null : ix,
     };
   });
 
@@ -137,17 +141,20 @@ function ontvangs_dele(f, ontvang_sent) {
   }
 
   const per_kat = new Map();
+  const reels_per = new Map();
   let toegeken = 0;
   gewigte.forEach((g) => {
     if (g.sent <= 0) return;
     const deel = Math.round((ontvang_sent * g.sent) / totaal_gewig);
     per_kat.set(g.kategorie_id, (per_kat.get(g.kategorie_id) || 0) + deel);
+    if (g.ix != null) reels_per.set(g.kategorie_id, (reels_per.get(g.kategorie_id) || []).concat([g.ix]));
     toegeken += deel;
   });
 
   const dele = [...per_kat.entries()].map(([kategorie_id, bedrag_sent]) => ({
     kategorie_id,
     bedrag_sent,
+    reels: reels_per.get(kategorie_id) || [],
   }));
 
   // Die res van die afronding op die laaste deel.

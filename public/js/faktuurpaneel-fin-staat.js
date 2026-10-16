@@ -1,4 +1,7 @@
 // public/js/faktuurpaneel-fin-staat.js
+// Weergawe 3 (16 Oktober 2026): 'n faktuur se inkomste in die oopgeklikte
+// lys kry 'n keuselys; 'n ander inkomstekategorie stel die faktuurreels se
+// kategorie reg (stel-faktuur-kategorie.js) en die staat laai weer.
 // Weergawe 2 (16 Oktober 2026): OOPKLIK. 'n Kategorie met 'n eie bedrag kan
 // op die skerm oopgeklik word; daaronder verskyn die inskrywings waaruit
 // daardie bedrag bestaan (datum, beskrywing, bron, bedrag). Net op die skerm;
@@ -110,6 +113,7 @@ function fs_dele_van(r, per_naam) {
     return eie.map((d) => ({
       kategorie_id: d.kategorie_id || "",
       bedrag_sent: Number(d.bedrag_sent) || 0,
+      faktuur_reels: Array.isArray(d.reels) ? d.reels : [],
     }));
   }
 
@@ -189,6 +193,9 @@ function fs_tel_op() {
           beskrywing: d.reel ? `${r.beskrywing} \u00b7 ${d.reel}` : r.beskrywing,
           bron: r.bron || "",
           bedrag_sent: d.bedrag_sent,
+          faktuur_sleutel: r.bron === "faktuur" ? (r.faktuur_sleutel || "") : "",
+          faktuur_reels: d.faktuur_reels || [],
+          kategorie_id: d.kategorie_id,
         });
         dele_per.set(d.kategorie_id, l);
         return;
@@ -237,8 +244,38 @@ function fs_dele_ry(id, inspring) {
       <tr><td class="fs-d-dat">${fs_ontsnap(String(d.datum).replace(/-/g, "/"))}</td>
         <td class="fs-d-besk">${fs_ontsnap(d.beskrywing)}</td>
         <td class="fs-d-bron">${fs_ontsnap(fs_t("fs_bron_" + d.bron, FS_BRON[d.bron] || d.bron))}</td>
-        <td class="fs-d-bed">${fs_rand(d.bedrag_sent)}</td></tr>`).join("")}
+        <td class="fs-d-bed">${fs_rand(d.bedrag_sent)}</td></tr>${
+        d.faktuur_sleutel && d.faktuur_reels.length ? `
+      <tr class="fs-d-kat"><td></td><td colspan="3">
+        <label>${fs_ontsnap(fs_t("fs_kat_regstel", "Kategorie op die faktuur:"))}
+        <select class="veld-invoer fs-kat-kies" data-fs-faktuur="${fs_ontsnap(d.faktuur_sleutel)}"
+          data-fs-reels="${fs_ontsnap(d.faktuur_reels.join(","))}">
+          ${FS.kategoriee.filter((k) => k.rigting === "in" && (k.aktief !== false || k.id === d.kategorie_id))
+            .map((k) => `<option value="${fs_ontsnap(k.id)}"${k.id === d.kategorie_id ? " selected" : ""}>${
+              fs_ontsnap(k.pad || k.naam)}</option>`).join("")}
+        </select></label></td></tr>` : ""}`).join("")}
     </tbody></table></td></tr>`;
+}
+
+async function fs_stel_kategorie(sel) {
+  sel.disabled = true;
+  try {
+    const resp = await fetch("/.netlify/functions/stel-faktuur-kategorie", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...(await identiteit_kop()) },
+      body: JSON.stringify({
+        sleutel: sel.getAttribute("data-fs-faktuur"),
+        reels: sel.getAttribute("data-fs-reels").split(",").map(Number),
+        kategorie_id: sel.value,
+      }),
+    });
+    if (!resp.ok) throw new Error((await resp.text().catch(() => "")) || String(resp.status));
+    FS.oop.add(sel.value);
+    await fs_laai();
+  } catch (fout) {
+    window.alert(String(fout.message || fout));
+    sel.disabled = false;
+  }
 }
 
 /* ═══ die skerm ═══ */
@@ -380,7 +417,12 @@ function fs_teken() {
       </tr>${tussen}`;
   }).join("");
 
+  plek.onchange = (e) => {
+    const sel = e.target && e.target.closest && e.target.closest(".fs-kat-kies");
+    if (sel) fs_stel_kategorie(sel);
+  };
   plek.onclick = (e) => {
+    if (e.target && e.target.closest && e.target.closest(".fs-dele")) return;
     const ry = e.target && e.target.closest && e.target.closest("[data-fs-oop]");
     if (!ry) return;
     const id = ry.getAttribute("data-fs-oop");
