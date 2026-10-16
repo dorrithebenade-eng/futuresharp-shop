@@ -1,0 +1,18 @@
+/* public/css/faktuurpaneel-grootboek.css
+   Die Bankstate-pil se Grootboek-aansig. Die tabel leen .bs-tabel. */
+
+.gb-tabel { min-width: 720px; }
+.gb-w-kode { width: 90px; }
+.gb-w-gepas { width: 80px; }
+.gb-w-kat { width: 300px; }
+.gb-kode { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.gb-tabel .bs-verw { display: block; }
+.gb-tabel select { width: 100%; }
+
+.gb-tel { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+
+.gb-lys { margin: 10px 0; font-size: 0.86rem; }
+.gb-lys summary { cursor: pointer; font-weight: 600; }
+.gb-lys ul { margin: 8px 0 0; padding-left: 18px; }
+.gb-lys li { margin-bottom: 4px; }
+.gb-lys .bs-verw { display: inline; margin-left: 6px; }

@@ -1,4 +1,6 @@
 // public/js/faktuurpaneel-maandopsomming.js
+// Weergawe 3 (16 Oktober 2026): die aansig-wissel ken nou elke houer met 'n
+// id wat met bs-aansig- begin, sodat die Grootboek-aansig daarby kan.
 // Weergawe 2 (25 September 2026).
 //
 // Die Bankstate-pil se tweede aansig: die maandopsomming vir een boekjaar, en
@@ -332,8 +334,9 @@
   function wissel(aansig) {
     document.querySelectorAll("[data-bs-aansig]").forEach((k) =>
       k.classList.toggle("aan", k.getAttribute("data-bs-aansig") === aansig));
-    document.getElementById("bs-aansig-reels").hidden = aansig !== "reels";
-    document.getElementById("bs-aansig-maande").hidden = aansig !== "maande";
+    document.querySelectorAll('[id^="bs-aansig-"]').forEach((h) => {
+      h.hidden = h.id !== "bs-aansig-" + aansig;
+    });
     if (aansig === "maande" && !MS.bank) laai(Number(document.getElementById("ms-jaar").value));
   }
 

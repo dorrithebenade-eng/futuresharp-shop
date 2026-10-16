@@ -30,6 +30,7 @@
   <link rel="stylesheet" href="css/faktuurpaneel-projekte.css" />
   <link rel="stylesheet" href="css/faktuurpaneel-bankstate.css" />
   <link rel="stylesheet" href="css/faktuurpaneel-bankstate-meervoudig.css" />
+  <link rel="stylesheet" href="css/faktuurpaneel-grootboek.css" />
   <link rel="stylesheet" href="css/faktuurpaneel-befondsers.css" />
   <link rel="stylesheet" href="css/bewys.css" />
   <link rel="icon" href="/icons/paneel-ikoon-32.png" sizes="32x32" type="image/png">
@@ -896,6 +897,7 @@
         <div class="fk-sub bs-aansigte">
           <button type="button" class="fr-sub-knop aan" data-bs-aansig="reels" data-i18n="ms_aansig_reels">State en transaksies</button>
           <button type="button" class="fr-sub-knop" data-bs-aansig="maande" data-i18n="ms_aansig_maande">Maandopsomming</button>
+          <button type="button" class="fr-sub-knop" data-bs-aansig="grootboek" data-i18n="gb_aansig">Grootboek</button>
         </div>
 
         <div id="bs-aansig-reels">
@@ -907,6 +909,18 @@
         <div id="bs-uitslag"></div>
         <div id="bs-staat"></div>
         <div id="bs-state"></div>
+        </div>
+
+        <!-- Die rekenmeester se grootboek: lees, koppel aan kategoriee, wys die
+             state daarvolgens toe. Sien grootboek-act.js en
+             faktuurpaneel-grootboek.js. -->
+        <div id="bs-aansig-grootboek" hidden>
+          <div class="bs-oplaai">
+            <label class="kaart-aksie" for="gb-leer" data-i18n="gb_kies">Laai 'n grootboek op (PDF)</label>
+            <input type="file" id="gb-leer" accept="application/pdf,.pdf">
+            <p class="bs-lei" data-i18n="gb_lei_oplaai">Die rekenmeester se GL Detailed Ledger. Die PDF word op hierdie rekenaar gelees en nie opgelaai nie.</p>
+          </div>
+          <div id="gb-uitslag"></div>
         </div>
 
         <!-- Die maandopsomming en die werkboek vir die rekenmeester. Sien
@@ -1201,6 +1215,8 @@
   <script src="js/bankstaat-fnb.js"></script>
   <script src="js/faktuurpaneel-bankstate.js"></script>
   <script src="js/faktuurpaneel-bankstate-meervoudig.js"></script>
+  <script src="js/grootboek-act.js"></script>
+  <script src="js/faktuurpaneel-grootboek.js"></script>
   <script src="js/faktuurpaneel-maandopsomming.js"></script>
   <script src="js/faktuurpaneel-fin-staat.js"></script>
   <script src="js/faktuurpaneel-staat-pdf.js"></script>

@@ -1,4 +1,6 @@
 // public/js/faktuurpaneel-bankstate-meervoudig.js
+// Weergawe 3 (16 Oktober 2026): 'n staat met presies dieselfde tydperk as 'n
+// ingevoerde een se "Reeds ingevoer", nie "oorvleuel" nie.
 // Weergawe 2 (16 Oktober 2026): 'n gedeelde grensdag tussen twee state (die
 // een eindig op 30 April, die volgende begin op 30 April) is nie oorvleueling
 // nie. FNB se maandstate loop so. Dieselfde reel as voer-bankstaat-in.js.
@@ -81,6 +83,10 @@
 
         if (!it.toets) {
           const bots = ingevoer.find((s) => s.toets !== true && s.rekening4 === r4 && oorvleuel(s, tyd));
+          if (bots && bots.van === tyd.van && bots.tot === tyd.tot) {
+            it.rede = g.t("bm_reeds_in", "Reeds ingevoer");
+            return;
+          }
           if (bots) {
             it.rede = g.t("bm_reeds", "Oorvleuel met die ingevoerde staat {v} tot {t}")
               .replace("{v}", g.datum(bots.van)).replace("{t}", g.datum(bots.tot));
