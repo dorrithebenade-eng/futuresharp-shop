@@ -1,4 +1,8 @@
 // public/js/faktuurpaneel-grootboek.js
+// Weergawe 4 (16 Oktober 2026): "Koppel al die oorblywende rekeninge" skep vir
+// elke ongekoppelde rekening 'n kategorie met die rekenmeester se naam en
+// rigting, of gebruik 'n bestaande een met presies daardie naam, en koppel
+// almal in een stoor. "Wys 1 transaksie toe" in die enkelvoud.
 // Weergawe 3 (16 Oktober 2026): 'n vierde kontrole, "Geen ontbrekende state nie". Die banksaldo kan
 // klop al ontbreek 'n hele staat, want FNB se saldo is absoluut; 'n gaping
 // tussen twee state se tydperke word nou self gewys.
@@ -196,6 +200,10 @@
       ${r.ok ? "" : `<p class="bs-opsom fout">${o(t("gb_nie_aanvaar", "Die grootboek is nie aanvaar nie: een of meer kontroles klop nie."))}</p>`}
       <h3 class="bs-kop3">${o(t("gb_koppel_kop", "Koppel elke rekening aan 'n kategorie"))}</h3>
       <p class="bs-lei">${o(t("gb_koppel_lei", "Die koppeling word dadelik gestoor en geld ook vir volgende jaar se grootboek. Jy kan dit enige tyd verander; wat reeds toegewys is, bly soos dit is."))}</p>
+      ${ongekoppel().length && !GB.besig ? `<div class="bs-invoer">
+        <button type="button" class="kaart-aksie" id="gb-koppel-almal">${o(t("gb_koppel_almal", "Koppel al {n} oorblywende rekeninge").replace("{n}", ongekoppel().length))}</button>
+        <p class="bs-lei">${o(t("gb_koppel_almal_lei", "Elke rekening wat nog nie gekoppel is nie, kry 'n kategorie met die rekenmeester se naam. Bestaan daar reeds een met presies daardie naam, word dit gebruik. Name kan later onder Registers verander word."))}</p>
+      </div>` : ""}
       <div class="bs-tabel-hou">
         <table class="jn-tabel bs-tabel gb-tabel">
           <thead><tr>
@@ -211,6 +219,8 @@
       ${r.ok ? opsomming() : ""}`;
 
     p.querySelectorAll(".gb-kies").forEach((s) => s.addEventListener("change", () => koppel(s)));
+    const almal = document.getElementById("gb-koppel-almal");
+    if (almal) almal.addEventListener("click", koppel_almal);
     const knop = document.getElementById("gb-wys-toe");
     if (knop) knop.addEventListener("click", wys_toe);
   }
@@ -239,7 +249,9 @@
       lys(t("gb_l_los", "Banktransaksies sonder grootboekinskrywing"), los.map(reel_b));
 
     const knop = tel.toewys && !GB.besig
-      ? `<button type="button" class="kaart-aksie" id="gb-wys-toe">${o(t("gb_wys_toe", "Wys {n} transaksies toe").replace("{n}", tel.toewys))}</button>`
+      ? `<button type="button" class="kaart-aksie" id="gb-wys-toe">${o(tel.toewys === 1
+          ? t("gb_wys_toe_een", "Wys 1 transaksie toe")
+          : t("gb_wys_toe", "Wys {n} transaksies toe").replace("{n}", tel.toewys))}</button>`
       : "";
 
     return `
@@ -315,6 +327,54 @@
     };
     td.querySelector(".bs-nk-skep").addEventListener("click", skep);
     naam.addEventListener("keydown", (ev) => { if (ev.key === "Enter") skep(); if (ev.key === "Escape") teken(); });
+  }
+
+  function ongekoppel() {
+    return GB.r && GB.r.rekeninge
+      ? GB.r.rekeninge.filter((x) => !((GB.koppeling.rekeninge[x.kode] || {}).kategorie))
+      : [];
+  }
+
+  // Een kategorie per oorblywende rekening. Twee rekeninge met dieselfde naam
+  // en rigting (die rekenmeester het twee keer "Reparasies & Instandhouding")
+  // kry dieselfde kategorie.
+  async function koppel_almal() {
+    const lys = ongekoppel();
+    if (!lys.length || GB.besig) return;
+    GB.besig = true;
+    teken();
+    const soek = (naam, rigting) => GB.kats.find((k) =>
+      String(k.naam || "").trim().toLowerCase() === naam.trim().toLowerCase() &&
+      (k.rigting === "in" ? "in" : "uit") === rigting);
+    const nuut = {};
+    const foute = [];
+    for (const x of lys) {
+      let k = soek(x.naam, x.rigting);
+      if (!k) {
+        try {
+          const uit = await G().pos("stoor-fin-kategorie", { naam: x.naam, onder: "", rigting: x.rigting });
+          k = uit.kategorie;
+          k.pad = k.naam;
+          GB.kats.push(k);
+        } catch (f) {
+          foute.push(`${x.kode}: ${String(f.message || f)}`);
+          continue;
+        }
+      }
+      nuut[x.kode] = { kategorie: k.id, naam: x.naam, rigting: x.rigting };
+    }
+    if (Object.keys(nuut).length) {
+      try {
+        GB.koppeling = await G().pos("stoor-grootboek-koppeling", { rekeninge: nuut });
+      } catch (f) {
+        foute.push(String(f.message || f));
+      }
+    }
+    GB.kats.sort((a, b) => String(a.pad || a.naam).localeCompare(String(b.pad || b.naam), "af-ZA"));
+    GB.besig = false;
+    GB.melding = foute.length ? foute.join(" ") : "";
+    herpas();
+    teken();
   }
 
   async function koppel(s, waarde) {
