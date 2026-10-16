@@ -195,8 +195,8 @@ async function bou_staat_pdf(data, maatskappy) {
   y -= 16;
   skryf(`${datum_lank(data.van)} tot ${datum_lank(data.tot)}`, KANT, y,
         { grootte: 10, kleur: GRYS });
-  y -= 12;
-  skryf("Alle bedrae in Suid-Afrikaanse rand", KANT, y, { grootte: 8.5, kleur: GRYS });
+  // "Alle bedrae in Suid-Afrikaanse rand" is weggelaat (16 Okt 2026): elke
+  // bedrag dra reeds die R.
   y -= 24;
 
   // ── die blokke ─────────────────────────────────────────────────────────

@@ -125,8 +125,7 @@ async function bou_maandopsomming_pdf(data, maatskappy) {
 
   skryf(`Maandopsomming: boekjaar ${data.boekjaar}`, KANT, y, { grootte: 15, vet: true });
   y -= 15;
-  skryf(`${S.datum_lank(data.van)} tot ${S.datum_lank(data.tot)} · alle bedrae in Suid-Afrikaanse rand`,
-        KANT, y, { grootte: 9.5, kleur: S.GRYS });
+  skryf(`${S.datum_lank(data.van)} tot ${S.datum_lank(data.tot)}`, KANT, y, { grootte: 9.5, kleur: S.GRYS });
   y -= 26;
 
   kop_rye();

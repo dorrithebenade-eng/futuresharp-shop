@@ -1,4 +1,8 @@
 // public/js/faktuurpaneel-fin-staat.js
+// Weergawe 2 (16 Oktober 2026): OOPKLIK. 'n Kategorie met 'n eie bedrag kan
+// op die skerm oopgeklik word; daaronder verskyn die inskrywings waaruit
+// daardie bedrag bestaan (datum, beskrywing, bron, bedrag). Net op die skerm;
+// die PDF en die uitvoer bly soos hulle is.
 //
 // Die inkomste- en uitgawestaat, onderaan die State-oortjie.
 //
@@ -47,6 +51,8 @@ const FS = {
   werk_items: [],
   inskrywings: [],
   boom: [],          // {kategorie, eie_sent, totaal_sent}
+  dele_per: new Map(), // kategorie_id -> [{datum, beskrywing, bron, bedrag_sent}]
+  oop: new Set(),      // kategorie_id's wat oopgeklik is
   ongekat: { in: 0, uit: 0, dele: [] },
   bank: { opening: null, sluiting: null },
 };
@@ -152,6 +158,7 @@ function fs_tel_op() {
 
   const eie = new Map();       // kategorie_id -> sent
   const ongekat = { in: 0, uit: 0, dele: [] };
+  const dele_per = new Map();
 
   FS.inskrywings.forEach((r) => {
     const teken = r.rigting === "in" ? "in" : "uit";
@@ -176,6 +183,14 @@ function fs_tel_op() {
 
       if (kat && rigting_pas) {
         eie.set(d.kategorie_id, (eie.get(d.kategorie_id) || 0) + d.bedrag_sent);
+        const l = dele_per.get(d.kategorie_id) || [];
+        l.push({
+          datum: r.datum,
+          beskrywing: d.reel ? `${r.beskrywing} \u00b7 ${d.reel}` : r.beskrywing,
+          bron: r.bron || "",
+          bedrag_sent: d.bedrag_sent,
+        });
+        dele_per.set(d.kategorie_id, l);
         return;
       }
       ongekat[teken] += d.bedrag_sent;
@@ -208,6 +223,22 @@ function fs_tel_op() {
     totaal_sent: totaal.get(k.id) || 0,
   }));
   FS.ongekat = ongekat;
+  FS.dele_per = dele_per;
+}
+
+// Die inskrywings onder een kategorie, as 'n ry onder haar.
+const FS_BRON = { bank: "Bank", hand: "Joernaal", faktuur: "Faktuur", uitbetaling: "Uitbetaling",
+  paystack: "Paystack", winkel: "Winkel" };
+function fs_dele_ry(id, inspring) {
+  const l = (FS.dele_per.get(id) || []).slice().sort((a, b) => String(a.datum).localeCompare(String(b.datum)));
+  if (!l.length) return "";
+  return `<tr class="fs-dele"><td colspan="3" style="padding-left:${inspring + 20}px">
+    <table class="fs-dele-tabel"><tbody>${l.map((d) => `
+      <tr><td class="fs-d-dat">${fs_ontsnap(String(d.datum).replace(/-/g, "/"))}</td>
+        <td class="fs-d-besk">${fs_ontsnap(d.beskrywing)}</td>
+        <td class="fs-d-bron">${fs_ontsnap(fs_t("fs_bron_" + d.bron, FS_BRON[d.bron] || d.bron))}</td>
+        <td class="fs-d-bed">${fs_rand(d.bedrag_sent)}</td></tr>`).join("")}
+    </tbody></table></td></tr>`;
 }
 
 /* ═══ die skerm ═══ */
@@ -234,13 +265,18 @@ function fs_teken() {
         <h4 class="fs-blok-kop">${fs_ontsnap(titel)}</h4>
         <table class="fs-tabel">
           <tbody>
-            ${met.map((b) => `
-              <tr class="${b.kategorie.onder ? "" : "fs-hoof"}">
+            ${met.map((b) => {
+              const kan = b.eie_sent !== 0;
+              const oop = kan && FS.oop.has(b.kategorie.id);
+              return `
+              <tr class="${b.kategorie.onder ? "" : "fs-hoof"}${kan ? " fs-kan-oop" : ""}${oop ? " fs-is-oop" : ""}"${
+                kan ? ` data-fs-oop="${fs_ontsnap(b.kategorie.id)}" title="${fs_ontsnap(fs_t("fs_klik_oop", "Klik om die inskrywings te sien"))}"` : ""}>
                 <td class="fs-naam" style="padding-left:${kant(b.kategorie.vlak)}px">${
-                  fs_ontsnap(b.kategorie.naam)}</td>
+                  kan ? `<span class="fs-pyl">${oop ? "\u25be" : "\u25b8"}</span>` : ""}${fs_ontsnap(b.kategorie.naam)}</td>
                 <td class="fs-eie">${b.eie_sent ? fs_rand(b.eie_sent) : ""}</td>
                 <td class="fs-tot">${fs_rand(b.totaal_sent)}</td>
-              </tr>`).join("")}
+              </tr>${oop ? fs_dele_ry(b.kategorie.id, kant(b.kategorie.vlak)) : ""}`;
+            }).join("")}
             ${FS.ongekat[rigting] ? `
               <tr class="fs-ongekat">
                 <td class="fs-naam">${fs_t("fs_ongekat", "Ongekategoriseer")}</td>
@@ -343,6 +379,14 @@ function fs_teken() {
         <td class="fs-tot">\u2212 ${fs_rand(b.totaal_sent)}</td>
       </tr>${tussen}`;
   }).join("");
+
+  plek.onclick = (e) => {
+    const ry = e.target && e.target.closest && e.target.closest("[data-fs-oop]");
+    if (!ry) return;
+    const id = ry.getAttribute("data-fs-oop");
+    if (FS.oop.has(id)) FS.oop.delete(id); else FS.oop.add(id);
+    fs_teken();
+  };
 
   plek.innerHTML = `
     ${blok("in", fs_t("fs_inkomste", "Inkomste"))}

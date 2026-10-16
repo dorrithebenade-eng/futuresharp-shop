@@ -1336,3 +1336,14 @@ a.paneel-kieslys-item { text-decoration: none; }
   .vf-fooi, .vf-stand { grid-column: 1 / -1; text-align: left; }
   .vf-binne { padding-left: 6px; }
 }
+
+/* Die staat: 'n kategorie oopklik (16 Oktober 2026). */
+.fs-kan-oop { cursor: pointer; }
+.fs-kan-oop:hover td { background: #F6F4EF; }
+.fs-pyl { display: inline-block; width: 14px; color: var(--teal, #479f91); font-size: 0.8em; }
+.fs-dele td { padding-top: 0; }
+.fs-dele-tabel { width: 100%; border-collapse: collapse; font-size: 0.8rem; color: var(--grys-teks); margin: 2px 0 8px; }
+.fs-dele-tabel td { padding: 3px 6px; border-bottom: 1px dotted #E7E4DE; vertical-align: top; }
+.fs-d-dat { white-space: nowrap; width: 82px; }
+.fs-d-bron { white-space: nowrap; width: 80px; }
+.fs-d-bed { text-align: right; white-space: nowrap; width: 100px; }
