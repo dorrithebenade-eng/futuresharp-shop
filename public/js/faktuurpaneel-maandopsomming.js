@@ -1,4 +1,6 @@
 // public/js/faktuurpaneel-maandopsomming.js
+// Weergawe 4 (16 Oktober 2026): teken() laat die klaar rye agter in
+// window.MS_PDF_VRAG vir die PDF (faktuurpaneel-maandopsomming-pdf.js).
 // Weergawe 3 (16 Oktober 2026): die aansig-wissel ken nou elke houer met 'n
 // id wat met bs-aansig- begin, sodat die Grootboek-aansig daarby kan.
 // Weergawe 2 (25 September 2026).
@@ -123,6 +125,20 @@
     const r = rye();
     const toetse = (MS.joernaal.inskrywings || []).filter(is_toets).length;
     const som = (k) => r.reduce((a, x) => a + (Number(x[k]) || 0), 0);
+
+    // Die PDF teken presies hierdie rye; dit bereken niks self nie.
+    window.MS_PDF_VRAG = {
+      boekjaar: `${MS.jaar}/${String(MS.jaar + 1).slice(2)}`,
+      van: MS.bank.van, tot: MS.bank.tot,
+      rye: r.map((x) => ({
+        maand: maand_naam(x.maand), gedek: Boolean(x.gedek),
+        opening_sent: x.opening_sent, in_sent: x.in_sent, uit_sent: x.uit_sent,
+        sluit_sent: x.sluit_sent, j_netto_sent: x.j_netto, verskil_sent: x.verskil,
+        stand: stand(x).teks,
+      })),
+      totale: { in_sent: som("in_sent"), uit_sent: som("uit_sent"), j_netto_sent: som("j_netto") },
+      nota: t("ms_verskil_nota_pdf", "Verskil: die joernaal se netto min die banktransaksies wat gepas of toegewys is. Paystack-geld wat oor 'n maandgrens oppad was, en betalings wat nie deur die bank geloop het nie, veroorsaak 'n verskil."),
+    };
 
     plek.innerHTML = `
       <div class="bs-tabel-hou">

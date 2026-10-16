@@ -301,4 +301,11 @@ async function bou_staat_pdf(data, maatskappy) {
   return await pdf.save();
 }
 
-module.exports = { bou_staat_pdf };
+// Weergawe 2 (16 Oktober 2026): die helpers word ook uitgevoer, sodat die
+// maandopsomming se PDF (_maandopsomming-pdf.js) dieselfde briefhoof, palet en
+// bedragvorm gebruik sonder 'n tweede afskrif.
+module.exports = {
+  bou_staat_pdf,
+  kry_logo, rand, datum_lank, breek,
+  TEAL, SWART, GRYS, KORAAL, LYN,
+};
