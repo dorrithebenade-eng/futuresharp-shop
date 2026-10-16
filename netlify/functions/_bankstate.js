@@ -92,7 +92,31 @@ function voorstel_kaart(state) {
   return kaart;
 }
 
+// Weergawe 2 (16 Oktober 2026): voorstelle by die LEES.
+//
+// By die invoer kry 'n oop reel 'n voorstel uit die toewysings wat op daardie
+// oomblik bestaan. Wat daarna toegewys word, het tot nou toe geen staat wat
+// reeds ingevoer is, gehelp nie. voeg_voorstelle() doen dieselfde opsoek elke
+// keer as 'n staat gelees word, oor alle regte state heen, sodat 'n nuwe
+// toewysing dadelik in elke ander staat se voorstelle verskyn.
+//
+// NIKS WORD GESTOOR NIE. Die voorstel gaan net in die antwoord; die stoor se
+// stand bly "oop" tot iemand bevestig. 'n Lees skryf nie.
+function voeg_voorstelle(staat, kaart) {
+  return {
+    ...staat,
+    reels: (staat.reels || []).map((r) => {
+      if (r.stand !== "oop") return r;
+      const p = patroon(r.beskrywing);
+      if (!p) return r;
+      const vk = kaart.get(r.rigting + "|" + p);
+      return vk ? { ...r, stand: "voorstel", voorstel_kategorie: vk } : r;
+    }),
+  };
+}
+
 module.exports = {
+  voeg_voorstelle,
   STORE_NAAM,
   EIE_REKENINGE,
   kry_bankstate_store,

@@ -3188,6 +3188,7 @@ const WOORDEBOEK = {
   bs_skrap_vra: { af: "Die staat en die joernaalinskrywings wat uit sy transaksies geskep is, word uitgevee. Tik SKRAP STAAT om te bevestig.", en: "The statement and the journal entries created from its transactions are deleted. Type SKRAP STAAT to confirm." },
   ts_state: { af: "Ook {n} toetsstaat of -state met hul inskrywings.", en: "Also {n} test statement(s) with their entries." },
   bs_soortgelyk: { af: "Ook {n} soortgelyke transaksie(s) het dieselfde kategorie gekry.", en: "{n} similar transaction(s) also received the same category." },
+  bs_soortgelyk_ander: { af: "In die ander state het {n} soortgelyke transaksie(s) ook dieselfde kategorie gekry.", en: "In the other statements, {n} similar transaction(s) also received the same category." },
   bs_nuwe_kat: { af: "+ Nuwe kategorie \u2026", en: "+ New category \u2026" },
   bs_nk_plek_in: { af: "Naam van die inkomstekategorie", en: "Name of the income category" },
   bs_nk_plek_uit: { af: "Naam van die uitgawekategorie", en: "Name of the expense category" },

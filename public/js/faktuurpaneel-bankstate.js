@@ -1,4 +1,8 @@
 // public/js/faktuurpaneel-bankstate.js
+// Weergawe 5 (16 Oktober 2026): 'n kategorie wat met die hand gekies word, gaan
+// ook na soortgelyke oop transaksies in die ander state (wys-bankreel-toe
+// weergawe 6). Die boodskap se hoeveel, en die lys van state laai weer sodat
+// hul tellings klop.
 // Weergawe 4 (16 Oktober 2026): meer as een PDF kan gelyk gekies word. Een
 // lêer loop soos altyd deur die voorskou hier; meer as een gaan na
 // faktuurpaneel-bankstate-meervoudig.js, wat window.BS_GEDEEL hieronder gebruik.
@@ -567,9 +571,11 @@
     try {
       const uit = await pos("wys-bankreel-toe", { sleutel: BS.oop.sleutel, reels, soortgelyk: soortgelyk === true });
       BS.oop = uit.staat;
-      BS.melding = uit.ekstra
-        ? t("bs_soortgelyk", "Ook {n} soortgelyke transaksie(s) het dieselfde kategorie gekry.").replace("{n}", uit.ekstra)
-        : "";
+      const m = [];
+      if (uit.ekstra) m.push(t("bs_soortgelyk", "Ook {n} soortgelyke transaksie(s) het dieselfde kategorie gekry.").replace("{n}", uit.ekstra));
+      if (uit.ekstra_ander) m.push(t("bs_soortgelyk_ander", "In die ander state het {n} soortgelyke transaksie(s) ook dieselfde kategorie gekry.").replace("{n}", uit.ekstra_ander));
+      BS.melding = m.join(" ");
+      if (uit.ekstra_ander) laai_state();
       const i = BS.state.findIndex((x) => x.sleutel === uit.staat.sleutel);
       if (i >= 0) {
         const tel = { oop: 0, voorstel: 0, gepas: 0, toegewys: 0, oordrag: 0, inligting: 0 };
