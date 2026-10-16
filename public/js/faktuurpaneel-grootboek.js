@@ -1,5 +1,5 @@
 // public/js/faktuurpaneel-grootboek.js
-// Weergawe 3 (16 Oktober 2026): 'n vierde kontrole, Dekking. Die banksaldo kan
+// Weergawe 3 (16 Oktober 2026): 'n vierde kontrole, "Geen ontbrekende state nie". Die banksaldo kan
 // klop al ontbreek 'n hele staat, want FNB se saldo is absoluut; 'n gaping
 // tussen twee state se tydperke word nou self gewys.
 // Weergawe 2 (16 Oktober 2026): "+ Nuwe kategorie" in die keuselys skep 'n
@@ -158,7 +158,7 @@
     const dek_detail = gaps.length
       ? t("gb_dek_fout", "Geen staat dek {g} nie. Laai die ontbrekende staat op.")
           .replace("{g}", gaps.map(([a, b]) => `${datum(a)} ${t("bs_tot", "tot")} ${datum(b)}`).join("; "))
-      : t("gb_dek_ok", "Die state dek die hele tydperk sonder gapings.");
+      : t("gb_dek_ok", "Die state loop aaneen van {v} tot {t}, sonder gapings.").replace("{v}", datum(r.tydperk.van)).replace("{t}", datum(r.tydperk.tot));
 
     const pas = GB.pas;
     const per_kode = {};
@@ -191,7 +191,7 @@
         ${merkie(k.rekeninge.ok, t("gb_k_rek", "Rekeninge"), rek_detail)}
         ${merkie(k.balans.ok, t("gb_k_bal", "Balans"), bal_detail)}
         ${merkie(bank_ok, t("gb_k_bank", "Bank teen die state"), bank_detail)}
-        ${merkie(!gaps.length, t("gb_k_dek", "Dekking"), dek_detail)}
+        ${merkie(!gaps.length, t("gb_k_dek", "Geen ontbrekende state nie"), dek_detail)}
       </div>
       ${r.ok ? "" : `<p class="bs-opsom fout">${o(t("gb_nie_aanvaar", "Die grootboek is nie aanvaar nie: een of meer kontroles klop nie."))}</p>`}
       <h3 class="bs-kop3">${o(t("gb_koppel_kop", "Koppel elke rekening aan 'n kategorie"))}</h3>
