@@ -1350,3 +1350,55 @@ a.paneel-kieslys-item { text-decoration: none; }
 .fs-d-kat td { border-bottom: 1px dotted #E7E4DE; padding-bottom: 6px; }
 .fs-d-kat label { display: flex; align-items: center; gap: 8px; font-size: 0.78rem; }
 .fs-d-kat select { max-width: 320px; height: 30px; font-size: 0.8rem; padding: 2px 6px; }
+
+/* ── Inkomste en Uitgawes as kaarte (16 Oktober 2026) ───────────────────────
+ * Elke blok kry sy eie kleur: teal vir wat inkom, koraal vir wat uitgaan,
+ * dieselfde twee kleure as In en Uit op die bankstate. Die blok se totaal
+ * staan in die band, sodat 'n mens die twee getalle sien sonder om te rol. */
+.fs-blok-in, .fs-blok-uit {
+  --fs-kleur: var(--teal, #479F91);
+  --fs-tint: #EEF6F4;
+  border: 1px solid #E7E4DE;
+  border-left: 4px solid var(--fs-kleur);
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+  margin: 0 0 22px;
+}
+.fs-blok-uit { --fs-kleur: var(--koraal, #EC5832); --fs-tint: #FDF0EB; }
+
+.fs-blok-band {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 11px 16px;
+  background: var(--fs-tint);
+  border-bottom: 1px solid #E7E4DE;
+}
+.fs-band-titel {
+  display: flex; align-items: center; gap: 9px;
+  font-size: 13px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+  color: var(--fs-kleur);
+}
+.fs-band-ikoon {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--fs-kleur); color: #fff; font-size: 12px; letter-spacing: 0;
+}
+.fs-band-som { font-weight: 700; font-size: 15px; color: var(--fs-kleur); font-variant-numeric: tabular-nums; }
+
+.fs-blok-in .fs-tabel td:last-child, .fs-blok-uit .fs-tabel td:last-child { padding-right: 16px; }
+.fs-blok-in .fs-som td, .fs-blok-uit .fs-som td {
+  background: var(--fs-tint); color: var(--fs-kleur); border-top: 1.5px solid var(--fs-kleur);
+}
+
+/* Die surplus: 'n balk, teal as daar oorskot is en koraal by 'n tekort. */
+.fs-slot .fs-som td {
+  background: #479F91; color: #fff; border-top: 0;
+  font-size: 15px; padding: 11px 12px;
+}
+.fs-slot .fs-som td:first-child { border-radius: 8px 0 0 8px; }
+.fs-slot .fs-som td:last-child { border-radius: 0 8px 8px 0; }
+.fs-slot-tekort .fs-som td { background: #EC5832; }
+.fs-slot .fs-som .fs-tot.kort { color: #fff; }
+.fs-blok-in .fs-som td:first-child, .fs-blok-uit .fs-som td:first-child { padding-left: 16px; }
+.fs-blok-in .fs-ongekat td:first-child, .fs-blok-uit .fs-ongekat td:first-child { padding-left: 16px; }
+.fs-blok-in .fs-pyl, .fs-blok-uit .fs-pyl { color: var(--fs-kleur); }

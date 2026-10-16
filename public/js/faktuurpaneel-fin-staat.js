@@ -1,4 +1,7 @@
 // public/js/faktuurpaneel-fin-staat.js
+// Weergawe 4 (16 Oktober 2026): Inkomste en Uitgawes elk in 'n eie
+// gekleurde kaart (teal en koraal) met die blok se totaal in die kop, en die
+// surplus as 'n uitgeligte balk. Net die skerm; die PDF bly soos dit is.
 // Weergawe 3 (16 Oktober 2026): 'n faktuur se inkomste in die oopgeklikte
 // lys kry 'n keuselys; 'n ander inkomstekategorie stel die faktuurreels se
 // kategorie reg (stel-faktuur-kategorie.js) en die staat laai weer.
@@ -284,7 +287,8 @@ function fs_teken() {
   const plek = document.getElementById("fs-staat");
   if (!plek) return;
 
-  const kant = (v) => Math.min((Number(v) || 1) - 1, 6) * 20;
+  // 16px binne die kaart se rand, plus 20px per vlak.
+  const kant = (v) => 16 + Math.min((Number(v) || 1) - 1, 6) * 20;
 
   const blok = (rigting, titel) => {
     const rye = FS.boom.filter((b) => b.kategorie.rigting === rigting);
@@ -298,8 +302,11 @@ function fs_teken() {
       .reduce((a, b) => a + b.totaal_sent, 0) + FS.ongekat[rigting];
 
     return `
-      <div class="fs-blok">
-        <h4 class="fs-blok-kop">${fs_ontsnap(titel)}</h4>
+      <div class="fs-blok fs-blok-${rigting}">
+        <div class="fs-blok-band">
+          <span class="fs-band-titel"><span class="fs-band-ikoon" aria-hidden="true">${rigting === "in" ? "\u2193" : "\u2191"}</span>${fs_ontsnap(titel)}</span>
+          <span class="fs-band-som">${fs_rand(som)}</span>
+        </div>
         <table class="fs-tabel">
           <tbody>
             ${met.map((b) => {
@@ -434,7 +441,7 @@ function fs_teken() {
     ${blok("in", fs_t("fs_inkomste", "Inkomste"))}
     ${blok("uit", fs_t("fs_uitgawes", "Uitgawes"))}
 
-    <table class="fs-tabel fs-slot">
+    <table class="fs-tabel fs-slot${oorskot < 0 ? " fs-slot-tekort" : ""}">
       <tbody>
         <tr><td class="fs-naam">${fs_t("fs_tot_in", "Totale inkomste")}</td>
             <td class="fs-tot">${fs_rand(inkomste)}</td></tr>
