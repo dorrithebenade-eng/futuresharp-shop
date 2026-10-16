@@ -1,4 +1,7 @@
 // public/js/faktuurpaneel-bankstate.js
+// Weergawe 4 (16 Oktober 2026): meer as een PDF kan gelyk gekies word. Een
+// lêer loop soos altyd deur die voorskou hier; meer as een gaan na
+// faktuurpaneel-bankstate-meervoudig.js, wat window.BS_GEDEEL hieronder gebruik.
 // Weergawe 3 (28 September 2026): die invoerblok (Toetsstaat, Voer in) staan bo
 // die voorskou-tabel, nie onder nie; en "reels" heet op die skerm nou
 // "transaksies".
@@ -626,6 +629,21 @@
     teken();
   }
 
+  // Vir die meervoudige oplaai: dieselfde leser, dieselfde invoer, dieselfde
+  // lys. Geen tweede afskrif van enigiets nie.
+  window.BS_GEDEEL = {
+    t, ontsnap, rand, datum, pos, lees_items,
+    state: () => BS.state,
+    eie: EIE,
+    laai_state,
+    maak_staat_oop,
+    maak_voorskou_toe: () => {
+      BS.resultaat = null;
+      const plek = document.getElementById("bs-uitslag");
+      if (plek) plek.innerHTML = "";
+    },
+  };
+
   document.addEventListener("DOMContentLoaded", async () => {
     const invoer = document.getElementById("bs-leer");
     if (!invoer) return;
@@ -635,7 +653,9 @@
     if (!sessie || !identiteit_het_rol(sessie.gebruiker, "boekhouding")) return;
 
     invoer.addEventListener("change", () => {
-      verwerk(invoer.files && invoer.files[0]);
+      const lêers = Array.from(invoer.files || []);
+      if (lêers.length > 1 && window.bs_meervoudig) window.bs_meervoudig(lêers);
+      else verwerk(lêers[0]);
       invoer.value = "";   // dieselfde lêer kan weer gekies word
     });
 

@@ -29,6 +29,7 @@
   <link rel="stylesheet" href="css/paneel-verslae-pil.css">
   <link rel="stylesheet" href="css/faktuurpaneel-projekte.css" />
   <link rel="stylesheet" href="css/faktuurpaneel-bankstate.css" />
+  <link rel="stylesheet" href="css/faktuurpaneel-bankstate-meervoudig.css" />
   <link rel="stylesheet" href="css/faktuurpaneel-befondsers.css" />
   <link rel="stylesheet" href="css/bewys.css" />
   <link rel="icon" href="/icons/paneel-ikoon-32.png" sizes="32x32" type="image/png">
@@ -899,8 +900,8 @@
 
         <div id="bs-aansig-reels">
         <div class="bs-oplaai">
-          <label class="kaart-aksie" for="bs-leer" data-i18n="bs_kies">Laai 'n FNB-staat op (PDF)</label>
-          <input type="file" id="bs-leer" accept="application/pdf,.pdf">
+          <label class="kaart-aksie" for="bs-leer" data-i18n="bs_kies">Laai FNB-state op (PDF)</label>
+          <input type="file" id="bs-leer" multiple accept="application/pdf,.pdf">
           <p class="bs-lei" data-i18n="bs_lei">Die PDF word op hierdie rekenaar gelees en nie opgelaai nie.</p>
         </div>
         <div id="bs-uitslag"></div>
@@ -1199,6 +1200,7 @@
   <script src="js/faktuurpaneel-toetse.js"></script>
   <script src="js/bankstaat-fnb.js"></script>
   <script src="js/faktuurpaneel-bankstate.js"></script>
+  <script src="js/faktuurpaneel-bankstate-meervoudig.js"></script>
   <script src="js/faktuurpaneel-maandopsomming.js"></script>
   <script src="js/faktuurpaneel-fin-staat.js"></script>
   <script src="js/faktuurpaneel-staat-pdf.js"></script>

@@ -1,0 +1,10 @@
+/* public/css/faktuurpaneel-bankstate-meervoudig.css
+   Meer as een staat gelyk oplaai. Die tabel leen .bs-tabel. */
+
+.bm-hou { margin-bottom: 18px; }
+.bm-hou .bs-kop3 { margin-top: 0; }
+.bm-tabel { min-width: 640px; }
+.bm-w-tyd { width: 200px; }
+.bm-w-tel { width: 110px; }
+.bm-w-st { width: 300px; }
+.bm-tabel .bs-stand { white-space: normal; }
