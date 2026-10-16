@@ -1,4 +1,7 @@
 // public/js/faktuurpaneel-bankstate.js
+// Weergawe 7 (16 Oktober 2026): die keuselys bied ook "Pas teen faktuur"
+// aan: elke onbenutte faktuur of uitbetaling met dieselfde bedrag (pas_kandidate),
+// vir waar die stelsel nie self kan kies nie (bv. twee fakture van R7 000).
 // Weergawe 6 (16 Oktober 2026): FAKTUURPAS. 'n Transaksie wat 'n faktuur se
 // betaling of 'n uitbetaling aan 'n begunstigde is, wys "Pas teen: FS/…" met
 // 'n knoppie Pas (en bo-aan "Pas al … teen fakture"). Gepas, tel die geld net
@@ -46,6 +49,7 @@
   const EIE = ["2857"];
   const OORDRAG = "__oordrag";
   const NUUT = "__nuut";
+  const PAS = "__pas:";
 
   function t(sleutel, verstek) {
     const uit = window.t ? window.t(sleutel) : null;
@@ -355,6 +359,8 @@
       ${opsies}
       <option value="${OORDRAG}"${gekies(OORDRAG)}>${ontsnap(t("bs_oordrag", "Oordrag tussen eie rekeninge"))}</option>
       <option value="${NUUT}">${ontsnap(t("bs_nuwe_kat", "+ Nuwe kategorie \u2026"))}</option>
+      ${Array.isArray(r.pas_kandidate) && r.pas_kandidate.length ? `<optgroup label="${ontsnap(t("bs_pas_groep", "Pas teen faktuur"))}">${
+        r.pas_kandidate.map((k) => `<option value="${ontsnap(PAS + k.ref)}">${ontsnap(k.beskrywing)} (${datum(k.datum)})</option>`).join("")}</optgroup>` : ""}
     </select>`;
   }
 
@@ -511,6 +517,10 @@
       const nr = Number(k.getAttribute("data-nr"));
       if (!k.value) return;
       if (k.value === NUUT) { nuwe_kat_vorm(k); return; }
+      if (k.value.indexOf(PAS) === 0) {
+        wys_toe([{ nr, aksie: "pas", ref: k.value.slice(PAS.length) }]);
+        return;
+      }
       if (k.value === OORDRAG && !bewyse_mag_weg(nr)) { teken_staat(); return; }
       wys_toe([k.value === OORDRAG ? { nr, aksie: "oordrag" } : { nr, aksie: "kategorie", kategorie_id: k.value }], true);
     }));

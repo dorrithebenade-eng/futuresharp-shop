@@ -124,16 +124,33 @@ function kies(r, kand, gebruikte) {
   return beste ? beste.k : null;
 }
 
+// Weergawe 2 (16 Oktober 2026): `pas_kandidate` per reel, vir die hand-keuse.
+// Elke onbenutte faktuur of uitbetaling met dieselfde bedrag en rigting binne
+// HAND_VENSTER dae, nuutste eerste. Die outomatiese voorstel bly streng (geen
+// raaiwerk tussen twee fakture van R7 000 nie); die mens kies self uit die lys.
+const HAND_VENSTER = 90;
+
+function kandidate_vir(r, kand, gebruikte) {
+  return kand
+    .filter((k) => !gebruikte.has(k.ref) && k.rigting === r.rigting &&
+      k.bedrag_sent === r.bedrag_sent && dae(k.datum, r.datum) <= HAND_VENSTER)
+    .sort((a, b) => dae(a.datum, r.datum) - dae(b.datum, r.datum))
+    .slice(0, 8)
+    .map((k) => ({ ref: k.ref, beskrywing: k.beskrywing, datum: k.datum }));
+}
+
 // Gee elke bankreel in `reels` (wat nog nie gepas is nie) 'n `pas_voorstel`,
 // sonder dat een kandidaat twee keer gebruik word. Raak niks anders aan nie.
 function stel_voor(reels, kand, gebruikte) {
   const hier = new Set(gebruikte);
   return (reels || []).map((r) => {
     if (r.stand === "gepas" || r.stand === "inligting" || r.stand === "oordrag") return r;
+    const lys = kandidate_vir(r, kand, gebruikte);
+    const met = lys.length ? { ...r, pas_kandidate: lys } : r;
     const k = kies(r, kand, hier);
-    if (!k) return r;
+    if (!k) return met;
     hier.add(k.ref);
-    return { ...r, pas_voorstel: { soort: k.soort, ref: k.ref, beskrywing: k.beskrywing } };
+    return { ...met, pas_voorstel: { soort: k.soort, ref: k.ref, beskrywing: k.beskrywing } };
   });
 }
 

@@ -3196,6 +3196,7 @@ const WOORDEBOEK = {
   fs_bron_uitbetaling: { af: "Uitbetaling", en: "Payout" },
   fs_bron_paystack: { af: "Paystack", en: "Paystack" },
   fs_bron_winkel: { af: "Winkel", en: "Shop" },
+  bs_pas_groep: { af: "Pas teen faktuur", en: "Match with invoice" },
   bs_pas_teen: { af: "Pas teen:", en: "Match with:" },
   bs_pas: { af: "Pas", en: "Match" },
   bs_st_faktuur: { af: "Gepas:", en: "Matched:" },
