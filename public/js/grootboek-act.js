@@ -1,4 +1,7 @@
 // public/js/grootboek-act.js
+// Weergawe 2 (16 Oktober 2026): 'n beskrywing loop nie meer oor 'n bladsy-
+// grens nie. Die volgende bladsy se kop ("13/10/2025 10:24 Page: 2 Prepared
+// by ...") is by die laaste inskrywing van die vorige bladsy gevoeg.
 // Weergawe 1 (16 Oktober 2026).
 //
 // Lees die rekenmeester se "GL Detailed Ledger" (ACT Solutions, as PDF) uit
@@ -79,6 +82,7 @@
 
     for (const blad of bladsye) {
       const reels = reels_van(blad.items || []);
+      laaste = null;   // 'n beskrywing loop nooit na 'n volgende bladsy oor nie
       // Die kolomkoppe van hierdie bladsy.
       let kol = null;
       for (const r of reels) {
@@ -150,7 +154,7 @@
         // 'n Voortsetting: die beskrywing se tweede of derde reel. Die "K" van
         // "ONTVANGSKASBOEK" wat na die volgende reel oorloop, staan links van
         // die beskrywing en word hier nie bygetel nie.
-        if (laaste) {
+        if (laaste && !/Page:\s*\d+|Prepared by|Cumulative/i.test(t)) {
           const by = r.items.filter((i) => i.x >= kol.beskr - 3).map((i) => String(i.s).trim()).join(" ");
           if (by) laaste.beskrywing = (laaste.beskrywing + " " + by).trim();
         }

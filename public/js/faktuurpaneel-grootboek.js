@@ -1,4 +1,7 @@
 // public/js/faktuurpaneel-grootboek.js
+// Weergawe 3 (16 Oktober 2026): 'n vierde kontrole, Dekking. Die banksaldo kan
+// klop al ontbreek 'n hele staat, want FNB se saldo is absoluut; 'n gaping
+// tussen twee state se tydperke word nou self gewys.
 // Weergawe 2 (16 Oktober 2026): "+ Nuwe kategorie" in die keuselys skep 'n
 // kategorie in die register (stoor-fin-kategorie, met al sy kontroles) en
 // koppel die rekening dadelik daaraan, soos by 'n banktransaksie.
@@ -82,6 +85,26 @@
     return saldo;
   }
 
+  // Gapings in die state se tydperke binne [van, tot]. FNB se state deel 'n
+  // grensdag, so 'n gaping is net waar die volgende staat NA die vorige se
+  // einde begin.
+  function gapings(van, tot) {
+    const st = GB.state.slice().sort((a, b) => String(a.van).localeCompare(String(b.van)));
+    const uit = [];
+    let tot_hier = null;
+    st.forEach((s) => {
+      if (tot_hier === null) {
+        if (s.van > van) uit.push([van, s.van]);
+      } else if (s.van > tot_hier) {
+        uit.push([tot_hier, s.van]);
+      }
+      if (tot_hier === null || s.tot > tot_hier) tot_hier = s.tot;
+    });
+    if (tot_hier === null) uit.push([van, tot]);
+    else if (tot_hier < tot) uit.push([tot_hier, tot]);
+    return uit;
+  }
+
   function dek(dag) {
     return GB.state.some((s) => s.van <= dag && s.tot >= dag);
   }
@@ -131,6 +154,12 @@
         .replace("{g}", rand(r.bank.sluit_sent)).replace("{s}", rand(s)).replace("{d}", datum(r.tydperk.tot));
     }
 
+    const gaps = gapings(r.tydperk.van, r.tydperk.tot);
+    const dek_detail = gaps.length
+      ? t("gb_dek_fout", "Geen staat dek {g} nie. Laai die ontbrekende staat op.")
+          .replace("{g}", gaps.map(([a, b]) => `${datum(a)} ${t("bs_tot", "tot")} ${datum(b)}`).join("; "))
+      : t("gb_dek_ok", "Die state dek die hele tydperk sonder gapings.");
+
     const pas = GB.pas;
     const per_kode = {};
     if (pas) pas.uitslag.forEach((u) => {
@@ -162,6 +191,7 @@
         ${merkie(k.rekeninge.ok, t("gb_k_rek", "Rekeninge"), rek_detail)}
         ${merkie(k.balans.ok, t("gb_k_bal", "Balans"), bal_detail)}
         ${merkie(bank_ok, t("gb_k_bank", "Bank teen die state"), bank_detail)}
+        ${merkie(!gaps.length, t("gb_k_dek", "Dekking"), dek_detail)}
       </div>
       ${r.ok ? "" : `<p class="bs-opsom fout">${o(t("gb_nie_aanvaar", "Die grootboek is nie aanvaar nie: een of meer kontroles klop nie."))}</p>`}
       <h3 class="bs-kop3">${o(t("gb_koppel_kop", "Koppel elke rekening aan 'n kategorie"))}</h3>
