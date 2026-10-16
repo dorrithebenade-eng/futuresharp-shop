@@ -206,6 +206,11 @@ exports.handler = async (event, context) => {
       verwysing: betaling.verwysing || "",
       aangeteken_deur: betaling.aangeteken_deur || "",
       nota: betaling.nota || "",
+      // Betalingsbewyse (16 Okt 2026), net naam en sleutel. Die leer self
+      // kom deur kry-bewys.js, wat die boekhouding-rol vereis.
+      dokumente: Array.isArray(betaling.dokumente)
+        ? betaling.dokumente.map((d) => ({ sleutel: d.sleutel, naam: d.naam }))
+        : [],
     },
 
     uitbetalings: Array.isArray(rekord.uitbetalings) ? rekord.uitbetalings : [],

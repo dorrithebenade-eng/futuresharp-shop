@@ -1,4 +1,6 @@
 // netlify/functions/laai-bewys-op.js
+// Weergawe 3 (16 Oktober 2026): ook by 'n faktuur se betaling (betalingsbewys).
+// Die lys leef op `betaling.dokumente` van die faktuur.
 // Weergawe 2 (28 September 2026): ook by 'n joernaalinskrywing.
 // Weergawe 1 (25 September 2026).
 //
@@ -7,6 +9,7 @@
 // Invoer, een van twee:
 //   { toekenning, item, leernaam, inhoud_tipe, data_base64 }   'n kontrolelys-item
 //   { inskrywing, leernaam, inhoud_tipe, data_base64 }         'n joernaalinskrywing
+//   { faktuur, leernaam, inhoud_tipe, data_base64 }            'n faktuur se betaling
 //
 // Die leer word eers gestoor en dan eers aan die rekord gekoppel. Misluk die
 // koppeling, word die leer weer uitgevee, sodat daar nie 'n wees in die store
@@ -21,6 +24,7 @@
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 const { kry_toekennings_store } = require("./_toekennings");
 const { kry_joernaal_store } = require("./_joernaal");
+const { kry_fakture_store, sleutel_na_nommer } = require("./_fakture");
 const B = require("./_bewysstukke");
 
 function antwoord(liggaam) {
@@ -55,6 +59,7 @@ exports.handler = async (event, context) => {
   const naam = String(invoer.leernaam || "bewysstuk").replace(/[\\/:*?"<>|]+/g, "-").slice(0, 120);
   const bstore = B.kry_bewys_store();
   const inskrywing_sleutel = String(invoer.inskrywing || "");
+  const faktuur_sleutel = String(invoer.faktuur || "");
 
   // -- Die teiken laai --------------------------------------------------
   let stoor_rekord;          // skryf die teiken terug
@@ -62,7 +67,24 @@ exports.handler = async (event, context) => {
   let sleutel;
   let rekord;
 
-  if (inskrywing_sleutel) {
+  if (faktuur_sleutel) {
+    // 'N BETALINGSBEWYS hoort by 'n betaling, dus net by 'n betaalde faktuur.
+    if (!sleutel_na_nommer(faktuur_sleutel)) return { statusCode: 400, body: "Ongeldige faktuur" };
+    const fstore = kry_fakture_store();
+    try {
+      rekord = await fstore.get(faktuur_sleutel, { type: "json" });
+    } catch (fout) {
+      return { statusCode: 500, body: "Kon nie die faktuur laai nie" };
+    }
+    if (!rekord) return { statusCode: 404, body: "Faktuur nie gevind nie" };
+    if (rekord.stand !== "betaal" || !rekord.betaling) {
+      return { statusCode: 409, body: "'n Betalingsbewys kan net by 'n betaalde faktuur gelaai word." };
+    }
+    rekord.betaling.dokumente = Array.isArray(rekord.betaling.dokumente) ? rekord.betaling.dokumente : [];
+    lys = rekord.betaling.dokumente;
+    sleutel = B.skep_sleutel(faktuur_sleutel, "betaling", tipe);
+    stoor_rekord = () => fstore.setJSON(faktuur_sleutel, rekord);
+  } else if (inskrywing_sleutel) {
     if (!inskrywing_sleutel.startsWith("J-")) return { statusCode: 400, body: "Ongeldige inskrywing" };
     const jstore = kry_joernaal_store();
     try {
@@ -112,6 +134,9 @@ exports.handler = async (event, context) => {
     return { statusCode: 500, body: "Kon nie die lêer aan die rekord koppel nie" };
   }
 
+  if (faktuur_sleutel) {
+    return antwoord({ faktuur: { sleutel: faktuur_sleutel, dokumente: B.kort_lys(rekord.betaling.dokumente) } });
+  }
   if (inskrywing_sleutel) {
     await B.spieel_na_bankreel(rekord);
     return antwoord({ inskrywing: { sleutel: rekord.sleutel, dokumente: B.kort_lys(rekord.dokumente) } });

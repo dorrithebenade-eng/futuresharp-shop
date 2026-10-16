@@ -22,6 +22,15 @@
 // rekenaar werk, sou beteken 'n mens moet huis toe ry om R10 000 af te merk.
 
 const FB_VERWYSING_MIN = 2;
+const FB_AANVAAR = ".pdf,application/pdf,image/*";
+
+// NETLIFY SE FOUTBLAD IS GEEN BOODSKAP NIE. Gee 'n funksie nie betyds
+// antwoord nie, stuur Netlify se proxy 'n rou HTML-blad ("Inactivity
+// Timeout"), en dit het op 16 Okt 2026 so op die skerm beland. Ons eie
+// foute is altyd gewone teks.
+function fb_is_html(teks) {
+  return /^\s*</.test(String(teks || ""));
+}
 
 function fb_t(sleutel, verstek) {
   const uit = window.t ? window.t(sleutel) : null;
@@ -132,6 +141,12 @@ function fb_vra() {
     <label class="fu-etiket" for="fb-nota">${fb_t("fb_nota", "Aantekening")}</label>
     <textarea class="fu-teksveld" id="fb-nota" rows="2" maxlength="300"></textarea>
 
+    <!-- DIE BETALINGSBEWYS (16 Okt 2026). Opsioneel. Gewoonlik 'n PDF van die
+         skool; 'n foto van die skerm gaan ook. Dit word ná die aantekening
+         opgelaai (bewys.js) en kan later by die faktuur bygevoeg word. -->
+    <label class="fu-etiket" for="fb-bewys">${fb_t("fb_bewys", "Betalingsbewys (opsioneel)")}</label>
+    <input class="fb-leer" type="file" id="fb-bewys" accept="${FB_AANVAAR}">
+
     <p class="fu-keer-fout" id="fb-fout" hidden></p>
 
     <div class="fu-knoppe">
@@ -230,10 +245,7 @@ async function fb_doen() {
   try {
     const resp = await fetch("/.netlify/functions/teken-betaling-aan", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${SESSIE.access_token}`,
-      },
+      headers: { "Content-Type": "application/json", ...(await identiteit_kop()) },
       body: JSON.stringify({
         sleutel: V.sleutel,
         ontvang_sent,
@@ -242,7 +254,43 @@ async function fb_doen() {
         nota: String((n_veld && n_veld.value) || "").trim(),
       }),
     });
-    if (!resp.ok) throw new Error(await resp.text());
+    if (!resp.ok) {
+      const teks = await resp.text().catch(() => "");
+      if (fb_is_html(teks) || resp.status === 502 || resp.status === 504) {
+        throw new Error(fb_t(
+          "fb_tydsgrens",
+          "Die bediener het nie betyds geantwoord nie. Die betaling is dalk wel aangeteken. Herlaai die bladsy en kyk of die faktuur op Betaal staan voor jy weer probeer."
+        ));
+      }
+      throw new Error(teks);
+    }
+
+    // DIE BETALING STAAN. Wat volg, mag haar nie ongedaan maak nie: 'n bewys
+    // wat nie oplaai nie, word gemeld en die skerm gaan voort.
+    const leers = document.getElementById("fb-bewys");
+    if (leers && leers.files && leers.files.length && window.bw_laai_op) {
+      knop.textContent = fb_t("bw_besig", "Word opgelaai \u2026");
+      try {
+        await window.bw_laai_op({ faktuur: V.sleutel }, leers.files);
+      } catch (fout) {
+        window.alert(
+          fb_t("fb_bewys_nie", "Die betaling is aangeteken, maar die bewys nie: {f}. Laai dit weer op by Betalingsbewys.")
+            .replace("{f}", String(fout.message || fout))
+        );
+      }
+    }
+
+    // DIE EPOSSE in die agtergrond (stuur-betaalposte-background.js). Netlify
+    // antwoord dadelik met 202; die skerm wag nie op die pos nie.
+    try {
+      await fetch("/.netlify/functions/stuur-betaalposte-background", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...(await identiteit_kop()) },
+        body: JSON.stringify({ sleutel: V.sleutel }),
+      });
+    } catch (fout) {
+      console.error("Kon nie die betaalposte begin nie:", fout);
+    }
 
     // Herlaai, sodat die hele skerm as betaal teken sonder dat hierdie lêer
     // weet hoe faktuur-vorm.js sy dokument bou. Dieselfde keuse as die
@@ -258,6 +306,87 @@ async function fb_doen() {
       null
     );
   }
+}
+
+/* ═══ die betalingsbewys by 'n betaalde faktuur (16 Okt 2026) ═══
+
+   DIESELFDE OORLEGSEL, 'n ander inhoud: die betaling soos aangeteken, die
+   bewyse om af te laai of te verwyder, en 'n veld om nog een by te voeg. Die
+   leers leef in die bewysstukke-store (_bewysstukke.js), net vir die
+   boekhouding-rol. */
+
+let FB_DOKS = [];
+
+function fb_datum(iso) {
+  return String(iso || "").slice(0, 10).replace(/-/g, "/");
+}
+
+function fb_bewys_wys(boodskap) {
+  const b = (V && V.betaling) || {};
+  const ry = [
+    b.ontvang_sent ? fb_rand(b.ontvang_sent) : "",
+    b.ontvang_op ? fb_datum(b.ontvang_op) : "",
+    b.verwysing || "",
+  ].filter(Boolean).join(" \u00B7 ");
+
+  const lys = FB_DOKS.length
+    ? `<ul class="fb-doks">${FB_DOKS.map((d) => `<li>
+        <button type="button" class="fb-dok-naam" data-fb-af="${fb_ontsnap(d.sleutel)}" data-fb-naam="${fb_ontsnap(d.naam)}">${fb_ontsnap(d.naam)}</button>
+        <button type="button" class="fb-dok-weg" data-fb-weg="${fb_ontsnap(d.sleutel)}" aria-label="${fb_ontsnap(fb_t("bw_verwyder", "Verwyder"))}">&#215;</button>
+      </li>`).join("")}</ul>`
+    : `<p class="fb-leeg">${fb_t("fb_bewys_geen", "Nog geen bewys gelaai nie.")}</p>`;
+
+  fb_wys(`
+    <h2>${fb_t("fb_bewys_kop", "Betalingsbewys")}</h2>
+    ${ry ? `<p>${fb_ontsnap(ry)}</p>` : ""}
+    ${lys}
+    <label class="fu-etiket" for="fb-bewys-by">${fb_t("fb_bewys_by", "Voeg 'n bewys by")}</label>
+    <input class="fb-leer" type="file" id="fb-bewys-by" accept="${FB_AANVAAR}">
+    <p class="fu-keer-fout" id="fb-fout" ${boodskap ? "" : "hidden"}>${fb_ontsnap(boodskap || "")}</p>
+    <div class="fu-knoppe">
+      <button type="button" class="kaart-aksie fu-stil" id="fb-terug">${fb_t("fu_terug", "Terug")}</button>
+    </div>`);
+
+  document.getElementById("fb-terug").addEventListener("click", fb_toe);
+
+  document.getElementById("fb-bewys-by").addEventListener("change", async (e) => {
+    const veld = e.target;
+    if (!veld.files || !veld.files.length) return;
+    veld.disabled = true;
+    try {
+      const uit = await window.bw_laai_op({ faktuur: V.sleutel }, veld.files);
+      if (uit && uit.faktuur) FB_DOKS = uit.faktuur.dokumente || [];
+      fb_bewys_wys();
+    } catch (fout) {
+      fb_bewys_wys(String(fout.message || fout));
+    }
+  });
+
+  document.querySelectorAll("[data-fb-af]").forEach((k) => {
+    k.addEventListener("click", () =>
+      window.bw_laai_af(k.getAttribute("data-fb-af"), k.getAttribute("data-fb-naam"))
+        .catch((fout) => fb_bewys_wys(String(fout.message || fout))));
+  });
+
+  document.querySelectorAll("[data-fb-weg]").forEach((k) => {
+    k.addEventListener("click", async () => {
+      if (!window.confirm(fb_t("bw_skrap_vra", "Vee hierdie bewys uit?"))) return;
+      try {
+        const uit = await window.bw_skrap({ faktuur: V.sleutel }, k.getAttribute("data-fb-weg"));
+        if (uit && uit.faktuur) FB_DOKS = uit.faktuur.dokumente || [];
+        fb_bewys_wys();
+      } catch (fout) {
+        fb_bewys_wys(String(fout.message || fout));
+      }
+    });
+  });
+}
+
+function fb_bewys_knop_teks() {
+  const knop = document.getElementById("fv-bewys");
+  if (!knop) return;
+  const n = FB_DOKS.length;
+  knop.textContent = fb_t("fb_bewys_kop", "Betalingsbewys") + (n ? ` (${n})` : "");
 }
 
 /* ═══ begin ═══ */
@@ -285,6 +414,21 @@ async function fb_doen() {
     knop.addEventListener("click", fb_vra);
   } else {
     knop.style.display = "none";
+  }
+
+  // DIE BEWYSKNOPPIE: net by 'n betaalde faktuur, en net as bewys.js gelaai is.
+  const bewys_knop = document.getElementById("fv-bewys");
+  if (bewys_knop && V && V.stand === "betaal" && V.betaling && window.bw_laai_op) {
+    FB_DOKS = Array.isArray(V.betaling.dokumente) ? V.betaling.dokumente : [];
+    bewys_knop.style.display = "";
+    bewys_knop.addEventListener("click", () => fb_bewys_wys());
+    // Die oorlegsel verander FB_DOKS; die telling op die knoppie volg wanneer
+    // hy toemaak.
+    const skerm = document.getElementById("fu-skerm");
+    if (skerm) new MutationObserver(fb_bewys_knop_teks).observe(skerm, { attributes: true, attributeFilter: ["hidden"] });
+    fb_bewys_knop_teks();
+  } else if (bewys_knop) {
+    bewys_knop.style.display = "none";
   }
 
   // Escape sluit die oorlegsel. faktuur-uitreik.js haak dieselfde luisteraar

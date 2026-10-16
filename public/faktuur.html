@@ -146,6 +146,11 @@
                faktuur-betaling-aan.js wys hom. -->
           <button type="button" class="kaart-aksie fu-stil" id="fv-betaling"
                   style="display:none;" data-i18n="fb_knop">Betaling ontvang</button>
+          <!-- BETALINGSBEWYS (16 Okt 2026) verskyn slegs by 'n BETAALDE faktuur.
+               Wys, laai af, verwyder of voeg die bewys van betaling by.
+               faktuur-betaling-aan.js wys hom. -->
+          <button type="button" class="kaart-aksie fu-stil" id="fv-bewys"
+                  style="display:none;">Betalingsbewys</button>
           <button type="button" class="kaart-aksie fu-stil" id="fv-druk" data-i18n="fv_druk">Druk</button>
 
           <!-- HERSIEN. Slegs op 'n UITGEREIKTE kwotasie, ook een wat verval
@@ -593,6 +598,8 @@
   <script src="js/faktuur-nuwe-klient.js"></script>
   <script src="js/faktuur-nuwe-koste-item.js"></script>
   <script src="js/faktuur-uitreik.js"></script>
+  <!-- bewys.js: die gedeelde oplaai van bewyse (foto's verklein, PDF). -->
+  <script src="js/bewys.js"></script>
   <script src="js/faktuur-betaling-aan.js"></script>
   <!-- NA faktuur-backoffice.js, want hy wikkel bo_teken() en bo_teken_syfers()
        om saam met hulle te herteken. Voor hulle sou daar niks wees om te

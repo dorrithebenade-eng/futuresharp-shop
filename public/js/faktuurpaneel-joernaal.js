@@ -158,8 +158,17 @@ function jn_teken() {
       //
       // 'n Bewys kan by 'n hand- en 'n bankinskrywing: albei leef in die
       // joernaal se store en het 'n sleutel.
-      const met_bewys = (r.bron === "hand" || r.bron === "bank") && r.sleutel && window.bw_knoppie;
-      const bewys_knop = met_bewys
+      //
+      // EN BY 'N FAKTUUR SE ONTVANGS (16 Okt 2026): die betalingsbewys leef op
+      // die faktuur (betaling.dokumente). Die eienaar dra die voorvoegsel F:
+      // sodat die verwyderknoppie weet om die faktuur te raak en nie die
+      // joernaal nie.
+      const by_faktuur = r.bron === "faktuur" && r.faktuur_sleutel && window.bw_knoppie;
+      const met_bewys = by_faktuur ||
+        ((r.bron === "hand" || r.bron === "bank") && r.sleutel && window.bw_knoppie);
+      const bewys_knop = by_faktuur
+        ? window.bw_knoppie(`data-jn-fbewys="${jn_ontsnap(r.faktuur_sleutel)}"`)
+        : met_bewys
         ? window.bw_knoppie(`data-jn-bewys="${jn_ontsnap(r.sleutel)}"`)
         : "";
       const aksies =
@@ -173,7 +182,9 @@ function jn_teken() {
               r.sleutel
             )}" title="${jn_t("jn_verwyder", "Verwyder")}">&times;</button>`
           : "");
-      const doks = met_bewys ? window.bw_lys(r.dokumente, r.sleutel, "jn-doks") : "";
+      const doks = met_bewys
+        ? window.bw_lys(r.dokumente, by_faktuur ? "F:" + r.faktuur_sleutel : r.sleutel, "jn-doks")
+        : "";
 
       return `
       <tr>
@@ -324,6 +335,20 @@ function jn_koppel_lys() {
       await jn_laai();
     });
   });
+  // Die betalingsbewys by 'n faktuur se ontvangs.
+  document.querySelectorAll("[data-jn-fbewys]").forEach((k) => {
+    k.addEventListener("change", async () => {
+      if (!k.files || !k.files.length) return;
+      const etiket = k.closest(".tk-laai");
+      if (etiket) etiket.classList.add("besig");
+      try {
+        await window.bw_laai_op({ faktuur: k.getAttribute("data-jn-fbewys") }, k.files);
+      } catch (fout) {
+        window.alert(String(fout.message || fout));
+      }
+      await jn_laai();
+    });
+  });
   document.querySelectorAll("#jn-lys [data-bw-af]").forEach((b) => {
     b.addEventListener("click", () =>
       window.bw_laai_af(b.getAttribute("data-bw-af"), b.getAttribute("data-bw-naam"))
@@ -333,7 +358,11 @@ function jn_koppel_lys() {
     b.addEventListener("click", async () => {
       if (!window.confirm(jn_t("bw_skrap_vra", "Vee hierdie bewys uit?"))) return;
       try {
-        await window.bw_skrap({ inskrywing: b.getAttribute("data-bw-eienaar") }, b.getAttribute("data-bw-weg"));
+        const eienaar = b.getAttribute("data-bw-eienaar") || "";
+        const basis = eienaar.startsWith("F:")
+          ? { faktuur: eienaar.slice(2) }
+          : { inskrywing: eienaar };
+        await window.bw_skrap(basis, b.getAttribute("data-bw-weg"));
       } catch (fout) {
         window.alert(String(fout.message || fout));
       }

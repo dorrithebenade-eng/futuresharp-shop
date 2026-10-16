@@ -87,6 +87,12 @@ exports.handler = async (event, context) => {
     return { statusCode: 500, body: "Kon nie die faktuur skrap nie" };
   }
 
+  // Betalingsbewyse (16 Okt 2026) leef in hul eie store; sonder dit bly hulle
+  // as wese agter. 'n Fout hier keer nie die skrap nie.
+  if (rekord.betaling && Array.isArray(rekord.betaling.dokumente)) {
+    await require("./_bewysstukke").vee_lys_uit(rekord.betaling.dokumente);
+  }
+
   // Aangeteken, want dit is die een handeling waarvan die rekord self niks
   // meer kan sê nie: hy is weg.
   console.log(

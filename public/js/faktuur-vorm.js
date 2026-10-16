@@ -155,6 +155,7 @@ const V = {
   hersiening: 1,
   geskep_op: null,
   betaalskakel: null,
+  betaling: null,
 };
 
 let SESSIE = null;
@@ -1449,6 +1450,9 @@ async function laai_faktuur(vraag) {
   V.dokument_datum = f.dokument_datum || null;
   V.uitgereik_op = f.uitgereik_op || null;
   V.betaalskakel = f.betaalskakel || null;
+  // Net om te lees (16 Okt 2026): faktuur-betaling-aan.js wys die betaling en
+  // sy bewyse. liggaam() stuur dit nooit terug nie.
+  V.betaling = f.betaling || null;
 }
 
 // 'n Uitgereikte of betaalde faktuur word gelees, nie gewysig nie. Elke veld

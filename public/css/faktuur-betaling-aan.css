@@ -66,3 +66,55 @@
 /* Die datumveld se eie knoppie sit reeds in die blaaier; hy hoef nie ook nog
    verticaal gerek te word nie. */
 #fb-datum { max-width: 220px; }
+
+/* ── Die betalingsbewys (16 Okt 2026) ─────────────────────────────────────
+   Die leerveld in die vorm, en die lys bewyse by 'n betaalde faktuur. */
+
+.fb-leer {
+  display: block;
+  width: 100%;
+  margin: 2px 0 0;
+  font-size: 13px;
+}
+
+.fb-doks {
+  list-style: none;
+  margin: 4px 0 14px;
+  padding: 0;
+}
+.fb-doks li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 0;
+  border-bottom: 1px solid #E8E6E1;
+}
+.fb-dok-naam {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  font-size: 14px;
+  color: var(--teal);
+  text-decoration: underline;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+.fb-dok-weg {
+  background: none;
+  border: 0;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--grys-teks);
+  cursor: pointer;
+  padding: 4px 6px;
+}
+.fb-dok-weg:hover { color: var(--koraal); }
+.fu-paneel > p.fb-leeg {
+  margin: 4px 0 14px;
+  font-size: 13px;
+  color: var(--grys-teks);
+}

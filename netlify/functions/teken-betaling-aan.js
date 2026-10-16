@@ -53,12 +53,6 @@ const {
   sleutel_na_nommer,
   voeg_geskiedenis_by,
 } = require("./_fakture");
-const { kry_maatskappy } = require("./_instellings");
-const {
-  stuur_kwitansie,
-  stuur_state,
-  stuur_kennisgewing,
-} = require("./_faktuur-betaling");
 
 // Die verwysing op die bankstaat. Dit is hoe hierdie inskrywing ses maande
 // later teen die staat versoen word; sonder dit is die aantekening 'n bewering
@@ -244,24 +238,18 @@ exports.handler = async (event, context) => {
       `${rand(ontvang_sent)}, bankoorbetaling, ${verwysing}`
   );
 
-  // ── Die eposse ─────────────────────────────────────────────────────────
+  // ── Die eposse word NIE HIER gestuur nie (16 Okt 2026) ─────────────────
   //
-  // DIESELFDE DRIE AS DIE WEBHOOK, uit dieselfde lêer. Twee kopieë sou beteken
-  // 'n mens verander die een en wonder hoekom die ander anders lees.
+  // Hierdie funksie het die drie eposse (kwitansie, state, kennisgewing) ná
+  // die stoor een na die ander afgewag. Op 16 Okt 2026 het dit by FS/01969
+  // langer gevat as Netlify se tydsgrens vir 'n gewone funksie: die betaling
+  // WAS gestoor, maar die skerm het Netlify se rou "Inactivity Timeout"-blad
+  // gekry en die gebruiker moes raai of dit gewerk het.
   //
-  // Elkeen in sy eie try/catch binne-in; die faktuur is klaar gestoor en 'n
-  // pos wat misluk mag dit nie ongedaan maak nie.
-  let maatskappy = null;
-  try {
-    maatskappy = await kry_maatskappy();
-  } catch (fout) {
-    console.error("Handmatige betaling: kon nie die instelling lees nie:", fout);
-  }
-
-  await stuur_kwitansie(rekord);
-  await stuur_state(rekord);
-  await stuur_kennisgewing(rekord, maatskappy, false);
-
+  // Die eposse gaan nou deur stuur-betaalposte-background.js, wat die
+  // blaaier roep sodra hierdie antwoord terug is (en ná 'n bewys opgelaai
+  // is). 'n Agtergrondfunksie kry tot 15 minute en die skerm wag nie op hom
+  // nie.
   return {
     statusCode: 200,
     headers: { "Content-Type": "application/json" },

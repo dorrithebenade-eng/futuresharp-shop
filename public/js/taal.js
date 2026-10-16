@@ -2338,6 +2338,19 @@ const WOORDEBOEK = {
     af: "Kon nie die betaling aanteken nie.",
     en: "The payment could not be recorded.",
   },
+  // Die betalingsbewys en die tydsgrens (16 Okt 2026).
+  fb_bewys: { af: "Betalingsbewys (opsioneel)", en: "Proof of payment (optional)" },
+  fb_bewys_kop: { af: "Betalingsbewys", en: "Proof of payment" },
+  fb_bewys_by: { af: "Voeg 'n bewys by", en: "Add a proof" },
+  fb_bewys_geen: { af: "Nog geen bewys gelaai nie.", en: "No proof uploaded yet." },
+  fb_bewys_nie: {
+    af: "Die betaling is aangeteken, maar die bewys nie: {f}. Laai dit weer op by Betalingsbewys.",
+    en: "The payment was recorded, but the proof was not: {f}. Upload it again under Proof of payment.",
+  },
+  fb_tydsgrens: {
+    af: "Die bediener het nie betyds geantwoord nie. Die betaling is dalk wel aangeteken. Herlaai die bladsy en kyk of die faktuur op Betaal staan voor jy weer probeer.",
+    en: "The server did not answer in time. The payment may have been recorded. Reload the page and check whether the invoice shows Paid before trying again.",
+  },
 
   fu_reik_uit: { af: "Reik uit", en: "Issue" },
   fu_vra_kop: { af: "Reik hierdie faktuur uit?", en: "Issue this invoice?" },

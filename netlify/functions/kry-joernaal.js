@@ -361,6 +361,12 @@ exports.handler = async (event, context) => {
           // reels, en die joernaal se telling en die CSV verander saam.
           dele: ontvangs_dele(f, ontvang_sent),
           bron: "faktuur",
+          // Die faktuur se sleutel en betalingsbewyse (16 Okt 2026), sodat die
+          // joernaalskerm 'n bewys by die ontvangs kan wys en oplaai.
+          faktuur_sleutel: b.key,
+          dokumente: Array.isArray(f.betaling && f.betaling.dokumente)
+            ? f.betaling.dokumente.map((d) => ({ sleutel: d.sleutel, naam: d.naam }))
+            : [],
           verwysing: (f.betaling && f.betaling.verwysing) || f.nommer || "",
           bruto_sent: ontvang_sent,
         });
