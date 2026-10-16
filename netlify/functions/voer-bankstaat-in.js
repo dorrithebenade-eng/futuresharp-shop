@@ -1,4 +1,7 @@
 // netlify/functions/voer-bankstaat-in.js
+// Weergawe 2 (16 Oktober 2026): FNB se maandstate deel 'n grensdag (die een
+// eindig op 30 April, die volgende begin op 30 April). Dit is nie oorvleueling
+// nie; net tydperke wat meer as daardie een dag deel, word geweier.
 //
 // Voer een gelese FNB-staat in. Rol: boekhouding.
 //
@@ -133,7 +136,8 @@ exports.handler = async (event, context) => {
 
   const regte = state.filter((s) => !s.toets);
   if (!toets) {
-    const bots = regte.find((s) => s.rekening4 === rekening4 && s.van <= tot && s.tot >= van);
+    // Streng kleiner: 'n gedeelde grensdag is FNB se gewone opvolging.
+    const bots = regte.find((s) => s.rekening4 === rekening4 && s.van < tot && s.tot > van);
     if (bots) {
       return {
         statusCode: 409,

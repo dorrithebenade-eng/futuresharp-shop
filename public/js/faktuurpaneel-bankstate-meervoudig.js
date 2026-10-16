@@ -1,4 +1,7 @@
 // public/js/faktuurpaneel-bankstate-meervoudig.js
+// Weergawe 2 (16 Oktober 2026): 'n gedeelde grensdag tussen twee state (die
+// een eindig op 30 April, die volgende begin op 30 April) is nie oorvleueling
+// nie. FNB se maandstate loop so. Dieselfde reel as voer-bankstaat-in.js.
 // Weergawe 1 (16 Oktober 2026).
 //
 // Meer as een FNB-staat gelyk oplaai. faktuurpaneel-bankstate.js stuur hierheen
@@ -30,8 +33,11 @@
 
   function G() { return window.BS_GEDEEL; }
 
+  // Meer as die grensdag gedeel. Dieselfde beginnende staat twee keer
+  // (dieselfde van en tot) tel steeds as oorvleueling.
   function oorvleuel(a, b) {
-    return a.van <= b.tot && b.van <= a.tot;
+    if (a.van === b.van && a.tot === b.tot) return true;
+    return a.van < b.tot && b.van < a.tot;
   }
 
   function rek4(r) {
