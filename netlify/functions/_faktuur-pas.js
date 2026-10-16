@@ -154,4 +154,45 @@ function stel_voor(reels, kand, gebruikte) {
   });
 }
 
-module.exports = { kandidate, gebruik, kies, stel_voor };
+// Weergawe 3 (16 Oktober 2026): DIE BANK SE DATUM GELD. Op kontantbasis is
+// geld ontvang of betaal op die dag dat dit deur die bank geloop het. Word 'n
+// faktuur se ontvangs of 'n uitbetaling teen 'n banktransaksie gepas, kry die
+// faktuur daardie datum (die aangetekende datum bly bewaar). Andersins staan
+// Standard Bank se R20 000 van Augustus in September se joernaal, en albei
+// maande wys 'n verskil wat geen fout is nie. `ontdoen` sit dit terug.
+const { kry_fakture_store: _fs, voeg_geskiedenis_by } = require("./_fakture");
+
+function ontleed(ref) {
+  const m = String(ref || "").match(/^([FU]):([^#]+)(?:#(\d+))?$/);
+  return m ? { soort: m[1], sleutel: m[2], ix: m[3] == null ? null : Number(m[3]) } : null;
+}
+
+// Stel die datum op die faktuur. Gee die vorige datum terug (vir ontdoen),
+// of null as niks verander het nie.
+async function stel_datum(ref, datum, wie, nota) {
+  const o = ontleed(ref);
+  if (!o || !/^\d{4}-\d{2}-\d{2}$/.test(String(datum))) return null;
+  const store = _fs();
+  const f = await store.get(o.sleutel, { type: "json" });
+  if (!f) return null;
+  let ou = null;
+  if (o.soort === "F") {
+    if (!f.betaling) return null;
+    ou = f.betaling.ontvang_op || null;
+    if (dag(ou) === datum) return null;
+    if (!f.betaling.aangeteken_op) f.betaling.aangeteken_op = ou;
+    f.betaling.ontvang_op = datum;
+  } else {
+    const ry = Array.isArray(f.uitbetalings) ? f.uitbetalings[o.ix] : null;
+    if (!ry) return null;
+    ou = ry.betaal_op || null;
+    if (dag(ou) === datum) return null;
+    if (!ry.aangeteken_op) ry.aangeteken_op = ou;
+    ry.betaal_op = datum;
+  }
+  voeg_geskiedenis_by(f, "datum_uit_bank", wie || "", `${nota}: ${dag(ou)} \u2192 ${datum}`);
+  await store.setJSON(o.sleutel, f);
+  return ou;
+}
+
+module.exports = { kandidate, gebruik, kies, stel_voor, stel_datum };

@@ -1,4 +1,7 @@
 // netlify/functions/wys-bankreel-toe.js
+// Weergawe 9 (16 Oktober 2026): by "pas" kry die faktuur die bank se datum
+// (sien stel_datum in _faktuur-pas.js); die vorige datum word op die pas
+// bewaar en by "ontdoen" teruggesit.
 // Weergawe 8 (16 Oktober 2026): AKSIE "pas" { nr, aksie: "pas", ref }. Die
 // banktransaksie word gepas teen 'n faktuur se ontvangs of 'n uitbetaling
 // (sien _faktuur-pas.js), in plaas van 'n eie kategorie te kry. Was dit reeds
@@ -268,8 +271,14 @@ exports.handler = async (event, context) => {
       } else if (o.aksie === "pas") {
         // Die bankinskrywing (as daar een was) gaan hieronder saam met enige
         // weeskind uit die joernaal: vee_ander behou niks vir hierdie reel nie.
+        let ou_datum = null;
+        try {
+          ou_datum = await FP.stel_datum(kd.ref, r.datum, gebruiker.email || "", `Gepas teen ${staat.sleutel}#${r.nr}`);
+        } catch (fout) {
+          console.error(`Kon nie die datum op ${kd.ref} stel nie:`, fout);
+        }
         r.stand = "gepas";
-        r.pas = { soort: kd.soort, ref: kd.ref, beskrywing: kd.beskrywing };
+        r.pas = { soort: kd.soort, ref: kd.ref, beskrywing: kd.beskrywing, ou_datum };
         r.kategorie_id = "";
         r.voorstel_kategorie = "";
         r.joernaal_sleutel = "";
@@ -282,6 +291,13 @@ exports.handler = async (event, context) => {
           await vee_uit_vir_inskrywing(r.joernaal_sleutel);
         }
         r.stand = "oop";
+        if (r.pas && r.pas.ou_datum && (r.pas.soort === "faktuur" || r.pas.soort === "uitbetaling")) {
+          try {
+            await FP.stel_datum(r.pas.ref, String(r.pas.ou_datum).slice(0, 10), gebruiker.email || "", "Pas ontdoen");
+          } catch (fout) {
+            console.error(`Kon nie die datum op ${r.pas.ref} terugsit nie:`, fout);
+          }
+        }
         r.pas = null;
         r.kategorie_id = "";
         r.joernaal_sleutel = "";
