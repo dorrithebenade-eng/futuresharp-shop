@@ -369,6 +369,9 @@ exports.handler = async (event, context) => {
             : [],
           verwysing: (f.betaling && f.betaling.verwysing) || f.nommer || "",
           bruto_sent: ontvang_sent,
+          // Die verwysing waarmee 'n banktransaksie hierteen gepas word (16 Okt
+          // 2026, sien _faktuur-pas.js). Dieselfde vorm as daar.
+          pas_ref: `F:${b.key}`,
         });
 
         // Op die dag van ontvangs, want dit is wanneer die hosting werklik
@@ -398,7 +401,7 @@ exports.handler = async (event, context) => {
       }
 
       // Elke uitbetaling wat werklik gebeur het
-      (Array.isArray(f.uitbetalings) ? f.uitbetalings : []).forEach((ry) => {
+      (Array.isArray(f.uitbetalings) ? f.uitbetalings : []).forEach((ry, ry_ix) => {
         const sent = Number(ry.bedrag_sent) || 0;
         if (sent <= 0) return;
         const betaal_op = dag(ry.betaal_op);
@@ -454,6 +457,7 @@ exports.handler = async (event, context) => {
           // se nie.
           waarvoor: Array.isArray(ry.waarvoor) ? ry.waarvoor : [],
           bron: "uitbetaling",
+          pas_ref: `U:${b.key}#${ry_ix}`,
         });
       });
     }

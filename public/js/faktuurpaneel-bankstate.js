@@ -1,4 +1,8 @@
 // public/js/faktuurpaneel-bankstate.js
+// Weergawe 6 (16 Oktober 2026): FAKTUURPAS. 'n Transaksie wat 'n faktuur se
+// betaling of 'n uitbetaling aan 'n begunstigde is, wys "Pas teen: FS/…" met
+// 'n knoppie Pas (en bo-aan "Pas al … teen fakture"). Gepas, tel die geld net
+// een keer: die faktuur se eie inskrywing dra dit. Sien _faktuur-pas.js.
 // Weergawe 5 (16 Oktober 2026): 'n kategorie wat met die hand gekies word, gaan
 // ook na soortgelyke oop transaksies in die ander state (wys-bankreel-toe
 // weergawe 6). Die boodskap se hoeveel, en die lys van state laai weer sodat
@@ -411,11 +415,21 @@
   }
 
   function stand_sel(r) {
+    const basis = stand_basis(r);
+    if (!r.pas_voorstel || r.stand === "gepas") return basis;
+    return `<div class="bs-pas-voorstel"><span class="bs-stand oop">${ontsnap(t("bs_pas_teen", "Pas teen:"))} ${ontsnap(r.pas_voorstel.beskrywing)}</span>
+      <button type="button" class="bs-bevestig bs-pas-knop" data-pas="${r.nr}">${ontsnap(t("bs_pas", "Pas"))}</button></div>${basis}`;
+  }
+
+  function stand_basis(r) {
     const ontdoen = `<button type="button" class="bs-ontdoen" data-ontdoen="${r.nr}">${ontsnap(t("bs_ontdoen", "Ontdoen"))}</button>`;
     switch (r.stand) {
       case "inligting":
         return `<span class="bs-stand info">${ontsnap(t("bs_st_info", "Kennisgewing van die bank"))}</span>`;
       case "gepas":
+        if (r.pas && (r.pas.soort === "faktuur" || r.pas.soort === "uitbetaling")) {
+          return `<span class="bs-stand voorstel">${ontsnap(t("bs_st_faktuur", "Gepas:"))} ${ontsnap(r.pas.beskrywing || "")}</span> ${ontdoen}`;
+        }
         return `<span class="bs-stand voorstel">${ontsnap(r.pas && r.pas.soort === "vereffening"
           ? t("bs_st_paystack", "Verklaar deur Paystack")
           : t("bs_st_joernaal", "Reeds in die joernaal"))}</span> ${ontdoen}`;
@@ -450,7 +464,8 @@
     const tel = { oop: 0, voorstel: 0, gepas: 0, toegewys: 0, oordrag: 0, inligting: 0 };
     s.reels.forEach((r) => { tel[r.stand] = (tel[r.stand] || 0) + 1; });
     const voorstelle = s.reels.filter((r) => r.stand === "voorstel" && r.voorstel_kategorie).length;
-    const wys = BS.net_oop ? s.reels.filter((r) => r.stand === "oop" || r.stand === "voorstel") : s.reels;
+    const pas_tel = s.reels.filter((r) => r.pas_voorstel && r.stand !== "gepas").length;
+    const wys = BS.net_oop ? s.reels.filter((r) => r.stand === "oop" || r.stand === "voorstel" || (r.pas_voorstel && r.stand !== "gepas")) : s.reels;
 
     plek.innerHTML = `
       <div class="bs-staat-kop">
@@ -458,6 +473,8 @@
           ${s.toets ? `<span class="fk-merkie">${ontsnap(t("bs_toets", "Toets"))}</span>` : ""}
           <div class="bs-staat-tel">${tel_merkies(tel)}</div></div>
         <div class="bs-staat-knoppe">
+          ${pas_tel ? `<button type="button" class="kaart-aksie" id="bs-al-pas">${ontsnap(
+            pas_tel === 1 ? t("bs_al_pas_een", "Pas 1 teen 'n faktuur") : t("bs_al_pas", "Pas al {n} teen fakture").replace("{n}", pas_tel))}</button>` : ""}
           ${voorstelle ? `<button type="button" class="kaart-aksie" id="bs-al-voorstelle">${ontsnap(
             t("bs_al_voorstelle", "Bevestig al {n} voorstelle").replace("{n}", voorstelle))}</button>` : ""}
           <button type="button" class="kaart-aksie wi-stil" id="bs-maak-toe">${ontsnap(t("bs_maak_toe", "Maak toe"))}</button>
@@ -501,6 +518,10 @@
       const r = s.reels.find((x) => x.nr === Number(k.getAttribute("data-bevestig")));
       wys_toe([opdrag_vir_voorstel(r)]);
     }));
+    plek.querySelectorAll("[data-pas]").forEach((k) => k.addEventListener("click", () => {
+      const r = s.reels.find((x) => x.nr === Number(k.getAttribute("data-pas")));
+      if (r && r.pas_voorstel) wys_toe([{ nr: r.nr, aksie: "pas", ref: r.pas_voorstel.ref }]);
+    }));
     plek.querySelectorAll("[data-ontdoen]").forEach((k) => k.addEventListener("click", () => {
       const nr = Number(k.getAttribute("data-ontdoen"));
       if (!bewyse_mag_weg(nr)) return;
@@ -535,6 +556,10 @@
       }
       teken_staat();
     }));
+    const al_pas = document.getElementById("bs-al-pas");
+    if (al_pas) al_pas.addEventListener("click", () =>
+      wys_toe(s.reels.filter((r) => r.pas_voorstel && r.stand !== "gepas")
+        .map((r) => ({ nr: r.nr, aksie: "pas", ref: r.pas_voorstel.ref }))));
     const al = document.getElementById("bs-al-voorstelle");
     if (al) al.addEventListener("click", () =>
       wys_toe(s.reels.filter((r) => r.stand === "voorstel" && r.voorstel_kategorie).map(opdrag_vir_voorstel)));

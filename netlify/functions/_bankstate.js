@@ -100,13 +100,16 @@ function voorstel_kaart(state) {
 // keer as 'n staat gelees word, oor alle regte state heen, sodat 'n nuwe
 // toewysing dadelik in elke ander staat se voorstelle verskyn.
 //
+// 'n Reel met 'n `pas_voorstel` (sien _faktuur-pas.js) kry geen
+// kategorievoorstel nie: daardie geld is reeds deur 'n faktuur in die joernaal.
+//
 // NIKS WORD GESTOOR NIE. Die voorstel gaan net in die antwoord; die stoor se
 // stand bly "oop" tot iemand bevestig. 'n Lees skryf nie.
 function voeg_voorstelle(staat, kaart) {
   return {
     ...staat,
     reels: (staat.reels || []).map((r) => {
-      if (r.stand !== "oop") return r;
+      if (r.stand !== "oop" || r.pas_voorstel) return r;   // 'n faktuurpas gaan voor
       const p = patroon(r.beskrywing);
       if (!p) return r;
       const vk = kaart.get(r.rigting + "|" + p);

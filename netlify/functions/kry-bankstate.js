@@ -1,4 +1,9 @@
 // netlify/functions/kry-bankstate.js
+// Weergawe 3 (16 Oktober 2026): 'n enkele staat se transaksies kry ook 'n
+// `pas_voorstel` teen 'n faktuur se ontvangs of 'n uitbetaling (sien
+// _faktuur-pas.js). Dit word eerste gedoen; so 'n transaksie kry dan geen
+// kategorievoorstel nie. Misluk die lees van die fakture, gaan die staat
+// sonder daardie voorstelle terug.
 // Weergawe 2 (16 Oktober 2026): elke oop transaksie kry by die lees 'n
 // voorstel uit al die toewysings in die regte state (sien voeg_voorstelle in
 // _bankstate.js). Die lys se tellings sluit daardie voorstelle in.
@@ -8,6 +13,7 @@
 
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 const B = require("./_bankstate");
+const FP = require("./_faktuur-pas");
 
 function tel(s) {
   const t = { oop: 0, voorstel: 0, gepas: 0, toegewys: 0, oordrag: 0, inligting: 0 };
@@ -29,7 +35,16 @@ exports.handler = async (event, context) => {
     if (sleutel) {
       const gestoor = almal.find((x) => x.sleutel === sleutel);
       if (!gestoor) return { statusCode: 404, body: "Staat nie gevind nie" };
-      const s = B.voeg_voorstelle(gestoor, kaart);
+      let met_pas = gestoor;
+      if (gestoor.toets !== true) {
+        try {
+          const kand = await FP.kandidate();
+          met_pas = { ...gestoor, reels: FP.stel_voor(gestoor.reels, kand, FP.gebruik(almal)) };
+        } catch (fout) {
+          console.error("Kon nie die fakture vir die pas lees nie:", fout);
+        }
+      }
+      const s = B.voeg_voorstelle(met_pas, kaart);
       return {
         statusCode: 200,
         headers: { "Content-Type": "application/json" },

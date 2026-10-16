@@ -1,4 +1,7 @@
 // public/js/faktuurpaneel-maandopsomming.js
+// Weergawe 5 (16 Oktober 2026): 'n faktuurontvangs of uitbetaling wat aan 'n
+// banktransaksie gepas is (pas.soort faktuur/uitbetaling, sien _faktuur-pas.js),
+// staan nie meer onder "Nie teen die bank gepas nie".
 // Weergawe 4 (16 Oktober 2026): teken() laat die klaar rye agter in
 // window.MS_PDF_VRAG vir die PDF (faktuurpaneel-maandopsomming-pdf.js).
 // Weergawe 3 (16 Oktober 2026): die aansig-wissel ken nou elke houer met 'n
@@ -307,7 +310,9 @@
     breels.forEach((r) => {
       const b = r.bedrag_sent / 100;
       const verklaar = r.stand === "gepas"
-        ? (r.pas && r.pas.soort === "vereffening" ? "Paystack-vereffening" : "Bestaande joernaalinskrywing")
+        ? (r.pas && r.pas.soort === "vereffening" ? "Paystack-vereffening"
+          : r.pas && (r.pas.soort === "faktuur" || r.pas.soort === "uitbetaling") ? (r.pas.beskrywing || "Faktuur")
+          : "Bestaande joernaalinskrywing")
         : r.stand === "toegewys" ? kat_pad(r.kategorie_id)
         : r.stand === "oordrag" ? "Oordrag tussen eie rekeninge" : "";
       geld(b4.addRow([r.datum, r.beskrywing, r.verwysing || "", r.rigting === "in" ? b : null,
@@ -316,8 +321,10 @@
 
     // 5. Joernaal wat nie aan 'n bankreel gekoppel is nie
     const gepas = new Set((MS.bank.reels || [])
-      .filter((r) => r.stand === "gepas" && r.pas && r.pas.soort === "joernaal").map((r) => r.pas.ref));
-    const los = jn.filter((r) => r.bron !== "bank" && !(r.sleutel && gepas.has(r.sleutel)));
+      .filter((r) => r.stand === "gepas" && r.pas && ["joernaal", "faktuur", "uitbetaling"].includes(r.pas.soort))
+      .map((r) => r.pas.ref));
+    const los = jn.filter((r) => r.bron !== "bank" &&
+      !(r.sleutel && gepas.has(r.sleutel)) && !(r.pas_ref && gepas.has(r.pas_ref)));
     const b5 = blad(wb, "Nie teen die bank gepas nie",
       "Joernaalinskrywings sonder 'n banktransaksie",
       "Paystack-inkomste word as vereffening gepas, nie per inskrywing nie; betalings uit eie sak loop nie deur die bank nie.",

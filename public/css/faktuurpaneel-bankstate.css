@@ -99,3 +99,7 @@
 .ms-tabel { min-width: 900px; }
 .ms-tabel tfoot td { border-top: 1px solid #B8B2A8; padding-top: 8px; }
 .ms-verskil { color: #8a5a1a; }
+
+/* Weergawe 2 (16 Oktober 2026): die faktuurpas-voorstel bo die keuselys. */
+.bs-pas-voorstel { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 6px; }
+.bs-pas-knop { width: auto; padding: 0 10px; }

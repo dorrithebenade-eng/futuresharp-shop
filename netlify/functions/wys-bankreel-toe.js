@@ -1,4 +1,13 @@
 // netlify/functions/wys-bankreel-toe.js
+// Weergawe 8 (16 Oktober 2026): AKSIE "pas" { nr, aksie: "pas", ref }. Die
+// banktransaksie word gepas teen 'n faktuur se ontvangs of 'n uitbetaling
+// (sien _faktuur-pas.js), in plaas van 'n eie kategorie te kry. Was dit reeds
+// toegewys, gaan daardie bankinskrywing uit die joernaal; die faktuur se eie
+// inskrywing dra die geld. Bedrag en rigting word hier weer nagegaan, en een
+// faktuurref word nooit aan twee banktransaksies gepas nie. 'n Transaksie met
+// bewyse word nie so verander nie; die bewyse sou saam met die inskrywing
+// verdwyn.
+//
 // Weergawe 7 (16 Oktober 2026): WEESKINDERS. Netlify se stoor gee soms vir
 // 'n oomblik 'n ou weergawe van 'n staat terug. Is 'n reel intussen reeds
 // toegewys (bv. deur die soortgelyk-reel uit 'n ander staat) en bevestig
@@ -88,6 +97,7 @@ function maak_indeks(jstore) {
 // koppeling aan 'n toekenning saam (sien _koppelings.js).
 const { vee_uit_vir_inskrywing } = require("./_koppelings");
 const B = require("./_bankstate");
+const FP = require("./_faktuur-pas");
 const { vee_lys_uit, vee_uit_vir_joernaal, kort_lys } = require("./_bewysstukke");
 
 exports.handler = async (event, context) => {
@@ -150,6 +160,8 @@ exports.handler = async (event, context) => {
 
   // -- Nagaan ---------------------------------------------------------
   const plan = [];
+  let fp_kand = null;
+  let fp_gebruik = null;
   for (const o of opdragte) {
     const r = (staat.reels || []).find((x) => x.nr === Number(o.nr));
     if (!r) return { statusCode: 400, body: `Transaksie ${o.nr} bestaan nie` };
@@ -174,6 +186,33 @@ exports.handler = async (event, context) => {
       plan.push({ r, o });
     } else if (o.aksie === "ontdoen") {
       plan.push({ r, o });
+    } else if (o.aksie === "pas") {
+      if (r.stand === "gepas") {
+        return { statusCode: 409, body: `Transaksie ${o.nr} is reeds gepas.` };
+      }
+      if (Array.isArray(r.dokumente) && r.dokumente.length) {
+        return { statusCode: 409, body: `Transaksie ${o.nr} het bewyse. Verwyder hulle eers, of heg hulle by die faktuur aan.` };
+      }
+      try {
+        if (!fp_kand) {
+          fp_kand = await FP.kandidate();
+          const almal = await B.lees_almal(store);
+          fp_gebruik = FP.gebruik(almal.filter((x) => x.sleutel !== staat.sleutel).concat([staat]));
+        }
+      } catch (fout) {
+        console.error("Kon nie die fakture lees nie:", fout);
+        return { statusCode: 500, body: "Kon nie die fakture lees nie" };
+      }
+      const kd = fp_kand.find((x) => x.ref === String(o.ref || ""));
+      if (!kd) return { statusCode: 400, body: `Die faktuur vir transaksie ${o.nr} is nie gevind nie.` };
+      if (kd.rigting !== r.rigting || kd.bedrag_sent !== r.bedrag_sent) {
+        return { statusCode: 409, body: `Transaksie ${o.nr} se bedrag of rigting klop nie met ${kd.beskrywing} nie.` };
+      }
+      if (fp_gebruik.has(kd.ref)) {
+        return { statusCode: 409, body: `${kd.beskrywing} is reeds aan 'n ander banktransaksie gepas.` };
+      }
+      fp_gebruik.add(kd.ref);
+      plan.push({ r, o, kd });
     } else {
       return { statusCode: 400, body: "Onbekende aksie" };
     }
@@ -184,7 +223,7 @@ exports.handler = async (event, context) => {
   const nou = new Date().toISOString();
   try {
     const indeks = maak_indeks(jstore);
-    for (const { r, o, k } of plan) {
+    for (const { r, o, k, kd } of plan) {
       // 'n Regstelling: die ou inskrywing gaan eers weg. Sy bewyse word eers
       // gelees, sodat 'n nuwe kategorie hulle kan oorneem.
       let ou_bewyse = [];
@@ -225,6 +264,16 @@ exports.handler = async (event, context) => {
         await vee_lys_uit(ou_bewyse);
         r.stand = "oordrag";
         r.kategorie_id = "";
+        r.dokumente = [];
+      } else if (o.aksie === "pas") {
+        // Die bankinskrywing (as daar een was) gaan hieronder saam met enige
+        // weeskind uit die joernaal: vee_ander behou niks vir hierdie reel nie.
+        r.stand = "gepas";
+        r.pas = { soort: kd.soort, ref: kd.ref, beskrywing: kd.beskrywing };
+        r.kategorie_id = "";
+        r.voorstel_kategorie = "";
+        r.joernaal_sleutel = "";
+        r.nota = "";
         r.dokumente = [];
       } else {
         if (r.stand === "toegewys" && r.joernaal_sleutel) {
@@ -327,7 +376,16 @@ exports.handler = async (event, context) => {
   let antwoord = staat;
   try {
     const kaart = B.voorstel_kaart(ander.concat([staat]).filter((x) => x.toets !== true));
-    antwoord = B.voeg_voorstelle(staat, kaart);
+    let met_pas = staat;
+    if (staat.toets !== true) {
+      try {
+        const kand = fp_kand || await FP.kandidate();
+        met_pas = { ...staat, reels: FP.stel_voor(staat.reels, kand, FP.gebruik(ander.concat([staat]))) };
+      } catch (fout) {
+        console.error("Kon nie die faktuurvoorstelle bereken nie:", fout);
+      }
+    }
+    antwoord = B.voeg_voorstelle(met_pas, kaart);
   } catch (fout) {
     console.error("Kon nie die voorstelle bereken nie:", fout);
   }
