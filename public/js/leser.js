@@ -27,7 +27,15 @@ let huidige_render_taak = null;
 let huidige_weergawe = null;
 
 const MIN_ZOEM = 0.6;
-const MAKS_ZOEM = 3;
+// 500%. Op 'n foon pas die hele bladsy nou op die skerm, so die teks
+// begin kleiner as voorheen en die leser het meer ruimte nodig om in te
+// zoem.
+const MAKS_ZOEM = 5;
+
+// Blaaiers weier canvasse groter as omtrent 16 miljoen pixels (iOS Safari
+// is die strengste). By hoë zoem op 'n 3x-skerm sou die bladsy dit oorskry
+// en wit vertoon; die pixeldigtheid word dan net so ver verlaag dat dit pas.
+const MAKS_CANVAS_PIXELS = 16 * 1024 * 1024;
 
 function wys_status(teks) {
   const el = document.getElementById("leser-status");
@@ -235,7 +243,9 @@ async function wys_bladsy(nommer) {
   // pixeldigtheid geteken en dan terug na CSS-grootte vertoon; sonder dit
   // is die teks op 'n foon (2x of 3x) sigbaar dof, en noudat die bladsy
   // kleiner vertoon, sou dit nog erger wees.
-  const dpr = Math.min(window.devicePixelRatio || 1, 3);
+  const gewenste_dpr = Math.min(window.devicePixelRatio || 1, 3);
+  const grens_dpr = Math.sqrt(MAKS_CANVAS_PIXELS / (viewport.width * viewport.height));
+  const dpr = Math.max(Math.min(gewenste_dpr, grens_dpr), 0.5);
   const canvas = document.getElementById("leser-canvas");
   const konteks = canvas.getContext("2d");
 
