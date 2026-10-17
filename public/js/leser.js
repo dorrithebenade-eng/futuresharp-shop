@@ -27,10 +27,11 @@ let huidige_render_taak = null;
 let huidige_weergawe = null;
 
 const MIN_ZOEM = 0.6;
-// 500%. Op 'n foon pas die hele bladsy nou op die skerm, so die teks
-// begin kleiner as voorheen en die leser het meer ruimte nodig om in te
-// zoem.
-const MAKS_ZOEM = 5;
+// Op 'n foon of tablet (aanraakskerm) tot 700%, elders tot 500%. Op 'n
+// foon pas die hele bladsy op die klein skerm, so die teks begin klein en
+// die leser het meer ruimte nodig om in te zoem.
+const IS_AANRAAK = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
+const MAKS_ZOEM = IS_AANRAAK ? 7 : 5;
 
 // Blaaiers weier canvasse groter as omtrent 16 miljoen pixels (iOS Safari
 // is die strengste). By hoë zoem op 'n 3x-skerm sou die bladsy dit oorskry
