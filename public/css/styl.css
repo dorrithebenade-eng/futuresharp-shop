@@ -2326,6 +2326,21 @@ body.leser-liggaam {
 }
 .leser-lisensie-nota:empty { display: none; }
 
+/* Foon dwars: elke pixel hoogte tel. Die balke word dunner, en die
+   blaai-knoppies en lisensienota staan langs mekaar in een reel. */
+@media (orientation: landscape) and (max-height: 500px) {
+  .leser-kopbalk { padding: 3px 10px; }
+  .leser-onderbalk {
+    flex-direction: row;
+    justify-content: center;
+    gap: 16px;
+    padding: 4px 12px calc(4px + env(safe-area-inset-bottom));
+  }
+  .leser-blaaiknoppie { height: 32px; }
+  .leser-bladsy-omhulsel { padding: 6px 12px; }
+  .leser-lisensie-nota { max-width: 45%; text-align: left; }
+}
+
 @media (max-width: 420px) {
   .leser-zoem-persentasie { display: none; }
   .leser-kopbalk { gap: 6px; padding: 6px 8px; }

@@ -236,7 +236,14 @@ async function wys_bladsy(nommer) {
   const beskikbaar_b = Math.max(omhulsel.clientWidth - opvul_x, 50);
   const beskikbaar_h = Math.max(omhulsel.clientHeight - opvul_y, 50);
   const basis = bladsy.getViewport({ scale: 1 });
-  const pas_skaal = Math.min(beskikbaar_b / basis.width, beskikbaar_h / basis.height);
+  // DWARS OP 'N FOON. As die skerm breër as hoog is en die hoogte klein is
+  // (foon gedraai), sou "hele bladsy" die teks piepklein maak. Dan pas die
+  // bladsy volgens breedte en rol die leser binne die bladsy op en af, soos
+  // in 'n gewone e-boekleser.
+  const is_dwars_foon = window.innerWidth > window.innerHeight && window.innerHeight <= 500;
+  const pas_skaal = is_dwars_foon
+    ? beskikbaar_b / basis.width
+    : Math.min(beskikbaar_b / basis.width, beskikbaar_h / basis.height);
   const skaal = Math.max(pas_skaal, 0.2) * huidige_zoem;
   const viewport = bladsy.getViewport({ scale: skaal });
 
