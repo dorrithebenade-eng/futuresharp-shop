@@ -2848,6 +2848,7 @@ const WOORDEBOEK = {
   // stelsel -- wat op 'n FAKTUUR oorbly na die verdeling.
   fs_surplus: { af: "Oorskot vir die tydperk", en: "Surplus for the period" },
   fs_na: { af: "Oor n\u00e1", en: "Left after" },
+  fs_bedryfskoste: { af: "Bedryfskoste", en: "Operating costs" },
 
   fs_oorskot: { af: "Oorskot vir die tydperk", en: "Surplus for the period" },
   fs_ongekat: { af: "Ongekategoriseer", en: "Uncategorised" },

@@ -404,9 +404,37 @@ function fs_teken() {
    *
    * DIE TUSSENTOTAAL VERDWYN WANNEER DAAR NET EEN KOP IS. Twee reels wat
    * dieselfde getal wys, se minder as een. */
-  const uit_koppe = FS.boom.filter(
-    (b) => b.kategorie.rigting === "uit" && !b.kategorie.onder && b.totaal_sent !== 0
-  );
+  /* TWEE STAPPE, NIE EEN PER HOOFKATEGORIE NIE (17 Oktober 2026).
+   *
+   * Die trap het elke hoofkategorie apart afgetrek. Met ses bedryfskategoriee
+   * op die boonste vlak het dit agt aftrekkings en sewe "Oor na"-reels gegee,
+   * wat niks se nie. Die vraag wat die trap beantwoord, is net twee: wat bly
+   * oor na die projekte, en wat bly oor na die bedryf?
+   *
+   * PROJEKKOSTE is die hoofkategorie waaronder Vergoeding vir projekwerk val
+   * (die vaste id `vergoeding-vir-dienste`), met al sy kinders. ALLES ANDERS
+   * wat uitgaan, is BEDRYFSKOSTE, ongeag hoe die register dit indeel. So hang
+   * die staat nie af daarvan dat elke nuwe kategorie onder die regte kop
+   * geskep word nie. Ongekategoriseer bly 'n eie reel. */
+  const top_van = (id) => {
+    let k = FS.kategoriee.find((x) => x.id === id);
+    for (let i = 0; k && k.onder && i < 10; i++) k = FS.kategoriee.find((x) => x.id === k.onder);
+    return k || null;
+  };
+  const proj_kop = top_van("vergoeding-vir-dienste");
+  const proj_b = proj_kop ? FS.boom.find((b) => b.kategorie.id === proj_kop.id) : null;
+  const proj_sent = proj_b ? proj_b.totaal_sent : 0;
+  const bedryf_sent = uitgawes - FS.ongekat.uit - proj_sent;
+  const bedryf_kat = FS.kategoriee.find((k) => k.rigting === "uit" && !k.onder &&
+    String(k.naam || "").trim().toLowerCase() === "bedryfskoste");
+  const uit_koppe = [];
+  if (proj_sent) uit_koppe.push({ kategorie: { naam: proj_kop.naam }, totaal_sent: proj_sent });
+  if (bedryf_sent) {
+    uit_koppe.push({
+      kategorie: { naam: bedryf_kat ? bedryf_kat.naam : fs_t("fs_bedryfskoste", "Bedryfskoste") },
+      totaal_sent: bedryf_sent,
+    });
+  }
   if (FS.ongekat.uit) {
     uit_koppe.push({
       kategorie: { naam: fs_t("fs_ongekat", "Ongekategoriseer") },
