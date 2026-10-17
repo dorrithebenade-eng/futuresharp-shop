@@ -45,7 +45,7 @@
   "use strict";
 
   const PDFJS = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/";
-  const BS = { kategoriee: [], resultaat: null, state: [], oop: null, net_oop: false };
+  const BS = { kategoriee: [], projekte: [], resultaat: null, state: [], oop: null, net_oop: false };
   const EIE = ["2857"];
   const OORDRAG = "__oordrag";
   const NUUT = "__nuut";
@@ -420,6 +420,19 @@
     naam.addEventListener("keydown", (ev) => { if (ev.key === "Enter") skep(); if (ev.key === "Escape") teken_staat(); });
   }
 
+  // DIE PROJEK BY 'N TOEGEWYSDE REEL (17 Oktober 2026). Opsioneel; die
+  // keuse gaan dadelik na stel-inskrywing-projek.js. Sien daar.
+  function projek_kies(r) {
+    if (!r.joernaal_sleutel || !BS.projekte.length) return "";
+    const huidig = r.projek_id || "";
+    const lys = BS.projekte.filter((p) => p.aktief !== false || p.id === huidig);
+    const opsies = lys.map((p) =>
+      `<option value="${ontsnap(p.id)}"${p.id === huidig ? " selected" : ""} title="${ontsnap(p.naam)}">${
+        ontsnap(p.nr ? p.nr + " \u00b7 " + p.naam : p.naam)}</option>`).join("");
+    return ` <select class="bs-projek${huidig ? " bs-projek-gekies" : ""}" data-bs-projek="${ontsnap(r.joernaal_sleutel)}" aria-label="${
+      ontsnap(t("bs_projek", "Projek"))}"><option value="">${ontsnap(t("bs_projek_geen", "Geen projek"))}</option>${opsies}</select>`;
+  }
+
   function stand_sel(r) {
     const basis = stand_basis(r);
     if (!r.pas_voorstel || r.stand === "gepas") return basis;
@@ -442,7 +455,7 @@
       // 'n Toegewysde reel hou sy keuselys, met die huidige keuse gekies: 'n
       // ander keuse vervang die inskrywing in een stap.
       case "toegewys":
-        return `${keuse(r, r.kategorie_id)} ${ontdoen}${
+        return `${keuse(r, r.kategorie_id)}${projek_kies(r)} ${ontdoen}${
           r.joernaal_sleutel && window.bw_knoppie ? " " + window.bw_knoppie(`data-bs-bewys="${ontsnap(r.joernaal_sleutel)}"`) : ""}${
           r.joernaal_sleutel && window.bw_lys ? window.bw_lys(r.dokumente, r.joernaal_sleutel, "bs-doks") : ""}`;
       case "oordrag":
@@ -536,6 +549,22 @@
       const nr = Number(k.getAttribute("data-ontdoen"));
       if (!bewyse_mag_weg(nr)) return;
       wys_toe([{ nr, aksie: "ontdoen" }]);
+    }));
+
+    // Die projek by 'n toegewysde reel.
+    plek.querySelectorAll("[data-bs-projek]").forEach((k) => k.addEventListener("change", async () => {
+      const sleutel = k.getAttribute("data-bs-projek");
+      const r = s.reels.find((x) => x.joernaal_sleutel === sleutel);
+      const ou = (r && r.projek_id) || "";
+      k.disabled = true;
+      try {
+        await pos("stel-inskrywing-projek", { sleutel, projek_id: k.value });
+        if (r) r.projek_id = k.value;
+      } catch (f) {
+        k.value = ou;
+        window.alert(String(f.message || f));
+      }
+      teken_staat();
     }));
 
     // Bewyse by 'n toegewysde reel.
@@ -705,6 +734,16 @@
       BS.kategoriee = Array.isArray(data.kategoriee) ? data.kategoriee : [];
     } catch (fout) {
       console.error("Kon nie die kategoriee laai nie:", fout);
+    }
+    // Die projekte vir die keuse by 'n toegewysde reel. 'n Leesfout laat net
+    // die keuse weg.
+    try {
+      const data = await vra("kry-projekte");
+      BS.projekte = (Array.isArray(data.projekte) ? data.projekte : [])
+        .sort((a, b) => String(b.nr || "").localeCompare(String(a.nr || "")) ||
+          String(a.naam).localeCompare(String(b.naam), "af-ZA"));
+    } catch (fout) {
+      console.error("Kon nie die projekte laai nie:", fout);
     }
     await laai_state();
   });

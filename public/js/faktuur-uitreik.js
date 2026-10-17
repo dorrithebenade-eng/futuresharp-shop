@@ -661,12 +661,22 @@ function fu_teken_strook() {
     // 'n R0-faktuur, of een wat gekanselleer is. Geen skakel om te wys nie,
     // en 'n leë strook sou soos 'n fout lyk.
     if (V.stand === "betaal") {
+      // NIE ELKE BETAALDE FAKTUUR SONDER SKAKEL IS 'N R0-FAKTUUR NIE (17
+      // Oktober 2026). Een wat met die hand betaal is, het ook geen skakel nie,
+      // en het tot hier die R0-teks gekry.
+      const b = V.betaling || {};
+      const gratis = b.metode === "gratis" || !(Number(b.ontvang_sent) > 0);
+      const op = String(b.ontvang_op || "").slice(0, 10).replace(/-/g, "/");
+      const teks = gratis
+        ? fu_t("fu_gratis_teks",
+            "Die bedrag was nul, dus is Paystack nie geroep nie. Die faktuur is aangeteken as betaal en daar is niks om te verdeel nie.")
+        : (b.metode === "paystack"
+            ? fu_t("fu_skakel_teks", "{r} deur die betaalskakel ontvang op {d}.")
+            : fu_t("fu_hand_teks", "{r} met die hand ontvang op {d}. Die uitbetalings aan die ontvangers word self gedoen."))
+            .replace("{r}", fu_rand(Number(b.ontvang_sent) || 0)).replace("{d}", op || "\u2014");
       plek.innerHTML = waarsku + `<div class="fu-strook">
         <h4>${nommer} — ${fu_t("fu_betaal", "betaal")}</h4>
-        <p class="fu-strook-teks">${fu_t(
-          "fu_gratis_teks",
-          "Die bedrag was nul, dus is Paystack nie geroep nie. Die faktuur is aangeteken as betaal en daar is niks om te verdeel nie."
-        )}</p>
+        <p class="fu-strook-teks">${fu_ontsnap(teks)}</p>
       </div>`;
       return;
     }

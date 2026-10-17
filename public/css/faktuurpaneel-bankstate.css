@@ -103,3 +103,11 @@
 /* Weergawe 2 (16 Oktober 2026): die faktuurpas-voorstel bo die keuselys. */
 .bs-pas-voorstel { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 6px; }
 .bs-pas-knop { width: auto; padding: 0 10px; }
+
+/* Die projek by 'n toegewysde reel (17 Oktober 2026). Stil totdat een gekies
+   is, sodat dit nie die kategorie oorskadu nie. */
+.bs-toe .bs-projek {
+  height: 32px; font-size: 0.78rem; padding: 2px 6px; max-width: 200px;
+  border: 1px dashed #CFC9BF; border-radius: 6px; background: #fff; color: var(--grys-teks);
+}
+.bs-toe .bs-projek.bs-projek-gekies { border-style: solid; border-color: #E7C76A; background: #FDF6E3; color: #7E610F; }

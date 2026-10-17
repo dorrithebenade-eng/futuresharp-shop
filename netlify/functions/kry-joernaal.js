@@ -281,6 +281,8 @@ exports.handler = async (event, context) => {
         // toewysing word in die Bankstate-pil ontdoen.
         bron: r.bron === "bank" ? "bank" : "hand",
         bankreel: r.bankreel || "",
+        // Die projek (17 Oktober 2026). Sien stel-inskrywing-projek.js.
+        projek_id: r.projek_id || "",
         // Die bewyse (28 September 2026), net naam en sleutel.
         dokumente: Array.isArray(r.dokumente)
           ? r.dokumente.map((d) => ({ sleutel: d.sleutel, naam: d.naam }))

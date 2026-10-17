@@ -230,16 +230,21 @@ exports.handler = async (event, context) => {
       // 'n Regstelling: die ou inskrywing gaan eers weg. Sy bewyse word eers
       // gelees, sodat 'n nuwe kategorie hulle kan oorneem.
       let ou_bewyse = [];
+      // Die projek reis saam met 'n nuwe kategorie (17 Oktober 2026); 'n
+      // oordrag het nie 'n projek nie.
+      let ou_projek = "";
       if ((o.aksie === "kategorie" || o.aksie === "oordrag") && r.stand === "toegewys" && r.joernaal_sleutel) {
         try {
           const ou = await jstore.get(r.joernaal_sleutel, { type: "json" });
           ou_bewyse = (ou && Array.isArray(ou.dokumente)) ? ou.dokumente : [];
+          ou_projek = (ou && ou.projek_id) || "";
         } catch (fout) {
           console.error(`Kon nie die bewyse van ${r.joernaal_sleutel} lees nie:`, fout);
         }
         await jstore.delete(r.joernaal_sleutel);
         await vee_uit_vir_inskrywing(r.joernaal_sleutel);
         r.joernaal_sleutel = "";
+        r.projek_id = "";
       }
       if (o.aksie === "kategorie") {
         const inskrywing = {
@@ -256,6 +261,7 @@ exports.handler = async (event, context) => {
           bankreel: B.verw(staat.sleutel, r.nr),
           toets: staat.toets === true,
           dokumente: ou_bewyse,
+          projek_id: ou_projek,
         };
         await jstore.setJSON(inskrywing.sleutel, inskrywing);
         r.stand = "toegewys";
@@ -263,6 +269,7 @@ exports.handler = async (event, context) => {
         r.joernaal_sleutel = inskrywing.sleutel;
         r.nota = inskrywing.nota;
         r.dokumente = kort_lys(ou_bewyse);
+        r.projek_id = ou_projek;
       } else if (o.aksie === "oordrag") {
         await vee_lys_uit(ou_bewyse);
         r.stand = "oordrag";
@@ -282,6 +289,7 @@ exports.handler = async (event, context) => {
         r.kategorie_id = "";
         r.voorstel_kategorie = "";
         r.joernaal_sleutel = "";
+        r.projek_id = "";
         r.nota = "";
         r.dokumente = [];
       } else {
@@ -301,6 +309,7 @@ exports.handler = async (event, context) => {
         r.pas = null;
         r.kategorie_id = "";
         r.joernaal_sleutel = "";
+        r.projek_id = "";
         r.dokumente = [];
       }
       r.bygewerk_op = nou;
