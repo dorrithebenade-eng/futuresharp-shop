@@ -1402,3 +1402,27 @@ a.paneel-kieslys-item { text-decoration: none; }
 .fs-blok-in .fs-som td:first-child, .fs-blok-uit .fs-som td:first-child { padding-left: 16px; }
 .fs-blok-in .fs-ongekat td:first-child, .fs-blok-uit .fs-ongekat td:first-child { padding-left: 16px; }
 .fs-blok-in .fs-pyl, .fs-blok-uit .fs-pyl { color: var(--fs-kleur); }
+
+/* ── Ontvangste volgens finansiering (17 Oktober 2026) ──────────────────────
+ * 'n Ligter kaart onder die ontvangste: dieselfde geld, nou volgens wie betaal
+ * het. Amber, soos die befonde projekte op die projekkaart. */
+.fs-blok-ff {
+  --fs-kleur: #9A7414;
+  --fs-tint: #FDF6E3;
+  border: 1px solid #E7E4DE;
+  border-left: 4px solid #E7C76A;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+  margin: -8px 0 22px;
+}
+.fs-blok-ff .fs-tabel td:last-child { padding-right: 16px; }
+.fs-blok-ff .fs-ongekat td:first-child { padding-left: 16px; }
+.fs-ff-hulp { font-size: 12px; color: var(--grys-teks); margin: 0; padding: 8px 16px 10px; }
+
+/* Die beperkte geld en wat oorbly, onder die oorskot-balk. */
+.fs-slot .fs-beperk td { padding-top: 10px; }
+.fs-slot .fs-vry td { background: #E3F1EE; color: #2E7D6F; font-weight: 700; padding: 10px 12px; border: 0; }
+.fs-slot .fs-vry td:first-child { border-radius: 8px 0 0 8px; }
+.fs-slot .fs-vry td:last-child { border-radius: 0 8px 8px 0; }
+.fs-slot .fs-vry .fs-tot.kort { color: var(--koraal); }

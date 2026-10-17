@@ -195,7 +195,7 @@
             : t("pk_niks_verskuldig", "niks nog verskuldig nie"), s.verskuldig > 0)}
         <span class="pk-pyl">→</span>
         ${teel(t("pk_oor", "Oor ná projekkoste"), oor,
-          s.ontvang > 0 ? t("pk_oor_pct", "{p}% vir die organisasie").replace("{p}", pct(oor, s.ontvang)) : "")}
+          s.ontvang > 0 ? t("pk_oor_pct", "{p}% organisasiebydrae").replace("{p}", pct(oor, s.ontvang)) : "")}
       </div>
       ${s.koste ? `<p class="pk-onder">${o(t("pk_koste_uit", "Projekkoste: {v} vergoeding vir projekwerk, {a} ander koste.")
         .replace("{v}", rand(s.vergoeding)).replace("{a}", rand(s.ander_koste)))}</p>` : ""}`;

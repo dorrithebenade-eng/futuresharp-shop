@@ -1,4 +1,9 @@
 // public/js/faktuurpaneel-fin-staat.js
+// Weergawe 5 (17 Oktober 2026): 'n blok ONTVANGSTE VOLGENS FINANSIERING onder
+// die ontvangste (wie betaal het, uit die projek), en in die slottabel die
+// beperkte geld van befonde projekte wat nog nie bestee is nie, met wat dan vir
+// die organisasie beskikbaar is. Sien faktuurpaneel-fin-finansiering.js. Die
+// blok en die twee reels gaan ook na die PDF.
 // Weergawe 4 (16 Oktober 2026): Inkomste en Uitgawes elk in 'n eie
 // gekleurde kaart (teal en koraal) met die blok se totaal in die kop, en die
 // surplus as 'n uitgeligte balk. Net die skerm; die PDF bly soos dit is.
@@ -61,6 +66,7 @@ const FS = {
   oop: new Set(),      // kategorie_id's wat oopgeklik is
   ongekat: { in: 0, uit: 0, dele: [] },
   bank: { opening: null, sluiting: null },
+  projekte: [],
 };
 
 function fs_t(sleutel, verstek) {
@@ -346,6 +352,31 @@ function fs_teken() {
   const uitgawes = som_van("uit");
   const oorskot = inkomste - uitgawes;
 
+  // WIE BETAAL HET, uit die projekte. Net as daar ten minste een ontvangs aan
+  // 'n projek gekoppel is; anders se die blok net wat die boom reeds se.
+  const ff = typeof window.ff_bereken === "function"
+    ? window.ff_bereken(FS.inskrywings, FS.projekte) : null;
+  const met_ff = Boolean(ff && ff.het_projekte);
+  const beperk = ff ? ff.beperk_sent : 0;
+  const ff_blok = !met_ff ? "" : `
+      <div class="fs-blok fs-blok-ff">
+        <div class="fs-blok-band">
+          <span class="fs-band-titel">${fs_ontsnap(fs_t("ff_titel", "Ontvangste volgens finansiering"))}</span>
+          <span class="fs-band-som">${fs_rand(ff.som_sent)}</span>
+        </div>
+        <table class="fs-tabel">
+          <tbody>
+            ${ff.rye.map((r) => `
+              <tr class="${r.hoof ? "fs-hoof" : ""}${r.los ? " fs-ongekat" : ""}">
+                <td class="fs-naam" style="padding-left:${kant(r.vlak)}px">${fs_ontsnap(r.naam)}</td>
+                <td class="fs-tot">${fs_rand(r.totaal_sent)}</td>
+              </tr>`).join("")}
+          </tbody>
+        </table>
+        ${ff.los_sent ? `<p class="fs-ff-hulp">${fs_ontsnap(fs_t("ff_hulp",
+          "Koppel 'n ontvangs aan 'n projek op die faktuur, of by die bank as dit reeds 'n kategorie het."))}</p>` : ""}
+      </div>`;
+
   // DIE HOSTINGVERGELYKING. Hosting is 'n heffing op projekwerk wat Future
   // Sharp se oorhoofse koste dra. Die enigste toets of die persentasie reg is,
   // is hierdie verskil -- en niemand kon dit tot nou sien nie.
@@ -439,6 +470,7 @@ function fs_teken() {
 
   plek.innerHTML = `
     ${blok("in", fs_t("fs_inkomste", "Ontvangste"))}
+    ${ff_blok}
     ${blok("uit", fs_t("fs_uitgawes", "Betalings"))}
 
     <table class="fs-tabel fs-slot${oorskot < 0 ? " fs-slot-tekort" : ""}">
@@ -450,6 +482,13 @@ function fs_teken() {
           fs_t("fs_surplus", "Oorskot vir die tydperk")}</td>
             <td class="fs-tot${oorskot < 0 ? " kort" : ""}">${
               (oorskot < 0 ? "\u2212 " : "") + fs_rand(oorskot)}</td></tr>
+        ${beperk > 0 ? `
+        <tr class="fs-aftrek fs-beperk"><td class="fs-naam">${
+          fs_t("ff_beperk", "waarvan nog vir befonde projekte bestee moet word")}</td>
+            <td class="fs-tot">\u2212 ${fs_rand(beperk)}</td></tr>
+        <tr class="fs-vry"><td class="fs-naam">${fs_t("ff_vry", "Beskikbaar vir die organisasie")}</td>
+            <td class="fs-tot${oorskot - beperk < 0 ? " kort" : ""}">${
+              (oorskot - beperk < 0 ? "\u2212 " : "") + fs_rand(oorskot - beperk)}</td></tr>` : ""}
       </tbody>
     </table>
 
@@ -541,6 +580,10 @@ function fs_teken() {
     }
   });
   vrag_slot.push({ naam: fs_t("fs_surplus", "Oorskot vir die tydperk"), bedrag_sent: oorskot, soort: "som" });
+  if (beperk > 0) {
+    vrag_slot.push({ naam: fs_t("ff_beperk", "waarvan nog vir befonde projekte bestee moet word"), bedrag_sent: beperk, soort: "aftrek" });
+    vrag_slot.push({ naam: fs_t("ff_vry", "Beskikbaar vir die organisasie"), bedrag_sent: oorskot - beperk, soort: "tussen" });
+  }
 
   // OP `window`, want FS is module-geslote. faktuurpaneel-staat-pdf.js is 'n
   // aparte leer en kan nie by hierdie skoop kom nie.
@@ -549,6 +592,11 @@ function fs_teken() {
     tot: FS.tot,
     blokke: [
       vrag_blok("in", fs_t("fs_inkomste", "Ontvangste")),
+      met_ff ? {
+        titel: fs_t("ff_titel", "Ontvangste volgens finansiering"),
+        rye: ff.rye.map((r) => ({ naam: r.naam, vlak: r.vlak - 1, eie_sent: 0, totaal_sent: r.totaal_sent, hoof: r.hoof })),
+        som_sent: ff.som_sent,
+      } : { rye: [] },
       vrag_blok("uit", fs_t("fs_uitgawes", "Betalings")),
     ].filter((b) => b.rye.length),
     slot: vrag_slot,
@@ -775,6 +823,16 @@ async function fs_laai() {
     plek.innerHTML = `<p class="stelsel-boodskap">${
       fs_t("fs_laai_fout", "Kon nie die staat laai nie.")}</p>`;
     return;
+  }
+
+  // Die projekte, vir die blok ontvangste volgens finansiering. 'n Leesfout
+  // laat net daardie blok weg.
+  try {
+    const pj = await fs_vra("kry-projekte");
+    FS.projekte = Array.isArray(pj.projekte) ? pj.projekte : [];
+  } catch (fout) {
+    console.error("Kon nie die projekte laai nie:", fout);
+    FS.projekte = [];
   }
 
   fs_tel_op();

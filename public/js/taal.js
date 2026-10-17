@@ -3323,6 +3323,16 @@ const WOORDEBOEK = {
   pj_fin_knop: { af: "Finansies", en: "Finances" },
   // DIE PROJEKKAART (17 Oktober 2026). Sien faktuurpaneel-projekkaart.js.
   pk_toe: { af: "Maak toe", en: "Close" },
+  // ONTVANGSTE VOLGENS FINANSIERING (17 Oktober 2026). Sien
+  // faktuurpaneel-fin-finansiering.js.
+  ff_titel: { af: "Ontvangste volgens finansiering", en: "Receipts by funding" },
+  ff_toelae: { af: "Toelaes en skenkings (beperk tot die projek)", en: "Grants and donations (restricted to the project)" },
+  ff_borgskap: { af: "Borgskappe", en: "Sponsorships" },
+  ff_los: { af: "Nie aan 'n projek gekoppel nie", en: "Not linked to a project" },
+  ff_inst_geen: { af: "Instansie nie gekies nie", en: "Institution not chosen" },
+  ff_hulp: { af: "Koppel 'n ontvangs aan 'n projek op die faktuur, of by die bank as dit reeds 'n kategorie het.", en: "Link a receipt to a project on the invoice, or at the bank once it has a category." },
+  ff_beperk: { af: "waarvan nog vir befonde projekte bestee moet word", en: "of which still to be spent on funded projects" },
+  ff_vry: { af: "Beskikbaar vir die organisasie", en: "Available to the organisation" },
   pk_aktief: { af: "Aktief", en: "Active" },
   pk_toegeken: { af: "Toegeken", en: "Awarded" },
   pk_geen_toekenning: { af: "Nog geen toekenning nie", en: "No grant yet" },
@@ -3345,7 +3355,7 @@ const WOORDEBOEK = {
   pk_verskuldig: { af: "{r} vergoeding nog verskuldig", en: "{r} remuneration still owed" },
   pk_niks_verskuldig: { af: "niks nog verskuldig nie", en: "nothing still owed" },
   pk_oor: { af: "Oor n\u00e1 projekkoste", en: "Left after project costs" },
-  pk_oor_pct: { af: "{p}% vir die organisasie", en: "{p}% for the organisation" },
+  pk_oor_pct: { af: "{p}% organisasiebydrae", en: "{p}% organisational contribution" },
   pk_koste_uit: { af: "Projekkoste: {v} vergoeding vir projekwerk, {a} ander koste.", en: "Project costs: {v} remuneration for project work, {a} other costs." },
   pk_nog_kop: { af: "Wat nog moet gebeur", en: "Still to happen" },
   pk_nog_klient: { af: "Nog nie betaal nie: {n}", en: "Not yet paid: {n}" },
