@@ -32,16 +32,26 @@ function aflyn_open_db() {
   });
 }
 
-// Gee die boek se PDF-grepe (ArrayBuffer) terug indien dit reeds plaaslik
-// gestoor is, of null as dit nog nie afgelaai is nie (of IndexedDB nie
-// beskikbaar is nie — bv. privaat/inkognito-modus in sommige blaaiers).
+// Gee { grepe, weergawe } terug indien die boek reeds plaaslik gestoor is,
+// of null as dit nog nie afgelaai is nie (of IndexedDB nie beskikbaar is
+// nie — bv. privaat/inkognito-modus in sommige blaaiers).
+//
+// WEERGAWE. Kopieë wat voor weergawes bestaan het, is as 'n kaal
+// ArrayBuffer gestoor; hulle kom terug met weergawe null, wat die leser
+// as "onbekend, laai vars af" behandel.
 async function aflyn_kry_boek(produk_slug) {
   try {
     const db = await aflyn_open_db();
     return await new Promise((resolve, reject) => {
       const tx = db.transaction(AFLYN_STORE_NAAM, "readonly");
       const versoek = tx.objectStore(AFLYN_STORE_NAAM).get(produk_slug);
-      versoek.onsuccess = () => resolve(versoek.result || null);
+      versoek.onsuccess = () => {
+        const waarde = versoek.result;
+        if (!waarde) return resolve(null);
+        if (waarde instanceof ArrayBuffer) return resolve({ grepe: waarde, weergawe: null });
+        if (waarde.grepe) return resolve({ grepe: waarde.grepe, weergawe: waarde.weergawe || null });
+        resolve(null);
+      };
       versoek.onerror = () => reject(versoek.error);
     });
   } catch (fout) {
@@ -54,12 +64,12 @@ async function aflyn_kry_boek(produk_slug) {
 // (bv. blaaiser-bergingslimiet bereik, of privaat-modus), word die fout
 // net stilweg aangeteken; die koper kan steeds normaal aanlyn lees, hulle
 // verloor net die aflyn-gemak vir hierdie boek.
-async function aflyn_stoor_boek(produk_slug, pdf_grepe) {
+async function aflyn_stoor_boek(produk_slug, pdf_grepe, weergawe) {
   try {
     const db = await aflyn_open_db();
     await new Promise((resolve, reject) => {
       const tx = db.transaction(AFLYN_STORE_NAAM, "readwrite");
-      tx.objectStore(AFLYN_STORE_NAAM).put(pdf_grepe, produk_slug);
+      tx.objectStore(AFLYN_STORE_NAAM).put({ grepe: pdf_grepe, weergawe: weergawe || null }, produk_slug);
       tx.oncomplete = () => resolve();
       tx.onerror = () => reject(tx.error);
     });

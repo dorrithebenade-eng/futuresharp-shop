@@ -23,6 +23,7 @@ let produk_slug_globaal = null;
 let sessie_globaal = null;
 let vordering_stoor_tydsaanwyser = null;
 let huidige_zoem = 1;
+let huidige_render_taak = null;
 
 const MIN_ZOEM = 0.6;
 const MAKS_ZOEM = 3;
@@ -32,11 +33,15 @@ function wys_status(teks) {
   if (el) el.textContent = teks;
 }
 
+// Leen-status sit nou as 'n klein amber etiket in die kopbalk (bv.
+// "⏳ 5 dae oor"). 'n Tik daarop maak die leen-paneel onder die kopbalk
+// oop met die vervaldatum en, as die bediener dit aanbied, die
+// leen-na-koop-knoppie.
 function wys_leen_kennisgewing(leen) {
-  const el = document.getElementById("leser-leen-kennisgewing");
-  if (!el) return;
+  const etiket = document.getElementById("leser-leen-etiket");
+  if (!etiket) return;
   if (!leen.aktief) {
-    el.style.display = "none";
+    etiket.hidden = true;
     return;
   }
   const dae_oor = typeof leen.dae_oor === "number"
@@ -45,21 +50,65 @@ function wys_leen_kennisgewing(leen) {
   const eenheid = dae_oor === 1
     ? (window.t ? window.t("dag_enkelvoud") : "dag oor")
     : (window.t ? window.t("dae_oor_meervoud") : "dae oor");
-  el.textContent = `⏳ ${window.t ? window.t("leen_kennisgewing_voorvoegsel") : "Geleen —"} ${dae_oor} ${eenheid}`;
-  el.style.display = "block";
+  etiket.textContent = `⏳ ${dae_oor} ${eenheid}`;
+  etiket.hidden = false;
+
+  const boodskap = document.getElementById("leser-leen-boodskap");
+  if (boodskap) {
+    const voorvoegsel = window.t ? window.t("leen_kennisgewing_voorvoegsel") : "Geleen —";
+    let teks = `${voorvoegsel} ${dae_oor} ${eenheid}.`;
+    if (leen.verval_op) {
+      const d = new Date(leen.verval_op);
+      const datum = `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, "0")}/${String(d.getDate()).padStart(2, "0")}`;
+      teks += ` ${window.t ? window.t("leser_leen_verval_op") : "Toegang verval op"} ${datum}.`;
+    }
+    boodskap.textContent = teks;
+  }
 }
 
-async function kry_boek_titel(sessie, produk_slug) {
+function wissel_leen_paneel() {
+  const etiket = document.getElementById("leser-leen-etiket");
+  const paneel = document.getElementById("leser-leen-paneel");
+  if (!etiket || !paneel) return;
+  const oop = paneel.hidden;
+  paneel.hidden = !oop;
+  etiket.setAttribute("aria-expanded", String(oop));
+  if (pdf_dokument) wys_bladsy(huidige_bladsy);
+}
+
+// Dieselfde leen-na-koop-aanbod as op My Leeskamer (sien my-boeke.js):
+// die bediener besluit of dit nou relevant is; ons wys dit net.
+function wys_opgradering(boek) {
+  const knoppie = document.getElementById("leser-opgradering-knoppie");
+  if (!knoppie || !boek || !boek.opgradering) return;
+  const bedrag = `R${(boek.opgradering.afslag_sent / 100).toFixed(2)}`;
+  knoppie.textContent = window.t
+    ? `${window.t("leen_opgradering_knoppie")} ${bedrag} ${window.t("leen_opgradering_afslag_suffix")}`
+    : `Koop nou — ${bedrag} afslag`;
+  knoppie.hidden = false;
+  knoppie.addEventListener("click", () => {
+    voeg_by_mandjie({
+      produk_slug: boek.produk_slug,
+      titel: boek.titel,
+      formaat: "eboek",
+      prys_sent: boek.opgradering.eboek_prys_sent,
+    });
+    window.location.href = `/voltooi-betaling.html?koepon=${encodeURIComponent(boek.opgradering.koepon_kode)}`;
+  });
+}
+
+// Gee die hele boek-rekord uit kry-my-boeke terug (titel, en by 'n leen
+// ook die opgradering-aanbod), of null.
+async function kry_boek(sessie, produk_slug) {
   try {
     const resp = await fetch("/.netlify/functions/kry-my-boeke", {
       headers: { Authorization: `Bearer ${sessie.access_token}` },
     });
-    if (!resp.ok) return "";
+    if (!resp.ok) return null;
     const data = await resp.json();
-    const gevind = (data.boeke || []).find((b) => b.produk_slug === produk_slug);
-    return gevind ? gevind.titel : "";
+    return (data.boeke || []).find((b) => b.produk_slug === produk_slug) || null;
   } catch {
-    return "";
+    return null;
   }
 }
 
@@ -107,21 +156,67 @@ function wys_voortgang() {
 async function wys_bladsy(nommer) {
   if (!pdf_dokument) return;
   const veilige_nommer = Math.min(Math.max(1, nommer), totale_bladsye);
+  const bladsy_verander = veilige_nommer !== huidige_bladsy;
   huidige_bladsy = veilige_nommer;
 
   const bladsy = await pdf_dokument.getPage(veilige_nommer);
   const omhulsel = document.querySelector(".leser-bladsy-omhulsel");
-  const pas_skaal = (omhulsel.clientWidth - 32) / bladsy.getViewport({ scale: 1 }).width;
-  const skaal = Math.max(pas_skaal, 0.3) * huidige_zoem;
+
+  // PAS DIE HELE BLADSY, NIE NET DIE BREEDTE NIE. Voorheen is net volgens
+  // breedte geskaal, dus was 'n bladsy altyd hoër as die skerm en moes die
+  // leser rol. Nou wen die kleinste van die twee verhoudings, sodat die
+  // hele bladsy by 100% in die omhulsel pas. Zoem vergroot van daar af.
+  const styl = getComputedStyle(omhulsel);
+  const opvul_x = parseFloat(styl.paddingLeft) + parseFloat(styl.paddingRight);
+  const opvul_y = parseFloat(styl.paddingTop) + parseFloat(styl.paddingBottom);
+  const beskikbaar_b = Math.max(omhulsel.clientWidth - opvul_x, 50);
+  const beskikbaar_h = Math.max(omhulsel.clientHeight - opvul_y, 50);
+  const basis = bladsy.getViewport({ scale: 1 });
+  const pas_skaal = Math.min(beskikbaar_b / basis.width, beskikbaar_h / basis.height);
+  const skaal = Math.max(pas_skaal, 0.2) * huidige_zoem;
   const viewport = bladsy.getViewport({ scale: skaal });
 
+  // SKERP OP FONE. Die canvas word teen die skerm se werklike
+  // pixeldigtheid geteken en dan terug na CSS-grootte vertoon; sonder dit
+  // is die teks op 'n foon (2x of 3x) sigbaar dof, en noudat die bladsy
+  // kleiner vertoon, sou dit nog erger wees.
+  const dpr = Math.min(window.devicePixelRatio || 1, 3);
   const canvas = document.getElementById("leser-canvas");
   const konteks = canvas.getContext("2d");
-  canvas.width = viewport.width;
-  canvas.height = viewport.height;
 
-  await bladsy.render({ canvasContext: konteks, viewport }).promise;
+  // PDF.js gooi 'n fout as twee render()-oproepe gelyk op een canvas
+  // loop (bv. tydens 'n skermdraai of knyp). Kanselleer die vorige een.
+  if (huidige_render_taak) {
+    huidige_render_taak.cancel();
+    huidige_render_taak = null;
+  }
+
+  canvas.width = Math.floor(viewport.width * dpr);
+  canvas.height = Math.floor(viewport.height * dpr);
+  canvas.style.width = `${Math.floor(viewport.width)}px`;
+  canvas.style.height = `${Math.floor(viewport.height)}px`;
+
+  const taak = bladsy.render({
+    canvasContext: konteks,
+    viewport,
+    transform: dpr !== 1 ? [dpr, 0, 0, dpr, 0, 0] : null,
+  });
+  huidige_render_taak = taak;
+  try {
+    await taak.promise;
+  } catch (fout) {
+    if (fout && fout.name === "RenderingCancelledException") return;
+    throw fout;
+  } finally {
+    if (huidige_render_taak === taak) huidige_render_taak = null;
+  }
   await bou_skakel_laag(bladsy, viewport);
+
+  // 'n Nuwe bladsy begin bo-links, ook as die vorige een ingezoem was.
+  if (bladsy_verander) {
+    omhulsel.scrollTop = 0;
+    omhulsel.scrollLeft = 0;
+  }
 
   wys_voortgang();
   stoor_vordering_debounced();
@@ -270,8 +365,12 @@ async function laai_leser() {
 
   wys_status(window.t ? window.t("leser_laai_tans") : "Jou boek word gelaai...");
 
-  kry_boek_titel(sessie, produk_slug).then((titel) => {
-    if (titel) document.getElementById("leser-titel").textContent = titel;
+  kry_boek(sessie, produk_slug).then((boek) => {
+    if (boek && boek.titel) {
+      document.getElementById("leser-titel").textContent = boek.titel;
+      document.title = `${boek.titel} — Future Shop`;
+    }
+    wys_opgradering(boek);
   });
 
   try {
@@ -393,17 +492,35 @@ document.addEventListener("DOMContentLoaded", () => {
     soek_in_boek(document.getElementById("leser-soek-invoer").value);
   });
 
+  document.getElementById("leser-leen-etiket").addEventListener("click", wissel_leen_paneel);
+
+  // Die soekveld is toegevou tot die leser dit nodig het, sodat die
+  // bladsy die ruimte kry.
+  document.getElementById("leser-soek-knoppie").addEventListener("click", () => {
+    const vorm = document.getElementById("leser-soek-vorm");
+    const knoppie = document.getElementById("leser-soek-knoppie");
+    vorm.hidden = !vorm.hidden;
+    knoppie.setAttribute("aria-expanded", String(!vorm.hidden));
+    if (!vorm.hidden) document.getElementById("leser-soek-invoer").focus();
+    if (pdf_dokument) wys_bladsy(huidige_bladsy);
+  });
+
   document.getElementById("leser-zoom-in").addEventListener("click", () => stel_zoem(huidige_zoem + 0.2));
   document.getElementById("leser-zoom-uit").addEventListener("click", () => stel_zoem(huidige_zoem - 0.2));
 
   document.addEventListener("keydown", (ev) => {
     if (!pdf_dokument) return;
+    if (ev.target && ev.target.matches && ev.target.matches("input, textarea")) return;
     if (ev.key === "ArrowRight") wys_bladsy(huidige_bladsy + 1);
     if (ev.key === "ArrowLeft") wys_bladsy(huidige_bladsy - 1);
   });
 
+  let grootte_tydsaanwyser = null;
   window.addEventListener("resize", () => {
-    if (pdf_dokument) wys_bladsy(huidige_bladsy);
+    clearTimeout(grootte_tydsaanwyser);
+    grootte_tydsaanwyser = setTimeout(() => {
+      if (pdf_dokument) wys_bladsy(huidige_bladsy);
+    }, 120);
   });
 
   // Eksplisiete skerm-draai-luisteraar — bo-op die gewone "resize" hierbo.

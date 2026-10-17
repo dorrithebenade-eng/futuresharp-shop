@@ -81,24 +81,34 @@ async function besit_boek(gebruiker_id, produk_slug) {
   return { besit: false, rede: leen_gevind_maar_verval ? "leen_verval" : null };
 }
 
+// WEERGAWES. Elke nuwe PDF-oplaai kry 'n nuwe eboek_sleutel (met 'n
+// tydstempel daarin, sien laai-eboek-op.js en keur-goed.js). Daardie
+// sleutel IS die boek se weergawe. Dit staan nou in die gemerkte kopie se
+// sleutel, sodat 'n opgedateerde boek outomaties 'n nuwe persoonlike
+// kopie vir elke bestaande koper kry. Voorheen was die sleutel net
+// boek + koper, en het bestaande kopers vir altyd die ou PDF gekry.
+// Moet presies ooreenstem met weergawe_merker in kry-leser-token.js.
+function weergawe_merker(eboek_sleutel) {
+  return String(eboek_sleutel).replace(/\.pdf$/i, "").replace(/[^a-zA-Z0-9_-]/g, "_");
+}
+
 async function kry_of_genereer_gemerkte_kopie(produk_slug, gebruiker) {
-  const gemerk_store = kry_store("eboeke-gemerk");
-  // "-v3" forseer 'n vars-generasie ná die skuif van 'n sigbare
-  // watermerk-bladsy na onsigbare dokument-metadata — ou "-v1"/"-v2"-
-  // kopieë bly onskadelik ongebruik in Blobs staan.
-  const gemerk_sleutel = `${produk_slug}--${gebruiker.id}-v3.pdf`;
-
-  const bestaande = await gemerk_store.get(gemerk_sleutel, { type: "arrayBuffer" });
-  if (bestaande) return Buffer.from(bestaande);
-
   const katalogus_store = kry_store("katalogus");
   const produk = await katalogus_store.get(produk_slug, { type: "json" });
   if (!produk || !produk.formate || !produk.formate.eboek || !produk.formate.eboek.eboek_sleutel) {
     return null;
   }
+  const eboek_sleutel = produk.formate.eboek.eboek_sleutel;
+
+  const gemerk_store = kry_store("eboeke-gemerk");
+  const koper_voorvoegsel = `${produk_slug}--${gebruiker.id}`;
+  const gemerk_sleutel = `${koper_voorvoegsel}--${weergawe_merker(eboek_sleutel)}.pdf`;
+
+  const bestaande = await gemerk_store.get(gemerk_sleutel, { type: "arrayBuffer" });
+  if (bestaande) return Buffer.from(bestaande);
 
   const eboeke_store = kry_store("eboeke");
-  const rou_pdf = await eboeke_store.get(produk.formate.eboek.eboek_sleutel, { type: "arrayBuffer" });
+  const rou_pdf = await eboeke_store.get(eboek_sleutel, { type: "arrayBuffer" });
   if (!rou_pdf) return null;
 
   const pdf = await PDFDocument.load(rou_pdf);
@@ -115,6 +125,19 @@ async function kry_of_genereer_gemerkte_kopie(produk_slug, gebruiker) {
 
   const gemerkte_bytes = Buffer.from(await pdf.save());
   await gemerk_store.set(gemerk_sleutel, gemerkte_bytes, { metadata: { inhoud_tipe: "application/pdf" } });
+
+  // Ruim hierdie koper se ou kopieë van hierdie boek op (vorige weergawes,
+  // en die ou "-v1/-v2/-v3"-sleutels). Beste-poging: as dit misluk, bly
+  // hulle net ongebruik staan. Die oorspronklike PDF in "eboeke" word NIE
+  // aangeraak nie; dit bly as rekord van wat opgelaai is.
+  try {
+    const { blobs } = await gemerk_store.list({ prefix: koper_voorvoegsel });
+    const ou = (blobs || []).filter((item) => item.key.startsWith(koper_voorvoegsel) && item.key !== gemerk_sleutel);
+    await Promise.all(ou.map((item) => gemerk_store.delete(item.key)));
+  } catch (fout) {
+    console.warn("Kon nie ou gemerkte kopieë opruim nie:", fout);
+  }
+
   return gemerkte_bytes;
 }
 

@@ -15,6 +15,23 @@ const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 
 const GELDIGHEID_MS = 15 * 60 * 1000; // 15 minute
 
+// Moet presies ooreenstem met weergawe_merker in kry-eboek-inhoud.js.
+function weergawe_merker(eboek_sleutel) {
+  return String(eboek_sleutel).replace(/\.pdf$/i, "").replace(/[^a-zA-Z0-9_-]/g, "_");
+}
+
+// Die huidige weergawe van die boek se PDF, sodat die leser kan sien of
+// sy plaaslike (aflyn) kopie verouderd is. Null as daar nog geen PDF is.
+async function kry_weergawe(produk_slug) {
+  try {
+    const produk = await kry_store("katalogus").get(produk_slug, { type: "json" });
+    const sleutel = produk && produk.formate && produk.formate.eboek && produk.formate.eboek.eboek_sleutel;
+    return sleutel ? weergawe_merker(sleutel) : null;
+  } catch {
+    return null;
+  }
+}
+
 // Suiwer informatief — vir die leser se "X dae oor"-kennisgewing. GEE
 // NIE toegang nie; kry-eboek-inhoud.js bly die enigste, gesaghebbende
 // toegangskontrole. Gee null terug as die koper dit gekoop het (nie
@@ -66,12 +83,15 @@ exports.handler = async (event, context) => {
       verval_op,
     });
 
-    const leen_status = await kry_leen_status(gebruiker.id, produk_slug);
+    const [leen_status, weergawe] = await Promise.all([
+      kry_leen_status(gebruiker.id, produk_slug),
+      kry_weergawe(produk_slug),
+    ]);
 
     return {
       statusCode: 200,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token, verval_op, leen: leen_status }),
+      body: JSON.stringify({ token, verval_op, leen: leen_status, weergawe }),
     };
   } catch (fout) {
     console.error("Kon nie leestoken skep nie:", fout);

@@ -29,7 +29,11 @@ exports.handler = async (event, context) => {
     return {
       statusCode: 200,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ bladsy: rekord ? rekord.bladsy : null }),
+      body: JSON.stringify({
+        bladsy: rekord ? rekord.bladsy : null,
+        weergawe: rekord && rekord.weergawe ? rekord.weergawe : null,
+        totaal_bladsye: rekord && rekord.totaal_bladsye ? rekord.totaal_bladsye : null,
+      }),
     };
   } catch (fout) {
     console.error("kry-lees-vordering fout:", fout);

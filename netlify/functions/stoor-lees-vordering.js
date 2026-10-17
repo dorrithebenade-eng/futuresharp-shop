@@ -65,6 +65,12 @@ exports.handler = async (event, context) => {
   }
 
   const { produk_slug, bladsy } = invoer;
+  // Opsioneel: watter weergawe van die PDF gelees is en hoeveel bladsye dit
+  // het. Daarmee kan die leser 'n koper op dieselfde relatiewe plek
+  // oopmaak as die boek later opgedateer en anders gepagineer is.
+  const weergawe = typeof invoer.weergawe === "string" && invoer.weergawe.length <= 200 ? invoer.weergawe : null;
+  const totaal = Number(invoer.totaal_bladsye);
+  const totaal_bladsye = Number.isInteger(totaal) && totaal >= 1 ? totaal : null;
   const bladsy_nommer = Number(bladsy);
 
   if (!produk_slug || !Number.isInteger(bladsy_nommer) || bladsy_nommer < 1) {
@@ -79,6 +85,8 @@ exports.handler = async (event, context) => {
     const store = kry_store("lees-vordering");
     await store.setJSON(`${produk_slug}--${gebruiker.id}`, {
       bladsy: bladsy_nommer,
+      weergawe,
+      totaal_bladsye,
       bygewerk_op: new Date().toISOString(),
     });
 
