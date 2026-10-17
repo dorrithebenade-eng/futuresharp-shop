@@ -2869,6 +2869,8 @@ const WOORDEBOEK = {
   fs_bank_verwag: { af: "Berekende balans", en: "Calculated balance" },
   fs_bank_verskil: { af: "Verskil", en: "Difference" },
   fs_bank_klop: { af: "Gerekonsilieer.", en: "Reconciled." },
+  fs_bank_uit_state: { af: "Uit die ingevoerde bankstate.", en: "From the imported bank statements." },
+  fs_bank_tot_staat: { af: "Uit die ingevoerde bankstate. Die jongste staat eindig op {d}; wat daarna in die joernaal staan, is nog nie op 'n staat nie.", en: "From the imported bank statements. The latest statement ends on {d}; what the journal shows after that is not yet on a statement." },
   fs_bank_verskil_hulp: { af: "Onverklaard. Vereffenings kan oor die tydperkgrens val.", en: "Unexplained. Settlements can fall across the period boundary." },
   fs_wag_kop: { af: "Ongekategoriseerde beskrywings", en: "Uncategorised descriptions" },
   fs_wag_hulp: { af: "Geen ooreenstemmende item in die register nie.", en: "No matching item in the register." },

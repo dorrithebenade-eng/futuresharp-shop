@@ -595,6 +595,14 @@ function fs_teken() {
 function fs_rekonsiliasie(inkomste, uitgawes) {
   const o = FS.bank.opening;
   const s = FS.bank.sluiting;
+  // UIT DIE BANKSTATE (17 Oktober 2026). Kom albei balansse uit die ingevoerde
+  // state, hoef niemand iets in te tik nie en die vorm val weg.
+  const uit_state = Boolean(o && s && o.bron === "bankstaat" && s.bron === "bankstaat");
+  const nota_state = !uit_state ? "" : `<p class="fs-hulp">${fs_ontsnap(
+    s.datum < FS.tot
+      ? fs_t("fs_bank_tot_staat", "Uit die ingevoerde bankstate. Die jongste staat eindig op {d}; wat daarna in die joernaal staan, is nog nie op 'n staat nie.")
+          .replace("{d}", String(s.datum).replace(/-/g, "/"))
+      : fs_t("fs_bank_uit_state", "Uit die ingevoerde bankstate."))}</p>`;
 
   const vorm = `
     <div class="fs-bank-vorm">
@@ -622,7 +630,13 @@ function fs_rekonsiliasie(inkomste, uitgawes) {
       </div>`;
   }
 
-  const beweeg = inkomste - uitgawes;
+  // Uit die state: die joernaal se beweging net tussen die twee balansdatums,
+  // sodat wat na die jongste staat gebeur het, nie as 'n verskil wys nie.
+  const beweeg = uit_state
+    ? FS.inskrywings
+        .filter((r) => r.datum > o.datum && r.datum <= s.datum)
+        .reduce((a, r) => a + (r.rigting === "in" ? 1 : -1) * (Number(r.bedrag_sent) || 0), 0)
+    : inkomste - uitgawes;
   const verwag = o.balans_sent + beweeg;
   const verskil = s.balans_sent - verwag;
 
@@ -632,7 +646,7 @@ function fs_rekonsiliasie(inkomste, uitgawes) {
       <table class="fs-tabel">
         <tbody>
           <tr><td class="fs-naam">${fs_t("fs_bank_open", "Balans op")} ${
-            fs_ontsnap(o.datum)}</td>
+            fs_ontsnap(o.datum).replace(/-/g, "/")}</td>
               <td class="fs-tot">${fs_rand(o.balans_sent)}</td></tr>
           <tr><td class="fs-naam">${fs_t("fs_bank_beweeg", "Beweging")}</td>
               <td class="fs-tot">${(beweeg < 0 ? "\u2212 " : "") + fs_rand(beweeg)}</td></tr>
@@ -640,7 +654,7 @@ function fs_rekonsiliasie(inkomste, uitgawes) {
             fs_t("fs_bank_verwag", "Berekende balans")}</td>
               <td class="fs-tot">${(verwag < 0 ? "\u2212 " : "") + fs_rand(verwag)}</td></tr>
           <tr><td class="fs-naam">${fs_t("fs_bank_sluit", "Balans op")} ${
-            fs_ontsnap(s.datum)}</td>
+            fs_ontsnap(s.datum).replace(/-/g, "/")}</td>
               <td class="fs-tot">${(s.balans_sent < 0 ? "\u2212 " : "") + fs_rand(s.balans_sent)}</td></tr>
           <tr class="fs-som ${verskil ? "fs-ongekat" : ""}">
               <td class="fs-naam">${fs_t("fs_bank_verskil", "Verskil")}</td>
@@ -652,7 +666,7 @@ function fs_rekonsiliasie(inkomste, uitgawes) {
           ? fs_t("fs_bank_klop", "Gerekonsilieer.")
           : fs_t("fs_bank_verskil_hulp", "Onverklaard. Vereffenings kan oor die tydperkgrens val.")
       }</p>
-      ${vorm}
+      ${uit_state ? nota_state : vorm}
     </div>`;
 }
 
