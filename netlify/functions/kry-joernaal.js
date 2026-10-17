@@ -343,6 +343,8 @@ exports.handler = async (event, context) => {
             klient,
             bedrag_sent: Number(f.totaal_sent) || 0,
             betaalbaar_teen: f.betaalbaar_teen || null,
+            // Vir die projekkaart (17 Oktober 2026): wat 'n kliënt nog skuld.
+            projek_id: f.projek_id || "",
           });
         }
       }
@@ -427,6 +429,8 @@ exports.handler = async (event, context) => {
               nommer,
               ontvanger: ry.ontvanger || "",
               bedrag_sent: sent,
+              // Vir die projekkaart (17 Oktober 2026): vergoeding nog uit te betaal.
+              projek_id: f.projek_id || "",
             });
           }
           return;

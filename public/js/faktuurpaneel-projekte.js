@@ -141,7 +141,8 @@ function pj_teken_lys() {
 
     const rand = (p.aktief === false
       ? `<button type="button" class="fp-skrap kt-aktiveer" data-pj-aktiveer="${pj_ontsnap(p.id)}">${pj_t("pj_aktiveer", "Aktiveer")}</button>`
-      : `${met_tk ? `<button type="button" class="pj-tk-knop" data-pj-tk="${pj_ontsnap(p.id)}">${pj_t("pj_tk_knop", "Toekennings")}</button>` : ""}
+      : `<button type="button" class="pj-tk-knop pj-fin-knop" data-pj-fin="${pj_ontsnap(p.id)}">${pj_t("pj_fin_knop", "Finansies")}</button>
+         ${met_tk ? `<button type="button" class="pj-tk-knop" data-pj-tk="${pj_ontsnap(p.id)}">${pj_t("pj_tk_knop", "Toekennings")}</button>` : ""}
          <button type="button" class="fp-skrap" data-pj-skrap="${pj_ontsnap(p.id)}">${pj_t("pj_skrap", "Skrap")}</button>`);
 
     return `
@@ -164,6 +165,11 @@ function pj_teken_lys() {
     b.addEventListener("click", () => pj_skrap(b.getAttribute("data-pj-skrap"))));
   plek.querySelectorAll("[data-pj-aktiveer]").forEach((b) =>
     b.addEventListener("click", () => pj_aktiveer(b.getAttribute("data-pj-aktiveer"))));
+  plek.querySelectorAll("[data-pj-fin]").forEach((b) =>
+    b.addEventListener("click", () => {
+      const p = PJ.projekte.find((x) => x.id === b.getAttribute("data-pj-fin"));
+      if (p && typeof window.pk_maak_oop === "function") window.pk_maak_oop(p);
+    }));
   plek.querySelectorAll("[data-pj-tk]").forEach((b) =>
     b.addEventListener("click", () => {
       const p = PJ.projekte.find((x) => x.id === b.getAttribute("data-pj-tk"));
