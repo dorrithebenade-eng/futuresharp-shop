@@ -3282,6 +3282,14 @@ const WOORDEBOEK = {
   pj_veld_soort: { af: "Soort projek", en: "Project type" },
   // NOMMER, FINANSIERING EN INSTANSIE (17 Oktober 2026). Sien _projekte.js.
   pj_veld_nr: { af: "Projeknommer", en: "Project number" },
+  // Die projek op 'n faktuur (17 Oktober 2026). Sien faktuur-projek.js.
+  fpj_titel: { af: "Projek", en: "Project" },
+  fpj_geen: { af: "Geen projek", en: "No project" },
+  fpj_onaktief: { af: "gedeaktiveer", en: "deactivated" },
+  fpj_weg: { af: "bestaan nie meer nie", en: "no longer exists" },
+  fpj_besig: { af: "Word gestoor \u2026", en: "Saving \u2026" },
+  fpj_gestoor: { af: "Gestoor", en: "Saved" },
+  fpj_laai_fout: { af: "Kon nie die projekte laai nie.", en: "Could not load the projects." },
   pj_nr_nuut: { af: "Kry 'n nommer wanneer dit gestoor word", en: "Receives a number when saved" },
   pj_veld_fin: { af: "Finansiering", en: "Funding" },
   pj_fin_fooie: { af: "Fooie vir dienste", en: "Fees for services" },

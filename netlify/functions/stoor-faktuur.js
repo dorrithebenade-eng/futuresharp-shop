@@ -35,6 +35,7 @@ const {
   TALE,
 } = require("./_fakture");
 const { kry_kliente_store } = require("./_kliente");
+const { kry_store } = require("./_blob-store");
 
 // 'n Reël is óf 'n verkoop óf 'n koste. Die onderskeid dryf faktuur-som.js se
 // etiket ("koste terug" teenoor "verdienste") en niks anders nie.
@@ -257,6 +258,23 @@ exports.handler = async (event, context) => {
   // Die afdeling binne die instansie. Sien die volle nota by nuwe_faktuur() in
   // _fakture.js: dit staan op die DOKUMENT en nooit op die klientrekord nie.
   if (invoer.afdeling !== undefined) rekord.afdeling = teks(invoer.afdeling, 120);
+
+  // Die projek (17 Oktober 2026). Nie op die dokument nie. 'n Nuwe keuse moet
+  // 'n bestaande projek wees; leeg maak dit los.
+  if (invoer.projek_id !== undefined) {
+    const projek_id = teks(invoer.projek_id, 120);
+    if (projek_id && projek_id !== rekord.projek_id) {
+      let p = null;
+      try {
+        p = await kry_store("projekte").get(projek_id, { type: "json" });
+      } catch (fout) {
+        console.error("Kon nie die projek nagaan nie:", fout);
+        return { statusCode: 503, body: "Kon nie die projek nagaan nie. Die faktuur is nie gestoor nie." };
+      }
+      if (!p) return { statusCode: 400, body: "Die projek bestaan nie." };
+    }
+    rekord.projek_id = projek_id;
+  }
   if (invoer.dokument_nota !== undefined) rekord.dokument_nota = teks(invoer.dokument_nota, 3000);
   if (invoer.reels !== undefined) rekord.reels = lees_reels(invoer.reels);
 

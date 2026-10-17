@@ -67,6 +67,7 @@ exports.handler = async (event, context) => {
       // nuwe veld op die rekord kom nie vanself hier deur nie.
       afdeling: rekord.afdeling || "",
       bestelnommer: rekord.bestelnommer || "",
+      projek_id: rekord.projek_id || "",
       totaal_sent: rekord.totaal_sent || 0,
       // Die toetsstempel. Die skerm gebruik hom om te sê wat geskrap kan word;
       // skrap-faktuur.js dwing dit af. DIE ANTWOORD WORD VELD VIR VELD GEBOU —

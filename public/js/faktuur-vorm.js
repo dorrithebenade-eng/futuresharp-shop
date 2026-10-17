@@ -1341,6 +1341,9 @@ function liggaam() {
       ? { geldig_tot: V.geldig_tot || "" }
       : { betaalbaar_teen: V.betaalbaar_teen || "" }),
     koste: V.koste,
+    // Die projek (17 Oktober 2026), net op 'n faktuur en net as dit gekies of
+    // gelaai is. Sien faktuur-projek.js.
+    ...(!IS_KW && window.FV_PROJEK_ID !== undefined ? { projek_id: window.FV_PROJEK_ID } : {}),
     // 'n Kwotasie ken die veld nie, en 'n veld wat deurgaan na 'n Function wat
     // hom nie ken nie, val stil weg. Sien die nota by geldig_tot hierbo.
     ...(IS_KW ? {} : { handmatig: V.handmatig === true }),
@@ -1422,6 +1425,10 @@ async function laai_faktuur(vraag) {
   V.klient = f.klient || V.klient;
   V.afdeling = f.afdeling || "";
   V.bestelnommer = f.bestelnommer || "";
+  // Die projek leef buite V, sodat ontdoen dit nie terugdraai nie. Sien
+  // faktuur-projek.js.
+  window.FV_PROJEK_ID = f.projek_id || "";
+  document.dispatchEvent(new CustomEvent("fv-projek-gelaai"));
   V.reels = Array.isArray(f.reels)
     ? f.reels.map((r) => ({
         soort: r.soort === "koste" ? "koste" : "verkoop",

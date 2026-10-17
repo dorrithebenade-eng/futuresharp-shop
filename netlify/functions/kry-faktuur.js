@@ -96,6 +96,9 @@ exports.handler = async (event, context) => {
     // gebou; sonder hierdie reel bereik hy nooit die skerm nie.
     afdeling: rekord.afdeling || "",
     bestelnommer: rekord.bestelnommer || "",
+    // Die projek (17 Oktober 2026). Nie op die dokument nie; die antwoord word
+    // veld vir veld gebou, dus moet dit hier genoem word.
+    projek_id: rekord.projek_id || "",
 
     // ELKE REEL DRA SY EIE VERDELING, SY EIE HOSTING EN SY EIE `vou_in`
     // (25 Augustus 2026). Sien Verdeling-Per-Lynitem-Ontwerp.md.

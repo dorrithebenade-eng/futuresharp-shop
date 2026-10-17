@@ -428,6 +428,17 @@
            Niks hierbinne verskyn op die dokument nie. -->
       <aside class="bo" id="fv-bo">
 
+        <!-- DIE PROJEK (17 Oktober 2026). Sien faktuur-projek.js. Mag ook op 'n
+             uitgereikte faktuur verander, want dit staan nie op die dokument nie. -->
+        <div class="bo-kaart fp-projek-kaart" id="fp-projek-kaart" hidden>
+          <div class="bo-kop">
+            <div class="bo-titel" data-i18n="fpj_titel">Projek</div>
+            <div class="bo-lei" data-i18n="bo_begroting_lei">verskyn nêrens op die dokument nie</div>
+          </div>
+          <select class="fp-projek-kies" id="fp-projek"></select>
+          <p class="fp-projek-stand" id="fp-projek-stand"></p>
+        </div>
+
         <div class="bo-kaart">
           <div class="bo-kop">
             <div class="bo-titel" data-i18n="bo_begroting">Begrote koste</div>
@@ -594,6 +605,7 @@
   <script src="js/faktuur-som.js"></script>
   <script src="js/faktuur-vorm.js"></script>
   <script src="js/faktuur-backoffice.js"></script>
+  <script src="js/faktuur-projek.js"></script>
   <script src="js/faktuur-koste-items.js"></script>
   <script src="js/faktuur-nuwe-klient.js"></script>
   <script src="js/faktuur-nuwe-koste-item.js"></script>

@@ -329,6 +329,13 @@ function nuwe_faktuur(wie) {
     afdeling: "",
     bestelnommer: "",           // die kliënt se PO; opsioneel, op die dokument
 
+    // DIE PROJEK (17 Oktober 2026). Die id uit die Projekte-register, of leeg.
+    // NIE OP DIE DOKUMENT NIE: die kliënt sien dit nooit. Die staat en die
+    // projekkaart tel die ontvangs en die uitbetalings van die faktuur daarmee
+    // by die projek. Mag ook op 'n uitgereikte faktuur verander, deur
+    // stel-faktuur-projek.js.
+    projek_id: "",
+
     // ELKE REEL DRA SY EIE VERDELING (25 Augustus 2026). Voor dit het die
     // faktuur EEN verdeling gehad, en 'n faktuur met 'n aanbieding, 'n
     // vraelys en 'n verslag -- elk met sy eie ontvangers -- kon nie bestaan

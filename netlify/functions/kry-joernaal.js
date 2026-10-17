@@ -368,6 +368,9 @@ exports.handler = async (event, context) => {
           // reels, en die joernaal se telling en die CSV verander saam.
           dele: ontvangs_dele(f, ontvang_sent),
           bron: "faktuur",
+          // Die faktuur se projek (17 Oktober 2026). 'n Koppeling aan 'n
+          // toekenning, verder af, gaan voor.
+          projek_id: f.projek_id || "",
           // Die faktuur se sleutel en betalingsbewyse (16 Okt 2026), sodat die
           // joernaalskerm 'n bewys by die ontvangs kan wys en oplaai.
           faktuur_sleutel: b.key,
@@ -464,6 +467,7 @@ exports.handler = async (event, context) => {
           // se nie.
           waarvoor: Array.isArray(ry.waarvoor) ? ry.waarvoor : [],
           bron: "uitbetaling",
+          projek_id: f.projek_id || "",
           pas_ref: `U:${b.key}#${ry_ix}`,
         });
       });
@@ -758,7 +762,7 @@ exports.handler = async (event, context) => {
     const k = koppelings.get(r.id);
     if (k) {
       r.toekenning = k.toekenning;
-      r.projek_id = k.projek_id;
+      if (k.projek_id) r.projek_id = k.projek_id;
     }
   });
 
