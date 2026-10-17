@@ -1,4 +1,7 @@
 // netlify/functions/stoor-projek.js
+// Weergawe 4 (17 Oktober 2026): die projeknommer, finansiering (fooie,
+// toelae of borgskap), instansie en tydperk. Die vorm stuur nie meer die ou
+// vrye-teks soort nie; wat daar was, bly staan. Sien _projekte.js.
 // Weergawe 3 (25 September 2026): ook die openbare-voordeel-aktiwiteit (PBA)
 // met sy Deel II-merk, en wie baat vind (beskrywing, getal, persentasie swart).
 // Weergawe 2: soort en "vir wie"; die befondsers-veld is
@@ -24,7 +27,14 @@ const {
   skoon_befondsers,
   maak_slug,
   is_toets_naam,
+  lees_almal,
+  FINANSIERING,
+  INSTANSIES,
+  volgende_nr,
+  jaar_van,
 } = require("./_projekte");
+
+const DATUM = /^\d{4}-\d{2}-\d{2}$/;
 
 const ROLLE = ["boekhouding"];
 
@@ -54,7 +64,6 @@ exports.handler = async (event, context) => {
   }
 
   const nota = String(invoer.nota || "").trim().slice(0, 500);
-  const soort = String(invoer.soort || "").trim().slice(0, 60);
   const vir_wie = String(invoer.vir_wie || "").trim().slice(0, 20);
 
   // PBA en wie baat vind. Totale, nie name nie: 'n befondser en SARS vra
@@ -70,6 +79,23 @@ exports.handler = async (event, context) => {
   }
   if (baat_swart_pct !== null && (!Number.isFinite(baat_swart_pct) || baat_swart_pct < 0 || baat_swart_pct > 100)) {
     return { statusCode: 400, body: "Die persentasie swart deelnemers moet tussen 0 en 100 wees." };
+  }
+
+  const finansiering = invoer.finansiering === undefined ? null : String(invoer.finansiering || "").trim();
+  if (finansiering !== null && !FINANSIERING.includes(finansiering)) {
+    return { statusCode: 400, body: "Kies hoe die projek gefinansier word: fooie, toelae of borgskap." };
+  }
+  const instansie = String(invoer.instansie || "").trim();
+  if (instansie && !INSTANSIES.includes(instansie)) {
+    return { statusCode: 400, body: "Onbekende instansie." };
+  }
+  const van = String(invoer.van || "").trim();
+  const tot = String(invoer.tot || "").trim();
+  if ((van && !DATUM.test(van)) || (tot && !DATUM.test(tot))) {
+    return { statusCode: 400, body: "Die tydperk se datums moet JJJJ-MM-DD wees." };
+  }
+  if (van && tot && tot < van) {
+    return { statusCode: 400, body: "Die tydperk eindig voordat dit begin." };
   }
 
   const store = kry_projekte_store();
@@ -136,12 +162,36 @@ exports.handler = async (event, context) => {
     }
   }
 
+  // DIE OU VRYE-TEKS SOORT. Net 'n uitdruklike waarde vervang dit.
+  const soort = invoer.soort === undefined
+    ? String((bestaande && bestaande.soort) || "")
+    : String(invoer.soort || "").trim().slice(0, 60);
+
   const nou = new Date().toISOString();
+
+  // DIE NOMMER. 'n Projek wat reeds een het, hou dit. Die jaar is die
+  // skeppingsjaar, ook vir 'n ouer projek wat eers nou een kry.
+  let nr = (bestaande && bestaande.nr) || "";
+  if (!nr) {
+    try {
+      const almal = await lees_almal(store);
+      nr = volgende_nr(almal, jaar_van((bestaande && bestaande.geskep_op) || nou));
+    } catch (fout) {
+      console.error("Kon nie die projeknommers lees nie:", fout);
+      return { statusCode: 503, body: "Kon nie 'n projeknommer toeken nie. Die projek is nie gestoor nie." };
+    }
+  }
+
   const rekord = {
     ...(bestaande || nuwe_projek()),
     id,
+    nr,
     naam,
     befondsers,
+    finansiering: finansiering || (bestaande && bestaande.finansiering) || "fooie",
+    instansie,
+    van,
+    tot,
     soort,
     vir_wie,
     pba,

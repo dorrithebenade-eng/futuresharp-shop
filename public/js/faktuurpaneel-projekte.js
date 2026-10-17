@@ -1,4 +1,7 @@
 // public/js/faktuurpaneel-projekte.js
+// Weergawe 4 (17 Oktober 2026): projeknommer, finansiering (fooie, toelae of
+// borgskap), instansie en tydperk. Die PBA en wie baat vind, wys net by 'n
+// toelae of skenking. Die ou vrye-teks soort word net nog gewys as dit daar is.
 // Weergawe 3 (25 September 2026): ook die openbare-voordeel-aktiwiteit (PBA)
 // met sy Deel II-merk, en wie baat vind. Sien stoor-projek.js.
 //
@@ -57,9 +60,24 @@ async function pj_vra(naam, opsies) {
 
 /* ═══ die lys ═══ */
 
+const PJ_FIN = {
+  fooie: ["pj_fin_fooie", "Fooie vir dienste"],
+  toelae: ["pj_fin_toelae", "Toelae of skenking"],
+  borgskap: ["pj_fin_borgskap", "Borgskap"],
+};
+const PJ_INST = {
+  skole: ["pj_inst_skole", "Skole"],
+  ouers: ["pj_inst_ouers", "Ouers en individue"],
+  hoer: ["pj_inst_hoer", "Ho\u00ebr onderwys"],
+  korporatief: ["pj_inst_korporatief", "Korporatief"],
+};
+function pj_fin_naam(f) { const x = PJ_FIN[f || "fooie"] || PJ_FIN.fooie; return pj_t(x[0], x[1]); }
+function pj_inst_naam(i) { const x = PJ_INST[i]; return x ? pj_t(x[0], x[1]) : ""; }
+function pj_datum(d) { return d ? String(d).replace(/-/g, "/") : ""; }
+
 function pj_pas(p, soek) {
   if (!soek) return true;
-  return [p.naam, p.nota, p.soort, p.vir_wie_naam]
+  return [p.nr, p.naam, p.nota, p.soort, p.vir_wie_naam, pj_fin_naam(p.finansiering), pj_inst_naam(p.instansie)]
     .filter(Boolean).join(" ").toLowerCase().replace(/\s+/g, "").includes(soek);
 }
 
@@ -90,21 +108,31 @@ function pj_teken_lys() {
     return;
   }
 
+  pj_teken_nommer_ban();
+
   plek.innerHTML = pas.map((p) => {
+    const fin = p.finansiering || "fooie";
     const merkies = [
       p.aktief === false ? `<span class="fk-merkie kt-onaktief">${pj_t("pj_onaktief", "Onaktief")}</span>` : "",
       p.toets ? `<span class="fk-merkie">${pj_t("pj_toets", "Toets")}</span>` : "",
     ].join("");
+    const tydperk = p.van || p.tot
+      ? `${pj_datum(p.van) || "\u2026"} ${pj_t("pj_tot_kort", "tot")} ${pj_datum(p.tot) || "\u2026"}` : "";
     const eerste = [
-      p.soort ? pj_ontsnap(p.soort) : "",
+      `<span class="pj-fin-merk pj-fin-${pj_ontsnap(fin)}">${pj_ontsnap(pj_fin_naam(fin))}</span>`,
+      p.instansie ? pj_ontsnap(pj_inst_naam(p.instansie)) : "",
       p.vir_wie ? `${pj_ontsnap(pj_t("pj_vir", "vir"))} ${pj_ontsnap(p.vir_wie_naam || p.vir_wie)}` : "",
+      tydperk ? pj_ontsnap(tydperk) : "",
     ].filter(Boolean).join(" \u00b7 ");
-    const baat = [
+    const ou_soort = p.soort
+      ? `<span class="fk-ry-onder pj-oud">${pj_ontsnap(pj_t("pj_ou_soort", "Ou soort:"))} ${pj_ontsnap(p.soort)}</span>` : "";
+    const baat = fin !== "toelae" ? "" : [
       p.pba ? pj_ontsnap(p.pba) + (p.pba_deel2 ? " (" + pj_ontsnap(pj_t("pj_deel2_kort", "Deel II")) + ")" : "") : "",
       p.baat_getal != null ? pj_ontsnap(pj_t("pj_baat_tel", "{n} deelnemers").replace("{n}", p.baat_getal)) +
         (p.baat_swart_pct != null ? pj_ontsnap(pj_t("pj_baat_pct", ", {p}% swart").replace("{p}", String(p.baat_swart_pct).replace(".", ","))) : "") : "",
     ].filter(Boolean).join(" \u00b7 ");
-    const tk = p.toekennings
+    const met_tk = fin !== "fooie" || p.toekennings;
+    const tk = !met_tk ? "" : p.toekennings
       ? pj_t("pj_tk_tel", "{n} toekenning(s), {r} toegesê").replace("{n}", p.toekennings).replace("{r}", pj_rand(p.toegese_sent))
       : pj_t("pj_tk_geen", "Nog geen toekenning nie");
     const oud = (p.befondsers || []).length
@@ -113,16 +141,17 @@ function pj_teken_lys() {
 
     const rand = (p.aktief === false
       ? `<button type="button" class="fp-skrap kt-aktiveer" data-pj-aktiveer="${pj_ontsnap(p.id)}">${pj_t("pj_aktiveer", "Aktiveer")}</button>`
-      : `<button type="button" class="pj-tk-knop" data-pj-tk="${pj_ontsnap(p.id)}">${pj_t("pj_tk_knop", "Toekennings")}</button>
+      : `${met_tk ? `<button type="button" class="pj-tk-knop" data-pj-tk="${pj_ontsnap(p.id)}">${pj_t("pj_tk_knop", "Toekennings")}</button>` : ""}
          <button type="button" class="fp-skrap" data-pj-skrap="${pj_ontsnap(p.id)}">${pj_t("pj_skrap", "Skrap")}</button>`);
 
     return `
       <div class="fk-ry fk-ry-twee${p.aktief === false ? " kt-ry-onaktief" : ""}">
         <button type="button" class="fk-ry-oop" data-pj="${pj_ontsnap(p.id)}">
-          <span class="fk-ry-naam">${pj_ontsnap(p.naam)}${merkies}</span>
+          <span class="fk-ry-naam">${p.nr ? `<span class="pj-nr-lys">${pj_ontsnap(p.nr)}</span>` : ""}${pj_ontsnap(p.naam)}${merkies}</span>
           ${eerste ? `<span class="fk-ry-onder">${eerste}</span>` : ""}
           ${baat ? `<span class="fk-ry-onder">${baat}</span>` : ""}
-          <span class="fk-ry-onder">${pj_ontsnap(tk)}</span>
+          ${tk ? `<span class="fk-ry-onder">${pj_ontsnap(tk)}</span>` : ""}
+          ${ou_soort}
           ${oud}
         </button>
         <span class="fk-ry-rand">${rand}</span>
@@ -142,14 +171,46 @@ function pj_teken_lys() {
     }));
 }
 
+/* ═══ projekte sonder 'n nommer ═══ */
+
+function pj_teken_nommer_ban() {
+  const ban = document.getElementById("pj-nommer-ban");
+  if (!ban) return;
+  const sonder = PJ.projekte.filter((p) => !p.nr).length;
+  if (!sonder) { ban.style.display = "none"; ban.innerHTML = ""; return; }
+  ban.style.display = "";
+  ban.innerHTML = `<span>${pj_ontsnap((sonder === 1
+      ? pj_t("pj_sonder_nr_een", "1 projek het nog nie 'n nommer nie.")
+      : pj_t("pj_sonder_nr", "{n} projekte het nog nie 'n nommer nie.")).replace("{n}", sonder))}</span>
+    <button type="button" class="kaart-aksie" id="pj-gee-nr">${pj_ontsnap(pj_t("pj_gee_nr", "Gee nommers"))}</button>`;
+  document.getElementById("pj-gee-nr").addEventListener("click", pj_gee_nommers);
+}
+
+async function pj_gee_nommers() {
+  const knop = document.getElementById("pj-gee-nr");
+  if (knop) knop.disabled = true;
+  try {
+    await pj_vra("nommer-projekte", { method: "POST" });
+    await pj_laai();
+  } catch (fout) {
+    window.alert(String(fout.message || fout));
+    if (knop) knop.disabled = false;
+  }
+}
+
 /* ═══ die vorm ═══ */
 
+function pj_kies_fin() {
+  const k = document.querySelector('input[name="pj-fin"]:checked');
+  return k ? k.value : "fooie";
+}
+
+function pj_wys_toelae_deel() {
+  const deel = document.getElementById("pj-toelae-deel");
+  if (deel) deel.style.display = pj_kies_fin() === "toelae" ? "" : "none";
+}
+
 function pj_vul_keuses(p) {
-  // Soorte: wat die bestaande projekte reeds gebruik, alfabeties.
-  const soorte = [...new Set(PJ.projekte.map((x) => x.soort).filter(Boolean))]
-    .sort((a, b) => a.localeCompare(b, "af-ZA"));
-  document.getElementById("pj-soorte").innerHTML =
-    soorte.map((s) => `<option value="${pj_ontsnap(s)}"></option>`).join("");
   const pbas = [...new Set(PJ.projekte.map((x) => x.pba).filter(Boolean))]
     .sort((a, b) => a.localeCompare(b, "af-ZA"));
   document.getElementById("pj-pbas").innerHTML =
@@ -175,7 +236,23 @@ function pj_maak_vorm_oop(id) {
     ? pj_t("pj_wysig_titel", "Wysig projek")
     : pj_t("pj_nuwe_titel", "Nuwe projek");
   document.getElementById("pj-naam").value = p ? p.naam : "";
-  document.getElementById("pj-soort").value = p ? p.soort || "" : "";
+  document.getElementById("pj-nr").textContent = p && p.nr
+    ? p.nr
+    : pj_t("pj_nr_nuut", "Kry 'n nommer wanneer dit gestoor word");
+  document.getElementById("pj-nr").classList.toggle("pj-nr-leeg", !(p && p.nr));
+  const fin = (p && p.finansiering) || "fooie";
+  document.querySelectorAll('input[name="pj-fin"]').forEach((r) => { r.checked = r.value === fin; });
+  pj_wys_toelae_deel();
+  document.getElementById("pj-instansie").value = p ? p.instansie || "" : "";
+  const ou = document.getElementById("pj-ou-soort");
+  if (p && p.soort) {
+    ou.textContent = pj_t("pj_ou_soort_hulp", "Voorheen as soort aangeteken: {s}").replace("{s}", p.soort);
+    ou.style.display = "";
+  } else {
+    ou.style.display = "none";
+  }
+  document.getElementById("pj-van").value = p ? p.van || "" : "";
+  document.getElementById("pj-tot").value = p ? p.tot || "" : "";
   document.getElementById("pj-pba").value = p ? p.pba || "" : "";
   document.getElementById("pj-pba-deel2").checked = Boolean(p && p.pba_deel2);
   document.getElementById("pj-baat-beskrywing").value = p ? p.baat_beskrywing || "" : "";
@@ -215,7 +292,10 @@ async function pj_stoor() {
       body: JSON.stringify({
         id: PJ.wysig || undefined,
         naam,
-        soort: document.getElementById("pj-soort").value.trim(),
+        finansiering: pj_kies_fin(),
+        instansie: document.getElementById("pj-instansie").value,
+        van: document.getElementById("pj-van").value,
+        tot: document.getElementById("pj-tot").value,
         vir_wie: document.getElementById("pj-vir-wie").value,
         pba: document.getElementById("pj-pba").value.trim(),
         pba_deel2: document.getElementById("pj-pba-deel2").checked,
@@ -317,6 +397,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (soekveld) soekveld.addEventListener("input", pj_teken_lys);
   document.getElementById("pj-stoor").addEventListener("click", pj_stoor);
   document.getElementById("pj-kanselleer").addEventListener("click", pj_maak_vorm_toe);
+  document.querySelectorAll('input[name="pj-fin"]').forEach((r) =>
+    r.addEventListener("change", pj_wys_toelae_deel));
 
   const oorlegsel = document.getElementById("pj-vorm");
   oorlegsel.addEventListener("click", (ev) => { if (ev.target === oorlegsel) pj_maak_vorm_toe(); });

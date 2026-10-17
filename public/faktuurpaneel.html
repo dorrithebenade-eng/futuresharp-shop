@@ -294,10 +294,11 @@
           <div class="fk-soekbalk">
             <input type="text" class="veld-invoer" id="pj-soek"
                    data-i18n-placeholder="pj_soek_plek"
-                   placeholder="Soek op naam, befondser of aantekening">
+                   placeholder="Soek op nommer, naam, befondser of aantekening">
             <button type="button" class="kaart-aksie" id="pj-nuut" data-i18n="pj_nuwe_knop">+ Nuwe projek</button>
           </div>
           <p class="fk-hulp" id="pj-hulp"></p>
+          <div class="pj-nommer-ban" id="pj-nommer-ban" style="display:none"></div>
 
           <div id="pj-lys">
             <p class="stelsel-boodskap" data-i18n="fp_laai">Word gelaai …</p>
@@ -412,14 +413,51 @@
           </div>
 
           <div class="fk-veld">
-            <label class="veld-etiket" for="pj-soort">
-              <span data-i18n="pj_veld_soort">Soort projek</span>
+            <span class="veld-etiket" data-i18n="pj_veld_nr">Projeknommer</span>
+            <div class="pj-nr" id="pj-nr"></div>
+          </div>
+
+          <div class="fk-veld">
+            <span class="veld-etiket" data-i18n="pj_veld_fin">Finansiering</span>
+            <div class="pj-fin" id="pj-fin">
+              <label class="pj-fin-keuse"><input type="radio" name="pj-fin" value="fooie">
+                <b data-i18n="pj_fin_fooie">Fooie vir dienste</b>
+                <span data-i18n="pj_fin_fooie_hulp">Die kli&euml;nt betaal vir die diens wat hy self ontvang: 'n skool, 'n ouer of 'n maatskappy.</span></label>
+              <label class="pj-fin-keuse"><input type="radio" name="pj-fin" value="toelae">
+                <b data-i18n="pj_fin_toelae">Toelae of skenking</b>
+                <span data-i18n="pj_fin_toelae_hulp">'n Befondser betaal sodat ander die diens kry, en kry self niks terug nie. Beperk tot die projek; 'n 18A-kwitansie is moontlik.</span></label>
+              <label class="pj-fin-keuse"><input type="radio" name="pj-fin" value="borgskap">
+                <b data-i18n="pj_fin_borgskap">Borgskap</b>
+                <span data-i18n="pj_fin_borgskap_hulp">'n Borg betaal en kry iets terug, soos sy handelsmerk op die werkswinkel. Geen 18A-kwitansie nie.</span></label>
+            </div>
+          </div>
+
+          <div class="fk-veld">
+            <label class="veld-etiket" for="pj-instansie">
+              <span data-i18n="pj_veld_instansie">Instansie</span>
               <span class="veld-opsioneel" data-i18n="pj_opsioneel">&mdash; opsioneel</span>
             </label>
-            <input type="text" class="veld-invoer" id="pj-soort" maxlength="60" list="pj-soorte"
-                   data-i18n-placeholder="pj_soort_plek" placeholder="Byvoorbeeld Skool of Geleentheid">
-            <datalist id="pj-soorte"></datalist>
-            <p class="fk-veldhulp" data-i18n="pj_soort_hulp">Kies een wat reeds gebruik is, of tik 'n nuwe soort.</p>
+            <select class="veld-invoer" id="pj-instansie">
+              <option value="" data-i18n="pj_inst_geen">Nie gekies nie</option>
+              <option value="skole" data-i18n="pj_inst_skole">Skole</option>
+              <option value="ouers" data-i18n="pj_inst_ouers">Ouers en individue</option>
+              <option value="hoer" data-i18n="pj_inst_hoer">Ho&euml;r onderwys</option>
+              <option value="korporatief" data-i18n="pj_inst_korporatief">Korporatief</option>
+            </select>
+            <p class="fk-veldhulp pj-ou-soort" id="pj-ou-soort" style="display:none"></p>
+          </div>
+
+          <div class="fk-veld">
+            <span class="veld-etiket">
+              <span data-i18n="pj_veld_tydperk">Tydperk</span>
+              <span class="veld-opsioneel" data-i18n="pj_opsioneel">&mdash; opsioneel</span>
+            </span>
+            <div class="bf-twee">
+              <label class="pj-klein"><span data-i18n="pj_van_dt">Van</span>
+                <input type="date" class="veld-invoer" id="pj-van"></label>
+              <label class="pj-klein"><span data-i18n="pj_tot_dt">Tot</span>
+                <input type="date" class="veld-invoer" id="pj-tot"></label>
+            </div>
           </div>
 
           <div class="fk-veld">
@@ -431,6 +469,7 @@
             <p class="fk-veldhulp" data-i18n="pj_vir_wie_hulp">Die skool of instansie waarvoor die projek is, uit die kli&euml;nteregister. Die befondsing kom by die toekennings.</p>
           </div>
 
+          <div id="pj-toelae-deel">
           <div class="fk-veld">
             <label class="veld-etiket" for="pj-pba">
               <span data-i18n="pj_veld_pba">Openbare-voordeel-aktiwiteit (PBA)</span>
@@ -454,6 +493,8 @@
                 <input type="text" class="veld-invoer" id="pj-baat-pct" inputmode="decimal" maxlength="5" placeholder="75"></label>
             </div>
             <p class="fk-veldhulp" data-i18n="pj_baat_hulp">Totale, nie name nie. B-BBEE-befondsers vra dat minstens 75% van die deelnemers swart is.</p>
+          </div>
+
           </div>
 
           <div class="fk-veld">

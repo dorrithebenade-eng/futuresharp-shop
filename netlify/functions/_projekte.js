@@ -38,11 +38,48 @@
 // Hoofletters en 'n woordgrens: "TOETS Skole", "TOETS-2" en "TOETS" tel;
 // "Toetsafnemers" en "TOETSING" nie. Dieselfde reel geld vir kliënte; sien
 // skrap-toetse.js.
+//
+// NOMMER, FINANSIERING EN INSTANSIE (17 Oktober 2026).
+//
+// Elke projek kry 'n nommer P-JJJJ-NNN by sy eerste stoor. Die jaar is die
+// jaar waarin die projek geskep is, en die volgnommer begin elke jaar by 001.
+// Die nommer verander nooit, ook nie as die naam verander nie: dit is waarna
+// 'n faktuur, 'n befondser en 'n verslag verwys.
+//
+// Finansiering se wie betaal, en bepaal hoe die geld op die staat val:
+//   fooie     die kliënt betaal vir die diens wat hy self ontvang (verstek)
+//   toelae    'n befondser betaal sodat ander die diens kry; beperk tot die
+//             projek, en 'n 18A-kwitansie is moontlik
+//   borgskap  'n borg betaal en kry iets terug; geen 18A-kwitansie nie
+// Die verstek is fooie, sodat 'n gewone projek niks ekstra verg nie.
+//
+// Instansie se waar die werk gedoen word. Die ou vrye-teks `soort` bly op die
+// rekord staan vir projekte wat dit reeds dra, maar die vorm stuur dit nie meer
+// nie.
 
 const { kry_store } = require("./_blob-store");
 const { maak_slug } = require("./_fin-kategoriee");
 
 const STORE_NAAM = "projekte";
+
+const FINANSIERING = ["fooie", "toelae", "borgskap"];
+const INSTANSIES = ["skole", "ouers", "hoer", "korporatief"];
+const NR_PATROON = /^P-(\d{4})-(\d{3,})$/;
+
+// Die volgende nommer vir `jaar`, uit die nommers wat reeds bestaan.
+function volgende_nr(almal, jaar) {
+  let hoogste = 0;
+  (almal || []).forEach((p) => {
+    const m = NR_PATROON.exec(String((p && p.nr) || ""));
+    if (m && Number(m[1]) === jaar) hoogste = Math.max(hoogste, Number(m[2]));
+  });
+  return `P-${jaar}-${String(hoogste + 1).padStart(3, "0")}`;
+}
+
+function jaar_van(iso) {
+  const j = Number(String(iso || "").slice(0, 4));
+  return j >= 2000 && j <= 2100 ? j : new Date().getFullYear();
+}
 
 function is_toets_naam(naam) {
   return /^\s*TOETS\b/.test(String(naam || ""));
@@ -56,6 +93,11 @@ function nuwe_projek() {
   const nou = new Date().toISOString();
   return {
     id: "",               // uit die naam, verander nooit
+    nr: "",               // P-JJJJ-NNN, by die eerste stoor
+    finansiering: "fooie",
+    instansie: "",
+    van: "",              // JJJJ-MM-DD, opsioneel
+    tot: "",
     naam: "",
     befondsers: [],       // kliëntnommers, in die volgorde waarin hulle bygevoeg is
     // 'n Rekord van voor hierdie veld bestaan nie, maar dieselfde reel as die
@@ -92,6 +134,10 @@ async function lees_almal(store) {
 
 module.exports = {
   STORE_NAAM,
+  FINANSIERING,
+  INSTANSIES,
+  volgende_nr,
+  jaar_van,
   kry_projekte_store,
   nuwe_projek,
   skoon_befondsers,

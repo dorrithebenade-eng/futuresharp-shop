@@ -141,3 +141,27 @@
 .tk-elders { opacity: 0.55; }
 .tk-kies { border: 1px solid #E3E0DA; border-radius: 8px; padding: 10px; margin-top: 8px; background: var(--grys-lig); }
 .tk-kies-lys { max-height: 280px; overflow-y: auto; margin-top: 8px; }
+
+/* Nommer, finansiering en instansie (17 Oktober 2026). */
+.pj-nr { font-weight: 700; font-variant-numeric: tabular-nums; padding: 8px 10px; border-radius: 8px; background: var(--grys-lig); }
+.pj-nr.pj-nr-leeg { font-weight: 400; color: var(--grys-teks); font-style: italic; }
+.pj-nr-lys { font-weight: 700; font-variant-numeric: tabular-nums; margin-right: 8px; }
+.pj-fin { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.pj-fin-keuse {
+  display: flex; flex-direction: column; gap: 4px; cursor: pointer;
+  border: 1.5px solid #E3E0DA; border-radius: 10px; padding: 9px 11px; background: #fff;
+  position: relative;
+}
+.pj-fin-keuse input { position: absolute; opacity: 0; pointer-events: none; }
+.pj-fin-keuse b { font-size: 0.86rem; }
+.pj-fin-keuse span { font-size: 0.76rem; line-height: 1.4; color: var(--grys-teks); }
+.pj-fin-keuse:has(input:checked) { border-color: var(--teal); background: #EFF7F5; }
+.pj-fin-keuse:has(input:focus-visible) { outline: 2px solid var(--teal); outline-offset: 2px; }
+@media (max-width: 640px) { .pj-fin { grid-template-columns: 1fr; } }
+.pj-fin-merk { display: inline-block; font-size: 0.72rem; font-weight: 600; padding: 1px 8px; border-radius: 20px; background: #E3F1EE; color: #2E7D6F; }
+.pj-fin-merk.pj-fin-toelae { background: #FDF3D9; color: #8A6A10; }
+.pj-fin-merk.pj-fin-borgskap { background: #F4E9F7; color: #7A3F8F; }
+.pj-nommer-ban {
+  display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between;
+  background: #FDF3E3; color: #8a5a1a; border-radius: 8px; padding: 8px 12px; margin: 0 0 10px; font-size: 0.86rem;
+}
