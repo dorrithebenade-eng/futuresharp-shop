@@ -24,6 +24,7 @@ let sessie_globaal = null;
 let vordering_stoor_tydsaanwyser = null;
 let huidige_zoem = 1;
 let huidige_render_taak = null;
+let huidige_weergawe = null;
 
 const MIN_ZOEM = 0.6;
 const MAKS_ZOEM = 3;
@@ -112,7 +113,7 @@ async function kry_boek(sessie, produk_slug) {
   }
 }
 
-async function kry_gestoorde_bladsy(sessie, produk_slug) {
+async function kry_gestoorde_vordering(sessie, produk_slug) {
   try {
     const resp = await fetch(
       `/.netlify/functions/kry-lees-vordering?produk_slug=${encodeURIComponent(produk_slug)}`,
@@ -120,10 +121,59 @@ async function kry_gestoorde_bladsy(sessie, produk_slug) {
     );
     if (!resp.ok) return null;
     const data = await resp.json();
-    return data.bladsy || null;
+    return data && data.bladsy ? data : null;
   } catch {
     return null;
   }
+}
+
+// OPGEDATEERDE BOEK: as die gestoorde bladsy uit 'n ander weergawe kom,
+// word dit volgens dieselfde relatiewe posisie in die nuwe weergawe
+// geplaas (bv. 40% deur die boek bly 40% deur die boek), eerder as
+// dieselfde bladsynommer wat nou dalk 'n ander hoofstuk is.
+function bepaal_beginbladsy(vordering, weergawe, nuwe_totaal) {
+  if (!vordering || !vordering.bladsy) return { bladsy: 1, verskuif: false };
+  const ou_bladsy = vordering.bladsy;
+  const ander_weergawe = Boolean(vordering.weergawe && weergawe && vordering.weergawe !== weergawe);
+
+  if (ander_weergawe && vordering.totaal_bladsye && vordering.totaal_bladsye > 1 && nuwe_totaal > 1) {
+    const verhouding = (ou_bladsy - 1) / (vordering.totaal_bladsye - 1);
+    const nuwe_bladsy = Math.round(verhouding * (nuwe_totaal - 1)) + 1;
+    return { bladsy: Math.min(Math.max(nuwe_bladsy, 1), nuwe_totaal), verskuif: nuwe_bladsy !== ou_bladsy };
+  }
+  return { bladsy: Math.min(Math.max(ou_bladsy, 1), nuwe_totaal), verskuif: false };
+}
+
+function wys_weergawe_kennisgewing() {
+  const el = document.getElementById("leser-weergawe-kennisgewing");
+  if (!el) return;
+  el.hidden = false;
+}
+
+// Die bediener stuur 'n groot PDF in stukke van hoogstens 5MB (sien
+// MAKS_ANTWOORD_GREPE in kry-eboek-inhoud.js) met 'n Content-Range-
+// kopstuk. Haal stuk vir stuk tot die hele lêer daar is; anders word 'n
+// boek groter as 5MB afgesny en kan PDF.js dit nie oopmaak nie.
+async function haal_volledige_pdf(eerste_antwoord, pdf_url) {
+  const eerste = new Uint8Array(await eerste_antwoord.arrayBuffer());
+  const reeks = eerste_antwoord.headers.get("Content-Range");
+  if (eerste_antwoord.status !== 206 || !reeks) return eerste.buffer;
+
+  const totaal = parseInt(reeks.split("/")[1], 10);
+  if (!Number.isFinite(totaal) || totaal <= eerste.length) return eerste.buffer;
+
+  const volledig = new Uint8Array(totaal);
+  volledig.set(eerste, 0);
+  let posisie = eerste.length;
+  while (posisie < totaal) {
+    const resp = await fetch(pdf_url, { headers: { Range: `bytes=${posisie}-` } });
+    if (!resp.ok) throw new Error(`Onverwagte status: ${resp.status}`);
+    const stuk = new Uint8Array(await resp.arrayBuffer());
+    if (!stuk.length) throw new Error("Leë stuk ontvang");
+    volledig.set(stuk.subarray(0, totaal - posisie), posisie);
+    posisie += stuk.length;
+  }
+  return volledig.buffer;
 }
 
 function stoor_vordering_debounced() {
@@ -138,7 +188,12 @@ function stoor_vordering_debounced() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${sessie_globaal.access_token}`,
         },
-        body: JSON.stringify({ produk_slug: produk_slug_globaal, bladsy: huidige_bladsy }),
+        body: JSON.stringify({
+          produk_slug: produk_slug_globaal,
+          bladsy: huidige_bladsy,
+          weergawe: huidige_weergawe,
+          totaal_bladsye: totale_bladsye,
+        }),
       });
     } catch (fout) {
       console.warn("Kon nie leesvordering stoor nie:", fout);
@@ -400,7 +455,8 @@ async function laai_leser() {
       throw new Error(`Onverwagte status: ${token_resp.status}`);
     }
 
-    const { token, leen } = await token_resp.json();
+    const { token, leen, weergawe } = await token_resp.json();
+    huidige_weergawe = weergawe || null;
 
     if (leen && leen.is_leen) {
       wys_leen_kennisgewing(leen);
@@ -415,18 +471,28 @@ async function laai_leser() {
       return;
     }
 
-    // Kyk NOU eers plaaslik (IndexedDB) — as die boek reeds afgelaai is,
-    // laai dit direk daarvandaan, GEEN verdere netwerk-versoek of
-    // data-gebruik nie. Veilig om hier te doen, aangesien ons hierbo
-    // reeds bevestig het die leen (indien enige) nog aktief is.
-    let pdf_grepe = await aflyn_kry_boek(produk_slug);
-    let aflyn_status = "reeds_plaaslik";
+    // Kyk NOU eers plaaslik (IndexedDB). Die plaaslike kopie word net
+    // gebruik as dit dieselfde weergawe as die bediener s'n is; dan word
+    // GEEN verdere netwerk-versoek of data gebruik nie. Is daar 'n nuwer
+    // weergawe, word dit afgelaai en vervang die ou kopie. Veilig om hier
+    // te doen, aangesien ons hierbo reeds bevestig het die leen (indien
+    // enige) nog aktief is.
+    const plaaslik = await aflyn_kry_boek(produk_slug);
+    const plaaslik_is_huidig = Boolean(
+      plaaslik && (plaaslik.weergawe === huidige_weergawe || !huidige_weergawe)
+    );
+    let boek_opgedateer = Boolean(
+      plaaslik && plaaslik.weergawe && huidige_weergawe && plaaslik.weergawe !== huidige_weergawe
+    );
 
-    if (!pdf_grepe) {
-      const pdf_url = `/.netlify/functions/kry-eboek-inhoud?produk_slug=${encodeURIComponent(
-        produk_slug
-      )}&token=${encodeURIComponent(token)}`;
+    const pdf_url = `/.netlify/functions/kry-eboek-inhoud?produk_slug=${encodeURIComponent(
+      produk_slug
+    )}&token=${encodeURIComponent(token)}`;
 
+    // Haal die boek van die bediener af en stoor dit plaaslik vir volgende
+    // keer. Gee null terug as die leen intussen verval het (die boodskap is
+    // dan reeds gewys).
+    async function haal_van_bediener() {
       const pdf_resp = await fetch(pdf_url);
       if (!pdf_resp.ok) {
         if (pdf_resp.status === 403) {
@@ -437,27 +503,75 @@ async function laai_leser() {
                 ? window.t("leen_verval_boodskap")
                 : "Jou leen-tydperk vir hierdie e-boek het verval. Koop dit, of leen dit weer, om verder te lees."
             );
-            return;
+            return null;
           }
         }
         throw new Error(`Onverwagte status: ${pdf_resp.status}`);
       }
-      pdf_grepe = await pdf_resp.arrayBuffer();
-      aflyn_status = "nuut_afgelaai";
-
+      const grepe = await haal_volledige_pdf(pdf_resp, pdf_url);
       // Stoor plaaslik vir volgende keer — "beste-poging", loop nie die
       // huidige lees-sessie in gedrang as dit misluk nie.
-      aflyn_stoor_boek(produk_slug, pdf_grepe);
+      aflyn_stoor_boek(produk_slug, grepe, huidige_weergawe);
+      return grepe;
     }
 
-    pdf_dokument = await pdfjsLib.getDocument({ data: pdf_grepe }).promise;
+    // PDF.js neem die grepe oor (hulle word "losgemaak" en is daarna leeg).
+    // Gee dit dus altyd 'n afskrif, sodat die oorspronklike steeds plaaslik
+    // gestoor kan word. Voorheen het die stoor hierdeur stilweg misluk.
+    async function open_pdf(grepe) {
+      return pdfjsLib.getDocument({ data: new Uint8Array(grepe.slice(0)) }).promise;
+    }
+
+    let pdf_grepe = plaaslik_is_huidig ? plaaslik.grepe : null;
+    let van_plaaslik = Boolean(pdf_grepe);
+
+    if (!pdf_grepe) {
+      try {
+        pdf_grepe = await haal_van_bediener();
+        if (!pdf_grepe) return;
+      } catch (aflaai_fout) {
+        // MINSTE ONTWRIGTING. As die nuwe weergawe nie nou afgelaai kan
+        // word nie (swak verbinding) maar 'n ouer kopie is plaaslik, lees
+        // die koper eerder die ou weergawe as om 'n foutboodskap te kry.
+        // Volgende keer word weer probeer.
+        const is_toegangsfout = /status: (403|404)$/.test(aflaai_fout && aflaai_fout.message);
+        if (plaaslik && !is_toegangsfout) {
+          console.warn("Kon nie nuwe weergawe aflaai nie; gebruik plaaslike kopie:", aflaai_fout);
+          pdf_grepe = plaaslik.grepe;
+          van_plaaslik = true;
+          huidige_weergawe = plaaslik.weergawe;
+          boek_opgedateer = false;
+        } else {
+          throw aflaai_fout;
+        }
+      }
+    }
+
+    try {
+      pdf_dokument = await open_pdf(pdf_grepe);
+    } catch (oopmaak_fout) {
+      // 'n Beskadigde of onvolledige plaaslike kopie (bv. een wat vroeër
+      // ná die eerste 5MB afgesny is) mag nooit die boek blokkeer nie: gooi
+      // dit weg en haal 'n vars kopie van die bediener af.
+      if (!van_plaaslik) throw oopmaak_fout;
+      console.warn("Plaaslike kopie kon nie oopgemaak word nie; haal vars kopie:", oopmaak_fout);
+      await aflyn_verwyder_boek(produk_slug);
+      pdf_grepe = await haal_van_bediener();
+      if (!pdf_grepe) return;
+      pdf_dokument = await open_pdf(pdf_grepe);
+    }
     totale_bladsye = pdf_dokument.numPages;
 
-    const gestoorde_bladsy = await kry_gestoorde_bladsy(sessie, produk_slug);
+    const vordering = await kry_gestoorde_vordering(sessie, produk_slug);
+    if (vordering && vordering.weergawe && huidige_weergawe && vordering.weergawe !== huidige_weergawe) {
+      boek_opgedateer = true;
+    }
+    const begin = bepaal_beginbladsy(vordering, huidige_weergawe, totale_bladsye);
 
     wys_status("");
+    if (boek_opgedateer) wys_weergawe_kennisgewing();
     document.getElementById("leser-bekyker").hidden = false;
-    await wys_bladsy(gestoorde_bladsy || 1);
+    await wys_bladsy(begin.bladsy);
   } catch (fout) {
     console.error("Kon nie e-boek laai nie:", fout);
     if (fout && fout.message === "Onverwagte status: 403") {
@@ -493,6 +607,11 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   document.getElementById("leser-leen-etiket").addEventListener("click", wissel_leen_paneel);
+
+  document.getElementById("leser-weergawe-toemaak").addEventListener("click", () => {
+    document.getElementById("leser-weergawe-kennisgewing").hidden = true;
+    if (pdf_dokument) wys_bladsy(huidige_bladsy);
+  });
 
   // Die soekveld is toegevou tot die leser dit nodig het, sodat die
   // bladsy die ruimte kry.
