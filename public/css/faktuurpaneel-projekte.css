@@ -202,3 +202,25 @@
 .pk-dat { white-space: nowrap; color: var(--grys-teks); }
 .pk-leeg { font-size: 0.84rem; color: var(--grys-teks); margin-top: 16px; }
 @media (max-width: 640px) { .pk-teels { grid-template-columns: repeat(2, minmax(0, 1fr)); } .pk-pyl { display: none; } }
+
+/* Die projekverslag onder State (17 Oktober 2026). Sien faktuurpaneel-projekverslag.js. */
+.st-aansigte { margin-bottom: 18px; }
+.pv-teels { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 6px 0 16px; }
+.pv-teel { background: #fff; border: 1px solid #E7E4DE; border-radius: 10px; padding: 10px 12px; min-width: 0; }
+.pv-teel span { display: block; font-size: 0.68rem; letter-spacing: .06em; text-transform: uppercase; color: var(--grys-teks); font-weight: 600; }
+.pv-teel b { display: block; font-size: 1.1rem; margin-top: 4px; font-variant-numeric: tabular-nums; }
+.pv-teel small { display: block; font-size: 0.74rem; color: var(--grys-teks); margin-top: 2px; }
+.pv-tabel { overflow-x: auto; background: #fff; border: 1px solid #E7E4DE; border-radius: 10px; }
+.pv-tabel table { width: 100%; border-collapse: collapse; min-width: 760px; font-size: 0.86rem; }
+.pv-tabel th { text-align: left; font-size: 0.68rem; letter-spacing: .06em; text-transform: uppercase; color: var(--grys-teks); padding: 9px 10px; border-bottom: 1px solid #E3E0DA; white-space: nowrap; }
+.pv-tabel td { padding: 9px 10px; border-bottom: 1px solid #F3F1ED; vertical-align: top; }
+.pv-tabel .n { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.pv-nr { font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.pv-klein { font-size: 0.76rem; color: var(--grys-teks); }
+.pv-let { color: #7E610F; }
+.pv-ry { cursor: pointer; }
+.pv-ry:hover td { background: #F7FAF9; }
+.pv-groep td { background: var(--grys-lig); font-weight: 700; font-size: 0.72rem; letter-spacing: .05em; text-transform: uppercase; color: var(--grys-teks); }
+.pv-sub td { font-weight: 700; border-bottom: 1px solid #D3CDC3; }
+.pv-tot td { font-weight: 700; background: #EEF6F4; color: #2E7D6F; border-top: 1.5px solid var(--teal); border-bottom: 0; }
+@media (max-width: 640px) { .pv-teels { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

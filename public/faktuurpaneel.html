@@ -730,6 +730,15 @@
            skulp en die vaste teks. -->
       <section class="paneel-afdeling fp-afdeling" data-afdeling="state">
 
+        <!-- VIER OORTJIES (17 Oktober 2026). Sien faktuurpaneel-state-aansigte.js. -->
+        <div class="fk-sub st-aansigte">
+          <button type="button" class="fr-sub-knop aan" data-st-aansig="betaal" data-i18n="sa_betaal">Begunstigdes en fakture</button>
+          <button type="button" class="fr-sub-knop" data-st-aansig="staat" data-i18n="fs_titel">Ontvangste en betalings</button>
+          <button type="button" class="fr-sub-knop" data-st-aansig="projekte" data-i18n="pv_titel">Projekverslag</button>
+          <button type="button" class="fr-sub-knop" data-st-aansig="maande" data-i18n="ms_aansig_maande">Maandopsomming</button>
+        </div>
+
+        <div id="st-aansig-betaal">
         <div id="st-drie" class="st-drie"></div>
         <p class="st-verduidelik" data-i18n="st_verduidelik">Elke syfer word by elke oopmaak uit die fakture herbereken en nooit gestoor nie. Die bedrae kom uit elke faktuur se gevriesde verdeling en word nooit oorgetik nie.</p>
 
@@ -762,6 +771,9 @@
           <div id="st-klaar"></div>
         </div>
 
+        </div>
+
+        <div id="st-aansig-staat" hidden>
         <!-- DIE INKOMSTE- EN UITGAWESTAAT.
 
              Sy tel op wat kry-joernaal.js reeds gee — die betaalde fakture,
@@ -791,6 +803,31 @@
           <div id="fs-staat">
             <p class="stelsel-boodskap" data-i18n="fp_laai">Word gelaai …</p>
           </div>
+        </div>
+        </div>
+
+        <!-- DIE PROJEKVERSLAG. Sien faktuurpaneel-projekverslag.js. -->
+        <div id="st-aansig-projekte" hidden>
+          <div class="ms-balk">
+            <label class="veld-etiket" for="pv-jaar" data-i18n="ms_boekjaar">Boekjaar</label>
+            <select class="veld-invoer" id="pv-jaar"></select>
+            <button type="button" class="kaart-aksie" id="pv-pdf" data-i18n="pv_pdf">Verslag as PDF</button>
+          </div>
+          <p class="st-afd-hulp" data-i18n="pv_hulp">Al die projekte van die boekjaar langs mekaar. Klik op 'n projek om sy projekkaart oop te maak.</p>
+          <div id="pv-verslag"></div>
+        </div>
+
+        <!-- Die maandopsomming en die werkboek vir die rekenmeester (17 Okt 2026
+             van Bankstate hierheen geskuif: dit is 'n verslag). Sien
+             faktuurpaneel-maandopsomming.js en kry-bankmaande.js. -->
+        <div id="st-aansig-maande" hidden>
+          <div class="ms-balk">
+            <label class="veld-etiket" for="ms-jaar" data-i18n="ms_boekjaar">Boekjaar</label>
+            <select class="veld-invoer" id="ms-jaar"></select>
+            <button type="button" class="kaart-aksie" id="ms-boekjaar-af" data-i18n="ms_laai_boekjaar">Laai boekjaar af (Excel)</button>
+            <button type="button" class="kaart-aksie wi-stil" id="ms-boekjaar-pdf" data-i18n="ms_laai_pdf">Laai boekjaar af (PDF)</button>
+          </div>
+          <div id="ms-tabel"></div>
         </div>
 
       </section>
@@ -937,7 +974,6 @@
              binding is tot #fr-sub beperk, so hierdie houer bots nie. -->
         <div class="fk-sub bs-aansigte">
           <button type="button" class="fr-sub-knop aan" data-bs-aansig="reels" data-i18n="ms_aansig_reels">State en transaksies</button>
-          <button type="button" class="fr-sub-knop" data-bs-aansig="maande" data-i18n="ms_aansig_maande">Maandopsomming</button>
           <button type="button" class="fr-sub-knop" data-bs-aansig="grootboek" data-i18n="gb_aansig">Grootboek</button>
         </div>
 
@@ -964,17 +1000,6 @@
           <div id="gb-uitslag"></div>
         </div>
 
-        <!-- Die maandopsomming en die werkboek vir die rekenmeester. Sien
-             faktuurpaneel-maandopsomming.js en kry-bankmaande.js. -->
-        <div id="bs-aansig-maande" hidden>
-          <div class="ms-balk">
-            <label class="veld-etiket" for="ms-jaar" data-i18n="ms_boekjaar">Boekjaar</label>
-            <select class="veld-invoer" id="ms-jaar"></select>
-            <button type="button" class="kaart-aksie" id="ms-boekjaar-af" data-i18n="ms_laai_boekjaar">Laai boekjaar af (Excel)</button>
-            <button type="button" class="kaart-aksie wi-stil" id="ms-boekjaar-pdf" data-i18n="ms_laai_pdf">Laai boekjaar af (PDF)</button>
-          </div>
-          <div id="ms-tabel"></div>
-        </div>
       </section>
 
       <section class="paneel-afdeling fp-afdeling" data-afdeling="instellings">
@@ -1251,6 +1276,8 @@
   <script src="js/faktuurpaneel-fin-kategoriee.js"></script>
   <script src="js/faktuurpaneel-projekte.js"></script>
   <script src="js/faktuurpaneel-projekkaart.js"></script>
+  <script src="js/faktuurpaneel-projekverslag.js"></script>
+  <script src="js/faktuurpaneel-state-aansigte.js"></script>
   <script src="js/faktuurpaneel-toekennings.js"></script>
   <script src="js/faktuurpaneel-befondsers.js"></script>
   <script src="js/faktuurpaneel-befondsingsoorte.js"></script>

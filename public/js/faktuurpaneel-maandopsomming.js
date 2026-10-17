@@ -360,8 +360,20 @@
     document.querySelectorAll('[id^="bs-aansig-"]').forEach((h) => {
       h.hidden = h.id !== "bs-aansig-" + aansig;
     });
-    if (aansig === "maande" && !MS.bank) laai(Number(document.getElementById("ms-jaar").value));
   }
+
+  // DIE MAANDOPSOMMING STAAN SEDERT 17 OKTOBER 2026 ONDER STATE, as 'n eie
+  // oortjie (faktuurpaneel-state-aansigte.js). Sy laai wanneer daardie oortjie
+  // oopgaan, en weer as 'n toewysing by die bank die syfers verander het.
+  //
+  // Gaan die oortjie oop voordat die boekjare gelaai is (die laaste oortjie
+  // word onthou), wag dit vir die einde van die opstel hieronder.
+  let ms_oop = false;
+  let ms_gereed = false;
+  document.addEventListener("st-aansig", (e) => {
+    ms_oop = e.detail === "maande";
+    if (ms_oop && ms_gereed && !MS.bank) laai(Number(document.getElementById("ms-jaar").value));
+  });
 
   document.addEventListener("DOMContentLoaded", async () => {
     if (!document.getElementById("ms-tabel")) return;
@@ -393,5 +405,7 @@
       k.addEventListener("click", () => wissel(k.getAttribute("data-bs-aansig"))));
     // 'n Toewysing verander die syfers; laai weer wanneer die aansig oopgaan.
     document.addEventListener("bs-gelaai", () => { MS.bank = null; });
+    ms_gereed = true;
+    if (ms_oop && !MS.bank) laai(Number(kies.value));
   });
 })();
