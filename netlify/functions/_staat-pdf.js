@@ -115,7 +115,7 @@ async function bou_staat_pdf(data, maatskappy) {
   const gewoon = await pdf.embedFont(StandardFonts.Helvetica);
   const vet = await pdf.embedFont(StandardFonts.HelveticaBold);
 
-  pdf.setTitle(`Staat van inkomste en uitgawes ${data.van} tot ${data.tot}`);
+  pdf.setTitle(`Staat van ontvangste en betalings ${data.van} tot ${data.tot}`);
   pdf.setProducer("Future Sharp");
 
   const logo = await kry_logo();
@@ -191,7 +191,7 @@ async function bou_staat_pdf(data, maatskappy) {
   y -= 26;
 
   // ── titel en tydperk ───────────────────────────────────────────────────
-  skryf("Staat van inkomste en uitgawes", KANT, y, { grootte: 16, vet: true });
+  skryf("Staat van ontvangste en betalings", KANT, y, { grootte: 16, vet: true });
   y -= 16;
   skryf(`${datum_lank(data.van)} tot ${datum_lank(data.tot)}`, KANT, y,
         { grootte: 10, kleur: GRYS });

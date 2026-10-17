@@ -285,7 +285,7 @@
         per_kat.set(naam, k);
       });
     });
-    const b2 = blad(wb, "Per kategorie", "Inkomste en uitgawes per kategorie", tydperk,
+    const b2 = blad(wb, "Per kategorie", "Ontvangste en betalings per kategorie", tydperk,
       ["Kategorie", "In", "Uit"], [48, 16, 16]);
     [...per_kat.entries()].sort((a, b) => a[0].localeCompare(b[0], "af-ZA")).forEach(([naam, k]) => {
       geld(b2.addRow([naam, k.in / 100, k.uit / 100]), [2, 3]);
@@ -327,7 +327,7 @@
       !(r.sleutel && gepas.has(r.sleutel)) && !(r.pas_ref && gepas.has(r.pas_ref)));
     const b5 = blad(wb, "Nie teen die bank gepas nie",
       "Joernaalinskrywings sonder 'n banktransaksie",
-      "Paystack-inkomste word as vereffening gepas, nie per inskrywing nie; betalings uit eie sak loop nie deur die bank nie.",
+      "Paystack-ontvangste word as vereffening gepas, nie per inskrywing nie; betalings uit eie sak loop nie deur die bank nie.",
       ["Datum", "Beskrywing", "Kategorie", "Bron", "In", "Uit"], [12, 46, 34, 12, 14, 14]);
     los.slice().sort((a, b) => String(a.datum).localeCompare(String(b.datum))).forEach((r) => {
       const b = Number(r.bedrag_sent) / 100;

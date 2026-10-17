@@ -557,11 +557,11 @@ function bo_teken_verdeling(S) {
           <div class="vd-soort">
             <button type="button" data-soort="verkoop" class="${isk ? "" : "aan"}">${fv_t(
               "bo_soort_inkomste",
-              "Inkomste"
+              "Ontvangs"
             )}</button>
             <button type="button" data-soort="koste" class="${isk ? "aan" : ""}">${fv_t(
               "bo_soort_uitgawe",
-              "Uitgawe"
+              "Betaling"
             )}</button>
           </div>
           <label class="vd-kat">

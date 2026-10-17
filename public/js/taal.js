@@ -672,19 +672,19 @@ const WOORDEBOEK = {
      Kontantbasis, per finansiele jaar (1 Maart tot 28 Februarie). */
   fp_nav_joernaal: { af: "Joernaal", en: "Journal" },
   jn_lei_1: {
-    af: "Inkomste en Uitgawes vir \u2019n finansi\u00eble jaar.",
-    en: "Income and expenses for a financial year.",
+    af: "Ontvangste en betalings vir \u2019n finansi\u00eble jaar.",
+    en: "Receipts and payments for a financial year.",
   },
   jn_lei_2: {
-    af: "Betalings deur Paystack word outomaties versprei as inkomste en geallokeer waar uitgawes van belang is.",
+    af: "Geld wat deur Paystack inkom, word outomaties as ontvangste versprei en toegewys waar betalings van belang is.",
     en: "Payments through Paystack are distributed automatically as income and allocated where expenses matter.",
   },
   jn_lei_3: {
     af: "Betalings wat nie deur Paystack vloei nie moet steeds handmatig ingevoer word.",
     en: "Payments that do not flow through Paystack must still be entered by hand.",
   },
-  jn_inkomste: { af: "Inkomste", en: "Income" },
-  jn_uitgawes: { af: "Uitgawes", en: "Expenses" },
+  jn_inkomste: { af: "Ontvangste", en: "Receipts" },
+  jn_uitgawes: { af: "Betalings", en: "Payments" },
   jn_verskil: { af: "Verskil", en: "Difference" },
 
   /* Debiteure en krediteure TEL NIE in die drie syfers hierbo nie. Op
@@ -721,8 +721,8 @@ const WOORDEBOEK = {
   jn_bedrag: { af: "Bedrag", en: "Amount" },
   jn_wie: { af: "Betaal deur", en: "Paid by" },
   jn_rigting: { af: "Soort", en: "Type" },
-  jn_in: { af: "Inkomste", en: "Income" },
-  jn_uit: { af: "Uitgawe", en: "Expense" },
+  jn_in: { af: "Ontvangs", en: "Receipt" },
+  jn_uit: { af: "Betaling", en: "Payment" },
   jn_teken_aan: { af: "Teken aan", en: "Record" },
   jn_besig: { af: "Besig \u2026", en: "Working \u2026" },
   jn_herhaal: { af: "herhaal", en: "repeat" },
@@ -1774,8 +1774,8 @@ const WOORDEBOEK = {
   bo_kopieer: { af: "Klik om te kopieer", en: "Click to copy" },
 
   bo_reel_naamloos: { af: "Naamloos", en: "Unnamed" },
-  bo_soort_inkomste: { af: "Inkomste", en: "Income" },
-  bo_soort_uitgawe: { af: "Uitgawe", en: "Expense" },
+  bo_soort_inkomste: { af: "Ontvangs", en: "Receipt" },
+  bo_soort_uitgawe: { af: "Betaling", en: "Payment" },
 
   // DIE KATEGORIE OP 'N REEL. Backoffice-taal, dus staan sy hier by die ander
   // bo_-sleutels en nie by die kt_-familie op die Registers-blad nie -- die
@@ -2807,7 +2807,7 @@ const WOORDEBOEK = {
     en: "Every figure is recalculated from the invoices each time this page opens and is never stored. The amounts come from each invoice's frozen split and are never typed over.",
   },
   // ── Die inkomste- en uitgawestaat ──
-  fs_titel: { af: "Inkomste en uitgawes", en: "Income and expenses" },
+  fs_titel: { af: "Ontvangste en betalings", en: "Receipts and payments" },
   fs_hulp: { af: "Kontantbasis. Finansi\u00eble jaar 1 Maart tot 28 Februarie.", en: "Cash basis. Financial year 1 March to 28 February." },
   fs_van: { af: "Van", en: "From" },
   fs_tot: { af: "Tot", en: "To" },
@@ -2825,15 +2825,15 @@ const WOORDEBOEK = {
     af: "Kon nie die staat as PDF bou nie.",
     en: "Could not build the statement as a PDF.",
   },
-  fs_pdf_nota_kop: { af: "Grondslag van inkomste", en: "Basis of income" },
+  fs_pdf_nota_kop: { af: "Grondslag van ontvangste", en: "Basis of receipts" },
   fs_pdf_nota: {
-    af: "Waar 'n kursus deur 'n eksterne ontwikkelaar aangebied word en die betaling regstreeks na daardie ontwikkelaar se rekening vereffen, tree Future Sharp as agent op. Slegs wat behou word, is inkomste.",
-    en: "Where a course is presented by an external developer and payment settles directly to that developer's account, Future Sharp acts as agent. Only the amount retained is income.",
+    af: "Waar 'n kursus deur 'n eksterne ontwikkelaar aangebied word en die betaling regstreeks na daardie ontwikkelaar se rekening vereffen, tree Future Sharp as agent op. Slegs wat behou word, word as ontvangste getoon.",
+    en: "Where a course is presented by an external developer and payment settles directly to that developer's account, Future Sharp acts as agent. Only the amount retained is shown as receipts.",
   },
-  fs_inkomste: { af: "Inkomste", en: "Income" },
-  fs_uitgawes: { af: "Uitgawes", en: "Expenses" },
-  fs_tot_in: { af: "Totale inkomste", en: "Total income" },
-  fs_tot_uit: { af: "Totale uitgawes", en: "Total expenses" },
+  fs_inkomste: { af: "Ontvangste", en: "Receipts" },
+  fs_uitgawes: { af: "Betalings", en: "Payments" },
+  fs_tot_in: { af: "Totale ontvangste", en: "Total receipts" },
+  fs_tot_uit: { af: "Totale betalings", en: "Total payments" },
   // DIE SLOTTABEL SE TRAP (5 September 2026). Elke uitgawekop word apart
   // afgetrek, met 'n tussentotaal daarna: "Surplus na direkte projekkoste".
   //
@@ -2841,8 +2841,8 @@ const WOORDEBOEK = {
   // gebruik, maar die slotreel lees nou Surplus: 'n NPC se staat gebruik
   // surplus en tekort, en `oorskot` dra reeds 'n ander betekenis in hierdie
   // stelsel -- wat op 'n FAKTUUR oorbly na die verdeling.
-  fs_surplus: { af: "Surplus", en: "Surplus" },
-  fs_na: { af: "Surplus n\u00e1", en: "Surplus after" },
+  fs_surplus: { af: "Oorskot vir die tydperk", en: "Surplus for the period" },
+  fs_na: { af: "Oor n\u00e1", en: "Left after" },
 
   fs_oorskot: { af: "Oorskot vir die tydperk", en: "Surplus for the period" },
   fs_ongekat: { af: "Ongekategoriseer", en: "Uncategorised" },
@@ -2850,8 +2850,8 @@ const WOORDEBOEK = {
   fs_hosting_in: { af: "Hosting ingebring", en: "Hosting collected" },
   fs_hosting_oor: { af: "Hosting oor", en: "Hosting left over" },
   fs_hosting_kort: { af: "Hosting kort", en: "Hosting short" },
-  fs_hosting_uit: { af: "Uitgawes gemerk gedek deur hosting", en: "Expenses marked covered by hosting" },
-  fs_hosting_hulp: { af: "Uitgawes wat sonder 'n eis gedra is, is nie hierin nie.", en: "Expenses carried without a claim are not included." },
+  fs_hosting_uit: { af: "Betalings gemerk gedek deur hosting", en: "Payments marked covered by hosting" },
+  fs_hosting_hulp: { af: "Betalings wat sonder 'n eis gedra is, is nie hierin nie.", en: "Expenses carried without a claim are not included." },
   fs_bank_kop: { af: "Bankrekonsiliasie", en: "Bank reconciliation" },
   fs_bank_leeg: { af: "Teken die balans aan op die dag voor die tydperk en op die laaste dag.", en: "Record the balance on the day before the period and on the last day." },
   fs_bank_datum: { af: "Datum", en: "Date" },
@@ -3050,8 +3050,8 @@ const WOORDEBOEK = {
   gb_bs_geen: { af: "Geen bankrekening om na te gaan nie.", en: "No bank account to check." },
   gb_bs_nie_gedek: { af: "Geen ingevoerde staat dek {d} nie.", en: "No imported statement covers {d}." },
   gb_bs: { af: "Grootboek {g}, state {s} op {d}.", en: "Ledger {g}, statements {s} on {d}." },
-  gb_inkomste: { af: "Inkomste", en: "Income" },
-  gb_uitgawe: { af: "Uitgawe", en: "Expense" },
+  gb_inkomste: { af: "Ontvangs", en: "Receipt" },
+  gb_uitgawe: { af: "Betaling", en: "Payment" },
   gb_grootboek: { af: "Grootboek", en: "Ledger" },
   gb_k_rek: { af: "Rekeninge", en: "Accounts" },
   gb_k_bal: { af: "Balans", en: "Balance" },
@@ -3204,8 +3204,8 @@ const WOORDEBOEK = {
   bs_al_pas_een: { af: "Pas 1 teen 'n faktuur", en: "Match 1 with an invoice" },
   bs_soortgelyk_ander: { af: "In die ander state het {n} soortgelyke transaksie(s) ook dieselfde kategorie gekry.", en: "In the other statements, {n} similar transaction(s) also received the same category." },
   bs_nuwe_kat: { af: "+ Nuwe kategorie \u2026", en: "+ New category \u2026" },
-  bs_nk_plek_in: { af: "Naam van die inkomstekategorie", en: "Name of the income category" },
-  bs_nk_plek_uit: { af: "Naam van die uitgawekategorie", en: "Name of the expense category" },
+  bs_nk_plek_in: { af: "Naam van die ontvangstekategorie", en: "Name of the receipts category" },
+  bs_nk_plek_uit: { af: "Naam van die betalingskategorie", en: "Name of the payments category" },
   bs_nk_bo: { af: "Op die boonste vlak", en: "At the top level" },
   bs_nk_skep: { af: "Skep en wys toe", en: "Create and allocate" },
   bs_nk_kanselleer: { af: "Kanselleer", en: "Cancel" },
@@ -3349,8 +3349,8 @@ const WOORDEBOEK = {
     af: "'n Kategorie word nie uitgevee nie. Plaas dit onder die korrekte kategorie; bestaande state bly onveranderd.",
     en: "A category is not deleted. Place it under the correct category; existing statements remain unchanged.",
   },
-  kt_in: { af: "Inkomste", en: "Income" },
-  kt_uit: { af: "Uitgawe", en: "Expense" },
+  kt_in: { af: "Ontvangs", en: "Receipt" },
+  kt_uit: { af: "Betaling", en: "Payment" },
   kt_veld_naam: { af: "Naam", en: "Name" },
   kt_veld_onder: { af: "Val onder", en: "Falls under" },
   kt_geen_ouer: { af: "\u2014 hoofkategorie \u2014", en: "\u2014 main category \u2014" },
@@ -3401,8 +3401,8 @@ const WOORDEBOEK = {
   // DIE TWEE BLOKOPSKRIFTE. Apart van kt_in en kt_uit, wat die VORM se
   // knoppies is: daar kies 'n mens een rigting, hier staan 'n opskrif oor
   // baie items.
-  kt_kop_in: { af: "Inkomste", en: "Income" },
-  kt_kop_uit: { af: "Uitgawes", en: "Expenses" },
+  kt_kop_in: { af: "Ontvangste", en: "Receipts" },
+  kt_kop_uit: { af: "Betalings", en: "Payments" },
 
   kt_soek_plek: {
     af: "Soek op naam of aantekening",

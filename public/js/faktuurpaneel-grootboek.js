@@ -177,7 +177,7 @@
       const pk = per_kode[x.kode] || { gepas: 0, tel: x.tel };
       return `<tr>
         <td class="gb-kode">${o(x.kode)}</td>
-        <td>${o(x.naam)}<span class="bs-verw">${o(x.rigting === "in" ? t("gb_inkomste", "Inkomste") : t("gb_uitgawe", "Uitgawe"))}</span></td>
+        <td>${o(x.naam)}<span class="bs-verw">${o(x.rigting === "in" ? t("gb_inkomste", "Ontvangs") : t("gb_uitgawe", "Betaling"))}</span></td>
         <td class="n">${pk.gepas} / ${pk.tel}</td>
         <td class="n">${rand(x.netto_sent)}</td>
         <td><select class="veld-invoer gb-kies" data-kode="${o(x.kode)}" data-naam="${o(x.naam)}" data-rigting="${x.rigting}"${GB.besig ? " disabled" : ""}>

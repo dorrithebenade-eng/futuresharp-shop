@@ -412,7 +412,7 @@ function fs_teken() {
       ? ""
       : `
         <tr class="fs-tussen">
-          <td class="fs-naam">${fs_t("fs_na", "Surplus n\u00e1")} ${
+          <td class="fs-naam">${fs_t("fs_na", "Oor n\u00e1")} ${
             fs_ontsnap(b.kategorie.naam.toLowerCase())}</td>
           <td class="fs-tot${loop < 0 ? " kort" : ""}">${
             (loop < 0 ? "\u2212 " : "") + fs_rand(loop)}</td>
@@ -438,16 +438,16 @@ function fs_teken() {
   };
 
   plek.innerHTML = `
-    ${blok("in", fs_t("fs_inkomste", "Inkomste"))}
-    ${blok("uit", fs_t("fs_uitgawes", "Uitgawes"))}
+    ${blok("in", fs_t("fs_inkomste", "Ontvangste"))}
+    ${blok("uit", fs_t("fs_uitgawes", "Betalings"))}
 
     <table class="fs-tabel fs-slot${oorskot < 0 ? " fs-slot-tekort" : ""}">
       <tbody>
-        <tr><td class="fs-naam">${fs_t("fs_tot_in", "Totale inkomste")}</td>
+        <tr><td class="fs-naam">${fs_t("fs_tot_in", "Totale ontvangste")}</td>
             <td class="fs-tot">${fs_rand(inkomste)}</td></tr>
         ${trap}
         <tr class="fs-som"><td class="fs-naam">${
-          fs_t("fs_surplus", "Surplus")}</td>
+          fs_t("fs_surplus", "Oorskot vir die tydperk")}</td>
             <td class="fs-tot${oorskot < 0 ? " kort" : ""}">${
               (oorskot < 0 ? "\u2212 " : "") + fs_rand(oorskot)}</td></tr>
       </tbody>
@@ -464,7 +464,7 @@ function fs_teken() {
               fs_t("fs_hosting_in", "Hosting ingebring")}</td>
                 <td class="fs-tot">${fs_rand(ingebring)}</td></tr>
             <tr><td class="fs-naam">${
-              fs_t("fs_hosting_uit", "Uitgawes gemerk \u201cgedek deur hosting\u201d")}</td>
+              fs_t("fs_hosting_uit", "Betalings gemerk \u201cgedek deur hosting\u201d")}</td>
                 <td class="fs-tot">${fs_rand(gedek)}</td></tr>
             <tr class="fs-hosting-slot">
               <td class="fs-naam">${
@@ -526,7 +526,7 @@ function fs_teken() {
   };
 
   const vrag_slot = [
-    { naam: fs_t("fs_tot_in", "Totale inkomste"), bedrag_sent: inkomste, soort: "reel" },
+    { naam: fs_t("fs_tot_in", "Totale ontvangste"), bedrag_sent: inkomste, soort: "reel" },
   ];
   let vloop = inkomste;
   uit_koppe.forEach((b, i) => {
@@ -534,13 +534,13 @@ function fs_teken() {
     vrag_slot.push({ naam: b.kategorie.naam, bedrag_sent: b.totaal_sent, soort: "aftrek" });
     if (!(i === uit_koppe.length - 1 || uit_koppe.length < 2)) {
       vrag_slot.push({
-        naam: `${fs_t("fs_na", "Surplus n\u00e1")} ${b.kategorie.naam.toLowerCase()}`,
+        naam: `${fs_t("fs_na", "Oor n\u00e1")} ${b.kategorie.naam.toLowerCase()}`,
         bedrag_sent: vloop,
         soort: "tussen",
       });
     }
   });
-  vrag_slot.push({ naam: fs_t("fs_surplus", "Surplus"), bedrag_sent: oorskot, soort: "som" });
+  vrag_slot.push({ naam: fs_t("fs_surplus", "Oorskot vir die tydperk"), bedrag_sent: oorskot, soort: "som" });
 
   // OP `window`, want FS is module-geslote. faktuurpaneel-staat-pdf.js is 'n
   // aparte leer en kan nie by hierdie skoop kom nie.
@@ -548,13 +548,13 @@ function fs_teken() {
     van: FS.van,
     tot: FS.tot,
     blokke: [
-      vrag_blok("in", fs_t("fs_inkomste", "Inkomste")),
-      vrag_blok("uit", fs_t("fs_uitgawes", "Uitgawes")),
+      vrag_blok("in", fs_t("fs_inkomste", "Ontvangste")),
+      vrag_blok("uit", fs_t("fs_uitgawes", "Betalings")),
     ].filter((b) => b.rye.length),
     slot: vrag_slot,
     nota: {
-      kop: fs_t("fs_pdf_nota_kop", "Grondslag van inkomste"),
-      teks: fs_t("fs_pdf_nota", "Waar 'n kursus deur 'n eksterne ontwikkelaar aangebied word en die betaling regstreeks na daardie ontwikkelaar se rekening vereffen, tree Future Sharp as agent op. Slegs wat behou word, is inkomste."),
+      kop: fs_t("fs_pdf_nota_kop", "Grondslag van ontvangste"),
+      teks: fs_t("fs_pdf_nota", "Waar 'n kursus deur 'n eksterne ontwikkelaar aangebied word en die betaling regstreeks na daardie ontwikkelaar se rekening vereffen, tree Future Sharp as agent op. Slegs wat behou word, word as ontvangste getoon."),
     },
   };
 }
@@ -690,7 +690,7 @@ function fs_voer_uit() {
       b.kategorie.vlak,
       b.kategorie.naam,
       ouer ? ouer.naam : "",
-      b.kategorie.rigting === "in" ? "Inkomste" : "Uitgawe",
+      b.kategorie.rigting === "in" ? "Ontvangs" : "Betaling",
       b.kategorie.gedek_deur_hosting ? "ja" : "",
       rand(b.eie_sent).toFixed(2),
       rand(b.totaal_sent).toFixed(2),
@@ -706,7 +706,7 @@ function fs_voer_uit() {
       "",
       "Ongekategoriseer",
       "",
-      rigting === "in" ? "Inkomste" : "Uitgawe",
+      rigting === "in" ? "Ontvangs" : "Betaling",
       "",
       rand(FS.ongekat[rigting]).toFixed(2),
       rand(FS.ongekat[rigting]).toFixed(2),
@@ -725,9 +725,9 @@ function fs_voer_uit() {
   const slot = (naam, sent) =>
     reels.push(["", naam, "", "", "", "", rand(sent).toFixed(2)].map(veilig).join(","));
 
-  slot("Totale inkomste", som_van("in"));
-  slot("Totale uitgawes", som_van("uit"));
-  slot("Oorskot", som_van("in") - som_van("uit"));
+  slot("Totale ontvangste", som_van("in"));
+  slot("Totale betalings", som_van("uit"));
+  slot("Oorskot vir die tydperk", som_van("in") - som_van("uit"));
 
   const blob = new Blob(["\uFEFF" + reels.join("\r\n")], {
     type: "text/csv;charset=utf-8;",
