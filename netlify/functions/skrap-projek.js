@@ -1,4 +1,5 @@
 // netlify/functions/skrap-projek.js
+// 17 Oktober 2026: fakture met hierdie projek tel ook as gebruik.
 // Weergawe 4 (25 September 2026): gekoppelde joernaalinskrywings tel as
 // gebruik; 'n toetsprojek maak sy koppelings los.
 // Weergawe 3: die toekennings se bewysstukke gaan saam weg.
@@ -28,6 +29,7 @@ const { kry_projekte_store, is_toets_naam } = require("./_projekte");
 const { kry_toekennings_store, lees_almal: lees_toekennings } = require("./_toekennings");
 const { vee_uit_vir } = require("./_bewysstukke");
 const { kry_koppelings_store, lees_almal: lees_koppelings, sleutel_van } = require("./_koppelings");
+const { kry_fakture_store } = require("./_fakture");
 
 const ROLLE = ["boekhouding"];
 
@@ -38,9 +40,18 @@ async function tel_verwysings(id) {
     await Promise.all((blobs || []).map((b) => jn_store.get(b.key, { type: "json" })))
   ).filter(Boolean);
   const jn = items.filter((r) => r && r.projek_id === id).length;
+  // FAKTURE TEL OOK (17 Oktober 2026). Sedert 'n faktuur 'n projek kan dra
+  // (stel-faktuur-projek.js), is 'n projek met fakture gebruik en word dit
+  // gedeaktiveer, nie uitgevee nie. Voor hierdie reel kon 'n projek met fakture
+  // uitgevee word en die fakture het na 'n projek gewys wat nie meer bestaan nie.
+  const fstore = kry_fakture_store();
+  const fl = await fstore.list();
+  const fakture = (
+    await Promise.all((fl.blobs || []).map((b) => fstore.get(b.key, { type: "json" })))
+  ).filter((f) => f && f.projek_id === id).length;
   const tk = (await lees_toekennings(kry_toekennings_store())).filter((t) => t.projek_id === id);
   const kp = (await lees_koppelings(kry_koppelings_store())).filter((k) => k.projek_id === id);
-  return { tel: jn + tk.length + kp.length, toekennings: tk, koppelings: kp };
+  return { tel: jn + fakture + tk.length + kp.length, toekennings: tk, koppelings: kp };
 }
 
 exports.handler = async (event, context) => {
