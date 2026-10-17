@@ -30,7 +30,6 @@
   <link rel="stylesheet" href="css/faktuurpaneel-projekte.css" />
   <link rel="stylesheet" href="css/faktuurpaneel-bankstate.css" />
   <link rel="stylesheet" href="css/faktuurpaneel-bankstate-meervoudig.css" />
-  <link rel="stylesheet" href="css/faktuurpaneel-grootboek.css" />
   <link rel="stylesheet" href="css/faktuurpaneel-befondsers.css" />
   <link rel="stylesheet" href="css/bewys.css" />
   <link rel="icon" href="/icons/paneel-ikoon-32.png" sizes="32x32" type="image/png">
@@ -970,13 +969,12 @@
            en elke reel verklaar. Sien bankstaat-fnb.js,
            faktuurpaneel-bankstate.js en _bankstate.js. -->
       <section class="paneel-afdeling fp-afdeling" data-afdeling="bankstate">
-        <!-- Twee aansigte. Die knoppies leen die Registers se voorkoms; hul
-             binding is tot #fr-sub beperk, so hierdie houer bots nie. -->
-        <div class="fk-sub bs-aansigte">
-          <button type="button" class="fr-sub-knop aan" data-bs-aansig="reels" data-i18n="ms_aansig_reels">State en transaksies</button>
-          <button type="button" class="fr-sub-knop" data-bs-aansig="grootboek" data-i18n="gb_aansig">Grootboek</button>
-        </div>
-
+        <!-- EEN AANSIG (17 Oktober 2026). Die Maandopsomming het na State
+             geskuif, en die Grootboek-oortjie is weggelaat: die rekenmeester se
+             grootboekopsomming van voor die stelsel was 'n eenmalige kontrole
+             van die geskiedenis, en is klaar. Die kode (grootboek-act.js,
+             faktuurpaneel-grootboek.js en die koppeling-Functions) bly in die
+             repo, sodat dit teruggesit kan word. -->
         <div id="bs-aansig-reels">
         <div class="bs-oplaai">
           <label class="kaart-aksie" for="bs-leer" data-i18n="bs_kies">Laai FNB-state op (PDF)</label>
@@ -988,17 +986,6 @@
         <div id="bs-state"></div>
         </div>
 
-        <!-- Die rekenmeester se grootboek: lees, koppel aan kategoriee, wys die
-             state daarvolgens toe. Sien grootboek-act.js en
-             faktuurpaneel-grootboek.js. -->
-        <div id="bs-aansig-grootboek" hidden>
-          <div class="bs-oplaai">
-            <label class="kaart-aksie" for="gb-leer" data-i18n="gb_kies">Laai 'n grootboek op (PDF)</label>
-            <input type="file" id="gb-leer" accept="application/pdf,.pdf">
-            <p class="bs-lei" data-i18n="gb_lei_oplaai">Die rekenmeester se GL Detailed Ledger. Die PDF word op hierdie rekenaar gelees en nie opgelaai nie.</p>
-          </div>
-          <div id="gb-uitslag"></div>
-        </div>
 
       </section>
 
@@ -1285,8 +1272,6 @@
   <script src="js/bankstaat-fnb.js"></script>
   <script src="js/faktuurpaneel-bankstate.js"></script>
   <script src="js/faktuurpaneel-bankstate-meervoudig.js"></script>
-  <script src="js/grootboek-act.js"></script>
-  <script src="js/faktuurpaneel-grootboek.js"></script>
   <script src="js/faktuurpaneel-maandopsomming-pdf.js"></script>
   <script src="js/faktuurpaneel-maandopsomming.js"></script>
   <script src="js/faktuurpaneel-fin-finansiering.js"></script>
