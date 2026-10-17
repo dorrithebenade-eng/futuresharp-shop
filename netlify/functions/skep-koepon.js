@@ -90,6 +90,7 @@ exports.handler = async (event, context) => {
     afslag_tipe: velde.afslag_tipe,
     afslag_waarde: velde.afslag_waarde,
     produk_slug: velde.produk_slug,
+    produk_slugs: velde.produk_slugs,
     formaat_beperking: velde.formaat_beperking,
     koper_id_beperking,
     maks_gebruike: velde.maks_gebruike,

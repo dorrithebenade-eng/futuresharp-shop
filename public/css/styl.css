@@ -1420,6 +1420,35 @@ body {
 
 /* Vorm-velde (gedeel deur aflewer- en kontak-afdelings) */
 
+/* Koeponvorm: die boeke as merkblokkies. Rol binne die lys as daar baie
+   boeke is, sodat die res van die vorm nie ver af beweeg nie. */
+.koepon-boeke-lys {
+  border: 1px solid #D8D6D1;
+  background: var(--wit);
+  max-height: 240px;
+  overflow-y: auto;
+  padding: 6px 0;
+  margin-bottom: 16px;
+}
+
+.koepon-boek-keuse {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 14px;
+  font-family: var(--font-liggaam);
+  font-size: 14px;
+  cursor: pointer;
+}
+.koepon-boek-keuse:hover { background: var(--grys-lig); }
+.koepon-boek-keuse input { margin: 0; flex-shrink: 0; }
+
+.koepon-boeke-wenk {
+  font-weight: 400;
+  color: var(--grys-teks);
+  font-size: 13px;
+}
+
 .veld-etiket {
   display: block;
   font-family: var(--font-liggaam);

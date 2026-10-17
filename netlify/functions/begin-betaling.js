@@ -40,6 +40,7 @@
 // uitbetaal, is binne 'n sent van die gestelde vaste bedrag).
 
 const { kry_store } = require("./_blob-store");
+const { koepon_geld_vir_boek } = require("./_koepon-velde");
 const { kry_gebruiker_en_rol_uitslag } = require("./_rol-kontrole");
 const { kry_maks_verdeling_sent } = require("./_paystack-koste.js");
 const { stuur_outeur_kennisgewings } = require("./_kennisgewing-outeur");
@@ -157,7 +158,7 @@ exports.handler = async (event, context) => {
   function koepon_geld_vir_item(produk_slug, formaat) {
     if (!koepon) return false;
     if (koepon.koper_id_beperking && koepon.koper_id_beperking !== gebruiker.id) return false;
-    if (koepon.produk_slug && koepon.produk_slug !== produk_slug) return false;
+    if (!koepon_geld_vir_boek(koepon, produk_slug)) return false;
     if (koepon.formaat_beperking !== "albei" && koepon.formaat_beperking !== formaat) return false;
     const reeds_gebruik_deur_koper = (koepon.gebruike_geskiedenis || []).some(
       (g) => g.koper_id === gebruiker.id && g.produk_slug === produk_slug

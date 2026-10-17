@@ -15,7 +15,16 @@ function bou_koepon_velde(invoer) {
   // "video" = 'n FutureSharp Talks-koepon (sien _talk-koepon.js); die boeke
   // se betaling aanvaar dit nooit.
   const formaat_beperking = GELDIGE_FORMATE.includes(invoer.formaat_beperking) ? invoer.formaat_beperking : "albei";
-  const produk_slug = invoer.produk_slug ? String(invoer.produk_slug).trim() : null; // null = enige boek/talk
+  // MEER AS EEN BOEK. 'n Koepon kan nou vir 'n lys boeke geld (bv. die
+  // Afrikaanse en die Engelse weergawe van dieselfde boek), sodat die koper
+  // self kan kies watter een hy koop. produk_slugs is die lys; produk_slug
+  // bly vir ou koepons en talk-koepons (een slug). Leeg = enige boek/talk.
+  const ruwe_lys = Array.isArray(invoer.produk_slugs)
+    ? invoer.produk_slugs
+    : invoer.produk_slug ? [invoer.produk_slug] : [];
+  let produk_slugs = [...new Set(ruwe_lys.map((s) => String(s || "").trim()).filter(Boolean))].slice(0, 100);
+  if (invoer.formaat_beperking === "video") produk_slugs = produk_slugs.slice(0, 1);
+  const produk_slug = produk_slugs.length === 1 ? produk_slugs[0] : null;
   const outeur_id = invoer.outeur_id ? String(invoer.outeur_id).trim() : null;
   // Net vir talk-koepons: beperk tot die talks van een spreker.
   const spreker_id = formaat_beperking === "video" && invoer.spreker_id ? String(invoer.spreker_id).trim() : null;
@@ -59,6 +68,7 @@ function bou_koepon_velde(invoer) {
       afslag_tipe,
       afslag_waarde,
       produk_slug,
+      produk_slugs,
       formaat_beperking,
       maks_gebruike,
       verval_op,
@@ -69,4 +79,18 @@ function bou_koepon_velde(invoer) {
   };
 }
 
-module.exports = { bou_koepon_velde };
+// Die boeke waarvoor 'n koepon geld, of null vir "enige boek". Lees
+// produk_slugs (nuut) en val terug op produk_slug (ou koepons, en die
+// leen-na-koop-koepons wat per koper geskep word).
+function koepon_boeke(koepon) {
+  if (koepon && Array.isArray(koepon.produk_slugs) && koepon.produk_slugs.length) return koepon.produk_slugs;
+  if (koepon && koepon.produk_slug) return [koepon.produk_slug];
+  return null;
+}
+
+function koepon_geld_vir_boek(koepon, produk_slug) {
+  const boeke = koepon_boeke(koepon);
+  return !boeke || boeke.includes(produk_slug);
+}
+
+module.exports = { bou_koepon_velde, koepon_boeke, koepon_geld_vir_boek };

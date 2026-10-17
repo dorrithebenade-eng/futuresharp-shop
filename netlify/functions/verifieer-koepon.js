@@ -5,6 +5,7 @@
 // om die koper dadelik terugvoer te gee voor hulle na Paystack gaan.
 
 const { kry_store } = require("./_blob-store");
+const { koepon_geld_vir_boek } = require("./_koepon-velde");
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 
 exports.handler = async (event, context) => {
@@ -89,7 +90,7 @@ exports.handler = async (event, context) => {
     oorspronklike_totaal_sent += item_prys_sent;
 
     const kom_ooreen =
-      (!koepon.produk_slug || koepon.produk_slug === produk.slug) &&
+      koepon_geld_vir_boek(koepon, produk.slug) &&
       (koepon.formaat_beperking === "albei" || koepon.formaat_beperking === kliënt_item.formaat);
 
     const reeds_gebruik = (koepon.gebruike_geskiedenis || []).some(

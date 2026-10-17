@@ -683,10 +683,10 @@
               <input type="number" id="koepon-vorm-afslag-waarde" class="veld-invoer" min="0" step="0.01">
             </div>
 
-            <label class="veld-etiket" for="koepon-vorm-produk"><span data-i18n="paneel_koepon_produk_etiket">Boek</span></label>
-            <select id="koepon-vorm-produk" class="veld-invoer">
-              <option value="" data-i18n="paneel_koepon_enige_boek">Enige boek</option>
-            </select>
+            <label class="veld-etiket" for="koepon-vorm-produk"><span data-i18n="paneel_koepon_boeke_etiket">Boeke</span> <span class="koepon-boeke-wenk" data-i18n="paneel_koepon_boeke_wenk">(merk een of meer; niks gemerk nie = enige boek)</span></label>
+            <!-- Merkblokkies, nie 'n keuselys nie: 'n koepon kan vir meer as
+                 een boek geld, bv. die Afrikaanse en die Engelse weergawe. -->
+            <div id="koepon-vorm-produk" class="koepon-boeke-lys" role="group"></div>
 
             <label class="veld-etiket" for="koepon-vorm-formaat"><span data-i18n="paneel_koepon_formaat_etiket">Formaat</span></label>
             <select id="koepon-vorm-formaat" class="veld-invoer">

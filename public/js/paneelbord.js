@@ -537,11 +537,14 @@ function wys_koepons_lys(koepons) {
 
   wrap.innerHTML = koepons
     .map((koepon) => {
-      const produk = produkte_kas.find((p) => p.slug === koepon.produk_slug);
       // 'n Talk-koepon (FutureSharp Talks) se produk_slug is 'n talk se slug.
       const is_talk = koepon.formaat_beperking === "video";
-      const boek_teks = koepon.produk_slug
-        ? (produk ? produk.titel : koepon.produk_slug)
+      const boeke = koepon_boeke_lys(koepon);
+      const boek_teks = boeke.length
+        ? boeke.map((slug) => {
+            const produk = produkte_kas.find((p) => p.slug === slug);
+            return produk ? produk.titel : slug;
+          }).join(", ")
         : is_talk ? "Enige talk" : t("paneel_koepon_enige_boek");
       const tipe_teks =
         koepon.tipe === "afslag"
@@ -606,11 +609,34 @@ function wys_koepons_lys(koepons) {
   });
 }
 
+// Die boeke waarvoor 'n koepon geld: produk_slugs (nuut), anders die ou
+// enkele produk_slug. Leë lys = enige boek.
+function koepon_boeke_lys(koepon) {
+  if (Array.isArray(koepon.produk_slugs) && koepon.produk_slugs.length) return koepon.produk_slugs;
+  return koepon.produk_slug ? [koepon.produk_slug] : [];
+}
+
+function ontsnap_html(teks) {
+  return String(teks == null ? "" : teks).replace(/[&<>"']/g, (k) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[k]));
+}
+
+function stel_gemerkte_boeke(slugs) {
+  const gemerk = new Set(slugs || []);
+  document.querySelectorAll("#koepon-vorm-produk input[type=checkbox]").forEach((blokkie) => {
+    blokkie.checked = gemerk.has(blokkie.value);
+  });
+}
+
+function kry_gemerkte_boeke() {
+  return [...document.querySelectorAll("#koepon-vorm-produk input[type=checkbox]:checked")].map((b) => b.value);
+}
+
 function vul_koepon_dropdowns() {
-  const produk_select = document.getElementById("koepon-vorm-produk");
-  const geen_produk_opsie = `<option value="">${t("paneel_koepon_enige_boek")}</option>`;
-  produk_select.innerHTML =
-    geen_produk_opsie + produkte_kas.map((p) => `<option value="${p.slug}">${p.titel}</option>`).join("");
+  const boeke_lys = document.getElementById("koepon-vorm-produk");
+  const gesorteer = [...produkte_kas].sort((a, b) => String(a.titel).localeCompare(String(b.titel), "af"));
+  boeke_lys.innerHTML = gesorteer
+    .map((p) => `<label class="koepon-boek-keuse"><input type="checkbox" value="${ontsnap_html(p.slug)}"><span>${ontsnap_html(p.titel)}</span></label>`)
+    .join("");
 
   const outeur_select = document.getElementById("koepon-vorm-outeur");
   const geen_outeur_opsie = `<option value="">${t("paneel_koepon_geen_outeur")}</option>`;
@@ -675,7 +701,7 @@ async function open_koepon_vorm_vir_wysig(koepon) {
     stel("koepon-vorm-talk", koepon.produk_slug || "");
     stel("koepon-vorm-spreker", koepon.spreker_id || "");
   } else {
-    stel("koepon-vorm-produk", koepon.produk_slug || "");
+    stel_gemerkte_boeke(koepon_boeke_lys(koepon));
     stel("koepon-vorm-outeur", koepon.outeur_id || "");
   }
 }
@@ -702,7 +728,7 @@ async function hanteer_koepon_vorm_indiening(gebeurtenis) {
     tipe,
     afslag_tipe: document.getElementById("koepon-vorm-afslag-tipe").value,
     afslag_waarde: Number(document.getElementById("koepon-vorm-afslag-waarde").value),
-    produk_slug: document.getElementById("koepon-vorm-produk").value || null,
+    produk_slugs: kry_gemerkte_boeke(),
     formaat_beperking: document.getElementById("koepon-vorm-formaat").value,
     maks_gebruike: Number(document.getElementById("koepon-vorm-maks-gebruike").value) || 1,
     verval_op: document.getElementById("koepon-vorm-verval").value || null,

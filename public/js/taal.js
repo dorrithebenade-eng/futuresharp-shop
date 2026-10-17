@@ -940,6 +940,11 @@ const WOORDEBOEK = {
   paneel_koepon_afslag_waarde_etiket: { af: "Afslag-waarde", en: "Discount value" },
   paneel_koepon_produk_etiket: { af: "Boek", en: "Book" },
   paneel_koepon_enige_boek: { af: "Enige boek", en: "Any book" },
+  paneel_koepon_boeke_etiket: { af: "Boeke", en: "Books" },
+  paneel_koepon_boeke_wenk: {
+    af: "(merk een of meer; niks gemerk nie = enige boek)",
+    en: "(tick one or more; nothing ticked = any book)",
+  },
   paneel_koepon_formaat_etiket: { af: "Formaat", en: "Format" },
   paneel_koepon_formaat_albei: { af: "Alle formate", en: "All formats" },
   paneel_koepon_formaat_eboek: { af: "E-boek", en: "E-book" },
