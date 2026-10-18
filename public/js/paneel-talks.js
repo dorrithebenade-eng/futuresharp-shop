@@ -319,41 +319,78 @@ function pt_profiel_opsomming(p) {
   return `${pt_getal(p.besoeke_totaal)} besoeke · ${pt_getal(p.kopers)} ${p.kopers === 1 ? "koper" : "kopers"} · ${pt_rand(p.bruto_sent)}`;
 }
 
+// Hoeveel kopers in teks: "albei", "al 3", of "1 van 4".
+function pt_deel_teks(deel, totaal) {
+  if (!totaal || !deel) return "";
+  if (deel === totaal) return totaal === 2 ? "albei" : totaal === 1 ? "" : `al ${totaal}`;
+  return `${deel} van ${totaal}`;
+}
+
+// Omskakeling eers vanaf soveel besoeke; met 2 besoeke sê "50%" niks.
+const PT_MIN_BESOEKE_VIR_OMSKAKELING = 10;
+
 function pt_profiel_html(t) {
   const p = t.profiel;
   if (!p) return `<p class="pt-profiel-leeg">Nog geen syfers vir hierdie talk nie.</p>`;
-  const omskakeling = p.besoeke_totaal ? `${((p.kopers / p.besoeke_totaal) * 100).toFixed(1).replace(".", ",")}%` : "—";
-  const kopers_uiteen = [
-    p.betaalde_kopers ? `${p.betaalde_kopers} betaal` : "",
-    p.koepon_kopers ? `${p.koepon_kopers} koepon` : "",
-  ].filter(Boolean).join(", ");
+
   const maande = pt_laaste_maande(p.besoeke_per_maand);
+  const hierdie = maande[maande.length - 1];
+  const vorige = maande[maande.length - 2];
+  const maand_naam = (m) => PT_MAANDE_KORT[Number(m.sleutel.slice(5, 7)) - 1];
+  const verskil = hierdie.telling - vorige.telling;
+  const pil = verskil
+    ? `<span class="pt-pf-pil${verskil < 0 ? " pt-pf-pil-af" : ""}">${verskil > 0 ? "+" : "−"}${Math.abs(verskil)} teen ${maand_naam(vorige)}</span>`
+    : "";
+
+  // Verkope se konteks: inkomste, en hoe die kopers aan die talk gekom het.
+  const verkope_deel = [];
+  if (p.koepon_kopers) {
+    const d = pt_deel_teks(p.koepon_kopers, p.kopers);
+    verkope_deel.push(d ? `${d} met koepon` : "met koepon");
+  }
+  if (p.betaalde_kopers && p.koepon_kopers) verkope_deel.push(`${p.betaalde_kopers} betaal`);
+  const verkope_s = [pt_rand(p.bruto_sent), ...verkope_deel].join(" · ");
+
+  const kyk_s = p.kopers
+    ? `${pt_getal(p.verskillende_kykers)} van ${pt_getal(p.kopers)} ${p.kopers === 1 ? "koper" : "kopers"} het gekyk`
+    : "Nog geen kopers nie";
+
+  const genoeg = p.besoeke_totaal >= PT_MIN_BESOEKE_VIR_OMSKAKELING;
+  const omskakeling = genoeg ? `${((p.kopers / p.besoeke_totaal) * 100).toFixed(1).replace(".", ",")}%` : "—";
+  const omskakeling_etiket = genoeg ? "besoekers koop" : `eers vanaf ${PT_MIN_BESOEKE_VIR_OMSKAKELING} besoeke`;
+  const aankoop_s = p.eerste_aankoop
+    ? `Eerste aankoop ${pt_datum(p.eerste_aankoop)}<br>Laaste aankoop ${pt_datum(p.laaste_aankoop)}`
+    : "Nog geen aankope nie";
+
+  const groep = (titel, syfer, etiket, onder, gedemp) => `
+    <div class="pt-pf-groep${gedemp ? " pt-pf-gedemp" : ""}">
+      <h4>${titel}</h4>
+      <div class="pt-pf-syfer"><b>${syfer}</b><span>${etiket}</span></div>
+      <div class="pt-pf-onder">${onder}</div>
+    </div>`;
+
   const hoogste = Math.max(1, ...maande.map((m) => m.telling));
-  const kaart = (syfer, etiket) => `<div class="pt-profiel-kaart"><strong>${syfer}</strong><span>${etiket}</span></div>`;
+  const STAAF_MAKS = 48; // px
+  const kolomme = maande.map((m, i) => {
+    const nou = i === maande.length - 1;
+    const staaf = m.telling
+      ? `<i style="height:${Math.max(4, Math.round((m.telling / hoogste) * STAAF_MAKS))}px"></i>`
+      : `<i class="pt-pf-nul"></i>`;
+    return `<div class="pt-pf-kolom${nou ? " pt-pf-nou" : ""}" title="${maand_naam(m)} ${m.sleutel.slice(0, 4)}: ${m.telling}">${staaf}${maand_naam(m)}</div>`;
+  }).join("");
 
   return `
-    <div class="pt-profiel-rooster">
-      ${kaart(pt_getal(p.besoeke_totaal), "Besoeke aan bladsy")}
-      ${kaart(omskakeling, "Besoekers wat koop")}
-      ${kaart(pt_getal(p.kopers), `Kopers${kopers_uiteen ? ` (${kopers_uiteen})` : ""}`)}
-      ${kaart(pt_rand(p.bruto_sent), "Bruto inkomste")}
-      ${kaart(pt_getal(p.kyke_totaal), "Kere gekyk")}
-      ${kaart(pt_getal(p.verskillende_kykers), "Kopers wat gekyk het")}
+    <div class="pt-pf-groepe">
+      ${groep("Belangstelling", pt_getal(p.besoeke_totaal), p.besoeke_totaal === 1 ? "besoek" : "besoeke", `${pt_getal(hierdie.telling)} hierdie maand ${pil}`)}
+      ${groep("Verkope", pt_getal(p.kopers), p.kopers === 1 ? "koper" : "kopers", verkope_s)}
+      ${groep("Kyk", pt_getal(p.kyke_totaal), p.kyke_totaal === 1 ? "keer gekyk" : "kere gekyk", kyk_s, !p.kyke_totaal)}
+      ${groep("Omskakeling", omskakeling, omskakeling_etiket, aankoop_s, !genoeg)}
     </div>
-    <p class="pt-profiel-opskrif">Besoeke per maand</p>
-    <div class="pt-profiel-grafiek" role="img" aria-label="Besoeke per maand, laaste ses maande">
-      ${maande.map((m) => {
-        const hoogte = Math.round((m.telling / hoogste) * 100);
-        const maand = PT_MAANDE_KORT[Number(m.sleutel.slice(5, 7)) - 1];
-        return `<div class="pt-profiel-kolom" title="${maand} ${m.sleutel.slice(0, 4)}: ${m.telling}">
-          <span class="pt-profiel-waarde">${m.telling}</span>
-          <span class="pt-profiel-staaf" style="height:${Math.max(Math.round(hoogte * 0.7), m.telling ? 3 : 1)}%"></span>
-          <span class="pt-profiel-maand">${maand}</span>
-        </div>`;
-      }).join("")}
-    </div>
-    <p class="pt-profiel-voet">Eerste aankoop ${pt_datum(p.eerste_aankoop)} · Laaste aankoop ${pt_datum(p.laaste_aankoop)}<br>
-      "Kere gekyk" tel sedert 2026/10/18; personeel se eie kyke tel nie.</p>`;
+    <div class="pt-pf-onderste">
+      <div class="pt-pf-grafiek" role="img" aria-label="Besoeke per maand, laaste ses maande">${kolomme}</div>
+      <div class="pt-pf-legende">Besoeke, laaste ses maande<br><strong>${maand_naam(hierdie)} ${pt_getal(hierdie.telling)}</strong> · ${maand_naam(vorige)} ${pt_getal(vorige.telling)}</div>
+      <div class="pt-pf-voet">"Kere gekyk" tel sedert 2026/10/18.<br>Personeel se eie kyke tel nie.</div>
+    </div>`;
 }
 
 function pt_teken_lys() {
@@ -375,7 +412,7 @@ function pt_teken_lys() {
           <span class="pt-meta">${pt_esc(pt_kategorie_name(t.kategoriee))} · ${v.net_koepon ? "net met koepon" : pt_rand(v.prys_sent || 0)}${v.duur_sekondes ? " · " + pt_sekondes_na_duur(v.duur_sekondes) : ""}${aktief ? "" : " · onaktief"}${v.beskikbaar ? "" : " · nie beskikbaar nie"}${pt_video_merk(t)}</span>
         </div>
         <div class="pt-aksies">
-          <button type="button" class="terug-skakel" data-pt-profiel="${pt_esc(t.slug)}" aria-expanded="${pt_profiel_oop.has(t.slug)}">Profiel ${pt_profiel_oop.has(t.slug) ? "▴" : "▾"}</button>
+          <button type="button" class="terug-skakel${pt_profiel_oop.has(t.slug) ? " pt-profiel-oop" : ""}" data-pt-profiel="${pt_esc(t.slug)}" aria-expanded="${pt_profiel_oop.has(t.slug)}">Profiel ${pt_profiel_oop.has(t.slug) ? "▴" : "▾"}</button>
           <button type="button" class="terug-skakel" data-pt-wysig="${pt_esc(t.slug)}">Wysig</button>
           <button type="button" class="terug-skakel" data-pt-aktief="${pt_esc(t.slug)}">${aktief ? "Deaktiveer" : "Aktiveer"}</button>
           <button type="button" class="terug-skakel paneel-skrap-knoppie" data-pt-skrap="${pt_esc(t.slug)}">Skrap</button>

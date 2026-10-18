@@ -32,60 +32,83 @@
   .pt-aksies { grid-column: 1 / -1; justify-content: flex-start; }
 }
 
-/* PROFIEL — die syfers van een talk, oopgevou onder sy ry. */
-.pt-meta-syfers { color: var(--teal) !important; font-weight: 600; }
+/* PROFIEL — die syfers van een talk, oopgevou onder sy ry. Vier groepe
+   (Belangstelling, Verkope, Kyk, Omskakeling) met een groot syfer en 'n
+   reël konteks elk, en 'n kompakte maandgrafiek daaronder. */
+.pt-meta-syfers { color: #2E7D71 !important; font-weight: 600; font-size: 12.5px !important; }
+.pt-profiel-oop { color: #2E7D71 !important; font-weight: 600; }
 .pt-profiel {
   grid-column: 1 / -1;
-  background: var(--grys-lig);
-  border-radius: 12px;
-  padding: 16px 18px;
-}
-.pt-profiel-rooster {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 10px;
-}
-.pt-profiel-kaart {
+  border: 1px solid #e8e6e1;
+  border-radius: 14px;
   background: var(--wit);
-  border-radius: 10px;
-  padding: 10px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+  padding: 18px 20px 16px;
+  margin-top: 4px;
 }
-.pt-profiel-kaart strong {
+.pt-pf-groepe { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.pt-pf-groep { padding: 0 18px; border-left: 1px solid #e8e6e1; min-width: 0; }
+.pt-pf-groep:first-child { padding-left: 0; border-left: 0; }
+.pt-pf-groep h4 {
+  margin: 0 0 6px;
+  font-family: var(--font-liggaam);
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--grys-teks);
+}
+.pt-pf-syfer { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+.pt-pf-syfer b {
   font-family: var(--font-opskrif);
   font-weight: 800;
-  font-size: 20px;
-  color: var(--teal);
+  font-size: 26px;
+  line-height: 1.1;
+  color: #2E7D71;
 }
-.pt-profiel-kaart span { font-size: 12.5px; color: var(--grys-teks); }
-.pt-profiel-opskrif { font-size: 12.5px; color: var(--grys-teks); margin: 16px 0 6px; }
-.pt-profiel-grafiek {
+.pt-pf-syfer span { font-size: 12.5px; color: var(--grys-teks); }
+.pt-pf-gedemp .pt-pf-syfer b { color: #9a9892; }
+.pt-pf-onder { font-size: 12px; color: var(--grys-teks); margin-top: 4px; line-height: 1.45; }
+.pt-pf-pil {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 500;
+  background: #E3F2EF;
+  color: #2E7D71;
+  border-radius: 999px;
+  padding: 1px 8px;
+  margin-left: 2px;
+}
+.pt-pf-pil-af { background: #FBEAE4; color: #B5442A; }
+
+.pt-pf-onderste {
   display: flex;
-  gap: 8px;
-  align-items: stretch;
-  height: 110px;
+  align-items: flex-end;
+  gap: 22px;
+  border-top: 1px solid #e8e6e1;
+  margin-top: 16px;
+  padding-top: 14px;
 }
-.pt-profiel-kolom {
-  flex: 1;
+.pt-pf-grafiek { display: flex; gap: 8px; align-items: flex-end; height: 64px; }
+.pt-pf-kolom {
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
   align-items: center;
-  gap: 3px;
-  min-width: 0;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--grys-teks);
 }
-.pt-profiel-staaf {
-  width: 100%;
-  max-width: 44px;
-  background: var(--teal);
-  border-radius: 3px 3px 0 0;
-}
-.pt-profiel-waarde { font-size: 11.5px; color: var(--grys-teks); }
-.pt-profiel-maand { font-size: 11.5px; color: var(--grys-teks); }
-.pt-profiel-voet { font-size: 12px; color: var(--grys-teks); margin: 12px 0 0; line-height: 1.5; }
+.pt-pf-kolom i { display: block; width: 16px; border-radius: 4px 4px 2px 2px; background: var(--teal); }
+.pt-pf-kolom i.pt-pf-nul { height: 3px; background: #DDDAD3; border-radius: 2px; }
+.pt-pf-nou i:not(.pt-pf-nul) { background: #2E7D71; }
+.pt-pf-legende { font-size: 12px; color: var(--grys-teks); line-height: 1.6; }
+.pt-pf-legende strong { color: var(--swart); font-weight: 600; }
+.pt-pf-voet { margin-left: auto; font-size: 11.5px; color: #8d8b85; text-align: right; line-height: 1.6; }
 .pt-profiel-leeg { font-size: 13px; color: var(--grys-teks); margin: 0; }
+
+@media (max-width: 760px) {
+  .pt-pf-groepe { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 16px; }
+  .pt-pf-groep:nth-child(3) { padding-left: 0; border-left: 0; }
+  .pt-pf-onderste { flex-wrap: wrap; }
+  .pt-pf-voet { margin-left: 0; text-align: left; width: 100%; }
+}
 
 .pt-vorm-blok { margin-top: 28px; }
 
