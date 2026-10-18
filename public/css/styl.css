@@ -2697,6 +2697,18 @@ a.my-boek-kaart:focus-visible {
   margin: 4px 0 28px;
 }
 
+/* Die opskrif bo elke ry tellers (Future Shop, FutureSharp Talks). Die
+   blok onder die opskrif sit nader, sodat elke opskrif by sy eie ry hoort. */
+.paneel-statistieke-opskrif {
+  font-family: var(--font-opskrif);
+  font-weight: 800;
+  font-size: 13px;
+  color: var(--grys-teks);
+  margin: 0 0 6px;
+}
+.paneel-statistieke-opskrif + .paneel-statistieke-blok { margin-top: 0; margin-bottom: 14px; }
+#paneel-statistieke-geskiedenis-plek { margin-bottom: 18px; }
+
 .paneel-statistiek {
   background: var(--grys-lig);
   border-radius: 12px;

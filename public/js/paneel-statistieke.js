@@ -15,8 +15,13 @@ function formateer_maand_etiket(maand_sleutel) {
   return `${maand_lys[Number(maand_nommer) - 1]} ${jaar}`;
 }
 
-function wys_maandelikse_geskiedenis(geskiedenis) {
-  const plek = document.getElementById("paneel-statistieke-geskiedenis-plek");
+// Die winkel se elemente het geen voorvoegsel nie; FutureSharp Talks s'n
+// begin met "fst-".
+const STATISTIEK_AFDELINGS = { winkel: "", fst: "fst-" };
+
+function wys_maandelikse_geskiedenis(geskiedenis, voorvoegsel = "") {
+  const plek = document.getElementById(voorvoegsel ? `${voorvoegsel}statistieke-geskiedenis-plek` : "paneel-statistieke-geskiedenis-plek");
+  if (!plek) return;
 
   if (!geskiedenis || !geskiedenis.length) {
     plek.innerHTML = "";
@@ -35,6 +40,20 @@ function wys_maandelikse_geskiedenis(geskiedenis) {
   `;
 }
 
+function vul_tellers(data, voorvoegsel) {
+  const stel = (id, waarde) => {
+    const el = document.getElementById(`${voorvoegsel}${id}`);
+    if (el) el.textContent = waarde == null ? 0 : waarde;
+  };
+  stel("statistiek-totaal", data.totaal);
+  stel("statistiek-vandag", data.vandag);
+  stel("statistiek-week", data.hierdie_week);
+  stel("statistiek-maand", data.hierdie_maand);
+  const info = document.getElementById(`${voorvoegsel}statistiek-week-info`);
+  if (info) info.title = t("statistiek_week_nota");
+  wys_maandelikse_geskiedenis(data.maandelikse_geskiedenis, voorvoegsel);
+}
+
 async function paneel_statistieke_laai() {
   try {
     const resp = await fetch("/.netlify/functions/kry-statistieke", {
@@ -44,30 +63,26 @@ async function paneel_statistieke_laai() {
     if (!resp.ok) throw new Error(`Status ${resp.status}`);
     const data = await resp.json();
 
-    document.getElementById("statistiek-totaal").textContent = data.totaal;
-    document.getElementById("statistiek-vandag").textContent = data.vandag;
-    document.getElementById("statistiek-week").textContent = data.hierdie_week;
-    document.getElementById("statistiek-maand").textContent = data.hierdie_maand;
-    document.getElementById("statistiek-week-info").title = t("statistiek_week_nota");
-    wys_maandelikse_geskiedenis(data.maandelikse_geskiedenis);
+    vul_tellers(data, STATISTIEK_AFDELINGS.winkel);
+    vul_tellers(data.fst || {}, STATISTIEK_AFDELINGS.fst);
   } catch (fout) {
     console.error("Kon nie statistieke laai nie:", fout);
   }
 }
 
-async function paneel_statistiek_herstel_totaal() {
+async function paneel_statistiek_herstel_totaal(afdeling = "winkel") {
   if (!window.confirm(t("statistiek_herstel_bevestig"))) {
     return;
   }
 
-  const knoppie = document.getElementById("statistiek-herstel-totaal");
+  const knoppie = document.getElementById(`${STATISTIEK_AFDELINGS[afdeling]}statistiek-herstel-totaal`);
   knoppie.disabled = true;
 
   try {
     const resp = await fetch("/.netlify/functions/herstel-statistiek", {
       method: "POST",
       headers: { "Content-Type": "application/json", ...kry_outorisasie_kop() },
-      body: JSON.stringify({ teller: "totaal" }),
+      body: JSON.stringify({ teller: "totaal", afdeling }),
     });
     if (!resp.ok) throw new Error(`Status ${resp.status}`);
     paneel_statistieke_laai();
@@ -80,9 +95,10 @@ async function paneel_statistiek_herstel_totaal() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  document
-    .getElementById("statistiek-herstel-totaal")
-    .addEventListener("click", paneel_statistiek_herstel_totaal);
+  Object.entries(STATISTIEK_AFDELINGS).forEach(([afdeling, voorvoegsel]) => {
+    const knoppie = document.getElementById(`${voorvoegsel}statistiek-herstel-totaal`);
+    if (knoppie) knoppie.addEventListener("click", () => paneel_statistiek_herstel_totaal(afdeling));
+  });
 });
 
 // Selfde "wag totdat paneel-inhoud sigbaar raak"-patroon as elders

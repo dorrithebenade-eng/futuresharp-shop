@@ -79,3 +79,19 @@ function fst_sleutelwoorde(talk) {
   const en = talk.sleutelwoorde_en || [];
   return kry_huidige_taal() === "en" && en.length ? en : talk.sleutelwoorde || [];
 }
+
+// BESOEKTELLER vir die paneelbord (tel-fst-besoek.js). Net een keer per
+// besoek: die eerste FST-bladsy wat oopmaak tel, en die vlag in
+// sessionStorage keer dat die volgende bladsye in dieselfde besoek weer
+// tel. Is sessionStorage nie beskikbaar nie (bv. privaat modus), tel dit
+// eerder elke bladsy as om die besoek glad nie te tel nie.
+(function fst_tel_besoek() {
+  const VLAG = "fst_besoek_getel";
+  try {
+    if (sessionStorage.getItem(VLAG)) return;
+    sessionStorage.setItem(VLAG, "1");
+  } catch {
+    // geen sessionStorage nie: tel steeds
+  }
+  fetch("/.netlify/functions/tel-fst-besoek", { method: "POST", keepalive: true }).catch(() => {});
+})();

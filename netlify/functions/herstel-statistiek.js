@@ -5,6 +5,7 @@
 
 const { kry_store } = require("./_blob-store");
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
+const { AFDELINGS, sleutels_vir } = require("./_besoek-teller");
 
 const GELDIGE_TELLERS = ["totaal", "daagliks", "weekliks", "maandeliks"];
 
@@ -30,17 +31,21 @@ exports.handler = async (event, context) => {
     return { statusCode: 400, body: `Ongeldige teller — moet een van wees: ${GELDIGE_TELLERS.join(", ")}` };
   }
 
+  // "winkel" (verstek) of "fst" vir FutureSharp Talks se teller.
+  const afdeling = invoer.afdeling === "fst" ? "fst" : "winkel";
+  const sleutel = sleutels_vir(AFDELINGS[afdeling])[teller];
+
   const store = kry_store("statistieke");
 
   if (teller === "totaal") {
-    await store.setJSON("totaal", { telling: 0 });
+    await store.setJSON(sleutel, { telling: 0 });
   } else {
-    await store.setJSON(teller, { sleutel: null, telling: 0 });
+    await store.setJSON(sleutel, { sleutel: null, telling: 0 });
   }
 
   return {
     statusCode: 200,
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ herstel: teller }),
+    body: JSON.stringify({ herstel: teller, afdeling }),
   };
 };

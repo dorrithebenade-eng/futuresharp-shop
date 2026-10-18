@@ -36,8 +36,10 @@ function paneel_vennoot_beperk() {
   //
   // Verwyder en nie versteek nie, om dieselfde rede as die kieslys-items:
   // die blok word een keer gebou en verander nie weer nie.
-  const herstel = document.getElementById("statistiek-herstel-totaal");
-  if (herstel) herstel.remove();
+  ["statistiek-herstel-totaal", "fst-statistiek-herstel-totaal"].forEach((id) => {
+    const herstel = document.getElementById(id);
+    if (herstel) herstel.remove();
+  });
 
   // Verwyder die kieslys-items wat nie geld nie heeltemal uit die DOM.
   // CSS sou hulle net versteek; hier is dit skoner, want die kieslys word

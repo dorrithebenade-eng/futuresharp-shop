@@ -288,6 +288,74 @@ function pt_video_merk(t) {
   return " · nog geen video";
 }
 
+// ---------------------------------------------------------------- profiel
+
+const pt_profiel_oop = new Set();
+
+function pt_getal(n) {
+  return Number(n || 0).toLocaleString("af-ZA");
+}
+
+function pt_datum(iso) {
+  return iso ? String(iso).slice(0, 10).replace(/-/g, "/") : "—";
+}
+
+// Die laaste ses maande, oudste eerste, met 0 vir 'n maand sonder besoeke.
+function pt_laaste_maande(per_maand, aantal = 6) {
+  const uit = [];
+  const nou = new Date();
+  for (let i = aantal - 1; i >= 0; i--) {
+    const d = new Date(Date.UTC(nou.getUTCFullYear(), nou.getUTCMonth() - i, 1));
+    const sleutel = d.toISOString().slice(0, 7);
+    uit.push({ sleutel, telling: (per_maand && per_maand[sleutel]) || 0 });
+  }
+  return uit;
+}
+
+const PT_MAANDE_KORT = ["Jan", "Feb", "Mrt", "Apr", "Mei", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Des"];
+
+function pt_profiel_opsomming(p) {
+  if (!p) return "";
+  return `${pt_getal(p.besoeke_totaal)} besoeke · ${pt_getal(p.kopers)} ${p.kopers === 1 ? "koper" : "kopers"} · ${pt_rand(p.bruto_sent)}`;
+}
+
+function pt_profiel_html(t) {
+  const p = t.profiel;
+  if (!p) return `<p class="pt-profiel-leeg">Nog geen syfers vir hierdie talk nie.</p>`;
+  const omskakeling = p.besoeke_totaal ? `${((p.kopers / p.besoeke_totaal) * 100).toFixed(1).replace(".", ",")}%` : "—";
+  const kopers_uiteen = [
+    p.betaalde_kopers ? `${p.betaalde_kopers} betaal` : "",
+    p.koepon_kopers ? `${p.koepon_kopers} koepon` : "",
+  ].filter(Boolean).join(", ");
+  const maande = pt_laaste_maande(p.besoeke_per_maand);
+  const hoogste = Math.max(1, ...maande.map((m) => m.telling));
+  const kaart = (syfer, etiket) => `<div class="pt-profiel-kaart"><strong>${syfer}</strong><span>${etiket}</span></div>`;
+
+  return `
+    <div class="pt-profiel-rooster">
+      ${kaart(pt_getal(p.besoeke_totaal), "Besoeke aan bladsy")}
+      ${kaart(omskakeling, "Besoekers wat koop")}
+      ${kaart(pt_getal(p.kopers), `Kopers${kopers_uiteen ? ` (${kopers_uiteen})` : ""}`)}
+      ${kaart(pt_rand(p.bruto_sent), "Bruto inkomste")}
+      ${kaart(pt_getal(p.kyke_totaal), "Kere gekyk")}
+      ${kaart(pt_getal(p.verskillende_kykers), "Kopers wat gekyk het")}
+    </div>
+    <p class="pt-profiel-opskrif">Besoeke per maand</p>
+    <div class="pt-profiel-grafiek" role="img" aria-label="Besoeke per maand, laaste ses maande">
+      ${maande.map((m) => {
+        const hoogte = Math.round((m.telling / hoogste) * 100);
+        const maand = PT_MAANDE_KORT[Number(m.sleutel.slice(5, 7)) - 1];
+        return `<div class="pt-profiel-kolom" title="${maand} ${m.sleutel.slice(0, 4)}: ${m.telling}">
+          <span class="pt-profiel-waarde">${m.telling}</span>
+          <span class="pt-profiel-staaf" style="height:${Math.max(Math.round(hoogte * 0.7), m.telling ? 3 : 1)}%"></span>
+          <span class="pt-profiel-maand">${maand}</span>
+        </div>`;
+      }).join("")}
+    </div>
+    <p class="pt-profiel-voet">Eerste aankoop ${pt_datum(p.eerste_aankoop)} · Laaste aankoop ${pt_datum(p.laaste_aankoop)}<br>
+      "Kere gekyk" tel sedert 2026/10/18; personeel se eie kyke tel nie.</p>`;
+}
+
 function pt_teken_lys() {
   const lys = document.getElementById("pt-lys");
   if (!pt.talks.length) {
@@ -303,19 +371,28 @@ function pt_teken_lys() {
         <div class="pt-inligting">
           <strong>${pt_esc(t.titel)}</strong>
           <span>${pt_esc(t.spreker)}</span>
+          ${t.profiel ? `<span class="pt-meta pt-meta-syfers">${pt_esc(pt_profiel_opsomming(t.profiel))}</span>` : ""}
           <span class="pt-meta">${pt_esc(pt_kategorie_name(t.kategoriee))} · ${v.net_koepon ? "net met koepon" : pt_rand(v.prys_sent || 0)}${v.duur_sekondes ? " · " + pt_sekondes_na_duur(v.duur_sekondes) : ""}${aktief ? "" : " · onaktief"}${v.beskikbaar ? "" : " · nie beskikbaar nie"}${pt_video_merk(t)}</span>
         </div>
         <div class="pt-aksies">
+          <button type="button" class="terug-skakel" data-pt-profiel="${pt_esc(t.slug)}" aria-expanded="${pt_profiel_oop.has(t.slug)}">Profiel ${pt_profiel_oop.has(t.slug) ? "▴" : "▾"}</button>
           <button type="button" class="terug-skakel" data-pt-wysig="${pt_esc(t.slug)}">Wysig</button>
           <button type="button" class="terug-skakel" data-pt-aktief="${pt_esc(t.slug)}">${aktief ? "Deaktiveer" : "Aktiveer"}</button>
           <button type="button" class="terug-skakel paneel-skrap-knoppie" data-pt-skrap="${pt_esc(t.slug)}">Skrap</button>
         </div>
+        ${pt_profiel_oop.has(t.slug) ? `<div class="pt-profiel">${pt_profiel_html(t)}</div>` : ""}
       </div>`;
   }).join("");
 
   lys.querySelectorAll("[data-pt-wysig]").forEach((b) => b.addEventListener("click", () => {
     const t = pt.talks.find((x) => x.slug === b.dataset.ptWysig);
     if (t) pt_open_vorm(t);
+  }));
+  lys.querySelectorAll("[data-pt-profiel]").forEach((b) => b.addEventListener("click", () => {
+    const slug = b.dataset.ptProfiel;
+    if (pt_profiel_oop.has(slug)) pt_profiel_oop.delete(slug);
+    else pt_profiel_oop.add(slug);
+    pt_teken_lys();
   }));
   lys.querySelectorAll("[data-pt-aktief]").forEach((b) => b.addEventListener("click", () => pt_wissel_aktief(b)));
   lys.querySelectorAll("[data-pt-skrap]").forEach((b) => b.addEventListener("click", () => pt_skrap(b)));
@@ -791,7 +868,10 @@ async function pt_stoor(e) {
 
     // Plaaslik bywerk: Blobs se list() kan 'n oomblik agter wees.
     const was_nuut = !pt.wysig_slug;
-    talk.video_stand = (pt.talks.find((t) => t.slug === talk.slug) || {}).video_stand || { stand: "geen" };
+    const vorige = pt.talks.find((t) => t.slug === talk.slug) || {};
+    talk.video_stand = vorige.video_stand || { stand: "geen" };
+    // Die profiel kom net uit kry-talks; behou dit oor 'n stoor heen.
+    if (vorige.profiel) talk.profiel = vorige.profiel;
     pt.talks = [talk, ...pt.talks.filter((t) => t.slug !== talk.slug)];
     pt_teken_lys();
     if (was_nuut) {
@@ -824,7 +904,9 @@ async function pt_wissel_aktief(knoppie) {
     });
     if (!resp.ok) throw new Error((await resp.text()) || `Status ${resp.status}`);
     const bygewerk = await resp.json();
-    pt.talks = pt.talks.map((t) => (t.slug === bygewerk.slug ? bygewerk : t));
+    pt.talks = pt.talks.map((t) => (t.slug === bygewerk.slug
+      ? { ...bygewerk, video_stand: t.video_stand, profiel: t.profiel }
+      : t));
     pt_teken_lys();
   } catch (fout) {
     console.error("Kon nie aktief wissel nie:", fout);

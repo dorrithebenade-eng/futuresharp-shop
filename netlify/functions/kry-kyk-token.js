@@ -52,6 +52,26 @@ exports.handler = async (event, context) => {
     return { statusCode: 404, body: "Die video is nog nie gereed nie" };
   }
 
+  // KYK-TELLER vir die talk se profiel in die paneelbord. Elke keer wat 'n
+  // koper die video in die teater oopmaak, tel een kyk; die lys kykers
+  // (interne ID's, nooit teruggegee nie) gee die aantal verskillende kopers
+  // wat gekyk het. Personeel se eie toetskyke tel nie. Beste-poging: 'n
+  // fout hier mag die video nooit keer nie.
+  if (!is_personeel) {
+    try {
+      const kyk_store = kry_store("talk-kyke");
+      const huidig = (await kyk_store.get(slug, { type: "json" })) || {};
+      const maand = new Date().toISOString().slice(0, 7);
+      const per_maand = { ...(huidig.per_maand || {}) };
+      per_maand[maand] = (per_maand[maand] || 0) + 1;
+      const kykers = Array.isArray(huidig.kykers) ? huidig.kykers : [];
+      if (!kykers.includes(gebruiker.id)) kykers.push(gebruiker.id);
+      await kyk_store.setJSON(slug, { totaal: (huidig.totaal || 0) + 1, per_maand, kykers });
+    } catch (fout) {
+      console.warn("Kon nie kyk tel nie:", fout);
+    }
+  }
+
   return {
     statusCode: 200,
     headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },

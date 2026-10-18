@@ -134,6 +134,10 @@
     <div id="paneel-status" class="stelsel-boodskap" style="display:none;"></div>
 
     <div id="paneel-inhoud" style="display:none;">
+      <!-- Twee rye besoektellers: die winkel se tuisblad, en FutureSharp
+           Talks (die FST-blad, 'n talk se bladsy of die teater, een keer per
+           besoek). Albei word deur paneel-statistieke.js gevul. -->
+      <p class="paneel-statistieke-opskrif" data-i18n="statistiek_opskrif_winkel">Future Shop</p>
       <div class="paneel-statistieke-blok">
         <div class="paneel-statistiek">
           <span class="paneel-statistiek-syfer" id="statistiek-totaal">—</span>
@@ -157,6 +161,30 @@
         </div>
       </div>
       <div id="paneel-statistieke-geskiedenis-plek"></div>
+      <p class="paneel-statistieke-opskrif" data-i18n="statistiek_opskrif_fst">FutureSharp Talks</p>
+      <div class="paneel-statistieke-blok">
+        <div class="paneel-statistiek">
+          <span class="paneel-statistiek-syfer" id="fst-statistiek-totaal">—</span>
+          <span class="paneel-statistiek-etiket"><span data-i18n="statistiek_totaal">Totaal</span>
+            <button type="button" id="fst-statistiek-herstel-totaal" class="paneel-statistiek-herstel" title="Herstel totaal na 0">↺</button>
+          </span>
+        </div>
+        <div class="paneel-statistiek">
+          <span class="paneel-statistiek-syfer" id="fst-statistiek-vandag">—</span>
+          <span class="paneel-statistiek-etiket" data-i18n="statistiek_vandag">Vandag</span>
+        </div>
+        <div class="paneel-statistiek">
+          <span class="paneel-statistiek-syfer" id="fst-statistiek-week">—</span>
+          <span class="paneel-statistiek-etiket"><span data-i18n="statistiek_week">Hierdie week</span>
+            <span id="fst-statistiek-week-info" class="paneel-statistiek-info" tabindex="0">ⓘ</span>
+          </span>
+        </div>
+        <div class="paneel-statistiek">
+          <span class="paneel-statistiek-syfer" id="fst-statistiek-maand">—</span>
+          <span class="paneel-statistiek-etiket" data-i18n="statistiek_maand">Hierdie maand</span>
+        </div>
+      </div>
+      <div id="fst-statistieke-geskiedenis-plek"></div>
 
 
       <button id="paneel-kieslys-hamburger" class="paneel-kieslys-hamburger" type="button" aria-label="Wys afdelings">

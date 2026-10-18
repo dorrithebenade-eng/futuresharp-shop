@@ -31,6 +31,41 @@ exports.handler = async (event, context) => {
       : { stand: "geen" };
   }));
 
+  // PROFIEL per talk, vir die paneel se "Profiel"-knoppie: besoeke aan die
+  // talk se bladsy (talk-besigtigings), betaalde aankope (talk-bestellings)
+  // en kyke in die teater (talk-kyke). Net getalle; geen koper se
+  // identiteit word teruggegee nie.
+  const besig_store = kry_store("talk-besigtigings");
+  const kyk_store = kry_store("talk-kyke");
+  const best_store = kry_store("talk-bestellings");
+  const { blobs: best_blobs } = await best_store.list();
+  const bestellings = (await Promise.all(best_blobs.map((b) => best_store.get(b.key, { type: "json" }))))
+    .filter((b) => b && b.status === "Betaal");
+
+  await Promise.all(talks.map(async (t) => {
+    const [besoeke, kyke] = await Promise.all([
+      besig_store.get(t.slug, { type: "json" }),
+      kyk_store.get(t.slug, { type: "json" }),
+    ]);
+    const hierdie = bestellings.filter((b) => b.slug === t.slug);
+    const betaal = hierdie.filter((b) => (Number(b.totaal_sent) || 0) > 0);
+    const datums = hierdie.map((b) => String(b.betaal_op || b.geskep_op || "").slice(0, 10)).filter(Boolean).sort();
+    t.profiel = {
+      besoeke_totaal: (besoeke && besoeke.totaal) || 0,
+      besoeke_per_maand: (besoeke && besoeke.per_maand) || {},
+      kopers: hierdie.length,
+      betaalde_kopers: betaal.length,
+      koepon_kopers: hierdie.filter((b) => b.koepon_kode).length,
+      gratis_kopers: hierdie.filter((b) => !(Number(b.totaal_sent) > 0)).length,
+      bruto_sent: betaal.reduce((som, b) => som + (Number(b.totaal_sent) || 0), 0),
+      eerste_aankoop: datums[0] || null,
+      laaste_aankoop: datums[datums.length - 1] || null,
+      kyke_totaal: (kyke && kyke.totaal) || 0,
+      kyke_per_maand: (kyke && kyke.per_maand) || {},
+      verskillende_kykers: kyke && Array.isArray(kyke.kykers) ? kyke.kykers.length : 0,
+    };
+  }));
+
   return {
     statusCode: 200,
     headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },

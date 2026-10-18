@@ -43,14 +43,17 @@
 
   // Watter bladsy is dit? Die anker bepaal ook WAAR die ry ingaan.
   //
-  // Paneelbord: net ná #paneel-statistieke-geskiedenis-plek, dus onder die
-  // maandelikse geskiedenis en bo die sy-kieslys.
+  // Paneelbord: net ná #fst-statistieke-geskiedenis-plek, dus onder die
+  // tweede ry tellers se maandgeskiedenis en bo die sy-kieslys.
   //
   // Boekhouding: net voor #fp-kieslys, dus bo die afdelingspille. Daar is geen
   // statistiekblok op daardie bladsy nie; die ry staan bo-aan die paneel.
   function kry_bladsy() {
     if (document.getElementById("paneel-sy-kieslys")) {
-      const anker = document.getElementById("paneel-statistieke-geskiedenis-plek");
+      // Sedert die FutureSharp Talks-tellers (Okt 2026) is daar twee rye;
+      // die pille kom ná die laaste een, nie tussen hulle nie.
+      const anker = document.getElementById("fst-statistieke-geskiedenis-plek")
+        || document.getElementById("paneel-statistieke-geskiedenis-plek");
       if (!anker) return null;
       return { area: "admin", anker, waar: "na" };
     }
