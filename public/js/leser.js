@@ -217,7 +217,7 @@ function wys_voortgang() {
   document.getElementById("leser-voortgang-balk").style.width = `${persentasie}%`;
 }
 
-async function wys_bladsy(nommer) {
+async function wys_bladsy(nommer, opsies = {}) {
   if (!pdf_dokument) return;
   const veilige_nommer = Math.min(Math.max(1, nommer), totale_bladsye);
   const bladsy_verander = veilige_nommer !== huidige_bladsy;
@@ -286,7 +286,12 @@ async function wys_bladsy(nommer) {
   await bou_skakel_laag(bladsy, viewport);
 
   // 'n Nuwe bladsy begin bo-links, ook as die vorige een ingezoem was.
-  if (bladsy_verander) {
+  // Terugblaai met die muiswiel maak die vorige bladsy ONDERAAN oop, sodat
+  // die leser aaneenlopend teruglees.
+  if (bladsy_verander && opsies.begin_onder) {
+    omhulsel.scrollTop = omhulsel.scrollHeight;
+    omhulsel.scrollLeft = 0;
+  } else if (bladsy_verander) {
     omhulsel.scrollTop = 0;
     omhulsel.scrollLeft = 0;
   }
@@ -670,6 +675,71 @@ document.addEventListener("DOMContentLoaded", () => {
       if (pdf_dokument) wys_bladsy(huidige_bladsy);
     }, 200);
   });
+
+  // --- Muiswiel (rekenaar). Pas die bladsy op die skerm, blaai die wiel
+  // direk. Kan die bladsy self rol (ingezoem, of dwars op 'n foon), rol die
+  // wiel eers binne die bladsy, en blaai eers as die rand bereik is en die
+  // leser verder rol. Ctrl + wiel zoem die leser (nie die hele blaaier nie).
+  //
+  // 'n Raakvlak stuur tientalle klein wiel-gebeurtenisse per gebaar; die
+  // drempel tel hulle op, en die pouse keer dat een gebaar bladsye oorslaan.
+  const WIEL_DREMPEL = 60;      // pixels opgetel voordat daar geblaai word
+  const WIEL_POUSE_MS = 450;    // minimum tyd tussen twee blaaie
+  let wiel_som = 0;
+  let wiel_laaste_blaai = 0;
+  let wiel_herstel = null;
+
+  const wiel_omhulsel = document.querySelector(".leser-bladsy-omhulsel");
+  if (wiel_omhulsel) {
+    wiel_omhulsel.addEventListener(
+      "wheel",
+      (ev) => {
+        if (!pdf_dokument) return;
+
+        if (ev.ctrlKey) {
+          ev.preventDefault();
+          stel_zoem(huidige_zoem + (ev.deltaY < 0 ? 0.2 : -0.2));
+          return;
+        }
+
+        // Horisontale rol (bv. twee vingers sywaarts) word nie geblaai nie.
+        if (Math.abs(ev.deltaX) > Math.abs(ev.deltaY)) return;
+
+        // Lyn- of bladsy-eenhede (sommige muise) omgeskakel na pixels.
+        const delta = ev.deltaY * (ev.deltaMode === 1 ? 32 : ev.deltaMode === 2 ? 600 : 1);
+        if (!delta) return;
+
+        const kan_rol = wiel_omhulsel.scrollHeight - wiel_omhulsel.clientHeight > 2;
+        const onder = wiel_omhulsel.scrollTop + wiel_omhulsel.clientHeight >= wiel_omhulsel.scrollHeight - 2;
+        const bo = wiel_omhulsel.scrollTop <= 2;
+        const by_rand = !kan_rol || (delta > 0 ? onder : bo);
+
+        // Nog nie by die rand nie: laat die blaaier gewoon binne die bladsy rol.
+        if (!by_rand) {
+          wiel_som = 0;
+          return;
+        }
+
+        ev.preventDefault();
+        wiel_som += delta;
+        clearTimeout(wiel_herstel);
+        wiel_herstel = setTimeout(() => { wiel_som = 0; }, 250);
+
+        const nou = Date.now();
+        if (Math.abs(wiel_som) < WIEL_DREMPEL || nou - wiel_laaste_blaai < WIEL_POUSE_MS) return;
+
+        wiel_laaste_blaai = nou;
+        const vorentoe = wiel_som > 0;
+        wiel_som = 0;
+        if (vorentoe && huidige_bladsy < totale_bladsye) {
+          wys_bladsy(huidige_bladsy + 1);
+        } else if (!vorentoe && huidige_bladsy > 1) {
+          wys_bladsy(huidige_bladsy - 1, { begin_onder: kan_rol });
+        }
+      },
+      { passive: false }
+    );
+  }
 
   // --- Swipe-gebare (foon/tablet) — links blaai vorentoe, regs blaai terug.
   // Net op die bladsy-omhulsel self, sodat 'n normale vertikale
