@@ -11,6 +11,7 @@ const { kry_store } = require("./_blob-store");
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 const { kry_maks_verdeling_persentasie, beskryf_minimum } = require("./_paystack-koste.js");
 const { kontroleer_leen_prys } = require("./_leen-prys-kontrole");
+const { kry_geldige_taal, kry_geldige_eweknie, kontroleer_eweknie, sinkroniseer_eweknie } = require("./_eweknie");
 
 const GELDIGE_ROL_TIPES = ["outeur", "vennoot", "ontwerp_admin", "printing", "aflewering"];
 
@@ -198,9 +199,22 @@ exports.handler = async (event, context) => {
     ? await kry_outeur_naam_string(nuwe_outeur_ids)
     : bestaande.outeur;
 
+  const ou_eweknie = bestaande.eweknie_slug || null;
+  const nuwe_eweknie = "eweknie_slug" in wysigings
+    ? kry_geldige_eweknie(wysigings.eweknie_slug, slug)
+    : ou_eweknie;
+  if (nuwe_eweknie !== ou_eweknie) {
+    const eweknie_fout = await kontroleer_eweknie(store, nuwe_eweknie);
+    if (eweknie_fout) {
+      return { statusCode: 400, body: eweknie_fout };
+    }
+  }
+
   const bygewerk = {
     ...bestaande,
     ...wysigings,
+    taal: "taal" in wysigings ? kry_geldige_taal(wysigings.taal) : bestaande.taal || null,
+    eweknie_slug: nuwe_eweknie,
     outeur_ids: nuwe_outeur_ids,
     kategorie_ids: Array.isArray(wysigings.kategorie_ids)
       ? wysigings.kategorie_ids.filter(Boolean)
@@ -214,6 +228,7 @@ exports.handler = async (event, context) => {
   };
 
   await store.setJSON(slug, bygewerk);
+  await sinkroniseer_eweknie(store, slug, ou_eweknie, nuwe_eweknie);
 
   return {
     statusCode: 200,

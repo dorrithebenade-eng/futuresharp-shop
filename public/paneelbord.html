@@ -896,6 +896,24 @@
           <label class="veld-etiket"><span data-i18n="paneel_nav_kategoriee">Kategorieë</span> <span class="veld-opsioneel" data-i18n="opsioneel">(opsioneel)</span></label>
           <div id="vorm-kategoriee-lys" class="paneel-kategoriee-merkblokkies"></div>
 
+          <div class="paneel-isbn-paar">
+            <div>
+              <label class="veld-etiket" for="vorm-taal">Taal van hierdie uitgawe <span class="veld-opsioneel" data-i18n="opsioneel">(opsioneel)</span></label>
+              <select id="vorm-taal" class="veld-invoer">
+                <option value="">Nie gespesifiseer nie</option>
+                <option value="af">Afrikaans</option>
+                <option value="en">Engels</option>
+              </select>
+            </div>
+            <div>
+              <label class="veld-etiket" for="vorm-eweknie">Eweknie in die ander taal <span class="veld-opsioneel" data-i18n="opsioneel">(opsioneel)</span></label>
+              <select id="vorm-eweknie" class="veld-invoer">
+                <option value="">Geen</option>
+              </select>
+            </div>
+          </div>
+          <p class="paneel-hulp-teks">Gekoppelde uitgawes staan in die katalogus as een paar langs mekaar. Die koppeling word outomaties aan albei boeke gestoor.</p>
+
           <label class="veld-etiket" for="vorm-oorsig" data-i18n="vorm_oorsig_etiket">Oorsig (verskyn op die katalogus-kaart, ongeveer 100 woorde)</label>
           <textarea id="vorm-oorsig" class="veld-invoer paneel-teksarea" rows="5"></textarea>
 
@@ -935,6 +953,7 @@
               <option value="nuut">Nuut! / New!</option>
               <option value="topverkoper">Topverkoper / Bestseller</option>
               <option value="spesiale_aanbod">Spesiale aanbod / Special offer</option>
+              <option value="binnekort">Binnekort op die rak / Soon on the shelf</option>
               <option value="aangepas">Pasgemaak …</option>
             </select>
 

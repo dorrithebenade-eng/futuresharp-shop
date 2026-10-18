@@ -176,7 +176,46 @@ function wys_produkte(produkte, { demo_modus, besit_stel = new Set() } = {}) {
     return;
   }
 
-  rooster.innerHTML += produkte.map((produk) => bou_kaart(produk, besit_stel)).join("");
+  rooster.innerHTML += groepeer_eweknieë(produkte)
+    .map((groep) =>
+      groep.length === 2
+        ? `<div class="eweknie-paar">
+             <p class="eweknie-paar-etiket">${t("eweknie_paar_etiket")}</p>
+             <div class="eweknie-paar-kaarte">${groep.map((produk) => bou_kaart(produk, besit_stel)).join("")}</div>
+           </div>`
+        : bou_kaart(groep[0], besit_stel)
+    )
+    .join("");
+}
+
+// Taaluitgawes van dieselfde werk (eweknie_slug) word een paar. Die paar
+// neem die plek in van die eerste van die twee in die gesorteerde lys, so
+// die gekose sortering bly geld. Binne die paar staan die uitgawe in die
+// winkeltaal eerste. 'n Eweknie wat nie in die huidige lys is nie (bv.
+// uitgefiltreer of onaktief) laat die boek alleen staan.
+function groepeer_eweknieë(produkte) {
+  const per_slug = new Map(produkte.map((p) => [p.slug, p]));
+  const reeds = new Set();
+  const winkeltaal = kry_huidige_taal();
+  const groepe = [];
+
+  for (const produk of produkte) {
+    if (reeds.has(produk.slug)) continue;
+    reeds.add(produk.slug);
+
+    const eweknie = produk.eweknie_slug && per_slug.get(produk.eweknie_slug);
+    if (!eweknie || reeds.has(eweknie.slug)) {
+      groepe.push([produk]);
+      continue;
+    }
+    reeds.add(eweknie.slug);
+
+    const paar = eweknie.taal === winkeltaal && produk.taal !== winkeltaal
+      ? [eweknie, produk]
+      : [produk, eweknie];
+    groepe.push(paar);
+  }
+  return groepe;
 }
 
 // Lees die aangemelde koper se reeds-gekoopte e-boeke — gebruik dieselfde

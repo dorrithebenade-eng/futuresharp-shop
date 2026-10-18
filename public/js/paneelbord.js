@@ -22,6 +22,7 @@ const VOORAFGESTELDE_ETIKETTE = {
   nuut: { af: "Nuut!", en: "New!" },
   topverkoper: { af: "Topverkoper", en: "Bestseller" },
   spesiale_aanbod: { af: "Spesiale aanbod", en: "Special offer" },
+  binnekort: { af: "Binnekort op die rak", en: "Soon on the shelf" },
 };
 
 function kry_etiket_voorafgestelde_sleutel(teks_af, teks_en) {
@@ -190,6 +191,10 @@ function wys_produkte_lys(produkte) {
           <div class="paneel-produk-inligting">
             <strong>${produk.titel}</strong>
             <span class="paneel-produk-outeur">${produk.outeur}</span>
+            ${produk.eweknie_slug ? (() => {
+              const eweknie = produkte.find((p) => p.slug === produk.eweknie_slug);
+              return `<span class="paneel-produk-outeur">Eweknie: ${ontsnap_html(eweknie ? eweknie.titel : produk.eweknie_slug)}</span>`;
+            })() : ""}
             <span class="paneel-produk-pryse">${pryse.join(" · ") || t("paneel_geen_formaat")}</span>
             <span class="paneel-produk-besigtigings">👁 ${produk.besigtigings || 0}</span>
             <span class="paneel-produk-aankope">
@@ -926,6 +931,24 @@ function ververs_alle_outeur_aftrekkieslyste() {
 
 // --- Vorm: oopmaak/toemaak ---
 
+// Eweknie-keuselys: alle ander produkte, alfabeties. `eie_slug` word
+// uitgesluit sodat 'n boek nie na homself kan wys nie.
+function bou_eweknie_opsies(eie_slug, gekose_slug) {
+  const kies = document.getElementById("vorm-eweknie");
+  const taal_naam = { af: "AF", en: "EN" };
+  const ander = produkte_kas
+    .filter((p) => p.slug !== eie_slug)
+    .sort((a, b) => String(a.titel || "").localeCompare(String(b.titel || ""), "af"));
+  kies.innerHTML =
+    `<option value="">Geen</option>` +
+    ander
+      .map((p) => {
+        const merk = p.taal ? ` (${taal_naam[p.taal]})` : "";
+        return `<option value="${ontsnap_html(p.slug)}"${p.slug === gekose_slug ? " selected" : ""}>${ontsnap_html(p.titel || p.slug)}${merk}</option>`;
+      })
+      .join("");
+}
+
 function reset_vorm() {
   document.getElementById("paneel-produk-vorm").reset();
   document.getElementById("vorm-oorspronklike-slug").value = "";
@@ -941,6 +964,8 @@ function reset_vorm() {
   document.getElementById("vorm-leen-verdelings-lys").innerHTML = "";
   document.getElementById("vorm-outeurs-lys").innerHTML = "";
   bou_kategorie_merkblokkies([]);
+  document.getElementById("vorm-taal").value = "";
+  bou_eweknie_opsies(null, null);
   document.getElementById("vorm-etiket-pasgemaak-velde").style.display = "none";
   wys_verberg_formaat_velde();
   document.getElementById("paneel-vorm-titel").textContent = t("paneel_voeg_produk_by_titel");
@@ -1147,6 +1172,8 @@ function open_vorm_vir_wysig(produk) {
     voeg_outeur_ry_by(null);
   }
   bou_kategorie_merkblokkies(produk.kategorie_ids || []);
+  document.getElementById("vorm-taal").value = produk.taal || "";
+  bou_eweknie_opsies(produk.slug, produk.eweknie_slug || null);
   document.getElementById("vorm-oorsig").value = produk.oorsig || "";
   document.getElementById("vorm-vol-beskrywing").value = produk.vol_beskrywing || "";
   document.getElementById("vorm-isbn-eboek").value = (produk.isbn && produk.isbn.eboek) || "";
@@ -1315,6 +1342,8 @@ function bou_produk_liggaam() {
     titel: document.getElementById("vorm-titel").value.trim(),
     outeur_ids: kry_outeur_ids_uit_vorm(),
     kategorie_ids: kry_kategorie_ids_uit_vorm(),
+    taal: document.getElementById("vorm-taal").value || null,
+    eweknie_slug: document.getElementById("vorm-eweknie").value || null,
     oorsig: document.getElementById("vorm-oorsig").value.trim(),
     vol_beskrywing: document.getElementById("vorm-vol-beskrywing").value.trim(),
     omslag: document.getElementById("vorm-omslag").value.trim(),

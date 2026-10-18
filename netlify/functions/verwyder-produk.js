@@ -13,6 +13,7 @@
 
 const { kry_store } = require("./_blob-store");
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
+const { sinkroniseer_eweknie } = require("./_eweknie");
 
 async function het_bestaande_kopers(slug) {
   const bestellings_store = kry_store("bestellings");
@@ -102,6 +103,13 @@ exports.handler = async (event, context) => {
     // Hoof-rekord eerste — as enigiets hieronder faal, is die produk in
     // elk geval reeds uit die katalogus, wat die belangrikste is.
     await katalogus_store.delete(slug);
+
+    // Eweknie in die ander taal mag nie na 'n geskrapte boek bly wys nie.
+    if (produk.eweknie_slug) {
+      await sinkroniseer_eweknie(katalogus_store, slug, produk.eweknie_slug, null).catch((fout) => {
+        console.warn("Kon nie eweknie-skakel losmaak nie:", fout);
+      });
+    }
 
     const eboek_sleutel = produk.formate && produk.formate.eboek && produk.formate.eboek.eboek_sleutel;
     if (eboek_sleutel) {

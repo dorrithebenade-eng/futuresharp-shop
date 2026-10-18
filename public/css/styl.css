@@ -4022,3 +4022,57 @@ body.vennoot-modus .paneel-dokument-skrap-knoppie {
 @media (max-width: 640px) {
   .mini-kop-links .taal-wisselaar { display: none; }
 }
+
+/* ---------- Eweknie-paar: twee taaluitgawes van een werk ----------
+   Sien groepeer_eweknieë() in katalogus.js. Die kaarte in 'n paar is
+   smaller as 'n gewone ry-kaart, dus kry die omslag minder breedte en die
+   etiket-ster word kleiner. Op 'n foon bly die twee langs mekaar. */
+
+.eweknie-paar {
+  background: #F3EFE7;
+  border-radius: 16px;
+  padding: 12px;
+}
+
+.eweknie-paar-etiket {
+  font-family: var(--font-liggaam);
+  font-size: 13px;
+  color: var(--grys-teks);
+  margin: 0 4px 10px;
+}
+
+.eweknie-paar-kaarte {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px;
+}
+
+.eweknie-paar .kaart-omslag-wrap { width: 40%; max-width: 200px; }
+.eweknie-paar .kaart-liggaam { padding: 16px 16px 18px; }
+.eweknie-paar .kaart-titel { font-size: 17px; }
+.eweknie-paar .kaart-etiket-ster-wrap { width: 96px; height: 96px; top: -16px; right: -6px; }
+.eweknie-paar .kaart-etiket-ster-teks { max-width: 70px; }
+.eweknie-paar .kaart-etiket-ster-teks--kort { font-size: 16px; }
+.eweknie-paar .kaart-etiket-ster-teks--medium { font-size: 12.5px; }
+.eweknie-paar .kaart-etiket-ster-teks--lank { font-size: 10px; }
+
+@media (max-width: 860px) {
+  .eweknie-paar .kaart { flex-direction: column; }
+  .eweknie-paar .kaart-omslag-wrap { width: 100%; max-width: none; }
+}
+
+@media (max-width: 560px) {
+  .eweknie-paar { padding: 8px; }
+  .eweknie-paar-kaarte { gap: 8px; }
+  .eweknie-paar .kaart-liggaam { padding: 10px 10px 12px; gap: 6px; }
+  .eweknie-paar .kaart-titel { font-size: 14px; }
+  .eweknie-paar .kaart-outeur { font-size: 12px; }
+  .eweknie-paar .kaart-teaser { display: none; }
+  .eweknie-paar .lees-meer-skakel { font-size: 13px; }
+  .eweknie-paar .beskikbaar-merker { font-size: 11px; padding: 4px 8px; }
+  .eweknie-paar .kaart-etiket-ster-wrap { width: 84px; height: 84px; top: -12px; right: -4px; }
+  .eweknie-paar .kaart-etiket-ster-teks { max-width: 62px; }
+  .eweknie-paar .kaart-etiket-ster-teks--kort { font-size: 13px; }
+  .eweknie-paar .kaart-etiket-ster-teks--medium { font-size: 11px; }
+  .eweknie-paar .kaart-etiket-ster-teks--lank { font-size: 9.5px; }
+}

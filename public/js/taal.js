@@ -287,6 +287,7 @@ const WOORDEBOEK = {
     en: "Your loan period for this e-book has expired. Buy it, or borrow it again, to keep reading.",
   },
   beskikbaar_as_etiket: { af: "Beskikbaar as:", en: "Available as:" },
+  eweknie_paar_etiket: { af: "Beskikbaar in Afrikaans en Engels", en: "Available in English and Afrikaans" },
 
   // Katalogus-sortering (winkel) — sien katalogus-sorteer.js
   sorteer_etiket: { af: "Sorteer", en: "Sort" },
