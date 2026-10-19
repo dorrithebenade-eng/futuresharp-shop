@@ -78,6 +78,9 @@ exports.handler = async (event, context) => {
   const onder = String(invoer.onder || "").trim();
   const rigting = RIGTINGS.includes(invoer.rigting) ? invoer.rigting : "uit";
   const gedek = invoer.gedek_deur_hosting === true;
+  // LENING (19 Oktober 2026): geld wat terugbetaal moet word, of wat terugbetaal
+  // word. Nie inkomste of uitgawe nie; die finansiele state wys dit as 'n las.
+  const lening = invoer.lening === true;
   const nota = String(invoer.nota || "").trim().slice(0, 500);
 
   const store = kry_fin_kategoriee_store();
@@ -179,6 +182,7 @@ exports.handler = async (event, context) => {
     onder,
     rigting,
     gedek_deur_hosting: gedek,
+    lening,
     vas: is_vas,
     nota,
     bygewerk_op: nou,

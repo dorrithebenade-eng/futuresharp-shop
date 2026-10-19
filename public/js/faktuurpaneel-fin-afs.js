@@ -1,4 +1,10 @@
 // public/js/faktuurpaneel-fin-afs.js
+// Weergawe 2 (19 Oktober 2026): LENINGS en VERGOEDING AAN DIREKTEURE.
+// 'n Kategorie met die merkie `lening` tel nie by inkomste of uitgawes nie;
+// die opgehoopte netto bedrag is 'n las, en die jaar se beweging staan onder
+// finansiering in die kontantvloeistaat. Die nota oor vergoeding aan
+// direkteure tel die betalings onder Projekkoste waarvan die beskrywing 'n
+// direkteur se naam dra; die rekenmeester bevestig.
 // Weergawe 1 (19 Oktober 2026).
 //
 // DIE VOORLOPIGE FINANSIELE STATE, die vyfde oortjie onder State. Vir die
@@ -41,12 +47,14 @@
     kantoor: "285 Talana-laan, Villieria, Pretoria, 0186",
     pos: "Posbus 11602, Queenswood, 0121",
     bank: "First National Bank",
+    // `soek`: woorde waarmee 'n betaling in die beskrywing aan die direkteur
+    // gekoppel word. Net woorde wat net een direkteur het (Gous is twee).
     direkteure: [
-      { naam: "Ignatius Gous", aangestel: "2024-02-29" },
-      { naam: "Rialetta Gous", aangestel: "2024-02-29" },
-      { naam: "Marike Venter", aangestel: "2024-02-29" },
-      { naam: "Eugene Botha", aangestel: "2025-03-01" },
-      { naam: "Dorrithé Labuschagne", aangestel: "2025-03-01" },
+      { naam: "Ignatius Gous", aangestel: "2024-02-29", soek: ["ignatius"] },
+      { naam: "Rialetta Gous", aangestel: "2024-02-29", soek: ["rialetta"] },
+      { naam: "Marike Venter", aangestel: "2024-02-29", soek: ["marike", "venter"] },
+      { naam: "Eugene Botha", aangestel: "2025-03-01", soek: ["eugene", "botha"] },
+      { naam: "Dorrithé Labuschagne", aangestel: "2025-03-01", soek: ["dorrith", "labuschagne"] },
     ],
   };
 
@@ -97,12 +105,26 @@
   // Een inskrywing (of debiteur/krediteur in dieselfde vorm) se dele by die
   // kategoriee, met dieselfde rigtingtoets as die staat. Wat nie pas nie,
   // gaan na "" (Ongekategoriseer).
-  function voeg_by(kaart, r, rigting, per_naam, per_id) {
+  // 'n Lening (of 'n kategorie onder een) gaan na `lening`, met teken: in
+  // plus, uit minus.
+  function is_lening(id, per_id) {
+    let k = per_id.get(id);
+    for (let i = 0; k && i < 20; i++) {
+      if (k.lening) return true;
+      k = k.onder ? per_id.get(k.onder) : null;
+    }
+    return false;
+  }
+  function voeg_by(kaart, r, rigting, per_naam, per_id, lening) {
     fs_dele_van(r, per_naam).forEach((d) => {
       if (!d.bedrag_sent) return;
       const kat = d.kategorie_id ? per_id.get(d.kategorie_id) : null;
       const pas = kat && (kat.rigting === "in" ? "in" : "uit") === rigting;
       const id = pas ? d.kategorie_id : "";
+      if (id && lening && is_lening(id, per_id)) {
+        lening.set(id, (lening.get(id) || 0) + (rigting === "in" ? 1 : -1) * d.bedrag_sent);
+        return;
+      }
       kaart.set(id, (kaart.get(id) || 0) + d.bedrag_sent);
     });
   }
@@ -142,6 +164,7 @@
 
     const jare = [];
     for (let j = BEGIN_JAAR; j <= AFS.jaar; j++) jare.push(j);
+    const som_map = (m) => [...m.values()].reduce((a, v) => a + v, 0);
 
     const per_jaar = new Map();
     let alle_inskrywings = [];
@@ -150,15 +173,22 @@
       const jn = R.joernaal.get(j) || {};
       const lys = Array.isArray(jn.inskrywings) ? jn.inskrywings : [];
       alle_inskrywings = alle_inskrywings.concat(lys);
-      const k_in = new Map(), k_uit = new Map();
-      const los_bates = [];
+      const k_in = new Map(), k_uit = new Map(), lening = new Map();
+      const los_bates = [], projek_bet = [];
       lys.forEach((x) => {
         const rig = x.rigting === "in" ? "in" : "uit";
-        voeg_by(rig === "in" ? k_in : k_uit, x, rig, per_naam, per_id);
+        voeg_by(rig === "in" ? k_in : k_uit, x, rig, per_naam, per_id, lening);
         if (rig === "uit") {
           fs_dele_van(x, per_naam).forEach((d) => {
-            if (d.kategorie_id && is_los_bate(d.kategorie_id) && d.bedrag_sent) {
+            if (!d.kategorie_id || !d.bedrag_sent) return;
+            if (is_los_bate(d.kategorie_id)) {
               los_bates.push({ datum: x.datum, beskrywing: x.beskrywing || "", bedrag_sent: d.bedrag_sent });
+            }
+            const top = top_van(d.kategorie_id);
+            if (proj_kop && top && top.id === proj_kop.id) {
+              const k = kat(d.kategorie_id);
+              projek_bet.push({ datum: x.datum, beskrywing: [x.beskrywing, x.wie, d.reel].filter(Boolean).join(" \u00b7 "),
+                kategorie: k ? k.naam : "", bedrag_sent: d.bedrag_sent });
             }
           });
         }
@@ -180,13 +210,14 @@
         toelae_sent: toelae,
         bank_sluit: bank.sluiting || null,
         bank_open: bank.opening || null,
-        los_bates,
+        los_bates, projek_bet,
+        lening, lening_netto: som_map(lening),
       });
     });
 
     const som = (m) => [...m.values()].reduce((a, v) => a + v, 0);
     const leeg = { kontant_in: new Map(), kontant_uit: new Map(), deb: new Map(), kred: new Map(),
-      deb_sent: 0, kred_sent: 0, toelae_sent: 0, bank_sluit: { balans_sent: 0, datum: `${BEGIN_JAAR}-02-29`, bron: "bankstaat" } };
+      deb_sent: 0, kred_sent: 0, toelae_sent: 0, lening_saldo: 0, bank_sluit: { balans_sent: 0, datum: `${BEGIN_JAAR}-02-29`, bron: "bankstaat" } };
 
     // Die toevallingsyfers per jaar.
     let opgehoop = 0;
@@ -216,15 +247,16 @@
       x.fondse_einde = opgehoop;
       x.bank_sent = x.bank_sluit ? Number(x.bank_sluit.balans_sent) || 0 : 0;
       x.bank_vorig = j === BEGIN_JAAR ? 0 : (per_jaar.get(j - 1).bank_sent);
+      x.lening_saldo = (v.lening_saldo || 0) + x.lening_netto;
       x.bates = x.bank_sent + x.deb_sent;
-      x.laste = x.kred_sent + x.toelae_sent;
+      x.laste = x.kred_sent + x.toelae_sent + x.lening_saldo;
       x.verskil_balans = x.bates - x.laste - x.fondse_einde;
       x.d_deb = x.deb_sent - v.deb_sent;
       x.d_kred = x.kred_sent - v.kred_sent;
       x.d_toelae = x.toelae_sent - v.toelae_sent;
       x.bedryf_kontant = x.oorskot - x.d_deb + x.d_kred + x.d_toelae;
-      x.verskil_kontant = (x.bank_sent - x.bank_vorig) - x.bedryf_kontant;
-      x.kontant_netto = x.kontant_in_sent - x.kontant_uit_sent;
+      x.verskil_kontant = (x.bank_sent - x.bank_vorig) - x.bedryf_kontant - x.lening_netto;
+      x.kontant_netto = x.kontant_in_sent - x.kontant_uit_sent + x.lening_netto;
       x.verskil_bank = (x.bank_sent - x.bank_vorig) - x.kontant_netto;
     });
 
@@ -247,7 +279,35 @@
     };
     const ink = reels("in");
     const uit = reels("uit");
+
+    // VERGOEDING AAN DIREKTEURE: betalings onder Projekkoste waarvan die
+    // beskrywing een van 'n direkteur se soekwoorde dra.
+    const vir_dir = (x) => MAATSKAPPY.direkteure.map((d) => {
+      const lys = (x ? x.projek_bet : []).filter((p) => {
+        const t2 = String(p.beskrywing || "").toLowerCase();
+        return d.soek.some((w) => t2.includes(w));
+      });
+      return { naam: d.naam, lys, sent: lys.reduce((a, p) => a + p.bedrag_sent, 0) };
+    });
+    const dir_nou = vir_dir(ditjaar), dir_vorig = vir_dir(vorig);
+    const dir_vergoeding = dir_nou.map((d, i) => ({ naam: d.naam, nou: d.sent, vorig: dir_vorig[i].sent, lys: d.lys }))
+      .filter((d) => d.nou || d.vorig);
+
+    // Die lenings per kategorie, opgehoop tot die jaareinde.
+    const lening_rye = (() => {
+      const m = new Map();
+      jare.forEach((j) => per_jaar.get(j).lening.forEach((sent, id) => {
+        const x = m.get(id) || { naam: (kat(id) || {}).naam || id, nou: 0, vorig: 0, beweging: 0 };
+        if (j <= AFS.jaar) x.nou += sent;
+        if (j <= AFS.jaar - 1) x.vorig += sent;
+        if (j === AFS.jaar) x.beweging += sent;
+        m.set(id, x);
+      }));
+      return [...m.values()].filter((x) => x.nou || x.vorig);
+    })();
+
     return {
+      dir_vergoeding, lening_rye,
       jaar: AFS.jaar, x: ditjaar, v: vorig, per_jaar,
       ink, projek: uit.filter((u) => u.groep === "projek"), bedryf: uit.filter((u) => u.groep === "bedryf"),
       proj_naam: proj_kop ? proj_kop.naam : t("fs_projekkoste", "Projekkoste"),
@@ -288,7 +348,9 @@
           ${ry(o(t("afs_tot_bates", "Totale bates")), x.bates, vv("bates"), s, "afs-subtot")}
           ${groep(t("afs_laste", "Laste"), s)}
           ${ry(o(t("afs_krediteure", "Krediteure")), x.kred_sent, vv("kred_sent"), s, "afs-ink")}
-          ${ry(o(t("afs_lenings", "Lenings van direkteure")), 0, v ? 0 : null, s, "afs-ink")}
+          ${s.lening_rye.length
+            ? s.lening_rye.map((l) => ry(o(l.naam), l.nou, v ? l.vorig : null, s, "afs-ink")).join("")
+            : ry(o(t("afs_lenings", "Lenings van direkteure")), 0, v ? 0 : null, s, "afs-ink")}
           ${ry(o(t("afs_toelaes", "Ongebruikte toelaes")), x.toelae_sent, vv("toelae_sent"), s, "afs-ink")}
           ${ry(o(t("afs_tot_laste", "Totale laste")), x.laste, vv("laste"), s, "afs-subtot")}
           ${groep(t("afs_fondse", "Fondse"), s)}
@@ -346,7 +408,7 @@
           ${ry(o(t("afs_kontant_bedryf", "Kontant uit bedrywighede")), x.bedryf_kontant, vv("bedryf_kontant"), s, "afs-subtot")}
           ${groep(t("afs_bel_fin", "Belegging en finansiering"), s)}
           ${ry(o(t("afs_toerusting_gekoop", "Toerusting gekoop")), 0, v ? 0 : null, s, "afs-ink")}
-          ${ry(o(t("afs_lenings", "Lenings van direkteure")), 0, v ? 0 : null, s, "afs-ink")}
+          ${ry(o(t("afs_lenings_netto", "Lenings ontvang min terugbetaal")), x.lening_netto, vv("lening_netto"), s, "afs-ink")}
           ${(x.verskil_kontant || (v && v.verskil_kontant)) ? ry(o(t("afs_onverklaar", "Onverklaarde verskil")), x.verskil_kontant, vv("verskil_kontant"), s, "afs-ink afs-rooi") : ""}
           ${ry(o(t("afs_beweging", "Beweging in kontant")), x.bank_sent - x.bank_vorig, v ? v.bank_sent - v.bank_vorig : null, s, "afs-subtot")}
           ${ry(o(t("afs_kontant_begin", "Kontant aan die begin")), x.bank_vorig, vv("bank_vorig"), s)}
@@ -423,12 +485,14 @@
         ${kop3(t("afs_ander", "Lenings en ongebruikte toelaes"), t("afs_ander_sub", "Laste wat nie uit die fakture kom nie"))}
         <div class="afs-tabel"><table>
           <tr><th>${o(t("afs_h_item", "Item"))}</th><th>${o(t("afs_h_stand", "Stand"))}</th></tr>
-          <tr><td>${o(t("afs_lenings", "Lenings van direkteure"))}</td><td><span class="afs-chip afs-chip-wag">${o(t("afs_nog_nie", "Nog nie aangeteken nie"))}</span></td></tr>
+          ${s.lening_rye.length ? s.lening_rye.map((l) => `<tr><td>${o(l.naam)}<div class="afs-klein">${o(
+            t("afs_lening_beweging", "beweging in die jaar: {r}").replace("{r}", b(l.beweging)))}</div></td><td><b>${r(l.nou)}</b></td></tr>`).join("")
+            : `<tr><td>${o(t("afs_lenings", "Lenings van direkteure"))}</td><td><span class="afs-chip afs-chip-ok">${o(t("afs_geen_toelae", "Geen"))}</span></td></tr>`}
           <tr><td>${o(t("afs_toelaes", "Ongebruikte toelaes"))}</td><td>${x.toelae_sent
             ? `<b>${r(x.toelae_sent)}</b>`
             : `<span class="afs-chip afs-chip-ok">${o(t("afs_geen_toelae", "Geen"))}</span>`}</td></tr>
         </table></div>
-        <p class="afs-uitleg">${o(t("afs_lenings_uitleg", "'n Direkteur wat uit eie sak vir Future Sharp betaal het, word as lening aangeteken tot dit terugbetaal is."))}</p>
+        <p class="afs-uitleg">${o(t("afs_lenings_uitleg2", "Kategorieë met die merkie Lening in die register. Wat ontvang is, min wat terugbetaal is, opgehoop sedert registrasie."))}</p>
       </div>`;
 
     return `<div class="afs-rooster">${aansl}${deb}${kred}${los}${ander}</div>`;
@@ -473,6 +537,13 @@
         </table></div>
       </div>
       <div class="afs-staat afs-breed">
+        ${kop3(t("afs_dir_verg", "Vergoeding aan direkteure"), t("afs_dir_verg_sub", "Betalings onder Projekkoste waarvan die beskrywing 'n direkteur se naam dra. Die rekenmeester bevestig."))}
+        ${s.dir_vergoeding.length ? `<div class="afs-tabel"><table>
+          <tr><th>${o(t("afs_h_naam", "Naam"))}</th><th class="n">${jaar_kort(s.jaar)}</th>${s.v ? `<th class="n">${jaar_kort(s.jaar - 1)}</th>` : ""}</tr>
+          ${s.dir_vergoeding.map((d) => `<tr><td>${o(d.naam)}</td><td class="n">${b(d.nou)}</td>${s.v ? `<td class="n afs-vg">${b(d.vorig)}</td>` : ""}</tr>`).join("")}
+        </table></div>` : `<p class="afs-leeg">${o(t("afs_dir_geen", "Geen betaling onder Projekkoste dra 'n direkteur se naam nie. As 'n direkteur wel betaal is, sien die blad Projekkoste-betalings in die Excel-werkboek."))}</p>`}
+      </div>
+      <div class="afs-staat afs-breed">
         ${kop3(t("afs_notas", "Notas by die state"))}
         <ol class="afs-lys">${notas(s).map((n) => `<li><b>${o(n[0])}.</b> ${o(n[1])}</li>`).join("")}</ol>
       </div>
@@ -486,6 +557,12 @@
       [t("afs_n2_kop", "Inkomste"), t("afs_n2", "Fooie word erken op die faktuur se datum. Toelaes word erken soos die geld op die projek bestee word.")],
       [t("afs_n3_kop", "Vergoeding vir projekwerk"), t("afs_n3", "Erken saam met die inkomste waarvoor dit betaal word, op die faktuur se datum. Wat op die jaareinde nog nie uitbetaal was nie, staan as krediteur.")],
       [t("afs_n4_kop", "Toerusting"), t("afs_n4", "Aankope onder Los bates is as uitgawe hanteer. Wat langer as 'n jaar gebruik word, sal as bate teen koste min waardevermindering opgeneem word.")],
+      [t("afs_n7_kop", "Lenings van direkteure"), s.lening_rye.length
+        ? t("afs_n7", "Bedrae wat 'n direkteur aan die maatskappy voorgeskiet het en wat terugbetaal moet word: {r} op die jaareinde. Die terme (rente en terugbetaling) word deur die direkteure bevestig.").replace("{r}", r(s.lening_rye.reduce((a, l) => a + l.nou, 0)))
+        : t("afs_n7_geen", "Geen lenings van direkteure nie.")],
+      [t("afs_n8_kop", "Vergoeding aan direkteure"), s.dir_vergoeding.length
+        ? t("afs_n8", "Vir projekwerk betaal: {l}.").replace("{l}", s.dir_vergoeding.map((d) => `${d.naam} ${r(d.nou)}`).join("; "))
+        : t("afs_n8_geen", "Geen direkteur is in die jaar vir projekwerk betaal nie.")],
       [t("afs_n5_kop", "Belasting"), t("afs_n5", "Die maatskappy is nie as openbare weldaadsorganisasie geregistreer nie. Die belastingposisie word deur die rekenmeester bevestig.")],
       [t("afs_n6_kop", "Gebeure ná die jaareinde"), later.length
         ? t("afs_n6_dir", "{n} is ná die jaareinde as direkteur aangestel.").replace("{n}", later.map((d) => `${d.naam} (${datum_teks(d.aangestel)})`).join(", "))
@@ -566,6 +643,7 @@
     pb_rye.push(["Debiteure", x.deb_sent, 0]);
     pb_rye.push(["Krediteure", 0, x.kred_sent]);
     if (x.toelae_sent) pb_rye.push(["Ongebruikte toelaes", 0, x.toelae_sent]);
+    s.lening_rye.forEach((l) => pb_rye.push([`Lening: ${l.naam}`, l.nou < 0 ? -l.nou : 0, l.nou > 0 ? l.nou : 0]));
     pb_rye.push(["Opgehoopte oorskot aan die begin", x.fondse_begin < 0 ? -x.fondse_begin : 0, x.fondse_begin > 0 ? x.fondse_begin : 0]);
     s.ink.forEach((q) => pb_rye.push([`Inkomste: ${q.naam}`, q.nou < 0 ? -q.nou : 0, q.nou > 0 ? q.nou : 0]));
     if (x.toelae_uitgestel) pb_rye.push(["Toelaes nog nie bestee nie", x.toelae_uitgestel > 0 ? x.toelae_uitgestel : 0, x.toelae_uitgestel < 0 ? -x.toelae_uitgestel : 0]);
@@ -579,7 +657,8 @@
     const vv = (veld) => (v ? v[veld] : 0);
     [["Bates"], twee("Toerusting", 0, 0), twee("Debiteure", x.deb_sent, vv("deb_sent")), twee("Kontant in die bank", x.bank_sent, vv("bank_sent")),
       twee("Totale bates", x.bates, vv("bates")), [""], ["Laste"], twee("Krediteure", x.kred_sent, vv("kred_sent")),
-      twee("Lenings van direkteure", 0, 0), twee("Ongebruikte toelaes", x.toelae_sent, vv("toelae_sent")),
+      ...(s.lening_rye.length ? s.lening_rye.map((l) => twee(l.naam, l.nou, v ? l.vorig : 0)) : [twee("Lenings van direkteure", 0, 0)]),
+      twee("Ongebruikte toelaes", x.toelae_sent, vv("toelae_sent")),
       twee("Totale laste", x.laste, vv("laste")), [""], ["Fondse"], twee("Opgehoopte oorskot", x.fondse_einde, vv("fondse_einde")),
       twee("Laste en fondse", x.laste + x.fondse_einde, v ? v.laste + v.fondse_einde : 0)]
       .forEach((q) => ry(fp, q, q.length === 1 || /^Totale|^Laste en/.test(q[0]), [2, 3]));
@@ -606,7 +685,7 @@
     [twee("Oorskot vir die jaar", x.oorskot, vv("oorskot")), twee("Toename in debiteure", -x.d_deb, v ? -v.d_deb : 0),
       twee("Toename in krediteure", x.d_kred, vv("d_kred")), twee("Toename in ongebruikte toelaes", x.d_toelae, vv("d_toelae")),
       twee("Kontant uit bedrywighede", x.bedryf_kontant, vv("bedryf_kontant")), twee("Toerusting gekoop", 0, 0),
-      twee("Lenings van direkteure", 0, 0), twee("Onverklaarde verskil", x.verskil_kontant, vv("verskil_kontant")),
+      twee("Lenings ontvang min terugbetaal", x.lening_netto, vv("lening_netto")), twee("Onverklaarde verskil", x.verskil_kontant, vv("verskil_kontant")),
       twee("Beweging in kontant", x.bank_sent - x.bank_vorig, v ? v.bank_sent - v.bank_vorig : 0),
       twee("Kontant aan die begin", x.bank_vorig, vv("bank_vorig")), twee("Kontant aan die einde", x.bank_sent, vv("bank_sent"))]
       .forEach((q) => ry(kv, q, /^Kontant uit|^Kontant aan die einde/.test(q[0]), [2, 3]));
@@ -634,13 +713,22 @@
     const lb = blad("Los bates", "Betalings onder Los bates (as uitgawe hanteer)", ["Datum", "Beskrywing", "Bedrag", "Bate? (ja/nee)"], [13, 52, 16, 16]);
     x.los_bates.forEach((l) => ry(lb, [l.datum, l.beskrywing, l.bedrag_sent, ""], false, [3]));
 
-    // 9. Besonderhede
+    // 9. Projekkoste-betalings, sodat die rekenmeester die direkteure kan uitken
+    const pk = blad("Projekkoste-betalings", "Betalings onder Projekkoste in die jaar", ["Datum", "Beskrywing", "Kategorie", "Bedrag"], [13, 60, 30, 16]);
+    x.projek_bet.slice().sort((a, c) => String(a.datum).localeCompare(String(c.datum)))
+      .forEach((q) => ry(pk, [q.datum, q.beskrywing, q.kategorie, q.bedrag_sent], false, [4]));
+
+    // 10. Besonderhede
     const bs = blad("Besonderhede", "Maatskappybesonderhede", null, [30, 60]);
     const M = MAATSKAPPY;
     [["Naam", M.naam], ["Registrasienommer", M.reg_nr], ["Soort", M.soort], ["Belastingnommer", M.belasting_nr],
       ["Geregistreer", datum_teks(M.geregistreer)], ["Jaareinde", M.jaareinde], ["Geregistreerde kantoor", M.kantoor],
       ["Posadres", M.pos], ["Bankier", M.bank], [""], ["Direkteure", ""]].forEach((q) => bs.addRow(q));
     direkteure_vir(s.jaar).forEach((d) => bs.addRow([d.naam, `aangestel ${datum_teks(d.aangestel)}${d.stand === "later" ? " (ná die jaareinde)" : ""}`]));
+    bs.addRow([]);
+    bs.addRow(["Vergoeding aan direkteure (projekwerk)"]).font = { bold: true };
+    if (s.dir_vergoeding.length) s.dir_vergoeding.forEach((d) => bs.addRow([d.naam, (d.nou / 100).toFixed(2)]));
+    else bs.addRow(["Geen opgespoor nie", ""]);
     bs.addRow([]);
     bs.addRow(["Notas"]).font = { bold: true };
     notas(s).forEach((n, i) => bs.addRow([`${i + 1}. ${n[0]}`, n[1]]));

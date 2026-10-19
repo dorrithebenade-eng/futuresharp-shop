@@ -1,4 +1,8 @@
 // public/js/faktuurpaneel-fin-staat.js
+// Weergawe 6 (19 Oktober 2026): LENINGS. 'n Kategorie met die merkie
+// `lening` (of onder so een) is nie ontvangs of betaling vir die oorskot nie.
+// Haar bedrae staan in 'n eie blok onder die slottabel, en tel nie by die
+// oorskot nie. Die bankrekonsiliasie tel hulle wel, want die geld het beweeg.
 // Weergawe 5 (17 Oktober 2026): in die slottabel die beperkte geld van befonde
 // projekte wat nog nie bestee is nie, met wat dan vir die organisasie
 // beskikbaar is. Net as daar sulke geld is; ook in die PDF. Sien
@@ -64,6 +68,7 @@ const FS = {
   dele_per: new Map(), // kategorie_id -> [{datum, beskrywing, bron, bedrag_sent}]
   oop: new Set(),      // kategorie_id's wat oopgeklik is
   ongekat: { in: 0, uit: 0, dele: [] },
+  lenings: [],         // [{kategorie, in_sent, uit_sent}] -- sien fs_is_lening
   bank: { opening: null, sluiting: null },
   projekte: [],
 };
@@ -162,6 +167,16 @@ function fs_dele_van(r, per_naam) {
   return dele;
 }
 
+// Is hierdie kategorie, of een waaronder sy val, as lening gemerk?
+function fs_is_lening(id) {
+  let k = FS.kategoriee.find((x) => x.id === id);
+  for (let i = 0; k && i < 20; i++) {
+    if (k.lening) return true;
+    k = k.onder ? FS.kategoriee.find((x) => x.id === k.onder) : null;
+  }
+  return false;
+}
+
 function fs_tel_op() {
   const per_naam = new Map(
     FS.werk_items.map((w) => [fs_sleutel(w.naam), w])
@@ -169,6 +184,7 @@ function fs_tel_op() {
   const per_id = new Map(FS.kategoriee.map((k) => [k.id, k]));
 
   const eie = new Map();       // kategorie_id -> sent
+  const lening = new Map();    // kategorie_id -> {in_sent, uit_sent}
   const ongekat = { in: 0, uit: 0, dele: [] };
   const dele_per = new Map();
 
@@ -192,6 +208,18 @@ function fs_tel_op() {
        * die bank tel nie, en niemand weet dit nie. */
       const kat = d.kategorie_id ? per_id.get(d.kategorie_id) : null;
       const rigting_pas = kat && (kat.rigting === "in" ? "in" : "uit") === teken;
+
+      // 'N LENING TEL NIE BY DIE OORSKOT NIE (19 Okt 2026).
+      if (kat && rigting_pas && fs_is_lening(d.kategorie_id)) {
+        const x = lening.get(d.kategorie_id) || { kategorie: kat, in_sent: 0, uit_sent: 0 };
+        x[teken === "in" ? "in_sent" : "uit_sent"] += d.bedrag_sent;
+        lening.set(d.kategorie_id, x);
+        const l = dele_per.get(d.kategorie_id) || [];
+        l.push({ datum: r.datum, beskrywing: r.beskrywing, bron: r.bron || "", bedrag_sent: d.bedrag_sent,
+          faktuur_sleutel: "", faktuur_reels: [], kategorie_id: d.kategorie_id });
+        dele_per.set(d.kategorie_id, l);
+        return;
+      }
 
       if (kat && rigting_pas) {
         eie.set(d.kategorie_id, (eie.get(d.kategorie_id) || 0) + d.bedrag_sent);
@@ -239,6 +267,8 @@ function fs_tel_op() {
   }));
   FS.ongekat = ongekat;
   FS.dele_per = dele_per;
+  FS.lenings = [...lening.values()].sort((a, b) =>
+    String(a.kategorie.naam).localeCompare(String(b.kategorie.naam), "af-ZA"));
 }
 
 // Die inskrywings onder een kategorie, as 'n ry onder haar.
@@ -486,6 +516,8 @@ function fs_teken() {
         projekkoste" en "Bedryfskoste" beantwoord die vraag reeds, en die blok
         het sonder gemerkte kategoriee altyd gelyk of alles oorbly. */ ""}
 
+    ${fs_lening_blok()}
+
     ${fs_rekonsiliasie(inkomste, uitgawes)}
 
     ${FS.ongekat.dele.length ? `
@@ -564,6 +596,12 @@ function fs_teken() {
     blokke: [
       vrag_blok("in", fs_t("fs_inkomste", "Ontvangste")),
       vrag_blok("uit", fs_t("fs_uitgawes", "Betalings")),
+      {
+        titel: fs_t("fs_lenings", "Lenings (nie inkomste of uitgawe nie)"),
+        rye: FS.lenings.map((l) => ({ naam: l.kategorie.naam, vlak: 1, eie_sent: l.in_sent - l.uit_sent,
+          totaal_sent: l.in_sent - l.uit_sent, hoof: false })),
+        som_sent: fs_lening_netto(),
+      },
     ].filter((b) => b.rye.length),
     slot: vrag_slot,
     nota: {
@@ -571,6 +609,34 @@ function fs_teken() {
       teks: fs_t("fs_pdf_nota", "Waar 'n kursus deur 'n eksterne ontwikkelaar aangebied word en die betaling regstreeks na daardie ontwikkelaar se rekening vereffen, tree Future Sharp as agent op. Slegs wat behou word, word as ontvangste getoon."),
     },
   };
+}
+
+/* ═══ die lenings ═══ */
+
+// Die lenings in die tydperk, in hul eie blok. Klik oop soos 'n kategorie.
+function fs_lening_netto() {
+  return FS.lenings.reduce((a, l) => a + l.in_sent - l.uit_sent, 0);
+}
+function fs_lening_blok() {
+  if (!FS.lenings.length) return "";
+  const netto = fs_lening_netto();
+  return `
+    <div class="fs-blok fs-blok-lening">
+      <h4 class="fs-blok-kop">${fs_ontsnap(fs_t("fs_lenings", "Lenings (nie inkomste of uitgawe nie)"))}</h4>
+      <table class="fs-tabel"><tbody>
+        ${FS.lenings.map((l) => {
+          const id = l.kategorie.id;
+          const oop = FS.oop.has(id);
+          const n = l.in_sent - l.uit_sent;
+          return `<tr class="fs-kan-oop${oop ? " fs-is-oop" : ""}" data-fs-oop="${fs_ontsnap(id)}">
+            <td class="fs-naam" style="padding-left:16px"><span class="fs-pyl">${oop ? "\u25be" : "\u25b8"}</span>${fs_ontsnap(l.kategorie.naam)}</td>
+            <td class="fs-eie"></td>
+            <td class="fs-tot">${(n < 0 ? "\u2212 " : "") + fs_rand(n)}</td></tr>${oop ? fs_dele_ry(id, 16) : ""}`;
+        }).join("")}
+        ${FS.lenings.length > 1 ? `<tr class="fs-som"><td class="fs-naam">${fs_ontsnap(fs_t("fs_lenings_netto", "Netto lenings"))}</td><td></td>
+          <td class="fs-tot">${(netto < 0 ? "\u2212 " : "") + fs_rand(netto)}</td></tr>` : ""}
+      </tbody></table>
+    </div>`;
 }
 
 /* ═══ die bankrekonsiliasie ═══ */
@@ -636,7 +702,7 @@ function fs_rekonsiliasie(inkomste, uitgawes) {
     ? FS.inskrywings
         .filter((r) => r.datum > o.datum && r.datum <= s.datum)
         .reduce((a, r) => a + (r.rigting === "in" ? 1 : -1) * (Number(r.bedrag_sent) || 0), 0)
-    : inkomste - uitgawes;
+    : inkomste - uitgawes + fs_lening_netto();
   const verwag = o.balans_sent + beweeg;
   const verskil = s.balans_sent - verwag;
 
@@ -756,6 +822,7 @@ function fs_voer_uit() {
   slot("Totale ontvangste", som_van("in"));
   slot("Totale betalings", som_van("uit"));
   slot("Oorskot vir die tydperk", som_van("in") - som_van("uit"));
+  FS.lenings.forEach((l) => slot(`Lening: ${l.kategorie.naam}`, l.in_sent - l.uit_sent));
 
   const blob = new Blob(["\uFEFF" + reels.join("\r\n")], {
     type: "text/csv;charset=utf-8;",

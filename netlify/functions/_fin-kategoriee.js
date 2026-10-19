@@ -101,6 +101,7 @@ function nuwe_kategorie() {
     onder: "",              // die id van die ouer, of "" vir 'n hoofkategorie
     rigting: "uit",
     gedek_deur_hosting: false,
+    lening: false,          // 19 Okt 2026: 'n lening, nie inkomste of uitgawe nie
     vas: false,             // deur die stelsel geskryf; naam en rigting is vas
     // AKTIEF OF GEDEAKTIVEER.
     //

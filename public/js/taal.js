@@ -3470,6 +3470,11 @@ const WOORDEBOEK = {
   },
   kt_hosting: { af: "Word deur hosting gedek", en: "Covered by hosting" },
   kt_hosting_kort: { af: "Hosting", en: "Hosting" },
+  kt_lening: { af: "Lening: nie inkomste of uitgawe nie", en: "Loan: not income or expense" },
+  kt_lening_kort: { af: "Lening", en: "Loan" },
+  kt_lening_hulp: { af: "Geld wat terugbetaal moet word, soos 'n direkteur wat namens Future Sharp betaal het, of die terugbetaling daarvan. Staan apart op die staat van ontvangste en betalings, en as 'n las in die finansi\u00eble state.", en: "Money that must be repaid, such as a director who paid on behalf of Future Sharp, or its repayment. Shown separately on the statement of receipts and payments, and as a liability in the financial statements." },
+  fs_lenings: { af: "Lenings (nie inkomste of uitgawe nie)", en: "Loans (not income or expense)" },
+  fs_lenings_netto: { af: "Netto lenings", en: "Net loans" },
   kt_hosting_hulp: {
     af: "Die staat vergelyk die totaal van gemerkte kategorie\u00eb met die hosting wat ingevorder is.",
     en: "The statement compares the total of marked categories with the hosting collected.",

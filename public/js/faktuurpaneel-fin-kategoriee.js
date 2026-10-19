@@ -127,6 +127,8 @@ function kt_teken_blok(lys, plek_id) {
         ? `<span class="fk-merkie">${kt_t("kt_vas", "Stelsel")}</span>` : "",
       k.gedek_deur_hosting
         ? `<span class="fk-merkie kt-hosting">${kt_t("kt_hosting_kort", "Hosting")}</span>` : "",
+      k.lening
+        ? `<span class="fk-merkie kt-hosting">${kt_t("kt_lening_kort", "Lening")}</span>` : "",
       k.toets
         ? `<span class="fk-merkie">${kt_t("kt_toets", "Toets")}</span>` : "",
     ].join("");
@@ -294,6 +296,7 @@ function kt_maak_vorm_oop(id, verstek_rigting) {
     kt_onder_opsies(k ? k.id : null, k ? k.onder : "");
   document.getElementById("kt-nota").value = k ? k.nota || "" : "";
   document.getElementById("kt-hosting").checked = Boolean(k && k.gedek_deur_hosting);
+  document.getElementById("kt-lening").checked = Boolean(k && k.lening);
 
   kt_stel_rigting(k ? k.rigting : (verstek_rigting === "in" ? "in" : "uit"));
 
@@ -351,6 +354,7 @@ async function kt_stoor() {
         onder: document.getElementById("kt-onder").value,
         rigting: kt_huidige_rigting(),
         gedek_deur_hosting: document.getElementById("kt-hosting").checked,
+        lening: document.getElementById("kt-lening").checked,
         nota: document.getElementById("kt-nota").value.trim(),
       }),
     });
