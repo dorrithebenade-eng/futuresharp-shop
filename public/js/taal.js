@@ -3332,6 +3332,7 @@ const WOORDEBOEK = {
   // DIE VOORLOPIGE FINANSIELE STATE (19 Oktober 2026). Sien faktuurpaneel-fin-afs.js.
   afs_titel: { af: "Finansi\u00eble state", en: "Financial statements" },
   afs_excel: { af: "Excel vir die rekenmeester", en: "Excel for the accountant" },
+  afs_word: { af: "State as Word", en: "Statements as Word" },
   afs_hulp: { af: "Die staat van ontvangste en betalings omgesit na toevallingsbasis, met die vorige jaar langsaan. Voorlopig: vir die rekenmeester om na te gaan.", en: "The statement of receipts and payments converted to the accrual basis, with the previous year alongside. Draft: for the accountant to review." },
   pv_hulp: { af: "Al die projekte van die boekjaar langs mekaar. Klik op 'n projek om sy projekkaart oop te maak.", en: "All the projects of the financial year side by side. Click a project to open its project card." },
   pv_pdf: { af: "Verslag as PDF", en: "Report as PDF" },

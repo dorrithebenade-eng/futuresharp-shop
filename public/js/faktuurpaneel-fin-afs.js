@@ -1,4 +1,7 @@
 // public/js/faktuurpaneel-fin-afs.js
+// Weergawe 3 (19 Oktober 2026): die state as Word-dokument (docx van
+// jsDelivr, eers gelaai wanneer die knoppie gedruk word), met titelblad,
+// algemene inligting, die direkteure se goedkeuring, die vier state en notas.
 // Weergawe 2 (19 Oktober 2026): LENINGS en VERGOEDING AAN DIREKTEURE.
 // 'n Kategorie met die merkie `lening` tel nie by inkomste of uitgawes nie;
 // die opgehoopte netto bedrag is 'n las, en die jaar se beweging staan onder
@@ -739,6 +742,207 @@
       `Future-Sharp-Finansiele-state-${s.jaar}-${String(s.jaar + 1).slice(2)}-voorlopig.xlsx`);
   }
 
+  /* ═══ die Word-dokument ═══ */
+
+  // docx (https://docx.js.org) word eers gelaai wanneer iemand die knoppie druk.
+  const DOCX_URL = "https://cdn.jsdelivr.net/npm/docx@9.5.1/dist/index.iife.js";
+  function laai_docx() {
+    if (window.docx) return Promise.resolve(window.docx);
+    return new Promise((los, breek) => {
+      const sk = document.createElement("script");
+      sk.src = DOCX_URL;
+      sk.onload = () => (window.docx ? los(window.docx) : breek(new Error("docx het nie gelaai nie")));
+      sk.onerror = () => breek(new Error("Kon nie die Word-biblioteek laai nie"));
+      document.head.appendChild(sk);
+    });
+  }
+
+  function datum_vol(iso) {
+    if (!iso) return "";
+    const m = ["Januarie", "Februarie", "Maart", "April", "Mei", "Junie", "Julie", "Augustus", "September", "Oktober", "November", "Desember"];
+    return `${Number(iso.slice(8, 10))} ${m[Number(iso.slice(5, 7)) - 1]} ${iso.slice(0, 4)}`;
+  }
+
+  // Die rye van elke staat, een keer gebou vir die Word-dokument.
+  // soort: groep | ink | reel | subtot | tot
+  function woord_state(s) {
+    const x = s.x, v = s.v;
+    const vv = (veld) => (v ? v[veld] : 0);
+    const R = (naam, nou, vorig, soort) => ({ naam, nou, vorig, soort: soort || "reel" });
+    const G = (naam) => ({ naam, soort: "groep" });
+    const lening = s.lening_rye.length
+      ? s.lening_rye.map((l) => R(l.naam, l.nou, v ? l.vorig : 0, "ink"))
+      : [R("Lenings van direkteure", 0, 0, "ink")];
+    return [
+      { titel: "Staat van finansiële posisie", sub: `op ${datum_vol(x.tot)}`, rye: [
+        G("Bates"), R("Toerusting", 0, 0, "ink"), R("Debiteure", x.deb_sent, vv("deb_sent"), "ink"),
+        R("Kontant in die bank", x.bank_sent, vv("bank_sent"), "ink"), R("Totale bates", x.bates, vv("bates"), "subtot"),
+        G("Laste"), R("Krediteure", x.kred_sent, vv("kred_sent"), "ink"), ...lening,
+        R("Ongebruikte toelaes", x.toelae_sent, vv("toelae_sent"), "ink"), R("Totale laste", x.laste, vv("laste"), "subtot"),
+        G("Fondse"), R("Opgehoopte oorskot", x.fondse_einde, vv("fondse_einde"), "ink"),
+        R("Totale laste en fondse", x.laste + x.fondse_einde, v ? v.laste + v.fondse_einde : 0, "tot"),
+      ] },
+      { titel: "Staat van inkomste en uitgawes", sub: `vir die jaar geëindig ${datum_vol(x.tot)}`, rye: [
+        G("Inkomste"), ...s.ink.map((q) => R(q.naam, q.nou, q.vorig, "ink")),
+        ...((x.toelae_uitgestel || (v && v.toelae_uitgestel)) ? [R("Min: toelaes nog nie bestee nie", -x.toelae_uitgestel, v ? -v.toelae_uitgestel : 0, "ink")] : []),
+        R("Totale inkomste", x.inkomste_sent, vv("inkomste_sent"), "subtot"),
+        ...(s.projek.length ? [G(s.proj_naam), ...s.projek.map((q) => R(q.naam, q.nou, q.vorig, "ink"))] : []),
+        ...(s.bedryf.length ? [G("Bedryfskoste"), ...s.bedryf.map((q) => R(q.naam, q.nou, q.vorig, "ink"))] : []),
+        R("Totale uitgawes", x.uitgawes_sent, vv("uitgawes_sent"), "subtot"),
+        R(x.oorskot < 0 ? "Tekort vir die jaar" : "Oorskot vir die jaar", x.oorskot, vv("oorskot"), "tot"),
+      ] },
+      { titel: "Staat van veranderinge in fondse", sub: `vir die jaar geëindig ${datum_vol(x.tot)}`, rye: [
+        R("Opgehoopte oorskot aan die begin van die jaar", x.fondse_begin, vv("fondse_begin")),
+        R("Oorskot (tekort) vir die jaar", x.oorskot, vv("oorskot")),
+        R("Opgehoopte oorskot aan die einde van die jaar", x.fondse_einde, vv("fondse_einde"), "tot"),
+      ] },
+      { titel: "Kontantvloeistaat", sub: `vir die jaar geëindig ${datum_vol(x.tot)}`, rye: [
+        G("Kontantvloei uit bedrywighede"), R("Oorskot (tekort) vir die jaar", x.oorskot, vv("oorskot"), "ink"),
+        R("Toename in debiteure", -x.d_deb, v ? -v.d_deb : 0, "ink"), R("Toename in krediteure", x.d_kred, vv("d_kred"), "ink"),
+        ...((x.d_toelae || (v && v.d_toelae)) ? [R("Toename in ongebruikte toelaes", x.d_toelae, vv("d_toelae"), "ink")] : []),
+        R("Kontant uit bedrywighede", x.bedryf_kontant, vv("bedryf_kontant"), "subtot"),
+        G("Kontantvloei uit belegging en finansiering"), R("Toerusting gekoop", 0, 0, "ink"),
+        R("Lenings ontvang min terugbetaal", x.lening_netto, vv("lening_netto"), "ink"),
+        ...((x.verskil_kontant || (v && v.verskil_kontant)) ? [R("Onverklaarde verskil", x.verskil_kontant, vv("verskil_kontant"), "ink")] : []),
+        R("Beweging in kontant", x.bank_sent - x.bank_vorig, v ? v.bank_sent - v.bank_vorig : 0, "subtot"),
+        R("Kontant aan die begin van die jaar", x.bank_vorig, vv("bank_vorig")),
+        R("Kontant aan die einde van die jaar", x.bank_sent, vv("bank_sent"), "tot"),
+      ] },
+    ];
+  }
+
+  async function woord() {
+    if (!AFS.s) return;
+    const knop = document.getElementById("afs-word");
+    const ou = knop ? knop.textContent : "";
+    if (knop) { knop.disabled = true; knop.textContent = t("ms_pdf_besig", "Word gebou …"); }
+    try {
+      const D = await laai_docx();
+      const s = AFS.s, x = s.x, M = MAATSKAPPY;
+      const jaar_n = String(s.jaar + 1), jaar_v = String(s.jaar);
+      const BREED = 9026; // A4 met 2,54 cm kantlyne, in twips
+      const KOL = s.v ? [5826, 1600, 1600] : [7426, 1600];
+      const GEEN = { style: D.BorderStyle.NONE, size: 0, color: "FFFFFF" };
+      const DUN = { style: D.BorderStyle.SINGLE, size: 4, color: "000000" };
+      const DUBBEL = { style: D.BorderStyle.DOUBLE, size: 4, color: "000000" };
+      const grense = (bo, onder) => ({ top: bo || GEEN, bottom: onder || GEEN, left: GEEN, right: GEEN });
+
+      const P = (teks, o2 = {}) => new D.Paragraph({
+        alignment: o2.align, spacing: { after: o2.na == null ? 120 : o2.na, before: o2.voor || 0 },
+        pageBreakBefore: Boolean(o2.bladsy), indent: o2.inspring ? { left: o2.inspring } : undefined,
+        children: [new D.TextRun({ text: teks, bold: o2.vet, size: o2.grootte, italics: o2.kursief, allCaps: o2.hoof })],
+      });
+      const sel = (teks, breedte, o2 = {}) => new D.TableCell({
+        width: { size: breedte, type: D.WidthType.DXA },
+        borders: grense(o2.bo, o2.onder),
+        margins: { top: 40, bottom: 40, left: 60, right: 60 },
+        children: [new D.Paragraph({ alignment: o2.regs ? D.AlignmentType.RIGHT : D.AlignmentType.LEFT,
+          indent: o2.inspring ? { left: o2.inspring } : undefined,
+          children: [new D.TextRun({ text: teks, bold: o2.vet, size: o2.grootte || 19, allCaps: o2.hoof, color: o2.kleur })] })],
+      });
+      const bedrag = (sent) => b(sent).replace("–", "-");
+      const tabel = (rye) => new D.Table({
+        width: { size: BREED, type: D.WidthType.DXA }, columnWidths: KOL,
+        borders: { top: GEEN, bottom: GEEN, left: GEEN, right: GEEN, insideHorizontal: GEEN, insideVertical: GEEN },
+        rows: [
+          new D.TableRow({ tableHeader: true, children: [sel("", KOL[0]),
+            sel(jaar_n, KOL[1], { regs: true, vet: true, onder: DUN }),
+            ...(s.v ? [sel(jaar_v, KOL[2], { regs: true, vet: true, onder: DUN })] : [])] }),
+          new D.TableRow({ children: [sel("", KOL[0]), sel("R", KOL[1], { regs: true, grootte: 16, kleur: "666666" }),
+            ...(s.v ? [sel("R", KOL[2], { regs: true, grootte: 16, kleur: "666666" })] : [])] }),
+          ...rye.map((q) => {
+            if (q.soort === "groep") {
+              return new D.TableRow({ children: [sel(q.naam, KOL[0], { vet: true }), sel("", KOL[1]), ...(s.v ? [sel("", KOL[2])] : [])] });
+            }
+            const vet = q.soort === "subtot" || q.soort === "tot";
+            const bo = vet ? DUN : null;
+            const onder = q.soort === "tot" ? DUBBEL : null;
+            return new D.TableRow({ children: [
+              sel(q.naam, KOL[0], { vet, inspring: q.soort === "ink" ? 240 : 0 }),
+              sel(bedrag(q.nou), KOL[1], { regs: true, vet, bo, onder }),
+              ...(s.v ? [sel(bedrag(q.vorig), KOL[2], { regs: true, vet, bo, onder })] : []),
+            ] });
+          }),
+        ],
+      });
+      const kop = (teks, bladsy) => P(teks.toUpperCase(), { vet: true, grootte: 22, bladsy, na: 60 });
+      const voet = new D.Footer({ children: [new D.Paragraph({ alignment: D.AlignmentType.CENTER, children: [
+        new D.TextRun({ text: `${M.naam} · Voorlopige finansiële state ${s.jaar}/${String(s.jaar + 1).slice(2)} · Nie deur 'n rekenmeester nagegaan nie · Bladsy `, size: 16, color: "666666" }),
+        new D.TextRun({ children: [D.PageNumber.CURRENT], size: 16, color: "666666" }),
+      ] })] });
+
+      const inhoud = [];
+      // Titelblad
+      inhoud.push(P("", { na: 2400 }));
+      inhoud.push(P(M.naam.toUpperCase(), { vet: true, grootte: 36, align: D.AlignmentType.CENTER }));
+      inhoud.push(P(`Registrasienommer ${M.reg_nr}`, { align: D.AlignmentType.CENTER, na: 600 }));
+      inhoud.push(P("VOORLOPIGE FINANSIËLE STATE", { vet: true, grootte: 28, align: D.AlignmentType.CENTER }));
+      inhoud.push(P(`vir die jaar geëindig ${datum_vol(x.tot)}`, { align: D.AlignmentType.CENTER, na: 1200 }));
+      inhoud.push(P("Voorlopig. Opgestel deur die direkteure uit die boekhoustelsel van die maatskappy. Hierdie state is nie deur 'n rekenmeester saamgestel, nagegaan of geouditeer nie.",
+        { kursief: true, align: D.AlignmentType.CENTER }));
+
+      // Inhoud
+      inhoud.push(kop("Inhoud", true));
+      ["Algemene inligting", "Verantwoordelikheid en goedkeuring van die direkteure", "Staat van finansiële posisie",
+        "Staat van inkomste en uitgawes", "Staat van veranderinge in fondse", "Kontantvloeistaat", "Notas by die finansiële state"]
+        .forEach((n, i) => inhoud.push(P(`${i + 1}.  ${n}`)));
+
+      // Algemene inligting
+      inhoud.push(kop("Algemene inligting", true));
+      const inligting = [["Land van inlywing", "Suid-Afrika"], ["Aard van die maatskappy", M.soort],
+        ["Registrasienommer", M.reg_nr], ["Belastingnommer", M.belasting_nr], ["Datum van registrasie", datum_vol(M.geregistreer)],
+        ["Geregistreerde kantoor", M.kantoor], ["Posadres", M.pos], ["Bankier", M.bank],
+        ["Direkteure", direkteure_vir(s.jaar).filter((d) => d.stand !== "later").map((d) => d.naam).join(", ")]];
+      inhoud.push(new D.Table({ width: { size: BREED, type: D.WidthType.DXA }, columnWidths: [3000, 6026],
+        borders: { top: GEEN, bottom: GEEN, left: GEEN, right: GEEN, insideHorizontal: GEEN, insideVertical: GEEN },
+        rows: inligting.map(([a, c]) => new D.TableRow({ children: [sel(a, 3000, { vet: true }), sel(c, 6026)] })) }));
+
+      // Verantwoordelikheid en goedkeuring
+      inhoud.push(kop("Verantwoordelikheid en goedkeuring van die direkteure", true));
+      [
+        "Die direkteure is verantwoordelik vir die opstel van hierdie finansiële state en vir die rekeningkundige rekords waarop hulle gebaseer is.",
+        "Die state is opgestel uit die maatskappy se boekhoustelsel. Elke maand van die jaar is met die bankstate van die maatskappy gerekonsilieer.",
+        "Hierdie state is voorlopig en word aan die rekenmeester voorgelê vir samestelling of onafhanklike oorsig. Die direkteure het geen rede om te glo dat die maatskappy nie in die afsienbare toekoms as 'n lopende saak sal voortbestaan nie.",
+        "Die finansiële state is deur die direksie goedgekeur op ____________________ en word namens die direksie onderteken deur:",
+      ].forEach((n) => inhoud.push(P(n, { na: 200 })));
+      [0, 1].forEach(() => {
+        inhoud.push(P("", { na: 600 }));
+        inhoud.push(P("______________________________", { na: 40 }));
+        inhoud.push(P("Direkteur", { grootte: 18 }));
+      });
+
+      // Die state
+      woord_state(s).forEach((st) => {
+        inhoud.push(kop(st.titel, true));
+        inhoud.push(P(st.sub, { kursief: true, na: 200 }));
+        inhoud.push(tabel(st.rye));
+      });
+
+      // Notas
+      inhoud.push(kop("Notas by die finansiële state", true));
+      inhoud.push(P(`vir die jaar geëindig ${datum_vol(x.tot)}`, { kursief: true, na: 200 }));
+      notas(s).forEach((n, i) => {
+        inhoud.push(P(`${i + 1}.  ${n[0]}`, { vet: true, na: 60, voor: 120 }));
+        inhoud.push(P(n[1], { inspring: 360 }));
+      });
+
+      const dok = new D.Document({
+        creator: "Future Sharp", title: `${M.naam}: Voorlopige finansiële state ${s.jaar}/${String(s.jaar + 1).slice(2)}`,
+        styles: { default: { document: { run: { font: "Arial", size: 20 } } } },
+        sections: [{ properties: { page: { size: { width: 11906, height: 16838 },
+          margin: { top: 1440, bottom: 1440, left: 1440, right: 1440 } } },
+          footers: { default: voet }, children: inhoud }],
+      });
+      const blob = await D.Packer.toBlob(dok);
+      jn_stuur_af(blob, `Future-Sharp-Finansiele-state-${s.jaar}-${String(s.jaar + 1).slice(2)}-voorlopig.docx`);
+    } catch (fout) {
+      console.error("Kon nie die Word-dokument bou nie:", fout);
+      window.alert(t("afs_word_fout", "Kon nie die Word-dokument bou nie.") + " " + (fout.message || ""));
+    } finally {
+      if (knop) { knop.disabled = false; knop.textContent = ou; }
+    }
+  }
+
   /* ═══ laai ═══ */
 
   async function laai(jaar) {
@@ -801,6 +1005,8 @@
     }
     kies.addEventListener("change", () => laai(Number(kies.value)));
     document.getElementById("afs-excel").addEventListener("click", werkboek);
+    const wk = document.getElementById("afs-word");
+    if (wk) wk.addEventListener("click", woord);
     AFS.gereed = true;
     if (AFS.oop && AFS.jaar === null) laai(Number(kies.value));
   });
