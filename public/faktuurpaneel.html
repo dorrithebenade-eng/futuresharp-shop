@@ -735,6 +735,7 @@
           <button type="button" class="fr-sub-knop" data-st-aansig="staat" data-i18n="fs_titel">Ontvangste en betalings</button>
           <button type="button" class="fr-sub-knop" data-st-aansig="projekte" data-i18n="pv_titel">Projekverslag</button>
           <button type="button" class="fr-sub-knop" data-st-aansig="maande" data-i18n="ms_aansig_maande">Maandopsomming</button>
+          <button type="button" class="fr-sub-knop" data-st-aansig="afs" data-i18n="afs_titel">Finansiële state</button>
         </div>
 
         <div id="st-aansig-betaal">
@@ -827,6 +828,18 @@
             <button type="button" class="kaart-aksie wi-stil" id="ms-boekjaar-pdf" data-i18n="ms_laai_pdf">Laai boekjaar af (PDF)</button>
           </div>
           <div id="ms-tabel"></div>
+        </div>
+
+        <!-- DIE VOORLOPIGE FINANSIELE STATE (19 Oktober 2026), vir die
+             rekenmeester. Sien faktuurpaneel-fin-afs.js en kry-jaareinde.js. -->
+        <div id="st-aansig-afs" hidden>
+          <div class="ms-balk">
+            <label class="veld-etiket" for="afs-jaar" data-i18n="ms_boekjaar">Boekjaar</label>
+            <select class="veld-invoer" id="afs-jaar"></select>
+            <button type="button" class="kaart-aksie" id="afs-excel" data-i18n="afs_excel">Excel vir die rekenmeester</button>
+          </div>
+          <p class="st-afd-hulp" data-i18n="afs_hulp">Die staat van ontvangste en betalings omgesit na toevallingsbasis, met die vorige jaar langsaan. Voorlopig: vir die rekenmeester om na te gaan.</p>
+          <div id="afs-inhoud"></div>
         </div>
 
       </section>
@@ -1276,6 +1289,7 @@
   <script src="js/faktuurpaneel-maandopsomming.js"></script>
   <script src="js/faktuurpaneel-fin-finansiering.js"></script>
   <script src="js/faktuurpaneel-fin-staat.js"></script>
+  <script src="js/faktuurpaneel-fin-afs.js"></script>
   <script src="js/faktuurpaneel-staat-pdf.js"></script>
   <script src="js/paneel-area-pille.js"></script>
   <script src="js/paneel-verslae-pil.js"></script>

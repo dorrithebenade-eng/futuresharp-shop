@@ -28,8 +28,6 @@ const WOORDEBOEK = {
   opsioneel: { af: "(opsioneel)", en: "(optional)" },
 
   // Statistieke-blokkie
-  statistiek_opskrif_winkel: { af: "Future Shop", en: "Future Shop" },
-  statistiek_opskrif_fst: { af: "FutureSharp Talks", en: "FutureSharp Talks" },
   statistiek_totaal: { af: "Totaal", en: "Total" },
   statistiek_vandag: { af: "Vandag", en: "Today" },
   statistiek_week: { af: "Hierdie week", en: "This week" },
@@ -287,7 +285,6 @@ const WOORDEBOEK = {
     en: "Your loan period for this e-book has expired. Buy it, or borrow it again, to keep reading.",
   },
   beskikbaar_as_etiket: { af: "Beskikbaar as:", en: "Available as:" },
-  eweknie_paar_etiket: { af: "Beskikbaar in Afrikaans en Engels", en: "Available in English and Afrikaans" },
 
   // Katalogus-sortering (winkel) — sien katalogus-sorteer.js
   sorteer_etiket: { af: "Sorteer", en: "Sort" },
@@ -943,11 +940,6 @@ const WOORDEBOEK = {
   paneel_koepon_afslag_waarde_etiket: { af: "Afslag-waarde", en: "Discount value" },
   paneel_koepon_produk_etiket: { af: "Boek", en: "Book" },
   paneel_koepon_enige_boek: { af: "Enige boek", en: "Any book" },
-  paneel_koepon_boeke_etiket: { af: "Boeke", en: "Books" },
-  paneel_koepon_boeke_wenk: {
-    af: "(merk een of meer; niks gemerk nie = enige boek)",
-    en: "(tick one or more; nothing ticked = any book)",
-  },
   paneel_koepon_formaat_etiket: { af: "Formaat", en: "Format" },
   paneel_koepon_formaat_albei: { af: "Alle formate", en: "All formats" },
   paneel_koepon_formaat_eboek: { af: "E-boek", en: "E-book" },
@@ -1049,11 +1041,6 @@ const WOORDEBOEK = {
     en: "You're offline, and this book hasn't been stored locally yet — connect to the internet once to open it.",
   },
   leser_van: { af: "van", en: "of" },
-  leser_leen_verval_op: { af: "Toegang verval op", en: "Access expires on" },
-  leser_weergawe_opgedateer: {
-    af: "Hierdie boek is bygewerk na 'n nuwer weergawe. Jou leesplek is so na as moontlik behou.",
-    en: "This book has been updated to a newer version. Your place has been kept as closely as possible.",
-  },
   leser_soek_besig: { af: "Soek …", en: "Searching …" },
   leser_soek_gevind: { af: "Gevind op bladsy", en: "Found on page" },
   leser_soek_niks: { af: "Geen resultate gevind nie.", en: "No results found." },
@@ -3342,6 +3329,10 @@ const WOORDEBOEK = {
   // DIE OORTJIES ONDER STATE EN DIE PROJEKVERSLAG (17 Oktober 2026).
   sa_betaal: { af: "Begunstigdes en fakture", en: "Beneficiaries and invoices" },
   pv_titel: { af: "Projekverslag", en: "Project report" },
+  // DIE VOORLOPIGE FINANSIELE STATE (19 Oktober 2026). Sien faktuurpaneel-fin-afs.js.
+  afs_titel: { af: "Finansi\u00eble state", en: "Financial statements" },
+  afs_excel: { af: "Excel vir die rekenmeester", en: "Excel for the accountant" },
+  afs_hulp: { af: "Die staat van ontvangste en betalings omgesit na toevallingsbasis, met die vorige jaar langsaan. Voorlopig: vir die rekenmeester om na te gaan.", en: "The statement of receipts and payments converted to the accrual basis, with the previous year alongside. Draft: for the accountant to review." },
   pv_hulp: { af: "Al die projekte van die boekjaar langs mekaar. Klik op 'n projek om sy projekkaart oop te maak.", en: "All the projects of the financial year side by side. Click a project to open its project card." },
   pv_pdf: { af: "Verslag as PDF", en: "Report as PDF" },
   pv_pdf_geen: { af: "Daar is geen projekte in hierdie boekjaar nie.", en: "There are no projects in this financial year." },

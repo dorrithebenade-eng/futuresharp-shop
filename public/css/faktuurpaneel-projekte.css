@@ -224,3 +224,42 @@
 .pv-sub td { font-weight: 700; border-bottom: 1px solid #D3CDC3; }
 .pv-tot td { font-weight: 700; background: #EEF6F4; color: #2E7D6F; border-top: 1.5px solid var(--teal); border-bottom: 0; }
 @media (max-width: 640px) { .pv-teels { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* ═══ DIE VOORLOPIGE FINANSIELE STATE (19 Oktober 2026). Sien faktuurpaneel-fin-afs.js. ═══ */
+.afs-strook { background: #FBF2DA; color: #7E610F; border-radius: 8px; padding: 9px 12px; font-size: 0.82rem; line-height: 1.5; margin: 6px 0 12px; }
+.afs-kontroles { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.afs-kontrole { font-size: 0.8rem; border-radius: 20px; padding: 4px 10px; font-weight: 600; }
+.afs-ok { background: #EEF6F4; color: #2E7D6F; }
+.afs-nee { background: #FDEFE9; color: #C2421F; }
+.afs-subs { display: flex; flex-wrap: wrap; gap: 4px; border-bottom: 1px solid #E3E0DA; margin-bottom: 16px; }
+.afs-sub-knop { border: 0; background: none; font: inherit; font-size: 0.86rem; font-weight: 600; color: var(--grys-teks); padding: 8px 12px; border-bottom: 2px solid transparent; margin-bottom: -1px; cursor: pointer; }
+.afs-sub-knop.aan { color: #2E7D6F; border-bottom-color: var(--teal); }
+.afs-rooster { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.afs-staat { background: #fff; border: 1px solid #E7E4DE; border-radius: 10px; padding: 14px 16px; min-width: 0; }
+.afs-staat h3 { font-size: 0.95rem; margin: 0 0 2px; }
+.afs-breed { grid-column: 1 / -1; }
+.afs-sub { color: var(--grys-teks); font-size: 0.8rem; margin: 0 0 10px; }
+.afs-tabel { overflow-x: auto; }
+.afs-tabel table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
+.afs-tabel th { font-size: 0.68rem; letter-spacing: .06em; text-transform: uppercase; color: var(--grys-teks); text-align: left; padding: 6px; border-bottom: 1px solid #E3E0DA; white-space: nowrap; }
+.afs-tabel td { padding: 6px; border-bottom: 1px solid #F3F1ED; vertical-align: top; }
+.afs-tabel .n { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.afs-tabel th.n { text-align: right; }
+.afs-vg { color: var(--grys-teks); }
+.afs-groep td { font-weight: 700; font-size: 0.7rem; letter-spacing: .05em; text-transform: uppercase; color: var(--grys-teks); padding-top: 12px; border-bottom: 0; }
+.afs-ink td:first-child { padding-left: 18px; }
+.afs-subtot td { font-weight: 700; border-top: 1px solid #D3CDC3; }
+.afs-tot td { font-weight: 700; background: #EEF6F4; color: #2E7D6F; border-top: 1.5px solid var(--teal); }
+.afs-rooi td { color: #C2421F; }
+.afs-uitleg, .afs-leeg { font-size: 0.8rem; color: var(--grys-teks); line-height: 1.5; margin: 8px 0 0; }
+.afs-waarsku { font-size: 0.8rem; color: #C2421F; margin: 8px 0 0; }
+.afs-klein { font-size: 0.78rem; color: var(--grys-teks); white-space: nowrap; }
+.afs-chip { display: inline-block; font-size: 0.7rem; font-weight: 600; padding: 2px 8px; border-radius: 20px; white-space: nowrap; }
+.afs-chip-ok { background: #EEF6F4; color: #2E7D6F; }
+.afs-chip-wag { background: #FBF2DA; color: #7E610F; }
+.afs-chip-grys { background: #F1EFEB; color: var(--grys-teks); }
+.afs-dl { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 4px 16px; font-size: 0.86rem; margin: 0; }
+.afs-dl dt { color: var(--grys-teks); }
+.afs-dl dd { margin: 0; }
+.afs-lys { margin: 0; padding-left: 18px; line-height: 1.6; font-size: 0.86rem; }
+@media (max-width: 760px) { .afs-rooster { grid-template-columns: minmax(0, 1fr); } }
