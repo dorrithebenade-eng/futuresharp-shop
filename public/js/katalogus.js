@@ -180,7 +180,7 @@ function wys_produkte(produkte, { demo_modus, besit_stel = new Set() } = {}) {
     .map((groep) =>
       groep.length === 2
         ? `<div class="eweknie-paar">
-             <p class="eweknie-paar-etiket">${eweknie_paar_etiket()}</p>
+             <p class="eweknie-paar-etiket">${eweknie_paar_etiket(groep)}</p>
              <div class="eweknie-paar-kaarte">${groep.map((produk) => bou_kaart(produk, besit_stel)).join("")}</div>
            </div>`
         : bou_kaart(groep[0], besit_stel)
@@ -188,12 +188,23 @@ function wys_produkte(produkte, { demo_modus, besit_stel = new Set() } = {}) {
     .join("");
 }
 
-// Die sleutel staan in taal.js. Die terugval keer dat die rou sleutel op
+// Die etiket hang af van die twee boeke se taal. Net wanneer albei 'n taal
+// het en dit verskil, is dit taaluitgawes van een werk. Anders is dit twee
+// boeke wat bymekaar hoort (bv. 'n Ma se Reis en 'n Pa se Reis).
+// Die sleutels staan in taal.js. Die terugval keer dat die rou sleutel op
 // die skerm verskyn as taal.js ooit met 'n ouer weergawe vervang word.
-function eweknie_paar_etiket() {
-  const teks = t("eweknie_paar_etiket");
-  if (teks !== "eweknie_paar_etiket") return teks;
-  return kry_huidige_taal() === "en" ? "Available in English and Afrikaans" : "Beskikbaar in Afrikaans en Engels";
+const EWEKNIE_ETIKET_TERUGVAL = {
+  eweknie_paar_etiket: { af: "Beskikbaar in Afrikaans en Engels", en: "Available in English and Afrikaans" },
+  eweknie_paar_etiket_saam: { af: "Twee boeke wat bymekaar hoort", en: "Two books that belong together" },
+};
+
+function eweknie_paar_etiket(paar) {
+  const [a, b] = paar || [];
+  const tale_verskil = a && b && a.taal && b.taal && a.taal !== b.taal;
+  const sleutel = tale_verskil ? "eweknie_paar_etiket" : "eweknie_paar_etiket_saam";
+  const teks = t(sleutel);
+  if (teks !== sleutel) return teks;
+  return EWEKNIE_ETIKET_TERUGVAL[sleutel][kry_huidige_taal() === "en" ? "en" : "af"];
 }
 
 // Taaluitgawes van dieselfde werk (eweknie_slug) word een paar. Die paar

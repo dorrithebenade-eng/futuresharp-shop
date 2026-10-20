@@ -4114,9 +4114,9 @@ body.vennoot-modus .paneel-dokument-skrap-knoppie {
 }
 
 .eweknie-paar .kaart-omslag-wrap { width: 40%; max-width: 200px; }
-.eweknie-paar .kaart-liggaam { padding: 16px 16px 18px; }
+.eweknie-paar .kaart-liggaam { padding: 16px 16px 18px 20px; }
 .eweknie-paar .kaart-titel { font-size: 17px; }
-.eweknie-paar .kaart-etiket-ster-wrap { width: 96px; height: 96px; top: -16px; right: -6px; }
+.eweknie-paar .kaart-etiket-ster-wrap { width: 96px; height: 96px; top: -16px; right: 8px; }
 .eweknie-paar .kaart-etiket-ster-teks { max-width: 70px; }
 .eweknie-paar .kaart-etiket-ster-teks--kort { font-size: 16px; }
 .eweknie-paar .kaart-etiket-ster-teks--medium { font-size: 12.5px; }

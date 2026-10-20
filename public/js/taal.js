@@ -286,6 +286,7 @@ const WOORDEBOEK = {
   },
   beskikbaar_as_etiket: { af: "Beskikbaar as:", en: "Available as:" },
   eweknie_paar_etiket: { af: "Beskikbaar in Afrikaans en Engels", en: "Available in English and Afrikaans" },
+  eweknie_paar_etiket_saam: { af: "Twee boeke wat bymekaar hoort", en: "Two books that belong together" },
 
   // Katalogus-sortering (winkel) — sien katalogus-sorteer.js
   sorteer_etiket: { af: "Sorteer", en: "Sort" },
