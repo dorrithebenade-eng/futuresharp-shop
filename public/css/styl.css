@@ -2441,10 +2441,15 @@ body.leser-liggaam {
   gap: 28px 20px;
 }
 
+/* FOON: twee groter omslae per ry. Die bladsy se kantlyn word op die foon
+   smaller (24px na 16px) en die tussenruimte stywer, sodat die omslae die
+   ekstra breedte kry: op 'n gewone foon ongeveer 175px breed in plaas van
+   165px, op 'n kleiner foon 160px in plaas van 150px. */
 @media (max-width: 480px) {
+  .vb-wrap:has(> .my-boeke-rooster) { padding-left: 16px; padding-right: 16px; }
   .my-boeke-rooster {
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 22px 14px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px 12px;
   }
 }
 
