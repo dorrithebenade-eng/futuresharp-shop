@@ -386,10 +386,31 @@ function wys_zoem_persentasie() {
   opdateer_gebaar_modus();
 }
 
-function stel_zoem(nuwe_zoem) {
+// Zoem na nuwe_zoem. Met 'n fokuspunt ({ x, y } op die skerm, en die
+// breuk fx/fy van die bladsy wat daar gestaan het) bly daardie plek van die
+// bladsy ná die herteken op dieselfde plek op die skerm, soos by knyp-zoem.
+async function stel_zoem(nuwe_zoem, fokus) {
   huidige_zoem = Math.min(Math.max(nuwe_zoem, MIN_ZOEM), MAKS_ZOEM);
   wys_zoem_persentasie();
-  wys_bladsy(huidige_bladsy);
+  await wys_bladsy(huidige_bladsy);
+  if (!fokus) return;
+  const omhulsel = document.querySelector(".leser-bladsy-omhulsel");
+  const posisie = document.querySelector(".leser-bladsy-posisie");
+  if (!omhulsel || !posisie) return;
+  const r = posisie.getBoundingClientRect();
+  omhulsel.scrollLeft += r.left + fokus.fx * r.width - fokus.x;
+  omhulsel.scrollTop += r.top + fokus.fy * r.height - fokus.y;
+}
+
+// Die breuk van die bladsy (0..1) onder 'n skermpunt.
+function fokus_by(x, y) {
+  const posisie = document.querySelector(".leser-bladsy-posisie");
+  const r = posisie.getBoundingClientRect();
+  return {
+    x, y,
+    fx: Math.min(Math.max((x - r.left) / r.width, 0), 1),
+    fy: Math.min(Math.max((y - r.top) / r.height, 0), 1),
+  };
 }
 
 async function soek_in_boek(soekterm) {
@@ -741,99 +762,194 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   }
 
-  // --- Swipe-gebare (foon/tablet) — links blaai vorentoe, regs blaai terug.
-  // Net op die bladsy-omhulsel self, sodat 'n normale vertikale
-  // bladsy-rol (bv. as die skerm laer as die bladsy is) nie per ongeluk
-  // as 'n blaai-gebaar gelees word nie.
-  const MIN_SWIPE_AFSTAND = 50;
-  const MAKS_VERTIKALE_AFWYKING = 60;
-  let swipe_begin_x = null;
-  let swipe_begin_y = null;
-
-  // --- Knyp-om-te-zoem (twee vingers) — op dieselfde omhulsel as die
-  // swipe-gebare. 'n Knyp begin sodra 'n TWEEDE vinger raak; ons kanselleer
-  // dan enige lopende swipe-opsporing sodat die vinger wat afgelig word ná
-  // die knyp nie per ongeluk as 'n eenvinger-swipe gelees word nie.
-  let knyp_begin_afstand = null;
-  let knyp_begin_zoem = 1;
-  let knyp_render_hangende = false;
-
-  function kry_knyp_afstand(ev) {
-    const [a, b] = ev.touches;
-    return Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY);
-  }
+  // --- AANRAAKGEBARE (foon/tablet), Oktober 2026 herbou.
+  //
+  // KNYP-ZOEM: tydens die knyp word die bladsy net met 'n CSS-transform
+  // vergroot (glad, geen herteken nie), geanker op die punt tussen die
+  // vingers. Eers as die vingers los, word die bladsy een keer skerp teen
+  // die nuwe zoem herteken, en die rolposisie so gestel dat dieselfde plek
+  // onder die vingers bly. Voorheen is die PDF met elke vingerbeweging
+  // herteken, wat stamperig was en altyd na bo-links gezoem het.
+  //
+  // DUBBELTIK: zoem in op die getikte plek, of terug na die hele bladsy.
+  //
+  // SWIPE: links of op = volgende bladsy, regs of af = vorige. Kan die
+  // bladsy in daardie rigting rol (ingezoem, of dwars op 'n foon), rol die
+  // vinger eers gewoon binne die bladsy; eers as die swipe BY die rand
+  // begin het en daar eindig, word geblaai. Net soos die muiswiel.
+  const MIN_SWIPE = 60;          // px
+  const MAKS_SWIPE_MS = 900;     // 'n stadige sleep is rol, nie 'n swipe nie
+  const DUBBELTIK_MS = 300;
+  const DUBBELTIK_AFSTAND = 30;  // px tussen die twee tikke
+  const TIK_BEWEGING = 10;       // px; meer is 'n sleep, nie 'n tik nie
+  const DUBBELTIK_ZOEM = 2.5;
 
   const omhulsel = document.querySelector(".leser-bladsy-omhulsel");
-  if (omhulsel) {
-    omhulsel.addEventListener(
-      "touchstart",
-      (ev) => {
-        if (!pdf_dokument) return;
+  const posisie = document.querySelector(".leser-bladsy-posisie");
+  if (!omhulsel || !posisie) return;
 
-        if (ev.touches.length === 2) {
-          swipe_begin_x = null;
-          swipe_begin_y = null;
-          knyp_begin_afstand = kry_knyp_afstand(ev);
-          knyp_begin_zoem = huidige_zoem;
+  let knyp = null;   // { afstand0, zoem0, mid0, rand0, laaste_skaal, laaste_mid }
+  let swipe = null;  // { x, y, t, rand }
+  let laaste_tik = null; // { x, y, t }
+
+  const afstand = (a, b) => Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY);
+  const middel = (a, b) => ({ x: (a.clientX + b.clientX) / 2, y: (a.clientY + b.clientY) / 2 });
+
+  function rande() {
+    const maks_x = omhulsel.scrollWidth - omhulsel.clientWidth;
+    const maks_y = omhulsel.scrollHeight - omhulsel.clientHeight;
+    return {
+      links: omhulsel.scrollLeft <= 2,
+      regs: omhulsel.scrollLeft >= maks_x - 2,
+      bo: omhulsel.scrollTop <= 2,
+      onder: omhulsel.scrollTop >= maks_y - 2,
+      kan_rol_y: maks_y > 2,
+    };
+  }
+
+  // iOS Safari se eie knyp-zoem van die hele bladsy keer; ons zoem self.
+  ["gesturestart", "gesturechange"].forEach((naam) =>
+    omhulsel.addEventListener(naam, (ev) => ev.preventDefault(), { passive: false })
+  );
+
+  omhulsel.addEventListener(
+    "touchstart",
+    (ev) => {
+      if (!pdf_dokument) return;
+
+      if (ev.touches.length === 2) {
+        swipe = null;
+        laaste_tik = null;
+        const [a, b] = ev.touches;
+        const mid0 = middel(a, b);
+        knyp = {
+          afstand0: afstand(a, b),
+          zoem0: huidige_zoem,
+          mid0,
+          rand0: posisie.getBoundingClientRect(),
+          laaste_skaal: 1,
+          laaste_mid: mid0,
+        };
+        posisie.style.transformOrigin = "0 0";
+        posisie.style.willChange = "transform";
+        return;
+      }
+
+      if (ev.touches.length === 1 && !knyp) {
+        const t = ev.touches[0];
+        swipe = { x: t.clientX, y: t.clientY, t: Date.now(), rand: rande() };
+      }
+    },
+    { passive: true }
+  );
+
+  omhulsel.addEventListener(
+    "touchmove",
+    (ev) => {
+      if (!knyp || ev.touches.length !== 2) return;
+      ev.preventDefault();
+      const [a, b] = ev.touches;
+      // Beperk die skaal sodat die eindzoem binne MIN_ZOEM..MAKS_ZOEM bly.
+      let skaal = afstand(a, b) / knyp.afstand0;
+      skaal = Math.min(Math.max(skaal, MIN_ZOEM / knyp.zoem0), MAKS_ZOEM / knyp.zoem0);
+      const mid = middel(a, b);
+      // Die bladsypunt wat by mid0 was, volg die huidige middelpunt.
+      const px = knyp.mid0.x - knyp.rand0.left;
+      const py = knyp.mid0.y - knyp.rand0.top;
+      const tx = mid.x - knyp.rand0.left - skaal * px;
+      const ty = mid.y - knyp.rand0.top - skaal * py;
+      posisie.style.transform = `translate(${tx}px, ${ty}px) scale(${skaal})`;
+      knyp.laaste_skaal = skaal;
+      knyp.laaste_mid = mid;
+      huidige_zoem = knyp.zoem0 * skaal;
+      wys_zoem_persentasie();
+    },
+    { passive: false }
+  );
+
+  async function beeindig_knyp() {
+    const k = knyp;
+    knyp = null;
+    const fokus = {
+      x: k.laaste_mid.x,
+      y: k.laaste_mid.y,
+      fx: (k.mid0.x - k.rand0.left) / k.rand0.width,
+      fy: (k.mid0.y - k.rand0.top) / k.rand0.height,
+    };
+    const nuwe_zoem = k.zoem0 * k.laaste_skaal;
+    // Die transform bly staan terwyl die skerp bladsy geteken word, sodat
+    // daar geen flits is nie; dan word dit in dieselfde oomblik verwyder.
+    huidige_zoem = Math.min(Math.max(nuwe_zoem, MIN_ZOEM), MAKS_ZOEM);
+    wys_zoem_persentasie();
+    await wys_bladsy(huidige_bladsy);
+    posisie.style.transform = "";
+    posisie.style.willChange = "";
+    const r = posisie.getBoundingClientRect();
+    omhulsel.scrollLeft += r.left + fokus.fx * r.width - fokus.x;
+    omhulsel.scrollTop += r.top + fokus.fy * r.height - fokus.y;
+  }
+
+  omhulsel.addEventListener(
+    "touchend",
+    (ev) => {
+      if (!pdf_dokument) return;
+
+      // Knyp klaar sodra minder as twee vingers oorbly. Die vinger wat
+      // daarna nog lig, mag nie as 'n swipe of tik tel nie.
+      if (knyp) {
+        if (ev.touches.length < 2) beeindig_knyp();
+        swipe = null;
+        return;
+      }
+      if (!swipe || ev.touches.length) return;
+
+      const t = ev.changedTouches[0];
+      const dx = t.clientX - swipe.x;
+      const dy = t.clientY - swipe.y;
+      const duur = Date.now() - swipe.t;
+      const begin_rand = swipe.rand;
+      swipe = null;
+
+      // --- Tik en dubbeltik
+      if (Math.abs(dx) < TIK_BEWEGING && Math.abs(dy) < TIK_BEWEGING && duur < 300) {
+        const nou = Date.now();
+        if (laaste_tik && nou - laaste_tik.t < DUBBELTIK_MS &&
+            Math.hypot(t.clientX - laaste_tik.x, t.clientY - laaste_tik.y) < DUBBELTIK_AFSTAND) {
+          laaste_tik = null;
+          if (is_ingezoem()) {
+            stel_zoem(1);
+          } else {
+            stel_zoem(DUBBELTIK_ZOEM, { ...fokus_by(t.clientX, t.clientY), x: omhulsel.getBoundingClientRect().left + omhulsel.clientWidth / 2, y: omhulsel.getBoundingClientRect().top + omhulsel.clientHeight / 2 });
+          }
           return;
         }
+        laaste_tik = { x: t.clientX, y: t.clientY, t: nou };
+        return;
+      }
+      laaste_tik = null;
 
-        if (ev.touches.length === 1 && !is_ingezoem()) {
-          swipe_begin_x = ev.touches[0].clientX;
-          swipe_begin_y = ev.touches[0].clientY;
+      // --- Swipe
+      if (duur > MAKS_SWIPE_MS) return;
+      const nou_rand = rande();
+      const horisontaal = Math.abs(dx) > Math.abs(dy) * 1.2;
+      const vertikaal = Math.abs(dy) > Math.abs(dx) * 1.2;
+
+      if (horisontaal && Math.abs(dx) >= MIN_SWIPE) {
+        if (dx < 0 && begin_rand.regs && nou_rand.regs) return void wys_bladsy(huidige_bladsy + 1);
+        if (dx > 0 && begin_rand.links && nou_rand.links) return void wys_bladsy(huidige_bladsy - 1);
+      }
+      if (vertikaal && Math.abs(dy) >= MIN_SWIPE) {
+        if (dy < 0 && begin_rand.onder && nou_rand.onder) return void wys_bladsy(huidige_bladsy + 1);
+        if (dy > 0 && begin_rand.bo && nou_rand.bo) {
+          return void wys_bladsy(huidige_bladsy - 1, { begin_onder: nou_rand.kan_rol_y });
         }
-      },
-      { passive: true }
-    );
+      }
+    },
+    { passive: true }
+  );
 
-    omhulsel.addEventListener(
-      "touchmove",
-      (ev) => {
-        if (!pdf_dokument || ev.touches.length !== 2 || knyp_begin_afstand === null) return;
-
-        const huidige_afstand = kry_knyp_afstand(ev);
-        const nuwe_zoem = knyp_begin_zoem * (huidige_afstand / knyp_begin_afstand);
-        huidige_zoem = Math.min(Math.max(nuwe_zoem, MIN_ZOEM), MAKS_ZOEM);
-        wys_zoem_persentasie();
-
-        // Herteken die bladsy hoogstens een keer per animasie-raam — 'n
-        // knyp-gebeurtenis skiet baie vinniger as wat PDF.js kan herteken.
-        if (!knyp_render_hangende) {
-          knyp_render_hangende = true;
-          requestAnimationFrame(() => {
-            wys_bladsy(huidige_bladsy);
-            knyp_render_hangende = false;
-          });
-        }
-      },
-      { passive: true }
-    );
-
-    omhulsel.addEventListener(
-      "touchend",
-      (ev) => {
-        if (ev.touches.length < 2) {
-          knyp_begin_afstand = null;
-        }
-
-        if (!pdf_dokument || swipe_begin_x === null) return;
-        const eind_x = ev.changedTouches[0].clientX;
-        const eind_y = ev.changedTouches[0].clientY;
-        const delta_x = eind_x - swipe_begin_x;
-        const delta_y = eind_y - swipe_begin_y;
-
-        swipe_begin_x = null;
-        swipe_begin_y = null;
-
-        if (Math.abs(delta_x) < MIN_SWIPE_AFSTAND || Math.abs(delta_y) > MAKS_VERTIKALE_AFWYKING) return;
-
-        if (delta_x < 0) {
-          wys_bladsy(huidige_bladsy + 1);
-        } else {
-          wys_bladsy(huidige_bladsy - 1);
-        }
-      },
-      { passive: true }
-    );
-  }
+  omhulsel.addEventListener("touchcancel", () => {
+    if (knyp) beeindig_knyp();
+    swipe = null;
+  });
 });
