@@ -80,7 +80,12 @@
       .map((t) => {
         const skakel = g.skakel + (g.tale.length > 1 ? "?taal=" + t : "");
         const sin = sper_sin(g, t);
-        return String(sj[t] || "").replace(/\{skool\}/g, g.naam).replace(/\{skakel\}/g, (sin ? sin + "\n\n" : "") + skakel);
+        // {een|meer}: die woorde vir een vraelys of vir meer as een.
+        const meer = g.vraelyste.length > 1;
+        return String(sj[t] || "")
+          .replace(/\{([^{}|]*)\|([^{}|]*)\}/g, (_, een, veel) => (meer ? veel : een))
+          .replace(/\{skool\}/g, g.naam)
+          .replace(/\{skakel\}/g, (sin ? sin + "\n\n" : "") + skakel);
       })
       .join("\n\n---\n\n");
   }
@@ -143,7 +148,7 @@
     sj.id = "fsp-gr-sjablone";
     sj.innerHTML =
       "<h2>Boodskappe vir groepskakels</h2>" +
-      '<p class="fsp-hulp fsp-hulp-bo">Die boodskap wat saam met \'n groepskakel gaan. <b>{skool}</b> word die skool of groep se naam, en <b>{skakel}</b> die skakel. Kies die gehoor om sy boodskap te sien.</p>' +
+      '<p class="fsp-hulp fsp-hulp-bo">Die boodskap wat saam met \'n groepskakel gaan. <b>{skool}</b> word die skool of groep se naam, en <b>{skakel}</b> die skakel. <b>{die vraelys|die vraelyste}</b> kies die woorde vir een of vir meer vraelyste. Kies die gehoor om sy boodskap te sien.</p>' +
       '<div class="fsp-filters" id="fsp-gr-sj-gehoor"><button type="button" class="fsp-filter aan" data-sj="ouer">Ouers</button><button type="button" class="fsp-filter" data-sj="leerder">Leerders</button><button type="button" class="fsp-filter" data-sj="onderwyser">Onderwysers</button></div>' +
       '<div class="fsp-twee fsp-gr-sj-twee">' +
         '<label><span class="fsp-klein-et">Afrikaans</span><textarea class="fsp-invoer fsp-gr-sj" data-t="af" rows="12"></textarea></label>' +
