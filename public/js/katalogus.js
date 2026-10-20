@@ -180,12 +180,20 @@ function wys_produkte(produkte, { demo_modus, besit_stel = new Set() } = {}) {
     .map((groep) =>
       groep.length === 2
         ? `<div class="eweknie-paar">
-             <p class="eweknie-paar-etiket">${t("eweknie_paar_etiket")}</p>
+             <p class="eweknie-paar-etiket">${eweknie_paar_etiket()}</p>
              <div class="eweknie-paar-kaarte">${groep.map((produk) => bou_kaart(produk, besit_stel)).join("")}</div>
            </div>`
         : bou_kaart(groep[0], besit_stel)
     )
     .join("");
+}
+
+// Die sleutel staan in taal.js. Die terugval keer dat die rou sleutel op
+// die skerm verskyn as taal.js ooit met 'n ouer weergawe vervang word.
+function eweknie_paar_etiket() {
+  const teks = t("eweknie_paar_etiket");
+  if (teks !== "eweknie_paar_etiket") return teks;
+  return kry_huidige_taal() === "en" ? "Available in English and Afrikaans" : "Beskikbaar in Afrikaans en Engels";
 }
 
 // Taaluitgawes van dieselfde werk (eweknie_slug) word een paar. Die paar
