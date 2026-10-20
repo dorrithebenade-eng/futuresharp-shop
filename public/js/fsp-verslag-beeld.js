@@ -36,7 +36,7 @@
     const W = 1200, H = 630;
     canvas.width = W; canvas.height = H;
     const ctx = canvas.getContext("2d");
-    try { await document.fonts.load("800 60px Montserrat"); await document.fonts.load("600 30px Poppins"); } catch (_) {}
+    try { await document.fonts.load("700 26px Montserrat"); await document.fonts.load("800 60px Montserrat"); await document.fonts.load("600 30px Poppins"); } catch (_) {}
     const [logo, hand] = await Promise.all([laai("images/future-sharp-logo.png"), laai("images/hand-spiraal.png")]);
 
     // Agtergrond
