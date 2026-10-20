@@ -2441,15 +2441,18 @@ body.leser-liggaam {
   gap: 28px 20px;
 }
 
-/* FOON: twee groter omslae per ry. Die bladsy se kantlyn word op die foon
-   smaller (24px na 16px) en die tussenruimte stywer, sodat die omslae die
-   ekstra breedte kry: op 'n gewone foon ongeveer 175px breed in plaas van
-   165px, op 'n kleiner foon 160px in plaas van 150px. */
+/* FOON: een groot omslag per ry, ongeveer 60% van die skermbreedte en in
+   die middel. Twee per ry was op 'n foon te klein om die omslag behoorlik
+   te sien. Die titel en ander teks onder die omslag bly so breed soos die
+   omslag self, sodat dit by hom hoort. */
 @media (max-width: 480px) {
-  .vb-wrap:has(> .my-boeke-rooster) { padding-left: 16px; padding-right: 16px; }
   .my-boeke-rooster {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 24px 12px;
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    gap: 32px;
+  }
+  .my-boeke-rooster > .my-boek-kaart {
+    width: min(62%, 260px);
   }
 }
 
