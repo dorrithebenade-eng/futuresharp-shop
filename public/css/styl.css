@@ -2563,10 +2563,32 @@ a.my-boek-kaart:focus-visible {
   outline-offset: 2px;
 }
 
+/* Die boodskapvak ("Jou boeke word gelaai …") hou andersins sy 48px
+   opvulling ook as dit leeg is, en dan staan daar 'n groot gat bo die rak. */
+#my-boeke-status:empty { display: none; }
+
+/* LEES-KNOPPIE onder 'n e-boek of leen (my-boeke.js). */
+.my-boek-lees-knoppie {
+  display: block;
+  margin-top: 6px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  background: var(--teal);
+  color: var(--wit);
+  font-family: var(--font-liggaam);
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.2;
+  transition: background 0.15s ease;
+}
+a.my-boek-kaart:hover .my-boek-lees-knoppie,
+a.my-boek-kaart:focus-visible .my-boek-lees-knoppie { background: var(--teal-helder); }
+
 .my-boek-titel {
   font-family: var(--font-opskrif);
   font-weight: 700;
-  font-size: 13px;
+  font-size: 14px;
   margin: 0;
   line-height: 1.3;
   display: -webkit-box;
@@ -2577,9 +2599,31 @@ a.my-boek-kaart:focus-visible {
 
 .my-boek-outeur {
   font-family: var(--font-liggaam);
-  font-size: 12px;
-  color: var(--grys-teks);
+  font-size: 13px;
+  color: #4a4a4a;
   margin: -4px 0 0;
+  line-height: 1.4;
+}
+
+/* FOON: die omslag is nou groot (een per ry), dus moet die teks saam groei.
+   Die formaat word 'n klein pil sodat dit nie langs die groot omslag
+   verdwyn nie. */
+@media (max-width: 480px) {
+  .my-boek-titel { font-size: 18px; margin-top: 4px; }
+  .my-boek-outeur { font-size: 15px; }
+  .my-boek-formaat {
+    align-self: flex-start;
+    font-size: 12.5px !important;
+    font-weight: 600;
+    opacity: 1 !important;
+    color: #2E7D71 !important;
+    background: #E3F2EF;
+    border-radius: 999px;
+    padding: 3px 10px;
+    margin-top: 2px !important;
+  }
+  .my-boek-leen-status, .my-boek-hk-status { font-size: 14px; }
+  .my-boek-lees-knoppie { font-size: 16px; padding: 13px 14px; }
 }
 
 /* ---------- PWA installeer-balk ---------- */

@@ -449,6 +449,9 @@ const WOORDEBOEK = {
   // wat op 'n knoppie reg lees maar as etiket onder 'n boektitel soos 'n
   // opdrag klink. "Loan" is die selfstandige naamwoord.
   mb_formaat_leen: { af: "Leen", en: "Loan" },
+  mb_lees_nou: { af: "Lees nou", en: "Read now" },
+  mb_lees_verder: { af: "Lees verder", en: "Continue reading" },
+  mb_bladsy_kort: { af: "bl.", en: "p." },
 
   hk_merk_bestel: { af: "Bestel", en: "Ordered" },
   hk_merk_gestuur: { af: "Gestuur", en: "Shipped" },

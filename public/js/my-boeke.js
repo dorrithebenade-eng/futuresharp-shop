@@ -185,6 +185,24 @@ function bou_boek_kaart(boek) {
     el.appendChild(status_el);
   }
 
+  // LEES-KNOPPIE. Die hele kaart is reeds 'n skakel na die leser, maar 'n
+  // koper sien dit nie raak nie; 'n omslag lyk nie soos iets om op te tik
+  // nie. Die knoppie is 'n <span> (nie 'n <a> nie, want dit staan binne die
+  // kaart se <a>) en sê wat gaan gebeur. Het hy al begin lees, wys dit
+  // "Lees verder" met die bladsy.
+  if (kan_oopmaak) {
+    const knop = document.createElement("span");
+    knop.className = "my-boek-lees-knoppie";
+    if (boek.lees_bladsy) {
+      const verder = window.t ? window.t("mb_lees_verder") : "Lees verder";
+      const bl = window.t ? window.t("mb_bladsy_kort") : "bl.";
+      knop.textContent = `${verder} · ${bl} ${boek.lees_bladsy}`;
+    } else {
+      knop.textContent = window.t ? window.t("mb_lees_nou") : "Lees nou";
+    }
+    el.appendChild(knop);
+  }
+
   // Leen-status-reël — net vir aktiewe leen-items, wys hoeveel dae oor is.
   if (boek.is_leen && boek.leen_aktief && typeof boek.dae_oor === "number") {
     const leen_el = document.createElement("p");

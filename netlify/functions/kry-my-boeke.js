@@ -39,6 +39,16 @@ exports.handler = async (event, context) => {
     // boek oor verskeie bestellings besit, geen rede om dit twee keer
     // uit Blobs te lees nie.
     const produk_kas = new Map();
+    const vordering_store = kry_store("lees-vordering");
+    async function kry_lees_bladsy(slug) {
+      try {
+        const rekord = await vordering_store.get(`${slug}--${gebruiker.id}`, { type: "json" });
+        return rekord && rekord.bladsy > 1 ? rekord.bladsy : null;
+      } catch {
+        return null;
+      }
+    }
+
     async function kry_produk(slug) {
       if (produk_kas.has(slug)) return produk_kas.get(slug);
       const produk = await katalogus_store.get(slug, { type: "json" });
@@ -189,6 +199,9 @@ exports.handler = async (event, context) => {
           leen_aktief,
           dae_oor,
           opgradering,
+          // Waar die koper laas was, vir die "Lees verder"-knoppie. Net vir
+          // 'n e-boek of leen; 'n harde kopie het geen leser nie.
+          lees_bladsy: is_harde_kopie ? null : await kry_lees_bladsy(boek_item.produk_slug),
         });
       }
     }
