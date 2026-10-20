@@ -56,11 +56,24 @@
   }
 
   // ---------- Die boodskap ----------
-  function boodskap(s) {
+  // {groet}: "Beste Pieter" met 'n voornaam, anders "Goeie dag".
+  function groet(t, voornaam) {
+    const v = String(voornaam || "").trim();
+    return t === "en" ? (v ? "Dear " + v : "Good day") : (v ? "Beste " + v : "Goeie dag");
+  }
+
+  function boodskap(s, voornaam) {
     const sj = S.sjablone || {};
     const tale = s.taal === "tw" ? ["af", "en"] : [s.taal];
-    return tale.map((t) => String(sj[t] || "").replace(/\{skool\}/g, s.skool).replace(/\{skakel\}/g, s.skakel)).join("\n\n---\n\n");
+    return tale.map((t) => String(sj[t] || "").replace(/\{groet\}/g, groet(t, voornaam)).replace(/\{skool\}/g, s.skool).replace(/\{skakel\}/g, s.skakel)).join("\n\n---\n\n");
   }
+
+  // Die handtekening onderaan die WhatsApp-boodskap: naam en titel.
+  function hand_reels() {
+    const h = S.handtekening;
+    return h && h.naam ? [h.naam, h.titel].filter(Boolean).join("\n") : "Future Sharp";
+  }
+  const wa_teks = () => $("#fsv-teks").value.replace(/\s+$/, "") + "\n" + hand_reels();
 
   // ---------- Bou die afdeling ----------
   function bou() {
@@ -142,6 +155,8 @@
     S.skakels = d.skakels || S.skakels;
     S.skole = d.skole || S.skole;
     S.sjablone = d.sjablone || S.sjablone;
+    if ("handtekening" in d) S.handtekening = d.handtekening;
+    if ("epos_gereed" in d) S.epos_gereed = d.epos_gereed;
     S.gelaai = true;
   }
 
@@ -270,12 +285,22 @@
     const sj = S.sjablone || {};
     m.innerHTML =
       '<details class="fsv-meer"><summary>Boodskappe vir verslagskakels</summary><div>' +
-        '<p class="fsp-hulp fsp-hulp-bo"><b>{skool}</b> word die skool se naam en <b>{skakel}</b> die skakel. By tweetalig gaan albei saam, met \'n streep tussen.</p>' +
+        '<p class="fsp-hulp fsp-hulp-bo"><b>{groet}</b> word "Beste Pieter" as julle \'n voornaam intik (anders "Goeie dag"), <b>{skool}</b> die skool se naam en <b>{skakel}</b> die skakel. Die handtekening van wie stuur, kom vanself onderaan. By tweetalig gaan albei saam, met \'n streep tussen.</p>' +
         '<div class="fsv-sj-twee">' +
           '<label><span class="fsp-klein-et">Afrikaans</span><textarea class="fsp-invoer" id="fsv-sj-af" rows="11">' + esc(sj.af || "") + "</textarea></label>" +
           '<label><span class="fsp-klein-et">English</span><textarea class="fsp-invoer" id="fsv-sj-en" rows="11">' + esc(sj.en || "") + "</textarea></label>" +
         "</div>" +
         '<div class="fsp-aksies"><button type="button" class="fsp-knop fsp-knop-hoof" id="fsv-sj-stoor">Stoor die boodskappe</button></div>' +
+      "</div></details>" +
+      '<details class="fsv-meer" id="fsv-hand-kaart"><summary>My handtekening</summary><div>' +
+        '<p class="fsp-hulp fsp-hulp-bo">Eenmalig, vir jou eie aanmelding. Dit kom onderaan elke verslae-boodskap wat jy stuur, en antwoorde op die e-pos gaan na die adres hier.</p>' +
+        '<div class="fsv-aan">' +
+          '<div class="fsp-veld"><label class="fsp-klein-et" for="fsv-h-naam">Naam soos dit onderaan staan</label><input class="fsp-invoer" id="fsv-h-naam" maxlength="80" placeholder="Bv. Prof. Ignatius Gous" value="' + esc((S.handtekening || {}).naam || "") + '"></div>' +
+          '<div class="fsp-veld"><label class="fsp-klein-et" for="fsv-h-titel">Titel <span class="fsv-klein">(opsioneel)</span></label><input class="fsp-invoer" id="fsv-h-titel" maxlength="100" placeholder="Bv. Direkteur, Future Sharp NPC" value="' + esc((S.handtekening || {}).titel || "") + '"></div>' +
+          '<div class="fsp-veld"><label class="fsp-klein-et" for="fsv-h-epos">E-posadres vir antwoorde</label><input class="fsp-invoer" id="fsv-h-epos" type="email" maxlength="120" value="' + esc((S.handtekening || {}).epos || "") + '"></div>' +
+          '<div class="fsp-veld"><label class="fsp-klein-et" for="fsv-h-sel">Selfoon <span class="fsv-klein">(opsioneel, net in die e-pos)</span></label><input class="fsp-invoer" id="fsv-h-sel" maxlength="30" value="' + esc((S.handtekening || {}).selfoon || "") + '"></div>' +
+        "</div>" +
+        '<div class="fsp-aksies"><button type="button" class="fsp-knop fsp-knop-hoof" id="fsv-h-stoor">Stoor my handtekening</button></div>' +
       "</div></details>" +
       '<details class="fsv-meer"><summary>Google-koppeling</summary><div>' +
         '<p class="fsp-hulp fsp-hulp-bo">Die paneel se Google-adres. Enige vouer wat die paneel moet sien, word met hierdie adres gedeel.</p>' +
@@ -308,19 +333,27 @@
           '<div class="fsv-wa-teks" id="fsv-wa-teks"></div><div class="fsv-wa-tyd">✓✓</div>' +
         "</div></div>" +
         "<div>" +
-          '<div class="fsp-epos-titel">Boodskap</div>' +
-          '<div class="fsp-epos-hulp">Uit die sjabloon; net die skool se naam en die skakel verander. Pas dit hier aan voor jy stuur.</div>' +
-          '<textarea class="fsp-invoer" id="fsv-teks" rows="10">' + esc(boodskap(s)) + "</textarea>" +
-          '<div class="fsv-aan">' +
-            '<div class="fsp-veld"><label class="fsp-klein-et" for="fsv-sel">Selfoon <span class="fsv-klein">(opsioneel)</span></label><input class="fsp-invoer" id="fsv-sel" inputmode="tel" placeholder="082 123 4567"></div>' +
-            '<div class="fsp-veld"><label class="fsp-klein-et" for="fsv-epos">E-pos <span class="fsv-klein">(opsioneel)</span></label><input class="fsp-invoer" id="fsv-epos" type="email" placeholder="hoof@skool.co.za"></div>' +
+          '<div class="fsp-epos-titel">Stuur aan</div>' +
+          '<div class="fsp-epos-hulp">Die voornaam en jou handtekening gaan in albei: WhatsApp en e-pos.</div>' +
+          '<div class="fsv-aan fsv-aan3">' +
+            '<div class="fsp-veld"><label class="fsp-klein-et" for="fsv-voornaam">Voornaam <span class="fsv-klein">(opsioneel)</span></label><input class="fsp-invoer" id="fsv-voornaam" maxlength="60" placeholder="Bv. Pieter" autocomplete="off"></div>' +
+            '<div class="fsp-veld"><label class="fsp-klein-et" for="fsv-sel">Selfoon</label><input class="fsp-invoer" id="fsv-sel" inputmode="tel" placeholder="082 123 4567"></div>' +
+            '<div class="fsp-veld"><label class="fsp-klein-et" for="fsv-epos">E-posadres</label><input class="fsp-invoer" id="fsv-epos" type="email" placeholder="hoof@skool.co.za"></div>' +
           "</div>" +
+          '<div class="fsv-hand" id="fsv-hand"></div>' +
+          '<div class="fsp-epos-titel" style="margin-top:12px">Boodskap</div>' +
+          '<div class="fsp-epos-hulp">Uit die sjabloon; die voornaam, die skool en die skakel word ingevul en jou handtekening kom vanself onderaan. Pas gerus aan voor jy stuur.</div>' +
+          '<textarea class="fsp-invoer" id="fsv-teks" rows="10">' + esc(boodskap(s, "")) + "</textarea>" +
+          '<label class="fsv-chk"><input type="checkbox" id="fsv-afskrif" checked> Stuur vir my \'n afskrif van die e-pos</label>' +
           '<div class="fsp-epos-ry">' +
             '<button type="button" class="fsp-knop fsp-knop-wa" id="fsv-wa"' + (s.oop ? "" : " disabled") + ">Stuur op WhatsApp</button>" +
-            '<button type="button" class="fsp-knop fsp-knop-lig" id="fsv-pos"' + (s.oop ? "" : " disabled") + ">Nuwe e-pos</button>" +
-            '<button type="button" class="fsp-knop fsp-knop-lig" data-kopieer="#fsv-teks">Kopieer boodskap</button>' +
+            '<button type="button" class="fsp-knop fsp-knop-hoof" id="fsv-pos"' + (s.oop && S.epos_gereed ? "" : " disabled") + ">Stuur e-pos</button>" +
+            '<button type="button" class="fsp-knop fsp-knop-lig" id="fsv-kopieer">Kopieer boodskap</button>' +
             '<a class="fsp-knop fsp-knop-lig" href="/verslae-beeld/' + esc(s.slug) + ".jpg?v=" + (s.beeld_v || 1) + '" download="' + esc(s.slug) + '.jpg">Laai beeld af</a>' +
           "</div>" +
+          (S.epos_gereed ? "" : '<p class="fsp-waarsku">Stuur e-pos werk sodra die verslae@-posbus se wagwoord in Netlify gestel is.</p>') +
+          '<p class="fsp-hulp">WhatsApp maak oop op jou eie foon of rekenaar met die boodskap klaar ingetik, en gaan dus uit jou eie WhatsApp. Die e-pos gaan uit verslae@futuresharp.co.za met jou naam as afsender; antwoorde gaan na jou adres.</p>' +
+          (s.gestuur && s.gestuur.length ? '<p class="fsp-hulp">Laas per e-pos gestuur: ' + esc(s.gestuur[0].aan.join(", ")) + " op " + kort(s.gestuur[0].op) + "</p>" : "") +
           '<div class="fsv-deel nog" id="fsv-deel-stand">' + (s.oop ? "Kyk of die vouer nog gedeel is …" : "Die vouer word nie meer gedeel nie.") + "</div>" +
           '<div class="fsv-wysig"><span class="fsp-klein-et">Taal</span>' +
             Object.keys(TAAL).map((t) => '<button type="button" class="fsp-filter' + (t === s.taal ? " aan" : "") + '" data-wtaal="' + t + '">' + TAAL[t] + "</button>").join("") +
@@ -334,6 +367,8 @@
             '<button type="button" class="fsp-knop fsp-knop-gevaar" id="fsv-skrap" disabled>Skrap</button></div></div>') +
         "</div>" +
       "</div></div>";
+    S.groet_nou = { af: groet("af", ""), en: groet("en", "") };
+    teken_hand();
     teken_wa_teks();
     uit.hidden = false;
     uit.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -357,7 +392,82 @@
     const s = S.skakels.find((x) => x.slug === S.gekies);
     const el = $("#fsv-wa-teks");
     if (!s || !el) return;
-    el.innerHTML = esc($("#fsv-teks").value).split(esc(s.skakel)).join("<a>" + esc(s.skakel) + "</a>");
+    el.innerHTML = esc(wa_teks()).split(esc(s.skakel)).join("<a>" + esc(s.skakel) + "</a>");
+  }
+
+  function teken_hand() {
+    const el = $("#fsv-hand");
+    if (!el) return;
+    const h = S.handtekening;
+    el.innerHTML = h && h.naam
+      ? '<div><span class="fsp-klein-et">Onderteken deur</span><div><b>' + esc(h.naam) + "</b>" + (h.titel ? " · " + esc(h.titel) : "") + (h.epos ? '<div class="fsv-klein">Antwoorde na ' + esc(h.epos) + "</div>" : "") + "</div></div>" +
+        '<button type="button" class="fsv-skakelknop" id="fsv-hand-wysig">Wysig my handtekening</button>'
+      : '<div><span class="fsp-klein-et">Onderteken deur</span><div>Nog geen handtekening nie; die boodskap eindig met <b>Future Sharp</b>.</div></div>' +
+        '<button type="button" class="fsv-skakelknop" id="fsv-hand-wysig">Stel my handtekening op</button>';
+  }
+
+  // Die voornaam verander die eerste reël, ook as die res al aangepas is.
+  function verander_voornaam(v) {
+    const t = $("#fsv-teks");
+    let x = t.value;
+    for (const taal of ["af", "en"]) {
+      const ou = S.groet_nou[taal], nuut = groet(taal, v);
+      if (ou && x.includes(ou)) x = x.replace(ou, nuut);
+      S.groet_nou[taal] = nuut;
+    }
+    t.value = x;
+    teken_wa_teks();
+  }
+
+  function wys_handtekening_vorm() {
+    const d = $("#fsv-hand-kaart");
+    if (!d) return;
+    d.open = true;
+    d.scrollIntoView({ behavior: "smooth", block: "start" });
+    const n = $("#fsv-h-naam");
+    if (n) setTimeout(() => n.focus(), 400);
+  }
+
+  async function stoor_handtekening(knop) {
+    knop.disabled = true;
+    try {
+      const d = await bediener({ aksie: "stoor_handtekening", handtekening: { naam: $("#fsv-h-naam").value, titel: $("#fsv-h-titel").value, epos: $("#fsv-h-epos").value, selfoon: $("#fsv-h-sel").value } });
+      S.handtekening = d.handtekening;
+      teken_hand();
+      teken_wa_teks();
+      kennis("Handtekening gestoor");
+    } catch (f) {
+      kennis(f.message);
+    } finally {
+      knop.disabled = false;
+    }
+  }
+
+  async function stuur_epos(knop) {
+    const s = S.skakels.find((x) => x.slug === S.gekies);
+    if (!s) return;
+    const aan = $("#fsv-epos").value.trim();
+    if (!aan) { $("#fsv-epos").focus(); return kennis("Tik die e-posadres"); }
+    if (!confirm("Stuur die e-pos aan " + aan + "?")) return;
+    knop.disabled = true;
+    knop.textContent = "Stuur …";
+    try {
+      const d = await bediener({ aksie: "stuur_epos", slug: s.slug, aan, boodskap: $("#fsv-teks").value, afskrif: $("#fsv-afskrif").checked });
+      Object.assign(s, d.skakel);
+      kennis("E-pos gestuur aan " + d.gestuur.join(", "));
+    } catch (f) {
+      kennis(f.message);
+    } finally {
+      knop.disabled = false;
+      knop.textContent = "Stuur e-pos";
+    }
+  }
+
+  async function kopieer_boodskap() {
+    const t = wa_teks();
+    try { await navigator.clipboard.writeText(t); }
+    catch (_) { const a = document.createElement("textarea"); a.value = t; document.body.appendChild(a); a.select(); document.execCommand("copy"); a.remove(); }
+    kennis("Gekopieer");
   }
 
   // ---------- Aksies ----------
@@ -463,16 +573,9 @@
   function stuur_wa() {
     const n = wa_nommer($("#fsv-sel").value);
     if (n === null) return kennis("Die selfoonnommer lyk nie reg nie");
-    window.open("https://wa.me/" + n + "?text=" + encodeURIComponent($("#fsv-teks").value), "_blank", "noopener");
+    window.open("https://wa.me/" + n + "?text=" + encodeURIComponent(wa_teks()), "_blank", "noopener");
   }
 
-  function pos() {
-    const s = S.skakels.find((x) => x.slug === S.gekies);
-    if (!s) return;
-    const onderwerp = s.skool + " · Future Sharp " + (s.taal === "en" ? "Reports" : s.taal === "tw" ? "Verslae / Reports" : "Verslae");
-    location.href = "mailto:" + encodeURIComponent($("#fsv-epos").value.trim()).replace(/%40/g, "@") +
-      "?subject=" + encodeURIComponent(onderwerp) + "&body=" + encodeURIComponent($("#fsv-teks").value);
-  }
 
   async function laai_sleutel(inv) {
     const lêer = inv.files && inv.files[0];
@@ -543,7 +646,10 @@
       case "fsv-sluit": return sluit(b);
       case "fsv-skrap": return skrap(b);
       case "fsv-wa": return stuur_wa();
-      case "fsv-pos": return pos();
+      case "fsv-pos": return stuur_epos(b);
+      case "fsv-kopieer": return kopieer_boodskap();
+      case "fsv-hand-wysig": return wys_handtekening_vorm();
+      case "fsv-h-stoor": return stoor_handtekening(b);
       case "fsv-deel-weer": return deel_weer();
       case "fsv-sj-stoor": return stoor_sjablone(b);
       case "fsv-hoof-soek": return wys_hoofvouers($("#fsv-hoof-lys"));
@@ -568,6 +674,7 @@
     if (id === "fsv-plak-skakel") { if (e.target.value.trim()) S.vouer = null; teken_vouers(); }
     if (id === "fsv-soek") { S.soek = e.target.value; teken_lys(); }
     if (id === "fsv-teks") teken_wa_teks();
+    if (id === "fsv-voornaam") verander_voornaam(e.target.value);
     if (id === "fsv-skrap-naam") {
       const s = S.skakels.find((x) => x.slug === S.gekies);
       $("#fsv-skrap").disabled = !s || e.target.value.trim() !== s.skool;

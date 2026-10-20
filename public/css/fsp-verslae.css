@@ -62,3 +62,12 @@
   .fsv-rooster, .fsv-uit, .fsv-sj-twee, .fsv-aan { grid-template-columns: 1fr; }
   .fsv-wa-bel { margin: 0 auto; }
 }
+
+/* Persoonlike stuur (Oktober 2026) */
+.fsv-aan3 { grid-template-columns: 1fr 1fr 1.2fr; margin-top: 4px; }
+.fsv-hand { display: flex; gap: 12px; align-items: center; background: var(--grys-lig); border-radius: 8px; padding: 10px 12px; font-size: 13px; margin: 2px 0 4px; }
+.fsv-hand b { font-size: 14px; }
+.fsv-hand .fsv-skakelknop { margin-left: auto; white-space: nowrap; }
+.fsv-chk { display: flex; gap: 8px; align-items: center; font-size: 13.5px; margin: 8px 0 2px; cursor: pointer; }
+.fsv-chk input { accent-color: #00A291; width: 16px; height: 16px; margin: 0; }
+@media (max-width: 760px) { .fsv-aan3 { grid-template-columns: 1fr; } .fsv-hand { flex-wrap: wrap; } .fsv-hand .fsv-skakelknop { margin-left: 0; } }

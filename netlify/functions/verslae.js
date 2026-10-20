@@ -21,15 +21,26 @@ const { kry_gebruiker_en_rol_uitslag } = require("./_rol-kontrole");
 const { kry_store } = require("./_blob-store");
 const { portaal_admin } = require("./_portaal");
 const G = require("./_google-drive");
+const E = require("./_verslae-epos");
 
 const PUBLIEKE_WERF = "https://futureshop.futuresharp.co.za";
 const JSON_KOP = { "Content-Type": "application/json", "Cache-Control": "no-store" };
 const TALE = ["af", "en", "tw"];
 
+// {groet} word "Beste Pieter" as 'n voornaam ingetik is, anders "Goeie dag".
+// Die handtekening (naam, titel) kom vanself onderaan; die sjabloon eindig
+// dus by "Vriendelike groete".
 const STANDAARD_SJABLONE = {
-  af: "Goeie dag\n\nDie Future Sharp-verslae vir {skool} is gereed. Julle kan dit hier oopmaak en aflaai:\n\n{skakel}\n\nLaat weet gerus as daar enige vrae is.\n\nVriendelike groete\nFuture Sharp",
-  en: "Good day\n\nThe Future Sharp reports for {skool} are ready. You can open and download them here:\n\n{skakel}\n\nPlease let us know if you have any questions.\n\nKind regards\nFuture Sharp",
+  af: "{groet}\n\nDie Future Sharp-verslae vir {skool} is gereed. Julle kan dit hier oopmaak en aflaai:\n\n{skakel}\n\nLaat weet gerus as daar enige vrae is.\n\nVriendelike groete",
+  en: "{groet}\n\nThe Future Sharp reports for {skool} are ready. You can open and download them here:\n\n{skakel}\n\nPlease let us know if you have any questions.\n\nKind regards",
 };
+
+// Ouer gestoorde sjablone het "Goeie dag" bo-aan en "Future Sharp" onderaan.
+function moderniseer(t, taal) {
+  let x = String(t || "").replace(/\r/g, "");
+  if (!x.includes("{groet}")) x = x.replace(taal === "en" ? /^\s*Good day[^\n]*/ : /^\s*Goeie dag[^\n]*/, "{groet}");
+  return x.replace(/\n+\s*Future Sharp\s*$/, "").trimEnd();
+}
 
 const antwoord = (status, data) => ({ statusCode: status, headers: JSON_KOP, body: JSON.stringify(data) });
 const store = () => kry_store("verslae");
@@ -37,7 +48,14 @@ const beelde = () => kry_store("verslae-beelde");
 
 async function lees_skakels() { return (await store().get("skakels", { type: "json" })) || []; }
 async function stoor_skakels(lys) { await store().setJSON("skakels", lys); }
-async function lees_sjablone() { return { ...STANDAARD_SJABLONE, ...((await store().get("sjablone", { type: "json" })) || {}) }; }
+async function lees_sjablone() {
+  const s = { ...STANDAARD_SJABLONE, ...((await store().get("sjablone", { type: "json" })) || {}) };
+  return { af: moderniseer(s.af, "af"), en: moderniseer(s.en, "en") };
+}
+
+// Elkeen se eie handtekening, op sy aanmeld-e-posadres.
+const hand_sleutel = (g) => "handtekening:" + String((g && g.email) || "").trim().toLowerCase();
+async function lees_handtekening(g) { return (await store().get(hand_sleutel(g), { type: "json" })) || null; }
 
 function maak_slug(naam, bestaande) {
   const basis = String(naam).normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase()
@@ -72,7 +90,7 @@ async function skole(skakels) {
   return [...name].sort((a, b) => a.localeCompare(b, "af"));
 }
 
-async function stand() {
+async function stand(_, gebruiker) {
   const g = await G.kry_google();
   const skakels = await lees_skakels();
   return {
@@ -80,6 +98,8 @@ async function stand() {
     skakels: skakels.map(publiek),
     skole: await skole(skakels),
     sjablone: await lees_sjablone(),
+    handtekening: await lees_handtekening(gebruiker),
+    epos_gereed: E.instellings().gereed,
   };
 }
 
@@ -188,6 +208,44 @@ const AKSIES = {
     return { gedeel: await G.is_gedeel(await G.kry_google(), s.vouer_id) };
   },
 
+  async stoor_handtekening({ handtekening }, gebruiker) {
+    const h = handtekening || {};
+    const skoon = (x, n) => String(x || "").replace(/\s+/g, " ").trim().slice(0, n);
+    const uit = { naam: skoon(h.naam, 80), titel: skoon(h.titel, 100), epos: skoon(h.epos, 120).toLowerCase(), selfoon: skoon(h.selfoon, 30) };
+    if (uit.naam.length < 2) throw new Error("Tik jou naam soos dit onderaan moet staan");
+    if (uit.epos && !E.EPOS_RE.test(uit.epos)) throw new Error("Die e-posadres vir antwoorde lyk nie reg nie");
+    if (!gebruiker || !gebruiker.email) throw new Error("Kon nie bepaal wie aangemeld is nie");
+    await store().setJSON(hand_sleutel(gebruiker), uit);
+    return { handtekening: uit };
+  },
+
+  async stuur_epos({ slug, aan, boodskap, afskrif }, gebruiker) {
+    const s = (await lees_skakels()).find((x) => x.slug === slug);
+    if (!s) throw new Error("Skakel nie gevind nie");
+    if (!s.oop) throw new Error("Die skakel is gedeaktiveer");
+    const p = publiek(s);
+    const teks = String(boodskap || "").trim();
+    if (!teks.includes(p.skakel)) throw new Error("Die boodskap moet die skakel bevat");
+    if (teks.length > 8000) throw new Error("Die boodskap is te lank");
+    const etiket = s.taal === "en" ? "Reports" : s.taal === "tw" ? "Verslae / Reports" : "Verslae";
+    const r = await E.stuur_verslae_epos({
+      aan, afskrif: !!afskrif, taal: s.taal,
+      onderwerp: s.skool + " · Future Sharp " + etiket,
+      titel: s.skool + " · Future Sharp " + etiket,
+      beeld: PUBLIEKE_WERF + "/verslae-beeld/" + s.slug + ".jpg?v=" + (s.beeld_v || 1),
+      skakel: p.skakel, boodskap: teks,
+      handtekening: await lees_handtekening(gebruiker),
+    });
+    // 'n Kort logboek op die skakel: wanneer en aan wie.
+    const lys = await lees_skakels();
+    const x = lys.find((y) => y.slug === slug);
+    if (x) {
+      x.gestuur = [{ op: new Date().toISOString(), aan: r.aan, deur: (gebruiker && gebruiker.email) || "" }, ...(x.gestuur || [])].slice(0, 30);
+      await stoor_skakels(lys);
+    }
+    return { gestuur: r.aan, antwoord: r.antwoord, skakel: x ? publiek(x) : p };
+  },
+
   async stoor_sjablone({ sjablone }) {
     const af = String((sjablone && sjablone.af) || "").trim();
     const en = String((sjablone && sjablone.en) || "").trim();
@@ -199,7 +257,7 @@ const AKSIES = {
 
 exports.handler = async (event, context) => {
   if (event.httpMethod !== "POST") return { statusCode: 405, body: "Metode nie toegelaat nie" };
-  const { rede } = await kry_gebruiker_en_rol_uitslag(event, context, ["boekhouding"]);
+  const { rede, gebruiker } = await kry_gebruiker_en_rol_uitslag(event, context, ["boekhouding"]);
   if (rede === "geen_token") return antwoord(401, { fout: "Nie aangemeld nie" });
   if (rede !== "ok") return antwoord(403, { fout: "Geen toegang tot Future Sharp nie" });
 
@@ -209,11 +267,11 @@ exports.handler = async (event, context) => {
   if (!doen) return antwoord(400, { fout: "Onbekende aksie" });
 
   try {
-    return antwoord(200, await doen(invoer));
+    return antwoord(200, await doen(invoer, gebruiker));
   } catch (f) {
     console.error("verslae", invoer.aksie, f);
     return antwoord(f.status === 403 ? 403 : 400, { fout: f.message || "Iets het skeefgeloop" });
   }
 };
 
-exports._toets = { maak_slug, lees_beeld, AKSIES, STANDAARD_SJABLONE };
+exports._toets = { maak_slug, lees_beeld, AKSIES, STANDAARD_SJABLONE, moderniseer };
