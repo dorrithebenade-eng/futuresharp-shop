@@ -106,3 +106,21 @@
   from = "/talks/*"
   to = "/.netlify/functions/talk-bladsy?slug=:splat"
   status = 200
+
+# VERSLAGSKAKELS VIR SKOLE (Oktober 2026).
+#
+# /verslae/<slug> is 'n skool se verslagskakel uit die Future Sharp-paneel
+# (Verslae). Die Function verslae-bladsy sit die skool se beeld in die kop vir
+# WhatsApp en e-pos en stuur 'n mens dan na die skool se Google Drive-vouer.
+# /verslae-beeld/<slug>.jpg is daardie beeld.
+[[redirects]]
+  from = "/verslae/*"
+  to = "/.netlify/functions/verslae-bladsy?slug=:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/verslae-beeld/*"
+  to = "/.netlify/functions/verslae-bladsy?beeld=1&slug=:splat"
+  status = 200
+  force = true

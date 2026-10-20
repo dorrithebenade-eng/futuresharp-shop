@@ -1,0 +1,64 @@
+/* public/css/fsp-verslae.css — verslagskakels vir skole (Oktober 2026). Eie lêer. */
+.fsv-rooster { display: grid; grid-template-columns: 1.3fr 1fr; gap: 16px; }
+.fsv-taal { display: flex; gap: 8px; flex-wrap: wrap; margin: 0; }
+.fsv-ander { margin-top: 8px; }
+
+.fsv-vouers { border: 1px solid var(--fsp-lyn); border-radius: 10px; overflow: hidden; background: #fff; }
+.fsv-vouers .fsv-soek { border: 0; border-bottom: 1px solid var(--fsp-lyn); width: 100%; padding: 9px 12px; font: 14px var(--font-liggaam); box-sizing: border-box; }
+.fsv-vouers .fsv-soek:focus { outline: none; background: #FAFAF8; }
+.fsv-vouer-lys { max-height: 260px; overflow-y: auto; }
+.fsv-vouer { display: flex; align-items: center; gap: 10px; padding: 9px 12px; font-size: 14px; border: 0; border-bottom: 1px solid #F0EEEA;
+  cursor: pointer; width: 100%; background: #fff; text-align: left; font-family: var(--font-liggaam); color: var(--swart); }
+.fsv-vouer:last-child { border-bottom: 0; }
+.fsv-vouer:hover { background: #FAFAF8; }
+.fsv-ik { width: 22px; height: 16px; border-radius: 3px; background: #5F6B7A; position: relative; flex: 0 0 auto; margin-top: 3px; }
+.fsv-ik::before { content: ""; position: absolute; left: 0; top: -4px; width: 10px; height: 6px; background: #5F6B7A; border-radius: 2px 2px 0 0; }
+.fsv-vouer.aan { background: #EAF6F4; font-weight: 600; }
+.fsv-vouer.aan .fsv-ik, .fsv-vouer.aan .fsv-ik::before { background: #00A291; }
+.fsv-vouer small { margin-left: auto; color: var(--grys-teks); font-size: 12px; font-weight: 400; white-space: nowrap; }
+.fsv-vouer-leeg { padding: 12px; font-size: 13px; color: var(--grys-teks); }
+.fsv-deel { display: flex; align-items: flex-start; gap: 8px; margin-top: 10px; font-size: 13px; padding: 8px 12px; border-radius: 8px; background: #EAF6F4; color: #05665B; }
+.fsv-deel.nog { background: #F5F4F1; color: var(--grys-teks); }
+.fsv-deel.fout { background: #FDECE7; color: #A1300F; }
+.fsv-plak { display: none; margin-top: 8px; }
+.fsv-plak.wys { display: flex; gap: 8px; }
+.fsv-plak input { flex: 1; }
+.fsv-skakelknop { background: none; border: 0; padding: 0; color: #0B5FA8; text-decoration: underline; cursor: pointer; font: inherit; }
+
+/* Die uitslag: WhatsApp-voorskou links, die boodskap regs */
+#fsv-uit { margin-bottom: 16px; }
+.fsv-uit { display: grid; grid-template-columns: 340px 1fr; gap: 18px; align-items: start; }
+.fsv-wa { background: #E5DDD5; border-radius: 12px; padding: 14px; }
+.fsv-wa-et { font-size: 12px; color: var(--grys-teks); margin-bottom: 8px; text-align: center; }
+.fsv-wa-bel { background: #DCF8C6; border-radius: 8px; padding: 4px; max-width: 320px; margin-left: auto; box-shadow: 0 1px 1px rgba(0,0,0,.12); }
+.fsv-wa-kaart { background: #D2EFBC; border-radius: 6px; overflow: hidden; }
+.fsv-wa-kaart img, .fsv-wa-kaart canvas { width: 100%; display: block; }
+.fsv-wa-kaart .t { padding: 6px 8px 2px; font-size: 13px; font-weight: 600; color: #111; }
+.fsv-wa-kaart .d { padding: 0 8px; font-size: 12px; color: #555; }
+.fsv-wa-kaart .u { padding: 2px 8px 6px; font-size: 11.5px; color: #777; }
+.fsv-wa-teks { font-size: 13px; padding: 6px 6px 2px; white-space: pre-wrap; color: #111; line-height: 1.4; overflow-wrap: anywhere; }
+.fsv-wa-teks a { color: #0B7BC1; }
+.fsv-wa-tyd { text-align: right; font-size: 10.5px; color: #667; padding: 0 6px 2px; }
+.fsv-uit textarea { font-size: 13.5px; line-height: 1.45; }
+.fsv-aan { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+.fsv-aan .fsp-veld { margin-bottom: 0; }
+.fsv-wysig { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 10px; font-size: 13px; }
+.fsp-knop-wa { background: #1F8F55; color: #fff; }
+#fsv-lys .fsp-ry { cursor: pointer; }
+.fsv-klein { font-size: 12px; color: var(--grys-teks); }
+
+/* Opstel en instellings */
+.fsv-stappe { margin: 0 0 14px; padding-left: 20px; font-size: 14px; line-height: 1.55; }
+.fsv-stappe li { margin-bottom: 6px; }
+.fsv-stappe code { background: var(--grys-lig); border-radius: 4px; padding: 1px 5px; font-size: 13px; overflow-wrap: anywhere; }
+.fsv-meer { background: #fff; border-radius: 12px; margin-bottom: 12px; box-shadow: 0 2px 10px rgba(23,23,23,.05); }
+.fsv-meer > summary { cursor: pointer; padding: 14px 18px; font-family: var(--font-opskrif); font-weight: 700; font-size: 15px; }
+.fsv-meer > div { padding: 0 18px 18px; }
+.fsv-sj-twee { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.fsv-sj-twee textarea { font-size: 13.5px; line-height: 1.45; }
+.fsv-epos-sa { background: var(--grys-lig); border-radius: 6px; padding: 8px 10px; font-size: 13px; overflow-wrap: anywhere; flex: 1 1 260px; }
+
+@media (max-width: 760px) {
+  .fsv-rooster, .fsv-uit, .fsv-sj-twee, .fsv-aan { grid-template-columns: 1fr; }
+  .fsv-wa-bel { margin: 0 auto; }
+}
