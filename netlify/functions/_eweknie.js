@@ -64,7 +64,23 @@ async function sinkroniseer_eweknie(store, slug, ou_eweknie, nuwe_eweknie) {
   await stel_skakel(store, nuwe_eweknie, slug);
 }
 
+// Reeks: boeke wat in 'n vaste volgorde saam vertoon word (bv. die vier
+// SPEEL-SLIM-ouderdomsgroepe). reeks_slug is die reeks se naam soos
+// personeel dit tik; volgorde_in_reeks is 1, 2, 3 ... Albei of geeneen.
+function kry_geldige_reeks(waarde) {
+  const leeg = { reeks_slug: null, volgorde_in_reeks: null };
+  if (!waarde || typeof waarde !== "object") return leeg;
+  const naam = typeof waarde.reeks_slug === "string" ? waarde.reeks_slug.trim().slice(0, 60) : "";
+  if (!naam) return leeg;
+  const volgorde = Number(waarde.volgorde_in_reeks);
+  return {
+    reeks_slug: naam,
+    volgorde_in_reeks: Number.isInteger(volgorde) && volgorde > 0 ? volgorde : null,
+  };
+}
+
 module.exports = {
+  kry_geldige_reeks,
   kry_geldige_taal,
   kry_geldige_eweknie,
   kontroleer_eweknie,

@@ -13,7 +13,7 @@ const { kry_store } = require("./_blob-store");
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 const { kry_maks_verdeling_persentasie, beskryf_minimum } = require("./_paystack-koste.js");
 const { kontroleer_leen_prys } = require("./_leen-prys-kontrole");
-const { kry_geldige_taal, kry_geldige_eweknie, kontroleer_eweknie, sinkroniseer_eweknie } = require("./_eweknie");
+const { kry_geldige_reeks, kry_geldige_taal, kry_geldige_eweknie, kontroleer_eweknie, sinkroniseer_eweknie } = require("./_eweknie");
 
 const GELDIGE_ROL_TIPES = ["outeur", "vennoot", "ontwerp_admin", "printing", "aflewering"];
 
@@ -283,7 +283,7 @@ exports.handler = async (event, context) => {
         : { beskikbaar: false },
     },
     eboek_konfig_pad: invoer.eboek_konfig_pad || `config/boek-dele/${slug}.json`,
-    reeks: invoer.reeks || { reeks_slug: null, volgorde_in_reeks: null },
+    reeks: kry_geldige_reeks(invoer.reeks),
     aktief: true,
     geskep_op: new Date().toISOString(),
     geskep_deur: gebruiker.email,

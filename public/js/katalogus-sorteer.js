@@ -112,6 +112,50 @@ function ks_bou_kontrole() {
   });
 }
 
+// Reekse bly bymekaar, in hul eie volgorde. Die reeks neem die plek in
+// van sy eerste boek in die gesorteerde lys, so die gekose sortering
+// bepaal steeds waar die reeks as geheel staan. 'n Boek sonder 'n eie
+// reeks erf dié van sy eweknie, sodat net een taal opgestel hoef te word.
+function ks_reeks_sleutel(produk, per_slug) {
+  const eie = produk.reeks && produk.reeks.reeks_slug;
+  if (eie) return { naam: eie.trim().toLowerCase(), volgorde: produk.reeks.volgorde_in_reeks };
+  const eweknie = produk.eweknie_slug && per_slug.get(produk.eweknie_slug);
+  const ander = eweknie && eweknie.reeks && eweknie.reeks.reeks_slug;
+  if (ander) return { naam: ander.trim().toLowerCase(), volgorde: eweknie.reeks.volgorde_in_reeks };
+  return null;
+}
+
+function ks_hou_reekse_bymekaar(produkte) {
+  const per_slug = new Map(produkte.map((p) => [p.slug, p]));
+  const lede = new Map();
+  for (const produk of produkte) {
+    const sleutel = ks_reeks_sleutel(produk, per_slug);
+    if (!sleutel) continue;
+    if (!lede.has(sleutel.naam)) lede.set(sleutel.naam, []);
+    lede.get(sleutel.naam).push({ produk, volgorde: sleutel.volgorde });
+  }
+  if (!lede.size) return produkte;
+
+  const geplaas = new Set();
+  const uit = [];
+  for (const produk of produkte) {
+    const sleutel = ks_reeks_sleutel(produk, per_slug);
+    if (!sleutel) {
+      uit.push(produk);
+      continue;
+    }
+    if (geplaas.has(sleutel.naam)) continue;
+    geplaas.add(sleutel.naam);
+    // Sonder volgordenommer gaan 'n boek aan die einde van sy reeks.
+    // Array.sort is stabiel, dus bly gelyke nommers in die gekose sortering.
+    const gesorteer = [...lede.get(sleutel.naam)].sort(
+      (a, b) => (a.volgorde || Number.MAX_SAFE_INTEGER) - (b.volgorde || Number.MAX_SAFE_INTEGER)
+    );
+    uit.push(...gesorteer.map((l) => l.produk));
+  }
+  return uit;
+}
+
 // Omhul wys_produkte. Die tweede argument (besit_stel ens.) gaan
 // onveranderd deur — ons raak net die volgorde van die eerste aan.
 function ks_koppel() {
@@ -122,7 +166,9 @@ function ks_koppel() {
   window.wys_produkte = function (produkte, opsies) {
     if (Array.isArray(produkte) && produkte.length) ks_bou_kontrole();
     const sorteerder = KS_SORTEERDERS[ks_kry_gekose()] || KS_SORTEERDERS[KS_VERSTEK];
-    const gesorteer = Array.isArray(produkte) ? [...produkte].sort(sorteerder) : produkte;
+    const gesorteer = Array.isArray(produkte)
+      ? ks_hou_reekse_bymekaar([...produkte].sort(sorteerder))
+      : produkte;
     return window.ks_oorspronklik(gesorteer, opsies);
   };
 }

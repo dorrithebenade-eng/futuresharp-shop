@@ -11,7 +11,7 @@ const { kry_store } = require("./_blob-store");
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 const { kry_maks_verdeling_persentasie, beskryf_minimum } = require("./_paystack-koste.js");
 const { kontroleer_leen_prys } = require("./_leen-prys-kontrole");
-const { kry_geldige_taal, kry_geldige_eweknie, kontroleer_eweknie, sinkroniseer_eweknie } = require("./_eweknie");
+const { kry_geldige_reeks, kry_geldige_taal, kry_geldige_eweknie, kontroleer_eweknie, sinkroniseer_eweknie } = require("./_eweknie");
 
 const GELDIGE_ROL_TIPES = ["outeur", "vennoot", "ontwerp_admin", "printing", "aflewering"];
 
@@ -214,6 +214,7 @@ exports.handler = async (event, context) => {
     ...bestaande,
     ...wysigings,
     taal: "taal" in wysigings ? kry_geldige_taal(wysigings.taal) : bestaande.taal || null,
+    reeks: "reeks" in wysigings ? kry_geldige_reeks(wysigings.reeks) : bestaande.reeks || kry_geldige_reeks(null),
     eweknie_slug: nuwe_eweknie,
     outeur_ids: nuwe_outeur_ids,
     kategorie_ids: Array.isArray(wysigings.kategorie_ids)

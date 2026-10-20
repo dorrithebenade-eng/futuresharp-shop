@@ -931,6 +931,18 @@ function ververs_alle_outeur_aftrekkieslyste() {
 
 // --- Vorm: oopmaak/toemaak ---
 
+// Bestaande reeksname as voorstelle, sodat dieselfde reeks nie met 'n
+// ander spelling twee reekse word nie.
+function bou_reeks_voorstelle() {
+  const name = new Set(
+    produkte_kas.map((p) => p.reeks && p.reeks.reeks_slug).filter(Boolean)
+  );
+  document.getElementById("vorm-reeks-lys").innerHTML = [...name]
+    .sort((a, b) => a.localeCompare(b, "af"))
+    .map((naam) => `<option value="${ontsnap_html(naam)}"></option>`)
+    .join("");
+}
+
 // Eweknie-keuselys: alle ander produkte, alfabeties. `eie_slug` word
 // uitgesluit sodat 'n boek nie na homself kan wys nie.
 function bou_eweknie_opsies(eie_slug, gekose_slug) {
@@ -966,6 +978,9 @@ function reset_vorm() {
   bou_kategorie_merkblokkies([]);
   document.getElementById("vorm-taal").value = "";
   bou_eweknie_opsies(null, null);
+  document.getElementById("vorm-reeks").value = "";
+  document.getElementById("vorm-reeks-volgorde").value = "";
+  bou_reeks_voorstelle();
   document.getElementById("vorm-etiket-pasgemaak-velde").style.display = "none";
   wys_verberg_formaat_velde();
   document.getElementById("paneel-vorm-titel").textContent = t("paneel_voeg_produk_by_titel");
@@ -1174,6 +1189,8 @@ function open_vorm_vir_wysig(produk) {
   bou_kategorie_merkblokkies(produk.kategorie_ids || []);
   document.getElementById("vorm-taal").value = produk.taal || "";
   bou_eweknie_opsies(produk.slug, produk.eweknie_slug || null);
+  document.getElementById("vorm-reeks").value = (produk.reeks && produk.reeks.reeks_slug) || "";
+  document.getElementById("vorm-reeks-volgorde").value = (produk.reeks && produk.reeks.volgorde_in_reeks) || "";
   document.getElementById("vorm-oorsig").value = produk.oorsig || "";
   document.getElementById("vorm-vol-beskrywing").value = produk.vol_beskrywing || "";
   document.getElementById("vorm-isbn-eboek").value = (produk.isbn && produk.isbn.eboek) || "";
@@ -1344,6 +1361,10 @@ function bou_produk_liggaam() {
     kategorie_ids: kry_kategorie_ids_uit_vorm(),
     taal: document.getElementById("vorm-taal").value || null,
     eweknie_slug: document.getElementById("vorm-eweknie").value || null,
+    reeks: {
+      reeks_slug: document.getElementById("vorm-reeks").value.trim() || null,
+      volgorde_in_reeks: Number(document.getElementById("vorm-reeks-volgorde").value) || null,
+    },
     oorsig: document.getElementById("vorm-oorsig").value.trim(),
     vol_beskrywing: document.getElementById("vorm-vol-beskrywing").value.trim(),
     omslag: document.getElementById("vorm-omslag").value.trim(),
