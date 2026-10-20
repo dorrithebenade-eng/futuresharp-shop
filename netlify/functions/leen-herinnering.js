@@ -37,6 +37,17 @@ exports.handler = async () => {
   const nou = new Date();
   const bestellings_store = kry_store("bestellings");
   const koepon_store = kry_store("koepons");
+  // Die herinnering noem die boek by sy huidige katalogus-titel, net soos
+  // My Leeskamer (sien kry-my-boeke.js). Een lees per boek, gekas.
+  const katalogus_store = kry_store("katalogus");
+  const titel_kas = new Map();
+  async function huidige_titel(slug, terugval) {
+    if (!titel_kas.has(slug)) {
+      const produk = await katalogus_store.get(slug, { type: "json" }).catch(() => null);
+      titel_kas.set(slug, (produk && produk.titel) || null);
+    }
+    return titel_kas.get(slug) || terugval;
+  }
 
   let gestuur = 0;
   let oorgeslaan = 0;
@@ -144,7 +155,7 @@ exports.handler = async () => {
 
         const uitslag = await stuur_leen_verval_kennisgewing({
           aan,
-          titel: item.titel,
+          titel: await huidige_titel(item.produk_slug, item.titel),
           verval_op: item.verval_op,
           dae_oor: oor,
           koepon_kode: koepon.kode,

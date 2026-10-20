@@ -170,7 +170,12 @@ exports.handler = async (event, context) => {
         my_boeke.push({
           bestelnommer: bestelling.bestelnommer,
           produk_slug: boek_item.produk_slug,
-          titel: boek_item.titel,
+          // DIE KATALOGUS SE HUIDIGE TITEL, nie die een op die bestelling nie.
+          // Die bestelling hou die titel soos dit by die koop was (dit hoort
+          // by die faktuur); die rak wys die boek soos hy nou heet, sodat 'n
+          // titelwysiging in die katalogus oral dieselfde lees. Is die
+          // produk uit die katalogus weg, val dit terug op die bestelling s'n.
+          titel: (produk && produk.titel) || boek_item.titel,
           outeur: (produk && produk.outeur) || "",
           omslag: (produk && produk.omslag) || "",
           vrystelling_datum,
