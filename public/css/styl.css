@@ -1205,6 +1205,8 @@ body {
   color: #333;
   margin: 0 0 28px;
   max-width: 55ch;
+  /* Reëlbreuke in die beskrywing word paragrawe op die skerm. */
+  white-space: pre-line;
 }
 
 .produk-aksies {
