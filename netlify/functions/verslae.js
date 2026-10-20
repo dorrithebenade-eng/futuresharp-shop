@@ -25,7 +25,7 @@ const E = require("./_verslae-epos");
 
 const PUBLIEKE_WERF = "https://futureshop.futuresharp.co.za";
 const JSON_KOP = { "Content-Type": "application/json", "Cache-Control": "no-store" };
-const TALE = ["af", "en", "tw"];
+const TALE = ["af", "en"]; // Tweetalig weggeneem (Okt 2026); ou "tw"-skakels werk steeds
 
 // {groet} word "Beste Pieter" as 'n voornaam ingetik is, anders "Goeie dag".
 // Die handtekening (naam, titel) kom vanself onderaan; die sjabloon eindig

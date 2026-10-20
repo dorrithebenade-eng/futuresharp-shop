@@ -15,7 +15,10 @@
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
   const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
+  // Tweetalig is in Oktober 2026 weggeneem; ou tweetalige skakels wys nog
+  // reg (die naam bly hier), maar 'n mens kies net Afrikaans of English.
   const TAAL = { af: "Afrikaans", en: "English", tw: "Tweetalig" };
+  const KIESBAAR = ["af", "en"];
   const ETIKET = { af: "Verslae", en: "Reports", tw: "Verslae · Reports" };
   const BESKRYWING = { af: "Julle skool se Future Sharp-verslae op een plek.", en: "Your school's Future Sharp reports in one place.", tw: "Julle skool se Future Sharp-verslae op een plek." };
   const MAANDE = ["Jan", "Feb", "Mrt", "Apr", "Mei", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Des"];
@@ -105,7 +108,7 @@
               '<input id="fsv-skool-ander" class="fsp-invoer fsv-ander" maxlength="120" placeholder="Tik die skool se naam" hidden>' +
               '<p class="fsp-hulp">Die skole kom uit Groepskakels. Kies "\'n Ander skool" om \'n nuwe naam te tik.</p></div>' +
             '<div class="fsp-veld"><span class="fsp-et">Taal op die beeld en in die boodskap</span>' +
-              '<div class="fsp-filters fsv-taal" id="fsv-taal">' + Object.keys(TAAL).map((t) => '<button type="button" class="fsp-filter' + (t === "af" ? " aan" : "") + '" data-taal="' + t + '">' + TAAL[t] + "</button>").join("") + "</div></div>" +
+              '<div class="fsp-filters fsv-taal" id="fsv-taal">' + KIESBAAR.map((t) => '<button type="button" class="fsp-filter' + (t === "af" ? " aan" : "") + '" data-taal="' + t + '">' + TAAL[t] + "</button>").join("") + "</div></div>" +
           "</div>" +
           '<div class="fsp-veld"><span class="fsp-et">Google Drive-vouer</span>' +
             '<div class="fsv-vouers"><input class="fsv-soek" id="fsv-vouer-soek" placeholder="Soek" aria-label="Soek \'n vouer"><div class="fsv-vouer-lys" id="fsv-vouer-lys"><div class="fsv-vouer-leeg">Word gelaai …</div></div></div>' +
@@ -285,7 +288,7 @@
     const sj = S.sjablone || {};
     m.innerHTML =
       '<details class="fsv-meer"><summary>Boodskappe vir verslagskakels</summary><div>' +
-        '<p class="fsp-hulp fsp-hulp-bo"><b>{groet}</b> word "Beste Pieter" as julle \'n voornaam intik (anders "Goeie dag"), <b>{skool}</b> die skool se naam en <b>{skakel}</b> die skakel. Die handtekening van wie stuur, kom vanself onderaan. By tweetalig gaan albei saam, met \'n streep tussen.</p>' +
+        '<p class="fsp-hulp fsp-hulp-bo"><b>{groet}</b> word "Beste Pieter" as julle \'n voornaam intik (anders "Goeie dag"), <b>{skool}</b> die skool se naam en <b>{skakel}</b> die skakel. Die handtekening van wie stuur, kom vanself onderaan.</p>' +
         '<div class="fsv-sj-twee">' +
           '<label><span class="fsp-klein-et">Afrikaans</span><textarea class="fsp-invoer" id="fsv-sj-af" rows="11">' + esc(sj.af || "") + "</textarea></label>" +
           '<label><span class="fsp-klein-et">English</span><textarea class="fsp-invoer" id="fsv-sj-en" rows="11">' + esc(sj.en || "") + "</textarea></label>" +
@@ -356,7 +359,7 @@
           (s.gestuur && s.gestuur.length ? '<p class="fsp-hulp">Laas per e-pos gestuur: ' + esc(s.gestuur[0].aan.join(", ")) + " op " + kort(s.gestuur[0].op) + "</p>" : "") +
           '<div class="fsv-deel nog" id="fsv-deel-stand">' + (s.oop ? "Kyk of die vouer nog gedeel is …" : "Die vouer word nie meer gedeel nie.") + "</div>" +
           '<div class="fsv-wysig"><span class="fsp-klein-et">Taal</span>' +
-            Object.keys(TAAL).map((t) => '<button type="button" class="fsp-filter' + (t === s.taal ? " aan" : "") + '" data-wtaal="' + t + '">' + TAAL[t] + "</button>").join("") +
+            KIESBAAR.map((t) => '<button type="button" class="fsp-filter' + (t === s.taal ? " aan" : "") + '" data-wtaal="' + t + '">' + TAAL[t] + "</button>").join("") +
           "</div>" +
           '<p class="fsp-hulp"><a href="' + esc(s.drive) + '" target="_blank" rel="noopener">Drive › ' + esc(s.vouer_naam) + "</a> · geskep " + kort(s.geskep_op) + (s.oop ? "" : " · gedeaktiveer " + kort(s.gesluit_op)) + "</p>" +
           '<div class="fsp-aksies"><button type="button" class="fsp-knop ' + (s.oop ? "fsp-knop-gevaar" : "fsp-knop-lig") + '" id="fsv-sluit">' + (s.oop ? "Deaktiveer die skakel" : "Aktiveer weer") + "</button></div>" +
