@@ -71,3 +71,12 @@
 .fsv-chk { display: flex; gap: 8px; align-items: center; font-size: 13.5px; margin: 8px 0 2px; cursor: pointer; }
 .fsv-chk input { accent-color: #00A291; width: 16px; height: 16px; margin: 0; }
 @media (max-width: 760px) { .fsv-aan3 { grid-template-columns: 1fr; } .fsv-hand { flex-wrap: wrap; } .fsv-hand .fsv-skakelknop { margin-left: 0; } }
+
+/* Geskiedenis en "bestaan reeds" (Oktober 2026) */
+.fsv-bestaan { margin: 6px 0 0; line-height: 1.6; background: #FFF6DD; color: #6B4E00; }
+.fsv-gs { margin: 10px 0 4px; }
+.fsv-gs ul { list-style: none; margin: 4px 0 0; padding: 0; }
+.fsv-gs li { display: flex; gap: 10px; font-size: 13px; padding: 5px 0; border-bottom: 1px solid #F0EEEA; }
+.fsv-gs li:last-child { border-bottom: 0; }
+.fsv-gs-tyd { color: var(--grys-teks); white-space: nowrap; min-width: 118px; }
+.fsv-gs details summary { cursor: pointer; font-size: 13px; color: #0B5FA8; margin-top: 4px; }

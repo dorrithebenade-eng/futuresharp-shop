@@ -117,6 +117,7 @@
             '<div class="fsv-plak" id="fsv-plak"><input class="fsp-invoer" id="fsv-plak-skakel" placeholder="https://drive.google.com/drive/folders/…"></div>' +
           "</div>" +
         "</div>" +
+        '<div id="fsv-bestaan"></div>' +
         '<div class="fsp-aksies"><button type="button" class="fsp-knop fsp-knop-hoof" id="fsv-skep">Skep die skakel</button></div>' +
       "</div>" +
       '<div id="fsv-uit" hidden></div>' +
@@ -180,7 +181,6 @@
     const klaar = S.google.gekoppel && S.google.hoofvouer;
     teken_opstel();
     $("#fsv-nuut").hidden = !klaar;
-    $("#fsv-lys-blok").hidden = !S.skakels.length;
     if (klaar) teken_skole();
     teken_lys();
     teken_meer();
@@ -275,11 +275,13 @@
       ? lys.map((s) =>
           '<div class="fsp-ry" role="button" tabindex="0" data-slug="' + esc(s.slug) + '" data-stand="' + (s.oop ? "gereel" : "verval") + '">' +
             '<div class="fsp-ry-no">' + esc(kort(s.geskep_op)) + "</div>" +
-            '<div><div class="fsp-ry-naam">' + esc(s.skool) + '</div><div class="fsp-ry-sub">' + esc(ETIKET[s.taal] + " · " + TAAL[s.taal] + " · Drive › " + s.vouer_naam) + "</div></div>" +
+            '<div><div class="fsp-ry-naam">' + esc(s.skool) + '</div><div class="fsp-ry-sub">' + esc(ETIKET[s.taal] + " · " + TAAL[s.taal] + " · Drive › " + s.vouer_naam) + "</div>" +
+              (s.geskep_deur ? '<div class="fsp-ry-sub">Geskep deur ' + esc(s.geskep_deur) + "</div>" : "") + "</div>" +
             '<div><span class="fsp-stand ' + (s.oop ? "gereel" : "verval") + '">' + (s.oop ? "Aktief" : "Onaktief") + "</span></div>" +
           "</div>").join("")
-      : '<p class="fsp-leeg">Niks hier nie.</p>';
-    blok.hidden = !S.skakels.length;
+      : '<p class="fsp-leeg">' + (S.skakels.length ? "Niks hier nie." : "Nog geen verslagskakels nie. Skep die eerste een hierbo.") + "</p>";
+    // Soos by Groepskakels: die lys staan altyd, ook as dit nog leeg is.
+    blok.hidden = !(S.google.gekoppel && S.google.hoofvouer) && !S.skakels.length;
   }
 
   function teken_meer() {
@@ -356,12 +358,13 @@
           "</div>" +
           (S.epos_gereed ? "" : '<p class="fsp-waarsku">Stuur e-pos werk sodra die verslae@-posbus se wagwoord in Netlify gestel is.</p>') +
           '<p class="fsp-hulp">WhatsApp maak oop op jou eie foon of rekenaar met die boodskap klaar ingetik, en gaan dus uit jou eie WhatsApp. Die e-pos gaan uit verslae@futuresharp.co.za met jou naam as afsender; antwoorde gaan na jou adres.</p>' +
-          (s.gestuur && s.gestuur.length ? '<p class="fsp-hulp">Laas per e-pos gestuur: ' + esc(s.gestuur[0].aan.join(", ")) + " op " + kort(s.gestuur[0].op) + "</p>" : "") +
+
           '<div class="fsv-deel nog" id="fsv-deel-stand">' + (s.oop ? "Kyk of die vouer nog gedeel is …" : "Die vouer word nie meer gedeel nie.") + "</div>" +
           '<div class="fsv-wysig"><span class="fsp-klein-et">Taal</span>' +
             KIESBAAR.map((t) => '<button type="button" class="fsp-filter' + (t === s.taal ? " aan" : "") + '" data-wtaal="' + t + '">' + TAAL[t] + "</button>").join("") +
           "</div>" +
-          '<p class="fsp-hulp"><a href="' + esc(s.drive) + '" target="_blank" rel="noopener">Drive › ' + esc(s.vouer_naam) + "</a> · geskep " + kort(s.geskep_op) + (s.oop ? "" : " · gedeaktiveer " + kort(s.gesluit_op)) + "</p>" +
+          '<p class="fsp-hulp"><a href="' + esc(s.drive) + '" target="_blank" rel="noopener">Drive › ' + esc(s.vouer_naam) + "</a> · geskep " + kort(s.geskep_op) + (s.geskep_deur ? " deur " + esc(s.geskep_deur) : "") + (s.oop ? "" : " · gedeaktiveer " + kort(s.gesluit_op)) + "</p>" +
+          geskiedenis_html(s) +
           '<div class="fsp-aksies"><button type="button" class="fsp-knop ' + (s.oop ? "fsp-knop-gevaar" : "fsp-knop-lig") + '" id="fsv-sluit">' + (s.oop ? "Deaktiveer die skakel" : "Aktiveer weer") + "</button></div>" +
           (s.oop ? "" :
             '<div class="fsp-toets-skrap"><b>Skrap hierdie verslagskakel</b>' +
@@ -493,6 +496,7 @@
       S.vouer = null;
       teken_skole();
       teken_vouers();
+      teken_bestaan();
       teken_lys();
       kies(d.skakel.slug);
       kennis("Skakel geskep en die vouer gedeel");
@@ -573,10 +577,41 @@
     return /^\d{8,15}$/.test(n) ? n : null;
   }
 
+  const WAT = { geskep: "Skakel geskep", gewysig: "Taal verander", epos: "E-pos gestuur", whatsapp: "WhatsApp oopgemaak", gedeaktiveer: "Gedeaktiveer", geaktiveer: "Weer geaktiveer" };
+  const tyd = (iso) => { const d = new Date(iso); return kort(iso) + " " + String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0"); };
+
+  function geskiedenis_html(s) {
+    const ou = (s.gestuur || []).map((g) => ({ op: g.op, wat: "epos", deur: g.deur, aan: (g.aan || []).join(", ") }));
+    const lys = (s.geskiedenis || []).concat(ou.filter((g) => !(s.geskiedenis || []).some((x) => x.op === g.op)));
+    if (!lys.length) return "";
+    const ry = (g) => '<li><span class="fsv-gs-tyd">' + esc(tyd(g.op)) + "</span><span><b>" + esc(WAT[g.wat] || g.wat) + "</b>" +
+      (g.aan ? " aan " + esc(g.aan) : "") + (g.taal ? " (" + esc(TAAL[g.taal] || g.taal) + ")" : "") + (g.deur ? " · " + esc(g.deur) : "") + "</span></li>";
+    return '<div class="fsv-gs"><span class="fsp-klein-et">Geskiedenis</span><ul>' + lys.slice(0, 4).map(ry).join("") + "</ul>" +
+      (lys.length > 4 ? '<details><summary>Wys alles (' + lys.length + ")</summary><ul>" + lys.slice(4).map(ry).join("") + "</ul></details>" : "") + "</div>";
+  }
+
+  // Bestaan daar reeds 'n aktiewe skakel vir hierdie skool? Dan sê ons wie
+  // dit geskep het, sodat niemand 'n tweede een maak sonder om te weet nie.
+  function teken_bestaan() {
+    const el = $("#fsv-bestaan");
+    if (!el) return;
+    const skool = gekose_skool().toLowerCase();
+    const reeds = skool ? S.skakels.filter((x) => x.oop && x.skool.trim().toLowerCase() === skool) : [];
+    el.innerHTML = reeds.length
+      ? '<div class="fsv-deel fsv-bestaan">' +
+          "<span><b>Daar is reeds " + (reeds.length > 1 ? reeds.length + " aktiewe skakels" : "'n aktiewe skakel") + " vir hierdie skool.</b><br>" +
+          reeds.map((x) => esc(TAAL[x.taal]) + ", geskep " + kort(x.geskep_op) + (x.geskep_deur ? " deur " + esc(x.geskep_deur) : "") +
+            ' · <button type="button" class="fsv-skakelknop" data-oop="' + esc(x.slug) + '">Maak dit oop</button>').join("<br>") +
+          "<br>Jy kan steeds 'n nuwe een skep, byvoorbeeld in die ander taal.</span></div>"
+      : "";
+  }
+
   function stuur_wa() {
     const n = wa_nommer($("#fsv-sel").value);
     if (n === null) return kennis("Die selfoonnommer lyk nie reg nie");
     window.open("https://wa.me/" + n + "?text=" + encodeURIComponent(wa_teks()), "_blank", "noopener");
+    const s = S.skakels.find((x) => x.slug === S.gekies);
+    if (s) bediener({ aksie: "log_whatsapp", slug: s.slug, aan: $("#fsv-sel").value }).then((d) => { Object.assign(s, d.skakel); }).catch(() => {});
   }
 
 
@@ -644,6 +679,7 @@
     if (b.dataset.hoof) return stel_hoofvouer(b.dataset.hoof);
     if (b.dataset.filter) { S.filter = b.dataset.filter; teken_lys(); return; }
     if (b.dataset.slug) return kies(b.dataset.slug);
+    if (b.dataset.oop) return kies(b.dataset.oop);
     switch (b.id) {
       case "fsv-skep": return skep(b);
       case "fsv-sluit": return sluit(b);
@@ -667,6 +703,7 @@
       $("#fsv-skool-ander").hidden = e.target.value !== ANDER;
       if (e.target.value === ANDER) $("#fsv-skool-ander").focus();
       else { pas_vouer(); teken_vouers(); }
+      teken_bestaan();
     }
     if (id === "fsv-sleutel" || id === "fsv-sleutel2") laai_sleutel(e.target);
   }
@@ -678,6 +715,7 @@
     if (id === "fsv-soek") { S.soek = e.target.value; teken_lys(); }
     if (id === "fsv-teks") teken_wa_teks();
     if (id === "fsv-voornaam") verander_voornaam(e.target.value);
+    if (id === "fsv-skool-ander") teken_bestaan();
     if (id === "fsv-skrap-naam") {
       const s = S.skakels.find((x) => x.slug === S.gekies);
       $("#fsv-skrap").disabled = !s || e.target.value.trim() !== s.skool;

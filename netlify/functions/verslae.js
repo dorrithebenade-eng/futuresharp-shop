@@ -57,6 +57,17 @@ async function lees_sjablone() {
 const hand_sleutel = (g) => "handtekening:" + String((g && g.email) || "").trim().toLowerCase();
 async function lees_handtekening(g) { return (await store().get(hand_sleutel(g), { type: "json" })) || null; }
 
+// Wie het iets gedoen: die handtekening se naam, anders die aanmeld-e-pos.
+async function wie(g) {
+  const h = await lees_handtekening(g);
+  return { naam: (h && h.naam) || (g && g.email) || "Onbekend", epos: (g && g.email) || "" };
+}
+
+// Die geskiedenis van 'n skakel: geskep, taal, e-pos, WhatsApp, (de)aktiveer.
+function log(s, wat, deur, ekstra) {
+  s.geskiedenis = [{ op: new Date().toISOString(), wat, deur: deur.naam, deur_epos: deur.epos, ...(ekstra || {}) }, ...(s.geskiedenis || [])].slice(0, 60);
+}
+
 function maak_slug(naam, bestaande) {
   const basis = String(naam).normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase()
     .replace(/'/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60) || "skool";
@@ -142,7 +153,7 @@ const AKSIES = {
     return { vouers: await G.subvouers(g, g.hoofvouer.id) };
   },
 
-  async skep({ skool, vouer, taal, beeld }) {
+  async skep({ skool, vouer, taal, beeld }, gebruiker) {
     skool = String(skool || "").trim();
     if (skool.length < 2) throw new Error("Kies of tik die skool se naam");
     if (!TALE.includes(taal)) throw new Error("Kies 'n taal");
@@ -158,7 +169,12 @@ const AKSIES = {
       slug: maak_slug(skool, new Set(lys.map((x) => x.slug))),
       skool, taal, vouer_id: v.id, vouer_naam: v.naam,
       oop: true, beeld_v: 1, geskep_op: new Date().toISOString(), gesluit_op: null,
+      geskep_deur: null,
     };
+    const deur = await wie(gebruiker);
+    s.geskep_deur = deur.naam;
+    s.geskep_deur_epos = deur.epos;
+    log(s, "geskep", deur);
     await beelde().set(s.slug, buf);
     lys.unshift(s);
     await stoor_skakels(lys);
@@ -166,18 +182,19 @@ const AKSIES = {
   },
 
   // Taal of skoolnaam verander: 'n nuwe beeld, dieselfde skakel.
-  async wysig({ slug, skool, taal, beeld }) {
+  async wysig({ slug, skool, taal, beeld }, gebruiker) {
     const lys = await lees_skakels();
     const s = lys.find((x) => x.slug === slug);
     if (!s) throw new Error("Skakel nie gevind nie");
     if (skool !== undefined) { skool = String(skool).trim(); if (skool.length < 2) throw new Error("Tik die skool se naam"); s.skool = skool; }
     if (taal !== undefined) { if (!TALE.includes(taal)) throw new Error("Kies 'n taal"); s.taal = taal; }
     if (beeld) { await beelde().set(s.slug, lees_beeld(beeld)); s.beeld_v = (s.beeld_v || 1) + 1; }
+    log(s, "gewysig", await wie(gebruiker), { taal: s.taal });
     await stoor_skakels(lys);
     return { skakel: publiek(s) };
   },
 
-  async sluit({ slug, oop }) {
+  async sluit({ slug, oop }, gebruiker) {
     const lys = await lees_skakels();
     const s = lys.find((x) => x.slug === slug);
     if (!s) throw new Error("Skakel nie gevind nie");
@@ -186,6 +203,7 @@ const AKSIES = {
     else await G.hou_op_deel(g, s.vouer_id);
     s.oop = !!oop;
     s.gesluit_op = oop ? null : new Date().toISOString();
+    log(s, oop ? "geaktiveer" : "gedeaktiveer", await wie(gebruiker));
     await stoor_skakels(lys);
     return { skakel: publiek(s) };
   },
@@ -240,10 +258,21 @@ const AKSIES = {
     const lys = await lees_skakels();
     const x = lys.find((y) => y.slug === slug);
     if (x) {
-      x.gestuur = [{ op: new Date().toISOString(), aan: r.aan, deur: (gebruiker && gebruiker.email) || "" }, ...(x.gestuur || [])].slice(0, 30);
+      log(x, "epos", await wie(gebruiker), { aan: r.aan.join(", ") });
       await stoor_skakels(lys);
     }
     return { gestuur: r.aan, antwoord: r.antwoord, skakel: x ? publiek(x) : p };
+  },
+
+  // Die paneel kan nie sien of 'n WhatsApp werklik gestuur is nie; dit teken
+  // aan dat iemand op "Stuur op WhatsApp" geklik het.
+  async log_whatsapp({ slug, aan }, gebruiker) {
+    const lys = await lees_skakels();
+    const s = lys.find((x) => x.slug === slug);
+    if (!s) throw new Error("Skakel nie gevind nie");
+    log(s, "whatsapp", await wie(gebruiker), { aan: String(aan || "").replace(/[^\d+ ]/g, "").slice(0, 20) });
+    await stoor_skakels(lys);
+    return { skakel: publiek(s) };
   },
 
   async stoor_sjablone({ sjablone }) {
