@@ -2443,7 +2443,8 @@ body.leser-liggaam {
 /* DIE RAK. Die omslag moet groot genoeg wees om die subtitel te lees.
    Rekenaar: die bladsy word breër as die ander vorms (1000px in plaas van
    640px) en elke omslag is 240 tot 300px breed, dus drie op 'n ry.
-   Foon: een omslag per ry, 82% van die skermbreedte (hoogstens 340px). */
+   Foon: een omslag per ry, oor die volle breedte binne die bladsy se
+   kantlyn van 16px. */
 .vb-wrap:has(> .my-boeke-rooster) { max-width: 1000px; }
 
 .my-boeke-rooster {
@@ -2461,7 +2462,7 @@ body.leser-liggaam {
     gap: 40px;
   }
   .my-boeke-rooster > .my-boek-kaart {
-    width: min(82%, 340px);
+    width: 100%;
   }
 }
 
