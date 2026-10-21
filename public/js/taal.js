@@ -28,6 +28,8 @@ const WOORDEBOEK = {
   opsioneel: { af: "(opsioneel)", en: "(optional)" },
 
   // Statistieke-blokkie
+  statistiek_opskrif_winkel: { af: "Besoeke aan Future Shop", en: "Visits to Future Shop" },
+  statistiek_opskrif_fst: { af: "Besoeke aan FutureSharp Talks", en: "Visits to FutureSharp Talks" },
   statistiek_totaal: { af: "Totaal", en: "Total" },
   statistiek_vandag: { af: "Vandag", en: "Today" },
   statistiek_week: { af: "Hierdie week", en: "This week" },
