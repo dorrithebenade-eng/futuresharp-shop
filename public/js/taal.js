@@ -2522,6 +2522,10 @@ const WOORDEBOEK = {
   fp_kw_stand_verval: { af: "Verval", en: "Expired" },
 
   fp_kw_geldig_tot: { af: "geldig tot", en: "valid until" },
+  fp_kw_geen_verval: { af: "verval nie", en: "does not expire" },
+  fp_kw_kanselleer: { af: "Kanselleer", en: "Cancel" },
+  fp_kw_kanselleer_vra: { af: "Kanselleer?", en: "Cancel?" },
+  fp_kw_kanselleer_fout: { af: "Kon nie die kwotasie kanselleer nie.", en: "Could not cancel the quotation." },
   fp_kw_verval_op: { af: "verval", en: "expired" },
   fp_kw_aanvaar_op: { af: "aanvaar", en: "accepted" },
   fp_kw_verwerp_op: { af: "verwerp", en: "declined" },
@@ -2603,6 +2607,10 @@ const WOORDEBOEK = {
   fd_kw_geldig_kop: {
     af: "Hierdie kwotasie is geldig tot",
     en: "This quotation is valid until",
+  },
+  fd_kw_aanvaar_kop: {
+    af: "Aanvaar hierdie kwotasie",
+    en: "Accepting this quotation",
   },
   fd_kw_geldig_lei: {
     af: "By aanvaarding word 'n faktuur uitgereik. Betaal dan met 'n onmiddellike EFT of kaart deur die betaalskakel of die QR-kode.",

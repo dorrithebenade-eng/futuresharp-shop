@@ -113,6 +113,12 @@ function kw_onderreel(k) {
   const klient = k.afdeling ? klient_naam + " – " + kw_ontsnap(k.afdeling) : klient_naam;
   const dele = [klient];
 
+  // 'n Speel-Slim-kwotasie dra haar verslagkode, sodat die ry by die aanvraag
+  // in SpeelSlim_Aanvrae gepas kan word.
+  if (k.speelslim && k.speelslim.verslagkode) {
+    dele.push(`Speel-Slim ${kw_ontsnap(k.speelslim.verslagkode)}`);
+  }
+
   // 'n Hersiening is 'n ONDERHANDELING, nie 'n fout nie. Sy wys van 2 af.
   if (Number(k.hersiening) > 1) {
     dele.push(`${kw_t("fp_kw_hersiening", "hersiening")} ${Number(k.hersiening)}`);
@@ -131,7 +137,11 @@ function kw_onderreel(k) {
   } else if (k.vertoon_stand === "verval") {
     dele.push(`${kw_t("fp_kw_verval_op", "verval")} ${kw_datum(k.geldig_tot)}`);
   } else if (k.vertoon_stand === "uitgereik") {
-    dele.push(`${kw_t("fp_kw_geldig_tot", "geldig tot")} ${kw_datum(k.geldig_tot)}`);
+    dele.push(
+      k.geldig_tot
+        ? `${kw_t("fp_kw_geldig_tot", "geldig tot")} ${kw_datum(k.geldig_tot)}`
+        : kw_t("fp_kw_geen_verval", "verval nie")
+    );
   } else if (k.geskep_deur) {
     // 'n KONSEP WYS WIE HOM GEMAAK HET. Albei direkteure stel kwotasies op, en
     // 'n konsep dra geen nommer — twee konsepte vir dieselfde skool is
@@ -199,6 +209,14 @@ function kw_teken(lys) {
           </span>
         </button>
         <span class="fp-ry-rand" data-kw-rand="${ix}">
+          ${
+            k.stand === "uitgereik"
+              ? `<button type="button" class="fp-skrap" data-kw-kanselleer="${ix}">${kw_t(
+                  "fp_kw_kanselleer",
+                  "Kanselleer"
+                )}</button>`
+              : ""
+          }
           <button type="button" class="fp-skrap" data-kw-skrap="${ix}"${
             kw_mag_skrap(k) ? "" : " disabled"
           }>${kw_t("fp_skrap", "Skrap")}</button>
@@ -214,6 +232,9 @@ function kw_teken(lys) {
   });
   plek.querySelectorAll("[data-kw-skrap]").forEach((knop) => {
     knop.addEventListener("click", () => kw_vra_bevestiging(Number(knop.dataset.kwSkrap)));
+  });
+  plek.querySelectorAll("[data-kw-kanselleer]").forEach((knop) => {
+    knop.addEventListener("click", () => kw_vra_kanselleer(Number(knop.dataset.kwKanselleer)));
   });
 }
 
@@ -261,6 +282,63 @@ function kw_vra_bevestiging(ix) {
     <button type="button" class="fp-bevestig-nee">${kw_t("fp_nee", "Nee")}</button></span>`;
   plek.querySelector(".fp-bevestig-nee").addEventListener("click", () => kw_teken(KW_LYS));
   plek.querySelector(".fp-bevestig-ja").addEventListener("click", () => kw_skrap(ix, plek));
+}
+
+/* KANSELLEER. Dieselfde bevestiging in die ry as by Skrap. 'n Gekanselleerde
+   kwotasie bly in die register (stand Verwerp) en kan nie meer aanvaar word
+   nie. Kom sy uit Speel-Slim, laat die bediener FSF weet. */
+function kw_vra_kanselleer(ix) {
+  const plek = document.querySelector(`[data-kw-rand="${ix}"]`);
+  if (!plek) return;
+  plek.innerHTML = `<span class="fp-bevestig">${kw_t("fp_kw_kanselleer_vra", "Kanselleer?")}
+    <button type="button" class="fp-bevestig-ja">${kw_t("fp_ja", "Ja")}</button>
+    <button type="button" class="fp-bevestig-nee">${kw_t("fp_nee", "Nee")}</button></span>`;
+  plek.querySelector(".fp-bevestig-nee").addEventListener("click", () => kw_teken(KW_LYS));
+  plek.querySelector(".fp-bevestig-ja").addEventListener("click", () => kw_kanselleer(ix, plek));
+}
+
+async function kw_kanselleer(ix, plek) {
+  const k = KW_LYS[ix];
+  if (!k || !KW_SESSIE) return;
+  plek.innerHTML = `<span class="fp-bevestig">${kw_t("fp_laai", "Word gelaai …")}</span>`;
+  try {
+    const resp = await fetch("/.netlify/functions/kanselleer-kwotasie", {
+      method: "POST",
+      headers: await identiteit_kop({ "Content-Type": "application/json" }),
+      body: JSON.stringify({ sleutel: k.sleutel }),
+    });
+    if (!resp.ok) throw new Error(await resp.text());
+    const data = await resp.json();
+    // PLAASLIK bygewerk, om dieselfde rede as by Skrap: list() loop agter.
+    kw_teken(
+      KW_LYS.map((x) =>
+        x.sleutel === k.sleutel
+          ? { ...x, stand: "verwerp", vertoon_stand: "verwerp", verwerp_op: data.verwerp_op }
+          : x
+      )
+    );
+    if (data.fsf_ingelig === false) {
+      const lys = document.getElementById("kw-lys");
+      if (lys) {
+        const boodskap = document.createElement("p");
+        boodskap.className = "stelsel-boodskap";
+        boodskap.textContent = `${k.nommer} is gekanselleer, maar FSF kon nie ingelig word nie: ${data.fsf_fout || ""}`;
+        lys.prepend(boodskap);
+      }
+    }
+  } catch (fout) {
+    console.error("Kon nie die kwotasie kanselleer nie:", fout);
+    kw_teken(KW_LYS);
+    const lys = document.getElementById("kw-lys");
+    if (lys) {
+      const boodskap = document.createElement("p");
+      boodskap.className = "stelsel-boodskap";
+      boodskap.textContent =
+        String(fout.message || "").trim() ||
+        kw_t("fp_kw_kanselleer_fout", "Kon nie die kwotasie kanselleer nie.");
+      lys.prepend(boodskap);
+    }
+  }
 }
 
 async function kw_skrap(ix, plek) {

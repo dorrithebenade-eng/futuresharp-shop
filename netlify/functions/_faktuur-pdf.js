@@ -442,9 +442,11 @@ async function bou_faktuur_pdf(rekord, maatskappy, opsies) {
      staan, en wat gebeur as die klient hom aanvaar. Geen bankrekening, geen
      QR, geen betaalknoppie -- 'n kwotasie is nie betaalbaar nie. */
   if (IS_KW) {
-    const kop = `${t_in("fd_kw_geldig_kop", taal)} ${
-      datum_veld(rekord.geldig_tot) || "\u2014"
-    }`;
+    // 'n Kwotasie sonder vervaldatum (Speel-Slim) kry 'n kop sonder datum,
+    // nie "geldig tot —" nie.
+    const kop = datum_veld(rekord.geldig_tot)
+      ? `${t_in("fd_kw_geldig_kop", taal)} ${datum_veld(rekord.geldig_tot)}`
+      : t_in("fd_kw_aanvaar_kop", taal);
     const lei = breek(t_in("fd_kw_geldig_lei", taal), gewoon, 9, REGS - KANT - 32);
     const hoog = 20 + 15 + lei.length * 12;
     const bo = y;

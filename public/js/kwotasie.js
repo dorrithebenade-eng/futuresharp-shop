@@ -128,9 +128,13 @@ function kw_dokument(u) {
           <div><span>${kw_ontsnap(t_in("fd_datum", u.taal))}</span><b>${kw_ontsnap(
             kw_datum(u.dokument_datum || u.uitgereik_op, u.taal)
           )}</b></div>
-          <div><span>${kw_ontsnap(t_in("fd_geldig_tot", u.taal))}</span><b>${kw_ontsnap(
-            kw_datum(u.geldig_tot, u.taal)
-          )}</b></div>
+          ${
+            u.geldig_tot
+              ? `<div><span>${kw_ontsnap(t_in("fd_geldig_tot", u.taal))}</span><b>${kw_ontsnap(
+                  kw_datum(u.geldig_tot, u.taal)
+                )}</b></div>`
+              : ""
+          }
           ${
             u.bestelnommer
               ? `<div><span>${kw_ontsnap(
@@ -177,7 +181,9 @@ function kw_dokument(u) {
       u.kan_aanvaar
         ? `<div class="kw-geldig">
              <b>${kw_ontsnap(
-               t_in("fd_kw_geldig_kop", u.taal) + " " + kw_datum(u.geldig_tot, u.taal)
+               u.geldig_tot
+                 ? t_in("fd_kw_geldig_kop", u.taal) + " " + kw_datum(u.geldig_tot, u.taal)
+                 : t_in("fd_kw_aanvaar_kop", u.taal)
              )}</b><br>${kw_ontsnap(t_in("fd_kw_geldig_lei", u.taal))}
            </div>`
         : ""

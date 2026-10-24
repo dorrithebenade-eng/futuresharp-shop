@@ -312,8 +312,9 @@ async function stuur_kwotasie_pos(rekord, sleutel, kode) {
           : `Hierby kwotasie <b>${ontsnap(nommer)}</b>.`,
 
       `${en ? "Quotation number" : "Kwotasienommer"}: <b>${ontsnap(nommer)}</b><br>` +
-        `${en ? "Total" : "Totaal"}: <b>${bedrag}</b><br>` +
-        `${en ? "Valid until" : "Geldig tot"}: <b>${ontsnap(geldig)}</b>`,
+        `${en ? "Total" : "Totaal"}: <b>${bedrag}</b>` +
+        // 'n Kwotasie sonder vervaldatum (Speel-Slim) druk geen "Geldig tot".
+        (geldig ? `<br>${en ? "Valid until" : "Geldig tot"}: <b>${ontsnap(geldig)}</b>` : ""),
 
       en
         ? "Open the quotation to view the full breakdown. If you accept it, an invoice is issued immediately and the payment options appear."

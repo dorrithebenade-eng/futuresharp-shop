@@ -106,6 +106,12 @@ exports.handler = async (event, context) => {
       // Die toetsstempel. Die skerm gebruik hom om te sê wat geskrap kan
       // word; skrap-kwotasie.js dwing dit af.
       toets: rekord.toets === true,
+
+      // UIT 'N SPEEL-SLIM-AANVRAAG. Die register wys die verslagkode, en die
+      // kanselleer-knoppie weet dat FSF teruggeroep moet word.
+      speelslim: rekord.speelslim && rekord.speelslim.verslagkode
+        ? { verslagkode: rekord.speelslim.verslagkode }
+        : null,
     });
   }
 

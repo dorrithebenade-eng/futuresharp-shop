@@ -60,6 +60,7 @@ const { bou_faktuur_pdf } = require("./_faktuur-pdf");
 const { stuur_epos, ontsnap } = require("./_stuur-epos");
 const { stuur_kwitansie, stuur_kennisgewing } = require("./_faktuur-betaling");
 const { bou_betaal_url } = require("./_betaal-url");
+const { meld_faktuur_betaal } = require("./_speelslim");
 // Dieselfde formateerder as die skerm en die PDF. Die desimaalteken verskil
 // per taal — R25 500,00 teenoor R25 500.00 — en dit is die konvensie waarteen
 // 'n debiteureklerk lees, nie 'n voorkeur nie.
@@ -560,6 +561,9 @@ async function reik_faktuur_uit(store, sleutel, rekord, wie) {
     }
     await stuur_kwitansie(rekord);
     await stuur_kennisgewing(rekord, maatskappy, false);
+    // Speel-Slim: 'n R0-faktuur is dadelik betaal; FSF hoor dit hier, want
+    // geen webhook sal ooit vuur nie. Doen niks vir ander fakture nie.
+    await meld_faktuur_betaal(rekord);
   }
 
   return {

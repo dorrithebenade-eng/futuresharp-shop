@@ -35,6 +35,7 @@ const {
   stuur_state,
   stuur_kennisgewing,
 } = require("./_faktuur-betaling");
+const { meld_faktuur_betaal } = require("./_speelslim");
 
 exports.handler = async (event, context) => {
   if (event.httpMethod !== "POST") return { statusCode: 405 };
@@ -99,6 +100,8 @@ exports.handler = async (event, context) => {
   await stuur_kwitansie(rekord);
   await stuur_state(rekord);
   await stuur_kennisgewing(rekord, maatskappy, false);
+  // Speel-Slim: laat FSF weet dat die terugvoerverslag betaal is.
+  await meld_faktuur_betaal(rekord);
 
   console.log(`Betaalposte: ${rekord.nommer || sleutel} se eposse gestuur (${gebruiker.email || ""}).`);
   return { statusCode: 200 };

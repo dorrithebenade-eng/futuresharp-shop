@@ -27,6 +27,7 @@ const { kry_store } = require("./_blob-store");
 const { kry_fakture_store, voeg_geskiedenis_by } = require("./_fakture");
 const { kry_maatskappy } = require("./_instellings");
 const { stuur_epos, ontsnap } = require("./_stuur-epos");
+const { meld_faktuur_betaal } = require("./_speelslim");
 
 function rand(sent) {
   const n = Math.round(Number(sent) || 0);
@@ -168,6 +169,10 @@ async function hanteer_faktuur_betaling(data, nou) {
   await stuur_kwitansie(rekord);
   await stuur_state(rekord);
   await stuur_kennisgewing(rekord, maatskappy, was_gekanselleer);
+
+  // Speel-Slim: laat FSF weet dat die terugvoerverslag betaal is. Net as die
+  // faktuur uit 'n Speel-Slim-kwotasie kom en nie gekanselleer was nie.
+  if (!was_gekanselleer) await meld_faktuur_betaal(rekord);
 
   return { statusCode: 200, body: "Faktuur aangeteken" };
 }
