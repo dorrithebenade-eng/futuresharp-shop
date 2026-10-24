@@ -2,9 +2,18 @@
 //
 // Wysig die Speel-Slim-prystabel. Rol: boekhouding.
 //
-// DRIE VELDE, ELK MET DIE HAND GELEES. Die prys van 'n hoofverslag, die prys
-// per bykomende vraelys by 'n gesamentlike verslag, en die persentasie vir
-// hosting. Niks gaan deur 'n spread nie.
+// VIER VELDE, ELK MET DIE HAND GELEES. Die prys van 'n hoofverslag, die prys
+// per bykomende vraelys by 'n gesamentlike verslag, die persentasie vir
+// hosting, en die verdeling van die res. Niks gaan deur 'n spread nie.
+//
+// DIE VERDELING. 'n Leë lys beteken: verdeel die res gelyk tussen Dorrithé en
+// Ignatius (los_ontvangers_op reken dit by elke aanvraag uit die hosting). 'n
+// Lys met rye is 'n vaste verdeling. Elke ontvanger moet presies so in die
+// begunstigde-register staan, anders kry hy by uitreiking geen subrekening
+// nie en bly sy geld stilweg in die hoofrekening.
+//
+// HOOGSTENS 99,9% SAAM. By presies 100% loop die afronding by sommige bedrae
+// een sent oor en keer faktuur-som.js die kwotasie as oorbestee.
 //
 // DIE REKORD IN DIE STORE WORD AANGEVUL, NIE VERVANG NIE. Ander velde wat
 // daar mag staan (verdeling, kategorie_id, projek_id) bly soos hulle is.
@@ -14,12 +23,15 @@
 
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 const { kry_store } = require("./_blob-store");
-const { INSTELLING_SLEUTEL, kry_instelling, los_ontvangers_op } = require("./_speelslim");
+const { INSTELLING_SLEUTEL, kry_instelling, los_ontvangers_op, begunstigde_name } = require("./_speelslim");
 
 // R10 000 is ruim bo enige verslagprys; 'n hoër bedrag is byna seker 'n tikfout.
 const MAKS_SENT = 1000000;
 // Meer as die helfte vir hosting is nie 'n verdeling nie, dit is 'n tikfout.
 const MAKS_HOSTING = 50;
+// In honderdstes van 'n persent: 99,9%.
+const MAKS_SAAM = 9990;
+const MAKS_RYE = 6;
 
 function sent_uit(waarde) {
   const n = Number(waarde);
@@ -64,6 +76,37 @@ exports.handler = async (event, context) => {
     return { statusCode: 400, body: `Hosting moet tussen 0% en ${MAKS_HOSTING}% wees.` };
   }
 
+  // Die verdeling: weggelaat of leeg is gelyk; anders 'n vaste lys.
+  let nuwe_verdeling = [];
+  if (invoer.verdeling != null) {
+    if (!Array.isArray(invoer.verdeling) || invoer.verdeling.length > MAKS_RYE) {
+      return { statusCode: 400, body: `Die verdeling mag hoogstens ${MAKS_RYE} ontvangers hê.` };
+    }
+    const bekend = new Set(await begunstigde_name());
+    const gesien = new Set();
+    for (const ry of invoer.verdeling) {
+      const ontvanger = String((ry && ry.ontvanger) || "").trim();
+      if (!ontvanger) return { statusCode: 400, body: "Kies 'n ontvanger vir elke ry." };
+      if (!bekend.has(ontvanger)) {
+        return { statusCode: 400, body: `${ontvanger} staan nie in die begunstigde-register nie.` };
+      }
+      if (gesien.has(ontvanger)) return { statusCode: 400, body: `${ontvanger} staan twee keer in die verdeling.` };
+      const n = Number(ry && ry.waarde);
+      if (!Number.isFinite(n) || n <= 0 || n > 100) {
+        return { statusCode: 400, body: `Die persentasie vir ${ontvanger} moet bo 0% en hoogstens 100% wees.` };
+      }
+      gesien.add(ontvanger);
+      nuwe_verdeling.push({ ontvanger, tipe: "pct", waarde: Math.round(n * 100) / 100 });
+    }
+    const saam = Math.round(hosting_pct * 100) + nuwe_verdeling.reduce((s, v) => s + Math.round(v.waarde * 100), 0);
+    if (saam > MAKS_SAAM) {
+      return {
+        statusCode: 400,
+        body: `Hosting en die ontvangers is saam ${(saam / 100).toString().replace(".", ",")}%. Dit mag hoogstens 99,9% wees.`,
+      };
+    }
+  }
+
   const store = kry_store("instellings");
   let rekord = {};
   try {
@@ -76,6 +119,7 @@ exports.handler = async (event, context) => {
   rekord.hoof_sent = hoof_sent;
   rekord.ekstra_sent = ekstra_sent;
   rekord.hosting_pct = hosting_pct;
+  if (invoer.verdeling != null) rekord.verdeling = nuwe_verdeling;
   rekord.bygewerk_op = new Date().toISOString();
   rekord.bygewerk_deur = (gebruiker && gebruiker.email) || "";
 
@@ -101,6 +145,7 @@ exports.handler = async (event, context) => {
       vaste_verdeling: Array.isArray(instelling.verdeling) && instelling.verdeling.length > 0,
       ontvangers: verdeling.map((v) => v.ontvanger),
       verdeling,
+      begunstigdes: await begunstigde_name(),
       bygewerk_op: rekord.bygewerk_op,
       bygewerk_deur: rekord.bygewerk_deur,
     }),

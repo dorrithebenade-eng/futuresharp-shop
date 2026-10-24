@@ -1425,3 +1425,12 @@ a.paneel-kieslys-item { text-decoration: none; }
 .ss-tabel td.ss-fyn { color: #9a958d; font-size: 12px; }
 .ss-tweede { margin-top: 24px; }
 .ss-waarsku { color: var(--koraal); font-weight: 500; }
+
+/* Die verdelingsrye: ontvanger links, persentasie regs, verwyder-knoppie. */
+.ss-merk { display: flex; align-items: center; gap: 10px; margin: 4px 0 14px; font-size: 14px; cursor: pointer; }
+.ss-ry { display: grid; grid-template-columns: 1fr 110px auto; gap: 10px; align-items: center; margin-bottom: 10px; }
+.ss-ry .veld-invoer { margin: 0; }
+.ss-ry-weg { background: none; border: 0; color: #9a958d; font-size: 20px; line-height: 1; cursor: pointer; padding: 4px 8px; }
+.ss-ry-weg:hover { color: var(--koraal); }
+.ss-ry-weg[disabled] { visibility: hidden; }
+#ss-ry-by { margin: 2px 0 6px; }

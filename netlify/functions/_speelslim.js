@@ -382,8 +382,25 @@ async function meld_kwotasie_gekanselleer(kwotasie) {
   }
 }
 
+// Die name in die begunstigde-register, vir die keuselys op die Speel-Slim-blad
+// en om 'n vaste verdeling na te gaan. Future Sharp self is nooit 'n
+// begunstigde nie (sien kry-begunstigdes.js).
+async function begunstigde_name() {
+  try {
+    const store = kry_store("begunstigdes");
+    const lys = await store.list();
+    const rekords = await Promise.all((lys.blobs || []).map((b) => store.get(b.key, { type: "json" })));
+    return [...new Set(rekords.filter((r) => r && r.naam).map((r) => String(r.naam).trim()))]
+      .sort((a, b) => a.localeCompare(b, "af"));
+  } catch (fout) {
+    console.error("Speel-Slim: kon nie die begunstigdes lees nie:", fout);
+    return [];
+  }
+}
+
 module.exports = {
   AANVRAE_STORE,
+  begunstigde_name,
   INSTELLING_SLEUTEL,
   STATUSSE,
   verstek_instelling,

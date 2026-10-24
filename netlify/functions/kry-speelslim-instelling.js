@@ -12,7 +12,7 @@
 // alles na die hoofrekening.
 
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
-const { kry_instelling, los_ontvangers_op } = require("./_speelslim");
+const { kry_instelling, los_ontvangers_op, begunstigde_name } = require("./_speelslim");
 
 exports.handler = async (event, context) => {
   if (event.httpMethod !== "GET") {
@@ -38,6 +38,8 @@ exports.handler = async (event, context) => {
       vaste_verdeling: Array.isArray(instelling.verdeling) && instelling.verdeling.length > 0,
       ontvangers: verdeling.map((v) => v.ontvanger),
       verdeling,
+      // Vir die keuselys by 'n eie verdeling.
+      begunstigdes: await begunstigde_name(),
       bygewerk_op: instelling.bygewerk_op || null,
       bygewerk_deur: instelling.bygewerk_deur || null,
     }),

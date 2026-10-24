@@ -7,9 +7,11 @@
 // by elke aanvraag uit FSF; 'n kwotasie wat reeds uitgereik is, hou sy eie
 // bedrae.
 //
-// DIE VOORSKOU REKEN SOOS DIE BEDIENER. Die persentasie per persoon is
-// dieselfde formule as los_ontvangers_op() in _speelslim.js, met die buffer
-// van 0,1% teen afronding. Ná Stoor wys die skerm wat die bediener teruggee.
+// DIE VOORSKOU REKEN SOOS DIE BEDIENER. By 'n gelyke verdeling is die
+// persentasie per persoon dieselfde formule as los_ontvangers_op() in
+// _speelslim.js, met die buffer van 0,1% teen afronding. 'n Eie verdeling is
+// 'n vaste lys ontvangers uit die begunstigde-register. Ná Stoor wys die
+// skerm wat die bediener teruggee.
 //
 // DIE SKERM IS NIE DIE POORT NIE. Albei Functions dwing die boekhouding-rol af.
 
@@ -69,6 +71,81 @@ function ss_elk(hosting, n) {
   return Math.floor(((100 - hosting) / n - 0.05) * 100) / 100;
 }
 
+// DIE RYE OP DIE SKERM. By "gelyk" word hulle uit die name en die hosting
+// gereken en is hulle net om te lees; anders is elke ry 'n keuselys en 'n
+// persentasie.
+let SS_RYE = [];
+let SS_GELYK = true;
+
+function ss_hosting_nou() {
+  const h = ss_getal_uit(document.getElementById("ss-hosting").value);
+  return h == null ? 0 : h;
+}
+
+function ss_gelyke_rye() {
+  const name = (SS_DATA && SS_DATA.ontvangers) || [];
+  const elk = ss_elk(ss_hosting_nou(), name.length);
+  return name.map((ontvanger) => ({ ontvanger, waarde: elk }));
+}
+
+function ss_huidige_rye() {
+  return SS_GELYK ? ss_gelyke_rye() : SS_RYE;
+}
+
+function ss_pct_vir_veld(n) {
+  if (n === "" || n == null) return "";
+  const teks = String(n);
+  return ss_taal() === "en" ? teks : teks.replace(".", ",");
+}
+
+function ss_teken_rye() {
+  const plek = document.getElementById("ss-rye");
+  const by = document.getElementById("ss-ry-by");
+  const merk = document.getElementById("ss-gelyk");
+  if (!plek || !SS_DATA) return;
+  merk.checked = SS_GELYK;
+  by.hidden = SS_GELYK;
+
+  const name = SS_DATA.begunstigdes || [];
+  const rye = ss_huidige_rye();
+  plek.innerHTML = rye
+    .map((ry, ix) => {
+      const opsies = [`<option value="">${ss_ontsnap(ss_t("ss_kies", "Kies 'n ontvanger"))}</option>`]
+        .concat(
+          [...new Set(name.concat(ry.ontvanger ? [ry.ontvanger] : []))].map(
+            (n) => `<option value="${ss_ontsnap(n)}"${n === ry.ontvanger ? " selected" : ""}>${ss_ontsnap(n)}</option>`
+          )
+        )
+        .join("");
+      const af = SS_GELYK ? " disabled" : "";
+      return `<div class="ss-ry">
+        <select class="veld-invoer" data-ss-naam="${ix}"${af}>${opsies}</select>
+        <input class="veld-invoer" data-ss-pct="${ix}" inputmode="decimal" value="${ss_ontsnap(ss_pct_vir_veld(ry.waarde))}"${af}>
+        <button type="button" class="ss-ry-weg" data-ss-weg="${ix}" title="${ss_ontsnap(ss_t("fp_skrap", "Skrap"))}"${af}>×</button>
+      </div>`;
+    })
+    .join("");
+
+  if (SS_GELYK) return;
+  plek.querySelectorAll("[data-ss-naam]").forEach((el) =>
+    el.addEventListener("change", () => {
+      SS_RYE[Number(el.dataset.ssNaam)].ontvanger = el.value;
+      ss_teken_voorskou();
+    }));
+  plek.querySelectorAll("[data-ss-pct]").forEach((el) =>
+    el.addEventListener("input", () => {
+      const n = ss_getal_uit(el.value);
+      SS_RYE[Number(el.dataset.ssPct)].waarde = n == null ? "" : n;
+      ss_teken_voorskou();
+    }));
+  plek.querySelectorAll("[data-ss-weg]").forEach((el) =>
+    el.addEventListener("click", () => {
+      SS_RYE.splice(Number(el.dataset.ssWeg), 1);
+      ss_teken_rye();
+      ss_teken_voorskou();
+    }));
+}
+
 function ss_teken_voorskou() {
   const pryse = document.getElementById("ss-pryse");
   const verdeling = document.getElementById("ss-verdeling");
@@ -77,7 +154,6 @@ function ss_teken_voorskou() {
 
   const hoof = ss_sent_uit(document.getElementById("ss-hoof").value);
   const ekstra = ss_sent_uit(document.getElementById("ss-ekstra").value);
-  const hosting = ss_getal_uit(document.getElementById("ss-hosting").value);
 
   const h = hoof == null ? 0 : hoof;
   const e = ekstra == null ? 0 : ekstra;
@@ -91,42 +167,45 @@ function ss_teken_voorskou() {
     .map(([etiket, sent]) => `<tr><td>${ss_ontsnap(etiket)}</td><td class="ss-bedrag">${ss_rand(sent)}</td></tr>`)
     .join("");
 
-  const hp = hosting == null ? 0 : hosting;
+  // Na die gelyke verdeling se rye: herreken hulle met die nuwe hosting.
+  if (SS_GELYK) ss_teken_rye();
+
+  const hp = ss_hosting_nou();
   const ry = (etiket, pct) => `<tr><td>${ss_ontsnap(etiket)}</td><td class="ss-bedrag">${ss_pct(pct)}</td></tr>`;
+  const rye = ss_huidige_rye().filter((r) => r.ontvanger);
 
-  if (SS_DATA.vaste_verdeling) {
-    // 'n Vaste verdeling in die store: wys hom soos hy is.
-    verdeling.innerHTML =
-      ry("Future Sharp (hosting)", hp) +
-      SS_DATA.verdeling.map((v) => ry(v.ontvanger, v.waarde)).join("");
-    fyn.textContent = "";
-    return;
-  }
-
-  const name = SS_DATA.ontvangers || [];
-  if (!name.length) {
+  if (!rye.length) {
     verdeling.innerHTML = ry("Future Sharp", 100);
     fyn.innerHTML = `<span class="ss-waarsku">${ss_ontsnap(
-      ss_t("ss_geen_ontvangers", "Dorrithé en Ignatius is nie in die begunstigde-register gevind nie. Alles gaan na die hoofrekening.")
+      SS_GELYK
+        ? ss_t("ss_geen_ontvangers", "Dorrithé en Ignatius is nie in die begunstigde-register gevind nie. Alles gaan na die hoofrekening.")
+        : ss_t("ss_geen_rye", "Geen ontvangers nie. Alles gaan na die hoofrekening.")
     )}</span>`;
     return;
   }
 
-  const elk = ss_elk(hp, name.length);
-  const buffer = Math.round((100 - hp - elk * name.length) * 100) / 100;
+  const som = rye.reduce((s, r) => s + (Number(r.waarde) || 0), 0);
+  const res = Math.round((100 - hp - som) * 100) / 100;
   verdeling.innerHTML =
     ry("Future Sharp (hosting)", hp) +
-    name.map((n) => ry(n, elk)).join("") +
-    `<tr><td class="ss-fyn">${ss_ontsnap(ss_t("ss_buffer", "Buffer teen afronding (bly in die hoofrekening)"))}</td><td class="ss-bedrag ss-fyn">${ss_pct(buffer)}</td></tr>`;
-  fyn.textContent = "";
+    rye.map((r) => ry(r.ontvanger, Number(r.waarde) || 0)).join("") +
+    `<tr><td class="ss-fyn">${ss_ontsnap(ss_t("ss_buffer", "Bly in die hoofrekening"))}</td><td class="ss-bedrag ss-fyn">${ss_pct(res)}</td></tr>`;
+
+  fyn.innerHTML =
+    res < 0.1
+      ? `<span class="ss-waarsku">${ss_ontsnap(
+          ss_t("ss_te_veel", "Hosting en die ontvangers saam is meer as 99,9%. Verlaag een van die persentasies.")
+        )}</span>`
+      : "";
 }
 
 function ss_vul(data) {
   SS_DATA = data;
+  SS_GELYK = !data.vaste_verdeling;
+  SS_RYE = (data.verdeling || []).map((v) => ({ ontvanger: v.ontvanger, waarde: v.waarde }));
   document.getElementById("ss-hoof").value = ss_rand_vir_veld(data.hoof_sent);
   document.getElementById("ss-ekstra").value = ss_rand_vir_veld(data.ekstra_sent);
-  document.getElementById("ss-hosting").value =
-    ss_taal() === "en" ? String(data.hosting_pct) : String(data.hosting_pct).replace(".", ",");
+  document.getElementById("ss-hosting").value = ss_pct_vir_veld(data.hosting_pct);
 
   const stand = document.getElementById("ss-stand");
   if (stand) {
@@ -135,6 +214,7 @@ function ss_vul(data) {
       ? `${ss_t("ss_laaste", "Laas gestoor")} ${String(data.bygewerk_op).slice(0, 10).replace(/-/g, "/")}`
       : ss_t("ss_verstek", "Die verstekpryse geld nog.");
   }
+  ss_teken_rye();
   ss_teken_voorskou();
 }
 
@@ -167,8 +247,24 @@ async function ss_stoor() {
 
   if (hoof == null || ekstra == null || hosting == null) {
     stand.classList.add("fout");
-    stand.textContent = ss_t("ss_ongeldig", "Vul al drie velde met 'n getal in.");
+    stand.textContent = ss_t("ss_ongeldig", "Vul die pryse en die hosting met 'n getal in.");
     return;
+  }
+
+  // Gelyk: 'n leë lys, sodat die bediener by elke aanvraag self reken.
+  let verdeling = [];
+  if (!SS_GELYK) {
+    if (SS_RYE.some((r) => !r.ontvanger || r.waarde === "" || !(Number(r.waarde) > 0))) {
+      stand.classList.add("fout");
+      stand.textContent = ss_t("ss_ry_onvolledig", "Kies 'n ontvanger en 'n persentasie vir elke ry.");
+      return;
+    }
+    if (!SS_RYE.length) {
+      stand.classList.add("fout");
+      stand.textContent = ss_t("ss_geen_rye", "Geen ontvangers nie. Alles gaan na die hoofrekening.");
+      return;
+    }
+    verdeling = SS_RYE.map((r) => ({ ontvanger: r.ontvanger, waarde: Number(r.waarde) }));
   }
 
   knop.disabled = true;
@@ -178,7 +274,7 @@ async function ss_stoor() {
     const resp = await fetch("/.netlify/functions/stoor-speelslim-instelling", {
       method: "POST",
       headers: await identiteit_kop({ "Content-Type": "application/json" }),
-      body: JSON.stringify({ hoof_sent: hoof, ekstra_sent: ekstra, hosting_pct: hosting }),
+      body: JSON.stringify({ hoof_sent: hoof, ekstra_sent: ekstra, hosting_pct: hosting, verdeling }),
     });
     if (!resp.ok) throw new Error(await resp.text());
     ss_vul(await resp.json());
@@ -212,4 +308,24 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   const stoor = document.getElementById("ss-stoor");
   if (stoor) stoor.addEventListener("click", ss_stoor);
+
+  // Van gelyk na 'n eie verdeling: begin by die gelyke syfers, sodat 'n mens
+  // net verander wat anders moet wees.
+  const merk = document.getElementById("ss-gelyk");
+  if (merk) {
+    merk.addEventListener("change", () => {
+      if (!merk.checked && SS_GELYK) SS_RYE = ss_gelyke_rye();
+      SS_GELYK = merk.checked;
+      ss_teken_rye();
+      ss_teken_voorskou();
+    });
+  }
+  const by = document.getElementById("ss-ry-by");
+  if (by) {
+    by.addEventListener("click", () => {
+      SS_RYE.push({ ontvanger: "", waarde: "" });
+      ss_teken_rye();
+      ss_teken_voorskou();
+    });
+  }
 });
