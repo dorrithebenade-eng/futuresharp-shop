@@ -251,7 +251,8 @@ exports.handler = async (event) => {
     // GEEN VERVALDATUM. is_verval() gee false wanneer geldig_tot leeg is.
     rekord.geldig_tot = null;
 
-    const kw_sleutel = await skep_nommer(store);
+    // 'n Toetsaanvraag kry 'n nommer uit die toetsreeks (KW/T...).
+    const kw_sleutel = await skep_nommer(store, { toets: aanvraag.toets === true });
     const nommer = sleutel_na_nommer(kw_sleutel);
     rekord.nommer = nommer;
     rekord.stand = "uitgereik";

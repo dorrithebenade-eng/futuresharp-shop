@@ -81,20 +81,30 @@ const SYFERS = 5;
 const SLEUTEL_VOORVOEGSEL = "KW-";
 const NOMMER_VOORVOEGSEL = "KW/";
 
+// 'N EIE REEKS VIR TOETSAANVRAE (Dorrithé, 24 Oktober 2026). 'n
+// Speel-Slim-aanvraag wat FSF met toets=true stuur, kry KW/T01961, KW/T01962
+// ... in plaas van 'n nommer uit die gewone reeks. Sonder dit het 'n
+// geskrapte toetskwotasie sy nommer vrygemaak en het die volgende kwotasie
+// dieselfde nommer gekry (KW/01962 twee keer). Die T sit ná die skuinsstreep
+// sodat elke toets op voorvoegsel ("KW-", "KW/") onveranderd bly werk.
+const SLEUTEL_PATROON = /^KW-(T?)(\d+)$/;
+const NOMMER_PATROON = /^KW\/(T?)(\d+)$/;
+
 function nommer_na_sleutel(nommer) {
-  const teks = String(nommer || "").trim();
-  if (!teks.startsWith(NOMMER_VOORVOEGSEL)) return null;
-  const syfers = teks.slice(NOMMER_VOORVOEGSEL.length);
-  if (!/^\d+$/.test(syfers)) return null;
-  return SLEUTEL_VOORVOEGSEL + syfers;
+  const m = NOMMER_PATROON.exec(String(nommer || "").trim());
+  return m ? SLEUTEL_VOORVOEGSEL + m[1] + m[2] : null;
 }
 
 function sleutel_na_nommer(sleutel) {
-  const teks = String(sleutel || "").trim();
-  if (!teks.startsWith(SLEUTEL_VOORVOEGSEL)) return null;
-  const syfers = teks.slice(SLEUTEL_VOORVOEGSEL.length);
-  if (!/^\d+$/.test(syfers)) return null;
-  return NOMMER_VOORVOEGSEL + syfers;
+  const m = SLEUTEL_PATROON.exec(String(sleutel || "").trim());
+  return m ? NOMMER_VOORVOEGSEL + m[1] + m[2] : null;
+}
+
+// Is hierdie sleutel of nommer uit die toetsreeks?
+function is_toetsreeks(sleutel_of_nommer) {
+  const teks = String(sleutel_of_nommer || "").trim();
+  const m = SLEUTEL_PATROON.exec(teks) || NOMMER_PATROON.exec(teks);
+  return Boolean(m && m[1] === "T");
 }
 
 // DIE TOETS WAARMEE DIE FAKTUURLESERS FILTREER. kry-fakture.js, kry-staat.js
@@ -109,10 +119,12 @@ function is_kwotasie_sleutel(sleutel) {
   );
 }
 
-function volgnommer_van(sleutel) {
-  const nommer = sleutel_na_nommer(sleutel);
-  if (!nommer) return 0;
-  const getal = Number(nommer.slice(NOMMER_VOORVOEGSEL.length));
+// Die volgnommer binne EEN reeks. 'n Sleutel uit die ander reeks tel as 0,
+// sodat die gewone reeks en die toetsreeks mekaar nooit opstoot nie.
+function volgnommer_van(sleutel, toets = false) {
+  const m = SLEUTEL_PATROON.exec(String(sleutel || "").trim());
+  if (!m || (m[1] === "T") !== Boolean(toets)) return 0;
+  const getal = Number(m[2]);
   return Number.isFinite(getal) ? getal : 0;
 }
 
@@ -126,7 +138,9 @@ function volgnommer_van(sleutel) {
 // konsekwent (sowat vier sekondes), en Dorrithé en Ignatius reik albei
 // kwotasies uit. Twee binne 'n paar sekondes van mekaar sou dieselfde nommer
 // kry sonder die bestaan-toets.
-async function skep_nommer(store) {
+async function skep_nommer(store, opsies = {}) {
+  const toets = opsies.toets === true;
+  const reeks = SLEUTEL_VOORVOEGSEL + (toets ? "T" : "");
   let sleutels = [];
   try {
     const lys = await store.list({ prefix: SLEUTEL_VOORVOEGSEL });
@@ -138,15 +152,14 @@ async function skep_nommer(store) {
 
   let hoogste = 0;
   sleutels.forEach((sleutel) => {
-    const getal = volgnommer_van(sleutel);
+    const getal = volgnommer_van(sleutel, toets);
     if (getal > hoogste) hoogste = getal;
   });
 
   const begin = Math.max(BEGIN_NOMMER, hoogste + 1);
 
   for (let poging = 0; poging < 20; poging += 1) {
-    const kandidaat =
-      SLEUTEL_VOORVOEGSEL + String(begin + poging).padStart(SYFERS, "0");
+    const kandidaat = reeks + String(begin + poging).padStart(SYFERS, "0");
     if (!sleutels.includes(kandidaat)) {
       // list() loop agter. 'n Sleutel wat nie in die lys was nie, kan reeds
       // bestaan — dus vra ons hom direk.
@@ -452,6 +465,7 @@ module.exports = {
   kry_kwotasies_store,
   nommer_na_sleutel,
   sleutel_na_nommer,
+  is_toetsreeks,
   is_kwotasie_sleutel,
   skep_nommer,
   skep_konsep_sleutel,
