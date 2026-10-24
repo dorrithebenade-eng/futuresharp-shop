@@ -302,6 +302,13 @@ async function stuur_kwotasie_pos(rekord, sleutel, kode) {
 
     const hersien = Number(rekord.hersiening) > 1;
 
+    // 'n Kwotasie uit 'n Speel-Slim-aanvraag gaan aan 'n ouer, nie aan 'n
+    // skool se finansiële afdeling nie. Sy kry haar eie pos: 'n groet, die
+    // boek se groeisimbool, die verslagkode en wat ná betaling gebeur.
+    if (rekord.speelslim && rekord.speelslim.verslagkode) {
+      return await stuur_speelslim_pos(rekord, maatskappy, skakel, en, nommer, bedrag);
+    }
+
     const reels = [
       hersien
         ? en
@@ -362,6 +369,94 @@ async function stuur_kwotasie_pos(rekord, sleutel, kode) {
     console.error("Kon nie die kwotasie pos nie:", fout);
     return { ok: false, fout: String((fout && fout.message) || fout) };
   }
+}
+
+/* ═══ die Speel-Slim-pos ═══
+
+   Die simbole is uit die omslae gesny en leef in public/images/speelslim.
+   Elke boek het sy eie groeisimbool en kleur (Speel-Slim se besluit): 1
+   saadjie, 2 spruitjie, 3 twee blaartjies, 4 plantjie, 5 blom, 6 boompie.
+   Blokkeer 'n poskliënt beelde, bly die boek se naam in sy kleur staan. */
+const SS_BEELDE = "https://futureshop.futuresharp.co.za/images/speelslim";
+const SS_KLEURE = {
+  1: "#A26A48", 2: "#5D6247", 3: "#80452D", 4: "#72511A", 5: "#93443D", 6: "#394B5C",
+};
+
+function ss_boeke_teks(boeke, en) {
+  if (boeke.length === 1) return String(boeke[0]);
+  return `${boeke.slice(0, -1).join(", ")} ${en ? "and" : "en"} ${boeke[boeke.length - 1]}`;
+}
+
+async function stuur_speelslim_pos(rekord, maatskappy, skakel, en, nommer, bedrag) {
+  const ss = rekord.speelslim;
+  const boeke = (Array.isArray(ss.boeke) ? ss.boeke : [])
+    .map(Number)
+    .filter((b) => b >= 1 && b <= 6);
+  const reeks = en ? "Play-Smart" : "Speel-Slim";
+  const boek_woord = en ? (boeke.length > 1 ? "Books" : "Book") : (boeke.length > 1 ? "Boeke" : "Boek");
+  const gesamentlik = ss.soort === "gesamentlik";
+  const verslag = en
+    ? (gesamentlik ? "Joint Future Sharp Feedback Report" : "Future Sharp Feedback Report")
+    : (gesamentlik ? "gesamentlike Future Sharp-terugvoerverslag" : "Future Sharp-terugvoerverslag");
+
+  const voornaam = teks(rekord.klient && rekord.klient.naam).split(/\s+/)[0] || "";
+  const kontak = ontsnap(teks((maatskappy && maatskappy.epos) || "admin@futuresharp.co.za"));
+
+  // Die simbool en die boek se naam, langs mekaar, een per boek.
+  const simbole = boeke
+    .map((b) =>
+      `<span style="display:inline-block;margin:0 22px 8px 0;white-space:nowrap;">` +
+      `<img src="${SS_BEELDE}/simbool-${b}.png" width="52" alt="" ` +
+      `style="width:52px;height:auto;border:0;vertical-align:middle;margin-right:10px;">` +
+      `<span style="vertical-align:middle;font-size:18px;font-weight:700;color:${SS_KLEURE[b]};">` +
+      `${reeks} ${en ? "Book" : "Boek"} ${b}</span></span>`
+    )
+    .join("");
+
+  const reels = [
+    voornaam ? (en ? `Hello ${ontsnap(voornaam)}` : `Goeie dag ${ontsnap(voornaam)}`) : (en ? "Hello" : "Goeie dag"),
+    simbole,
+    en
+      ? `Thank you for requesting a ${verslag} on ${reeks} ${boek_woord} ${ss_boeke_teks(boeke, true)}. Please find your quotation below.`
+      : `Dankie vir jou aanvraag vir 'n ${verslag} oor ${reeks} ${boek_woord} ${ss_boeke_teks(boeke, false)}. Hier is jou kwotasie.`,
+    `${en ? "Report code" : "Verslagkode"}: <b>${ontsnap(ss.verslagkode)}</b><br>` +
+      `${en ? "Quotation number" : "Kwotasienommer"}: <b>${ontsnap(nommer)}</b><br>` +
+      `${en ? "Total" : "Totaal"}: <b>${bedrag}</b>`,
+    en
+      ? "Open the quotation to accept it. You can then pay straight away by Instant EFT or card."
+      : "Maak die kwotasie oop om dit te aanvaar. Daarna kan jy dadelik met 'n onmiddellike EFT of kaart betaal.",
+    en
+      ? "As soon as your payment has been received, our experts will compile your report and email it to you."
+      : "Sodra jou betaling ontvang is, stel ons kundiges jou verslag saam en stuur dit per e-pos aan jou.",
+    en ? `Questions? Contact us at ${kontak}.` : `Vrae? Skakel ons by ${kontak}.`,
+  ];
+
+  let aanhegsels = [];
+  try {
+    const grepe = await bou_faktuur_pdf(rekord, maatskappy, { soort: "kwotasie" });
+    aanhegsels = [{
+      filename: `${String(nommer).replace(/\//g, "-")}.pdf`,
+      content: Buffer.from(grepe),
+      contentType: "application/pdf",
+    }];
+  } catch (fout) {
+    console.error(`Speel-Slim-kwotasie: kon nie die PDF bou vir ${nommer} nie:`, fout);
+  }
+
+  return await stuur_epos({
+    merk: en ? "playsmart" : "speelslim",
+    aan: teks(rekord.klient && rekord.klient.epos),
+    aanhegsels,
+    onderwerp: en
+      ? `Quotation ${nommer}: ${reeks} Feedback Report`
+      : `Kwotasie ${nommer}: ${reeks}-terugvoerverslag`,
+    opskrif: en ? "Your quotation" : "Jou kwotasie",
+    reels,
+    knoppie: {
+      teks: en ? "View and accept the quotation" : "Sien en aanvaar die kwotasie",
+      url: skakel,
+    },
+  });
 }
 
 module.exports.stuur_kwotasie_pos = stuur_kwotasie_pos;

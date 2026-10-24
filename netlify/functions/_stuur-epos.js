@@ -144,6 +144,12 @@ const MERKE = {
   },
 };
 
+/* SPEEL-SLIM EN PLAY-SMART. Dieselfde posbus as die faktuurmerk (admin@),
+   maar 'n kop wat 'n ouer verstaan. "Boekhouding" bo-aan 'n kwotasie vir 'n
+   ouer se terugvoerverslag lees soos 'n rekening van 'n vreemde kantoor. */
+MERKE.speelslim = { ...MERKE.faktuur, boonste: "FUTURE SHARP", onderste: "Speel-Slim" };
+MERKE.playsmart = { ...MERKE.faktuur, boonste: "FUTURE SHARP", onderste: "Play-Smart" };
+
 function kry_merk(naam) {
   return MERKE[naam] || MERKE.winkel;
 }
