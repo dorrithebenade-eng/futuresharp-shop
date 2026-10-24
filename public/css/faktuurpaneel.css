@@ -1409,3 +1409,19 @@ a.paneel-kieslys-item { text-decoration: none; }
 .fs-slot .fs-vry td:first-child { border-radius: 8px 0 0 8px; }
 .fs-slot .fs-vry td:last-child { border-radius: 0 8px 8px 0; }
 .fs-slot .fs-vry .fs-tot.kort { color: var(--koraal); }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   KWOTASIES: SUB-BLAAIE (Alle kwotasies, Speel-Slim)
+   Dieselfde meganisme as .fk-reg onder Registers.
+   ═══════════════════════════════════════════════════════════════════════ */
+.kw-deel { display: none; }
+.kw-deel.wys { display: block; }
+
+/* Die Speel-Slim-voorskou: twee klein tabelle, bedrag regs. */
+.ss-tabel { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.ss-tabel td { padding: 7px 0; border-bottom: 1px solid #E2DFD9; }
+.ss-tabel tr:last-child td { border-bottom: 0; }
+.ss-tabel td.ss-bedrag { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; }
+.ss-tabel td.ss-fyn { color: #9a958d; font-size: 12px; }
+.ss-tweede { margin-top: 24px; }
+.ss-waarsku { color: var(--koraal); font-weight: 500; }

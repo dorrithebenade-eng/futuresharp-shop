@@ -142,6 +142,16 @@
 
       <section class="paneel-afdeling fp-afdeling" data-afdeling="kwotasies">
 
+        <!-- SUB-NAVIGASIE, soos by Registers. "Alle kwotasies" is die register;
+             elke soort diens kry later sy eie knoppie met sy eie pryse en
+             verdeling. Speel-Slim is die eerste. -->
+        <div class="fk-sub" id="kw-sub">
+          <button type="button" class="fr-sub-knop aan" data-kw="alle" data-i18n="ss_sub_alle">Alle kwotasies</button>
+          <button type="button" class="fr-sub-knop" data-kw="speelslim">Speel-Slim</button>
+        </div>
+
+        <div class="kw-deel wys" data-kw="alle">
+
         <!-- DIE WERKSYFER. Wat Future Sharp aangebied het en waaraan dit nog
              gebonde is — nie verwagte inkomste nie. 'n Aanbod bind die klient
              aan niks; dit staan eers op die staat wanneer 'n faktuur uitgereik
@@ -166,6 +176,46 @@
 
         <div id="kw-lys">
           <p class="stelsel-boodskap" data-i18n="fp_laai">Word gelaai …</p>
+        </div>
+        </div>
+
+        <!-- ═══ Speel-Slim: die prystabel en die verdeling ═══
+             Geld vir NUWE aanvrae uit FSF. 'n Kwotasie wat reeds uitgereik is,
+             hou sy eie bedrae. -->
+        <div class="kw-deel" data-kw="speelslim">
+          <div class="in-wrap">
+            <div class="in-vorm">
+              <h3 class="paneel-afdeling-titel" data-i18n="ss_kop">Speel-Slim-terugvoerverslae</h3>
+              <p class="in-lei" data-i18n="ss_lei">Hierdie pryse en die verdeling geld vir elke nuwe aanvraag uit FSF. Kwotasies wat reeds uitgereik is, bly soos hulle is.</p>
+
+              <label class="veld-etiket" for="ss-hoof" data-i18n="ss_hoof">Terugvoerverslag (een vraelys)</label>
+              <input class="veld-invoer" id="ss-hoof" inputmode="decimal" placeholder="350,00">
+              <p class="veld-fyn" data-i18n="ss_hoof_fyn">Die prys van elke verslag, ook die eerste vraelys van 'n gesamentlike verslag.</p>
+
+              <label class="veld-etiket" for="ss-ekstra" data-i18n="ss_ekstra">Per bykomende vraelys</label>
+              <input class="veld-invoer" id="ss-ekstra" inputmode="decimal" placeholder="100,00">
+              <p class="veld-fyn" data-i18n="ss_ekstra_fyn">Kom net by wanneer meer as een vraelys in 'n gesamentlike verslag kom.</p>
+
+              <label class="veld-etiket" for="ss-hosting" data-i18n="ss_hosting">Hosting vir Future Sharp (%)</label>
+              <input class="veld-invoer" id="ss-hosting" inputmode="decimal" placeholder="5">
+              <p class="veld-fyn" data-i18n="ss_hosting_fyn">Van wat ná die Paystack-fooi oorbly. Die res word gelyk verdeel.</p>
+
+              <div class="in-knoppe">
+                <button type="button" class="kaart-aksie" id="ss-stoor" data-i18n="in_stoor">Stoor</button>
+                <span class="in-stand" id="ss-stand"></span>
+              </div>
+            </div>
+
+            <div class="in-voorskou">
+              <div class="in-vs-blok">
+                <p class="in-vs-kop" data-i18n="ss_voorbeelde">Wat 'n aanvraer betaal</p>
+                <table class="ss-tabel" id="ss-pryse"></table>
+                <p class="in-vs-kop ss-tweede" data-i18n="ss_verdeling_kop">Verdeling ná die Paystack-fooi</p>
+                <table class="ss-tabel" id="ss-verdeling"></table>
+                <p class="veld-fyn" id="ss-verdeling-fyn"></p>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -1266,6 +1316,7 @@
     <!-- NA faktuurpaneel.js. Hy voeg sy eie luisteraar by die Kwotasies-pil;
          luisteraars stapel, hulle vervang mekaar nie. -->
     <script src="js/kwotasiepaneel.js" defer></script>
+    <script src="js/speelslim-instelling.js" defer></script>
   <script src="js/faktuurpaneel-kliente.js"></script>
   <script src="js/faktuurpaneel-skrap-klient.js"></script>
   <script src="js/faktuurpaneel-skrap-begunstigde.js"></script>
