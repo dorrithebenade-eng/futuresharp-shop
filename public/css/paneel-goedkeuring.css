@@ -49,6 +49,7 @@
 .pg-merk-ingedien { background: #FFF7E6; color: #6b5610; }
 .pg-merk-wysiging { background: #FFF7E6; color: #6b5610; }
 .pg-merk-op_rak { background: #E9F5F3; color: #17685E; }
+.pg-merk-voorbereiding { background: #EFEDE8; color: #55524C; }
 
 /* --- Een indiening --- */
 
@@ -243,3 +244,10 @@
   margin-bottom: 10px;
 }
 .pg-merk-goedgekeur { background: #E9F5F3; color: #17685E; }
+
+/* 'n Wysiging in voorbereiding verg nog niks; dit lees dus rustig, nie geel nie. */
+.pg-nota.pg-nota-voorbereiding {
+  background: #F5F4F1;
+  border-color: #CFCBC3;
+  color: #55524C;
+}

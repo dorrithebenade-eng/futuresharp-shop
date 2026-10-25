@@ -90,6 +90,23 @@ function pg_datum(iso) {
   return d.toLocaleDateString("af-ZA", { year: "numeric", month: "short", day: "numeric" });
 }
 
+// Datum met tyd, vir die outeur se laaste verandering. Die stelsel stoor elke
+// paar sekondes terwyl hy tik; die dag alleen sê nie of hy nou nog besig is nie.
+function pg_datum_tyd(iso) {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  return pg_datum(iso) + " " +
+    d.toLocaleTimeString("af-ZA", { hour: "2-digit", minute: "2-digit", hour12: false });
+}
+
+// 'N WYSIGING IN VOORBEREIDING: 'n boek op die rak waarvan die outeur die vorm
+// verander het, maar nog nie op Dien in gedruk het nie. Die stand bly `op_rak`
+// en `hangend` hou sy voorstel. Niks hier verg nog aandag nie: daar is geen
+// e-pos nie, en die boek kan nie goedgekeur word voordat hy indien nie.
+function pg_in_voorbereiding(r) {
+  return Boolean(r && r.stand === "op_rak" && (r.het_hangende_wysiging || r.hangend));
+}
+
 function pg_diep(voorwerp, pad) {
   return String(pad).split(".").reduce(
     (h, s) => (h && h[s] !== undefined ? h[s] : undefined),
@@ -100,9 +117,20 @@ function pg_diep(voorwerp, pad) {
 // --- Die lys ---
 
 function pg_kaart(r) {
-  const merk = PG_MERKIES[r.stand] || ["", r.stand];
+  const voorbereiding = pg_in_voorbereiding(r);
+  const merk = voorbereiding
+    ? ["pg_merk_voorbereiding", "Wysiging in voorbereiding"]
+    : (PG_MERKIES[r.stand] || ["", r.stand]);
+  const klas = voorbereiding ? "voorbereiding" : r.stand;
   const titel = r.titel || pg_t("pg_geen_titel", "Sonder titel");
   const datum = r.ingedien_op || r.gewysig_op;
+
+  // By 'n wysiging in voorbereiding is die datum van die oorspronklike
+  // indiening nie die nuus nie; die outeur se laaste verandering is.
+  const laas = voorbereiding
+    ? " · " + pg_ontsnap(pg_t("pg_laas_verander", "Laas verander")) + " " +
+      pg_datum_tyd(r.gewysig_op)
+    : "";
 
   return (
     '<div class="pg-kaart" data-pg-nommer="' + pg_ontsnap(r.nommer) + '">' +
@@ -110,8 +138,8 @@ function pg_kaart(r) {
     '<div class="pg-kaart-titel">' + pg_ontsnap(titel) + "</div>" +
     '<div class="pg-kaart-fyn">' + pg_ontsnap(r.nommer) +
     (r.outeur_naam ? " · " + pg_ontsnap(r.outeur_naam) : "") +
-    " · " + pg_datum(datum) + "</div></div>" +
-    '<span class="pg-merk pg-merk-' + pg_ontsnap(r.stand) + '">' +
+    " · " + pg_datum(datum) + laas + "</div></div>" +
+    '<span class="pg-merk pg-merk-' + pg_ontsnap(klas) + '">' +
     pg_ontsnap(pg_t(merk[0], merk[1])) + "</span></div>"
   );
 }
@@ -315,7 +343,13 @@ function pg_besonderhede_html(rekord) {
 
   let uit = "";
 
-  if (is_wysiging) {
+  if (is_wysiging && pg_in_voorbereiding(rekord)) {
+    uit += '<div class="pg-nota pg-nota-voorbereiding">' +
+      pg_ontsnap(pg_t("pg_voorbereiding_nota",
+        "Wysiging in voorbereiding. Die outeur het dit nog nie ingedien nie. Die winkel wys steeds die ou waardes.")) +
+      " " + pg_ontsnap(pg_t("pg_laas_verander", "Laas verander")) + " " +
+      pg_datum_tyd(rekord.gewysig_op) + ".</div>";
+  } else if (is_wysiging) {
     uit += '<div class="pg-nota">' +
       pg_ontsnap(pg_t("pg_wysiging_nota",
         "Dit is 'n hangende wysiging. Die winkel wys steeds die ou waardes.")) + "</div>";
