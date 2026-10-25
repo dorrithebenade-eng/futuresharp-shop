@@ -88,7 +88,7 @@ function bou_teks({ boodskap, handtekening }) {
 
 const EPOS_RE = /^[^\s@<>,;]+@[^\s@<>,;]+\.[^\s@<>,;]+$/;
 
-async function stuur_verslae_epos({ aan, onderwerp, titel, beeld, skakel, boodskap, handtekening, afskrif, taal }) {
+async function stuur_verslae_epos({ aan, onderwerp, titel, beeld, skakel, boodskap, handtekening, afskrif, taal, knop_teks: eie_knop }) {
   const s = instellings();
   const v = kry_vervoerder();
   if (!v) throw new Error("Die verslae@-posbus is nog nie in Netlify opgestel nie (EPOS_VERSLAE_GEBRUIKER en EPOS_VERSLAE_WAGWOORD)");
@@ -101,7 +101,8 @@ async function stuur_verslae_epos({ aan, onderwerp, titel, beeld, skakel, boodsk
   const h = handtekening && handtekening.naam ? handtekening : null;
   const van_naam = h ? h.naam + " (Future Sharp)" : "Future Sharp";
   const antwoord = h && h.epos && EPOS_RE.test(h.epos) ? h.epos : s.gebruiker;
-  const knop_teks = taal === "en" ? "Open the reports" : taal === "tw" ? "Maak die verslae oop · Open the reports" : "Maak die verslae oop";
+  // Dokumente (Okt 2026) gee sy eie knopteks; Verslae gebruik die verstek.
+  const knop_teks = eie_knop ? String(eie_knop) : taal === "en" ? "Open the reports" : taal === "tw" ? "Maak die verslae oop · Open the reports" : "Maak die verslae oop";
 
   const info = await v.sendMail({
     from: { name: van_naam, address: s.gebruiker },

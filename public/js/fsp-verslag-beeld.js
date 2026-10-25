@@ -6,6 +6,11 @@
 // "Reports". Daarna word dit as JPG gestoor; geen bediener hoef te teken nie.
 //
 // teken_verslag_beeld(canvas, { skool, taal: "af" | "en" | "tw" }) -> Promise
+//
+// DOKUMENTE (Okt 2026) gebruik dieselfde tekening met drie ekstra opsies:
+//   etiket       eie etiket in plaas van Verslae/Reports (bv. "Dokumente")
+//   sonder_kop   laat die klein amber "FUTURE SHARP" bo-aan weg
+//   groot_reels  vaste reëls vir die groot teks (bv. ["Future", "Sharp"])
 
 (function () {
   const NAVY = "#071630", TEAL = "#00A291", AMBER = "#FCBA10", KORAAL = "#FF491B";
@@ -51,19 +56,23 @@
     // Die teks regs van die logo
     const tx = lx + lw + 70, tw = W - tx - 70;
     ctx.textBaseline = "alphabetic";
-    ctx.fillStyle = AMBER;
-    ctx.font = "700 26px Montserrat";
-    ctx.fillText("FUTURE SHARP", tx, 120);
+    if (!opsies.sonder_kop) {
+      ctx.fillStyle = AMBER;
+      ctx.font = "700 26px Montserrat";
+      ctx.fillText("FUTURE SHARP", tx, 120);
+    }
 
     const t = opsies.taal || "af";
-    const etiket = t === "en" ? "Reports" : t === "tw" ? "Verslae · Reports" : "Verslae";
+    const etiket = opsies.etiket ? opsies.etiket : t === "en" ? "Reports" : t === "tw" ? "Verslae · Reports" : "Verslae";
     ctx.font = "600 44px Poppins";
     ctx.fillStyle = "#fff";
     ctx.fillText(etiket, tx, 176);
     // Kort kleurstrepe onder die etiket, in die logo se kleure
     [[TEAL, 0], [AMBER, 74], [KORAAL, 148]].forEach(([k, x]) => { ctx.fillStyle = k; ctx.fillRect(tx + x, 198, 64, 6); });
 
-    const { grootte, reels } = pas_naam(ctx, (opsies.skool || "").trim() || "Skool se naam", tw);
+    const { grootte, reels } = opsies.groot_reels
+      ? { grootte: 88, reels: opsies.groot_reels }
+      : pas_naam(ctx, (opsies.skool || "").trim() || "Skool se naam", tw);
     ctx.font = "800 " + grootte + "px Montserrat";
     ctx.fillStyle = "#fff";
     const lyn = Math.round(grootte * 1.12);

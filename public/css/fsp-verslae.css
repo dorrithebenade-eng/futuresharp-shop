@@ -80,3 +80,7 @@
 .fsv-gs li:last-child { border-bottom: 0; }
 .fsv-gs-tyd { color: var(--grys-teks); white-space: nowrap; min-width: 118px; }
 .fsv-gs details summary { cursor: pointer; font-size: 13px; color: #0B5FA8; margin-top: 4px; }
+
+/* Dokumente (Okt 2026) gebruik dieselfde style; net die eie id's hier. */
+#fsd-uit { margin-bottom: 16px; }
+#fsd-lys .fsp-ry { cursor: pointer; }

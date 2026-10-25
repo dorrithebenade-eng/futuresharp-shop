@@ -124,3 +124,20 @@
   to = "/.netlify/functions/verslae-bladsy?beeld=1&slug=:splat"
   status = 200
   force = true
+
+# DOKUMENTESKAKELS VIR PERSONE (Oktober 2026).
+#
+# /dokumente/<kode> is 'n persoon se dokumenteskakel uit die Future Sharp-paneel
+# (Dokumente). Die kode is lukraak, sodat die naam nie in die adres staan nie.
+# /dokumente-beeld/<kode>.jpg is die beeld (Future Sharp, Dokumente).
+[[redirects]]
+  from = "/dokumente/*"
+  to = "/.netlify/functions/dokumente-bladsy?kode=:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/dokumente-beeld/*"
+  to = "/.netlify/functions/dokumente-bladsy?beeld=1&kode=:splat"
+  status = 200
+  force = true
