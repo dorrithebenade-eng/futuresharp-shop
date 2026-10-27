@@ -87,6 +87,32 @@ function bou_beskikbaar_merkers(eboek, hardeKopie, leen) {
   `;
 }
 
+// --- Titel-vertoning vir reeksboeke ---
+// 'n Boek in 'n reeks (met 'n eweknie of 'n reeks) se titel kan as
+// "Reeks: Boektitel" gestoor word, bv. "Speel-Slim Fokus: Eerste Blik".
+// Op die kaart en die produkbladsy word dit dan gestapel gewys:
+//   SPEEL-SLIM        (eerste woord van die reeks, hoofletters)
+//   Fokus             (res van die reeksnaam, skuinsdruk, as daar is)
+//   Eerste Blik       (die boek se eie titel)
+// Die gestoorde titel self bly gewone teks, sodat fakture, e-posse, die
+// mandjie en die leeskamer dit steeds as een reël wys.
+function titel_ontsnap(teks) {
+  return String(teks == null ? "" : teks)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+function bou_titel_html(produk) {
+  const titel = String(produk.titel || "");
+  const is_reeks = !!(produk.eweknie_slug || (produk.reeks && produk.reeks.reeks_slug));
+  const pas = titel.match(/^([^:]{2,40}):\s+(.+)$/);
+  if (!is_reeks || !pas) return titel_ontsnap(titel);
+  const reeks_woorde = pas[1].trim().split(/\s+/);
+  const hoof = reeks_woorde.shift();
+  const sub = reeks_woorde.join(" ");
+  return `<span class="titel-reeks">${titel_ontsnap(hoof)}</span>`
+    + (sub ? `<span class="titel-reeks-sub">${titel_ontsnap(sub)}</span>` : "")
+    + `<span class="titel-boek">${titel_ontsnap(pas[2])}</span>`;
+}
+
 function bou_kaart(produk, besit_stel) {
   const eboek = produk.formate && produk.formate.eboek;
   const hardeKopie = produk.formate && produk.formate.harde_kopie;
@@ -103,7 +129,11 @@ function bou_kaart(produk, besit_stel) {
 
   const etiketHtml = produk.etiket
     ? (() => {
-        const etiket_teks = kry_huidige_taal() === "en"
+        // Die etiket volg die boek se eie taal (Engelse boek = Engelse
+        // etiket), en val net terug op die werf se taal as die boek nie 'n
+        // taal het nie.
+        const etiket_taal = produk.taal === "af" || produk.taal === "en" ? produk.taal : kry_huidige_taal();
+        const etiket_teks = etiket_taal === "en"
           ? (produk.etiket.teks_en || produk.etiket.teks_af || produk.etiket.teks || "")
           : (produk.etiket.teks_af || produk.etiket.teks_en || produk.etiket.teks || "");
         const teks_lengte = etiket_teks.length;
@@ -129,7 +159,7 @@ function bou_kaart(produk, besit_stel) {
         ${etiketHtml}
       </div>
       <div class="kaart-liggaam">
-        <h3 class="kaart-titel">${produk.titel}</h3>
+        <h3 class="kaart-titel">${bou_titel_html(produk)}</h3>
         <p class="kaart-outeur">${produk.outeur}</p>
         <p class="kaart-teaser">${produk.oorsig || ""}</p>
         <a class="lees-meer-skakel" href="produk.html?produk=${produk.slug}" data-slug="${produk.slug}">

@@ -4144,3 +4144,41 @@ body.vennoot-modus .paneel-dokument-skrap-knoppie {
   .eweknie-paar .kaart-etiket-ster-teks--medium { font-size: 11px; }
   .eweknie-paar .kaart-etiket-ster-teks--lank { font-size: 9.5px; }
 }
+
+/* --- Gestapelde titel vir reeksboeke (bou_titel_html) --- */
+.kaart-titel .titel-reeks,
+.produk-titel .titel-reeks {
+  display: block;
+  font-size: 0.72em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1.15;
+}
+.kaart-titel .titel-reeks-sub,
+.produk-titel .titel-reeks-sub {
+  display: block;
+  font-size: 0.72em;
+  font-style: italic;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1.15;
+  color: var(--teal);
+}
+.kaart-titel .titel-boek,
+.produk-titel .titel-boek {
+  display: block;
+  margin-top: 4px;
+  font-size: 1.15em;
+  line-height: 1.2;
+}
+
+/* --- Etiket-ster onder regs op die omslag ---
+   Bo regs het die ster dikwels deel van die boek se titel bedek (bv.
+   "SPEEL-SLIM FOKUS" het as "SPEEL… FOK…" gelees). Onder regs bedek dit
+   net die omslag se onderste rand, waar daar selde belangrike teks is. */
+.kaart-etiket-ster-wrap { top: auto; bottom: 0; right: -10px; }
+.eweknie-paar .kaart-etiket-ster-wrap { top: auto; bottom: -4px; right: -12px; width: 88px; height: 88px; }
+@media (max-width: 560px) {
+  .eweknie-paar .kaart-etiket-ster-wrap { top: auto; bottom: -4px; right: -8px; width: 78px; height: 78px; }
+}
