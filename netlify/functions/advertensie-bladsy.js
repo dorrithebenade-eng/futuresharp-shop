@@ -48,7 +48,7 @@ function beskrywing(a, t) {
     .replace(/https?:\/\/\S+/g, "")
     .replace(/futureshop\.futuresharp\.co\.za\S*/gi, "")
     .split("\n").map((r) => r.trim()).find((r) => r.length > 0);
-  return (reel || t.beskrywing).slice(0, 200);
+  return (reel || t.beskrywing).replace(/[\p{Extended_Pictographic}\uFE0F\u200D]/gu, "").trim().slice(0, 200) || t.beskrywing;
 }
 
 function bladsy(a, t) {
@@ -124,5 +124,17 @@ exports.handler = async (event) => {
     return { statusCode: 302, headers: { Location: WINKEL, "Cache-Control": "no-store" }, body: "" };
   }
   const t = TEKS[a.taal] || TEKS.af;
-  return { statusCode: 200, headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "public, max-age=60" }, body: bladsy(a, t) };
+  // WhatsApp wag net 'n oomblik vir 'n voorskou. 'n Koue Function het meer as
+  // twee sekondes gevat (27 Okt 2026), en toe wys WhatsApp net die domein.
+  // Netlify se CDN hou die bladsy dus vir tien minute (en bied 'n ou kopie
+  // aan terwyl hy vernuwe), sodat WhatsApp dadelik 'n antwoord kry.
+  return {
+    statusCode: 200,
+    headers: {
+      "Content-Type": "text/html; charset=utf-8",
+      "Cache-Control": "public, max-age=60",
+      "Netlify-CDN-Cache-Control": "public, durable, max-age=600, stale-while-revalidate=86400",
+    },
+    body: bladsy(a, t),
+  };
 };

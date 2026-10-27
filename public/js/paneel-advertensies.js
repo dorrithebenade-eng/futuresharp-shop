@@ -164,8 +164,23 @@
   // EEN KLIK: WhatsApp (op die foon of die rekenaar) maak oop met die
   // boodskap en die advertensie se skakel klaar ingetik. Jy kies net die
   // persoon of groep en stuur; WhatsApp wys die advertensie self as prent.
+  // Sonder emoji: WhatsApp op Windows wys 'n emoji uit so 'n skakel as "�".
   function whatsapp_url(a) {
-    return "https://wa.me/?text=" + encodeURIComponent(skakel_boodskap(a));
+    const teks = skakel_boodskap(a)
+      .replace(/[\p{Extended_Pictographic}\uFE0F\u200D]/gu, "")
+      .replace(/[ \t]+\n/g, "\n")
+      .replace(/^[ \t]+/gm, "")
+      .trim();
+    return "https://wa.me/?text=" + encodeURIComponent(teks);
+  }
+
+  // Roep die deelskakel een keer aan sodat dit klaar warm is (en in die CDN
+  // sit) wanneer WhatsApp kom kyk.
+  const warm_gemaak = new Set();
+  function maak_skakel_warm(a) {
+    if (warm_gemaak.has(a.slug)) return;
+    warm_gemaak.add(a.slug);
+    fetch(`/a/${a.slug}`, { cache: "no-store" }).catch(() => {});
   }
 
   // ------------------------------------------------------------------- deel
@@ -367,7 +382,10 @@
           if (!i.isIntersecting) return;
           waarnemer.unobserve(i.target);
           const a = advertensies.find((x) => x.slug === i.target.dataset.slug);
-          if (a) haal_lêer(a).catch(() => {});
+          if (a) {
+            haal_lêer(a).catch(() => {});
+            maak_skakel_warm(a);
+          }
         });
       }, { rootMargin: "120px" });
       lys.querySelectorAll(".adv-kaart").forEach((k) => waarnemer.observe(k));
