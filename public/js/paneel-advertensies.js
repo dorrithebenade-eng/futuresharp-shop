@@ -120,10 +120,74 @@
     }
   };
 
+  // WhatsApp (Web en Desktop) aanvaar 'n geplakte prent, maar net as PNG op
+  // die knipbord, en die knipbord hou een ding op 'n slag. Daarom twee stappe
+  // op die rekenaar: eers die prent, dan die boodskap as onderskrif.
+  async function na_png(lêer) {
+    const bron = await createImageBitmap(lêer);
+    const b = Math.min(1600, bron.width);
+    const h = Math.round(bron.height * (b / bron.width));
+    const c = document.createElement("canvas");
+    c.width = b; c.height = h;
+    c.getContext("2d").drawImage(bron, 0, 0, b, h);
+    return new Promise((klaar) => c.toBlob(klaar, "image/png"));
+  }
+
+  function kan_prent_kopieer() {
+    return !!(navigator.clipboard && navigator.clipboard.write && window.ClipboardItem);
+  }
+
+  async function kopieer_prent(a) {
+    // Die ClipboardItem kry 'n belofte, sodat die skryf binne die tik begin.
+    const item = new ClipboardItem({ "image/png": haal_lêer(a).then(na_png) });
+    await navigator.clipboard.write([item]);
+  }
+
+  // Stap 2 op die rekenaar: dieselfde knoppie kopieer dan die boodskap.
+  function stel_stap_twee(knoppie, a) {
+    const oud = knoppie.dataset.oud || knoppie.textContent;
+    knoppie.dataset.oud = oud;
+    knoppie.dataset.stap = "2";
+    knoppie.textContent = "2. Kopieer boodskap";
+    knoppie.classList.add("adv-stap-twee");
+    clearTimeout(knoppie._tydhouer);
+    knoppie._tydhouer = setTimeout(() => herstel_knoppie(knoppie), 60000);
+  }
+
+  function herstel_knoppie(knoppie) {
+    if (!knoppie.dataset.oud) return;
+    knoppie.textContent = knoppie.dataset.oud;
+    delete knoppie.dataset.stap;
+    knoppie.classList.remove("adv-stap-twee");
+  }
+
   // ------------------------------------------------------------------- deel
 
   async function deel_prent(a, knoppie) {
     const teks = a.boodskap || "";
+
+    if (knoppie.dataset.stap === "2") {
+      await kopieer(teks);
+      herstel_knoppie(knoppie);
+      toast("Boodskap gekopieer. Plak dit in WhatsApp as onderskrif by die prent (Ctrl+V) en stuur.");
+      return;
+    }
+
+    // Rekenaar sonder deel-venster vir lêers: kopieer die prent.
+    const op_rekenaar = !(navigator.canShare && navigator.share) || !/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+    if (op_rekenaar && kan_prent_kopieer()) {
+      try {
+        await kopieer_prent(a);
+        stel_stap_twee(knoppie, a);
+        toast("1. Prent gekopieer. Plak dit in WhatsApp (Ctrl+V). Tik dan hier op \"2. Kopieer boodskap\".");
+      } catch (_) {
+        try { laai_af(await haal_lêer(a)); } catch (__) { /* niks */ }
+        if (teks) kopieer(teks).catch(() => {});
+        toast("Kon nie die prent kopieer nie. Dit is afgelaai en die boodskap is gekopieer.");
+      }
+      return;
+    }
+
     // Begin die kopieer binne die tik, voor enige wag.
     if (teks) kopieer(teks).catch(() => {});
 
@@ -253,6 +317,7 @@
           </div>
           <div class="adv-ander-knoppies">
             <button type="button" class="terug-skakel adv-laai-af">Laai af</button>
+            <button type="button" class="terug-skakel adv-kopieer-prent">Kopieer prent</button>
             <button type="button" class="terug-skakel adv-kopieer-boodskap">Kopieer boodskap</button>
             <button type="button" class="terug-skakel adv-kopieer-skakel">Kopieer skakel</button>
             ${a.beeld && a.beeld.pdf ? `<a class="terug-skakel" href="${esc(a.beeld.pdf)}" target="_blank" rel="noopener">PDF</a>` : ""}
@@ -267,6 +332,14 @@
     lys.querySelectorAll(".adv-deel-skakel").forEach((b) => b.addEventListener("click", () => deel_skakel(vind(b))));
     lys.querySelectorAll(".adv-laai-af").forEach((b) => b.addEventListener("click", async () => {
       try { laai_af(await haal_lêer(vind(b))); } catch (_) { toast("Kon nie die prent laai nie."); }
+    }));
+    lys.querySelectorAll(".adv-kopieer-prent").forEach((b) => b.addEventListener("click", async () => {
+      try {
+        await kopieer_prent(vind(b));
+        toast("Prent gekopieer. Plak dit in WhatsApp (Ctrl+V).");
+      } catch (_) {
+        toast("Hierdie blaaier kan nie 'n prent kopieer nie. Gebruik Laai af.");
+      }
     }));
     lys.querySelectorAll(".adv-kopieer-boodskap").forEach((b) => b.addEventListener("click", async () => {
       await kopieer(vind(b).boodskap || "");
@@ -497,6 +570,7 @@
       .adv-etiket{font-size:13px;color:#5b5b5b}
       .adv-hoof-knoppies{display:grid;grid-template-columns:1fr 1fr;gap:8px}
       .adv-hoof-knoppies .kaart-aksie{margin:0;width:100%;padding:12px 8px;font-size:15px}
+      .adv-stap-twee{background:#171717!important;border-color:#171717!important}
       .adv-ander-knoppies{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:13px}
       .adv-ander-knoppies .terug-skakel{font-size:13px;padding:2px 0;margin:0;background:none;border:0;color:#2f7f73;text-decoration:underline;cursor:pointer}
       .adv-vorm-agter{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:flex-start;justify-content:center;z-index:1000;overflow:auto;padding:24px 12px}
