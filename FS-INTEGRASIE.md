@@ -2,7 +2,7 @@
 
 Plaas hierdie lêer in elke repo wat deel is van die integrasie (Future Sharp-paneel, FSF en FSVS). Lees dit saam met die repo se eie CLAUDE.md.
 
-## Die opdrag "LEES"
+## Tydelike reëling: "LEES" (geldig tot 5 November 2026, of tot die wolkkrediet op is)
 
 Wanneer Dorrithé net "LEES" sê, wil sy hê jy moet die gedeelde Google Drive-vouer "Future Sharp Stand van sake" lees (Future Sharp se Drive, futuresharpmentor@gmail.com, binne Future Sharp NPC).
 
@@ -10,6 +10,8 @@ Wanneer Dorrithé net "LEES" sê, wil sy hê jy moet die gedeelde Google Drive-v
 2. Net as die koppeling nie aan is nie: vra Dorrithé om die relevante deel van die nota in te plak, of om die Google Drive-koppeling aan te skakel.
 3. Moenie aannames maak oor wat in die nota staan nie.
 4. Vra vrae as iets ná die lees steeds nie duidelik is nie.
+
+Hierdie reëling verval op 5 November 2026, of vroeër as die wolkkrediet op is, wat ook al eerste gebeur. Verwyder dan hierdie afdeling.
 
 ## Wat die integrasie is
 
