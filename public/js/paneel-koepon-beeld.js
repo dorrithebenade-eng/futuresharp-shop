@@ -59,7 +59,8 @@
   // Kies 'n agtergrond wat by die koepon se boeke pas.
   function stel_agtergrond_voor(koepon) {
     const boeke = koepon_boeke(koepon).map((s) => s.toLowerCase());
-    const eerste = boeke[0] || "";
+    // By 'n Afrikaans-Engelse paar: begin by die Afrikaanse advertensie.
+    const eerste = boeke.find((s) => s.startsWith("speel-slim") || s.startsWith("n-")) || boeke[0] || "";
     if (eerste.startsWith("speel-slim-fokus")) return "Speel-Slim_Fokus_reeks_AF";
     if (eerste.startsWith("play-smart-focus")) return "Play-Smart_Focus_series_EN";
     if (eerste.startsWith("speel-slim")) return "Speel-Slim_reeks_AF";
