@@ -2,6 +2,16 @@
 
 Lees hierdie lêer voordat jy enige werk in hierdie repo doen. As die taak die Future Sharp-paneel, FSF of FSVS raak, lees ook `FS-INTEGRASIE.md`.
 
+## Tydelike reëling: "LEES" (geldig tot 5 November 2026)
+
+Wanneer Dorrithé net "LEES" sê, wil sy hê jy moet die gedeelde Google Drive-vouer "Future Sharp Stand van sake" lees. 'n Wolksessie kan nie haar Drive sien nie. Tot en met 5 November 2026:
+
+1. Vra haar om die relevante deel van die "Stand van sake"-nota in te plak.
+2. Moenie aannames maak oor wat in die nota staan nie.
+3. Vra vrae as iets ná die lees steeds nie duidelik is nie.
+
+Ná 5 November 2026 verval hierdie reëling. Verwyder dan hierdie afdeling.
+
 ## Oor die projek
 
 Future Sharp NPC (Pretoria) se Afrikaans-eerste platform vir fakturering, boekhouding en e-handel. Twee komponente:

@@ -2,6 +2,16 @@
 
 Plaas hierdie lêer in elke repo wat deel is van die integrasie (Future Sharp-paneel, FSF en FSVS). Lees dit saam met die repo se eie CLAUDE.md.
 
+## Tydelike reëling: "LEES" (geldig tot 5 November 2026)
+
+Wanneer Dorrithé net "LEES" sê, wil sy hê jy moet die gedeelde Google Drive-vouer "Future Sharp Stand van sake" lees. 'n Wolksessie kan nie haar Drive sien nie. Tot en met 5 November 2026:
+
+1. Vra haar om die relevante deel van die "Stand van sake"-nota in te plak.
+2. Moenie aannames maak oor wat in die nota staan nie.
+3. Vra vrae as iets ná die lees steeds nie duidelik is nie.
+
+Ná 5 November 2026 verval hierdie reëling. Verwyder dan hierdie afdeling.
+
 ## Wat die integrasie is
 
 Drie stelsels wat met mekaar praat, maar nie saamgesmelt word nie:
