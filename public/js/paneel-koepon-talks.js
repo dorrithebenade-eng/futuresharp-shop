@@ -70,6 +70,7 @@ function pkt_pas_vorm_aan() {
   const talk = pkt_is_talk();
   pkt_wys("koepon-vorm-produk", !talk);
   pkt_wys("koepon-vorm-outeur", !talk);
+  pkt_wys("koepon-vorm-soort-velde", !talk);
   document.getElementById("pkt-talk-velde").style.display = talk ? "block" : "none";
   return talk ? pkt_laai() : Promise.resolve();
 }

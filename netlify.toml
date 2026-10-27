@@ -107,6 +107,24 @@
   to = "/.netlify/functions/talk-bladsy?slug=:splat"
   status = 200
 
+# ADVERTENSIESKAKELS (Oktober 2026).
+#
+# /a/<slug> is 'n advertensie se deelskakel uit die paneel (Advertensies).
+# Die Function advertensie-bladsy sit die advertensie se beeld in die kop vir
+# WhatsApp en stuur 'n mens dan na die winkel. /a-beeld/<slug>.jpg is die
+# voorskou en /a-beeld/<slug>-vol.jpg die volle beeld.
+[[redirects]]
+  from = "/a/*"
+  to = "/.netlify/functions/advertensie-bladsy?slug=:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/a-beeld/*"
+  to = "/.netlify/functions/advertensie-bladsy?beeld=1&slug=:splat"
+  status = 200
+  force = true
+
 # VERSLAGSKAKELS VIR SKOLE (Oktober 2026).
 #
 # /verslae/<slug> is 'n skool se verslagskakel uit die Future Sharp-paneel

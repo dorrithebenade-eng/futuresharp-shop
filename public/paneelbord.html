@@ -194,6 +194,7 @@
 
       <div class="paneel-uitleg">
         <nav id="paneel-sy-kieslys" class="paneel-sy-kieslys" aria-label="Paneelbord-afdelings">
+          <button type="button" class="paneel-kieslys-item rol-personeel" data-afdeling="advertensies">Advertensies 📣</button>
           <button type="button" class="paneel-kieslys-item rol-personeel" data-afdeling="aflewering">Aflewering</button>
           <button type="button" class="paneel-kieslys-item rol-personeel" data-afdeling="bestellings">Bestellings</button>
           <button type="button" class="paneel-kieslys-item rol-personeel" data-afdeling="dokumente" data-i18n="paneel_dokumente_titel">Dokumente</button>
@@ -677,6 +678,9 @@
         </div>
       </section>
 
+      <!-- Advertensies: paneel-advertensies.js bou die inhoud. -->
+      <section class="paneel-afdeling" data-afdeling-inhoud="advertensies"></section>
+
       <section class="paneel-afdeling" data-afdeling-inhoud="koepons">
         <div class="paneel-afdeling-kop">
           <h2 class="paneel-afdeling-titel" data-i18n="paneel_koepons_titel">Koepons</h2>
@@ -723,6 +727,20 @@
               <option value="harde_kopie" data-i18n="paneel_koepon_formaat_hardekopie">Harde kopie</option>
               <option value="leen" data-i18n="paneel_koepon_formaat_leen">Leen</option>
             </select>
+
+            <div id="koepon-vorm-soort-velde">
+              <label class="veld-etiket" for="koepon-vorm-soort">Soort</label>
+              <select id="koepon-vorm-soort" class="veld-invoer">
+                <option value="veldtog">Veldtog (bv. Black Friday)</option>
+                <option value="lojaliteit">Lojaliteit (bv. die kode agter in 'n boek)</option>
+              </select>
+              <p class="paneel-hulp-teks">'n Koper kan een kode van elke soort saam gebruik. Twee veldtogkodes saam word geweier.</p>
+
+              <label class="koepon-boek-keuse">
+                <input type="checkbox" id="koepon-vorm-vereis-besit">
+                <span>Net vir kopers wat reeds een van die gemerkte boeke as e-boek besit</span>
+              </label>
+            </div>
 
             <label class="veld-etiket" for="koepon-vorm-maks-gebruike"><span data-i18n="paneel_koepon_maks_gebruike_etiket">Maksimum aantal gebruike</span></label>
             <input type="number" id="koepon-vorm-maks-gebruike" class="veld-invoer" min="1" step="1" value="1">
@@ -1186,6 +1204,7 @@
   <script src="js/paneel-talk-video.js"></script>
   <script src="js/paneel-koepon-talks.js"></script>
   <script src="js/paneel-koepon-beeld.js"></script>
+  <script src="js/paneel-advertensies.js"></script>
   <script src="js/dokumente.js"></script>
   <script src="js/paneel-vennoot.js"></script>
   <script src="js/paneel-katalogus-soek.js"></script>

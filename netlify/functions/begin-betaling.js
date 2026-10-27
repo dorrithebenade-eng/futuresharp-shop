@@ -40,7 +40,14 @@
 // uitbetaal, is binne 'n sent van die gestelde vaste bedrag).
 
 const { kry_store } = require("./_blob-store");
-const { koepon_geld_vir_boek } = require("./_koepon-velde");
+const {
+  koepon_geld_vir_boek,
+  koepon_soort,
+  besit_voldoen,
+  skoon_kodes,
+  pas_koepon_toe,
+  sorteer_koepons,
+} = require("./_koepon-velde");
 const { kry_gebruiker_en_rol_uitslag } = require("./_rol-kontrole");
 const { kry_maks_verdeling_sent } = require("./_paystack-koste.js");
 const { stuur_outeur_kennisgewings } = require("./_kennisgewing-outeur");
@@ -93,7 +100,7 @@ exports.handler = async (event, context) => {
     return { statusCode: 400, body: "Ongeldige JSON" };
   }
 
-  const { bestelnommer, items, aflewering, koper, koepon_kode } = invoer;
+  const { bestelnommer, items, aflewering, koper } = invoer;
 
   if (!bestelnommer || !items || !items.length || !koper || !koper.epos || !koper.selfoonnommer) {
     return { statusCode: 400, body: "Onvolledige bestelling-data" };
@@ -127,35 +134,44 @@ exports.handler = async (event, context) => {
   // --- Stap 0.5: koepon opsoek + basiese validasie (NOOIT die kliënt se
   // eie voorstel van die afslag-bedrag vertrou nie — ons haal die regte
   // koepon-rekord op en bereken self) ---
-  let koepon = null;
-  const koepon_kode_skoon = koepon_kode ? String(koepon_kode).trim().toUpperCase() : "";
-
-  if (koepon_kode_skoon) {
+  //
+  // TOT TWEE KODES, een van elke soort (veldtog en lojaliteit; sien
+  // _koepon-velde.js). koepon_kode (een kode) werk steeds vir ouer kliënte.
+  const koepon_kodes = skoon_kodes(invoer);
+  if (koepon_kodes.length > 2) {
+    return { statusCode: 400, body: "Jy kan hoogstens twee koepon-kodes gebruik" };
+  }
+  const koepons = [];
+  for (const kode of koepon_kodes) {
     const koeponStore = kry_store("koepons");
-    const gevonde_koepon = await koeponStore.get(koepon_kode_skoon, { type: "json" });
+    const gevonde_koepon = await koeponStore.get(kode, { type: "json" });
 
-    if (!gevonde_koepon) {
-      return { statusCode: 400, body: "Koepon-kode is nie geldig nie" };
+    if (!gevonde_koepon || gevonde_koepon.formaat_beperking === "video") {
+      return { statusCode: 400, body: `Koepon-kode ${kode} is nie geldig nie` };
     }
     if (!gevonde_koepon.aktief) {
-      return { statusCode: 400, body: "Hierdie koepon is nie meer aktief nie" };
+      return { statusCode: 400, body: `Koepon ${kode} is nie meer aktief nie` };
     }
     if (gevonde_koepon.verval_op && new Date(gevonde_koepon.verval_op) < new Date()) {
-      return { statusCode: 400, body: "Hierdie koepon het verval" };
+      return { statusCode: 400, body: `Koepon ${kode} het verval` };
     }
     if (gevonde_koepon.gebruike_tot_dusver >= gevonde_koepon.maks_gebruike) {
-      return { statusCode: 400, body: "Hierdie koepon is klaar ten volle gebruik" };
+      return { statusCode: 400, body: `Koepon ${kode} is klaar ten volle gebruik` };
     }
     if (gevonde_koepon.koper_id_beperking && gevonde_koepon.koper_id_beperking !== gebruiker.id) {
-      return { statusCode: 400, body: "Hierdie koepon is nie vir jou rekening geldig nie" };
+      return { statusCode: 400, body: `Koepon ${kode} is nie vir jou rekening geldig nie` };
     }
-    koepon = gevonde_koepon;
+    koepons.push(gevonde_koepon);
   }
+  if (koepons.length === 2 && koepon_soort(koepons[0]) === koepon_soort(koepons[1])) {
+    return { statusCode: 400, body: "Jy kan net een koepon van elke soort saam gebruik" };
+  }
+  const gesorteerde_koepons = sorteer_koepons(koepons);
 
   // Gee terug of 'n koepon op 'n spesifieke item van toepassing is —
   // hou ook "een keer per boek per koper" reg, selfs by 'n
   // veelvuldig-herbruikbare koepon-kode.
-  function koepon_geld_vir_item(produk_slug, formaat) {
+  function koepon_geld_vir_item(koepon, produk_slug, formaat) {
     if (!koepon) return false;
     if (koepon.koper_id_beperking && koepon.koper_id_beperking !== gebruiker.id) return false;
     if (!koepon_geld_vir_boek(koepon, produk_slug)) return false;
@@ -195,13 +211,23 @@ exports.handler = async (event, context) => {
     }
   }
 
+  // Lojaliteitskoepons (bv. VOLGENDE50) geld net vir kopers wat reeds een
+  // van die koepon se boeke as e-boek besit.
+  const sonder_besit = koepons.find((k) => !besit_voldoen(k, reeds_besitte_eboeke));
+  if (sonder_besit) {
+    return {
+      statusCode: 400,
+      body: `Koepon ${sonder_besit.kode} is vir lesers wat reeds een van ons boeke besit`,
+    };
+  }
+
   // --- Stap 1: herbou items + totaal server-kant vanuit die katalogus ---
   let totaal_sent = 0;
   let hosting_totaal_sent = 0;
   let bevat_harde_kopie = false;
   const geverifieerde_items = [];
   const verdeling_per_subrekening = {}; // { "ACCT_xxx": sent_bedrag }
-  const koepon_gebruikte_items = []; // items waarop die koepon toegepas is
+  const koepon_gebruikte_items = {}; // kode -> items waarop dit toegepas is
 
   for (const kliënt_item of items) {
     const produk = await katalogusStore.get(kliënt_item.produk_slug, { type: "json" });
@@ -239,21 +265,17 @@ exports.handler = async (event, context) => {
 
     const item_prys_sent = formaat_data.prys_sent; // oorspronklike prys, voor enige koepon
     let verkoop_prys_sent = item_prys_sent;
-    let item_koepon_toegepas = false;
+    const item_koepon_kodes = [];
 
-    if (koepon_geld_vir_item(produk.slug, kliënt_item.formaat)) {
-      item_koepon_toegepas = true;
-      if (koepon.tipe === "gratis") {
-        verkoop_prys_sent = 0;
-      } else if (koepon.afslag_tipe === "vaste_bedrag") {
-        verkoop_prys_sent = Math.max(0, item_prys_sent - koepon.afslag_waarde);
-      } else {
-        verkoop_prys_sent = Math.max(
-          0,
-          item_prys_sent - Math.round((item_prys_sent * koepon.afslag_waarde) / 100)
-        );
-      }
-      koepon_gebruikte_items.push({ produk_slug: produk.slug, formaat: kliënt_item.formaat });
+    // Veldtog eerste, dan lojaliteit op die prys wat oorbly.
+    for (const koepon of gesorteerde_koepons) {
+      if (!koepon_geld_vir_item(koepon, produk.slug, kliënt_item.formaat)) continue;
+      verkoop_prys_sent = pas_koepon_toe(koepon, verkoop_prys_sent);
+      item_koepon_kodes.push(koepon.kode);
+      (koepon_gebruikte_items[koepon.kode] = koepon_gebruikte_items[koepon.kode] || []).push({
+        produk_slug: produk.slug,
+        formaat: kliënt_item.formaat,
+      });
     }
 
     totaal_sent += verkoop_prys_sent;
@@ -273,7 +295,9 @@ exports.handler = async (event, context) => {
       titel: produk.titel,
       formaat: kliënt_item.formaat,
       prys_sent: verkoop_prys_sent,
-      ...(item_koepon_toegepas ? { oorspronklike_prys_sent: item_prys_sent, koepon_kode: koepon.kode } : {}),
+      ...(item_koepon_kodes.length
+        ? { oorspronklike_prys_sent: item_prys_sent, koepon_kode: item_koepon_kodes[0], koepon_kodes: item_koepon_kodes }
+        : {}),
       ...leen_ekstra,
     });
 
@@ -323,6 +347,13 @@ exports.handler = async (event, context) => {
     return { statusCode: 400, body: "Bestelling se totaal is ongeldig" };
   }
 
+  // Elke koepon wat op minstens een item toegepas is. koepon_toegepas (die
+  // eerste) bly vir die paneel en ouer kode; koepons_toegepas het almal.
+  const koepons_toegepas = gesorteerde_koepons
+    .filter((k) => koepon_gebruikte_items[k.kode])
+    .map((k) => ({ kode: k.kode, items: koepon_gebruikte_items[k.kode] }));
+  const koepon_toegepas = koepons_toegepas[0] || null;
+
   // --- 100%-koepon-kortpad: R0, geen Paystack-transaksie moontlik of
   // nodig nie. Merk die bestelling dadelik as betaal (soos die webhook
   // normaalweg sou doen), werk koepon-gebruik + per-produk aankope-tellers
@@ -344,7 +375,8 @@ exports.handler = async (event, context) => {
       verdeling: null,
       split_code: null,
       split_fout: null,
-      koepon_toegepas: koepon ? { kode: koepon.kode, items: koepon_gebruikte_items } : null,
+      koepon_toegepas,
+      koepons_toegepas,
       drukker: bevat_harde_kopie ? { bestelling_geplaas: false, geplaas_op: null, nota: "" } : null,
       paystack: {
         referensie: bestelnommer,
@@ -361,11 +393,13 @@ exports.handler = async (event, context) => {
 
     // Werk koepon-gebruik-rekord dadelik by — geen latere webhook-stap
     // gaan dit doen nie, aangesien daar geen betaling was nie.
-    if (koepon && koepon_gebruikte_items.length) {
+    for (const toegepas of koepons_toegepas) {
+      const koepon = koepons.find((k) => k.kode === toegepas.kode);
+      if (!koepon) continue;
       const koeponStore = kry_store("koepons");
       const nuwe_geskiedenis = [
         ...(koepon.gebruike_geskiedenis || []),
-        ...koepon_gebruikte_items.map((i) => ({
+        ...toegepas.items.map((i) => ({
           koper_id: gebruiker.id,
           produk_slug: i.produk_slug,
           formaat: i.formaat,
@@ -530,7 +564,8 @@ exports.handler = async (event, context) => {
     verdeling: subrekening_kodes.length ? verdeling_per_subrekening : null,
     split_code,
     split_fout,
-    koepon_toegepas: koepon ? { kode: koepon.kode, items: koepon_gebruikte_items } : null,
+    koepon_toegepas,
+      koepons_toegepas,
     drukker: bevat_harde_kopie
       ? { bestelling_geplaas: false, geplaas_op: null, nota: "" }
       : null,

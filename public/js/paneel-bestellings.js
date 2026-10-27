@@ -33,8 +33,12 @@ function bou_bestelling_kaart(b) {
     )
     .join("");
 
-  const koepon_html = b.koepon_toegepas
-    ? `<p class="paneel-bestelling-koepon">🎟️ Koepon toegepas: <strong>${b.koepon_toegepas.kode}</strong></p>`
+  // Tot twee koepons (koepons_toegepas); ouer bestellings het net een.
+  const koepon_kodes = Array.isArray(b.koepons_toegepas) && b.koepons_toegepas.length
+    ? b.koepons_toegepas.map((k) => k.kode)
+    : b.koepon_toegepas ? [b.koepon_toegepas.kode] : [];
+  const koepon_html = koepon_kodes.length
+    ? `<p class="paneel-bestelling-koepon">🎟️ Koepon toegepas: <strong>${koepon_kodes.join(" + ")}</strong></p>`
     : "";
 
   const gratis_html = b.paystack && b.paystack.gratis_via_koepon
@@ -370,7 +374,9 @@ async function laai_bestellings_as_excel() {
         b.status,
         b.bevat_harde_kopie ? "Ja" : "Nee",
         b.bevat_harde_kopie ? (b.drukker && b.drukker.bestelling_geplaas ? "Ja" : "Nee") : "n.v.t.",
-        (b.koepon_toegepas && b.koepon_toegepas.kode) || "",
+        Array.isArray(b.koepons_toegepas) && b.koepons_toegepas.length
+          ? b.koepons_toegepas.map((k) => k.kode).join(" + ")
+          : (b.koepon_toegepas && b.koepon_toegepas.kode) || "",
         b.paystack && b.paystack.gratis_via_koepon ? "Ja" : "Nee",
         b.split_fout ? "Ja" : "Nee",
       ];

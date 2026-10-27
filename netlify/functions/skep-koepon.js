@@ -104,6 +104,8 @@ exports.handler = async (event, context) => {
     outeur_id: velde.outeur_id,
     spreker_id: velde.spreker_id,
     nota: velde.nota,
+    soort: velde.soort,
+    vereis_besit: velde.vereis_besit,
     geskep_deur: gebruiker.email,
     geskep_op: new Date().toISOString(),
   };

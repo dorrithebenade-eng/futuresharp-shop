@@ -12,7 +12,9 @@ const BESTELNOMMER_SLEUTEL = "future_shop_bestelnommer_konsep";
 
 // Koepon-toestand — module-vlak, aangesien dit tussen die "Toepas"-klik en
 // die uiteindelike "Gaan na betaling"-indiening moet oorleef.
-let TOEGEPASTE_KOEPON_KODE = null;
+// Tot twee kodes: een veldtogkode (bv. BLACKFRIDAY) en een lojaliteitskode
+// (bv. VOLGENDE50). Die bediener kontroleer die reëls; hier hou ons net lys.
+let TOEGEPASTE_KOEPON_KODES = [];
 let VERTOONDE_TOTAAL_SENT = 0;
 
 // Koppel elke taal-onafhanklike foutkode (van verifieer-koepon.js) aan die
@@ -26,6 +28,9 @@ const KOEPON_FOUT_SLEUTELS = {
   VOLGEBRUIK: "koepon_fout_volgebruik",
   GEEN_TOEPASSING: "koepon_fout_geen_toepassing",
   NIE_JOUNE: "koepon_fout_nie_joune",
+  TE_VEEL: "koepon_fout_te_veel",
+  TWEE_VAN_SOORT: "koepon_fout_twee_van_soort",
+  BESIT_NODIG: "koepon_fout_besit_nodig",
 };
 
 function formateer_prys_sent(sent) {
@@ -67,10 +72,12 @@ function bou_opsomming(items, totaal) {
 
       <div class="vb-koepon-blok">
         <label class="veld-etiket" for="vb-koepon-invoer">${t("koepon_etiket")}</label>
+        <p id="vb-koepon-etiket-meer" class="vb-koepon-meer" style="display:none;">${t("koepon_nog_een")}</p>
         <div class="vb-koepon-ry">
           <input type="text" id="vb-koepon-invoer" class="veld-invoer" placeholder="${t("koepon_plekhouer")}">
           <button type="button" id="vb-koepon-toepas" class="terug-skakel">${t("koepon_toepas_knoppie")}</button>
         </div>
+        <div id="vb-koepon-toegepas" class="vb-koepon-toegepas"></div>
         <p id="vb-koepon-nota" class="vb-koepon-nota" style="display:none;"></p>
       </div>
 
@@ -122,7 +129,7 @@ function bou_kontak_afdeling() {
   `;
 }
 
-function valideer_en_bou_bestelling(items, totaal, bestelnommer, bevat_harde_kopie, koepon_kode) {
+function valideer_en_bou_bestelling(items, totaal, bestelnommer, bevat_harde_kopie, koepon_kodes) {
   const foute = [];
 
   const epos = document.getElementById("kontak-epos").value.trim();
@@ -164,7 +171,8 @@ function valideer_en_bou_bestelling(items, totaal, bestelnommer, bevat_harde_kop
     totaal_sent: totaal,
     bevat_harde_kopie,
     aflewering,
-    koepon_kode: koepon_kode || null,
+    koepon_kodes: koepon_kodes || [],
+    koepon_kode: (koepon_kodes && koepon_kodes[0]) || null,
     status: "Konsep — wag vir betaling",
   };
 
@@ -244,70 +252,112 @@ function wys_koepon_nota(teks, is_fout) {
   nota.classList.toggle("vb-koepon-nota--sukses", !is_fout);
 }
 
+// Vra die bediener om 'n voorskou vir 'n lys kodes. Gooi 'n Error met die
+// regte taalboodskap as een van die kodes nie werk nie.
+async function verifieer_kodes(kodes, items, toegangs_token) {
+  const resp = await fetch("/.netlify/functions/verifieer-koepon", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${toegangs_token}`,
+    },
+    body: JSON.stringify({
+      koepon_kodes: kodes,
+      items: items.map((i) => ({ produk_slug: i.produk_slug, formaat: i.formaat })),
+    }),
+  });
+
+  if (!resp.ok) {
+    let fout_kode = "ONGELDIG";
+    let kode = null;
+    try {
+      const fout_data = await resp.json();
+      if (fout_data && fout_data.fout_kode) fout_kode = fout_data.fout_kode;
+      if (fout_data && fout_data.kode) kode = fout_data.kode;
+    } catch {
+      // Onverwagte, nie-JSON-antwoord (bv. 'n 500 sonder liggaam) — val
+      // terug op die generiese "ongeldig"-boodskap.
+    }
+    const boodskap = t(KOEPON_FOUT_SLEUTELS[fout_kode] || "koepon_ongeldig");
+    throw new Error(kode && kodes.length > 1 ? `${kode}: ${boodskap}` : boodskap);
+  }
+  return resp.json();
+}
+
+// Wys die toegepaste kodes, elk met 'n Verwyder-knoppie, en die totaal.
+function wys_toegepaste_koepons(data, items, oorspronklike_totaal, toegangs_token) {
+  const lys = document.getElementById("vb-koepon-toegepas");
+  const ry = document.querySelector(".vb-koepon-ry");
+  const invoer = document.getElementById("vb-koepon-invoer");
+
+  lys.innerHTML = TOEGEPASTE_KOEPON_KODES.map((kode) => `
+    <span class="vb-koepon-kaartjie">🎟️ <strong>${kode}</strong>
+      <button type="button" class="terug-skakel vb-koepon-verwyder" data-kode="${kode}">${t("koepon_verwyder_knoppie")}</button>
+    </span>`).join("");
+
+  lys.querySelectorAll(".vb-koepon-verwyder").forEach((knoppie) => {
+    knoppie.addEventListener("click", () => verwyder_koepon(knoppie.dataset.kode, items, oorspronklike_totaal, toegangs_token));
+  });
+
+  const totaal = data ? data.nuwe_totaal_sent : oorspronklike_totaal;
+  VERTOONDE_TOTAAL_SENT = totaal;
+  document.getElementById("vb-totaal-bedrag").textContent = formateer_prys_sent(totaal);
+
+  if (!data) {
+    document.getElementById("vb-koepon-nota").style.display = "none";
+  } else if (data.nuwe_totaal_sent === 0) {
+    wys_koepon_nota(t("koepon_toegepas_gratis"), false);
+  } else {
+    wys_koepon_nota(`${t("koepon_toegepas_afslag")} ${formateer_prys_sent(data.afslag_sent)}`, false);
+  }
+
+  // Twee kodes is die maksimum; daarna verdwyn die invoerry.
+  ry.style.display = TOEGEPASTE_KOEPON_KODES.length >= 2 ? "none" : "";
+  invoer.value = "";
+  document.getElementById("vb-koepon-etiket-meer").style.display = TOEGEPASTE_KOEPON_KODES.length === 1 ? "" : "none";
+}
+
+async function verwyder_koepon(kode, items, oorspronklike_totaal, toegangs_token) {
+  const oorblywend = TOEGEPASTE_KOEPON_KODES.filter((k) => k !== kode);
+  if (!oorblywend.length) {
+    TOEGEPASTE_KOEPON_KODES = [];
+    wys_toegepaste_koepons(null, items, oorspronklike_totaal, toegangs_token);
+    return;
+  }
+  try {
+    const data = await verifieer_kodes(oorblywend, items, toegangs_token);
+    TOEGEPASTE_KOEPON_KODES = data.kodes || oorblywend;
+    wys_toegepaste_koepons(data, items, oorspronklike_totaal, toegangs_token);
+  } catch (fout) {
+    TOEGEPASTE_KOEPON_KODES = [];
+    wys_toegepaste_koepons(null, items, oorspronklike_totaal, toegangs_token);
+    wys_koepon_nota(fout.message || t("koepon_ongeldig"), true);
+  }
+}
+
 async function hanteer_koepon_toepas(items, oorspronklike_totaal, toegangs_token) {
   const invoer = document.getElementById("vb-koepon-invoer");
   const knoppie = document.getElementById("vb-koepon-toepas");
-  const kode = invoer.value.trim();
+  const kode = invoer.value.trim().toUpperCase();
 
   if (!kode) return;
+  if (TOEGEPASTE_KOEPON_KODES.includes(kode)) {
+    invoer.value = "";
+    return;
+  }
 
   knoppie.disabled = true;
   const oorspronklike_knoppie_teks = knoppie.textContent;
   knoppie.textContent = t("besig");
 
   try {
-    const resp = await fetch("/.netlify/functions/verifieer-koepon", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${toegangs_token}`,
-      },
-      body: JSON.stringify({
-        koepon_kode: kode,
-        items: items.map((i) => ({ produk_slug: i.produk_slug, formaat: i.formaat })),
-      }),
-    });
-
-    if (!resp.ok) {
-      let fout_kode = "ONGELDIG";
-      try {
-        const fout_data = await resp.json();
-        if (fout_data && fout_data.fout_kode) fout_kode = fout_data.fout_kode;
-      } catch {
-        // Onverwagte, nie-JSON-antwoord (bv. 'n 500 sonder liggaam) — val
-        // terug op die generiese "ongeldig"-boodskap.
-      }
-      throw new Error(t(KOEPON_FOUT_SLEUTELS[fout_kode] || "koepon_ongeldig"));
-    }
-
-    const data = await resp.json();
-
-    TOEGEPASTE_KOEPON_KODE = kode.toUpperCase();
-    VERTOONDE_TOTAAL_SENT = data.nuwe_totaal_sent;
-    document.getElementById("vb-totaal-bedrag").textContent = formateer_prys_sent(data.nuwe_totaal_sent);
-
-    if (data.nuwe_totaal_sent === 0) {
-      wys_koepon_nota(t("koepon_toegepas_gratis"), false);
-    } else {
-      wys_koepon_nota(`${t("koepon_toegepas_afslag")} ${formateer_prys_sent(data.afslag_sent)}`, false);
-    }
-
-    invoer.disabled = true;
-    knoppie.textContent = t("koepon_verwyder_knoppie");
-    knoppie.disabled = false;
-    knoppie.onclick = () => {
-      TOEGEPASTE_KOEPON_KODE = null;
-      VERTOONDE_TOTAAL_SENT = oorspronklike_totaal;
-      document.getElementById("vb-totaal-bedrag").textContent = formateer_prys_sent(oorspronklike_totaal);
-      document.getElementById("vb-koepon-nota").style.display = "none";
-      invoer.disabled = false;
-      invoer.value = "";
-      knoppie.textContent = oorspronklike_knoppie_teks;
-      knoppie.onclick = () => hanteer_koepon_toepas(items, oorspronklike_totaal, toegangs_token);
-    };
+    const data = await verifieer_kodes([...TOEGEPASTE_KOEPON_KODES, kode], items, toegangs_token);
+    TOEGEPASTE_KOEPON_KODES = data.kodes || [...TOEGEPASTE_KOEPON_KODES, kode];
+    wys_toegepaste_koepons(data, items, oorspronklike_totaal, toegangs_token);
   } catch (fout) {
     console.error("Kon nie koepon toepas nie:", fout);
     wys_koepon_nota(fout.message || t("koepon_ongeldig"), true);
+  } finally {
     knoppie.disabled = false;
     knoppie.textContent = oorspronklike_knoppie_teks;
   }
@@ -349,7 +399,7 @@ async function laai_vb() {
 
   const totaal = kry_mandjie_totaal_sent();
   VERTOONDE_TOTAAL_SENT = totaal;
-  TOEGEPASTE_KOEPON_KODE = null;
+  TOEGEPASTE_KOEPON_KODES = [];
   const bevatHardeKopie = mandjie_bevat_harde_kopie();
   const bestelnommer = kry_of_skep_bestelnommer();
 
@@ -398,7 +448,7 @@ async function laai_vb() {
       VERTOONDE_TOTAAL_SENT,
       bestelnommer,
       bevatHardeKopie,
-      TOEGEPASTE_KOEPON_KODE
+      TOEGEPASTE_KOEPON_KODES
     );
     if (!resultaat.geldig) {
       wys_foute(resultaat.foute);

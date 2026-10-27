@@ -269,7 +269,9 @@
             <input type="text" id="kb-geldig" class="veld-invoer" maxlength="60">
             <p class="kb-wenk">Die teks is voorgestel uit die koepon self. Verander dit gerus; dit verander net die beeld, nie wat die koepon in die winkel doen nie. Laat Geldigheid leeg as die koepon nie verval nie.</p>
             <div class="kb-knoppies">
+              <button type="button" class="kaart-aksie" id="kb-deel">📲 Deel</button>
               <button type="button" class="kaart-aksie" id="kb-aflaai">Laai beeld af</button>
+              <span class="kb-wenk" id="kb-deel-status" role="status"></span>
             </div>
             <label class="veld-etiket" for="kb-boodskap">WhatsApp-boodskap</label>
             <textarea id="kb-boodskap" class="veld-invoer" rows="6"></textarea>
@@ -300,6 +302,7 @@
     venster.querySelector("#kb-aanbod").addEventListener("input", () => { herteken_later(); werk_boodskap_by(); });
     venster.querySelector("#kb-geldig").addEventListener("input", () => { herteken_later(); werk_boodskap_by(); });
     venster.querySelector("#kb-aflaai").addEventListener("click", laai_af);
+    venster.querySelector("#kb-deel").addEventListener("click", deel);
     venster.querySelector("#kb-boodskap").addEventListener("input", () => { boodskap_self_verander = true; });
     venster.querySelector("#kb-kopieer").addEventListener("click", kopieer_boodskap);
   }
@@ -366,6 +369,33 @@
     document.body.appendChild(a);
     a.click();
     a.remove();
+  }
+
+  // Deel die beeld en die boodskap met die foon se deel-venster. Die lêer word
+  // sonder wag uit die canvas gebou, want die blaaier laat net deel toe binne
+  // die tik self. Die boodskap word ook gekopieer: sommige fone (veral iPhone
+  // na WhatsApp) laat die teks val as daar 'n prent by is.
+  function deel() {
+    const canvas = venster.querySelector("#kb-canvas");
+    const status = venster.querySelector("#kb-deel-status");
+    const teks = venster.querySelector("#kb-boodskap").value || "";
+    const data = atob(canvas.toDataURL("image/jpeg", 0.9).split(",")[1]);
+    const grepe = new Uint8Array(data.length);
+    for (let i = 0; i < data.length; i++) grepe[i] = data.charCodeAt(i);
+    const lêer = new File([grepe], `koepon-${huidige_koepon.kode}.jpg`, { type: "image/jpeg" });
+
+    if (teks && navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(teks).catch(() => {});
+
+    let kan = false;
+    try { kan = !!(navigator.share && navigator.canShare && navigator.canShare({ files: [lêer] })); } catch (_) { kan = false; }
+    if (kan) {
+      navigator.share({ files: [lêer], text: teks })
+        .then(() => { status.textContent = "Gedeel. Die boodskap is ook gekopieer."; })
+        .catch((e) => { if (!e || e.name !== "AbortError") status.textContent = "Kon nie deel nie."; });
+      return;
+    }
+    laai_af();
+    status.textContent = teks ? "Beeld afgelaai en boodskap gekopieer." : "Beeld afgelaai.";
   }
 
   function sluit() {

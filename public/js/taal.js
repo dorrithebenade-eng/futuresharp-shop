@@ -381,6 +381,19 @@ const WOORDEBOEK = {
     af: "Hierdie koepon is nie van toepassing op enigiets in jou mandjie nie",
     en: "This coupon does not apply to anything in your cart",
   },
+  koepon_fout_te_veel: { af: "Jy kan hoogstens twee koepon-kodes gebruik", en: "You can use at most two coupon codes" },
+  koepon_fout_twee_van_soort: {
+    af: "Hierdie twee kodes kan nie saam gebruik word nie",
+    en: "These two codes cannot be used together",
+  },
+  koepon_fout_besit_nodig: {
+    af: "Hierdie kode is vir lesers wat reeds een van ons boeke het. Meld aan met die rekening waarmee jy die boek gekoop het.",
+    en: "This code is for readers who already own one of our books. Sign in with the account you used to buy the book.",
+  },
+  koepon_nog_een: {
+    af: "Het jy nog 'n kode, soos die een agter in jou boek? Jy kan dit ook byvoeg.",
+    en: "Do you have another code, like the one at the back of your book? You can add it too.",
+  },
   koepon_fout_nie_joune: {
     af: "Hierdie koepon is nie vir jou rekening geldig nie",
     en: "This coupon is not valid for your account",

@@ -3,9 +3,20 @@
 // te registreer as gebruik nie. Die WERKLIKE, gesaghebbende berekening
 // gebeur eers by begin-betaling.js self — hierdie Function bestaan net
 // om die koper dadelik terugvoer te gee voor hulle na Paystack gaan.
+//
+// Aanvaar tot twee kodes (koepon_kodes), een van elke soort (veldtog en
+// lojaliteit). koepon_kode (een kode) werk steeds vir ouer kliënte.
 
 const { kry_store } = require("./_blob-store");
-const { koepon_geld_vir_boek } = require("./_koepon-velde");
+const {
+  koepon_geld_vir_boek,
+  koepon_soort,
+  besit_voldoen,
+  kry_besitte_eboeke,
+  skoon_kodes,
+  pas_koepon_toe,
+  sorteer_koepons,
+} = require("./_koepon-velde");
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 
 exports.handler = async (event, context) => {
@@ -25,60 +36,46 @@ exports.handler = async (event, context) => {
     return { statusCode: 400, body: "Ongeldige JSON" };
   }
 
-  const kode = (invoer.koepon_kode || "").trim().toUpperCase();
+  const kodes = skoon_kodes(invoer);
   const items = Array.isArray(invoer.items) ? invoer.items : [];
+  const fout = (fout_kode, kode) => ({
+    statusCode: 400,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ fout_kode, kode: kode || null }),
+  });
 
-  if (!kode) {
-    return {
-      statusCode: 400,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ fout_kode: "VERPLIGTE_KODE" }),
-    };
-  }
+  if (!kodes.length) return fout("VERPLIGTE_KODE");
+  if (kodes.length > 2) return fout("TE_VEEL");
 
+  // Elke kode word apart getoets; 'n fout noem die kode wat dit veroorsaak.
   const koeponStore = kry_store("koepons");
-  const koepon = await koeponStore.get(kode, { type: "json" });
-
-  if (!koepon) {
-    return {
-      statusCode: 400,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ fout_kode: "ONGELDIG" }),
-    };
-  }
-  if (!koepon.aktief) {
-    return {
-      statusCode: 400,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ fout_kode: "ONAKTIEF" }),
-    };
-  }
-  if (koepon.verval_op && new Date(koepon.verval_op) < new Date()) {
-    return {
-      statusCode: 400,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ fout_kode: "VERVAL" }),
-    };
-  }
-  if (koepon.gebruike_tot_dusver >= koepon.maks_gebruike) {
-    return {
-      statusCode: 400,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ fout_kode: "VOLGEBRUIK" }),
-    };
-  }
-  if (koepon.koper_id_beperking && koepon.koper_id_beperking !== gebruiker.id) {
-    return {
-      statusCode: 400,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ fout_kode: "NIE_JOUNE" }),
-    };
+  const koepons = [];
+  for (const kode of kodes) {
+    const koepon = await koeponStore.get(kode, { type: "json" });
+    if (!koepon || koepon.formaat_beperking === "video") return fout("ONGELDIG", kode);
+    if (!koepon.aktief) return fout("ONAKTIEF", kode);
+    if (koepon.verval_op && new Date(koepon.verval_op) < new Date()) return fout("VERVAL", kode);
+    if (koepon.gebruike_tot_dusver >= koepon.maks_gebruike) return fout("VOLGEBRUIK", kode);
+    if (koepon.koper_id_beperking && koepon.koper_id_beperking !== gebruiker.id) return fout("NIE_JOUNE", kode);
+    koepons.push(koepon);
   }
 
+  // Een van elke soort: 'n veldtogkode en 'n lojaliteitskode mag saam.
+  if (koepons.length === 2 && koepon_soort(koepons[0]) === koepon_soort(koepons[1])) {
+    return fout("TWEE_VAN_SOORT", koepons[1].kode);
+  }
+
+  if (koepons.some((k) => k.vereis_besit)) {
+    const besitte = await kry_besitte_eboeke(kry_store("bestellings"), gebruiker.id);
+    const sonder_besit = koepons.find((k) => !besit_voldoen(k, besitte));
+    if (sonder_besit) return fout("BESIT_NODIG", sonder_besit.kode);
+  }
+
+  const gesorteer = sorteer_koepons(koepons);
   const katalogusStore = kry_store("katalogus");
   let oorspronklike_totaal_sent = 0;
   let nuwe_totaal_sent = 0;
-  let enige_item_pas = false;
+  const pas_iewers = new Set();
 
   for (const kliënt_item of items) {
     const produk = await katalogusStore.get(kliënt_item.produk_slug, { type: "json" });
@@ -88,47 +85,32 @@ exports.handler = async (event, context) => {
 
     const item_prys_sent = formaat_data.prys_sent;
     oorspronklike_totaal_sent += item_prys_sent;
+    let verkoop_prys_sent = item_prys_sent;
 
-    const kom_ooreen =
-      koepon_geld_vir_boek(koepon, produk.slug) &&
-      (koepon.formaat_beperking === "albei" || koepon.formaat_beperking === kliënt_item.formaat);
-
-    const reeds_gebruik = (koepon.gebruike_geskiedenis || []).some(
-      (g) => g.koper_id === gebruiker.id && g.produk_slug === produk.slug
-    );
-
-    if (kom_ooreen && !reeds_gebruik) {
-      enige_item_pas = true;
-      let verkoop_prys_sent = item_prys_sent;
-      if (koepon.tipe === "gratis") {
-        verkoop_prys_sent = 0;
-      } else if (koepon.afslag_tipe === "vaste_bedrag") {
-        verkoop_prys_sent = Math.max(0, item_prys_sent - koepon.afslag_waarde);
-      } else {
-        verkoop_prys_sent = Math.max(
-          0,
-          item_prys_sent - Math.round((item_prys_sent * koepon.afslag_waarde) / 100)
-        );
+    for (const koepon of gesorteer) {
+      const kom_ooreen =
+        koepon_geld_vir_boek(koepon, produk.slug) &&
+        (koepon.formaat_beperking === "albei" || koepon.formaat_beperking === kliënt_item.formaat);
+      const reeds_gebruik = (koepon.gebruike_geskiedenis || []).some(
+        (g) => g.koper_id === gebruiker.id && g.produk_slug === produk.slug
+      );
+      if (kom_ooreen && !reeds_gebruik) {
+        pas_iewers.add(koepon.kode);
+        verkoop_prys_sent = pas_koepon_toe(koepon, verkoop_prys_sent);
       }
-      nuwe_totaal_sent += verkoop_prys_sent;
-    } else {
-      nuwe_totaal_sent += item_prys_sent;
     }
+    nuwe_totaal_sent += verkoop_prys_sent;
   }
 
-  if (!enige_item_pas) {
-    return {
-      statusCode: 400,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ fout_kode: "GEEN_TOEPASSING" }),
-    };
-  }
+  const pas_nêrens = koepons.find((k) => !pas_iewers.has(k.kode));
+  if (pas_nêrens) return fout("GEEN_TOEPASSING", pas_nêrens.kode);
 
   return {
     statusCode: 200,
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       geldig: true,
+      kodes: koepons.map((k) => k.kode),
       oorspronklike_totaal_sent,
       nuwe_totaal_sent,
       afslag_sent: oorspronklike_totaal_sent - nuwe_totaal_sent,

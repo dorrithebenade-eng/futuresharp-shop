@@ -30,6 +30,16 @@ function bou_koepon_velde(invoer) {
   const spreker_id = formaat_beperking === "video" && invoer.spreker_id ? String(invoer.spreker_id).trim() : null;
   const nota = invoer.nota ? String(invoer.nota).trim().slice(0, 300) : "";
 
+  // TWEE SOORTE, SAAM BRUIKBAAR. 'n Koper mag een koepon van elke soort in
+  // dieselfde betaling gebruik: 'n "veldtog"-kode (bv. BLACKFRIDAY) plus 'n
+  // "lojaliteit"-kode (bv. VOLGENDE50 agter in elke boek). Twee veldtogkodes
+  // saam word geweier. Ou koepons sonder die veld is "veldtog".
+  const soort = invoer.soort === "lojaliteit" ? "lojaliteit" : "veldtog";
+  // Net vir kopers wat reeds een van die koepon se boeke as e-boek besit
+  // (of enige boek, as die koepon vir enige boek geld). So kan 'n gedrukte
+  // kode maar gedeel word: net bestaande lesers kry die afslag.
+  const vereis_besit = invoer.vereis_besit === true;
+
   const maks_gebruike = Number.isInteger(invoer.maks_gebruike) && invoer.maks_gebruike > 0 ? invoer.maks_gebruike : 1;
 
   let verval_op = null;
@@ -75,6 +85,8 @@ function bou_koepon_velde(invoer) {
       outeur_id,
       spreker_id,
       nota,
+      soort,
+      vereis_besit,
     },
   };
 }
@@ -93,4 +105,64 @@ function koepon_geld_vir_boek(koepon, produk_slug) {
   return !boeke || boeke.includes(produk_slug);
 }
 
-module.exports = { bou_koepon_velde, koepon_boeke, koepon_geld_vir_boek };
+function koepon_soort(koepon) {
+  return koepon && koepon.soort === "lojaliteit" ? "lojaliteit" : "veldtog";
+}
+
+// Besit die koper reeds 'n e-boek wat by hierdie koepon hoort? besitte is
+// 'n Set van produk_slugs wat die koper reeds betaal het.
+function besit_voldoen(koepon, besitte) {
+  if (!koepon || !koepon.vereis_besit) return true;
+  const boeke = koepon_boeke(koepon);
+  if (!boeke) return besitte.size > 0;
+  return boeke.some((slug) => besitte.has(slug));
+}
+
+// Die e-boeke (produk_slugs) wat 'n koper reeds betaal het. Dieselfde reël
+// as begin-betaling.js: 'n bestelling met status "Nuut" is betaal.
+async function kry_besitte_eboeke(bestellingsStore, koper_id) {
+  const besitte = new Set();
+  const { blobs } = await bestellingsStore.list();
+  for (const sleutel_item of blobs) {
+    const bestelling = await bestellingsStore.get(sleutel_item.key, { type: "json" });
+    if (!bestelling || bestelling.status !== "Nuut") continue;
+    if (!bestelling.koper || bestelling.koper.netlify_identity_id !== koper_id) continue;
+    for (const item of bestelling.items || []) {
+      if (item.formaat === "eboek") besitte.add(item.produk_slug);
+    }
+  }
+  return besitte;
+}
+
+// Die kodes wat die koper ingetik het, skoon en sonder duplikate. Aanvaar
+// koepon_kodes (lys, nuut) en koepon_kode (een, ouer kliënte).
+function skoon_kodes(invoer) {
+  const ruwe = Array.isArray(invoer.koepon_kodes)
+    ? invoer.koepon_kodes
+    : invoer.koepon_kode ? [invoer.koepon_kode] : [];
+  return [...new Set(ruwe.map((k) => String(k || "").trim().toUpperCase()).filter(Boolean))];
+}
+
+// Pas een koepon toe op 'n prys (sent).
+function pas_koepon_toe(koepon, prys_sent) {
+  if (koepon.tipe === "gratis") return 0;
+  if (koepon.afslag_tipe === "vaste_bedrag") return Math.max(0, prys_sent - koepon.afslag_waarde);
+  return Math.max(0, prys_sent - Math.round((prys_sent * koepon.afslag_waarde) / 100));
+}
+
+// Veldtog eerste, dan lojaliteit op die prys wat oorbly.
+function sorteer_koepons(koepons) {
+  return [...koepons].sort((a, b) => (koepon_soort(a) === "veldtog" ? 0 : 1) - (koepon_soort(b) === "veldtog" ? 0 : 1));
+}
+
+module.exports = {
+  bou_koepon_velde,
+  koepon_boeke,
+  koepon_geld_vir_boek,
+  koepon_soort,
+  besit_voldoen,
+  kry_besitte_eboeke,
+  skoon_kodes,
+  pas_koepon_toe,
+  sorteer_koepons,
+};

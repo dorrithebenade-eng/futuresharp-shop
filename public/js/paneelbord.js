@@ -573,6 +573,9 @@ function wys_koepons_lys(koepons) {
           <div class="paneel-produk-inligting">
             <strong>${koepon.kode}</strong>
             <span class="paneel-produk-outeur">${tipe_teks} · ${boek_teks} · ${formaat_teks} · ${koepon.gebruike_tot_dusver}/${koepon.maks_gebruike} · ${formateer_koepon_status(koepon)}</span>
+            ${koepon.soort === "lojaliteit" || koepon.vereis_besit
+              ? `<span class="paneel-produk-outeur">${koepon.soort === "lojaliteit" ? "Lojaliteitskode (saam met 'n veldtogkode bruikbaar)" : "Veldtogkode"}${koepon.vereis_besit ? " · net vir kopers wat reeds 'n boek besit" : ""}</span>`
+              : ""}
             ${koepon.nota ? `<span class="paneel-produk-outeur">${koepon.nota}</span>` : ""}
           </div>
           <div class="paneel-produk-aksies">
@@ -708,6 +711,8 @@ async function open_koepon_vorm_vir_wysig(koepon) {
   stel("koepon-vorm-verval", koepon.verval_op ? String(koepon.verval_op).slice(0, 10) : "");
   stel("koepon-vorm-nota", koepon.nota || "");
   stel("koepon-vorm-formaat", koepon.formaat_beperking || "albei");
+  stel("koepon-vorm-soort", koepon.soort === "lojaliteit" ? "lojaliteit" : "veldtog");
+  document.getElementById("koepon-vorm-vereis-besit").checked = koepon.vereis_besit === true;
 
   if (koepon.formaat_beperking === "video" && typeof pkt_pas_vorm_aan === "function") {
     // Talk-koepon: wys die talk- en sprekerkeuses en wag tot hulle gelaai is.
@@ -748,6 +753,8 @@ async function hanteer_koepon_vorm_indiening(gebeurtenis) {
     verval_op: document.getElementById("koepon-vorm-verval").value || null,
     outeur_id: document.getElementById("koepon-vorm-outeur").value || null,
     nota: document.getElementById("koepon-vorm-nota").value.trim(),
+    soort: document.getElementById("koepon-vorm-soort").value,
+    vereis_besit: document.getElementById("koepon-vorm-vereis-besit").checked,
   };
 
   const knoppie = document.getElementById("paneel-koepon-vorm-indien");
