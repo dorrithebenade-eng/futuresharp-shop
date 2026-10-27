@@ -161,6 +161,13 @@
     knoppie.classList.remove("adv-stap-twee");
   }
 
+  // EEN KLIK: WhatsApp (op die foon of die rekenaar) maak oop met die
+  // boodskap en die advertensie se skakel klaar ingetik. Jy kies net die
+  // persoon of groep en stuur; WhatsApp wys die advertensie self as prent.
+  function whatsapp_url(a) {
+    return "https://wa.me/?text=" + encodeURIComponent(skakel_boodskap(a));
+  }
+
   // ------------------------------------------------------------------- deel
 
   async function deel_prent(a, knoppie) {
@@ -312,8 +319,8 @@
           <div class="adv-titel">${esc(a.titel)}</div>
           <div class="adv-etiket">${esc(a.groep || "Ander")} · ${a.taal === "en" ? "Engels" : "Afrikaans"}${a.aktief === false ? " · versteek" : ""}</div>
           <div class="adv-hoof-knoppies">
-            <button type="button" class="kaart-aksie adv-deel-prent">📲 Deel prent</button>
-            <button type="button" class="kaart-aksie adv-deel-skakel">🔗 Deel skakel</button>
+            <a class="kaart-aksie adv-whatsapp" href="${esc(whatsapp_url(a))}" target="_blank" rel="noopener">💬 Stuur op WhatsApp</a>
+            <button type="button" class="kaart-aksie adv-deel-prent adv-tweede">📲 Deel prent</button>
           </div>
           <div class="adv-ander-knoppies">
             <button type="button" class="terug-skakel adv-laai-af">Laai af</button>
@@ -329,7 +336,6 @@
 
     const vind = (el) => advertensies.find((a) => a.slug === el.closest(".adv-kaart").dataset.slug);
     lys.querySelectorAll(".adv-deel-prent").forEach((b) => b.addEventListener("click", () => deel_prent(vind(b), b)));
-    lys.querySelectorAll(".adv-deel-skakel").forEach((b) => b.addEventListener("click", () => deel_skakel(vind(b))));
     lys.querySelectorAll(".adv-laai-af").forEach((b) => b.addEventListener("click", async () => {
       try { laai_af(await haal_lêer(vind(b))); } catch (_) { toast("Kon nie die prent laai nie."); }
     }));
@@ -514,7 +520,7 @@
         <h2 class="paneel-afdeling-titel">Advertensies</h2>
         <button id="adv-nuut" class="kaart-aksie paneel-voeg-by-knoppie" type="button">+ Nuwe advertensie</button>
       </div>
-      <p class="paneel-hulp-teks">Tik op <b>Deel prent</b> om die advertensie met sy boodskap op WhatsApp te stuur, of op <b>Deel skakel</b> om net 'n skakel te stuur wat die advertensie as voorskou wys.</p>
+      <p class="paneel-hulp-teks">Tik op <b>💬 Stuur op WhatsApp</b>, kies die persoon of groep en stuur. Die advertensie wys self as prent bo die boodskap.</p>
       <div id="adv-filters" class="adv-filters"></div>
       <div id="adv-lys" class="adv-lys"></div>
 
@@ -569,8 +575,10 @@
       .adv-titel{font-weight:700}
       .adv-etiket{font-size:13px;color:#5b5b5b}
       .adv-hoof-knoppies{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-      .adv-hoof-knoppies .kaart-aksie{margin:0;width:100%;padding:12px 8px;font-size:15px}
-      .adv-stap-twee{background:#171717!important;border-color:#171717!important}
+      .adv-hoof-knoppies .kaart-aksie{margin:0;width:100%;padding:12px 8px;font-size:15px;text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center;box-sizing:border-box}
+      .adv-hoof-knoppies .adv-whatsapp{background:#25D366;border-color:#25D366;color:#fff}
+      .adv-hoof-knoppies .adv-tweede{background:#fff;color:#171717;border:2px solid #cfd8d6}
+      .adv-stap-twee{background:#171717!important;border-color:#171717!important;color:#fff!important}
       .adv-ander-knoppies{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:13px}
       .adv-ander-knoppies .terug-skakel{font-size:13px;padding:2px 0;margin:0;background:none;border:0;color:#2f7f73;text-decoration:underline;cursor:pointer}
       .adv-vorm-agter{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:flex-start;justify-content:center;z-index:1000;overflow:auto;padding:24px 12px}
