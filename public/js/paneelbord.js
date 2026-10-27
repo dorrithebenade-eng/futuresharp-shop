@@ -577,7 +577,7 @@ function wys_koepons_lys(koepons) {
           </div>
           <div class="paneel-produk-aksies">
             <button class="terug-skakel paneel-koepon-wysig-knoppie" data-kode="${koepon.kode}">Wysig</button>
-            ${is_talk ? "" : `<button class="terug-skakel paneel-koepon-beeld-knoppie" data-kode="${koepon.kode}">Maak koeponbeeld</button>`}
+            <button class="terug-skakel paneel-koepon-beeld-knoppie" data-kode="${koepon.kode}">Maak koeponbeeld</button>
             <button class="terug-skakel paneel-koepon-aktief-knoppie" data-kode="${koepon.kode}" data-aktief="${koepon.aktief}">
               ${koepon.aktief ? t("paneel_deaktiveer") : t("paneel_aktiveer")}
             </button>

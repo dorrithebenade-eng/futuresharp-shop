@@ -6,6 +6,8 @@
 // tot wanneer dit geldig is. Die paneel teken die beeld self op 'n canvas
 // (2400 x 1260, dubbel 1200 x 630 sodat dit skerp is op WhatsApp, e-pos en
 // sosiale media) en laai dit as JPG af. Geen bediener hoef te teken nie.
+// Daaronder staan 'n WhatsApp-boodskap met die kode en 'n klikbare skakel,
+// om saam met die beeld te stuur.
 //
 // Die agtergronde is die advertensies met 'n leë, gestippelde koeponblok,
 // in public/images/koepon/. Die blok staan op dieselfde plek in elkeen
@@ -26,6 +28,9 @@
     { lêer: "Play-Smart_Focus_series_EN", naam: "Play-Smart Focus (English)", taal: "en" },
     { lêer: "Eugene_Botha_AF", naam: "Eugene Botha se boeke (Afrikaans)", taal: "af" },
     { lêer: "Eugene_Botha_EN", naam: "Eugene Botha's books (English)", taal: "en" },
+    // FutureSharp Talks: donker agtergrond, die koeponblok staan elders.
+    { lêer: "Talks_AF", naam: "FutureSharp Talks (Afrikaans)", taal: "af", blok: { x: 1200, y: 556, b: 660 } },
+    { lêer: "Talks_EN", naam: "FutureSharp Talks (English)", taal: "en", blok: { x: 1200, y: 556, b: 660 } },
   ];
 
   // Die gestippelde blok in die agtergrond, in pixels van die 2400 x 1260-beeld.
@@ -60,6 +65,7 @@
   function stel_agtergrond_voor(koepon) {
     const boeke = koepon_boeke(koepon).map((s) => s.toLowerCase());
     // By 'n Afrikaans-Engelse paar: begin by die Afrikaanse advertensie.
+    if (koepon.formaat_beperking === "video") return "Talks_AF";
     const eerste = boeke.find((s) => s.startsWith("speel-slim") || s.startsWith("n-")) || boeke[0] || "";
     if (eerste.startsWith("speel-slim-fokus")) return "Speel-Slim_Fokus_reeks_AF";
     if (eerste.startsWith("play-smart-focus")) return "Play-Smart_Focus_series_EN";
@@ -73,6 +79,13 @@
   // Stel die "wat dit gee"-teks voor uit die koepon se reëls.
   function stel_aanbod_voor(koepon, taal) {
     const af = taal !== "en";
+    if (koepon.formaat_beperking === "video") {
+      if (koepon.tipe === "afslag") {
+        const bedrag = koepon.afslag_tipe === "vaste_bedrag" ? `R${Math.round((koepon.afslag_waarde || 0) / 100)}` : `${koepon.afslag_waarde || 0}%`;
+        return af ? `${bedrag} afslag op ’n FutureSharp Talk` : `${bedrag} off a FutureSharp Talk`;
+      }
+      return af ? "’n Gratis FutureSharp Talk" : "A free FutureSharp Talk";
+    }
     const formaat = {
       eboek: af ? "e-boek" : "e-book",
       harde_kopie: af ? "harde kopie" : "hard copy",
@@ -153,7 +166,8 @@
     const agtergrond = await laai_beeld(`images/koepon/${opsies.agtergrond}.jpg`);
     ctx.drawImage(agtergrond, 0, 0, W, H);
 
-    const B = KOEPON_BLOK;
+    const a = AGTERGRONDE.find((x) => x.lêer === opsies.agtergrond);
+    const B = Object.assign({}, KOEPON_BLOK, (a && a.blok) || {});
     const x = B.x + B.rand + B.binne_x;
     const breedte = B.b - 2 * (B.rand + B.binne_x);
     ctx.textBaseline = "alphabetic";
@@ -182,6 +196,32 @@
     const onder_reels = breek(ctx, onder, breedte, 2);
     const onder_y = B.y + B.h - B.rand - 30 - (onder_reels.length - 1) * 34;
     onder_reels.forEach((r, i) => ctx.fillText(r, x, onder_y + i * 34));
+  }
+
+  // Die WhatsApp-boodskap wat saam met die beeld gestuur word. Die skakel
+  // in die teks is in WhatsApp klikbaar, anders as die QR-kode op die beeld
+  // (wat iemand nie met sy eie foon van sy eie skerm kan skandeer nie).
+  function stel_boodskap_voor(kode, aanbod, geldig, taal, is_talk) {
+    const winkel = is_talk ? "https://futuresharp.co.za/talks" : "https://futureshop.futuresharp.co.za";
+    const waar = is_talk ? "FutureSharp Talks" : "Future Shop";
+    const kies = is_talk
+      ? (taal === "en" ? "Choose the talk and enter the code when you pay." : "Kies die talk en tik die kode in wanneer jy betaal.")
+      : (taal === "en" ? "Choose the book, go to your cart and enter the code when you pay." : "Kies die boek, gaan na jou mandjie en tik die kode in wanneer jy betaal.");
+    const klein = String(aanbod || "").replace(/^’n Gratis/, "’n gratis").replace(/^A free/, "a free");
+    if (taal === "en") {
+      return [
+        `A gift for you! 🎁 Here's a voucher${klein ? ` for ${klein}` : ""} at ${is_talk ? "" : "the "}${waar}.`,
+        `Your code: *${kode}*`,
+        `${kies}${geldig ? ` ${geldig}.` : ""}`,
+        winkel,
+      ].join("\n");
+    }
+    return [
+      `’n Geskenk vir jou! 🎁 Hier is ’n koepon${klein ? ` vir ${klein}` : ""} by ${is_talk ? "" : "die "}${waar}.`,
+      `Jou kode: *${kode}*`,
+      `${kies}${geldig ? ` ${geldig}.` : ""}`,
+      winkel,
+    ].join("\n");
   }
 
   // --- Die venster ---
@@ -231,6 +271,13 @@
             <div class="kb-knoppies">
               <button type="button" class="kaart-aksie" id="kb-aflaai">Laai beeld af</button>
             </div>
+            <label class="veld-etiket" for="kb-boodskap">WhatsApp-boodskap</label>
+            <textarea id="kb-boodskap" class="veld-invoer" rows="6"></textarea>
+            <p class="kb-wenk">Stuur eers die beeld, en plak dan hierdie boodskap as onderskrif. Die skakel word in WhatsApp klikbaar, en *sterretjies* maak die kode vet.</p>
+            <div class="kb-knoppies">
+              <button type="button" class="kaart-aksie" id="kb-kopieer">Kopieer boodskap</button>
+              <span class="kb-wenk" id="kb-kopieer-status" role="status"></span>
+            </div>
           </div>
           <div class="kb-voorskou"><canvas id="kb-canvas" aria-label="Voorskou van die koeponbeeld"></canvas></div>
         </div>
@@ -246,15 +293,45 @@
       const taal = huidige_taal();
       venster.querySelector("#kb-aanbod").value = stel_aanbod_voor(huidige_koepon, taal);
       venster.querySelector("#kb-geldig").value = stel_geldig_voor(huidige_koepon, taal);
+      boodskap_self_verander = false;
+      werk_boodskap_by();
       herteken();
     });
-    venster.querySelector("#kb-aanbod").addEventListener("input", herteken_later);
-    venster.querySelector("#kb-geldig").addEventListener("input", herteken_later);
+    venster.querySelector("#kb-aanbod").addEventListener("input", () => { herteken_later(); werk_boodskap_by(); });
+    venster.querySelector("#kb-geldig").addEventListener("input", () => { herteken_later(); werk_boodskap_by(); });
     venster.querySelector("#kb-aflaai").addEventListener("click", laai_af);
+    venster.querySelector("#kb-boodskap").addEventListener("input", () => { boodskap_self_verander = true; });
+    venster.querySelector("#kb-kopieer").addEventListener("click", kopieer_boodskap);
   }
 
   let huidige_koepon = null;
   let wag = null;
+  let boodskap_self_verander = false;
+
+  function werk_boodskap_by() {
+    if (!huidige_koepon || boodskap_self_verander) return;
+    venster.querySelector("#kb-boodskap").value = stel_boodskap_voor(
+      huidige_koepon.kode,
+      venster.querySelector("#kb-aanbod").value.trim(),
+      venster.querySelector("#kb-geldig").value.trim(),
+      huidige_taal(),
+      huidige_koepon.formaat_beperking === "video"
+    );
+  }
+
+  async function kopieer_boodskap() {
+    const veld = venster.querySelector("#kb-boodskap");
+    const status = venster.querySelector("#kb-kopieer-status");
+    try {
+      await navigator.clipboard.writeText(veld.value);
+      status.textContent = "Gekopieer ✓";
+    } catch (_) {
+      veld.focus();
+      veld.select();
+      status.textContent = "Druk Ctrl+C om te kopieer";
+    }
+    setTimeout(() => { status.textContent = ""; }, 3000);
+  }
 
   function huidige_taal() {
     const a = AGTERGRONDE.find((x) => x.lêer === venster.querySelector("#kb-agtergrond").value);
@@ -306,6 +383,9 @@
     const taal = huidige_taal();
     venster.querySelector("#kb-aanbod").value = stel_aanbod_voor(koepon, taal);
     venster.querySelector("#kb-geldig").value = stel_geldig_voor(koepon, taal);
+    boodskap_self_verander = false;
+    werk_boodskap_by();
+    venster.querySelector("#kb-kopieer-status").textContent = "";
     venster.hidden = false;
     herteken();
   };
