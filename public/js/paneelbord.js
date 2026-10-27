@@ -577,6 +577,7 @@ function wys_koepons_lys(koepons) {
           </div>
           <div class="paneel-produk-aksies">
             <button class="terug-skakel paneel-koepon-wysig-knoppie" data-kode="${koepon.kode}">Wysig</button>
+            ${is_talk ? "" : `<button class="terug-skakel paneel-koepon-beeld-knoppie" data-kode="${koepon.kode}">Maak koeponbeeld</button>`}
             <button class="terug-skakel paneel-koepon-aktief-knoppie" data-kode="${koepon.kode}" data-aktief="${koepon.aktief}">
               ${koepon.aktief ? t("paneel_deaktiveer") : t("paneel_aktiveer")}
             </button>
@@ -590,6 +591,14 @@ function wys_koepons_lys(koepons) {
     knoppie.addEventListener("click", () => {
       const koepon = koepons_kas.find((k) => k.kode === knoppie.dataset.kode);
       if (koepon) open_koepon_vorm_vir_wysig(koepon);
+    });
+  });
+
+  // Koeponbeeld (paneel-koepon-beeld.js): 'n advertensie met die kode op.
+  wrap.querySelectorAll(".paneel-koepon-beeld-knoppie").forEach((knoppie) => {
+    knoppie.addEventListener("click", () => {
+      const koepon = koepons_kas.find((k) => k.kode === knoppie.dataset.kode);
+      if (koepon && typeof window.open_koepon_beeld === "function") window.open_koepon_beeld(koepon);
     });
   });
 
