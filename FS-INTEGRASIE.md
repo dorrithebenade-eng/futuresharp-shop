@@ -2,23 +2,24 @@
 
 Plaas hierdie lêer in elke repo wat deel is van die integrasie (Future Sharp-paneel, FSF en FSVS). Lees dit saam met die repo se eie CLAUDE.md.
 
-## Tydelike reëling: "LEES" (geldig tot 5 November 2026)
+## Die opdrag "LEES"
 
-Wanneer Dorrithé net "LEES" sê, wil sy hê jy moet die gedeelde Google Drive-vouer "Future Sharp Stand van sake" lees. 'n Wolksessie kan nie haar Drive sien nie. Tot en met 5 November 2026:
+Wanneer Dorrithé net "LEES" sê, wil sy hê jy moet die gedeelde Google Drive-vouer "Future Sharp Stand van sake" lees (Future Sharp se Drive, futuresharpmentor@gmail.com, binne Future Sharp NPC).
 
-1. Vra haar om die relevante deel van die "Stand van sake"-nota in te plak.
-2. Moenie aannames maak oor wat in die nota staan nie.
-3. Vra vrae as iets ná die lees steeds nie duidelik is nie.
-
-Ná 5 November 2026 verval hierdie reëling. Verwyder dan hierdie afdeling.
+1. Kyk eers of die Google Drive-koppeling in hierdie sessie aan is. As dit aan is, lees self "00 LEES MY EERS" en dan die betrokke Stand van sake-lêers, ook in 'n wolksessie.
+2. Net as die koppeling nie aan is nie: vra Dorrithé om die relevante deel van die nota in te plak, of om die Google Drive-koppeling aan te skakel.
+3. Moenie aannames maak oor wat in die nota staan nie.
+4. Vra vrae as iets ná die lees steeds nie duidelik is nie.
 
 ## Wat die integrasie is
 
 Drie stelsels wat met mekaar praat, maar nie saamgesmelt word nie:
 
-1. **Future Sharp-paneel**: registrasie- en administrasiepaneel (Boekhouding, Verslae, Dokumente, Akkreditasies).
-2. **FSF (Future Sharp Forms)**: die vraelysbouer en die katalogus (`futuresharp-katalogus.netlify.app`).
-3. **FSVS (Future Sharp Verslagstelsel)**: genereer verslae uit vraelysantwoorde.
+1. **Future Sharp-paneel**: registrasie- en administrasiepaneel (Boekhouding, Verslae, Dokumente, Akkreditasies). Repo: `futuresharp-shop`.
+2. **FSF (Future Sharp Forms)**: die vraelysbouer en die katalogus (`futuresharp-katalogus.netlify.app`), met die Apps Script. Repo: `futuresharp-paneelbord`.
+3. **FSVS (Future Sharp Verslagstelsel)**: genereer verslae uit vraelysantwoorde (Cloud Run). Repo: `fsvs`.
+
+Die registrasieportaal (`future-sharp-vraelyste`) is 'n aparte stelsel wat met die paneel praat.
 
 Speel-Slim, Future Shop en FutureSharp TALKS is aparte projekte langs hierdie drie.
 

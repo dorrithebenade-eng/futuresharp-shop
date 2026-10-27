@@ -2,15 +2,14 @@
 
 Lees hierdie lêer voordat jy enige werk in hierdie repo doen. As die taak die Future Sharp-paneel, FSF of FSVS raak, lees ook `FS-INTEGRASIE.md`.
 
-## Tydelike reëling: "LEES" (geldig tot 5 November 2026)
+## Die opdrag "LEES"
 
-Wanneer Dorrithé net "LEES" sê, wil sy hê jy moet die gedeelde Google Drive-vouer "Future Sharp Stand van sake" lees. 'n Wolksessie kan nie haar Drive sien nie. Tot en met 5 November 2026:
+Wanneer Dorrithé net "LEES" sê, wil sy hê jy moet die gedeelde Google Drive-vouer "Future Sharp Stand van sake" lees (Future Sharp se Drive, futuresharpmentor@gmail.com, binne Future Sharp NPC).
 
-1. Vra haar om die relevante deel van die "Stand van sake"-nota in te plak.
-2. Moenie aannames maak oor wat in die nota staan nie.
-3. Vra vrae as iets ná die lees steeds nie duidelik is nie.
-
-Ná 5 November 2026 verval hierdie reëling. Verwyder dan hierdie afdeling.
+1. Kyk eers of die Google Drive-koppeling in hierdie sessie aan is. As dit aan is, lees self "00 LEES MY EERS" en dan die betrokke Stand van sake-lêers, ook in 'n wolksessie.
+2. Net as die koppeling nie aan is nie: vra Dorrithé om die relevante deel van die nota in te plak, of om die Google Drive-koppeling aan te skakel.
+3. Moenie aannames maak oor wat in die nota staan nie.
+4. Vra vrae as iets ná die lees steeds nie duidelik is nie.
 
 ## Oor die projek
 
