@@ -196,8 +196,11 @@
     }
 
     // Rekenaar sonder deel-venster vir lêers: kopieer die prent.
-    const op_rekenaar = !(navigator.canShare && navigator.share) || !/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
-    if (op_rekenaar && kan_prent_kopieer()) {
+    // Waar die blaaier 'n deel-venster vir lêers het (foon, en ook Chrome of
+    // Edge op Windows en Safari op 'n Mac), gaan prent en boodskap saam.
+    // Net waar dit nie bestaan nie, kopieer ons die prent om te plak.
+    const kan_deel = !!(navigator.canShare && navigator.share);
+    if (!kan_deel && kan_prent_kopieer()) {
       try {
         await kopieer_prent(a);
         stel_stap_twee(knoppie, a);
@@ -217,7 +220,7 @@
     if (in_kas && kan_lêers_deel(in_kas)) {
       try {
         await navigator.share({ files: [in_kas], text: teks });
-        toast("Gedeel. Die boodskap is ook gekopieer, plak dit as dit nie saamgekom het nie.");
+        toast("Gestuur. Die boodskap is ook gekopieer: plak dit as dit nie saamgekom het nie.");
       } catch (e) {
         if (e && e.name === "AbortError") return;
         toast("Kon nie deel nie. Probeer weer.");
@@ -334,8 +337,8 @@
           <div class="adv-titel">${esc(a.titel)}</div>
           <div class="adv-etiket">${esc(a.groep || "Ander")} · ${a.taal === "en" ? "Engels" : "Afrikaans"}${a.aktief === false ? " · versteek" : ""}</div>
           <div class="adv-hoof-knoppies">
-            <a class="kaart-aksie adv-whatsapp" href="${esc(whatsapp_url(a))}" target="_blank" rel="noopener">💬 Stuur op WhatsApp</a>
-            <button type="button" class="kaart-aksie adv-deel-prent adv-tweede">📲 Deel prent</button>
+            <button type="button" class="kaart-aksie adv-deel-prent adv-whatsapp">💬 Stuur op WhatsApp</button>
+            <a class="kaart-aksie adv-tweede" href="${esc(whatsapp_url(a))}" target="_blank" rel="noopener">🔗 Stuur skakel</a>
           </div>
           <div class="adv-ander-knoppies">
             <button type="button" class="terug-skakel adv-laai-af">Laai af</button>
@@ -538,7 +541,7 @@
         <h2 class="paneel-afdeling-titel">Advertensies</h2>
         <button id="adv-nuut" class="kaart-aksie paneel-voeg-by-knoppie" type="button">+ Nuwe advertensie</button>
       </div>
-      <p class="paneel-hulp-teks">Tik op <b>💬 Stuur op WhatsApp</b>, kies die persoon of groep en stuur. Die advertensie wys self as prent bo die boodskap.</p>
+      <p class="paneel-hulp-teks">Tik op <b>💬 Stuur op WhatsApp</b>, kies WhatsApp en dan die persoon of groep. Die prent en die boodskap gaan saam. Die boodskap word ook gekopieer: as dit nie saamkom nie, plak dit onder die prent.</p>
       <div id="adv-filters" class="adv-filters"></div>
       <div id="adv-lys" class="adv-lys"></div>
 
