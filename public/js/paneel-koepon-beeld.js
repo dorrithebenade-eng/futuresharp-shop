@@ -77,10 +77,20 @@
       harde_kopie: af ? "harde kopie" : "hard copy",
       leen: af ? "lening" : "loan",
     }[koepon.formaat_beperking] || (af ? "boek" : "book");
-    const boeke = koepon_boeke(koepon);
+    let boeke = koepon_boeke(koepon);
+    // Geld die koepon vir die Afrikaanse en Engelse weergawe van dieselfde
+    // boek? Noem dan net die boek in die taal van die advertensie.
+    const lys = typeof produkte_kas !== "undefined" ? produkte_kas : [];
+    if (boeke.length === 2) {
+      const [a, b] = boeke.map((s) => lys.find((x) => x.slug === s));
+      if (a && b && (a.eweknie_slug === b.slug || b.eweknie_slug === a.slug)) {
+        const in_taal = [a, b].find((x) => x.taal === (af ? "af" : "en"));
+        boeke = [(in_taal || a).slug];
+      }
+    }
     let waarvan;
     if (boeke.length === 1) waarvan = boek_titel(boeke[0]);
-    else if (boeke.length > 1) waarvan = af ? `een van ${boeke.length} gekose boeke` : `one of ${boeke.length} selected books`;
+    else if (boeke.length > 1) waarvan = af ? `${boeke.length} gekose boeke` : `${boeke.length} selected books`;
     else waarvan = af ? "jou keuse" : "your choice";
 
     if (koepon.tipe === "afslag") {
@@ -88,9 +98,11 @@
         ? `R${Math.round((koepon.afslag_waarde || 0) / 100)}`
         : `${koepon.afslag_waarde || 0}%`;
       if (boeke.length === 1) return af ? `${bedrag} afslag op ${waarvan}` : `${bedrag} off ${waarvan}`;
+      if (boeke.length > 1) return af ? `${bedrag} afslag op ’n ${formaat} uit ${waarvan}` : `${bedrag} off a ${formaat} from ${waarvan}`;
       return af ? `${bedrag} afslag op ’n ${formaat} van ${waarvan}` : `${bedrag} off a ${formaat} of ${waarvan}`;
     }
     if (boeke.length === 1) return af ? `’n Gratis ${formaat}: ${waarvan}` : `A free ${formaat}: ${waarvan}`;
+    if (boeke.length > 1) return af ? `’n Gratis ${formaat} uit ${waarvan}` : `A free ${formaat} from ${waarvan}`;
     return af ? `’n Gratis ${formaat} van ${waarvan}` : `A free ${formaat} of ${waarvan}`;
   }
 
@@ -178,9 +190,12 @@
   function bou_venster() {
     const styl = document.createElement("style");
     styl.textContent = `
+      .kb-agter[hidden] { display: none !important; }
       .kb-agter { position: fixed; inset: 0; background: rgba(7,22,48,.55); z-index: 1000; display: flex; align-items: flex-start; justify-content: center; overflow-y: auto; padding: 24px 16px; }
       .kb-venster { background: #fff; border-radius: 12px; max-width: 980px; width: 100%; padding: 22px; display: grid; gap: 16px; box-shadow: 0 20px 50px rgba(0,0,0,.3); }
       .kb-kop { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+      .kb-sluit { background: #F5F4F1; border: 1px solid #ddd; border-radius: 999px; padding: 6px 14px; font: 600 14px Poppins, sans-serif; cursor: pointer; }
+      .kb-sluit:hover, .kb-sluit:focus-visible { background: #e9e7e1; }
       .kb-kop h3 { margin: 0; font-family: Montserrat, sans-serif; font-size: 20px; }
       .kb-uitleg { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 20px; align-items: start; }
       .kb-velde { display: grid; gap: 10px; }
@@ -199,7 +214,7 @@
       <div class="kb-venster" role="dialog" aria-modal="true" aria-labelledby="kb-titel">
         <div class="kb-kop">
           <h3 id="kb-titel">Koeponbeeld</h3>
-          <button type="button" class="terug-skakel" id="kb-sluit">Sluit</button>
+          <button type="button" class="kb-sluit" id="kb-sluit" aria-label="Sluit">Sluit ✕</button>
         </div>
         <div class="kb-uitleg">
           <div class="kb-velde">
