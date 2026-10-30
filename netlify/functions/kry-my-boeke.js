@@ -56,7 +56,8 @@ exports.handler = async (event, context) => {
       return produk;
     }
 
-    const vandag = new Date().toISOString().slice(0, 10);
+    // Suid-Afrikaanse datum (UTC+2), sodat 'n boek om 00:00 SA-tyd oopgaan en nie eers om 02:00 nie.
+    const vandag = new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString().slice(0, 10);
     const my_boeke = [];
     const koepon_store = kry_store("koepons");
 
