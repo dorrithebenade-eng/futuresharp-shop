@@ -395,7 +395,7 @@ const WOORDEBOEK = {
     en: "The books in your cart already have the series bundle price. Coupons do not apply on top of the bundle price.",
   },
   pakket_reel: { af: "Reekspakket", en: "Series bundle" },
-  pakket_tot: { af: "Tot", en: "Until" },
+  pakket_tot: { af: "Aanbod tot", en: "Offer ends" },
   pakket_vir: { af: "vir", en: "for" },
   pakket_al: { af: "Al", en: "All" },
   pakket_eboeke: { af: "e-boeke", en: "e-books" },
