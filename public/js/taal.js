@@ -390,6 +390,16 @@ const WOORDEBOEK = {
     af: "Hierdie kode is vir lesers wat reeds een van ons boeke het. Meld aan met die rekening waarmee jy die boek gekoop het.",
     en: "This code is for readers who already own one of our books. Sign in with the account you used to buy the book.",
   },
+  koepon_fout_in_pakket: {
+    af: "Die boeke in jou mandjie het reeds die reekspakketprys. Koepons geld nie bo-op die pakketprys nie.",
+    en: "The books in your cart already have the series bundle price. Coupons do not apply on top of the bundle price.",
+  },
+  pakket_reel: { af: "Reekspakket", en: "Series bundle" },
+  pakket_tot: { af: "Tot", en: "Until" },
+  pakket_vir: { af: "vir", en: "for" },
+  pakket_al: { af: "Al", en: "All" },
+  pakket_eboeke: { af: "e-boeke", en: "e-books" },
+  pakket_knoppie: { af: "Sit die hele reeks in my mandjie", en: "Add the whole series to my cart" },
   koepon_nog_een: {
     af: "Het jy nog 'n kode, soos die een agter in jou boek? Jy kan dit ook byvoeg.",
     en: "Do you have another code, like the one at the back of your book? You can add it too.",

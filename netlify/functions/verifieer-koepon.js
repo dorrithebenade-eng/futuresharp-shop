@@ -18,6 +18,7 @@ const {
   sorteer_koepons,
 } = require("./_koepon-velde");
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
+const { kry_aktiewe_pakkette, pas_pakkette_toe } = require("./_reekspakkette");
 
 exports.handler = async (event, context) => {
   if (event.httpMethod !== "POST") {
@@ -77,7 +78,19 @@ exports.handler = async (event, context) => {
   let nuwe_totaal_sent = 0;
   const pas_iewers = new Set();
 
+  // Reekspakkette eerste, soos begin-betaling.js: boeke in 'n pakket kry die
+  // pakketprys en geen koepon nie.
+  const pakket_invoer = [];
   for (const kliënt_item of items) {
+    const p = await katalogusStore.get(kliënt_item.produk_slug, { type: "json" });
+    const fd = p && p.formate && p.formate[kliënt_item.formaat];
+    pakket_invoer.push({ produk_slug: kliënt_item.produk_slug, formaat: kliënt_item.formaat, prys_sent: fd && fd.beskikbaar ? fd.prys_sent : 0 });
+  }
+  const { per_item: pakket_per_item } = pas_pakkette_toe(pakket_invoer, await kry_aktiewe_pakkette());
+  let item_indeks = -1;
+
+  for (const kliënt_item of items) {
+    item_indeks++;
     const produk = await katalogusStore.get(kliënt_item.produk_slug, { type: "json" });
     if (!produk) continue;
     const formaat_data = produk.formate && produk.formate[kliënt_item.formaat];
@@ -86,8 +99,10 @@ exports.handler = async (event, context) => {
     const item_prys_sent = formaat_data.prys_sent;
     oorspronklike_totaal_sent += item_prys_sent;
     let verkoop_prys_sent = item_prys_sent;
+    const in_pakket = pakket_per_item[item_indeks];
+    if (in_pakket) verkoop_prys_sent = in_pakket.prys_sent;
 
-    for (const koepon of gesorteer) {
+    for (const koepon of in_pakket ? [] : gesorteer) {
       const kom_ooreen =
         koepon_geld_vir_boek(koepon, produk.slug) &&
         (koepon.formaat_beperking === "albei" || koepon.formaat_beperking === kliënt_item.formaat);
@@ -103,7 +118,11 @@ exports.handler = async (event, context) => {
   }
 
   const pas_nêrens = koepons.find((k) => !pas_iewers.has(k.kode));
-  if (pas_nêrens) return fout("GEEN_TOEPASSING", pas_nêrens.kode);
+  if (pas_nêrens) {
+    // Alles in die mandjie val in 'n reekspakket: die pakketprys geld reeds.
+    const net_pakket = pakket_per_item.length > 0 && pakket_per_item.every(Boolean);
+    return fout(net_pakket ? "IN_PAKKET" : "GEEN_TOEPASSING", pas_nêrens.kode);
+  }
 
   return {
     statusCode: 200,

@@ -52,6 +52,7 @@ const { kry_gebruiker_en_rol_uitslag } = require("./_rol-kontrole");
 const { kry_maks_verdeling_sent } = require("./_paystack-koste.js");
 const { stuur_outeur_kennisgewings } = require("./_kennisgewing-outeur");
 const { stuur_koper_bevestiging } = require("./_kennisgewing-koper");
+const { kry_aktiewe_pakkette, pas_pakkette_toe } = require("./_reekspakkette");
 
 // Rol_tipe → watter Blobs-store die entiteit se subrekening-kode in is.
 const ROL_TIPE_STORES = {
@@ -229,7 +230,28 @@ exports.handler = async (event, context) => {
   const verdeling_per_subrekening = {}; // { "ACCT_xxx": sent_bedrag }
   const koepon_gebruikte_items = {}; // kode -> items waarop dit toegepas is
 
+  // REEKSPAKKETTE (sien _reekspakkette.js): is al die e-boeke van 'n reeks
+  // in die mandjie, kry hulle die pakketprys, versprei oor die boeke. Ons
+  // bereken dit vooraf met die katalogus se pryse; koepons geld nie op
+  // boeke in 'n pakket nie.
+  const pakket_invoer = [];
   for (const kliënt_item of items) {
+    const p = await katalogusStore.get(kliënt_item.produk_slug, { type: "json" });
+    const fd = p && p.formate && p.formate[kliënt_item.formaat];
+    pakket_invoer.push({
+      produk_slug: kliënt_item.produk_slug,
+      formaat: kliënt_item.formaat,
+      prys_sent: fd && fd.beskikbaar ? fd.prys_sent : 0,
+    });
+  }
+  const { per_item: pakket_per_item, toegepas: reekspakkette_toegepas } = pas_pakkette_toe(
+    pakket_invoer,
+    await kry_aktiewe_pakkette()
+  );
+  let item_indeks = -1;
+
+  for (const kliënt_item of items) {
+    item_indeks++;
     const produk = await katalogusStore.get(kliënt_item.produk_slug, { type: "json" });
     if (!produk || !produk.aktief) {
       return { statusCode: 400, body: `"${kliënt_item.produk_slug}" is nie meer beskikbaar nie` };
@@ -266,9 +288,12 @@ exports.handler = async (event, context) => {
     const item_prys_sent = formaat_data.prys_sent; // oorspronklike prys, voor enige koepon
     let verkoop_prys_sent = item_prys_sent;
     const item_koepon_kodes = [];
+    const in_pakket = pakket_per_item[item_indeks];
+    if (in_pakket) verkoop_prys_sent = in_pakket.prys_sent;
 
-    // Veldtog eerste, dan lojaliteit op die prys wat oorbly.
-    for (const koepon of gesorteerde_koepons) {
+    // Veldtog eerste, dan lojaliteit op die prys wat oorbly. Nie op 'n
+    // boek in 'n reekspakket nie: die pakketprys is die finale prys.
+    for (const koepon of in_pakket ? [] : gesorteerde_koepons) {
       if (!koepon_geld_vir_item(koepon, produk.slug, kliënt_item.formaat)) continue;
       verkoop_prys_sent = pas_koepon_toe(koepon, verkoop_prys_sent);
       item_koepon_kodes.push(koepon.kode);
@@ -298,6 +323,7 @@ exports.handler = async (event, context) => {
       ...(item_koepon_kodes.length
         ? { oorspronklike_prys_sent: item_prys_sent, koepon_kode: item_koepon_kodes[0], koepon_kodes: item_koepon_kodes }
         : {}),
+      ...(in_pakket ? { oorspronklike_prys_sent: item_prys_sent, reekspakket_id: in_pakket.pakket_id } : {}),
       ...leen_ekstra,
     });
 
@@ -377,6 +403,7 @@ exports.handler = async (event, context) => {
       split_fout: null,
       koepon_toegepas,
       koepons_toegepas,
+      reekspakkette_toegepas,
       drukker: bevat_harde_kopie ? { bestelling_geplaas: false, geplaas_op: null, nota: "" } : null,
       paystack: {
         referensie: bestelnommer,
@@ -565,7 +592,8 @@ exports.handler = async (event, context) => {
     split_code,
     split_fout,
     koepon_toegepas,
-      koepons_toegepas,
+    koepons_toegepas,
+    reekspakkette_toegepas,
     drukker: bevat_harde_kopie
       ? { bestelling_geplaas: false, geplaas_op: null, nota: "" }
       : null,

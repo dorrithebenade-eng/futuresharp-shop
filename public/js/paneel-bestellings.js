@@ -40,6 +40,9 @@ function bou_bestelling_kaart(b) {
   const koepon_html = koepon_kodes.length
     ? `<p class="paneel-bestelling-koepon">🎟️ Koepon toegepas: <strong>${koepon_kodes.join(" + ")}</strong></p>`
     : "";
+  const pakket_html = Array.isArray(b.reekspakkette_toegepas) && b.reekspakkette_toegepas.length
+    ? `<p class="paneel-bestelling-koepon">📚 Reekspakket: <strong>${b.reekspakkette_toegepas.map((p) => `${p.naam_af} (−R${(p.afslag_sent / 100).toFixed(2)})`).join(", ")}</strong></p>`
+    : "";
 
   const gratis_html = b.paystack && b.paystack.gratis_via_koepon
     ? `<p class="paneel-bestelling-koepon">🎁 100%-koepon — geen Paystack-transaksie nie</p>`
@@ -75,7 +78,7 @@ function bou_bestelling_kaart(b) {
         ${formateer_datum_vol_bestelling(b.geskep_op)} · ${(b.koper && b.koper.epos) || "—"} · <strong>${formateer_prys_sent_bestelling(b.totaal_sent)}</strong>
       </p>
       <ul class="paneel-bestelling-items">${items_html}</ul>
-      ${koepon_html}
+      ${koepon_html}${pakket_html}
       ${gratis_html}
       ${split_fout_html}
       ${drukker_html}

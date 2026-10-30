@@ -31,6 +31,7 @@ const KOEPON_FOUT_SLEUTELS = {
   TE_VEEL: "koepon_fout_te_veel",
   TWEE_VAN_SOORT: "koepon_fout_twee_van_soort",
   BESIT_NODIG: "koepon_fout_besit_nodig",
+  IN_PAKKET: "koepon_fout_in_pakket",
 };
 
 function formateer_prys_sent(sent) {
@@ -54,7 +55,7 @@ function kry_of_skep_bestelnommer() {
   return nommer;
 }
 
-function bou_opsomming(items, totaal) {
+function bou_opsomming(items, totaal, pakkette) {
   return `
     <section class="vb-afdeling">
       <h2 class="vb-afdeling-titel">${t("bestelling_opsomming")}</h2>
@@ -69,6 +70,8 @@ function bou_opsomming(items, totaal) {
           )
           .join("")}
       </div>
+
+      ${typeof reekspakket_lyne_html === "function" ? reekspakket_lyne_html(pakkette, "vb-opsomming-ry") : ""}
 
       <div class="vb-koepon-blok">
         <label class="veld-etiket" for="vb-koepon-invoer">${t("koepon_etiket")}</label>
@@ -308,7 +311,8 @@ function wys_toegepaste_koepons(data, items, oorspronklike_totaal, toegangs_toke
   } else if (data.nuwe_totaal_sent === 0) {
     wys_koepon_nota(t("koepon_toegepas_gratis"), false);
   } else {
-    wys_koepon_nota(`${t("koepon_toegepas_afslag")} ${formateer_prys_sent(data.afslag_sent)}`, false);
+    // Die besparing van die koepon self; 'n reekspakket se afslag staan reeds apart.
+    wys_koepon_nota(`${t("koepon_toegepas_afslag")} ${formateer_prys_sent(oorspronklike_totaal - data.nuwe_totaal_sent)}`, false);
   }
 
   // Twee kodes is die maksimum; daarna verdwyn die invoerry.
@@ -397,7 +401,19 @@ async function laai_vb() {
     return;
   }
 
-  const totaal = kry_mandjie_totaal_sent();
+  // Die totaal soos die kassa dit sal bereken, met reekspakkette (sien
+  // reekspakket.js); val terug op die mandjie se som as dit nie beskikbaar is nie.
+  let totaal = kry_mandjie_totaal_sent();
+  let pakkette = [];
+  try {
+    const prys = typeof reekspakket_kry_mandjie_prys === "function" ? await reekspakket_kry_mandjie_prys(items) : null;
+    if (prys) {
+      totaal = prys.totaal_sent;
+      pakkette = prys.pakkette || [];
+    }
+  } catch (_) {
+    /* die mandjie se som bly staan */
+  }
   VERTOONDE_TOTAAL_SENT = totaal;
   TOEGEPASTE_KOEPON_KODES = [];
   const bevatHardeKopie = mandjie_bevat_harde_kopie();
@@ -405,7 +421,7 @@ async function laai_vb() {
 
   wrap.innerHTML = `
     <p class="vb-bestelnommer">${t("bestelnommer_etiket")}: <strong>${bestelnommer}</strong></p>
-    ${bou_opsomming(items, totaal)}
+    ${bou_opsomming(items, totaal, pakkette)}
     ${bevatHardeKopie ? bou_aflewer_afdeling() : ""}
     ${bou_kontak_afdeling()}
     <div id="vb-foute" class="vb-foute" style="display:none;"></div>
