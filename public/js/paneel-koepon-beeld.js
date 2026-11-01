@@ -63,6 +63,213 @@
     return p ? p.titel : slug;
   }
 
+  // DIE GEKOSE BOEKE (November 2026). Die koeponbeeld kan die omslae wys van
+  // presies die boeke wat in die koepon gekies is: een boek groot, 'n paar in
+  // 'n waaier, baie in 'n rooster. Die paneel teken dit self op dieselfde
+  // uitleg as die reeksadvertensies (QR-kode, koeponblok en voetstrook bly).
+  // Van 'n Afrikaans-Engelse paar word net een uitgawe gewys.
+  const GEKOSE = "__boek";
+  const MAKS_OMSLAE = 12;
+
+  function gekose_boeke(koepon) {
+    if (koepon.formaat_beperking === "video") return null;
+    const lys = typeof produkte_kas !== "undefined" ? produkte_kas : [];
+    const boeke = koepon_boeke(koepon).map((s) => lys.find((x) => x.slug === s)).filter(Boolean);
+    if (!boeke.length) return null;
+    // Die taal van die meeste boeke; by gelykop Afrikaans.
+    const en = boeke.filter((b) => b.taal === "en").length;
+    const taal = en > boeke.length - en ? "en" : "af";
+    const gesien = new Set();
+    const uniek = [];
+    for (const b of boeke) {
+      if (gesien.has(b.slug)) continue;
+      const maat = b.eweknie_slug && boeke.find((x) => x.slug === b.eweknie_slug);
+      const kies = maat ? ((b.taal || "af") === taal ? b : maat) : b;
+      gesien.add(b.slug);
+      if (maat) gesien.add(maat.slug);
+      uniek.push(kies);
+    }
+    return { boeke: uniek, taal };
+  }
+
+  function deel_titel(titel) {
+    const t = String(titel || "");
+    const i = t.indexOf(":");
+    return i > 0 ? { reeks: t.slice(0, i).trim(), kort: t.slice(i + 1).trim() } : { reeks: "", kort: t.trim() };
+  }
+
+  // Een omslag met 'n room rand en 'n skaduwee, gedraai om sy middel.
+  function teken_omslag(ctx, o, mx, my, w, hoek) {
+    const h = Math.round((w * o.height) / o.width);
+    ctx.save();
+    ctx.translate(mx, my);
+    ctx.rotate((hoek * Math.PI) / 180);
+    const rand = Math.max(8, Math.round(w * 0.05));
+    ctx.shadowColor = "rgba(0,0,0,.35)";
+    ctx.shadowBlur = 36;
+    ctx.shadowOffsetY = 12;
+    ctx.fillStyle = "#FAF8F0";
+    ctx.fillRect(-(w + 2 * rand) / 2, -(h + 2 * rand) / 2, w + 2 * rand, h + 2 * rand);
+    ctx.shadowColor = "transparent";
+    ctx.drawImage(o, -w / 2, -h / 2, w, h);
+    ctx.restore();
+  }
+
+  // Die omslae in die linkerkantste vlak (x 40..1020, y 90..940).
+  async function teken_omslae(ctx, boeke) {
+    const beelde = [];
+    for (const b of boeke.slice(0, MAKS_OMSLAE)) {
+      if (!b.omslag) continue;
+      try {
+        beelde.push(await laai_beeld(b.omslag));
+      } catch (_) {
+        /* sonder hierdie omslag */
+      }
+    }
+    const n = beelde.length;
+    if (!n) return;
+    const verhouding = beelde[0].height / beelde[0].width || 1.42;
+
+    if (n === 1) {
+      const w = Math.min(500, Math.round(780 / verhouding));
+      teken_omslag(ctx, beelde[0], 560, 520, w, -4);
+      return;
+    }
+    if (n <= 8) {
+      // 'n Waaier van links na regs, soos die reeksadvertensies.
+      const w = n <= 3 ? 380 : n <= 5 ? 320 : 270;
+      // By twee of drie boeke oorvleuel hulle rondom die middel; meer boeke
+      // vul die hele breedte.
+      const span = n === 2 ? 300 : n === 3 ? 480 : 900 - w;
+      const links = 545 - span / 2, regs = 545 + span / 2;
+      const stap = (regs - links) / (n - 1);
+      beelde.forEach((o, i) => {
+        const hoek = n <= 3 ? (i - (n - 1) / 2) * 6 : -8 + (16 * i) / (n - 1);
+        const my = 560 - Math.round(i * (n <= 3 ? 10 : 18));
+        teken_omslag(ctx, o, links + i * stap, my, w, hoek);
+      });
+      return;
+    }
+    // 'n Rooster vir baie boeke.
+    const kolomme = n <= 10 ? 5 : 4;
+    const rye = Math.ceil(n / kolomme);
+    const sx = kolomme === 5 ? 192 : 230;
+    const w = Math.min(sx - 34, Math.floor(780 / rye / verhouding) - 20);
+    const h = Math.round(w * verhouding);
+    const sy = h + 36;
+    const begin_y = 520 - ((rye - 1) * sy) / 2;
+    beelde.forEach((o, i) => {
+      const r = Math.floor(i / kolomme), k = i % kolomme;
+      const in_ry = Math.min(kolomme, n - r * kolomme);
+      const begin_x = 540 - ((in_ry - 1) * sx) / 2;
+      teken_omslag(ctx, o, begin_x + k * sx, begin_y + r * sy, w, 0);
+    });
+  }
+
+  function boek_taal(keuse) {
+    return keuse && keuse.taal === "en" ? "en" : "af";
+  }
+
+  // Teken die gekose boeke se agtergrond oor die reeksadvertensie se uitleg.
+  async function teken_boek_agtergrond(ctx, keuse, taal) {
+    const boeke = keuse.boeke;
+    const basis = await laai_beeld(`images/koepon/${taal === "en" ? "Play-Smart_series_EN" : "Speel-Slim_reeks_AF"}.jpg`);
+    ctx.drawImage(basis, 0, 0, 2400, 1260);
+    ctx.fillStyle = "#479F91";
+    ctx.fillRect(0, 40, 1060, 935); // die reeks se omslae
+    ctx.fillRect(1060, 80, 770, 490); // die reeks se opskrif
+
+    await teken_omslae(ctx, boeke);
+
+    // Etiket, opskrif en 'n reël daaronder.
+    const dele = boeke.map((b) => deel_titel(b.titel));
+    const een_reeks = dele.every((d) => d.reeks && d.reeks === dele[0].reeks);
+    let etiket, opskrif, onder;
+    if (boeke.length === 1) {
+      etiket = dele[0].reeks || "Future Shop";
+      opskrif = dele[0].kort;
+      onder = boeke[0].outeur || "";
+    } else {
+      etiket = een_reeks ? dele[0].reeks : "Future Shop";
+      opskrif = taal === "en" ? `Valid on these ${boeke.length} books` : `Geldig op hierdie ${boeke.length} boeke`;
+      const outeurs = [...new Set(boeke.map((b) => b.outeur).filter(Boolean))];
+      onder = boeke.length <= 4 ? dele.map((d) => d.kort).join(" · ") : outeurs.length === 1 ? outeurs[0] : "";
+    }
+    if (onder) onder = onder.replace(/ en /, taal === "en" ? " and " : " en ");
+
+    ctx.textBaseline = "alphabetic";
+    ctx.font = "700 34px Montserrat";
+    etiket = etiket.toUpperCase();
+    const ew = ctx.measureText(etiket).width;
+    ctx.fillStyle = "#F5C043";
+    rond_reghoek(ctx, 1080, 100, ew + 52, 70, 10);
+    ctx.fillStyle = "#171717";
+    ctx.fillText(etiket, 1106, 148);
+
+    const BREEDTE = 740;
+    // Twee gebalanseerde reëls (die tweede kry die wit blok), so groot as
+    // wat pas. Een woord bly een reël.
+    const woorde = opskrif.split(/\s+/).filter(Boolean);
+    const verdeel = () => {
+      if (woorde.length < 2) return [opskrif];
+      let beste = null;
+      for (let i = 1; i < woorde.length; i++) {
+        const twee = [woorde.slice(0, i).join(" "), woorde.slice(i).join(" ")];
+        const wydste = Math.max(...twee.map((r) => ctx.measureText(r).width));
+        if (!beste || wydste < beste.wydste) beste = { twee, wydste };
+      }
+      return beste.twee;
+    };
+    let grootte = 92, reels;
+    do {
+      grootte -= 4;
+      ctx.font = `800 ${grootte}px Montserrat`;
+      reels = verdeel();
+    } while (reels.some((r) => ctx.measureText(r).width > BREEDTE - 40) && grootte > 44);
+    const reel_h = Math.round(grootte * 1.28);
+    let y = 205 + grootte;
+    reels.forEach((r, i) => {
+      const laaste = i === reels.length - 1 && reels.length > 1;
+      if (laaste) {
+        const rw = ctx.measureText(r).width;
+        ctx.fillStyle = "#FFFFFF";
+        rond_reghoek(ctx, 1072, y - grootte + 4, rw + 36, grootte + 22, 10);
+        ctx.fillStyle = "#EC5832";
+        ctx.fillText(r, 1090, y);
+      } else {
+        ctx.fillStyle = "#FFFFFF";
+        ctx.fillText(r, 1080, y);
+      }
+      y += reel_h;
+    });
+
+    if (onder) {
+      let og = 36;
+      ctx.font = `500 ${og}px Poppins`;
+      let onder_reels = breek(ctx, onder, BREEDTE, 2);
+      while (onder_reels.length > 1 && og > 26) {
+        og -= 2;
+        ctx.font = `500 ${og}px Poppins`;
+        onder_reels = breek(ctx, onder, BREEDTE, 2);
+        if (onder_reels.length === 1) break;
+      }
+      ctx.fillStyle = "#FFFFFF";
+      const begin = Math.min(y + 10, 560 - (onder_reels.length - 1) * (og + 8));
+      onder_reels.forEach((r, i) => ctx.fillText(r, 1080, begin + i * (og + 8)));
+    }
+  }
+
+  function rond_reghoek(ctx, x, y, b, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + b, y, x + b, y + h, r);
+    ctx.arcTo(x + b, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + b, y, r);
+    ctx.closePath();
+    ctx.fill();
+  }
+
   // Kies 'n agtergrond wat by die koepon se boeke pas.
   function stel_agtergrond_voor(koepon) {
     const boeke = koepon_boeke(koepon).map((s) => s.toLowerCase());
@@ -162,11 +369,17 @@
     const ctx = canvas.getContext("2d");
     try {
       await document.fonts.load("800 76px Montserrat");
+      await document.fonts.load("700 34px Montserrat");
       await document.fonts.load("600 32px Poppins");
+      await document.fonts.load("500 36px Poppins");
       await document.fonts.load("400 26px Poppins");
     } catch (_) {}
-    const agtergrond = await laai_beeld(`images/koepon/${opsies.agtergrond}.jpg`);
-    ctx.drawImage(agtergrond, 0, 0, W, H);
+    if (opsies.agtergrond === GEKOSE && opsies.boek) {
+      await teken_boek_agtergrond(ctx, opsies.boek, opsies.taal);
+    } else {
+      const agtergrond = await laai_beeld(`images/koepon/${opsies.agtergrond}.jpg`);
+      ctx.drawImage(agtergrond, 0, 0, W, H);
+    }
 
     const a = AGTERGRONDE.find((x) => x.lêer === opsies.agtergrond);
     const B = Object.assign({}, KOEPON_BLOK, (a && a.blok) || {});
@@ -310,6 +523,7 @@
   }
 
   let huidige_koepon = null;
+  let huidige_boek = null;
   let wag = null;
   let boodskap_self_verander = false;
 
@@ -339,6 +553,7 @@
   }
 
   function huidige_taal() {
+    if (venster.querySelector("#kb-agtergrond").value === GEKOSE) return boek_taal(huidige_boek);
     const a = AGTERGRONDE.find((x) => x.lêer === venster.querySelector("#kb-agtergrond").value);
     return a ? a.taal : "af";
   }
@@ -357,6 +572,7 @@
         kode: huidige_koepon.kode,
         aanbod: venster.querySelector("#kb-aanbod").value.trim(),
         geldig: venster.querySelector("#kb-geldig").value.trim(),
+        boek: huidige_boek,
       });
     } catch (fout) {
       console.error("Kon nie koeponbeeld teken nie:", fout);
@@ -410,8 +626,17 @@
     if (!koepon) return;
     if (!venster) bou_venster();
     huidige_koepon = koepon;
+    huidige_boek = gekose_boeke(koepon);
     venster.querySelector("#kb-titel").textContent = `Koeponbeeld: ${koepon.kode}`;
-    venster.querySelector("#kb-agtergrond").value = stel_agtergrond_voor(koepon);
+    const kies = venster.querySelector("#kb-agtergrond");
+    kies.innerHTML =
+      (huidige_boek
+        ? `<option value="${GEKOSE}">${huidige_boek.boeke.length === 1
+            ? `Net hierdie boek: ${ontsnap(huidige_boek.boeke[0].titel)}`
+            : `Die gekose boeke (${huidige_boek.boeke.length})`}</option>`
+        : "") +
+      AGTERGRONDE.map((a) => `<option value="${a.lêer}">${ontsnap(a.naam)}</option>`).join("");
+    kies.value = huidige_boek ? GEKOSE : stel_agtergrond_voor(koepon);
     const taal = huidige_taal();
     venster.querySelector("#kb-aanbod").value = stel_aanbod_voor(koepon, taal);
     venster.querySelector("#kb-geldig").value = stel_geldig_voor(koepon, taal);
