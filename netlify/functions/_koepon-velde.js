@@ -44,7 +44,11 @@ function bou_koepon_velde(invoer) {
 
   let verval_op = null;
   if (invoer.verval_op) {
-    const datum = new Date(invoer.verval_op);
+    // Die paneel stuur net 'n datum (JJJJ-MM-DD). new Date() lees dit as
+    // middernag UTC, en dan verval die koepon om 02:00 SA-tyd OP daardie dag.
+    // 'n Koepon geld tot en met die gekose dag: 23:59:59 Suid-Afrikaanse tyd.
+    const ruwe = String(invoer.verval_op).trim();
+    const datum = new Date(/^\d{4}-\d{2}-\d{2}$/.test(ruwe) ? `${ruwe}T23:59:59+02:00` : ruwe);
     if (Number.isNaN(datum.getTime())) return { fout: "Ongeldige vervaldatum" };
     verval_op = datum.toISOString();
   }
