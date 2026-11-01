@@ -89,7 +89,30 @@ function pas_pakkette_toe(items, pakkette) {
   return { per_item, toegepas };
 }
 
+// GESKENKE (November 2026): 'n Mandjie kan dieselfde boek vir die koper self
+// én as geskenk bevat. 'n Pakket mag nie die twee meng nie, daarom word die
+// koper se eie items en die geskenk-items elk apart nagegaan. items dra
+// `geskenk: true` waar dit 'n geskenk is. Dieselfde vorm as pas_pakkette_toe.
+function pas_pakkette_toe_per_groep(items, pakkette) {
+  const per_item = items.map(() => null);
+  const toegepas = [];
+  for (const is_geskenk of [false, true]) {
+    const indekse = [];
+    items.forEach((it, i) => {
+      if (!!it.geskenk === is_geskenk) indekse.push(i);
+    });
+    if (!indekse.length) continue;
+    const uitslag = pas_pakkette_toe(indekse.map((i) => items[i]), pakkette);
+    uitslag.per_item.forEach((p, k) => {
+      per_item[indekse[k]] = p;
+    });
+    for (const t of uitslag.toegepas) toegepas.push(is_geskenk ? { ...t, geskenk: true } : t);
+  }
+  return { per_item, toegepas };
+}
+
 module.exports = {
+  pas_pakkette_toe_per_groep,
   lees_pakkette,
   skryf_pakkette,
   is_aktief_nou,

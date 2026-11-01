@@ -128,7 +128,7 @@ async function kry_besitte_eboeke(bestellingsStore, koper_id) {
     if (!bestelling || bestelling.status !== "Nuut") continue;
     if (!bestelling.koper || bestelling.koper.netlify_identity_id !== koper_id) continue;
     for (const item of bestelling.items || []) {
-      if (item.formaat === "eboek") besitte.add(item.produk_slug);
+      if (item.formaat === "eboek" && item.geskenk !== true) besitte.add(item.produk_slug);
     }
   }
   return besitte;

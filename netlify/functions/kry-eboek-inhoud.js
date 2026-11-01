@@ -72,7 +72,7 @@ async function besit_boek(gebruiker_id, produk_slug) {
 
     const items = Array.isArray(bestelling.items) ? bestelling.items : [];
 
-    if (items.some((i) => i.produk_slug === produk_slug && i.formaat === "eboek")) {
+    if (items.some((i) => i.produk_slug === produk_slug && i.formaat === "eboek" && i.geskenk !== true)) {
       return { besit: true, rede: "koop" };
     }
 

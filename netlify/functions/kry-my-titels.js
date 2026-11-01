@@ -151,6 +151,7 @@ exports.handler = async (event, context) => {
     for (const item of bestelling.items || []) {
       const inskrywing = myne.get(item.produk_slug);
       if (!inskrywing) continue;
+      if (item.via_geskenk) continue; // ontvangde geskenk, nie 'n tweede verkoop nie
 
       const formaat_data =
         (inskrywing.produk.formate && inskrywing.produk.formate[item.formaat]) || null;

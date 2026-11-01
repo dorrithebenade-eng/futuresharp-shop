@@ -90,6 +90,8 @@ exports.handler = async (event, context) => {
     const reeds_besit_as_eboek = new Set();
     for (const bestelling of koper_bestellings) {
       for (const boek_item of bestelling.items || []) {
+        // 'n Geskenk wat hierdie koper vir iemand anders gekoop het, is nie syne nie.
+        if (boek_item.geskenk === true) continue;
         if (boek_item.formaat === "eboek") reeds_besit_as_eboek.add(boek_item.produk_slug);
       }
     }
@@ -107,6 +109,7 @@ exports.handler = async (event, context) => {
         // spoornommer, terwyl merk-bestelling-gestuur.js al drie noukeurig in
         // die rekord stoor. Die dankie-bladsy het hom boonop hierheen gestuur
         // met die belofte dat hy die status hier kan volg.
+        if (boek_item.geskenk === true) continue; // vir iemand anders gekoop
         const is_harde_kopie = boek_item.formaat === "harde_kopie";
         if (
           boek_item.formaat !== "eboek" &&

@@ -136,6 +136,7 @@ function bou_aksie_ry(produk, formaat, formaat_data, etiket, besit, leen_dae_oor
         <a class="kaart-aksie produk-alreeds-eie-knoppie" href="leser.html?boek=${produk.slug}">
           ${t("gaan_lees")}
         </a>
+        ${bou_geskenk_knoppie(produk, formaat_data)}
       </div>
     `;
   }
@@ -178,7 +179,21 @@ function bou_aksie_ry(produk, formaat, formaat_data, etiket, besit, leen_dae_oor
         data-voorbestelling="${voorbestelling}">
         ${knoppie_teks}
       </button>
+      ${formaat === "eboek" ? bou_geskenk_knoppie(produk, formaat_data) : ""}
     </div>
+  `;
+}
+
+// GESKENKE (November 2026): koop die e-boek vir iemand anders. Die boek gaan
+// as geskenk in die mandjie; ná betaling kry die koper 'n eenmalige
+// geskenkkode (sien netlify/functions/_geskenke.js). Ook as die koper die
+// boek self reeds besit.
+function bou_geskenk_knoppie(produk, formaat_data) {
+  return `
+    <button type="button" class="kaart-aksie produk-geskenk-knoppie"
+      data-slug="${produk.slug}" data-titel="${titel_ontsnap(produk.titel)}" data-prys="${formaat_data.prys_sent}">
+      🎁 ${t("geskenk_knoppie")}
+    </button>
   `;
 }
 
@@ -284,6 +299,39 @@ function wys_produk(produk, besit_info) {
         terugvoer.textContent =
           voorbestelling === "true" ? t("voorbestelling_bygevoeg") : t("bygevoeg_mandjie");
       }
+    });
+  });
+
+  koppel_geskenk_knoppies(wrap);
+}
+
+(function () {
+  const styl = document.createElement("style");
+  styl.textContent =
+    ".produk-geskenk-knoppie{display:block;width:100%;margin:8px 0 0;background:#fff;color:var(--teal,#479F91);border:2px solid var(--teal,#479F91)}" +
+    ".produk-geskenk-knoppie:disabled{opacity:.75}";
+  document.head.appendChild(styl);
+})();
+
+function koppel_geskenk_knoppies(wrap) {
+  wrap.querySelectorAll(".produk-geskenk-knoppie").forEach((knoppie) => {
+    knoppie.addEventListener("click", () => {
+      const { slug, titel, prys } = knoppie.dataset;
+      const resultaat = voeg_by_mandjie({
+        produk_slug: slug,
+        titel,
+        formaat: "eboek",
+        prys_sent: Number(prys),
+        geskenk: true,
+      });
+      const terugvoer = document.getElementById("produk-terugvoer");
+      if (resultaat.reeds_in_mandjie) {
+        terugvoer.textContent = t("geskenk_reeds_in_mandjie");
+        return;
+      }
+      knoppie.textContent = "✓ " + t("geskenk_bygevoeg");
+      knoppie.disabled = true;
+      terugvoer.innerHTML = `${t("geskenk_bygevoeg_nota")} <a href="mandjie.html">${t("gaan_na_mandjie")}</a>`;
     });
   });
 }

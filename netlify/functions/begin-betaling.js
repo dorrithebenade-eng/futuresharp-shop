@@ -52,7 +52,8 @@ const { kry_gebruiker_en_rol_uitslag } = require("./_rol-kontrole");
 const { kry_maks_verdeling_sent } = require("./_paystack-koste.js");
 const { stuur_outeur_kennisgewings } = require("./_kennisgewing-outeur");
 const { stuur_koper_bevestiging } = require("./_kennisgewing-koper");
-const { kry_aktiewe_pakkette, pas_pakkette_toe } = require("./_reekspakkette");
+const { kry_aktiewe_pakkette, pas_pakkette_toe_per_groep } = require("./_reekspakkette");
+const { is_eie_item, skoon_geskenk_besonderhede, skep_geskenk_vir_bestelling } = require("./_geskenke");
 
 // Rol_tipe → watter Blobs-store die entiteit se subrekening-kode in is.
 const ROL_TIPE_STORES = {
@@ -201,6 +202,8 @@ exports.handler = async (event, context) => {
         bestaande_bestelling.koper.netlify_identity_id === gebruiker.id;
       if (!behoort_aan_koper || bestaande_bestelling.status !== "Nuut") continue;
       for (const besitte_item of bestaande_bestelling.items || []) {
+        // 'n Geskenk wat die koper vir iemand anders gekoop het, besit hy nie.
+        if (!is_eie_item(besitte_item)) continue;
         if (besitte_item.formaat === "eboek") reeds_besitte_eboeke.add(besitte_item.produk_slug);
         if (besitte_item.formaat === "leen" && besitte_item.verval_op) {
           const huidige = aktiewe_leen_verval.get(besitte_item.produk_slug);
@@ -242,9 +245,10 @@ exports.handler = async (event, context) => {
       produk_slug: kliënt_item.produk_slug,
       formaat: kliënt_item.formaat,
       prys_sent: fd && fd.beskikbaar ? fd.prys_sent : 0,
+      geskenk: kliënt_item.geskenk === true,
     });
   }
-  const { per_item: pakket_per_item, toegepas: reekspakkette_toegepas } = pas_pakkette_toe(
+  const { per_item: pakket_per_item, toegepas: reekspakkette_toegepas } = pas_pakkette_toe_per_groep(
     pakket_invoer,
     await kry_aktiewe_pakkette()
   );
@@ -257,7 +261,14 @@ exports.handler = async (event, context) => {
       return { statusCode: 400, body: `"${kliënt_item.produk_slug}" is nie meer beskikbaar nie` };
     }
 
-    if (kliënt_item.formaat === "eboek" && reeds_besitte_eboeke.has(produk.slug)) {
+    // GESKENKE: tans net e-boeke (sien _geskenke.js). 'n Geskenk mag 'n boek
+    // wees wat die koper self reeds besit.
+    const is_geskenk = kliënt_item.geskenk === true;
+    if (is_geskenk && kliënt_item.formaat !== "eboek") {
+      return { statusCode: 400, body: "Net e-boeke kan tans as geskenk gekoop word" };
+    }
+
+    if (!is_geskenk && kliënt_item.formaat === "eboek" && reeds_besitte_eboeke.has(produk.slug)) {
       return {
         statusCode: 400,
         body: `Jy besit reeds die e-boek "${produk.titel}" — kyk gerus in "My Boeke". Kontak Future Sharp as jy dink dit is 'n fout.`,
@@ -324,6 +335,7 @@ exports.handler = async (event, context) => {
         ? { oorspronklike_prys_sent: item_prys_sent, koepon_kode: item_koepon_kodes[0], koepon_kodes: item_koepon_kodes }
         : {}),
       ...(in_pakket ? { oorspronklike_prys_sent: item_prys_sent, reekspakket_id: in_pakket.pakket_id } : {}),
+      ...(is_geskenk ? { geskenk: true } : {}),
       ...leen_ekstra,
     });
 
@@ -380,6 +392,12 @@ exports.handler = async (event, context) => {
     .map((k) => ({ kode: k.kode, items: koepon_gebruikte_items[k.kode] }));
   const koepon_toegepas = koepons_toegepas[0] || null;
 
+  // Die geskenk se besonderhede (vir wie, van wie, boodskap), net as daar
+  // geskenk-items is.
+  const geskenk = geverifieerde_items.some((i) => i.geskenk)
+    ? skoon_geskenk_besonderhede(invoer.geskenk)
+    : null;
+
   // --- 100%-koepon-kortpad: R0, geen Paystack-transaksie moontlik of
   // nodig nie. Merk die bestelling dadelik as betaal (soos die webhook
   // normaalweg sou doen), werk koepon-gebruik + per-produk aankope-tellers
@@ -404,6 +422,7 @@ exports.handler = async (event, context) => {
       koepon_toegepas,
       koepons_toegepas,
       reekspakkette_toegepas,
+      geskenk,
       drukker: bevat_harde_kopie ? { bestelling_geplaas: false, geplaas_op: null, nota: "" } : null,
       paystack: {
         referensie: bestelnommer,
@@ -469,6 +488,14 @@ exports.handler = async (event, context) => {
       await stuur_outeur_kennisgewings(gratis_bestelling);
     } catch (fout) {
       console.error(`Kon nie outeur-kennisgewings stuur nie vir gratis-bestelling ${bestelnommer}:`, fout);
+    }
+
+    // Geskenk-items: skep die eenmalige kode en stuur die geskenkbewys. Die
+    // webhook doen dit by 'n betaalde bestelling; hier moet dit self gebeur.
+    try {
+      await skep_geskenk_vir_bestelling(gratis_bestelling);
+    } catch (fout) {
+      console.error(`Kon nie die geskenk skep nie vir gratis-bestelling ${bestelnommer}:`, fout);
     }
 
     // En die koper se bevestiging. HIER IS DIT BELANGRIKER AS OP DIE GEWONE
@@ -594,6 +621,7 @@ exports.handler = async (event, context) => {
     koepon_toegepas,
     koepons_toegepas,
     reekspakkette_toegepas,
+    geskenk,
     drukker: bevat_harde_kopie
       ? { bestelling_geplaas: false, geplaas_op: null, nota: "" }
       : null,

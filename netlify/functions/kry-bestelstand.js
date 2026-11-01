@@ -122,8 +122,11 @@ exports.handler = async (event, context) => {
     // Die aantal, nie die items self nie. Dit beantwoord "hoeveel wag nog vir
     // my in die mandjie" ná 'n kansellasie, en niks verder nie.
     items: items.length,
-    bevat_eboek: items.some((i) => i && i.formaat === "eboek"),
+    // Geskenk-items gaan nie in die koper se leeskamer nie (sien _geskenke.js).
+    bevat_eboek: items.some((i) => i && i.formaat === "eboek" && i.geskenk !== true),
     bevat_harde_kopie: items.some((i) => i && i.formaat === "harde_kopie"),
+    bevat_geskenk: items.some((i) => i && i.geskenk === true),
+    geskenk_kode: rekord.geskenk_kode || null,
     stand: "onbekend",
   };
 

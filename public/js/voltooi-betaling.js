@@ -64,7 +64,7 @@ function bou_opsomming(items, totaal, pakkette) {
           .map(
             (i) => `
           <div class="vb-opsomming-ry">
-            <span>${i.titel} <span class="vb-opsomming-formaat">(${etiket_vir_formaat(i.formaat)})</span></span>
+            <span>${i.titel} <span class="vb-opsomming-formaat">(${etiket_vir_formaat(i.formaat)}${i.geskenk ? `, 🎁 ${t("geskenk_merk")}` : ""})</span></span>
             <span>${formateer_prys_sent(i.prys_sent)}</span>
           </div>`
           )
@@ -120,6 +120,23 @@ function bou_aflewer_afdeling() {
   `;
 }
 
+// GESKENKE (November 2026): vir wie, van wie en 'n boodskap. Dit kom op die
+// geskenkbewys wat die koper ná betaling kry (sien netlify/functions/_geskenke.js).
+function bou_geskenk_afdeling() {
+  return `
+    <section class="vb-afdeling">
+      <h2 class="vb-afdeling-titel">🎁 ${t("geskenk_afdeling_titel")}</h2>
+      <p class="vb-afdeling-nota">${t("geskenk_afdeling_nota")}</p>
+      <label class="veld-etiket" for="geskenk-aan">${t("geskenk_aan")}</label>
+      <input type="text" id="geskenk-aan" class="veld-invoer" maxlength="80">
+      <label class="veld-etiket" for="geskenk-van">${t("geskenk_van")} <span class="veld-verplig">${t("verplig")}</span></label>
+      <input type="text" id="geskenk-van" class="veld-invoer" maxlength="80">
+      <label class="veld-etiket" for="geskenk-boodskap">${t("geskenk_boodskap")}</label>
+      <textarea id="geskenk-boodskap" class="veld-invoer" rows="3" maxlength="400"></textarea>
+    </section>
+  `;
+}
+
 function bou_kontak_afdeling() {
   return `
     <section class="vb-afdeling">
@@ -162,6 +179,17 @@ function valideer_en_bou_bestelling(items, totaal, bestelnommer, bevat_harde_kop
     }
   }
 
+  let geskenk = null;
+  if (items.some((i) => i.geskenk)) {
+    const van = document.getElementById("geskenk-van").value.trim();
+    if (!van) foute.push(t("geskenk_van_verplig"));
+    geskenk = {
+      aan: document.getElementById("geskenk-aan").value.trim(),
+      van,
+      boodskap: document.getElementById("geskenk-boodskap").value.trim(),
+    };
+  }
+
   if (foute.length) {
     return { geldig: false, foute };
   }
@@ -174,6 +202,7 @@ function valideer_en_bou_bestelling(items, totaal, bestelnommer, bevat_harde_kop
     totaal_sent: totaal,
     bevat_harde_kopie,
     aflewering,
+    geskenk,
     koepon_kodes: koepon_kodes || [],
     koepon_kode: (koepon_kodes && koepon_kodes[0]) || null,
     status: "Konsep — wag vir betaling",
@@ -266,7 +295,7 @@ async function verifieer_kodes(kodes, items, toegangs_token) {
     },
     body: JSON.stringify({
       koepon_kodes: kodes,
-      items: items.map((i) => ({ produk_slug: i.produk_slug, formaat: i.formaat })),
+      items: items.map((i) => ({ produk_slug: i.produk_slug, formaat: i.formaat, ...(i.geskenk ? { geskenk: true } : {}) })),
     }),
   });
 
@@ -423,6 +452,7 @@ async function laai_vb() {
     <p class="vb-bestelnommer">${t("bestelnommer_etiket")}: <strong>${bestelnommer}</strong></p>
     ${bou_opsomming(items, totaal, pakkette)}
     ${bevatHardeKopie ? bou_aflewer_afdeling() : ""}
+    ${items.some((i) => i.geskenk) ? bou_geskenk_afdeling() : ""}
     ${bou_kontak_afdeling()}
     <div id="vb-foute" class="vb-foute" style="display:none;"></div>
     <button class="kaart-aksie vb-betaal-knoppie" id="gaan-na-betaling">${t("gaan_na_betaling")}</button>

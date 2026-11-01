@@ -3,7 +3,7 @@
 // sodra betaling voltooi en Paystack-betaling geverifieer is (Fase 3).
 //
 // Mandjie-item-vorm:
-// { produk_slug, titel, formaat: "eboek" | "harde_kopie", prys_sent }
+// { produk_slug, titel, formaat: "eboek" | "harde_kopie", prys_sent, geskenk? }
 //
 // LET WEL: die Identity-token-herleiding (na paneelbord.html) leef NIE
 // hier nie — dit moet as 'n inline skrip heel eerste in elke bladsy se
@@ -34,8 +34,13 @@ function voeg_by_mandjie(item) {
   // Verhoed duplikate: dieselfde produk + formaat kombinasie kan nie
   // twee keer bygevoeg word nie (elke boek word as 'n enkele eksemplaar
   // per formaat verkoop, nie hoeveelheid-gebaseerd nie).
+  // 'n Geskenk en die koper se eie eksemplaar van dieselfde boek is twee
+  // aparte items (geskenk: true, sien netlify/functions/_geskenke.js).
   const bestaan_reeds = items.some(
-    (i) => i.produk_slug === item.produk_slug && i.formaat === item.formaat
+    (i) =>
+      i.produk_slug === item.produk_slug &&
+      i.formaat === item.formaat &&
+      !!i.geskenk === !!item.geskenk
   );
   if (bestaan_reeds) return { reeds_in_mandjie: true };
 
@@ -44,9 +49,9 @@ function voeg_by_mandjie(item) {
   return { reeds_in_mandjie: false };
 }
 
-function verwyder_uit_mandjie(produk_slug, formaat) {
+function verwyder_uit_mandjie(produk_slug, formaat, geskenk = false) {
   const items = kry_mandjie().filter(
-    (i) => !(i.produk_slug === produk_slug && i.formaat === formaat)
+    (i) => !(i.produk_slug === produk_slug && i.formaat === formaat && !!i.geskenk === !!geskenk)
   );
   stoor_mandjie(items);
 }
@@ -58,6 +63,10 @@ function maak_mandjie_leeg() {
 
 function kry_mandjie_totaal_sent() {
   return kry_mandjie().reduce((som, item) => som + item.prys_sent, 0);
+}
+
+function mandjie_bevat_geskenk() {
+  return kry_mandjie().some((i) => i.geskenk === true);
 }
 
 function mandjie_bevat_harde_kopie() {

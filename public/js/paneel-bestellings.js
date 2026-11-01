@@ -29,7 +29,7 @@ function bou_bestelling_kaart(b) {
   const items_html = (b.items || [])
     .map(
       (i) =>
-        `<li>${i.titel} <span class="paneel-bestelling-item-formaat">(${etiket_vir_formaat_bestelling(i.formaat)})</span> — ${formateer_prys_sent_bestelling(i.prys_sent)}</li>`
+        `<li>${i.titel} <span class="paneel-bestelling-item-formaat">(${etiket_vir_formaat_bestelling(i.formaat)}${i.geskenk ? ", 🎁 geskenk" : ""}${i.via_geskenk ? ", ontvangde geskenk" : ""})</span> — ${formateer_prys_sent_bestelling(i.prys_sent)}</li>`
     )
     .join("");
 
@@ -46,6 +46,13 @@ function bou_bestelling_kaart(b) {
 
   const gratis_html = b.paystack && b.paystack.gratis_via_koepon
     ? `<p class="paneel-bestelling-koepon">🎁 100%-koepon — geen Paystack-transaksie nie</p>`
+    : "";
+
+  // GESKENKE (sien netlify/functions/_geskenke.js)
+  const geskenk_html = b.geskenk_kode
+    ? `<p class="paneel-bestelling-koepon">🎁 Geskenkkode: <strong>${b.geskenk_kode}</strong>${b.geskenk && b.geskenk.aan ? ` · vir ${b.geskenk.aan}` : ""}</p>`
+    : b.geskenk_ontvang
+    ? `<p class="paneel-bestelling-koepon">🎁 Ontvangde geskenk (${b.geskenk_ontvang.kode}, gekoop in ${b.geskenk_ontvang.gekoop_in}). Geen inkomste nie.</p>`
     : "";
 
   const split_fout_html = b.split_fout
@@ -80,6 +87,7 @@ function bou_bestelling_kaart(b) {
       <ul class="paneel-bestelling-items">${items_html}</ul>
       ${koepon_html}${pakket_html}
       ${gratis_html}
+      ${geskenk_html}
       ${split_fout_html}
       ${drukker_html}
     </div>

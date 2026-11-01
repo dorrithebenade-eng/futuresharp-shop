@@ -43,7 +43,9 @@
     const resp = await fetch(MANDJIE_PRYS_ENDPOINT, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ items: items.map((i) => ({ produk_slug: i.produk_slug, formaat: i.formaat })) }),
+      body: JSON.stringify({
+        items: items.map((i) => ({ produk_slug: i.produk_slug, formaat: i.formaat, ...(i.geskenk ? { geskenk: true } : {}) })),
+      }),
     });
     if (!resp.ok) return null;
     return resp.json();
@@ -54,7 +56,7 @@
       .map(
         (p) => `
       <div class="${klas} reekspakket-ry">
-        <span>${esc(tt("pakket_reel", "Reekspakket"))}: ${esc(naam(p))}</span>
+        <span>${esc(tt("pakket_reel", "Reekspakket"))}: ${esc(naam(p))}${p.geskenk ? " 🎁" : ""}</span>
         <span>−${formateer(p.afslag_sent)}</span>
       </div>`
       )
@@ -85,8 +87,9 @@
     const teken = () => {
       const aksies = wrap.querySelector(".produk-aksies");
       if (!aksies || wrap.querySelector(".reekspakket-blok")) return;
-      // Wie die boek reeds besit, kan nie die hele reeks in een keer koop nie.
-      if (aksies.querySelector(".produk-alreeds-eie-knoppie")) return;
+      // Wie die boek reeds besit, kan nie die hele reeks vir homself koop nie,
+      // maar wel as geskenk gee.
+      const besit_reeds = !!aksies.querySelector(".produk-alreeds-eie-knoppie");
 
       const tot = datum_kort(pakket.tot);
       const blok = document.createElement("div");
@@ -97,18 +100,28 @@
           <strong>${esc(naam(pakket))} ${esc(tt("pakket_vir", "vir"))} ${formateer_rond(pakket.prys_sent)}</strong><br>
           ${esc(tt("pakket_al", "Al"))} ${pakket.slugs.length} ${esc(tt("pakket_eboeke", "e-boeke"))}. <s>${formateer_rond(pakket.los_sent)}</s>
         </p>
-        <button type="button" class="kaart-aksie reekspakket-knoppie">${esc(tt("pakket_knoppie", "Sit die hele reeks in my mandjie"))}</button>
+        ${besit_reeds ? "" : `<button type="button" class="kaart-aksie reekspakket-knoppie">${esc(tt("pakket_knoppie", "Sit die hele reeks in my mandjie"))}</button>`}
+        <button type="button" class="kaart-aksie reekspakket-geskenk-knoppie">🎁 ${esc(tt("pakket_geskenk_knoppie", "Gee die hele reeks as geskenk"))}</button>
       `;
       aksies.insertAdjacentElement("afterend", blok);
 
-      blok.querySelector(".reekspakket-knoppie").addEventListener("click", () => {
+      const sit_in = (geskenk) => {
         for (const boek of pakket.boeke) {
           if (typeof voeg_by_mandjie === "function") {
-            voeg_by_mandjie({ produk_slug: boek.slug, titel: boek.titel, formaat: "eboek", prys_sent: boek.prys_sent });
+            voeg_by_mandjie({
+              produk_slug: boek.slug,
+              titel: boek.titel,
+              formaat: "eboek",
+              prys_sent: boek.prys_sent,
+              ...(geskenk ? { geskenk: true } : {}),
+            });
           }
         }
         window.location.href = "mandjie.html";
-      });
+      };
+      const self_knoppie = blok.querySelector(".reekspakket-knoppie");
+      if (self_knoppie) self_knoppie.addEventListener("click", () => sit_in(false));
+      blok.querySelector(".reekspakket-geskenk-knoppie").addEventListener("click", () => sit_in(true));
     };
 
     teken();
@@ -156,6 +169,7 @@
       .reekspakket-teks{margin:8px 0 10px;font-size:15px;line-height:1.45}
       .reekspakket-teks s{color:#999}
       .reekspakket-knoppie{width:100%;background:var(--teal,#479F91);border-color:var(--teal,#479F91)}
+      .reekspakket-geskenk-knoppie{width:100%;margin-top:8px;background:#fff;color:var(--teal,#479F91);border:2px solid var(--teal,#479F91)}
       .reekspakket-ry{color:var(--teal,#479F91);font-weight:700}
     `;
     document.head.appendChild(s);

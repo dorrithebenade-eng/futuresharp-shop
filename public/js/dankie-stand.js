@@ -90,6 +90,15 @@ function ds_teken(stand, u) {
   ds_stel("dankie-merkie", t("ds_merk_" + stand));
 
   if (stand === "betaal") {
+    // GESKENKE: die geskenkbewys verskyn onder die teks (dankie-geskenk.js).
+    if (u.bevat_geskenk && typeof dankie_wys_geskenk === "function") dankie_wys_geskenk(u);
+    if (u.bevat_geskenk && !u.bevat_eboek && !u.bevat_harde_kopie) {
+      ds_stel("dankie-titel", t("dankie_titel_aankoop"));
+      ds_stel("dankie-teks", t("dankie_teks_geskenk_alleen"));
+      ds_wys_knoppie("dankie-my-boeke-knoppie", false);
+      ds_wys_knoppie("dankie-mandjie-knoppie", false);
+      return;
+    }
     if (u.bevat_eboek && !u.bevat_harde_kopie) {
       ds_stel("dankie-titel", t("dankie_titel_aankoop"));
       ds_stel("dankie-teks", t("dankie_teks_eboek_alleen"));

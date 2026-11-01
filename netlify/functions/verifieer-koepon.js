@@ -18,7 +18,7 @@ const {
   sorteer_koepons,
 } = require("./_koepon-velde");
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
-const { kry_aktiewe_pakkette, pas_pakkette_toe } = require("./_reekspakkette");
+const { kry_aktiewe_pakkette, pas_pakkette_toe_per_groep } = require("./_reekspakkette");
 
 exports.handler = async (event, context) => {
   if (event.httpMethod !== "POST") {
@@ -84,9 +84,9 @@ exports.handler = async (event, context) => {
   for (const kliënt_item of items) {
     const p = await katalogusStore.get(kliënt_item.produk_slug, { type: "json" });
     const fd = p && p.formate && p.formate[kliënt_item.formaat];
-    pakket_invoer.push({ produk_slug: kliënt_item.produk_slug, formaat: kliënt_item.formaat, prys_sent: fd && fd.beskikbaar ? fd.prys_sent : 0 });
+    pakket_invoer.push({ produk_slug: kliënt_item.produk_slug, formaat: kliënt_item.formaat, prys_sent: fd && fd.beskikbaar ? fd.prys_sent : 0, geskenk: kliënt_item.geskenk === true });
   }
-  const { per_item: pakket_per_item } = pas_pakkette_toe(pakket_invoer, await kry_aktiewe_pakkette());
+  const { per_item: pakket_per_item } = pas_pakkette_toe_per_groep(pakket_invoer, await kry_aktiewe_pakkette());
   let item_indeks = -1;
 
   for (const kliënt_item of items) {

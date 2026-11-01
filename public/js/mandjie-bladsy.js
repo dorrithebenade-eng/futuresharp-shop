@@ -13,10 +13,10 @@ function bou_mandjie_ry(item) {
     <div class="mandjie-ry">
       <div class="mandjie-ry-info">
         <span class="mandjie-ry-titel">${item.titel}</span>
-        <span class="mandjie-ry-formaat">${etiket_vir_formaat(item.formaat)}</span>
+        <span class="mandjie-ry-formaat">${etiket_vir_formaat(item.formaat)}${item.geskenk ? ` <span class="mandjie-geskenk-merk">🎁 ${t("geskenk_merk")}</span>` : ""}</span>
       </div>
       <span class="mandjie-ry-prys">${formateer_prys_sent(item.prys_sent)}</span>
-      <button class="mandjie-verwyder" data-slug="${item.produk_slug}" data-formaat="${item.formaat}"
+      <button class="mandjie-verwyder" data-slug="${item.produk_slug}" data-formaat="${item.formaat}" data-geskenk="${item.geskenk ? "1" : ""}"
         aria-label="${t("verwyder")} ${item.titel} (${etiket_vir_formaat(item.formaat)})">
         ${t("verwyder")}
       </button>
@@ -41,7 +41,12 @@ function wys_mandjie() {
 
   wrap.innerHTML = `
     <div class="mandjie-lys">
-      ${items.map(bou_mandjie_ry).join("")}
+      ${items.filter((i) => !i.geskenk).map(bou_mandjie_ry).join("")}
+      ${items.some((i) => i.geskenk)
+        ? `<div class="mandjie-geskenk-kop">🎁 ${t("geskenk_groep")}</div>
+           <p class="mandjie-geskenk-nota">${t("geskenk_mandjie_nota")}</p>
+           ${items.filter((i) => i.geskenk).map(bou_mandjie_ry).join("")}`
+        : ""}
     </div>
     <div class="mandjie-totaal-ry">
       <span>${t("totaal")}</span>
@@ -54,7 +59,7 @@ function wys_mandjie() {
 
   wrap.querySelectorAll(".mandjie-verwyder").forEach((knoppie) => {
     knoppie.addEventListener("click", () => {
-      verwyder_uit_mandjie(knoppie.dataset.slug, knoppie.dataset.formaat);
+      verwyder_uit_mandjie(knoppie.dataset.slug, knoppie.dataset.formaat, knoppie.dataset.geskenk === "1");
       wys_mandjie();
     });
   });
@@ -63,5 +68,16 @@ function wys_mandjie() {
     window.location.href = "voltooi-betaling.html";
   });
 }
+
+// Die geskenkgroep se voorkoms (GESKENKE, November 2026).
+(function () {
+  const styl = document.createElement("style");
+  styl.textContent = `
+    .mandjie-geskenk-merk{display:inline-block;background:#FDE8E1;color:#EC5832;font-size:11px;font-weight:700;padding:1px 8px;border-radius:999px;margin-left:4px}
+    .mandjie-geskenk-kop{font-weight:700;color:#479F91;margin:18px 0 2px;letter-spacing:.03em}
+    .mandjie-geskenk-nota{font-size:13px;color:#6b6b6b;margin:0 0 6px}
+  `;
+  document.head.appendChild(styl);
+})();
 
 document.addEventListener("DOMContentLoaded", wys_mandjie);

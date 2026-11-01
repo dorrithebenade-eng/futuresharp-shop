@@ -54,8 +54,9 @@ async function stuur_koper_bevestiging(bestelling) {
   const bestelnommer = String(bestelling.bestelnommer || "").trim();
   const bevat_harde_kopie = items.some((i) => i && i.formaat === "harde_kopie");
   const bevat_lees = items.some(
-    (i) => i && (i.formaat === "eboek" || i.formaat === "leen")
+    (i) => i && i.geskenk !== true && (i.formaat === "eboek" || i.formaat === "leen")
   );
+  const bevat_geskenk = items.some((i) => i && i.geskenk === true);
 
   // Elke reël 'n titel met sy formaat en prys. Die prys staan hier omdat dit
   // die enigste rekord is wat die koper self behou -- Paystack se kwitansie
@@ -65,6 +66,7 @@ async function stuur_koper_bevestiging(bestelling) {
     return (
       `<b>${ontsnap(i.titel || "")}</b>` +
       (woord ? ` &middot; ${ontsnap(woord)}` : "") +
+      (i.geskenk === true ? " &middot; geskenk" : "") +
       ` &middot; ${rand(i.prys_sent)}`
     );
   });
@@ -89,8 +91,17 @@ async function stuur_koper_bevestiging(bestelling) {
       'Jou boek word gepos. Ons stuur die spoornommer sodra dit weg is, en jy ' +
         'kan die status enige tyd in "My Boeke" volg.'
     );
-  } else {
+  } else if (bevat_lees) {
     reels.push('Jou boeke wag in "My Boeke", gereed om te lees.');
+  }
+
+  // GESKENKE: die geskenkbewys met die kode kom in 'n aparte pos (sien
+  // _geskenke.js), sodat die koper dit net so kan aanstuur.
+  if (bevat_geskenk) {
+    reels.push(
+      "Die geskenkbewys met die geskenkkode kom in 'n aparte e-pos. " +
+        "Die geskenkboeke gaan nie in jou eie leeskamer nie, maar in die ontvanger s'n."
+    );
   }
 
   const uitslag = await stuur_epos({
@@ -100,7 +111,9 @@ async function stuur_koper_bevestiging(bestelling) {
       ? "Jou bestelling is ontvang"
       : "Dankie vir jou aankoop",
     reels,
-    knoppie: { teks: "Gaan na My Boeke", url: `${WERF_URL}/my-boeke.html` },
+    knoppie: bevat_lees || bevat_harde_kopie
+      ? { teks: "Gaan na My Boeke", url: `${WERF_URL}/my-boeke.html` }
+      : undefined,
   });
 
   if (!uitslag.ok) {

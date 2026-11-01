@@ -6,12 +6,12 @@
 // mandjie en die betaalbladsy wys hiermee die regte totaal; begin-betaling.js
 // bereken dit self weer, gesaghebbend.
 //
-// POST { items: [{ produk_slug, formaat }] }
+// POST { items: [{ produk_slug, formaat, geskenk? }] }
 // -> { items: [{ produk_slug, formaat, prys_sent, pakket_prys_sent?, pakket_id? }],
 //      pakkette: [...toegepas], oorspronklike_totaal_sent, totaal_sent }
 
 const { kry_store } = require("./_blob-store");
-const { kry_aktiewe_pakkette, pas_pakkette_toe } = require("./_reekspakkette");
+const { kry_aktiewe_pakkette, pas_pakkette_toe_per_groep } = require("./_reekspakkette");
 
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") return { statusCode: 405, body: "Metode nie toegelaat nie" };
@@ -32,10 +32,15 @@ exports.handler = async (event) => {
       const formaat = String(it.formaat || "");
       const produk = slug ? await katalogus.get(slug, { type: "json" }) : null;
       const fd = produk && produk.formate && produk.formate[formaat];
-      items.push({ produk_slug: slug, formaat, prys_sent: fd && fd.beskikbaar ? fd.prys_sent : 0 });
+      items.push({
+        produk_slug: slug,
+        formaat,
+        prys_sent: fd && fd.beskikbaar ? fd.prys_sent : 0,
+        ...(it.geskenk === true ? { geskenk: true } : {}),
+      });
     }
 
-    const { per_item, toegepas } = pas_pakkette_toe(items, await kry_aktiewe_pakkette());
+    const { per_item, toegepas } = pas_pakkette_toe_per_groep(items, await kry_aktiewe_pakkette());
     let oorspronklik = 0;
     let totaal = 0;
     const uit = items.map((it, i) => {

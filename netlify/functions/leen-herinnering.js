@@ -83,7 +83,7 @@ exports.handler = async () => {
       const koper_id = bestelling.koper && bestelling.koper.netlify_identity_id;
       if (!koper_id) continue;
       for (const item of bestelling.items || []) {
-        if (item && item.formaat === "eboek") {
+        if (item && item.formaat === "eboek" && item.geskenk !== true) {
           if (!besit_as_eboek.has(koper_id)) besit_as_eboek.set(koper_id, new Set());
           besit_as_eboek.get(koper_id).add(item.produk_slug);
         }

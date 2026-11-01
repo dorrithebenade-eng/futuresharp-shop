@@ -69,6 +69,8 @@
 
   function moet_verwyder(item, indeks) {
     if (!item || !item.produk_slug) return false;
+    // 'n Geskenk is vir iemand anders: dit bly, al besit die koper die boek self.
+    if (item.geskenk === true) return false;
 
     if (item.formaat === "eboek") {
       return indeks.permanent.has(item.produk_slug);

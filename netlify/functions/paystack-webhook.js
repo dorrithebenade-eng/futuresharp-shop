@@ -13,6 +13,7 @@ const { hanteer_talk_betaling } = require("./_talk-betaling");
 const { kry_store } = require("./_blob-store");
 const { stuur_outeur_kennisgewings } = require("./_kennisgewing-outeur");
 const { stuur_koper_bevestiging } = require("./_kennisgewing-koper");
+const { skep_geskenk_vir_bestelling } = require("./_geskenke");
 
 // Dieselfde patroon as skep-koepon.js — leesbaar-genoeg om oor die
 // telefoon deur te gee, sonder dubbelsinnige karakters (0/O, 1/I/L).
@@ -300,6 +301,14 @@ exports.handler = async (event) => {
     await stuur_outeur_kennisgewings(bygewerkte_bestelling);
   } catch (fout) {
     console.error(`Webhook: kon nie outeur-kennisgewings stuur nie vir ${bestelnommer}:`, fout);
+  }
+
+  // Geskenk-items: skep die eenmalige kode en stuur die geskenkbewys aan die
+  // koper (sien _geskenke.js). Dieselfde try/catch as die stappe hierbo.
+  try {
+    await skep_geskenk_vir_bestelling(bygewerkte_bestelling);
+  } catch (fout) {
+    console.error(`Webhook: kon nie die geskenk skep nie vir ${bestelnommer}:`, fout);
   }
 
   // En laat die KOPER weet wat hy gekoop het.
