@@ -26,6 +26,8 @@
     { lêer: "Play-Smart_series_EN", naam: "Play-Smart series (English)", taal: "en" },
     { lêer: "Speel-Slim_Fokus_reeks_AF", naam: "Speel-Slim Fokus (Afrikaans)", taal: "af" },
     { lêer: "Play-Smart_Focus_series_EN", naam: "Play-Smart Focus (English)", taal: "en" },
+    { lêer: "Nuwe_Baba_AF", naam: "Wanneer ’n Nuwe Baba Kom (Afrikaans)", taal: "af" },
+    { lêer: "New_Baby_EN", naam: "When a New Baby Arrives (English)", taal: "en" },
     { lêer: "Eugene_Botha_AF", naam: "Eugene Botha se boeke (Afrikaans)", taal: "af" },
     { lêer: "Eugene_Botha_EN", naam: "Eugene Botha's books (English)", taal: "en" },
     // FutureSharp Talks: donker agtergrond, die koeponblok staan elders.
