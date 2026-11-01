@@ -186,7 +186,7 @@
       etiket = dele[0].reeks || "Future Shop";
       opskrif = dele[0].kort;
       onder = keuse.paar
-        ? (taal === "en" ? "In Afrikaans and English" : "In Afrikaans en Engels")
+        ? (taal === "en" ? "In English and Afrikaans" : "In Engels en Afrikaans")
         : boeke[0].outeur || "";
     } else {
       etiket = een_reeks ? dele[0].reeks : "Future Shop";
@@ -309,14 +309,15 @@
         const in_taal = [a, b].find((x) => x.taal === (af ? "af" : "en"));
         boeke = [(in_taal || a).slug];
         const titel = boek_titel(boeke[0]);
-        const albei = af ? "in Afrikaans en Engels" : "in Afrikaans and English";
+        // Drie reëls: wat dit gee, die boek, die tale.
+        const tale = af ? "Engels en Afrikaans" : "English and Afrikaans";
         if (koepon.tipe === "afslag") {
           const bedrag = koepon.afslag_tipe === "vaste_bedrag"
             ? `R${Math.round((koepon.afslag_waarde || 0) / 100)}`
             : `${koepon.afslag_waarde || 0}%`;
-          return af ? `${bedrag} afslag op ${titel}, ${albei}` : `${bedrag} off ${titel}, ${albei}`;
+          return af ? `${bedrag} afslag\n${titel}\n${tale}` : `${bedrag} off\n${titel}\n${tale}`;
         }
-        return af ? `Gratis e-boeke: ${titel}, ${albei}` : `Free e-books: ${titel}, ${albei}`;
+        return af ? `Gratis e-boeke\n${titel}\n${tale}` : `Free e-books\n${titel}\n${tale}`;
       }
     }
     let waarvan;
@@ -407,16 +408,26 @@
     if ("letterSpacing" in ctx) ctx.letterSpacing = "0px";
 
     // Wat die koepon gee: hoogstens twee reëls.
+    // Wat die koepon gee: 'n reëlbreuk in die teks begin 'n nuwe reël;
+    // hoogstens drie reëls.
     ctx.font = "600 32px Poppins";
-    const aanbod = breek(ctx, opsies.aanbod, breedte, 2);
+    let aanbod = [];
+    for (const deel of String(opsies.aanbod || "").split(/\n+/)) aanbod.push(...breek(ctx, deel, breedte, 3));
+    if (aanbod.length > 3) {
+      aanbod = aanbod.slice(0, 3);
+      aanbod[2] = aanbod[2].replace(/\s*\S*$/, "") + "…";
+    }
     aanbod.forEach((r, i) => ctx.fillText(r, x, B.y + 206 + i * 40));
 
     // Onderste reël: geldigheid en hoe om die kode te gebruik.
     ctx.font = "400 26px Poppins";
     ctx.fillStyle = AMPER_WIT;
     const hoe = opsies.taal === "en" ? "Enter the code when you pay" : "Tik die kode in wanneer jy betaal";
-    const onder = opsies.geldig ? `${opsies.geldig} · ${hoe}` : hoe;
-    const onder_reels = breek(ctx, onder, breedte, 2);
+    // Met drie reëls bo is daar net plek vir die geldigheid (of anders die wenk).
+    const onder = aanbod.length >= 3 ? opsies.geldig || hoe : opsies.geldig ? `${opsies.geldig} · ${hoe}` : hoe;
+    // Met drie reëls bo kry die onderste teks net een reël.
+    if (aanbod.length >= 3) ctx.font = "400 22px Poppins";
+    const onder_reels = breek(ctx, onder, breedte, aanbod.length >= 3 ? 1 : 2);
     const onder_y = B.y + B.h - B.rand - 30 - (onder_reels.length - 1) * 34;
     onder_reels.forEach((r, i) => ctx.fillText(r, x, onder_y + i * 34));
   }
@@ -430,7 +441,9 @@
     const kies = is_talk
       ? (taal === "en" ? "Choose the talk and enter the code when you pay." : "Kies die talk en tik die kode in wanneer jy betaal.")
       : (taal === "en" ? "Choose the book, go to your cart and enter the code when you pay." : "Kies die boek, gaan na jou mandjie en tik die kode in wanneer jy betaal.");
-    const klein = String(aanbod || "").replace(/^’n Gratis/, "’n gratis").replace(/^A free/, "a free");
+    const klein = String(aanbod || "")
+      .split(/\n+/).map((d) => d.trim()).filter(Boolean).join(", ")
+      .replace(/^’n Gratis/, "’n gratis").replace(/^A free/, "a free").replace(/^Gratis e-boeke/, "gratis e-boeke").replace(/^Free e-books/, "free e-books");
     if (taal === "en") {
       return [
         `A gift for you! 🎁 Here's a voucher${klein ? ` for ${klein}` : ""} at ${is_talk ? "" : "the "}${waar}.`,
@@ -487,7 +500,7 @@
               ${AGTERGRONDE.map((a) => `<option value="${a.lêer}">${ontsnap(a.naam)}</option>`).join("")}
             </select>
             <label class="veld-etiket" for="kb-aanbod">Wat die koepon gee</label>
-            <textarea id="kb-aanbod" class="veld-invoer" rows="2" maxlength="90"></textarea>
+            <textarea id="kb-aanbod" class="veld-invoer" rows="3" maxlength="120"></textarea>
             <label class="veld-etiket" for="kb-geldig">Geldigheid</label>
             <input type="text" id="kb-geldig" class="veld-invoer" maxlength="60">
             <p class="kb-wenk">Die teks is voorgestel uit die koepon self. Verander dit gerus; dit verander net die beeld, nie wat die koepon in die winkel doen nie. Laat Geldigheid leeg as die koepon nie verval nie.</p>
