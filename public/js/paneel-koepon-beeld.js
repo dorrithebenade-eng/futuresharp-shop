@@ -79,17 +79,13 @@
     // Die taal van die meeste boeke; by gelykop Afrikaans.
     const en = boeke.filter((b) => b.taal === "en").length;
     const taal = en > boeke.length - en ? "en" : "af";
-    const gesien = new Set();
-    const uniek = [];
-    for (const b of boeke) {
-      if (gesien.has(b.slug)) continue;
-      const maat = b.eweknie_slug && boeke.find((x) => x.slug === b.eweknie_slug);
-      const kies = maat ? ((b.taal || "af") === taal ? b : maat) : b;
-      gesien.add(b.slug);
-      if (maat) gesien.add(maat.slug);
-      uniek.push(kies);
-    }
-    return { boeke: uniek, taal };
+    // Die Afrikaanse en Engelse uitgawe van een boek: albei omslae, en die
+    // titel in die taal van die advertensie.
+    const paar =
+      boeke.length === 2 &&
+      (boeke[0].eweknie_slug === boeke[1].slug || boeke[1].eweknie_slug === boeke[0].slug);
+    if (paar) boeke.sort((a, b) => ((a.taal || "af") === taal ? -1 : 1) - ((b.taal || "af") === taal ? -1 : 1));
+    return { boeke, taal, paar };
   }
 
   function deel_titel(titel) {
@@ -179,16 +175,19 @@
     ctx.fillRect(0, 40, 1060, 935); // die reeks se omslae
     ctx.fillRect(1060, 80, 770, 490); // die reeks se opskrif
 
-    await teken_omslae(ctx, boeke);
+    // By 'n paar staan die uitgawe in die advertensie se taal voor.
+    await teken_omslae(ctx, keuse.paar ? [...boeke].reverse() : boeke);
 
     // Etiket, opskrif en 'n reël daaronder.
     const dele = boeke.map((b) => deel_titel(b.titel));
     const een_reeks = dele.every((d) => d.reeks && d.reeks === dele[0].reeks);
     let etiket, opskrif, onder;
-    if (boeke.length === 1) {
+    if (boeke.length === 1 || keuse.paar) {
       etiket = dele[0].reeks || "Future Shop";
       opskrif = dele[0].kort;
-      onder = boeke[0].outeur || "";
+      onder = keuse.paar
+        ? (taal === "en" ? "In Afrikaans and English" : "In Afrikaans en Engels")
+        : boeke[0].outeur || "";
     } else {
       etiket = een_reeks ? dele[0].reeks : "Future Shop";
       opskrif = taal === "en" ? `Valid on these ${boeke.length} books` : `Geldig op hierdie ${boeke.length} boeke`;
@@ -309,6 +308,15 @@
       if (a && b && (a.eweknie_slug === b.slug || b.eweknie_slug === a.slug)) {
         const in_taal = [a, b].find((x) => x.taal === (af ? "af" : "en"));
         boeke = [(in_taal || a).slug];
+        const titel = boek_titel(boeke[0]);
+        const albei = af ? "in Afrikaans en Engels" : "in Afrikaans and English";
+        if (koepon.tipe === "afslag") {
+          const bedrag = koepon.afslag_tipe === "vaste_bedrag"
+            ? `R${Math.round((koepon.afslag_waarde || 0) / 100)}`
+            : `${koepon.afslag_waarde || 0}%`;
+          return af ? `${bedrag} afslag op ${titel}, ${albei}` : `${bedrag} off ${titel}, ${albei}`;
+        }
+        return af ? `Gratis e-boeke: ${titel}, ${albei}` : `Free e-books: ${titel}, ${albei}`;
       }
     }
     let waarvan;
@@ -633,6 +641,8 @@
       (huidige_boek
         ? `<option value="${GEKOSE}">${huidige_boek.boeke.length === 1
             ? `Net hierdie boek: ${ontsnap(huidige_boek.boeke[0].titel)}`
+            : huidige_boek.paar
+            ? `Hierdie boek in Afrikaans en Engels: ${ontsnap(huidige_boek.boeke[0].titel)}`
             : `Die gekose boeke (${huidige_boek.boeke.length})`}</option>`
         : "") +
       AGTERGRONDE.map((a) => `<option value="${a.lêer}">${ontsnap(a.naam)}</option>`).join("");
