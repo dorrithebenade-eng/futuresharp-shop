@@ -50,7 +50,9 @@ function fst_talk_teken(talk, kategoriee) {
       </div>
       <aside class="fst-koop">
         <div class="fst-koop-meta">${fst_esc(kat)}${v.duur_sekondes ? ` · ${fst_esc(fst_duur(v.duur_sekondes))}` : ""}</div>
-        <div class="fst-koop-prys${net_koepon ? " fst-koop-prys-koepon" : ""}">${fst_esc(net_koepon ? t("fst_net_koepon") : fst_prys(v.prys_sent))}</div>
+        ${net_koepon || v.prys_sent > 0
+          ? `<div class="fst-koop-prys${net_koepon ? " fst-koop-prys-koepon" : ""}">${fst_esc(net_koepon ? t("fst_net_koepon") : fst_prys(v.prys_sent))}</div>`
+          : "" /* 'n Gratis talk wys geen prys nie */}
         ${net_koepon ? `
           <div class="fst-koepon-nota" id="fst-koepon-nota">
             ${nota ? `<p>${fst_esc(nota)}</p>` : ""}

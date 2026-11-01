@@ -18,7 +18,11 @@ function fst_blad_kaart(talk) {
       </span>
       <span class="fst-kaart-titel">${fst_esc(talk.titel)}</span>
       <span class="fst-kaart-wie">${fst_esc(talk.spreker)}</span>
-      <span class="fst-kaart-meta">${fst_esc(kat)}${kat ? " · " : ""}${fst_esc(v.net_koepon ? t("fst_net_koepon_kort") : fst_prys(v.prys_sent))}</span>
+      <span class="fst-kaart-meta">${(() => {
+        // 'n Gratis talk wys geen prys nie (November 2026).
+        const prys = v.net_koepon ? t("fst_net_koepon_kort") : v.prys_sent > 0 ? fst_prys(v.prys_sent) : "";
+        return fst_esc([kat, prys].filter(Boolean).join(" · "));
+      })()}</span>
     </a>`;
 }
 
