@@ -4190,3 +4190,37 @@ body.vennoot-modus .paneel-dokument-skrap-knoppie {
 @media (max-width: 560px) {
   .eweknie-paar .kaart-etiket-ster-wrap { top: auto; bottom: -4px; right: -8px; width: 78px; height: 78px; }
 }
+
+/* --- Bondel-oplaai van e-boek-PDF's (paneel-bondel-eboek.js) --- */
+.bondel-kop-knoppies { display: flex; flex-wrap: wrap; gap: 10px; }
+.bondel-oop-knoppie { background: var(--teal); }
+.bondel-eboek {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 16px 18px;
+  margin-bottom: 20px;
+  background: #fff;
+}
+.bondel-eboek-kop { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.bondel-eboek-kop h3 { margin: 0; }
+.bondel-eboek-tabel { margin: 14px 0; }
+.bondel-ry {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid #eee;
+  font-size: 0.9rem;
+}
+.bondel-kop { font-weight: 600; border-bottom: 2px solid #ddd; }
+.bondel-leer { overflow-wrap: anywhere; }
+.bondel-leer small { color: #777; white-space: nowrap; }
+.bondel-boek-keuse { width: 100%; }
+.bondel-ry-fout { background: #fdecea; }
+.bondel-eboek-voet { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.bondel-opsomming { font-size: 0.9rem; }
+@media (max-width: 620px) {
+  .bondel-ry { grid-template-columns: 1fr; }
+  .bondel-kop { display: none; }
+}

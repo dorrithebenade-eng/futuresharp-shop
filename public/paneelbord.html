@@ -218,7 +218,23 @@
       <section class="paneel-afdeling" data-afdeling-inhoud="katalogus">
         <div class="paneel-afdeling-kop">
           <h2 class="paneel-afdeling-titel" data-i18n="paneel_katalogus_titel">Katalogus</h2>
-          <button id="paneel-voeg-by-knoppie" class="kaart-aksie paneel-voeg-by-knoppie" type="button" data-i18n="paneel_voeg_produk_by_knoppie">+ Voeg produk by</button>
+          <div class="bondel-kop-knoppies">
+            <button id="paneel-bondel-eboek-knoppie" class="kaart-aksie bondel-oop-knoppie" type="button" data-i18n="bondel_oop_knoppie">E-boeke in 'n bondel oplaai</button>
+            <button id="paneel-voeg-by-knoppie" class="kaart-aksie paneel-voeg-by-knoppie" type="button" data-i18n="paneel_voeg_produk_by_knoppie">+ Voeg produk by</button>
+          </div>
+        </div>
+        <div id="paneel-bondel-eboek" class="bondel-eboek" style="display:none;">
+          <div class="bondel-eboek-kop">
+            <h3 data-i18n="bondel_titel">E-boek-PDF's in 'n bondel oplaai</h3>
+            <button id="bondel-eboek-sluit" class="terug-skakel" type="button" data-i18n="bondel_sluit">Sluit</button>
+          </div>
+          <p class="paneel-hulp-teks" data-i18n="bondel_hulp">Kies al die PDF's gelyk. Elke lêer word volgens sy naam aan 'n boek gekoppel; gaan die lys na en stel dit reg waar nodig. Net die PDF word vervang. Prys, verdelings, etiket en vrystellingsdatum bly soos hulle is.</p>
+          <input id="bondel-eboek-leers" type="file" accept="application/pdf" multiple>
+          <div id="bondel-eboek-tabel" class="bondel-eboek-tabel"></div>
+          <div class="bondel-eboek-voet">
+            <button id="bondel-eboek-laai-op" class="kaart-aksie" type="button" disabled data-i18n="bondel_laai_op">Laai op</button>
+            <span id="bondel-eboek-opsomming" class="bondel-opsomming"></span>
+          </div>
         </div>
         <div id="paneel-produkte-lys">
           <p class="stelsel-boodskap" data-i18n="paneel_produkte_laai">Produkte word gelaai …</p>
@@ -1197,6 +1213,7 @@
 
   <script src="js/taal.js"></script>
   <script src="js/paneelbord.js"></script>
+  <script src="js/paneel-bondel-eboek.js"></script>
   <script src="js/paneel-ooreenkoms.js"></script>
   <script src="js/paneel-registers.js"></script>
   <script src="js/talk-omslag.js"></script>
