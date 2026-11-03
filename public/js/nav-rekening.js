@@ -28,14 +28,16 @@
   if (!regs) return;
   const tt = (sleutel, terug) => (window.t ? window.t(sleutel) : terug);
   const pad = window.location.pathname.replace(/\/+$/, "") || "/";
-  const blad = pad.split("/").pop() || "index.html";
+  // Netlify bedien boeke.html ook as /boeke (sonder .html). Vergelyk dus
+  // sonder die uitbreiding, anders word die regte skakel nie onderstreep nie.
+  const blad = (pad.split("/").pop() || "index").replace(/\.html$/, "");
 
   const skakels = [
-    { href: "boeke.html", teks: tt("nav_boeke", "Boeke"), aktief: blad === "boeke.html" || blad === "produk.html" },
+    { href: "boeke.html", teks: tt("nav_boeke", "Boeke"), aktief: blad === "boeke" || blad === "produk" },
     { href: "/talks", teks: tt("nav_videos", "Video's"), aktief: /^\/(talks|talk|teater)/.test(pad) },
     { href: "https://www.futuresharp.co/courses", teks: tt("nav_kursusse", "Kursusse"), ekstern: true },
-    { href: "my-boeke.html", teks: tt("my_boeke_titel", "My Leeskamer"), aktief: blad === "my-boeke.html" },
-    { href: "kontak.html", teks: tt("nav_kontak", "Kontak"), aktief: blad === "kontak.html" },
+    { href: "my-boeke.html", teks: tt("my_boeke_titel", "My Leeskamer"), aktief: blad === "my-boeke" },
+    { href: "kontak.html", teks: tt("nav_kontak", "Kontak"), aktief: blad === "kontak" },
   ];
 
   const groep = document.createElement("nav");
