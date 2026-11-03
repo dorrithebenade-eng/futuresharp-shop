@@ -4642,3 +4642,14 @@ div.pb-omslag { aspect-ratio: 2 / 3; background: #E2DCCF; }
   .pb-koop .produk-formaat-knoppie, .pb-koop .produk-alreeds-eie-knoppie { width: 100%; }
 }
 .pb-koop .reekspakket-blok { max-width: 520px; }
+
+/* "Sien alles" as 'n knoppie met 'n buitelyn (November 2026): as gewone
+   skakel was dit te onopmerklik. */
+.bk-sien-alles {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-weight: 600; font-size: 14px; color: var(--teal);
+  border: 1.5px solid var(--teal); border-radius: 999px; padding: 8px 18px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.bk-sien-alles:hover { background: var(--teal); color: var(--wit); text-decoration: none; }
+.bk-ry-kop--met-skakel { align-items: center; }
