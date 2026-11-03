@@ -4719,3 +4719,12 @@ div.pb-omslag { aspect-ratio: 2 / 3; background: #E2DCCF; }
 .bk-chip--klein { padding: 5px 13px; font-size: 12px; }
 .bk-taal a { color: var(--teal); text-decoration: none; font-style: normal; font-weight: 500; }
 .bk-taal a:hover { text-decoration: underline; }
+
+/* Die waaier effens uitgesprei (November 2026): wyer, kleiner draai na
+   buite, sodat die omslae links en regs meer van hulself wys. */
+.kop-waaier { max-width: 540px; aspect-ratio: 540 / 340; }
+.kop-waaier-omslag { width: 42%; }
+.kop-waaier-omslag--1 { left: 1%; top: 9%; transform: rotate(-9deg); }
+.kop-waaier-omslag--2 { left: 29%; top: 0; }
+.kop-waaier-omslag--3 { right: 1%; top: 9%; transform: rotate(9deg); }
+@media (max-width: 640px) { .kop-waaier { max-width: 340px; } }

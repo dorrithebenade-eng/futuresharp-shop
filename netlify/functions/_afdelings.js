@@ -54,4 +54,19 @@ async function skryf_afdelings(lys) {
   return skoon_lys;
 }
 
-module.exports = { lees_afdelings, skryf_afdelings };
+// DIE TUISBLAD SE BAND (November 2026): watter drie boeke in die waaier lê,
+// en waar. Sleutel "band": { links, middel, regs } (slugs, of leeg). As al
+// drie gekies is, wys die band presies hulle; anders wissel dit uit die
+// boeke met die merkie "Op die tuisblad".
+async function lees_band() {
+  return (await store().get("band", { type: "json" })) || { links: "", middel: "", regs: "" };
+}
+
+async function skryf_band(band) {
+  const teks = (w) => String(w == null ? "" : w).trim().slice(0, 120);
+  const skoon_band = { links: teks(band && band.links), middel: teks(band && band.middel), regs: teks(band && band.regs) };
+  await store().setJSON("band", skoon_band);
+  return skoon_band;
+}
+
+module.exports = { lees_afdelings, skryf_afdelings, lees_band, skryf_band };

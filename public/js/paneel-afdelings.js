@@ -24,6 +24,8 @@
   // die bladsy gelaai het (net veranderinge word gestoor).
   let TUIS = new Map();
   let TUIS_BEGIN = new Map();
+  let BAND = { links: "", middel: "", regs: "" };
+  let WERKE = [];
 
   function is_op_tuisblad(w) {
     const e = w.eweknie_slug && PER_SLUG.get(w.eweknie_slug);
@@ -144,7 +146,23 @@
       <button type="button" class="terug-skakel" id="ra-nuwe-ry">+ Nuwe ry</button>`;
 
     const getal = [...TUIS.values()].filter(Boolean).length;
-    const tuis_html = `<p class="paneel-hulp-teks" style="background:#FFF7E6;border:1px solid #F1D9A6;border-radius:10px;padding:10px 14px;max-width:760px;">
+    const band_vas = BAND.links && BAND.middel && BAND.regs;
+    const keuse = (plek, etiket) => `<label class="veld-etiket" style="flex:1;min-width:200px;">${etiket}
+        <select class="veld-invoer ra-band" data-plek="${plek}">
+          <option value="">— kies 'n boek —</option>
+          ${WERKE.map((w) => `<option value="${esc(w.slug)}"${BAND[plek] === w.slug ? " selected" : ""}>${esc(w.titel)}</option>`).join("")}
+        </select></label>`;
+    const band_html = `<div style="border:1px solid #E5E0D6;border-radius:12px;padding:16px 18px;margin-bottom:16px;max-width:900px;background:#fff;">
+      <b style="font-size:15px;">Die tuisblad se band</b>
+      <p class="paneel-hulp-teks" style="margin:4px 0 10px;">Kies watter boek links, bo in die middel en regs lê. Die keuse word dadelik gestoor.
+        Kies jy nie al drie nie, wissel die band elke keer uit die boeke met <b>★ Op die tuisblad</b>.</p>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        ${keuse("links", "Links")}${keuse("middel", "Bo, in die middel")}${keuse("regs", "Regs")}
+      </div>
+      <p class="paneel-hulp-teks" style="margin:10px 0 0;">${band_vas ? "<b>Vas:</b> die band wys altyd hierdie drie, in hierdie volgorde." : "<b>Wissel:</b> die band kies self uit die ★-boeke."}
+        ${BAND.links || BAND.middel || BAND.regs ? `<button type="button" class="terug-skakel ra-band-skoon" style="margin-left:8px;">Maak skoon (laat wissel)</button>` : ""}</p>
+    </div>`;
+    const tuis_html = band_html + `<p class="paneel-hulp-teks" style="background:#FFF7E6;border:1px solid #F1D9A6;border-radius:10px;padding:10px 14px;max-width:760px;">
       <b>★ Op die tuisblad:</b> ${getal} ${getal === 1 ? "boek" : "boeke"} gemerk.
       ${getal >= 3 ? (getal === 3 ? "Die band wys altyd hierdie drie." : "Die band wys elke keer drie van hulle, telkens 'n ander drie.")
         : "Merk ten minste drie. Tot dan kies die band uit al die boeke."}</p>`;
@@ -211,6 +229,28 @@
     // Die tuisblad-merkie stoor DADELIK (November 2026). Met net die
     // Stoor-knoppie heel onder het 'n merkie wat verander is, maklik
     // ongestoor gebly en die tuisblad het nie verander nie.
+    const stoor_band = async () => {
+      const status = document.getElementById("paneel-afdelings-status");
+      try {
+        const r = await fetch("/.netlify/functions/stoor-afdelings", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", ...kry_outorisasie_kop() },
+          body: JSON.stringify({ band: BAND }),
+        });
+        if (!r.ok) throw new Error(await r.text());
+        status.textContent = "Tuisblad se band gestoor.";
+      } catch (fout) {
+        alert("Kon nie die band stoor nie: " + (fout.message || fout));
+      }
+      teken();
+    };
+    wrap.querySelectorAll(".ra-band").forEach((sel) => sel.addEventListener("change", () => {
+      BAND[sel.dataset.plek] = sel.value;
+      stoor_band();
+    }));
+    const skoon = wrap.querySelector(".ra-band-skoon");
+    if (skoon) skoon.addEventListener("click", () => { BAND = { links: "", middel: "", regs: "" }; stoor_band(); });
+
     wrap.querySelectorAll(".ra-tuis").forEach((c) => c.addEventListener("change", async () => {
       const status = document.getElementById("paneel-afdelings-status");
       c.disabled = true;
@@ -251,7 +291,9 @@
     document.getElementById("paneel-afdelings-status").textContent = "";
     try {
       const [r, alle] = await Promise.all([fetch("/.netlify/functions/kry-afdelings"), kry_produkte()]);
-      const afdelings = r.ok ? ((await r.json()).afdelings || []) : [];
+      const afd_data = r.ok ? await r.json() : {};
+      const afdelings = afd_data.afdelings || [];
+      BAND = Object.assign({ links: "", middel: "", regs: "" }, afd_data.band || {});
       const produkte = alle.filter((p) => p && p.aktief !== false);
       PER_SLUG = new Map(produkte.map((p) => [p.slug, p]));
       const konteks = {
@@ -260,6 +302,7 @@
         lidmaatskap: bk_lidmaatskap(afdelings, PER_SLUG),
       };
       const werke = werke_uit(produkte);
+      WERKE = werke.filter((w) => w.omslag).slice().sort((a, b) => String(a.titel).localeCompare(String(b.titel), "af", { numeric: true }));
       TUIS = new Map(werke.map((w) => [w.slug, is_op_tuisblad(w)]));
       TUIS_BEGIN = new Map(TUIS);
       const rye = bk_bou_rye(werke, konteks);

@@ -53,8 +53,31 @@
     plek.classList.add("kop-waaier--gereed");
   }
 
-  fetch("/.netlify/functions/kry-katalogus")
-    .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
-    .then((data) => teken(kies(data.produkte || [])))
+  // VASTE KEUSE (November 2026): as personeel in die paneel 'n boek vir
+  // links, middel en regs gekies het, lê presies daardie drie so. 'n Boek
+  // word in die huidige taal gewys as sy eweknie in daardie taal bestaan.
+  function vaste_keuse(produkte, band) {
+    if (!band || !band.links || !band.middel || !band.regs) return null;
+    const taal = typeof kry_huidige_taal === "function" ? kry_huidige_taal() : "af";
+    const per_slug = new Map(produkte.map((p) => [p.slug, p]));
+    const kry = (slug) => {
+      const p = per_slug.get(slug);
+      if (!p) return null;
+      const e = p.eweknie_slug && per_slug.get(p.eweknie_slug);
+      const keuse = p.taal && p.taal !== taal && e && e.taal === taal ? e : p;
+      return keuse.omslag ? keuse : null;
+    };
+    const drie = [kry(band.links), kry(band.middel), kry(band.regs)];
+    return drie.every(Boolean) ? drie : null;
+  }
+
+  Promise.all([
+    fetch("/.netlify/functions/kry-katalogus").then((r) => (r.ok ? r.json() : Promise.reject(r.status))),
+    fetch("/.netlify/functions/kry-afdelings").then((r) => (r.ok ? r.json() : {})).catch(() => ({})),
+  ])
+    .then(([data, afd]) => {
+      const produkte = data.produkte || [];
+      teken(vaste_keuse(produkte, afd.band) || kies(produkte));
+    })
     .catch(() => { /* die band werk sonder omslae */ });
 })();

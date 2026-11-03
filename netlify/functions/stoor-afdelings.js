@@ -2,7 +2,7 @@
 // Sien _afdelings.js. Die paneel stuur altyd die volledige lys.
 
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
-const { skryf_afdelings } = require("./_afdelings");
+const { skryf_afdelings, skryf_band } = require("./_afdelings");
 
 exports.handler = async (event, context) => {
   if (event.httpMethod !== "POST") {
@@ -18,13 +18,16 @@ exports.handler = async (event, context) => {
   } catch {
     return { statusCode: 400, body: "Ongeldige JSON" };
   }
-  if (!Array.isArray(invoer.afdelings)) {
-    return { statusCode: 400, body: "Verpligte veld: afdelings (lys)" };
+  // Die tuisblad se band kan apart gestoor word ({ band } sonder afdelings).
+  if (!Array.isArray(invoer.afdelings) && !invoer.band) {
+    return { statusCode: 400, body: "Verpligte veld: afdelings (lys) of band" };
   }
-  const afdelings = await skryf_afdelings(invoer.afdelings);
+  const uit = {};
+  if (Array.isArray(invoer.afdelings)) uit.afdelings = await skryf_afdelings(invoer.afdelings);
+  if (invoer.band) uit.band = await skryf_band(invoer.band);
   return {
     statusCode: 200,
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ afdelings }),
+    body: JSON.stringify(uit),
   };
 };
