@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="af">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video's — Future Shop</title>
+  <link rel="stylesheet" href="css/styl.css">
+    <link rel="icon" href="/icons/ikoon-32.png" sizes="32x32" type="image/png">
+  <link rel="icon" href="/icons/ikoon-16.png" sizes="16x16" type="image/png">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-ikoon.png">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#3FB6A4"></head>
+<body>
+  <header class="mini-kop">
+   <div class="mini-kop-inner">
+    <a href="index.html" class="mini-kop-merk">
+      <span class="merk-sharp">Future Sharp</span>
+      <span class="merk-skeier">—</span>
+      <span class="merk-shop">Future Shop</span>
+    </a>
+    <div class="mini-kop-regs">
+      <a href="mandjie.html" class="mini-kop-mandjie">
+        <svg class="mandjie-ikoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="9" cy="21" r="1"></circle>
+          <circle cx="20" cy="21" r="1"></circle>
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+        </svg>
+        <span data-i18n="nav_mandjie">Mandjie</span>
+        <span id="mandjie-teller" class="mandjie-teller"></span>
+      </a>
+      <span id="nav-rekening-plek" class="mini-kop-rekening-plek"></span>
+      <div class="taal-wisselaar" role="group" aria-label="Taal / Language">
+        <button type="button" class="taal-knoppie" data-taal="af">AF</button>
+        <button type="button" class="taal-knoppie" data-taal="en">EN</button>
+      </div>
+    </div>
+   </div>
+  </header>
+  <header class="kop kop--videos">
+    <div class="kop-kolom">
+      <div class="kop-inhoud">
+        <p class="kop-eyebrow" data-i18n="vd_oog">Video's</p>
+        <h1 class="kop-titel">
+          <span class="kop-titel-brand" data-i18n-html="vd_titel">Een <span class="goud">skerp</span> idee op 'n slag.</span>
+        </h1>
+        <p class="kop-subtitel" data-i18n="vd_sub">Kort video's deur kundiges. Kyk wanneer dit jou pas, in jou eie Teater.</p>
+      </div>
+      <a class="vd-band-beeld" href="/talks" aria-label="FutureSharp Talks">
+        <img src="images/talks-strook.jpg" alt="FutureSharp Talks">
+      </a>
+    </div>
+  </header>
+
+  <main class="bk-wrap">
+    <section class="bk-ry">
+      <div class="bk-ry-kop bk-ry-kop--met-skakel">
+        <div>
+          <h2 class="bk-ry-titel vd-talks-merk" aria-label="FutureSharp Talks">
+            <span class="vd-talks-naam">FUTURESHARP</span><b class="vd-b vd-b-t">T</b><b class="vd-b vd-b-g">A</b><b class="vd-b vd-b-k">L</b><b class="vd-b vd-b-t">K</b><b class="vd-b vd-b-g">S</b>
+          </h2>
+          <p class="bk-ry-beskrywing" data-i18n="vd_talks_besk">Cutting-edge ideas. Kort aanbiedings van sowat 15 minute deur kundiges uit navorsing, besigheid, medisyne en professionele praktyk.</p>
+        </div>
+        <a class="bk-sien-alles" href="/talks"><span data-i18n="bk_sien_alles">Sien alles</span> →</a>
+      </div>
+      <div class="vd-rooster" id="vd-talks"><p class="stelsel-boodskap" data-i18n="fst_laai">Talks word gelaai …</p></div>
+    </section>
+
+    <section class="bk-ry vd-binnekort">
+      <div class="bk-ry-kop">
+        <h2 class="bk-ry-titel" data-i18n="vd_dag_titel">Dagstukkies</h2>
+        <p class="bk-ry-beskrywing" data-i18n="vd_dag_besk">'n Kort gedagte vir elke dag, deur Piet Smit.</p>
+      </div>
+      <div class="vd-rooster" id="vd-dag"></div>
+    </section>
+
+    <section class="bk-ry vd-binnekort">
+      <div class="bk-ry-kop">
+        <h2 class="bk-ry-titel" data-i18n="vd_stories_titel">Video-stories</h2>
+        <p class="bk-ry-beskrywing" data-i18n="vd_stories_besk">Stories om saam te kyk en oor te gesels.</p>
+      </div>
+      <div class="vd-rooster" id="vd-stories"></div>
+    </section>
+  </main>
+
+  <script src="js/taal.js"></script>
+  <script src="js/fst-taal.js"></script>
+  <script src="js/identiteit.js"></script>
+  <script src="js/mandjie.js"></script>
+  <script src="js/nav-rekening.js"></script>
+  <script src="js/fst-gedeel.js"></script>
+  <script src="js/videos.js"></script>
+</body>
+</html>

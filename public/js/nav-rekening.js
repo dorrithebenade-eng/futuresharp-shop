@@ -34,7 +34,7 @@
 
   const skakels = [
     { href: "boeke.html", teks: tt("nav_boeke", "Boeke"), aktief: blad === "boeke" || blad === "produk" },
-    { href: "/talks", teks: tt("nav_videos", "Video's"), aktief: /^\/(talks|talk|teater)/.test(pad) },
+    { href: "videos.html", teks: tt("nav_videos", "Video's"), aktief: blad === "videos" || /^\/(talks|talk|teater)/.test(pad) },
     { href: "https://www.futuresharp.co/courses", teks: tt("nav_kursusse", "Kursusse"), ekstern: true },
     { href: "my-boeke.html", teks: tt("my_boeke_titel", "My Leeskamer"), aktief: blad === "my-boeke" },
     { href: "kontak.html", teks: tt("nav_kontak", "Kontak"), aktief: blad === "kontak" },

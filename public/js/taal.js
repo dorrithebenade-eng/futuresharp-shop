@@ -63,6 +63,24 @@ const WOORDEBOEK = {
   },
   pb_hoe_werk_dit: { af: "Hoe werk dit?", en: "How does it work?" },
   pb_meer_uit_ry: { af: "Meer uit hierdie ry", en: "More from this shelf" },
+  // Video's-bladsy (fase 5)
+  vd_oog: { af: "Video's", en: "Videos" },
+  vd_titel: { af: 'Een <span class="goud">skerp</span> idee op \'n slag.', en: 'One <span class="goud">sharp</span> idea at a time.' },
+  vd_sub: {
+    af: "Kort video's deur kundiges. Kyk wanneer dit jou pas, in jou eie Teater.",
+    en: "Short videos by experts. Watch whenever it suits you, in your own Theatre.",
+  },
+  vd_talks_besk: {
+    af: "Cutting-edge ideas. Kort aanbiedings van sowat 15 minute deur kundiges uit navorsing, besigheid, medisyne en professionele praktyk.",
+    en: "Cutting-edge ideas. Short presentations of about 15 minutes by experts from research, business, medicine and professional practice.",
+  },
+  vd_dag_titel: { af: "Dagstukkies", en: "Daily reflections" },
+  vd_dag_besk: { af: "'n Kort gedagte vir elke dag, deur Piet Smit.", en: "A short thought for every day, by Piet Smit." },
+  vd_dag_een: { af: "Dagstukkie", en: "Daily reflection" },
+  vd_stories_titel: { af: "Video-stories", en: "Video stories" },
+  vd_stories_besk: { af: "Stories om saam te kyk en oor te gesels.", en: "Stories to watch together and talk about." },
+  vd_storie_een: { af: "Video-storie", en: "Video story" },
+  vd_binnekort: { af: "Binnekort", en: "Coming soon" },
   // My Leeskamer (fase 4)
   lk_sub: { af: "Jou boeke, gereed om te lees.", en: "Your books, ready to read." },
   lk_welkom_terug: { af: "Welkom terug,", en: "Welcome back," },
