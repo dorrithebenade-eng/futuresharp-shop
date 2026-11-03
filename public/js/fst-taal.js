@@ -9,7 +9,7 @@
 // wysiging riskant maak.
 
 Object.assign(WOORDEBOEK, {
-  fst_terug: { af: "Future Shop", en: "Future Shop" },
+  fst_terug: { af: "Video's", en: "Videos" },
   fst_subtitel: { af: "Cutting-Edge Ideas", en: "Cutting-Edge Ideas" },
   fst_lei: {
     af: "Een skerp idee op 'n slag, uit navorsing, besigheid, medisyne en professionele praktyk. Elke talk is sowat vyftien minute lank en bly joune ná aankoop.",

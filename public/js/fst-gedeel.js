@@ -61,7 +61,7 @@ function fst_klapbord() {
 function fst_kop(met_terug_na_alle) {
   const terug = met_terug_na_alle
     ? `<a class="fst-terug" href="/talks">‹ ${fst_esc(t("fst_alle_talks"))}</a>`
-    : `<a class="fst-terug" href="/">‹ ${fst_esc(t("fst_terug"))}</a>`;
+    : `<a class="fst-terug" href="/videos">‹ ${fst_esc(t("fst_terug"))}</a>`;
   return `<header class="fst-kop"><div class="fst-kop-in">
     ${terug}
     <a class="fst-kop-merk" href="/talks">${fst_woordmerk_klein()}</a>

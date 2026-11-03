@@ -342,7 +342,7 @@ async function nav_is_outeur(sessie) {
   // vanself in die bestaande mobiele skyfie-paneel (.mini-kop-regs)
   // in, saam met Mandjie en die taal-wisselaar — geen aparte
   // mobiel-hantering hier nodig nie.
-  const my_boeke_teks = window.t ? window.t("my_boeke_titel") : "My Boeke";
+  // My Leeskamer staan reeds in die hoofkieslys; hier herhaal ons dit nie.
   const meld_af_teks = window.t ? window.t("paneel_meld_af") : "Meld af";
   const inisiale = sessie.gebruiker.email
     .split("@")[0]
@@ -358,7 +358,6 @@ async function nav_is_outeur(sessie) {
         <span class="nav-rekening-avatar" title="${sessie.gebruiker.email}" aria-hidden="true">${inisiale}</span>
         <span class="nav-rekening-epos-mobiel">${sessie.gebruiker.email}</span>
       </div>
-      <a href="my-boeke.html" class="nav-rekening-skakel">${my_boeke_teks}</a>
       <button type="button" id="rekening-meld-af-knoppie" class="nav-rekening-skakel nav-rekening-skakel--gedemp">${meld_af_teks}</button>
     </div>
   `;
@@ -374,13 +373,13 @@ async function nav_is_outeur(sessie) {
   const is_outeur = await nav_is_outeur(sessie);
   if (is_outeur) {
     const groep = document.querySelector(".nav-rekening-groep");
-    const my_boeke = groep && groep.querySelector('a[href="my-boeke.html"]');
+    const meld_af = groep && groep.querySelector("#rekening-meld-af-knoppie");
     if (groep) {
       const skakel = document.createElement("a");
       skakel.href = "outeur.html";
       skakel.className = "nav-rekening-skakel";
       skakel.textContent = window.t ? window.t("nav_outeurspaneel") : "Outeurspaneel";
-      groep.insertBefore(skakel, my_boeke);
+      groep.insertBefore(skakel, meld_af);
     }
   }
 
@@ -389,13 +388,13 @@ async function nav_is_outeur(sessie) {
   // (paneel-rol-skakelaar.js), sodat die kop nie nog 'n item kry nie.
   if (!is_outeur && (await nav_is_spreker(sessie))) {
     const groep = document.querySelector(".nav-rekening-groep");
-    const my_boeke = groep && groep.querySelector('a[href="my-boeke.html"]');
+    const meld_af = groep && groep.querySelector("#rekening-meld-af-knoppie");
     if (groep && !groep.querySelector('a[href="spreker.html"]')) {
       const skakel = document.createElement("a");
       skakel.href = "spreker.html";
       skakel.className = "nav-rekening-skakel";
       skakel.textContent = window.t ? window.t("nav_sprekerspaneel") : "Sprekerspaneel";
-      groep.insertBefore(skakel, my_boeke);
+      groep.insertBefore(skakel, meld_af);
     }
   }
 
@@ -403,13 +402,13 @@ async function nav_is_outeur(sessie) {
   // direk ná "My Leeskamer".
   if (await nav_het_talks(sessie)) {
     const groep = document.querySelector(".nav-rekening-groep");
-    const my_boeke = groep && groep.querySelector('a[href="my-boeke.html"]');
+    const meld_af = groep && groep.querySelector("#rekening-meld-af-knoppie");
     if (groep && !groep.querySelector('a[href="/teater"]')) {
       const skakel = document.createElement("a");
       skakel.href = "/teater";
       skakel.className = "nav-rekening-skakel";
       skakel.textContent = window.t ? window.t("nav_my_teater") : "My Teater";
-      groep.insertBefore(skakel, my_boeke ? my_boeke.nextSibling : null);
+      groep.insertBefore(skakel, meld_af);
     }
   }
 })();

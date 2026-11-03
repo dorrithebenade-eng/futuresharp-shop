@@ -84,10 +84,21 @@
       teken_chips();
       teken_taal();
       teken();
+      spring_na_ry();
     } catch (fout) {
       console.error("Kon nie die boeke laai nie:", fout);
       wrap.innerHTML = `<p class="stelsel-boodskap">${t("katalogus_leeg_beskrywing")}</p>`;
     }
+  }
+
+  // "Sien alles" op die tuisblad en die broodkrummel op 'n boekbladsy wys
+  // na boeke.html#afdeling-<ry>. Die rye word eers ná die laai geteken, dus
+  // kan die blaaier nie self daarheen spring nie; ons doen dit hier.
+  function spring_na_ry() {
+    const anker = decodeURIComponent(window.location.hash.slice(1));
+    if (!anker) return;
+    const ry = document.getElementById(anker);
+    if (ry) requestAnimationFrame(() => ry.scrollIntoView({ block: "start" }));
   }
 
   document.addEventListener("DOMContentLoaded", laai);

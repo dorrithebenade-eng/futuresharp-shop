@@ -402,7 +402,7 @@ const WOORDEBOEK = {
   // Produk-bladsy
   produk_laai: { af: "Produk word gelaai …", en: "Loading product …" },
   terug_katalogus: { af: "← Terug na katalogus", en: "← Back to catalogue" },
-  terug_katalogus_skakel: { af: "Terug na katalogus", en: "Back to catalogue" },
+  terug_katalogus_skakel: { af: "Terug na die winkel", en: "Back to the shop" },
   voeg_by_mandjie: { af: "Voeg by mandjie", en: "Add to cart" },
   oor_hierdie_boek: { af: "Oor hierdie boek", en: "About this book" },
   isbn_etiket: { af: "ISBN", en: "ISBN" },
@@ -423,7 +423,7 @@ const WOORDEBOEK = {
   produk_nie_gevind: { af: "Hierdie produk kon nie gevind word nie.", en: "This product could not be found." },
 
   // Mandjie-bladsy
-  bly_aan_koop: { af: "← Terug na katalogus", en: "← Back to catalogue" },
+  bly_aan_koop: { af: "← Kyk verder rond", en: "← Keep browsing" },
 
   // 403, NIE 401 NIE. Die rekening is aangemeld en die token is geldig -- dit
   // het net nie die "koper"-rol nie. Aanmeld gaan niks verander nie, dus mag

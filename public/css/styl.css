@@ -4510,7 +4510,7 @@ html:has(#nav-rekening-plek) { background: var(--ink); }
 
 .bk-wrap { max-width: 1228px; margin: 0 auto; padding: 8px 24px 24px; }
 .bk-wrap--tuis { padding-top: 16px; }
-.bk-ry { padding-top: clamp(32px, 4vw, 52px); }
+.bk-ry { padding-top: clamp(32px, 4vw, 52px); scroll-margin-top: 72px; }
 .bk-ry-kop { margin-bottom: 18px; }
 .bk-ry-kop--met-skakel { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; }
 .bk-ry-titel {
