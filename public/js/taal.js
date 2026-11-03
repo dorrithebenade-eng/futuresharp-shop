@@ -307,7 +307,13 @@ const WOORDEBOEK = {
     af: "Lees op jou rekenaar, tablet of selfoon, in 'n leser wat spesiaal vir e-boeke gemaak is.",
     en: "Read on your computer, tablet or phone, in a reader made specially for e-books.",
   },
-  formaat_info_eboek_opskrif: { af: "Hoe werk E-boek?", en: "How does E-book work?" },
+  formaat_info_eboek_opskrif: { af: "Hoe kry en lees ek 'n e-boek?", en: "How do I get and read an e-book?" },
+  // Eie teks vir die e-boekvenster (November 2026). formaat_lees_teks bly vir
+  // die Leen-venster. Die venster gebruik innerHTML, dus werk <strong>.
+  formaat_info_eboek_teks: {
+    af: "Tydens betaling skep jy 'n profiel met jou e-posadres. Jou boek wag dan in <strong>My Leeskamer</strong>, 'n spesiale ruimte met jou persoonlike boekrak. Meld aan, gaan na My Leeskamer, en jou boek maak oop in Future Shop se leestoepassing, wat spesifiek vir jou leesgerief ontwerp is. Jy lees aanlyn of aflyn, op jou foon, tablet of rekenaar.",
+    en: "At checkout you create an account with your email address. Your book then waits in <strong>My Reading Room</strong>, a special space with your personal bookshelf. Sign in, go to My Reading Room, and your book opens in Future Shop's reading app, designed for comfortable reading. Read online or offline, on your phone, tablet or computer.",
+  },
   formaat_info_leen_opskrif: { af: "Hoe werk Leen?", en: "How does Borrow work?" },
   formaat_info_hardekopie_opskrif: { af: "Hoe werk Harde kopie?", en: "How does Hard copy work?" },
   formaat_info_hardekopie_teks: {
@@ -350,7 +356,7 @@ const WOORDEBOEK = {
   // nie as 'n skakel nie: die persoon sit reeds vas en 'n verdere klik help
   // hom nie.
   geen_koperprofiel: {
-    af: "Hierdie rekening kan nie aankope doen nie. Meld af en meld weer aan met die rekening waarmee jy koop, of skryf aan admin@futuresharp.co.za.",
+    af: "Hierdie profiel kan nie aankope doen nie. Meld af en meld weer aan met die profiel waarmee jy koop, of skryf aan admin@futuresharp.co.za.",
     en: "This account cannot make purchases. Sign out and sign in again with the account you buy with, or write to admin@futuresharp.co.za.",
   },
   jou_mandjie: { af: "Jou mandjie", en: "Your cart" },
@@ -387,7 +393,7 @@ const WOORDEBOEK = {
     en: "These two codes cannot be used together",
   },
   koepon_fout_besit_nodig: {
-    af: "Hierdie kode is vir lesers wat reeds een van ons boeke het. Meld aan met die rekening waarmee jy die boek gekoop het.",
+    af: "Hierdie kode is vir lesers wat reeds een van ons boeke het. Meld aan met die profiel waarmee jy die boek gekoop het.",
     en: "This code is for readers who already own one of our books. Sign in with the account you used to buy the book.",
   },
   koepon_fout_in_pakket: {
@@ -463,7 +469,7 @@ const WOORDEBOEK = {
   geskenk_kyk: { af: "Gaan voort", en: "Continue" },
   geskenk_ontvang_knoppie: { af: "Ontvang my geskenk", en: "Receive my gift" },
   geskenk_ontvang_nota: {
-    af: "Jy meld eers aan of skep 'n rekening. Die boeke gaan dan in jou leeskamer, en die kode werk daarna nie weer nie.",
+    af: "Jy meld eers aan of skep 'n profiel. Die boeke gaan dan in jou leeskamer, en die kode werk daarna nie weer nie.",
     en: "You first sign in or create an account. The books then go into your reading room, and the code will not work again.",
   },
   geskenk_fout_onbekend: { af: "Ons ken nie hierdie kode nie. Kyk of dit reg ingetik is.", en: "We don't recognise this code. Check that it was typed correctly." },
@@ -481,7 +487,7 @@ const WOORDEBOEK = {
     en: "Do you have another code, like the one at the back of your book? You can add it too.",
   },
   koepon_fout_nie_joune: {
-    af: "Hierdie koepon is nie vir jou rekening geldig nie",
+    af: "Hierdie koepon is nie vir jou profiel geldig nie",
     en: "This coupon is not valid for your account",
   },
   aflewering_titel: { af: "Aflewering", en: "Delivery" },
@@ -1151,7 +1157,7 @@ const WOORDEBOEK = {
   // nie sy boeke nie, en 'n nuwe koper moet weet dat registrasie hier kan
   // gebeur.
   meld_aan_vir_bestelling: {
-    af: "Meld aan om jou bestelling te voltooi — of registreer as jy nog nie 'n rekening het nie.",
+    af: "Meld aan om jou bestelling te voltooi, of registreer as jy nog nie 'n profiel het nie.",
     en: "Log in to complete your order — or register if you don't have an account yet.",
   },
   meld_aan_of_registreer: { af: "Meld aan of registreer", en: "Log in or register" },
@@ -1193,20 +1199,20 @@ const WOORDEBOEK = {
   wagwoord_versteek: { af: "Versteek wagwoord", en: "Hide password" },
   meld_aan_knoppie: { af: "Meld aan", en: "Log in" },
   bly_aangemeld_etiket: { af: "Bly aangemeld op hierdie toestel", en: "Stay signed in on this device" },
-  geen_rekening_nog: { af: "Het jy nog geen rekening nie?", en: "Don't have an account yet?" },
+  geen_rekening_nog: { af: "Het jy nog nie 'n profiel nie?", en: "Don't have an account yet?" },
   registreer_hier: { af: "Registreer hier", en: "Register here" },
   wagwoord_vergeet: { af: "Wagwoord vergeet?", en: "Forgot your password?" },
-  registreer_titel: { af: "Skep 'n rekening", en: "Create an account" },
+  registreer_titel: { af: "Skep 'n profiel", en: "Create an account" },
   registreer_knoppie: { af: "Registreer", en: "Register" },
-  het_reeds_rekening: { af: "Het jy reeds 'n rekening?", en: "Already have an account?" },
+  het_reeds_rekening: { af: "Het jy reeds 'n profiel?", en: "Already have an account?" },
   meld_aan_hier: { af: "Meld hier aan", en: "Log in here" },
   herstel_titel: { af: "Herstel wagwoord", en: "Reset password" },
   stuur_herstel_knoppie: { af: "Stuur herstel-skakel", en: "Send reset link" },
   terug_na_aanmeld: { af: "Terug na aanmeld", en: "Back to login" },
   meld_tans_aan: { af: "Meld aan …", en: "Logging in …" },
   aanmeld_fout: { af: "Verkeerde e-pos of wagwoord.", en: "Incorrect email or password." },
-  registreer_tans: { af: "Skep rekening …", en: "Creating account …" },
-  registreer_sukses_bevestig_epos: { af: "Rekening geskep. Bevestig dit via die skakel in jou e-pos.", en: "Account created. Confirm it via the link in your email." },
+  registreer_tans: { af: "Skep profiel …", en: "Creating account …" },
+  registreer_sukses_bevestig_epos: { af: "Profiel geskep. Bevestig dit met die skakel in jou e-pos.", en: "Account created. Confirm it via the link in your email." },
   registreer_fout: { af: "Kon nie registreer nie. Probeer weer.", en: "Couldn't register. Try again." },
   stuur_tans_herstel: { af: "Stuur …", en: "Sending …" },
   herstel_epos_gestuur: { af: "Herstel-skakel gestuur — kyk jou e-pos.", en: "Reset link sent — check your email." },
@@ -1214,7 +1220,7 @@ const WOORDEBOEK = {
 
   // Bevestig (e-pos-skakel-verwerking)
   bevestig_titel: { af: "Stel jou wagwoord", en: "Set your password" },
-  bevestig_hulp: { af: "Stel 'n wagwoord om jou rekening klaar te maak.", en: "Set a password to finish setting up your account." },
+  bevestig_hulp: { af: "Stel 'n wagwoord om jou profiel klaar te maak.", en: "Set a password to finish setting up your account." },
   bevestig_knoppie: { af: "Bevestig", en: "Confirm" },
   bevestig_tans: { af: "Bevestig …", en: "Confirming …" },
   bevestig_fout: { af: "Kon nie bevestig nie.", en: "Couldn't confirm." },

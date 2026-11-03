@@ -1639,6 +1639,10 @@ body {
   padding: 22px 24px 26px;
 }
 
+/* Die e-boekvenster het vier sinne (November 2026). Gesentreerde teks van
+   daardie lengte lees moeilik, dus lyn dit links; die ander vensters bly
+   gesentreer. */
+.formaat-info-venster--eboek .formaat-info-teks { text-align: left; }
 .formaat-info-teks {
   font-family: var(--font-liggaam);
   font-size: 15px;

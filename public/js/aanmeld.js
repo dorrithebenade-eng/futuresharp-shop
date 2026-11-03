@@ -81,7 +81,7 @@ document.getElementById("registreer-vorm")?.addEventListener("submit", async (ev
   const epos = document.getElementById("registreer-epos").value.trim();
   const wagwoord = document.getElementById("registreer-wagwoord").value;
 
-  wys_boodskap(window.t ? window.t("registreer_tans") : "Skep tans rekening...");
+  wys_boodskap(window.t ? window.t("registreer_tans") : "Skep profiel …");
 
   try {
     await identiteit_registreer(epos, wagwoord);
@@ -91,12 +91,12 @@ document.getElementById("registreer-vorm")?.addEventListener("submit", async (ev
     wys_boodskap(
       window.t
         ? window.t("registreer_sukses_bevestig_epos")
-        : "Rekening geskep! Kyk jou e-pos vir 'n bevestigingskakel voor jy kan aanmeld.",
+        : "Profiel geskep. Bevestig dit met die skakel in jou e-pos.",
       false
     );
   } catch (fout) {
     wys_boodskap(
-      fout.message || (window.t ? window.t("registreer_fout") : "Kon nie rekening skep nie."),
+      fout.message || (window.t ? window.t("registreer_fout") : "Kon nie registreer nie. Probeer weer."),
       true
     );
   }

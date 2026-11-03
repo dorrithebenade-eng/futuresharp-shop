@@ -34,7 +34,7 @@ function bou_formaat_info_inhoud(formaat, tydperk_dae) {
   // eboek (verstek)
   return {
     opskrif: t("formaat_info_eboek_opskrif"),
-    teks: t("formaat_lees_teks"),
+    teks: t("formaat_info_eboek_teks"),
     ikoon: "📖",
     klas: "formaat-info-venster--eboek",
   };
