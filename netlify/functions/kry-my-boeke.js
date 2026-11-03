@@ -40,10 +40,18 @@ exports.handler = async (event, context) => {
     // uit Blobs te lees nie.
     const produk_kas = new Map();
     const vordering_store = kry_store("lees-vordering");
-    async function kry_lees_bladsy(slug) {
+    // Die hele vorderingsrekord (November 2026): die bladsy, hoeveel bladsye
+    // die boek het en wanneer laas gelees. My Leeskamer wys bo-aan die boek
+    // wat die koper laaste gelees het, met 'n vorderingstaaf.
+    async function kry_lees_vordering(slug) {
       try {
         const rekord = await vordering_store.get(`${slug}--${gebruiker.id}`, { type: "json" });
-        return rekord && rekord.bladsy > 1 ? rekord.bladsy : null;
+        if (!rekord || !(rekord.bladsy > 1)) return null;
+        return {
+          bladsy: rekord.bladsy,
+          totaal: Number.isInteger(rekord.totaal_bladsye) ? rekord.totaal_bladsye : null,
+          op: rekord.bygewerk_op || null,
+        };
       } catch {
         return null;
       }
@@ -205,7 +213,14 @@ exports.handler = async (event, context) => {
           opgradering,
           // Waar die koper laas was, vir die "Lees verder"-knoppie. Net vir
           // 'n e-boek of leen; 'n harde kopie het geen leser nie.
-          lees_bladsy: is_harde_kopie ? null : await kry_lees_bladsy(boek_item.produk_slug),
+          ...(await (async () => {
+            const v = is_harde_kopie ? null : await kry_lees_vordering(boek_item.produk_slug);
+            return {
+              lees_bladsy: v ? v.bladsy : null,
+              lees_totaal: v ? v.totaal : null,
+              lees_op: v ? v.op : null,
+            };
+          })()),
         });
       }
     }

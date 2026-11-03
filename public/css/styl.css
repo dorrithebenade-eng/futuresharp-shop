@@ -4653,3 +4653,62 @@ div.pb-omslag { aspect-ratio: 2 / 3; background: #E2DCCF; }
 }
 .bk-sien-alles:hover { background: var(--teal); color: var(--wit); text-decoration: none; }
 .bk-ry-kop--met-skakel { align-items: center; }
+
+/* =====================================================================
+   FASE 4 (November 2026): My Leeskamer
+   ===================================================================== */
+.kop--leeskamer { padding-bottom: clamp(40px, 5vw, 60px); }
+.lk-wrap { max-width: 1228px; margin: 0 auto; padding: 0 24px 24px; }
+.lk-wrap #pwa-installeer-plek:not(:empty) { margin-top: 24px; }
+
+.lk-verder { margin-top: clamp(28px, 4vw, 44px); }
+.lk-verder-kaart {
+  display: flex; gap: clamp(18px, 3vw, 32px); align-items: center;
+  background: var(--room); border-radius: 14px; padding: clamp(18px, 2.5vw, 28px) clamp(18px, 3vw, 32px);
+  text-decoration: none; color: inherit; transition: transform 0.15s ease;
+}
+.lk-verder-kaart:hover { transform: translateY(-2px); }
+.lk-verder-omslag { width: clamp(88px, 11vw, 130px); height: auto; border-radius: 3px; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18); flex-shrink: 0; }
+.lk-verder-teks { flex: 1; min-width: 0; }
+.lk-verder-oog { font-family: var(--font-liggaam); font-weight: 600; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--teal); margin: 0 0 6px; }
+.lk-verder-titel { font-family: var(--font-opskrif); font-weight: 700; font-size: clamp(16px, 2vw, 22px); line-height: 1.25; color: #1F1F1D; margin: 0; }
+.lk-taaf { height: 6px; background: #E2DCCF; border-radius: 3px; margin: 14px 0 6px; max-width: 420px; overflow: hidden; }
+.lk-taaf span { display: block; height: 100%; background: var(--teal); border-radius: 3px; }
+.lk-verder-bladsy { font-family: var(--font-liggaam); font-size: 13px; color: #8A877E; margin: 6px 0 14px; }
+.lk-verder-knoppie {
+  display: inline-flex; gap: 8px; background: var(--teal); color: var(--wit);
+  font-family: var(--font-liggaam); font-weight: 600; font-size: 14px; padding: 11px 22px; border-radius: 999px;
+}
+
+.lk-rak { padding-top: clamp(32px, 4vw, 48px); }
+.lk-rak .stelsel-boodskap:empty { display: none; }
+
+/* Die boekrak in dieselfde styl as die winkel se kaarte: omslag op 'n
+   roomkleurige vlak, vier op 'n ry op 'n rekenaar, twee op 'n foon. */
+.lk-rak .my-boeke-rooster {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 30px 22px;
+  justify-items: stretch;
+}
+@media (max-width: 900px) { .lk-rak .my-boeke-rooster { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 640px) { .lk-rak .my-boeke-rooster { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 14px; } }
+.lk-rak .my-boek-kaart { gap: 6px; }
+.lk-rak .my-boek-omslag-wrap {
+  background: var(--room); border-radius: 8px; padding: 14px;
+  display: flex; justify-content: center; align-items: center; aspect-ratio: 3 / 4;
+}
+.lk-rak .my-boek-omslag { width: auto; height: 100%; max-width: 100%; aspect-ratio: auto; object-fit: contain; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.14); }
+.lk-rak .my-boek-merker { inset: 14px; }
+.lk-rak .my-boek-titel { font-size: 14px; margin-top: 8px; }
+.lk-rak .my-boek-outeur { font-size: 12px; color: #8A877E; margin: 0; }
+.lk-rak .my-boek-lees-knoppie {
+  display: inline-block; align-self: flex-start; background: none; color: var(--teal);
+  padding: 0; font-size: 14px; font-weight: 600; text-align: left;
+}
+.lk-rak .my-boek-lees-knoppie::after { content: " →"; }
+.lk-rak a.my-boek-kaart:hover .my-boek-lees-knoppie { background: none; text-decoration: underline; }
+@media (max-width: 480px) {
+  .lk-rak .my-boek-titel { font-size: 14px; }
+  .lk-rak .my-boek-lees-knoppie { font-size: 14px; padding: 0; }
+}
+.lk-rak .my-boek-opgradering-knoppie { border-radius: 999px; padding: 8px 14px; align-self: flex-start; }

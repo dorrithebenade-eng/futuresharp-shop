@@ -89,7 +89,7 @@ function bou_boek_kaart(boek) {
     const merker = document.createElement("span");
     merker.className = "my-boek-merker";
     merker.textContent = boek.vrystelling_datum
-      ? (window.t ? window.t("beskikbaar_vanaf") : "Beskikbaar vanaf") + " " + boek.vrystelling_datum
+      ? (window.t ? window.t("beskikbaar_vanaf") : "Beskikbaar vanaf") + " " + formateer_datum(boek.vrystelling_datum)
       : (window.t ? window.t("nog_nie_beskikbaar") : "Nog nie beskikbaar nie");
     omslag_wrap.appendChild(merker);
   } else if (boek.is_leen && boek.leen_aktief === false) {
@@ -223,7 +223,8 @@ function bou_boek_kaart(boek) {
     const opgradering_knoppie = document.createElement("button");
     opgradering_knoppie.type = "button";
     opgradering_knoppie.className = "my-boek-opgradering-knoppie";
-    const bedrag = `R${(boek.opgradering.afslag_sent / 100).toFixed(2)}`;
+    const rand = boek.opgradering.afslag_sent / 100;
+    const bedrag = `R${Number.isInteger(rand) ? rand : rand.toFixed(2).replace(".", ",")}`;
     opgradering_knoppie.textContent = window.t
       ? `${window.t("leen_opgradering_knoppie")} ${bedrag} ${window.t("leen_opgradering_afslag_suffix")}`
       : `Koop nou — ${bedrag} afslag`;
@@ -244,10 +245,67 @@ function bou_boek_kaart(boek) {
   return el;
 }
 
+// --- Nuwe Leeskamer (November 2026, fase 4) --------------------------------
+// Die band se groet: met die koper se naam as ons dit het, anders 'n groet
+// sonder naam. Netlify Identity hou 'n naam net as die profiel een het.
+function wys_welkom(sessie) {
+  const el = document.getElementById("lk-welkom");
+  if (!el) return;
+  const md = (sessie && sessie.gebruiker && sessie.gebruiker.user_metadata) || {};
+  const volle = String(md.full_name || md.naam || md.name || "").trim();
+  const naam = volle.split(/\s+/)[0] || "";
+  const esc = (w) => String(w).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  el.innerHTML = naam
+    ? `${esc(window.t ? window.t("lk_welkom_terug") : "Welkom terug,")} <span class="goud">${esc(naam)}</span>.`
+    : (window.t ? window.t("lk_welkom_sonder_naam") : 'Welkom in jou <span class="goud">Leeskamer</span>.');
+}
+
+// Die kaart "Lees verder": die boek wat die koper laaste gelees het (wat nog
+// oopgemaak kan word), met die bladsy en 'n vorderingstaaf as ons die
+// totaal ken. Geen kaart as hy nog niks begin lees het nie.
+function wys_lees_verder(boeke) {
+  const plek = document.getElementById("lk-verder");
+  if (!plek) return;
+  const kandidate = (boeke || []).filter((b) =>
+    b.lees_bladsy && !b.is_harde_kopie && b.beskikbaar_nou && (!b.is_leen || b.leen_aktief !== false));
+  if (!kandidate.length) return;
+  kandidate.sort((a, b) => String(b.lees_op || "").localeCompare(String(a.lees_op || "")));
+  const b = kandidate[0];
+  const tt = (k, terug) => (window.t ? window.t(k) : terug);
+  const esc = (w) => String(w == null ? "" : w).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  const persent = b.lees_totaal ? Math.max(2, Math.min(100, Math.round((b.lees_bladsy / b.lees_totaal) * 100))) : null;
+  const bladsy_teks = b.lees_totaal
+    ? `${tt("lk_bladsy", "Bladsy")} ${b.lees_bladsy} ${tt("leser_van", "van")} ${b.lees_totaal}`
+    : `${tt("lk_bladsy", "Bladsy")} ${b.lees_bladsy}`;
+  plek.innerHTML = `
+    <a class="lk-verder-kaart" href="/leser.html?boek=${encodeURIComponent(b.produk_slug)}">
+      ${b.omslag ? `<img class="lk-verder-omslag" src="${esc(b.omslag)}" alt="">` : ""}
+      <div class="lk-verder-teks">
+        <p class="lk-verder-oog">${esc(tt("mb_lees_verder", "Lees verder"))}</p>
+        <p class="lk-verder-titel">${esc(b.titel)}</p>
+        ${persent ? `<div class="lk-taaf" aria-hidden="true"><span style="width:${persent}%"></span></div>` : ""}
+        <p class="lk-verder-bladsy">${esc(bladsy_teks)}</p>
+        <span class="lk-verder-knoppie">${esc(tt("mb_lees_verder", "Lees verder"))} →</span>
+      </div>
+    </a>`;
+  plek.hidden = false;
+}
+
+// My Teater-skakel net vir wie al 'n talk besit (nav_het_talks uit nav-rekening.js).
+async function wys_teater_skakel(sessie) {
+  const a = document.getElementById("lk-teater");
+  if (!a || typeof nav_het_talks !== "function") return;
+  try {
+    if (await nav_het_talks(sessie)) a.hidden = false;
+  } catch { /* geen skakel nie */ }
+}
+
 async function laai_my_boeke() {
   // identiteit_kry_huidige_sessie() verfris outomaties 'n verlope
   // access_token via die refresh_token — sien identiteit.js.
   const sessie = await identiteit_kry_huidige_sessie();
+  wys_welkom(sessie);
+  if (sessie && sessie.access_token) wys_teater_skakel(sessie);
 
   if (!sessie || !sessie.access_token) {
     wys_status(
@@ -297,6 +355,7 @@ async function laai_my_boeke() {
 
     wys_status("");
     data.boeke.forEach((boek) => lys_el.appendChild(bou_boek_kaart(boek)));
+    wys_lees_verder(data.boeke);
   } catch (fout) {
     console.error("Kon nie My Boeke laai nie:", fout);
     wys_status(

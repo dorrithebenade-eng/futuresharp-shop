@@ -61,6 +61,12 @@ const WOORDEBOEK = {
   },
   pb_hoe_werk_dit: { af: "Hoe werk dit?", en: "How does it work?" },
   pb_meer_uit_ry: { af: "Meer uit hierdie ry", en: "More from this shelf" },
+  // My Leeskamer (fase 4)
+  lk_sub: { af: "Jou boeke, gereed om te lees.", en: "Your books, ready to read." },
+  lk_welkom_terug: { af: "Welkom terug,", en: "Welcome back," },
+  lk_welkom_sonder_naam: { af: 'Welkom in jou <span class="goud">Leeskamer</span>.', en: 'Welcome to your <span class="goud">Reading Room</span>.' },
+  lk_my_boekrak: { af: "My boekrak", en: "My bookshelf" },
+  lk_bladsy: { af: "Bladsy", en: "Page" },
   filter_alle: { af: "Alle", en: "All" },
   opsioneel: { af: "(opsioneel)", en: "(optional)" },
 

@@ -57,15 +57,28 @@
     </div>
    </div>
   </header>
-  <main class="vb-wrap">
-    <a class="terug-skakel-knoppie" href="index.html" data-i18n="terug_katalogus_skakel">Terug na katalogus</a>
-    <h1 class="mandjie-titel" data-i18n="my_boeke_titel">My Leeskamer</h1>
-    <p class="vb-afdeling-nota" data-i18n="my_boeke_subtitel">
-      Al jou gekoopte e-boeke, gereed om te lees.
-    </p>
+  <header class="kop kop--leeskamer">
+    <div class="kop-kolom kop-kolom--een">
+      <div class="kop-inhoud">
+        <p class="kop-eyebrow" data-i18n="my_boeke_titel">My Leeskamer</p>
+        <h1 class="kop-titel">
+          <span class="kop-titel-brand" id="lk-welkom">&nbsp;</span>
+        </h1>
+        <p class="kop-subtitel" data-i18n="lk_sub">Jou boeke, gereed om te lees.</p>
+      </div>
+    </div>
+  </header>
+  <main class="lk-wrap">
     <div id="pwa-installeer-plek"></div>
-    <div id="my-boeke-status" class="stelsel-boodskap" aria-live="polite"></div>
-    <div id="my-boeke-lys" class="my-boeke-rooster"></div>
+    <section id="lk-verder" class="lk-verder" hidden></section>
+    <section class="lk-rak">
+      <div class="bk-ry-kop bk-ry-kop--met-skakel">
+        <h2 class="bk-ry-titel" data-i18n="lk_my_boekrak">My boekrak</h2>
+        <a class="bk-sien-alles" id="lk-teater" href="/teater" hidden><span data-i18n="nav_my_teater">My Teater</span> →</a>
+      </div>
+      <div id="my-boeke-status" class="stelsel-boodskap" aria-live="polite"></div>
+      <div id="my-boeke-lys" class="my-boeke-rooster"></div>
+    </section>
   </main>
   <script src="js/taal.js"></script>
   <script src="js/identiteit.js"></script>

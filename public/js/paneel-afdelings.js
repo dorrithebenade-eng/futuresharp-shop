@@ -20,6 +20,15 @@
   let RYE = [];     // [{ kode, naam_af, naam_en, beskrywing_af, beskrywing_en, werke: [produk] }]
   let ANDER = [];   // [produk] — boeke in geen ry nie
   let PER_SLUG = new Map();
+  // Tuisblad-merkies: slug van die werk -> waar/onwaar, en hoe dit was toe
+  // die bladsy gelaai het (net veranderinge word gestoor).
+  let TUIS = new Map();
+  let TUIS_BEGIN = new Map();
+
+  function is_op_tuisblad(w) {
+    const e = w.eweknie_slug && PER_SLUG.get(w.eweknie_slug);
+    return w.op_tuisblad === true || !!(e && e.taal !== w.taal && e.op_tuisblad === true);
+  }
 
   const esc = (w) => String(w == null ? "" : w)
     .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -95,6 +104,9 @@
       <p style="font-size:12px;line-height:1.3;margin:6px 0 0;min-height:31px;">${esc(kort(w))}</p>
       ${pyle}
       ${skuif_keuse(w.slug, ry_i)}
+      <label style="display:flex;gap:5px;align-items:center;justify-content:center;font-size:12px;margin-top:8px;cursor:pointer;${TUIS.get(w.slug) ? "color:#B7791F;font-weight:600;" : ""}">
+        <input type="checkbox" class="ra-tuis" data-slug="${esc(w.slug)}" ${TUIS.get(w.slug) ? "checked" : ""}> ★ Op die tuisblad
+      </label>
     </div>`;
   }
 
@@ -131,7 +143,12 @@
       </div>
       <button type="button" class="terug-skakel" id="ra-nuwe-ry">+ Nuwe ry</button>`;
 
-    wrap.innerHTML = rye_html + ander_html;
+    const getal = [...TUIS.values()].filter(Boolean).length;
+    const tuis_html = `<p class="paneel-hulp-teks" style="background:#FFF7E6;border:1px solid #F1D9A6;border-radius:10px;padding:10px 14px;max-width:760px;">
+      <b>★ Op die tuisblad:</b> ${getal} ${getal === 1 ? "boek" : "boeke"} gemerk.
+      ${getal >= 3 ? (getal === 3 ? "Die band wys altyd hierdie drie." : "Die band wys elke keer drie van hulle, telkens 'n ander drie.")
+        : "Merk ten minste drie. Tot dan kies die band uit al die boeke."}</p>`;
+    wrap.innerHTML = tuis_html + rye_html + ander_html;
     koppel();
   }
 
@@ -191,6 +208,10 @@
       RYE.splice(i, 1);
       teken();
     }));
+    wrap.querySelectorAll(".ra-tuis").forEach((c) => c.addEventListener("change", () => {
+      TUIS.set(c.dataset.slug, c.checked);
+      teken();
+    }));
     const nuwe = document.getElementById("ra-nuwe-ry");
     if (nuwe) nuwe.addEventListener("click", () => {
       RYE.push({ kode: "", naam_af: "", naam_en: "", beskrywing_af: "", beskrywing_en: "", werke: [] });
@@ -225,7 +246,10 @@
         afdelings_per_kode: new Map(afdelings.map((a) => [a.kode, a])),
         lidmaatskap: bk_lidmaatskap(afdelings, PER_SLUG),
       };
-      const rye = bk_bou_rye(werke_uit(produkte), konteks);
+      const werke = werke_uit(produkte);
+      TUIS = new Map(werke.map((w) => [w.slug, is_op_tuisblad(w)]));
+      TUIS_BEGIN = new Map(TUIS);
+      const rye = bk_bou_rye(werke, konteks);
       RYE = rye.filter((ry) => ry.kode).map((ry) => {
         const meta = konteks.afdelings_per_kode.get(ry.kode) || {};
         return {
@@ -251,6 +275,33 @@
     } catch (fout) {
       console.error("Kon nie die rye laai nie:", fout);
       wrap.innerHTML = `<p class="stelsel-boodskap">Kon nie die rye laai nie.</p>`;
+    }
+  }
+
+  // Net die werke waarvan die merkie verander het. Die merkie sit op die
+  // uitgawe wat hier gewys word; word dit afgehaal, gaan dit ook van die
+  // eweknie af, anders sou die boek steeds in die band verskyn.
+  async function stoor_tuisblad() {
+    const stel = async (slug, waarde) => {
+      const r = await fetch("/.netlify/functions/wysig-produk", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...kry_outorisasie_kop() },
+        body: JSON.stringify({ slug, wysigings: { op_tuisblad: waarde } }),
+      });
+      if (!r.ok) throw new Error(`${slug}: ${await r.text()}`);
+      const p = PER_SLUG.get(slug);
+      if (p) p.op_tuisblad = waarde;
+    };
+    for (const [slug, nou] of TUIS) {
+      if (nou === TUIS_BEGIN.get(slug)) continue;
+      await stel(slug, nou);
+      const w = PER_SLUG.get(slug);
+      const e = w && w.eweknie_slug && PER_SLUG.get(w.eweknie_slug);
+      if (!nou && e && e.op_tuisblad === true) await stel(e.slug, false);
+    }
+    // Die paneel se eie produklys moet die nuwe waardes ook ken.
+    if (typeof produkte_kas !== "undefined" && Array.isArray(produkte_kas)) {
+      produkte_kas.forEach((p) => { const n = PER_SLUG.get(p.slug); if (n) p.op_tuisblad = n.op_tuisblad; });
     }
   }
 
@@ -284,6 +335,7 @@
         body: JSON.stringify({ afdelings }),
       });
       if (!r.ok) throw new Error(await r.text());
+      await stoor_tuisblad();
       await laai();
       status.textContent = "Gestoor. Die Boeke-bladsy wys dit dadelik.";
     } catch (fout) {
