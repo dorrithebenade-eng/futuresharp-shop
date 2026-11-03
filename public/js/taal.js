@@ -314,7 +314,13 @@ const WOORDEBOEK = {
     af: "Tydens betaling skep jy 'n profiel met jou e-posadres. Jou boek wag dan in <strong>My Leeskamer</strong>, 'n spesiale ruimte met jou persoonlike boekrak. Meld aan, gaan na My Leeskamer, en jou boek maak oop in Future Shop se leestoepassing, wat spesifiek vir jou leesgerief ontwerp is. Jy lees aanlyn of aflyn, op jou foon, tablet of rekenaar.",
     en: "At checkout you create an account with your email address. Your book then waits in <strong>My Reading Room</strong>, a special space with your personal bookshelf. Sign in, go to My Reading Room, and your book opens in Future Shop's reading app, designed for comfortable reading. Read online or offline, on your phone, tablet or computer.",
   },
-  formaat_info_leen_opskrif: { af: "Hoe werk Leen?", en: "How does Borrow work?" },
+  formaat_info_leen_opskrif: { af: "Hoe werk leen?", en: "How does borrowing work?" },
+  // Eie teks vir die Leen-venster (November 2026); %tydperk% is die boek se
+  // eie leentydperk in dae. leen_verduideliking bly vir die produkbladsy.
+  formaat_info_leen_teks: {
+    af: "Leen gee jou %tydperk% dae lank toegang tot die e-boek. Tydens betaling skep jy 'n profiel met jou e-posadres, en die boek verskyn in <strong>My Leeskamer</strong>, jou persoonlike boekrak. Dit maak oop in Future Shop se leestoepassing, en jy lees aanlyn of aflyn op jou foon, tablet of rekenaar. As jy die boek geniet, kan jy dit enige tyd koop en hou.",
+    en: "Borrowing gives you access to the e-book for %tydperk% days. At checkout you create an account with your email address, and the book appears in <strong>My Reading Room</strong>, your personal bookshelf. It opens in Future Shop's reading app, and you read online or offline on your phone, tablet or computer. If you enjoy the book, you can buy it and keep it at any time.",
+  },
   formaat_info_hardekopie_opskrif: { af: "Hoe werk Harde kopie?", en: "How does Hard copy work?" },
   formaat_info_hardekopie_teks: {
     af: "Afgelewer binne Suid-Afrika, binne 7 tot 14 werksdae na jou adres — aflewering reeds in die prys ingesluit.",

@@ -22,10 +22,9 @@ function bou_formaat_info_inhoud(formaat, tydperk_dae) {
   }
 
   if (formaat === "leen") {
-    const tydperk_teks = t("leen_verduideliking").replace("%tydperk%", tydperk_dae || 30);
     return {
       opskrif: t("formaat_info_leen_opskrif"),
-      teks: `${t("formaat_lees_teks")} ${tydperk_teks}`,
+      teks: t("formaat_info_leen_teks").replace("%tydperk%", tydperk_dae || 30),
       ikoon: "⏳",
       klas: "formaat-info-venster--leen",
     };
