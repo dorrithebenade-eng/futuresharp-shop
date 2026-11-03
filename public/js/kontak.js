@@ -42,4 +42,23 @@ function bou_kontak_mailto_skakel() {
     `&body=${encodeURIComponent(liggaam)}`;
 }
 
+// Die lesers se knoppie (November 2026): 'n navraag oor 'n boek, 'n
+// bestelling of My Leeskamer, met drie kort velde vooraf ingevul.
+function bou_leser_mailto_skakel() {
+  const skakel = document.getElementById("kontak-leser-knoppie");
+  if (!skakel) return;
+  const liggaam = [
+    `${t("kontak_leser_naam")}: `,
+    `${t("kontak_leser_bestelnommer")}: `,
+    "",
+    t("kontak_leser_vraag"),
+    "",
+  ].join("\n");
+  skakel.href =
+    "mailto:futureshop@futuresharp.co.za" +
+    `?subject=${encodeURIComponent(t("kontak_leser_onderwerp"))}` +
+    `&body=${encodeURIComponent(liggaam)}`;
+}
+
 document.addEventListener("DOMContentLoaded", bou_kontak_mailto_skakel);
+document.addEventListener("DOMContentLoaded", bou_leser_mailto_skakel);

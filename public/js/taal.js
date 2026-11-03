@@ -216,18 +216,24 @@ const WOORDEBOEK = {
     af: "Nog geen kategorieë geskep nie — voeg eers een by via die Kategorieë-oortjie.",
     en: "No categories created yet — add one via the Categories tab first.",
   },
-  kontak_titel: { af: "Is jy 'n skrywer?", en: "Are you a writer?" },
+  // KONTAK-BLADSY (November 2026): eers vir almal (lesers met 'n vraag),
+  // daaronder 'n afdeling wat oopvou vir skrywers.
+  kontak_titel: { af: "Kontak ons", en: "Contact us" },
   kontak_intro: {
-    af: "Kontak ons gerus as jy 'n skrywer is wat graag jou boek(e) in ons winkel wil verkoop. Verskeie opsies is beskikbaar — ons gesels graag met jou oor wat die beste vir jou werk sal werk.",
-    en: "Feel free to contact us if you're a writer who would like to sell your book(s) in our shop. Several options are available — we'd love to chat about what would work best for your work.",
+    af: "Het jy 'n vraag oor 'n boek, jou bestelling of My Leeskamer? Ons help jou graag.",
+    en: "Do you have a question about a book, your order or My Reading Room? We're happy to help.",
   },
-  kontak_epos_etiket: { af: "Stuur vir ons 'n e-pos", en: "Send us an email" },
-  kontak_stuur_knoppie: { af: "Stuur e-pos", en: "Send email" },
-  kontak_terugvoer: { af: "Ons kontak jou binnekort terug.", en: "We'll get back to you soon." },
-  kontak_raamwerk_nota: {
-    af: "As jy op die knoppie klik, open jou e-posprogram met 'n paar vrae reeds ingevul — vul dit sommer daar in voor jy stuur.",
-    en: "Clicking the button opens your email app with a few questions already filled in — just fill them in there before sending.",
+  kontak_stuur_knoppie: { af: "Stuur vir ons 'n e-pos", en: "Send us an email" },
+  kontak_leser_onderwerp: { af: "Navraag oor Future Shop", en: "Future Shop enquiry" },
+  kontak_leser_naam: { af: "Naam", en: "Name" },
+  kontak_leser_bestelnommer: { af: "Bestelnommer (indien van toepassing)", en: "Order number (if applicable)" },
+  kontak_leser_vraag: { af: "Jou vraag:", en: "Your question:" },
+  kontak_skrywer_opskrif: { af: "Is jy 'n skrywer?", en: "Are you a writer?" },
+  kontak_skrywer_intro: {
+    af: "Wil jy jou boek by Future Shop verkoop? Ons gesels graag oor die opsies wat by jou boek pas.",
+    en: "Would you like to sell your book at Future Shop? We'd love to talk about the options that suit your book.",
   },
+  kontak_skrywer_knoppie: { af: "Stuur 'n e-pos oor jou boek", en: "Email us about your book" },
 
   // Vooraf-ingevulde e-pos-raamwerk (word deur kontak.js in die mailto-skakel gebou)
   kontak_epos_onderwerp: { af: "Future Shop Outeurs-belangstelling", en: "Future Shop Authors Interest" },

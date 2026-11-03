@@ -74,6 +74,16 @@
       margin: 14px 0 0;
       line-height: 1.5;
     }
+    .kontak-kaart .kontak-raamwerk-nota { margin: 16px 0 0; }
+    /* Skrywers: 'n afdeling wat oopvou, onder die lesers se kaart. */
+    .kontak-skrywer { text-align: left; border: 1.5px solid var(--grys-lig); border-radius: 14px; margin-top: 8px; }
+    .kontak-skrywer summary { list-style: none; cursor: pointer; padding: 18px 22px; font-family: var(--font-opskrif); font-weight: 800; font-size: 16px; color: var(--swart); display: flex; justify-content: space-between; align-items: center; }
+    .kontak-skrywer summary::-webkit-details-marker { display: none; }
+    .kontak-skrywer summary::after { content: "\25BE"; color: var(--teal); font-size: 18px; transition: transform .2s; }
+    .kontak-skrywer[open] summary::after { transform: rotate(180deg); }
+    .kontak-skrywer-binne { padding: 0 22px 22px; text-align: center; }
+    .kontak-raam .kontak-skrywer-binne p { margin: 0 0 18px; }
+    .kontak-stuur-knoppie--sekonder { background: var(--wit); color: var(--teal); border: 2px solid var(--teal); }
   </style>
   <link rel="icon" href="/icons/ikoon-32.png" sizes="32x32" type="image/png">
   <link rel="icon" href="/icons/ikoon-16.png" sizes="16x16" type="image/png">
@@ -100,23 +110,25 @@
 
   <main class="kontak-raam">
     <img class="kontak-ikoon" src="/icons/ikoon-192.png" alt="" onerror="this.style.display='none'">
-    <h1 data-i18n="kontak_titel">Is jy 'n skrywer?</h1>
-    <p data-i18n="kontak_intro">
-      Kontak ons gerus as jy 'n skrywer is wat graag jou boek(e) in ons winkel
-      wil verkoop. Verskeie opsies is beskikbaar — ons gesels graag met jou
-      oor wat die beste vir jou werk sal werk.
-    </p>
+    <h1 data-i18n="kontak_titel">Kontak ons</h1>
+    <p data-i18n="kontak_intro">Het jy 'n vraag oor 'n boek, jou bestelling of My Leeskamer? Ons help jou graag.</p>
 
     <div class="kontak-kaart">
-      <p class="kontak-epos-etiket" data-i18n="kontak_epos_etiket">Stuur vir ons 'n e-pos</p>
-      <p class="kontak-epos-adres">futureshop@futuresharp.co.za</p>
-      <a id="kontak-stuur-knoppie" class="kontak-stuur-knoppie" href="mailto:futureshop@futuresharp.co.za?subject=Ek%20wil%20graag%20my%20boek%20verkoop">
-        ✉️ <span data-i18n="kontak_stuur_knoppie">Stuur e-pos</span>
+      <a id="kontak-leser-knoppie" class="kontak-stuur-knoppie" href="mailto:futureshop@futuresharp.co.za">
+        ✉️ <span data-i18n="kontak_stuur_knoppie">Stuur vir ons 'n e-pos</span>
       </a>
-      <p class="kontak-raamwerk-nota" data-i18n="kontak_raamwerk_nota">As jy op die knoppie klik, open jou e-posprogram met 'n paar vrae reeds ingevul — vul dit sommer daar in voor jy stuur.</p>
+      <p class="kontak-raamwerk-nota">futureshop@futuresharp.co.za</p>
     </div>
 
-    <p class="kontak-opsies" data-i18n="kontak_terugvoer">Ons kontak jou binnekort terug.</p>
+    <details class="kontak-skrywer">
+      <summary data-i18n="kontak_skrywer_opskrif">Is jy 'n skrywer?</summary>
+      <div class="kontak-skrywer-binne">
+        <p data-i18n="kontak_skrywer_intro">Wil jy jou boek by Future Shop verkoop? Ons gesels graag oor die opsies wat by jou boek pas.</p>
+        <a id="kontak-stuur-knoppie" class="kontak-stuur-knoppie kontak-stuur-knoppie--sekonder" href="mailto:futureshop@futuresharp.co.za">
+          ✉️ <span data-i18n="kontak_skrywer_knoppie">Stuur 'n e-pos oor jou boek</span>
+        </a>
+      </div>
+    </details>
   </main>
 
   <script src="js/taal.js"></script>
