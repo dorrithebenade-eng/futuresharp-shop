@@ -14,38 +14,13 @@
   let DATA = null;
   let KATEGORIEE = [];
 
-  function bou_rye(produkte) {
-    const { per_slug, afdelings_per_kode } = DATA;
-    const groepe = new Map();
-    for (const p of produkte) {
-      const { kode, volgorde } = bk_kode(p, per_slug);
-      if (!groepe.has(kode)) groepe.set(kode, []);
-      groepe.get(kode).push({ p, volgorde });
-    }
-    const rye = [...groepe.entries()].map(([kode, boeke]) => {
-      boeke.sort((a, b) => (a.volgorde || 999) - (b.volgorde || 999)
-        || String(a.p.titel).localeCompare(String(b.p.titel), "af", { numeric: true }));
-      const meta = afdelings_per_kode.get(kode);
-      const en = bk_taal() === "en";
-      return {
-        kode,
-        naam: kode ? bk_afdeling_naam(kode, afdelings_per_kode, boeke[0].p) : t("bk_ander_boeke"),
-        beskrywing: meta ? (en ? (meta.beskrywing_en || meta.beskrywing_af) : (meta.beskrywing_af || meta.beskrywing_en)) : "",
-        plek: kode ? ((meta && meta.plek) || 500) : 10000,
-        boeke: boeke.map((b) => b.p),
-      };
-    });
-    rye.sort((a, b) => a.plek - b.plek || b.boeke.length - a.boeke.length || a.naam.localeCompare(b.naam, "af"));
-    return rye;
-  }
-
   function teken() {
     const wrap = document.getElementById("boeke-rye");
     let produkte = bk_in_taal(DATA.produkte);
     if (AKTIEF.size) {
       produkte = produkte.filter((p) => (p.kategorie_ids || []).some((id) => AKTIEF.has(id)));
     }
-    const rye = bou_rye(produkte);
+    const rye = bk_bou_rye(produkte, DATA);
     if (!rye.length) {
       wrap.innerHTML = `<p class="stelsel-boodskap">${t("katalogus_leeg")}</p>`;
       return;

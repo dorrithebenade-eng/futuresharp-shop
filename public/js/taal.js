@@ -31,13 +31,13 @@ const WOORDEBOEK = {
   voet_inisiatief_a: { af: "'n Inisiatief van", en: "An initiative of" },
   voet_vir_skrywers: { af: "Vir skrywers", en: "For writers" },
   // Tuisblad: die strook vir FutureSharp Talks
-  talks_strook_oog: { af: "FutureSharp Talks", en: "FutureSharp Talks" },
+  talks_strook_oog: { af: "Video's", en: "Videos" },
   talks_strook_titel: { af: "Een skerp idee op 'n slag.", en: "One sharp idea at a time." },
   talks_strook_teks: {
-    af: "Kort praatjies van sowat 15 minute deur kundiges. Kyk wanneer dit jou pas, in jou eie Teater.",
-    en: "Short talks of about 15 minutes by experts. Watch whenever it suits you, in your own Theatre.",
+    af: "Kort video's deur kundiges: FutureSharp Talks, en binnekort ook dagstukkies en stories. Kyk wanneer dit jou pas, in jou eie Teater.",
+    en: "Short videos by experts: FutureSharp Talks, and soon daily reflections and stories too. Watch whenever it suits you, in your own Theatre.",
   },
-  talks_strook_knoppie: { af: "Kyk na die praatjies", en: "Watch the talks" },
+  talks_strook_knoppie: { af: "Ontdek ons video's", en: "Discover our videos" },
   // Boeke-bladsy en die nuwe boekkaart (November 2026)
   bk_oog: { af: "Boeke", en: "Books" },
   bk_titel: { af: 'Lees <span class="goud">skerp</span>, lees verder.', en: 'Read <span class="goud">sharp</span>, read on.' },

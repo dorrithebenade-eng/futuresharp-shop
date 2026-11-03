@@ -195,7 +195,7 @@
       <div class="paneel-uitleg">
         <nav id="paneel-sy-kieslys" class="paneel-sy-kieslys" aria-label="Paneelbord-afdelings">
           <button type="button" class="paneel-kieslys-item rol-personeel" data-afdeling="advertensies">Advertensies 📣</button>
-          <button type="button" class="paneel-kieslys-item rol-personeel" data-afdeling="afdelings">Afdelings (Boeke-bladsy)</button>
+          <button type="button" class="paneel-kieslys-item rol-personeel" data-afdeling="afdelings">Rye op die Boeke-bladsy</button>
           <button type="button" class="paneel-kieslys-item rol-personeel" data-afdeling="aflewering">Aflewering</button>
           <button type="button" class="paneel-kieslys-item rol-personeel" data-afdeling="bestellings">Bestellings</button>
           <button type="button" class="paneel-kieslys-item rol-personeel" data-afdeling="dokumente" data-i18n="paneel_dokumente_titel">Dokumente</button>
@@ -871,19 +871,20 @@
         </div>
       </section>
 
-      <!-- Afdelings op die Boeke-bladsy (November 2026). paneel-afdelings.js -->
+      <!-- Rye op die Boeke-bladsy (November 2026). paneel-afdelings.js -->
       <section class="paneel-afdeling" data-afdeling-inhoud="afdelings">
         <div class="paneel-afdeling-kop">
-          <h2 class="paneel-afdeling-titel">Afdelings (Boeke-bladsy)</h2>
+          <h2 class="paneel-afdeling-titel">Rye op die Boeke-bladsy</h2>
         </div>
-        <p class="paneel-hulp-teks">
-          Die Boeke-bladsy wys die boeke in rye. Elke ry is 'n afdeling, en 'n boek se afdeling is sy <b>Reeks</b> in die produkvorm.
-          Gee hier elke afdeling 'n naam in albei tale, 'n kort beskrywing (opsioneel) en 'n plek: 1 staan bo-aan.
-          Boeke sonder 'n reeks staan onderaan in "Ander boeke".
+        <p class="paneel-hulp-teks" style="max-width:760px;">
+          Die Boeke-bladsy wys die boeke in rye, van bo na onder soos hier. Skuif 'n ry met <b>▲ Op</b> en <b>▼ Af</b>,
+          en 'n boek binne sy ry met <b>◀</b> en <b>▶</b>. Met <b>Skuif na …</b> sit jy 'n boek in 'n ander ry.
+          'n Afrikaanse en Engelse uitgawe is een kaartjie: wat jy met die een doen, geld vir albei.
+          Niks verander op die winkel voordat jy <b>Stoor</b> druk nie.
         </p>
         <div id="paneel-afdelings-lys"></div>
         <div id="paneel-afdelings-foute" class="vb-foute" style="display:none;"></div>
-        <button type="button" id="paneel-afdelings-stoor" class="kaart-aksie" style="margin-top:14px;">Stoor afdelings</button>
+        <button type="button" id="paneel-afdelings-stoor" class="kaart-aksie" style="margin-top:14px;">Stoor</button>
         <span id="paneel-afdelings-status" class="paneel-hulp-teks" style="margin-left:12px;"></span>
       </section>
 
@@ -976,7 +977,7 @@
               <input type="number" id="vorm-reeks-volgorde" class="veld-invoer" min="1" step="1" placeholder="1">
             </div>
           </div>
-          <p class="paneel-hulp-teks">Boeke in dieselfde reeks staan in die katalogus saam, in hierdie volgorde, en vorm 'n ry (afdeling) op die Boeke-bladsy. Die eweknie in die ander taal volg sy paar en het nie 'n eie reeks nodig nie. Die ry se naam stel jy onder <b>Afdelings (Boeke-bladsy)</b>.</p>
+          <p class="paneel-hulp-teks">Boeke in dieselfde reeks staan in die katalogus saam, in hierdie volgorde, en vorm 'n ry (afdeling) op die Boeke-bladsy. Die eweknie in die ander taal volg sy paar en het nie 'n eie reeks nodig nie. Die rye se opskrifte en volgorde stel jy onder <b>Rye op die Boeke-bladsy</b>.</p>
 
           <label class="paneel-merkblokkie-ry" style="display:flex;gap:8px;align-items:center;margin:6px 0 18px;">
             <input type="checkbox" id="vorm-op-tuisblad">
@@ -1255,6 +1256,7 @@
   <script src="js/paneel-statistieke.js"></script>
   <script src="js/paneel-waarskuwings.js"></script>
   <script src="js/paneel-kategoriee.js"></script>
+  <script src="js/boekkaart.js"></script>
   <script src="js/paneel-afdelings.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
   <script src="js/paneel-bestellings.js"></script>

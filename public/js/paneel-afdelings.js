@@ -1,19 +1,25 @@
-// paneel-afdelings.js — die "Afdelings (Boeke-bladsy)"-afdeling (November 2026).
+// paneel-afdelings.js — "Rye op die Boeke-bladsy" (November 2026).
 //
-// Elke reekskode wat in die katalogus voorkom (die veld "Reeks" in die
-// produkvorm) word 'n ry op die Boeke-bladsy. Hier kry elke kode 'n naam
-// in Afrikaans en Engels, 'n kort beskrywing en 'n plek (1 = bo-aan).
+// Personeel stel hier self in hoe die Boeke-bladsy lyk:
+//   - die volgorde van die rye (▲ ▼),
+//   - elke ry se opskrif en kort beskrywing in albei tale,
+//   - watter boeke in watter ry staan ("Skuif na …"),
+//   - die volgorde van die boeke in 'n ry (◀ ▶).
 //
-// Die lys word saamgestel uit wat reeds gestoor is PLUS elke kode wat in
-// die produkte voorkom, sodat 'n nuwe reeks vanself hier verskyn. 'n Kode
-// wat nie meer by 'n boek gebruik word nie, bly staan tot iemand dit leeg
-// maak; dit doen niks op die winkel nie.
+// 'n Afrikaanse en Engelse uitgawe van een boek (eweknieë) is hier EEN
+// kaartjie: wat jy met die een doen, geld vir albei.
 //
-// kry_outorisasie_kop() kom van paneelbord.js.
+// Die begintoestand is presies wat die winkel nou wys (bk_bou_rye uit
+// boekkaart.js), sodat niks verander voordat iemand iets skuif nie.
+// "Stoor" stuur die hele uitleg na stoor-afdelings.js.
+//
+// kry_outorisasie_kop() kom van paneelbord.js; bk_* van boekkaart.js.
 
 (function () {
   const AFDELING = "afdelings";
-  let geskiedenis = [];
+  let RYE = [];     // [{ kode, naam_af, naam_en, beskrywing_af, beskrywing_en, werke: [produk] }]
+  let ANDER = [];   // [produk] — boeke in geen ry nie
+  let PER_SLUG = new Map();
 
   const esc = (w) => String(w == null ? "" : w)
     .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -32,62 +38,219 @@
     }
   }
 
-  function tel_per_kode(produkte) {
+  // Een kaartjie per werk: die Afrikaanse uitgawe as daar een is.
+  function werke_uit(produkte) {
     const per_slug = new Map(produkte.map((p) => [p.slug, p]));
-    const tel = new Map();
+    const gesien = new Set();
+    const werke = [];
     for (const p of produkte) {
-      let kode = p.reeks && p.reeks.reeks_slug;
-      if (!kode && p.eweknie_slug) {
-        const e = per_slug.get(p.eweknie_slug);
-        kode = e && e.reeks && e.reeks.reeks_slug;
+      if (gesien.has(p.slug)) continue;
+      gesien.add(p.slug);
+      const e = p.eweknie_slug && per_slug.get(p.eweknie_slug);
+      if (e && e.taal !== p.taal) {
+        gesien.add(e.slug);
+        werke.push(p.taal === "af" ? p : (e.taal === "af" ? e : p));
+      } else {
+        werke.push(p);
       }
-      if (!kode) continue;
-      kode = kode.trim().toUpperCase();
-      tel.set(kode, (tel.get(kode) || 0) + 1);
     }
-    return tel;
+    return werke;
   }
 
-  function veld(kode, naam, waarde, plekhouer, wye) {
-    return `<input type="text" class="veld-invoer" data-kode="${esc(kode)}" data-veld="${naam}" value="${esc(waarde)}" placeholder="${esc(plekhouer)}" style="${wye ? "" : "max-width:220px"}">`;
+  function engelse_naam(werk) {
+    const e = werk && werk.eweknie_slug && PER_SLUG.get(werk.eweknie_slug);
+    const titel = e && e.taal === "en" ? e.titel : (werk && werk.taal === "en" ? werk.titel : "");
+    const pas = String(titel || "").match(/^([^:]{2,40}):\s+/);
+    return pas ? pas[1].trim() : "";
   }
 
-  function teken(lys, tel) {
+  function afr_naam(werk) {
+    const pas = String((werk && werk.titel) || "").match(/^([^:]{2,40}):\s+/);
+    return pas ? pas[1].trim() : "";
+  }
+
+  function kort(p) {
+    return typeof bk_kort_titel === "function" ? bk_kort_titel(p) : p.titel;
+  }
+
+  // --- Teken -----------------------------------------------------------------
+
+  function skuif_keuse(slug, huidige) {
+    const opsies = RYE.map((r, i) => `<option value="${i}"${i === huidige ? " selected" : ""}>${esc(r.naam_af || r.kode || "Ry " + (i + 1))}</option>`).join("");
+    return `<select class="veld-invoer ra-skuif" data-slug="${esc(slug)}" data-huidig="${huidige}" style="font-size:12px;padding:4px 6px;margin-top:6px;">
+      <option value="" disabled>Skuif na …</option>${opsies}
+      <option value="ander"${huidige === "ander" ? " selected" : ""}>Ander boeke</option></select>`;
+  }
+
+  function boek_html(w, ry_i, boek_i, aantal) {
+    const omslag = w.omslag ? `<img src="${esc(w.omslag)}" alt="" style="height:96px;max-width:72px;object-fit:contain;border-radius:3px;box-shadow:0 3px 8px rgba(0,0,0,.15);">`
+      : `<span style="display:block;width:68px;height:96px;background:#E2DCCF;border-radius:3px;"></span>`;
+    const pyle = ry_i === "ander" ? "" : `
+      <div style="display:flex;gap:4px;justify-content:center;margin-top:6px;">
+        <button type="button" class="terug-skakel ra-links" data-ry="${ry_i}" data-boek="${boek_i}" ${boek_i === 0 ? "disabled" : ""} title="Skuif links">◀</button>
+        <button type="button" class="terug-skakel ra-regs" data-ry="${ry_i}" data-boek="${boek_i}" ${boek_i === aantal - 1 ? "disabled" : ""} title="Skuif regs">▶</button>
+      </div>`;
+    return `<div style="width:120px;text-align:center;background:#F7F4EE;border-radius:8px;padding:10px 6px;">
+      ${omslag}
+      <p style="font-size:12px;line-height:1.3;margin:6px 0 0;min-height:31px;">${esc(kort(w))}</p>
+      ${pyle}
+      ${skuif_keuse(w.slug, ry_i)}
+    </div>`;
+  }
+
+  function teken() {
     const wrap = document.getElementById("paneel-afdelings-lys");
-    if (!lys.length) {
-      wrap.innerHTML = `<p class="stelsel-boodskap">Nog geen reekse nie. Gee eers 'n boek 'n <b>Reeks</b> in die produkvorm.</p>`;
-      return;
-    }
-    wrap.innerHTML = lys.map((a) => `
-      <div class="paneel-produk-ry" style="display:block;padding:14px 0;border-bottom:1px solid #eee;">
-        <p style="margin:0 0 8px;"><b>${esc(a.kode)}</b> <span class="paneel-hulp-teks">(${(tel.get(a.kode) || 0) === 1 ? "1 boek" : (tel.get(a.kode) || 0) + " boeke"})</span></p>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px 14px;">
-          <label class="veld-etiket">Naam (Afrikaans)${veld(a.kode, "naam_af", a.naam_af, "bv. Speel-Slim", true)}</label>
-          <label class="veld-etiket">Name (English)${veld(a.kode, "naam_en", a.naam_en, "e.g. Play-Smart", true)}</label>
-          <label class="veld-etiket">Beskrywing (Afrikaans, opsioneel)${veld(a.kode, "beskrywing_af", a.beskrywing_af, "Een kort sin", true)}</label>
-          <label class="veld-etiket">Description (English, optional)${veld(a.kode, "beskrywing_en", a.beskrywing_en, "One short sentence", true)}</label>
-          <label class="veld-etiket">Plek (1 = bo-aan)<input type="number" min="1" step="1" class="veld-invoer" data-kode="${esc(a.kode)}" data-veld="plek" value="${a.plek || ""}" style="max-width:100px"></label>
+    const rye_html = RYE.map((r, i) => `
+      <div class="ra-ry" style="border:1px solid #E5E0D6;border-radius:12px;padding:16px 18px;margin-bottom:16px;background:#fff;">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <b style="font-size:15px;">Ry ${i + 1}</b>
+          <button type="button" class="terug-skakel ra-op" data-ry="${i}" ${i === 0 ? "disabled" : ""} title="Skuif die ry op">▲ Op</button>
+          <button type="button" class="terug-skakel ra-af" data-ry="${i}" ${i === RYE.length - 1 ? "disabled" : ""} title="Skuif die ry af">▼ Af</button>
+          <span style="flex:1"></span>
+          <button type="button" class="terug-skakel paneel-skrap-knoppie ra-verwyder" data-ry="${i}">Verwyder ry</button>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:8px 14px;margin-top:12px;">
+          <label class="veld-etiket">Opskrif (Afrikaans)<input type="text" class="veld-invoer ra-veld" data-ry="${i}" data-veld="naam_af" value="${esc(r.naam_af)}"></label>
+          <label class="veld-etiket">Opskrif (Engels)<input type="text" class="veld-invoer ra-veld" data-ry="${i}" data-veld="naam_en" value="${esc(r.naam_en)}"></label>
+          <label class="veld-etiket">Kort sin onder die opskrif (Afrikaans, opsioneel)<input type="text" class="veld-invoer ra-veld" data-ry="${i}" data-veld="beskrywing_af" value="${esc(r.beskrywing_af)}"></label>
+          <label class="veld-etiket">Kort sin (Engels, opsioneel)<input type="text" class="veld-invoer ra-veld" data-ry="${i}" data-veld="beskrywing_en" value="${esc(r.beskrywing_en)}"></label>
+        </div>
+        <p class="paneel-hulp-teks ra-voorskou" data-ry="${i}" style="margin:10px 0 0;">Op die winkel: <b>${esc(r.naam_af || "(geen opskrif)")}</b>${r.beskrywing_af ? " · " + esc(r.beskrywing_af) : ""}</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;">
+          ${r.werke.length ? r.werke.map((w, j) => boek_html(w, i, j, r.werke.length)).join("") : `<p class="paneel-hulp-teks">Nog geen boeke in hierdie ry nie. Skuif boeke hierheen met "Skuif na …".</p>`}
         </div>
       </div>`).join("");
+
+    const ander_html = `
+      <div style="border:1px dashed #D9D3C7;border-radius:12px;padding:16px 18px;margin-bottom:16px;">
+        <b style="font-size:15px;">Ander boeke</b>
+        <p class="paneel-hulp-teks" style="margin:4px 0 0;">Boeke in geen ry nie. Hulle staan onderaan die Boeke-bladsy, alfabeties.</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;">
+          ${ANDER.length ? ANDER.map((w) => boek_html(w, "ander", 0, 1)).join("") : `<p class="paneel-hulp-teks">Geen.</p>`}
+        </div>
+      </div>
+      <button type="button" class="terug-skakel" id="ra-nuwe-ry">+ Nuwe ry</button>`;
+
+    wrap.innerHTML = rye_html + ander_html;
+    koppel();
   }
+
+  // --- Aksies ----------------------------------------------------------------
+
+  function verwyder_uit_waar_hy_is(slug) {
+    for (const r of RYE) {
+      const i = r.werke.findIndex((w) => w.slug === slug);
+      if (i >= 0) return r.werke.splice(i, 1)[0];
+    }
+    const i = ANDER.findIndex((w) => w.slug === slug);
+    if (i >= 0) return ANDER.splice(i, 1)[0];
+    return null;
+  }
+
+  function sorteer_ander() {
+    ANDER.sort((a, b) => String(kort(a)).localeCompare(String(kort(b)), "af", { numeric: true }));
+  }
+
+  function koppel() {
+    const wrap = document.getElementById("paneel-afdelings-lys");
+    wrap.querySelectorAll(".ra-veld").forEach((el) => el.addEventListener("input", () => {
+      const r = RYE[Number(el.dataset.ry)];
+      r[el.dataset.veld] = el.value;
+      const v = wrap.querySelector(`.ra-voorskou[data-ry="${el.dataset.ry}"]`);
+      if (v) v.innerHTML = `Op die winkel: <b>${esc(r.naam_af || "(geen opskrif)")}</b>${r.beskrywing_af ? " · " + esc(r.beskrywing_af) : ""}`;
+    }));
+    wrap.querySelectorAll(".ra-op, .ra-af").forEach((b) => b.addEventListener("click", () => {
+      const i = Number(b.dataset.ry);
+      const j = b.classList.contains("ra-op") ? i - 1 : i + 1;
+      if (j < 0 || j >= RYE.length) return;
+      [RYE[i], RYE[j]] = [RYE[j], RYE[i]];
+      teken();
+    }));
+    wrap.querySelectorAll(".ra-links, .ra-regs").forEach((b) => b.addEventListener("click", () => {
+      const r = RYE[Number(b.dataset.ry)];
+      const i = Number(b.dataset.boek);
+      const j = b.classList.contains("ra-links") ? i - 1 : i + 1;
+      if (!r || j < 0 || j >= r.werke.length) return;
+      [r.werke[i], r.werke[j]] = [r.werke[j], r.werke[i]];
+      teken();
+    }));
+    wrap.querySelectorAll(".ra-skuif").forEach((s) => s.addEventListener("change", () => {
+      if (s.value === String(s.dataset.huidig)) return;
+      const w = verwyder_uit_waar_hy_is(s.dataset.slug);
+      if (!w) return;
+      if (s.value === "ander") { ANDER.push(w); sorteer_ander(); }
+      else RYE[Number(s.value)].werke.push(w);
+      teken();
+    }));
+    wrap.querySelectorAll(".ra-verwyder").forEach((b) => b.addEventListener("click", () => {
+      const i = Number(b.dataset.ry);
+      const r = RYE[i];
+      if (!confirm(`Verwyder die ry "${r.naam_af || r.kode}"? Die boeke daarin skuif na "Ander boeke".`)) return;
+      ANDER.push(...r.werke);
+      sorteer_ander();
+      RYE.splice(i, 1);
+      teken();
+    }));
+    const nuwe = document.getElementById("ra-nuwe-ry");
+    if (nuwe) nuwe.addEventListener("click", () => {
+      RYE.push({ kode: "", naam_af: "", naam_en: "", beskrywing_af: "", beskrywing_en: "", werke: [] });
+      teken();
+      const velde = wrap.querySelectorAll(`.ra-veld[data-ry="${RYE.length - 1}"][data-veld="naam_af"]`);
+      if (velde[0]) velde[0].focus();
+    });
+  }
+
+  function maak_kode(naam, gebruik) {
+    let basis = String(naam || "RY").normalize("NFD").replace(/[̀-ͯ]/g, "")
+      .toUpperCase().replace(/[^A-Z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40) || "RY";
+    let kode = basis, n = 2;
+    while (gebruik.has(kode)) kode = `${basis}-${n++}`;
+    gebruik.add(kode);
+    return kode;
+  }
+
+  // --- Laai en stoor ----------------------------------------------------------
 
   async function laai() {
     const wrap = document.getElementById("paneel-afdelings-lys");
     wrap.innerHTML = `<p class="stelsel-boodskap">${t("paneel_word_gelaai")}</p>`;
     document.getElementById("paneel-afdelings-status").textContent = "";
     try {
-      const [r, produkte] = await Promise.all([fetch("/.netlify/functions/kry-afdelings"), kry_produkte()]);
-      const gestoor = r.ok ? ((await r.json()).afdelings || []) : [];
-      const tel = tel_per_kode(produkte);
-      const per_kode = new Map(gestoor.map((a) => [a.kode, a]));
-      for (const kode of tel.keys()) {
-        if (!per_kode.has(kode)) per_kode.set(kode, { kode, naam_af: "", naam_en: "", beskrywing_af: "", beskrywing_en: "", plek: null });
+      const [r, alle] = await Promise.all([fetch("/.netlify/functions/kry-afdelings"), kry_produkte()]);
+      const afdelings = r.ok ? ((await r.json()).afdelings || []) : [];
+      const produkte = alle.filter((p) => p && p.aktief !== false);
+      PER_SLUG = new Map(produkte.map((p) => [p.slug, p]));
+      const konteks = {
+        per_slug: PER_SLUG,
+        afdelings_per_kode: new Map(afdelings.map((a) => [a.kode, a])),
+        lidmaatskap: bk_lidmaatskap(afdelings, PER_SLUG),
+      };
+      const rye = bk_bou_rye(werke_uit(produkte), konteks);
+      RYE = rye.filter((ry) => ry.kode).map((ry) => {
+        const meta = konteks.afdelings_per_kode.get(ry.kode) || {};
+        return {
+          kode: ry.kode,
+          naam_af: meta.naam_af || afr_naam(ry.boeke[0]) || ry.naam,
+          naam_en: meta.naam_en || engelse_naam(ry.boeke[0]) || "",
+          beskrywing_af: meta.beskrywing_af || "",
+          beskrywing_en: meta.beskrywing_en || "",
+          werke: ry.boeke,
+        };
+      });
+      // Gestoorde rye wat (nog) leeg is, bly ook staan.
+      for (const a of afdelings) {
+        if (!RYE.some((r) => r.kode === a.kode)) {
+          RYE.splice(Math.min((a.plek || RYE.length + 1) - 1, RYE.length), 0,
+            { kode: a.kode, naam_af: a.naam_af, naam_en: a.naam_en, beskrywing_af: a.beskrywing_af, beskrywing_en: a.beskrywing_en, werke: [] });
+        }
       }
-      geskiedenis = [...per_kode.values()].sort((a, b) => (a.plek || 999) - (b.plek || 999) || a.kode.localeCompare(b.kode));
-      teken(geskiedenis, tel);
+      const ander = rye.find((ry) => !ry.kode);
+      ANDER = ander ? ander.boeke.slice() : [];
+      sorteer_ander();
+      teken();
     } catch (fout) {
-      console.error("Kon nie afdelings laai nie:", fout);
-      wrap.innerHTML = `<p class="stelsel-boodskap">Kon nie die afdelings laai nie.</p>`;
+      console.error("Kon nie die rye laai nie:", fout);
+      wrap.innerHTML = `<p class="stelsel-boodskap">Kon nie die rye laai nie.</p>`;
     }
   }
 
@@ -96,24 +259,33 @@
     const status = document.getElementById("paneel-afdelings-status");
     const foute = document.getElementById("paneel-afdelings-foute");
     foute.style.display = "none";
-    const per_kode = new Map(geskiedenis.map((a) => [a.kode, { ...a }]));
-    document.querySelectorAll("#paneel-afdelings-lys [data-kode]").forEach((el) => {
-      const a = per_kode.get(el.dataset.kode);
-      if (!a) return;
-      a[el.dataset.veld] = el.dataset.veld === "plek" ? (Number(el.value) || null) : el.value.trim();
-    });
+    const leeg = RYE.findIndex((r) => !String(r.naam_af || "").trim());
+    if (leeg >= 0) {
+      foute.textContent = `Ry ${leeg + 1} het nog nie 'n Afrikaanse opskrif nie.`;
+      foute.style.display = "block";
+      return;
+    }
+    const gebruik = new Set(RYE.map((r) => r.kode).filter(Boolean));
+    const afdelings = RYE.map((r, i) => ({
+      kode: r.kode || maak_kode(r.naam_af, gebruik),
+      naam_af: r.naam_af.trim(),
+      naam_en: (r.naam_en || "").trim(),
+      beskrywing_af: (r.beskrywing_af || "").trim(),
+      beskrywing_en: (r.beskrywing_en || "").trim(),
+      plek: i + 1,
+      boeke: r.werke.map((w) => w.slug),
+    }));
     knoppie.disabled = true;
     status.textContent = "Besig …";
     try {
       const r = await fetch("/.netlify/functions/stoor-afdelings", {
         method: "POST",
         headers: { "Content-Type": "application/json", ...kry_outorisasie_kop() },
-        body: JSON.stringify({ afdelings: [...per_kode.values()] }),
+        body: JSON.stringify({ afdelings }),
       });
       if (!r.ok) throw new Error(await r.text());
-      status.textContent = "Gestoor.";
       await laai();
-      status.textContent = "Gestoor.";
+      status.textContent = "Gestoor. Die Boeke-bladsy wys dit dadelik.";
     } catch (fout) {
       foute.textContent = "Kon nie stoor nie: " + (fout.message || fout);
       foute.style.display = "block";

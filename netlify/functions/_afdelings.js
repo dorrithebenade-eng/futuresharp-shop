@@ -7,8 +7,12 @@
 // naam in albei tale, 'n kort beskrywing en 'n plek op die bladsy.
 //
 // STORE "afdelings", sleutel "lys": rekords
-//   { kode, naam_af, naam_en, beskrywing_af, beskrywing_en, plek }
+//   { kode, naam_af, naam_en, beskrywing_af, beskrywing_en, plek, boeke }
 // kode is die reekskode in hoofletters. plek: 1 = bo-aan.
+// boeke (November 2026): die boeke in hierdie ry, in die volgorde wat
+// personeel in die paneel gekies het (slugs; een uitgawe van 'n eweknie-paar
+// is genoeg, die ander volg). 'n Boek wat in GEEN lys staan nie, val terug
+// op sy reeks, en anders op "Ander boeke".
 
 const { kry_store } = require("./_blob-store");
 
@@ -26,6 +30,9 @@ function skoon(rekord) {
     beskrywing_af: teks(rekord.beskrywing_af, 200),
     beskrywing_en: teks(rekord.beskrywing_en, 200),
     plek: Number.isFinite(plek) && plek > 0 ? Math.round(plek) : null,
+    boeke: Array.isArray(rekord.boeke)
+      ? [...new Set(rekord.boeke.map((b) => teks(b, 120)).filter(Boolean))].slice(0, 200)
+      : [],
   };
 }
 

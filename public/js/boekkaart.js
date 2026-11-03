@@ -44,8 +44,9 @@ function bk_is_toekoms(datum) {
 
 // --- Afdelings ------------------------------------------------------------
 
-// Die reekskode van 'n boek: sy eie, of sy eweknie s'n.
-function bk_kode(p, per_slug) {
+// Die reekskode van 'n boek: sy eie, of sy eweknie s'n. volgorde is die
+// boek se NOMMER in die reeks ("Boek 3"), nie sy plek op die rak nie.
+function bk_reeks(p, per_slug) {
   let kode = p.reeks && p.reeks.reeks_slug;
   let volgorde = p.reeks && p.reeks.volgorde_in_reeks;
   if (!kode && p.eweknie_slug && per_slug) {
@@ -56,6 +57,34 @@ function bk_kode(p, per_slug) {
     }
   }
   return { kode: kode ? kode.trim().toUpperCase() : "", volgorde: Number(volgorde) || null };
+}
+
+// LIDMAATSKAP (November 2026): in die paneel kan personeel elke ry se boeke
+// en hul volgorde kies (afdeling.boeke). Hierdie kaart sê vir elke slug in
+// watter ry hy staan en op watter plek. 'n Eweknie kry dieselfde plek.
+// Twee rondtes: eers die boeke wat self in 'n lys staan, dan hul eweknieë
+// in die ANDER taal. 'n Eweknie in dieselfde taal ('n Ma se Reis en 'n Pa se
+// Reis) is 'n aparte boek met sy eie plek.
+function bk_lidmaatskap(afdelings, per_slug) {
+  const kaart = new Map();
+  const lyste = (afdelings || []).map((a) => ({ kode: a.kode, boeke: a.boeke || [] }));
+  lyste.forEach((a) => a.boeke.forEach((slug, i) => {
+    if (!kaart.has(slug)) kaart.set(slug, { kode: a.kode, posisie: i + 1 });
+  }));
+  lyste.forEach((a) => a.boeke.forEach((slug, i) => {
+    const p = per_slug && per_slug.get(slug);
+    const e = p && p.eweknie_slug && per_slug.get(p.eweknie_slug);
+    if (e && e.taal !== p.taal && !kaart.has(e.slug)) kaart.set(e.slug, { kode: a.kode, posisie: i + 1 });
+  }));
+  return kaart;
+}
+
+// Die ry en plek van 'n boek: eers die paneel se keuse, dan sy reeks.
+function bk_kode(p, per_slug, lidmaatskap) {
+  const reeks = bk_reeks(p, per_slug);
+  const lid = lidmaatskap && lidmaatskap.get(p.slug);
+  if (lid) return { kode: lid.kode, volgorde: reeks.volgorde, posisie: lid.posisie };
+  return { kode: reeks.kode, volgorde: reeks.volgorde, posisie: null };
 }
 
 function bk_afdeling_naam(kode, afdelings_per_kode, voorbeeld) {
@@ -114,6 +143,7 @@ async function bk_laai_alles() {
     per_slug: new Map(produkte.map((p) => [p.slug, p])),
     afdelings_per_kode: new Map((afd.afdelings || []).map((a) => [a.kode, a])),
     afdelings: afd.afdelings || [],
+    lidmaatskap: bk_lidmaatskap(afd.afdelings || [], new Map(produkte.map((p) => [p.slug, p]))),
     besit,
   };
 }
@@ -141,9 +171,9 @@ function bk_etiket(p) {
 
 // konteks: { per_slug, afdelings_per_kode, besit }
 function bk_kaart(p, konteks) {
-  const { per_slug, afdelings_per_kode, besit } = konteks;
+  const { per_slug, afdelings_per_kode, besit, lidmaatskap } = konteks;
   const skakel = `produk.html?produk=${encodeURIComponent(p.slug)}`;
-  const { kode, volgorde } = bk_kode(p, per_slug);
+  const { kode, volgorde } = bk_kode(p, per_slug, lidmaatskap);
 
   let lyn;
   if (kode) {
@@ -189,4 +219,35 @@ function bk_kaart(p, konteks) {
       ${onder}
       ${taal_nota ? `<p class="bk-taal">${bk_esc(taal_nota)}</p>` : ""}
     </article>`;
+}
+
+// --- Die rye ---------------------------------------------------------------
+// Gedeel deur die Boeke-bladsy en die paneel se "Rye op die Boeke-bladsy".
+// Volgorde van die rye: die paneel se volgorde (plek), dan reekse sonder 'n
+// plek, en "Ander boeke" altyd laaste (kode ""). Binne 'n ry: die paneel se
+// volgorde, dan die reeksnommer, dan die titel.
+function bk_bou_rye(produkte, konteks) {
+  const { per_slug, afdelings_per_kode, lidmaatskap } = konteks;
+  const groepe = new Map();
+  for (const p of produkte) {
+    const { kode, volgorde, posisie } = bk_kode(p, per_slug, lidmaatskap);
+    if (!groepe.has(kode)) groepe.set(kode, []);
+    groepe.get(kode).push({ p, volgorde, posisie });
+  }
+  const en = bk_taal() === "en";
+  const rye = [...groepe.entries()].map(([kode, boeke]) => {
+    boeke.sort((a, b) => (a.posisie || 9999) - (b.posisie || 9999)
+      || (a.volgorde || 999) - (b.volgorde || 999)
+      || String(a.p.titel).localeCompare(String(b.p.titel), "af", { numeric: true }));
+    const meta = afdelings_per_kode.get(kode);
+    return {
+      kode,
+      naam: kode ? bk_afdeling_naam(kode, afdelings_per_kode, boeke[0].p) : t("bk_ander_boeke"),
+      beskrywing: meta ? (en ? (meta.beskrywing_en || meta.beskrywing_af) : (meta.beskrywing_af || meta.beskrywing_en)) : "",
+      plek: kode ? ((meta && meta.plek) || 500) : 10000,
+      boeke: boeke.map((b) => b.p),
+    };
+  });
+  rye.sort((a, b) => a.plek - b.plek || b.boeke.length - a.boeke.length || a.naam.localeCompare(b.naam, "af"));
+  return rye;
 }
