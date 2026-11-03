@@ -208,8 +208,21 @@
       RYE.splice(i, 1);
       teken();
     }));
-    wrap.querySelectorAll(".ra-tuis").forEach((c) => c.addEventListener("change", () => {
+    // Die tuisblad-merkie stoor DADELIK (November 2026). Met net die
+    // Stoor-knoppie heel onder het 'n merkie wat verander is, maklik
+    // ongestoor gebly en die tuisblad het nie verander nie.
+    wrap.querySelectorAll(".ra-tuis").forEach((c) => c.addEventListener("change", async () => {
+      const status = document.getElementById("paneel-afdelings-status");
+      c.disabled = true;
       TUIS.set(c.dataset.slug, c.checked);
+      try {
+        await stoor_tuisblad();
+        TUIS_BEGIN = new Map(TUIS);
+        status.textContent = "★ Tuisblad gestoor.";
+      } catch (fout) {
+        TUIS.set(c.dataset.slug, !c.checked);
+        alert("Kon nie die tuisblad-keuse stoor nie: " + (fout.message || fout));
+      }
       teken();
     }));
     const nuwe = document.getElementById("ra-nuwe-ry");

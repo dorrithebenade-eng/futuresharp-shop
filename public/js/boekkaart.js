@@ -110,8 +110,9 @@ function bk_afdeling_naam(kode, afdelings_per_kode, voorbeeld) {
 // LET WEL: 'n eweknie tel net as hy in die HUIDIGE taal is. 'n Ma se Reis en
 // 'n Pa se Reis is eweknieë van mekaar, maar albei Afrikaans; in Engels moet
 // albei steeds wys, want daar is geen Engelse uitgawe nie.
-function bk_in_taal(produkte) {
-  const taal = bk_taal();
+function bk_in_taal(produkte, keuse) {
+  if (keuse === "albei") return produkte.slice();
+  const taal = keuse === "af" || keuse === "en" ? keuse : bk_taal();
   const per_slug = new Map(produkte.map((p) => [p.slug, p]));
   return produkte.filter((p) => {
     if (!p.taal || p.taal === taal) return true;
@@ -190,11 +191,15 @@ function bk_kaart(p, konteks) {
 
   const taal = bk_taal();
   let taal_nota = "";
+  let taal_skakel = "";
   if (p.taal && p.taal !== taal) {
     taal_nota = t(p.taal === "en" ? "bk_in_engels" : "bk_in_afrikaans");
   } else if (p.eweknie_slug && per_slug && per_slug.has(p.eweknie_slug)) {
     const e = per_slug.get(p.eweknie_slug);
-    if (e.taal && e.taal !== taal) taal_nota = t(e.taal === "en" ? "bk_ook_in_engels" : "bk_ook_in_afrikaans");
+    if (e.taal && e.taal !== taal) {
+      taal_nota = t(e.taal === "en" ? "bk_ook_in_engels" : "bk_ook_in_afrikaans");
+      taal_skakel = `produk.html?produk=${encodeURIComponent(e.slug)}`;
+    }
   }
 
   const formate = bk_formate(p);
@@ -222,7 +227,7 @@ function bk_kaart(p, konteks) {
       <p class="bk-lyn">${bk_esc(lyn)}</p>
       <h3 class="bk-titel"><a href="${skakel}">${bk_esc(bk_kort_titel(p))}</a></h3>
       ${onder}
-      ${taal_nota ? `<p class="bk-taal">${bk_esc(taal_nota)}</p>` : ""}
+      ${taal_nota ? `<p class="bk-taal">${taal_skakel ? `<a href="${taal_skakel}">${bk_esc(taal_nota)} →</a>` : bk_esc(taal_nota)}</p>` : ""}
     </article>`;
 }
 
@@ -240,9 +245,12 @@ function bk_bou_rye(produkte, konteks) {
     groepe.get(kode).push({ p, volgorde, posisie });
   }
   const en = bk_taal() === "en";
+  const taal_nou = bk_taal();
   const rye = [...groepe.entries()].map(([kode, boeke]) => {
     boeke.sort((a, b) => (a.posisie || 9999) - (b.posisie || 9999)
       || (a.volgorde || 999) - (b.volgorde || 999)
+      // Met albei tale sigbaar: die uitgawe in die winkel se taal eerste.
+      || (a.p.taal === taal_nou ? 0 : 1) - (b.p.taal === taal_nou ? 0 : 1)
       || String(a.p.titel).localeCompare(String(b.p.titel), "af", { numeric: true }));
     const meta = afdelings_per_kode.get(kode);
     return {

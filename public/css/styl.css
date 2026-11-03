@@ -4712,3 +4712,10 @@ div.pb-omslag { aspect-ratio: 2 / 3; background: #E2DCCF; }
   .lk-rak .my-boek-lees-knoppie { font-size: 14px; padding: 0; }
 }
 .lk-rak .my-boek-opgradering-knoppie { border-radius: 999px; padding: 8px 14px; align-self: flex-start; }
+
+/* Taalkeuse op die Boeke-bladsy en die skakel na die eweknie op die kaart. */
+.bk-taalkeuse { margin-top: 14px; align-items: center; }
+.bk-taal-etiket { font-family: var(--font-liggaam); font-size: 13px; color: #A9A59B; margin-right: 2px; }
+.bk-chip--klein { padding: 5px 13px; font-size: 12px; }
+.bk-taal a { color: var(--teal); text-decoration: none; font-style: normal; font-weight: 500; }
+.bk-taal a:hover { text-decoration: underline; }

@@ -11,12 +11,16 @@
 
 (function () {
   const AKTIEF = new Set();
+  // Taalkeuse (November 2026): standaard die winkel se taal, maar 'n
+  // besoeker kan ook die ander taal of albei kies, sodat iemand op die
+  // Afrikaanse kant ook die Engelse boeke kan sien.
+  let TAAL = typeof kry_huidige_taal === "function" ? kry_huidige_taal() : "af";
   let DATA = null;
   let KATEGORIEE = [];
 
   function teken() {
     const wrap = document.getElementById("boeke-rye");
-    let produkte = bk_in_taal(DATA.produkte);
+    let produkte = bk_in_taal(DATA.produkte, TAAL);
     if (AKTIEF.size) {
       produkte = produkte.filter((p) => (p.kategorie_ids || []).some((id) => AKTIEF.has(id)));
     }
@@ -33,6 +37,19 @@
         </div>
         <div class="bk-rooster">${ry.boeke.map((p) => bk_kaart(p, DATA)).join("")}</div>
       </section>`).join("");
+  }
+
+  function teken_taal() {
+    const wrap = document.getElementById("boeke-taal");
+    if (!wrap) return;
+    const opsies = [["af", "Afrikaans"], ["en", "English"], ["albei", t("bk_albei_tale")]];
+    wrap.innerHTML = `<span class="bk-taal-etiket">${bk_esc(t("bk_boeke_in"))}</span>`
+      + opsies.map(([k, n]) => `<button type="button" class="bk-chip bk-chip--klein${TAAL === k ? " bk-chip--aan" : ""}" data-taal-keuse="${k}">${bk_esc(n)}</button>`).join("");
+    wrap.querySelectorAll("[data-taal-keuse]").forEach((c) => c.addEventListener("click", () => {
+      TAAL = c.dataset.taalKeuse;
+      teken_taal();
+      teken();
+    }));
   }
 
   function teken_chips() {
@@ -62,9 +79,10 @@
       ]);
       DATA = data;
       // Net kategorieë wat by 'n boek in hierdie taal gebruik word.
-      const gebruik = new Set(bk_in_taal(data.produkte).flatMap((p) => p.kategorie_ids || []));
+      const gebruik = new Set(data.produkte.flatMap((p) => p.kategorie_ids || []));
       KATEGORIEE = (kat.kategoriee || []).filter((k) => gebruik.has(k.kategorie_id));
       teken_chips();
+      teken_taal();
       teken();
     } catch (fout) {
       console.error("Kon nie die boeke laai nie:", fout);

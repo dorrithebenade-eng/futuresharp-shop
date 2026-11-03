@@ -54,6 +54,8 @@ const WOORDEBOEK = {
   bk_ook_in_afrikaans: { af: "Ook in Afrikaans beskikbaar", en: "Also available in Afrikaans" },
   bk_nuut_op_rak: { af: "Nuut op die rak", en: "New on the shelf" },
   bk_sien_alles: { af: "Sien alles", en: "See all" },
+  bk_boeke_in: { af: "Boeke in:", en: "Books in:" },
+  bk_albei_tale: { af: "Albei tale", en: "Both languages" },
   // Boekbladsy (fase 3)
   pb_leeskamer: {
     af: "Jou boek wag dadelik in My Leeskamer. Lees aanlyn of aflyn op jou foon, tablet of rekenaar.",

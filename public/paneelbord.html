@@ -880,13 +880,16 @@
           Die Boeke-bladsy wys die boeke in rye, van bo na onder soos hier. Skuif 'n ry met <b>▲ Op</b> en <b>▼ Af</b>,
           en 'n boek binne sy ry met <b>◀</b> en <b>▶</b>. Met <b>Skuif na …</b> sit jy 'n boek in 'n ander ry.
           'n Afrikaanse en Engelse uitgawe is een kaartjie: wat jy met die een doen, geld vir albei.
-          Met <b>★ Op die tuisblad</b> kies jy watter omslae in die tuisblad se donker band verskyn.
-          Niks verander op die winkel voordat jy <b>Stoor</b> druk nie.
+          Met <b>★ Op die tuisblad</b> kies jy watter omslae in die tuisblad se donker band verskyn; dit word dadelik gestoor.
+          Veranderinge aan die rye geld eers wanneer jy <b>Stoor die rye</b> druk.
         </p>
         <div id="paneel-afdelings-lys"></div>
         <div id="paneel-afdelings-foute" class="vb-foute" style="display:none;"></div>
-        <button type="button" id="paneel-afdelings-stoor" class="kaart-aksie" style="margin-top:14px;">Stoor</button>
-        <span id="paneel-afdelings-status" class="paneel-hulp-teks" style="margin-left:12px;"></span>
+        <!-- Die Stoor-balk bly onderaan die skerm sigbaar terwyl jy rol. -->
+        <div style="position:sticky;bottom:0;background:#fff;border-top:1px solid #E5E0D6;padding:12px 0;margin-top:14px;z-index:5;display:flex;align-items:center;gap:12px;">
+          <button type="button" id="paneel-afdelings-stoor" class="kaart-aksie" style="margin:0;">Stoor die rye</button>
+          <span id="paneel-afdelings-status" class="paneel-hulp-teks"></span>
+        </div>
       </section>
 
       <section class="paneel-afdeling" data-afdeling-inhoud="bestellings">
