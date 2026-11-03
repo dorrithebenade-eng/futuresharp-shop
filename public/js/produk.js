@@ -267,6 +267,12 @@ function wys_produk(produk, besit_info, konteks) {
     aksies.push(bou_aksie_ry(produk, "leen", leen, t("leen_etiket"), false, leen_dae_oor));
   }
 
+  // "Laat weet my" (November 2026): die harde kopie kom nog, en die boek se
+  // merkie in die paneelbord vra of mense belangstel.
+  if (produk.vra_harde_kopie === true && !(hardeKopie && hardeKopie.beskikbaar)) {
+    aksies.push(bou_harde_kopie_belang(produk));
+  }
+
   // Die ry waarin die boek op die Boeke-bladsy staan, en sy nommer.
   let ry = null;
   let lyn = "";
@@ -347,6 +353,125 @@ function wys_produk(produk, besit_info, konteks) {
   });
 
   koppel_geskenk_knoppies(wrap);
+  koppel_harde_kopie_belang(wrap);
+}
+
+// --- Harde kopie: "Laat weet my" ---
+// Sien netlify/functions/_harde-kopie-belang.js. 'n Aangemelde koper hoef nie
+// sy e-pos in te tik nie; die blokkie verdwyn sodra ons weet wie hy is. Ná
+// aanmelding onthou die blaaier dit per boek, sodat die bedankie bly staan.
+const HK_SLEUTEL = "future_shop_hk_belang";
+
+function hk_onthou(slug) {
+  try {
+    const lys = JSON.parse(localStorage.getItem(HK_SLEUTEL) || "[]");
+    if (!lys.includes(slug)) lys.push(slug);
+    localStorage.setItem(HK_SLEUTEL, JSON.stringify(lys.slice(-200)));
+  } catch {}
+}
+function hk_reeds(slug) {
+  try {
+    return JSON.parse(localStorage.getItem(HK_SLEUTEL) || "[]").includes(slug);
+  } catch {
+    return false;
+  }
+}
+
+function bou_harde_kopie_belang(produk) {
+  const reeds = hk_reeds(produk.slug);
+  return `
+    <div class="produk-formaat-ry hk-belang" data-slug="${titel_ontsnap(produk.slug)}">
+      <div class="hk-kop">
+        <span class="produk-formaat-etiket">${t("hardekopie_etiket")}</span>
+        <span class="hk-binnekort">${t("hk_binnekort")}</span>
+      </div>
+      <p class="hk-teks">${t("hk_teks")}</p>
+      <form class="hk-vorm" novalidate ${reeds ? "hidden" : ""}>
+        <input type="email" class="veld-invoer hk-epos" name="epos" autocomplete="email"
+          placeholder="${t("hk_epos_plek")}" aria-label="${t("hk_epos_plek")}">
+        <input type="text" name="pot" class="hk-pot" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <button type="submit" class="kaart-aksie hk-knoppie">${t("hk_knoppie")}</button>
+      </form>
+      <p class="hk-fout" role="alert" hidden></p>
+      <p class="hk-dankie" role="status" ${reeds ? "" : "hidden"}>✓ ${t("hk_dankie")}</p>
+      <p class="hk-privaat" ${reeds ? "hidden" : ""}>${t("hk_privaat")}</p>
+    </div>
+  `;
+}
+
+async function koppel_harde_kopie_belang(wrap) {
+  const blok = wrap.querySelector(".hk-belang");
+  if (!blok) return;
+  const vorm = blok.querySelector(".hk-vorm");
+  const epos_veld = blok.querySelector(".hk-epos");
+  const fout = blok.querySelector(".hk-fout");
+  const dankie = blok.querySelector(".hk-dankie");
+  const privaat = blok.querySelector(".hk-privaat");
+  const knoppie = blok.querySelector(".hk-knoppie");
+  const slug = blok.dataset.slug;
+
+  let token = null;
+  let profiel_epos = "";
+  try {
+    if (typeof identiteit_kry_huidige_sessie === "function") {
+      const sessie = await identiteit_kry_huidige_sessie();
+      if (sessie && sessie.access_token) {
+        token = sessie.access_token;
+        profiel_epos = (sessie.gebruiker && sessie.gebruiker.email) || "";
+      }
+    }
+  } catch {}
+  if (token) {
+    epos_veld.hidden = true;
+    privaat.hidden = true;
+  }
+
+  epos_veld.addEventListener("input", () => { fout.hidden = true; });
+
+  vorm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const epos = token ? profiel_epos : epos_veld.value.trim();
+    if (!token && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(epos)) {
+      fout.textContent = t("hk_fout_epos");
+      fout.hidden = false;
+      epos_veld.focus();
+      return;
+    }
+    knoppie.disabled = true;
+    try {
+      const kop = { "Content-Type": "application/json" };
+      if (token) kop.Authorization = `Bearer ${token}`;
+      const resp = await fetch("/.netlify/functions/harde-kopie-belang", {
+        method: "POST",
+        headers: kop,
+        body: JSON.stringify({
+          slug,
+          epos,
+          taal: typeof kry_huidige_taal === "function" ? kry_huidige_taal() : "af",
+          pot: vorm.elements.pot.value,
+        }),
+      });
+      if (resp.status === 400) {
+        const data = await resp.json().catch(() => ({}));
+        if (data.fout === "epos") {
+          fout.textContent = t("hk_fout_epos");
+          fout.hidden = false;
+          knoppie.disabled = false;
+          return;
+        }
+      }
+      if (!resp.ok) throw new Error(String(resp.status));
+      hk_onthou(slug);
+      vorm.hidden = true;
+      privaat.hidden = true;
+      fout.hidden = true;
+      dankie.hidden = false;
+    } catch {
+      fout.textContent = t("hk_fout");
+      fout.hidden = false;
+      knoppie.disabled = false;
+    }
+  });
 }
 
 (function () {

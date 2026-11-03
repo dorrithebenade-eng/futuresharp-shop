@@ -997,6 +997,8 @@ function reset_vorm() {
   document.getElementById("vorm-reeks").value = "";
   document.getElementById("vorm-reeks-volgorde").value = "";
   document.getElementById("vorm-op-tuisblad").checked = false;
+  document.getElementById("vorm-vra-harde-kopie").checked = false;
+  if (typeof hk_paneel_wys === "function") hk_paneel_wys(null);
   bou_reeks_voorstelle();
   document.getElementById("vorm-etiket-pasgemaak-velde").style.display = "none";
   wys_verberg_formaat_velde();
@@ -1209,6 +1211,8 @@ function open_vorm_vir_wysig(produk) {
   document.getElementById("vorm-reeks").value = (produk.reeks && produk.reeks.reeks_slug) || "";
   document.getElementById("vorm-reeks-volgorde").value = (produk.reeks && produk.reeks.volgorde_in_reeks) || "";
   document.getElementById("vorm-op-tuisblad").checked = produk.op_tuisblad === true;
+  document.getElementById("vorm-vra-harde-kopie").checked = produk.vra_harde_kopie === true;
+  if (typeof hk_paneel_wys === "function") hk_paneel_wys(produk);
   document.getElementById("vorm-oorsig").value = produk.oorsig || "";
   document.getElementById("vorm-vol-beskrywing").value = produk.vol_beskrywing || "";
   document.getElementById("vorm-isbn-eboek").value = (produk.isbn && produk.isbn.eboek) || "";
@@ -1384,6 +1388,7 @@ function bou_produk_liggaam() {
       volgorde_in_reeks: Number(document.getElementById("vorm-reeks-volgorde").value) || null,
     },
     op_tuisblad: document.getElementById("vorm-op-tuisblad").checked,
+    vra_harde_kopie: document.getElementById("vorm-vra-harde-kopie").checked,
     oorsig: document.getElementById("vorm-oorsig").value.trim(),
     vol_beskrywing: document.getElementById("vorm-vol-beskrywing").value.trim(),
     omslag: document.getElementById("vorm-omslag").value.trim(),

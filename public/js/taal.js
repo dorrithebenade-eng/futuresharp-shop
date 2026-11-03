@@ -423,6 +423,20 @@ const WOORDEBOEK = {
   produk_nie_gevind: { af: "Hierdie produk kon nie gevind word nie.", en: "This product could not be found." },
 
   // Mandjie-bladsy
+  hk_binnekort: { af: "Binnekort", en: "Coming soon" },
+  hk_teks: {
+    af: "'n Harde kopie van hierdie boek sal binnekort te koop wees. Dui gerus aan of jy daarin belangstel, dan laat ons jou per e-pos weet sodra dit beskikbaar is.",
+    en: "A printed copy of this book will be on sale soon. Let us know if you're interested, and we'll e-mail you as soon as it's available.",
+  },
+  hk_epos_plek: { af: "jou@epos.co.za", en: "you@email.com" },
+  hk_knoppie: { af: "Laat weet my", en: "Let me know" },
+  hk_fout_epos: { af: "Tik eers jou e-posadres in.", en: "Enter your e-mail address first." },
+  hk_fout: { af: "Dit het nie deurgegaan nie. Probeer asseblief weer.", en: "That didn't go through. Please try again." },
+  hk_dankie: {
+    af: "Dankie. Ons stuur vir jou 'n e-pos sodra die harde kopie beskikbaar is.",
+    en: "Thank you. We'll e-mail you as soon as the printed copy is available.",
+  },
+  hk_privaat: { af: "Ons gebruik jou e-posadres net hiervoor.", en: "We only use your e-mail address for this." },
   bly_aan_koop: { af: "← Kyk verder rond", en: "← Keep browsing" },
 
   // 403, NIE 401 NIE. Die rekening is aangemeld en die token is geldig -- dit

@@ -250,6 +250,7 @@ exports.handler = async (event, context) => {
     isbn: kry_geldige_isbn(invoer.isbn),
     etiket: kry_geldige_etiket(invoer.etiket),
     op_tuisblad: invoer.op_tuisblad === true,
+    vra_harde_kopie: invoer.vra_harde_kopie === true,
     formate: {
       eboek: {
         beskikbaar: !!formate.eboek.beskikbaar,

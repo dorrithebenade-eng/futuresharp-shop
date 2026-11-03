@@ -227,6 +227,7 @@ exports.handler = async (event, context) => {
     // "Wys op die tuisblad" (November 2026): die tuisblad se waaier kies net
     // uit boeke met hierdie merkie, as daar drie of meer is.
     op_tuisblad: "op_tuisblad" in wysigings ? wysigings.op_tuisblad === true : bestaande.op_tuisblad === true,
+    vra_harde_kopie: "vra_harde_kopie" in wysigings ? wysigings.vra_harde_kopie === true : bestaande.vra_harde_kopie === true,
     bygewerk_op: new Date().toISOString(),
     bygewerk_deur: gebruiker.email,
   };
