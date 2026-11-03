@@ -26,7 +26,7 @@
       return;
     }
     wrap.innerHTML = rye.map((ry) => `
-      <section class="bk-ry" id="afdeling-${bk_esc((ry.kode || "ander").toLowerCase())}">
+      <section class="bk-ry" id="afdeling-${bk_anker(ry.kode)}">
         <div class="bk-ry-kop">
           <h2 class="bk-ry-titel">${bk_esc(ry.naam)}</h2>
           ${ry.beskrywing ? `<p class="bk-ry-beskrywing">${bk_esc(ry.beskrywing)}</p>` : ""}

@@ -28,8 +28,12 @@ const DEMO_PRODUKTE = [
   },
 ];
 
+// R300 eerder as R300.00, soos op die boekkaarte (November 2026). Net waar
+// daar werklik sente is, wys ons hulle.
 function formateer_prys_sent(sent) {
-  return `R${(sent / 100).toFixed(2)}`;
+  const rand = (sent || 0) / 100;
+  const teks = Number.isInteger(rand) ? String(rand) : rand.toFixed(2).replace(".", ",");
+  return "R" + teks.replace(/\B(?=(\d{3})+(?!\d))/g, "\u00A0");
 }
 
 function kry_produk_slug_uit_url() {
@@ -223,14 +227,23 @@ function bou_titel_html(produk) {
     + `<span class="titel-boek">${titel_ontsnap(pas[2])}</span>`;
 }
 
-function wys_produk(produk, besit_info) {
+// DIE BOEKBLADSY (November 2026, fase 3). Groot omslag links op 'n
+// roomkleurige vlak; regs die ry en boeknommer, die titel, die skrywer, die
+// formate met hul knoppies, en direk daaronder waar die boek heen gaan (My
+// Leeskamer). Onderaan "Meer uit hierdie ry" met die nuwe boekkaart.
+//
+// Die klasse wat ander skripte soek, bly: #produk-wrap, .produk-aksies,
+// .produk-formaat-knoppie, .produk-geskenk-knoppie, .produk-alreeds-eie-knoppie
+// (reekspakket.js sit sy blok ná .produk-aksies in).
+function wys_produk(produk, besit_info, konteks) {
   document.title = `${produk.titel} — Future Shop`;
 
   const wrap = document.getElementById("produk-wrap");
+  const kt = konteks || null;
 
   const omslagHtml = produk.omslag
-    ? `<img class="produk-omslag" src="${produk.omslag}" alt="Omslag van ${produk.titel}">`
-    : `<div class="produk-omslag" role="img" aria-label="Geen omslag beskikbaar vir ${produk.titel}"></div>`;
+    ? `<img class="produk-omslag pb-omslag" src="${produk.omslag}" alt="Omslag van ${titel_ontsnap(produk.titel)}">`
+    : `<div class="produk-omslag pb-omslag" role="img" aria-label="Geen omslag beskikbaar vir ${titel_ontsnap(produk.titel)}"></div>`;
 
   const eboek = produk.formate && produk.formate.eboek;
   const hardeKopie = produk.formate && produk.formate.harde_kopie;
@@ -254,31 +267,62 @@ function wys_produk(produk, besit_info) {
     aksies.push(bou_aksie_ry(produk, "leen", leen, t("leen_etiket"), false, leen_dae_oor));
   }
 
-  wrap.innerHTML = `
-    <a class="terug-skakel" href="index.html">${t("terug_katalogus")}</a>
-    <div class="produk-uitleg">
-      <div class="produk-titel-blok">
-        <h1 class="produk-titel">${bou_titel_html(produk)}</h1>
-        <p class="produk-outeur">${produk.outeur}</p>
-        ${bou_beskikbaar_merkers(eboek, hardeKopie, leen)}
-      </div>
+  // Die ry waarin die boek op die Boeke-bladsy staan, en sy nommer.
+  let ry = null;
+  let lyn = "";
+  if (kt && typeof bk_kode === "function") {
+    const { kode, volgorde } = bk_kode(produk, kt.per_slug, kt.lidmaatskap);
+    if (kode) {
+      const naam = bk_afdeling_naam(kode, kt.afdelings_per_kode, produk);
+      ry = { kode, naam };
+      lyn = volgorde ? `${naam} · ${t("bk_boek")} ${volgorde}` : naam;
+    }
+  }
+  const titel = typeof bk_kort_titel === "function" && ry ? bk_kort_titel(produk) : produk.titel;
 
-      <div class="produk-sylat">
-        ${omslagHtml}
-        <div class="koop-afdeling">
-          <div class="afdeling-etiket">${t("kies_formaat")}</div>
+  // Die eweknie in die ander taal.
+  let eweknie_html = "";
+  const e = produk.eweknie_slug && kt && kt.per_slug.get(produk.eweknie_slug);
+  if (e && e.taal && e.taal !== produk.taal) {
+    eweknie_html = `<p class="pb-eweknie">${t(e.taal === "en" ? "bk_ook_in_engels" : "bk_ook_in_afrikaans")}:
+      <a href="produk.html?produk=${encodeURIComponent(e.slug)}">${titel_ontsnap(e.titel)}</a></p>`;
+  }
+
+  const leeskamer_html = eboek && eboek.beskikbaar
+    ? `<p class="pb-leeskamer">${t("pb_leeskamer")}
+        <button type="button" class="beskikbaar-merker pb-hoe" data-formaat="eboek">${t("pb_hoe_werk_dit")}</button></p>`
+    : "";
+
+  const krummel = `<nav class="pb-krummel" aria-label="Broodkrummels">
+      <a href="boeke.html">${t("nav_boeke")}</a>
+      ${ry ? `<span aria-hidden="true">/</span><a href="boeke.html#afdeling-${bk_anker(ry.kode)}">${titel_ontsnap(ry.naam)}</a>` : ""}
+    </nav>`;
+
+  wrap.innerHTML = `
+    ${krummel}
+    <div class="pb-uitleg">
+      <div class="pb-beeld">${omslagHtml}</div>
+      <div class="pb-inhoud">
+        ${lyn ? `<p class="pb-lyn">${titel_ontsnap(lyn)}</p>` : ""}
+        <h1 class="pb-titel">${titel_ontsnap(titel)}</h1>
+        <p class="pb-outeur">${titel_ontsnap(produk.outeur || "")}</p>
+        <div class="koop-afdeling pb-koop">
           <div class="produk-aksies">${aksies.join("")}</div>
           <p class="produk-nota" id="produk-terugvoer" role="status"></p>
         </div>
-      </div>
-
-      <div class="produk-beskrywing-blok">
-        <div class="afdeling-etiket produk-beskrywing-etiket">${t("oor_hierdie_boek")}</div>
-        <p class="produk-beskrywing">${produk.vol_beskrywing || produk.oorsig || ""}</p>
-        ${bou_isbn_blok(produk)}
+        ${leeskamer_html}
+        ${eweknie_html}
+        <div class="pb-oor">
+          <h2 class="pb-oor-titel">${t("oor_hierdie_boek")}</h2>
+          <p class="produk-beskrywing">${produk.vol_beskrywing || produk.oorsig || ""}</p>
+          ${bou_isbn_blok(produk)}
+        </div>
       </div>
     </div>
+    <div id="pb-meer"></div>
   `;
+
+  wys_meer_uit_ry(produk, ry, kt);
 
   wrap.querySelectorAll(".produk-formaat-knoppie").forEach((knoppie) => {
     knoppie.addEventListener("click", () => {
@@ -313,6 +357,24 @@ function wys_produk(produk, besit_info) {
   document.head.appendChild(styl);
 })();
 
+// Ander boeke uit dieselfde ry, in die ry se volgorde, met die nuwe kaart.
+function wys_meer_uit_ry(produk, ry, kt) {
+  const plek = document.getElementById("pb-meer");
+  if (!plek || !ry || !kt || typeof bk_bou_rye !== "function") return;
+  const rye = bk_bou_rye(bk_in_taal(kt.produkte), kt);
+  const self = rye.find((r) => r.kode === ry.kode);
+  const ander = self ? self.boeke.filter((p) => p.slug !== produk.slug && p.slug !== produk.eweknie_slug) : [];
+  if (!ander.length) return;
+  plek.innerHTML = `
+    <section class="bk-ry pb-meer">
+      <div class="bk-ry-kop bk-ry-kop--met-skakel">
+        <h2 class="bk-ry-titel">${t("pb_meer_uit_ry")}</h2>
+        <a class="bk-sien-alles" href="boeke.html#afdeling-${bk_anker(ry.kode)}">${t("bk_sien_alles")} →</a>
+      </div>
+      <div class="bk-rooster bk-rooster--vier">${ander.slice(0, 4).map((p) => bk_kaart(p, kt)).join("")}</div>
+    </section>`;
+}
+
 function koppel_geskenk_knoppies(wrap) {
   wrap.querySelectorAll(".produk-geskenk-knoppie").forEach((knoppie) => {
     knoppie.addEventListener("click", () => {
@@ -343,15 +405,29 @@ async function laai_produk() {
   let produkte;
   let demo_modus = false;
   let besit_info = { eboek_besit: new Set(), leen_aktief: new Map() };
+  let konteks = null;
   try {
-    const [resp, opgehaalde_besit_info] = await Promise.all([
+    const [resp, opgehaalde_besit_info, afd] = await Promise.all([
       fetch(KATALOGUS_ENDPOINT),
       kry_besit_info(),
+      fetch("/.netlify/functions/kry-afdelings").then((r) => (r.ok ? r.json() : { afdelings: [] })).catch(() => ({ afdelings: [] })),
     ]);
     if (!resp.ok) throw new Error(`Status ${resp.status}`);
     const data = await resp.json();
     produkte = data.produkte || [];
     besit_info = opgehaalde_besit_info;
+    if (typeof bk_lidmaatskap === "function") {
+      const per_slug = new Map(produkte.map((p) => [p.slug, p]));
+      const afdelings = afd.afdelings || [];
+      konteks = {
+        produkte,
+        per_slug,
+        afdelings,
+        afdelings_per_kode: new Map(afdelings.map((a) => [a.kode, a])),
+        lidmaatskap: bk_lidmaatskap(afdelings, per_slug),
+        besit: besit_info.eboek_besit,
+      };
+    }
   } catch (fout) {
     console.warn("Kon nie lewendige katalogus laai nie, wys demo-data:", fout);
     produkte = DEMO_PRODUKTE;
@@ -365,17 +441,17 @@ async function laai_produk() {
       wys_produk(produkte[0], besit_info);
       return;
     }
-    wrap.innerHTML = `<p class="stelsel-boodskap">${t("geen_produk")} <a href="index.html">${t("terug_katalogus_skakel")}</a></p>`;
+    wrap.innerHTML = `<p class="stelsel-boodskap">${t("geen_produk")} <a href="boeke.html">${t("terug_katalogus_skakel")}</a></p>`;
     return;
   }
 
   const produk = produkte.find((p) => p.slug === slug);
   if (!produk) {
-    wrap.innerHTML = `<p class="stelsel-boodskap">${t("produk_nie_gevind")} <a href="index.html">${t("terug_katalogus_skakel")}</a></p>`;
+    wrap.innerHTML = `<p class="stelsel-boodskap">${t("produk_nie_gevind")} <a href="boeke.html">${t("terug_katalogus_skakel")}</a></p>`;
     return;
   }
 
-  wys_produk(produk, besit_info);
+  wys_produk(produk, besit_info, konteks);
 
   if (!demo_modus) {
     // Agtergrond-belangstelling-telling — "fire and forget", nooit die

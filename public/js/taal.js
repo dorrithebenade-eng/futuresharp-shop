@@ -54,6 +54,13 @@ const WOORDEBOEK = {
   bk_ook_in_afrikaans: { af: "Ook in Afrikaans beskikbaar", en: "Also available in Afrikaans" },
   bk_nuut_op_rak: { af: "Nuut op die rak", en: "New on the shelf" },
   bk_sien_alles: { af: "Sien alles", en: "See all" },
+  // Boekbladsy (fase 3)
+  pb_leeskamer: {
+    af: "Jou boek wag dadelik in My Leeskamer. Lees aanlyn of aflyn op jou foon, tablet of rekenaar.",
+    en: "Your book waits for you right away in My Reading Room. Read online or offline on your phone, tablet or computer.",
+  },
+  pb_hoe_werk_dit: { af: "Hoe werk dit?", en: "How does it work?" },
+  pb_meer_uit_ry: { af: "Meer uit hierdie ry", en: "More from this shelf" },
   filter_alle: { af: "Alle", en: "All" },
   opsioneel: { af: "(opsioneel)", en: "(optional)" },
 

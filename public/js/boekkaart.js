@@ -14,6 +14,11 @@
 const BK_KATALOGUS = "/.netlify/functions/kry-katalogus";
 const BK_AFDELINGS = "/.netlify/functions/kry-afdelings";
 
+// 'n Veilige anker vir 'n ry, bv. "SPEEL-SLIM FOKUS" -> "speel-slim-fokus".
+function bk_anker(kode) {
+  return String(kode || "ander").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "ander";
+}
+
 function bk_esc(w) {
   return String(w == null ? "" : w)
     .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");

@@ -4570,3 +4570,75 @@ html:has(#nav-rekening-plek) { background: var(--ink); }
 .bk-gekoop { color: var(--teal); font-weight: 600; }
 .bk-lees { color: var(--teal); font-weight: 600; text-decoration: none; margin-left: 6px; }
 .bk-taal { font-family: var(--font-liggaam); font-size: 12px; color: #8A877E; margin: 4px 0 0; font-style: italic; }
+
+/* =====================================================================
+   FASE 3 (November 2026): die boekbladsy
+   ===================================================================== */
+.produk-wrap { max-width: 1228px; padding: 28px 24px 24px; }
+.pb-krummel { font-family: var(--font-liggaam); font-size: 14px; color: #8A877E; margin-bottom: 22px; display: flex; gap: 10px; flex-wrap: wrap; }
+.pb-krummel a { color: #8A877E; text-decoration: none; }
+.pb-krummel a:hover { color: var(--teal); }
+
+.pb-uitleg { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: clamp(28px, 5vw, 64px); align-items: start; }
+.pb-beeld {
+  background: var(--room); border-radius: 12px; padding: clamp(24px, 4vw, 48px);
+  display: flex; justify-content: center; position: sticky; top: 100px;
+}
+.pb-omslag {
+  width: 100%; max-width: 380px; height: auto; display: block; border-radius: 4px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.18);
+}
+div.pb-omslag { aspect-ratio: 2 / 3; background: #E2DCCF; }
+
+.pb-lyn { font-family: var(--font-liggaam); font-weight: 500; font-size: 13px; color: var(--teal); margin: 0 0 8px; }
+.pb-titel {
+  font-family: var(--font-opskrif); font-weight: 800; font-size: clamp(28px, 3.4vw, 40px);
+  line-height: 1.1; color: #1F1F1D; margin: 0; letter-spacing: -0.01em;
+}
+.pb-outeur { font-family: var(--font-liggaam); font-size: 15px; color: #5F5E5A; margin: 10px 0 0; }
+
+.pb-koop { margin-top: 24px; background: transparent; padding: 0; border-radius: 0; }
+.pb-koop .produk-aksies { gap: 12px; max-width: 520px; }
+.pb-koop .produk-formaat-ry {
+  display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 10px 16px;
+  border: 1px solid #E5E0D6; border-radius: 12px; padding: 14px 16px; background: var(--wit);
+}
+.pb-koop .produk-formaat-info { flex-direction: row; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.pb-koop .produk-formaat-etiket { font-size: 15px; }
+.pb-koop .produk-formaat-prys { font-family: var(--font-liggaam); font-weight: 600; font-size: 16px; color: #1F1F1D; }
+.pb-koop .produk-formaat-knoppie,
+.pb-koop .produk-alreeds-eie-knoppie {
+  background: var(--koraal); color: var(--wit); border: none; border-radius: 999px;
+  padding: 11px 22px; font-family: var(--font-liggaam); font-weight: 600; font-size: 14px;
+  white-space: nowrap; text-decoration: none; text-align: center;
+}
+.pb-koop .produk-alreeds-eie-knoppie { background: var(--teal); }
+.pb-koop .produk-geskenk-knoppie {
+  grid-column: 1 / -1; width: auto; justify-self: start; margin: 0;
+  background: transparent; color: var(--teal); border: 1.5px solid var(--teal); border-radius: 999px;
+  padding: 8px 18px; font-family: var(--font-liggaam); font-weight: 600; font-size: 13px;
+}
+.pb-koop .produk-leen-tydperk-nota,
+.pb-koop .produk-voorbestel-nota { flex-basis: 100%; }
+.pb-koop .produk-nota { margin: 10px 0 0; }
+
+.pb-leeskamer { font-family: var(--font-liggaam); font-size: 14px; line-height: 1.55; color: #5F5E5A; margin: 16px 0 0; max-width: 520px; }
+.pb-hoe {
+  background: none; border: none; padding: 0; cursor: pointer;
+  font-family: var(--font-liggaam); font-size: 14px; color: var(--teal); text-decoration: underline;
+}
+.pb-eweknie { font-family: var(--font-liggaam); font-size: 13px; color: #8A877E; margin: 14px 0 0; }
+.pb-eweknie a { color: var(--teal); }
+
+.pb-oor { border-top: 1px solid var(--rand-lig); margin-top: 28px; padding-top: 22px; }
+.pb-oor-titel { font-family: var(--font-opskrif); font-weight: 700; font-size: 18px; color: #1F1F1D; margin: 0 0 10px; }
+.pb-oor .produk-beskrywing { max-width: 62ch; color: #4A4A46; }
+
+@media (max-width: 760px) {
+  .pb-uitleg { grid-template-columns: 1fr; }
+  .pb-beeld { position: static; padding: 28px; }
+  .pb-omslag { max-width: 70%; }
+  .pb-koop .produk-formaat-ry { grid-template-columns: 1fr; }
+  .pb-koop .produk-formaat-knoppie, .pb-koop .produk-alreeds-eie-knoppie { width: 100%; }
+}
+.pb-koop .reekspakket-blok { max-width: 520px; }
