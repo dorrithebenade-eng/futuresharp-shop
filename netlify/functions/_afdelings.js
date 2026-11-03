@@ -64,7 +64,11 @@ async function lees_band() {
 
 async function skryf_band(band) {
   const teks = (w) => String(w == null ? "" : w).trim().slice(0, 120);
-  const skoon_band = { links: teks(band && band.links), middel: teks(band && band.middel), regs: teks(band && band.regs) };
+  // nuut_op_rak: wys die ry "Nuut op die rak" bo-aan die tuisblad (verstek af).
+  const skoon_band = {
+    links: teks(band && band.links), middel: teks(band && band.middel), regs: teks(band && band.regs),
+    nuut_op_rak: !!(band && band.nuut_op_rak === true),
+  };
   await store().setJSON("band", skoon_band);
   return skoon_band;
 }

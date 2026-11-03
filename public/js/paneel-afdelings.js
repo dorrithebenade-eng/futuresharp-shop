@@ -24,7 +24,7 @@
   // die bladsy gelaai het (net veranderinge word gestoor).
   let TUIS = new Map();
   let TUIS_BEGIN = new Map();
-  let BAND = { links: "", middel: "", regs: "" };
+  let BAND = { links: "", middel: "", regs: "", nuut_op_rak: false };
   let WERKE = [];
 
   function is_op_tuisblad(w) {
@@ -159,6 +159,10 @@
       <div style="display:flex;gap:12px;flex-wrap:wrap;">
         ${keuse("links", "Links")}${keuse("middel", "Bo, in die middel")}${keuse("regs", "Regs")}
       </div>
+      <label style="display:flex;gap:8px;align-items:center;margin:14px 0 0;cursor:pointer;">
+        <input type="checkbox" class="ra-nuut" ${BAND.nuut_op_rak ? "checked" : ""}>
+        <span><b>Wys "Nuut op die rak" bo-aan die tuisblad</b> (die vier nuutste boeke). Onder die band wys die tuisblad altyd al die rye, in die volgorde hieronder.</span>
+      </label>
       <p class="paneel-hulp-teks" style="margin:10px 0 0;">${band_vas ? "<b>Vas:</b> die band wys altyd hierdie drie, in hierdie volgorde." : "<b>Wissel:</b> die band kies self uit die ★-boeke."}
         ${BAND.links || BAND.middel || BAND.regs ? `<button type="button" class="terug-skakel ra-band-skoon" style="margin-left:8px;">Maak skoon (laat wissel)</button>` : ""}</p>
     </div>`;
@@ -238,7 +242,7 @@
           body: JSON.stringify({ band: BAND }),
         });
         if (!r.ok) throw new Error(await r.text());
-        status.textContent = "Tuisblad se band gestoor.";
+        status.textContent = "Tuisblad gestoor.";
       } catch (fout) {
         alert("Kon nie die band stoor nie: " + (fout.message || fout));
       }
@@ -249,7 +253,9 @@
       stoor_band();
     }));
     const skoon = wrap.querySelector(".ra-band-skoon");
-    if (skoon) skoon.addEventListener("click", () => { BAND = { links: "", middel: "", regs: "" }; stoor_band(); });
+    if (skoon) skoon.addEventListener("click", () => { BAND = { ...BAND, links: "", middel: "", regs: "" }; stoor_band(); });
+    const nuut = wrap.querySelector(".ra-nuut");
+    if (nuut) nuut.addEventListener("change", () => { BAND.nuut_op_rak = nuut.checked; stoor_band(); });
 
     wrap.querySelectorAll(".ra-tuis").forEach((c) => c.addEventListener("change", async () => {
       const status = document.getElementById("paneel-afdelings-status");
@@ -293,7 +299,7 @@
       const [r, alle] = await Promise.all([fetch("/.netlify/functions/kry-afdelings"), kry_produkte()]);
       const afd_data = r.ok ? await r.json() : {};
       const afdelings = afd_data.afdelings || [];
-      BAND = Object.assign({ links: "", middel: "", regs: "" }, afd_data.band || {});
+      BAND = Object.assign({ links: "", middel: "", regs: "", nuut_op_rak: false }, afd_data.band || {});
       const produkte = alle.filter((p) => p && p.aktief !== false);
       PER_SLUG = new Map(produkte.map((p) => [p.slug, p]));
       const konteks = {
