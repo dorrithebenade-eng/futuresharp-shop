@@ -3,8 +3,7 @@
 // 1. Die pil in die kop: vooraan in .mini-kop-regs, net die vyf blokkies op
 //    die goue lyn. Op 'n foon skuif dit saam met die res van die kop agter
 //    die hamburger in.
-// 2. Die aankondigingspil bo-aan die teal-band: "Nuut", FutureSharp en die
-//    blokkies. Op 'n foon is dit die eerste ding wat 'n besoeker sien.
+// 2. (Afgehaal 3 Nov 2026) Die aankondigingspil bo-aan die teal-band.
 //
 // Loop SINCHROON (nie by DOMContentLoaded nie) en moet VOOR nav-rekening.js
 // laai, sodat die kop-pil reeds daar is wanneer die mobiele kieslys dit
@@ -26,17 +25,6 @@
     regs.insertBefore(pil, regs.firstChild);
   }
 
-  const band = document.querySelector(".kop-inhoud");
-  if (band && !band.querySelector(".fst-aank")) {
-    const engels = typeof kry_huidige_taal === "function" && kry_huidige_taal() === "en";
-    const aank = document.createElement("a");
-    aank.className = "fst-aank";
-    aank.href = "/talks";
-    aank.setAttribute("aria-label", `${engels ? "New" : "Nuut"}: FutureSharp Talks`);
-    aank.innerHTML =
-      `<span class="fst-aank-nuut">${engels ? "New" : "Nuut"}</span>` +
-      '<span class="fst-aank-naam">FutureSharp</span>' + blokke +
-      '<span class="fst-aank-pyl" aria-hidden="true">›</span>';
-    band.insertBefore(aank, band.firstChild);
-  }
+  // Die aankondigingspil ("Nuut" bo-aan die teal-band) is op 3 November
+  // 2026 afgehaal. Die pil in die kop bly.
 })();

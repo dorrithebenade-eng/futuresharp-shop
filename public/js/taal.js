@@ -255,13 +255,12 @@ const WOORDEBOEK = {
   kontak_raamwerk_bykomend: { af: "Enige bykomende inligting:", en: "Any additional information:" },
 
   // Kop (tuisblad)
-  kop_eyebrow: { af: "E-boeke · Harde kopieë · Leen", en: "E-books · Hard copies · Loan" },
-  kop_titel_normaal: { af: "Welkom by", en: "Welcome to" },
-  kop_subtitel: {
-    af: "Future Sharp se eie boekwinkel. Elke titel wys watter formate beskikbaar is — koop dit as e-boek, bestel 'n harde kopie, of leen dit vir 'n tydperk.",
-    en: "Future Sharp's own bookshop. Each title shows which formats are available — buy it as an e-book, order a hard copy, or borrow it for a period.",
-  },
-  kop_cta: { af: "Kyk gerus deur ons katalogus", en: "Browse our catalogue" },
+  // Tuisblad (November 2026): uitnodigend, nie verduidelikend nie.
+  kop_eyebrow: { af: "Welkom by Future Shop", en: "Welcome to Future Shop" },
+  kop_titel: { af: "Bly opgeskerp vir die toekoms.", en: "Stay sharp for the future." },
+  kop_subtitel: { af: "Boeke, video's en kursusse vol nuwe idees.", en: "Books, videos and courses full of new ideas." },
+  kop_cta: { af: "Kom kyk gerus rond", en: "Take a look around" },
+  kop_cta_nota: { af: "Ons het dalk iets waarby jy kan baatvind.", en: "You may well find something that's right for you." },
   katalogus_laai: { af: "Katalogus word gelaai …", en: "Loading catalogue …" },
   katalogus_leeg: { af: "Nog geen produkte beskikbaar nie.", en: "No products available yet." },
   katalogus_leeg_titel: { af: "Binnekort in aksie", en: "Coming soon" },

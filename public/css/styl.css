@@ -126,8 +126,9 @@ body {
   font-weight: 800;
   font-size: clamp(34px, 5.5vw, 52px);
   line-height: 1.05;
-  color: var(--koraal);
-  text-shadow: 3px 3px 0 rgba(23, 23, 23, 0.18);
+  /* Wit, nie koraal nie (3 Nov 2026): koraal was te dof op die teal. */
+  color: var(--wit);
+  text-shadow: 2px 2px 0 rgba(23, 23, 23, 0.25);
 }
 
 .kop-subtitel {
@@ -156,6 +157,14 @@ body {
   margin-top: 22px;
 }
 .kop-cta:hover { background: #2C2C2A; }
+.kop-cta-nota {
+  font-family: var(--font-liggaam);
+  font-size: 14px;
+  font-style: italic;
+  color: var(--wit);
+  opacity: 0.9;
+  margin: 10px 0 0;
+}
 
 /* ---------- Rooster ---------- */
 
