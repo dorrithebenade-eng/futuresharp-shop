@@ -73,10 +73,17 @@ function bk_afdeling_naam(kode, afdelings_per_kode, voorbeeld) {
 
 // Watter boeke wys in die huidige taal: die boeke in hierdie taal, plus
 // boeke wat net in die ander taal bestaan (sonder 'n eweknie hier).
+// LET WEL: 'n eweknie tel net as hy in die HUIDIGE taal is. 'n Ma se Reis en
+// 'n Pa se Reis is eweknieë van mekaar, maar albei Afrikaans; in Engels moet
+// albei steeds wys, want daar is geen Engelse uitgawe nie.
 function bk_in_taal(produkte) {
   const taal = bk_taal();
-  const slugs = new Set(produkte.map((p) => p.slug));
-  return produkte.filter((p) => !p.taal || p.taal === taal || !(p.eweknie_slug && slugs.has(p.eweknie_slug)));
+  const per_slug = new Map(produkte.map((p) => [p.slug, p]));
+  return produkte.filter((p) => {
+    if (!p.taal || p.taal === taal) return true;
+    const e = p.eweknie_slug && per_slug.get(p.eweknie_slug);
+    return !(e && e.taal === taal);
+  });
 }
 
 // --- Besit -----------------------------------------------------------------
