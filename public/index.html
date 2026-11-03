@@ -57,7 +57,7 @@
           <span class="kop-titel-brand" data-i18n-html="kop_titel">Bly <span class="goud">opgeskerp</span> vir die toekoms.</span>
         </h1>
         <p class="kop-subtitel" data-i18n="kop_subtitel">Boeke, video's en kursusse vol nuwe idees.</p>
-        <a href="index.html#katalogus-rooster" class="kop-cta">
+        <a href="boeke.html" class="kop-cta">
           <span data-i18n="kop_cta">Kom kyk gerus rond</span>
           <span aria-hidden="true">→</span>
         </a>
@@ -68,11 +68,14 @@
     </div>
   </header>
 
-  <main class="katalogus-wrap">
-    <div id="katalogus-filter" class="katalogus-filter"></div>
-    <div class="rooster" id="katalogus-rooster">
-      <p class="stelsel-boodskap" data-i18n="katalogus_laai">Katalogus word gelaai …</p>
-    </div>
+  <main class="bk-wrap bk-wrap--tuis">
+    <section class="bk-ry">
+      <div class="bk-ry-kop bk-ry-kop--met-skakel">
+        <h2 class="bk-ry-titel" data-i18n="bk_nuut_op_rak">Nuut op die rak</h2>
+        <a class="bk-sien-alles" href="boeke.html"><span data-i18n="bk_sien_alles">Sien alles</span> →</a>
+      </div>
+      <div class="bk-rooster bk-rooster--vier" id="tuis-rak"></div>
+    </section>
   </main>
 
   <section class="talks-strook-wrap">
@@ -92,8 +95,8 @@
   <script src="js/mandjie.js"></script>
   <script src="js/formaat-info.js"></script>
   <script src="js/nav-rekening.js"></script>
-  <script src="js/katalogus.js"></script>
-  <script src="js/katalogus-sorteer.js"></script>
+  <script src="js/boekkaart.js"></script>
+  <script src="js/tuis-rak.js"></script>
   <script src="js/tuis-waaier.js"></script>
   <script>
     // Agtergrond-besoekteller — "fire and forget", nooit die bladsy se

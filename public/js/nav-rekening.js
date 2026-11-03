@@ -31,7 +31,7 @@
   const blad = pad.split("/").pop() || "index.html";
 
   const skakels = [
-    { href: "index.html#katalogus-rooster", teks: tt("nav_boeke", "Boeke"), aktief: blad === "produk.html" },
+    { href: "boeke.html", teks: tt("nav_boeke", "Boeke"), aktief: blad === "boeke.html" || blad === "produk.html" },
     { href: "/talks", teks: tt("nav_videos", "Video's"), aktief: /^\/(talks|talk|teater)/.test(pad) },
     { href: "https://www.futuresharp.co/courses", teks: tt("nav_kursusse", "Kursusse"), ekstern: true },
     { href: "my-boeke.html", teks: tt("my_boeke_titel", "My Leeskamer"), aktief: blad === "my-boeke.html" },

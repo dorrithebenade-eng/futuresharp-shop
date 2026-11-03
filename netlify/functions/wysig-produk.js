@@ -224,6 +224,9 @@ exports.handler = async (event, context) => {
     formate: nuwe_formate,
     etiket: "etiket" in wysigings ? kry_geldige_etiket(wysigings.etiket) : bestaande.etiket,
     isbn: "isbn" in wysigings ? kry_geldige_isbn(wysigings.isbn) : bestaande.isbn || null,
+    // "Wys op die tuisblad" (November 2026): die tuisblad se waaier kies net
+    // uit boeke met hierdie merkie, as daar drie of meer is.
+    op_tuisblad: "op_tuisblad" in wysigings ? wysigings.op_tuisblad === true : bestaande.op_tuisblad === true,
     bygewerk_op: new Date().toISOString(),
     bygewerk_deur: gebruiker.email,
   };

@@ -38,6 +38,22 @@ const WOORDEBOEK = {
     en: "Short talks of about 15 minutes by experts. Watch whenever it suits you, in your own Theatre.",
   },
   talks_strook_knoppie: { af: "Kyk na die praatjies", en: "Watch the talks" },
+  // Boeke-bladsy en die nuwe boekkaart (November 2026)
+  bk_oog: { af: "Boeke", en: "Books" },
+  bk_titel: { af: 'Lees <span class="goud">skerp</span>, lees verder.', en: 'Read <span class="goud">sharp</span>, read on.' },
+  bk_sub: {
+    af: "Elke boek wag in jou eie Leeskamer, op jou foon, tablet of rekenaar.",
+    en: "Every book waits in your own Reading Room, on your phone, tablet or computer.",
+  },
+  bk_ander_boeke: { af: "Ander boeke", en: "More books" },
+  bk_boek: { af: "Boek", en: "Book" },
+  bk_lees_nou: { af: "Lees nou", en: "Read now" },
+  bk_in_engels: { af: "In Engels", en: "In English" },
+  bk_in_afrikaans: { af: "In Afrikaans", en: "In Afrikaans" },
+  bk_ook_in_engels: { af: "Ook in Engels beskikbaar", en: "Also available in English" },
+  bk_ook_in_afrikaans: { af: "Ook in Afrikaans beskikbaar", en: "Also available in Afrikaans" },
+  bk_nuut_op_rak: { af: "Nuut op die rak", en: "New on the shelf" },
+  bk_sien_alles: { af: "Sien alles", en: "See all" },
   filter_alle: { af: "Alle", en: "All" },
   opsioneel: { af: "(opsioneel)", en: "(optional)" },
 

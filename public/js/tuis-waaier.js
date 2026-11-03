@@ -27,7 +27,16 @@
 
   function kies(produkte) {
     const met_omslag = produkte.filter((p) => p && p.omslag);
-    const gemerk = met_omslag.filter((p) => p.op_tuisblad === true);
+    // 'n Merkie op een taaluitgawe geld vir albei; dan kies ons die
+    // uitgawe in die huidige taal.
+    const taal_nou = typeof kry_huidige_taal === "function" ? kry_huidige_taal() : "af";
+    const per_slug = new Map(met_omslag.map((p) => [p.slug, p]));
+    const gemerk = met_omslag.filter((p) => {
+      const e = p.eweknie_slug && per_slug.get(p.eweknie_slug);
+      const merk = p.op_tuisblad === true || (e && e.op_tuisblad === true);
+      const in_taal = !p.taal || p.taal === taal_nou || !e;
+      return merk && in_taal;
+    });
     if (gemerk.length >= 3) return skommel(gemerk).slice(0, 3);
 
     const taal = typeof kry_huidige_taal === "function" ? kry_huidige_taal() : "af";

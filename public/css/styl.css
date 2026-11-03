@@ -4440,7 +4440,7 @@ body.vennoot-modus .paneel-dokument-skrap-knoppie {
 }
 
 /* ---------- Tuisblad: strook vir FutureSharp Talks ---------- */
-.talks-strook-wrap { max-width: 1100px; margin: 0 auto; padding: 0 24px 24px; }
+.talks-strook-wrap { max-width: 1228px; margin: 0 auto; padding: clamp(40px, 5vw, 64px) 24px 24px; }
 .talks-strook {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -4492,3 +4492,81 @@ body.vennoot-modus .paneel-dokument-skrap-knoppie {
    GEEN flex op die body nie: dit sou elke bladsy se gesentreerde houers
    (max-width + margin: 0 auto) laat krimp tot hul inhoud. */
 html:has(#nav-rekening-plek) { background: var(--ink); }
+
+/* =====================================================================
+   FASE 2 (November 2026): die Boeke-bladsy en die nuwe boekkaart
+   ===================================================================== */
+.kop--boeke .kop-kolom--een { grid-template-columns: 1fr; }
+.kop--boeke { padding-bottom: clamp(36px, 4vw, 52px); }
+.bk-chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 26px; }
+.bk-chip {
+  font-family: var(--font-liggaam); font-weight: 500; font-size: 13px;
+  color: #EDEAE3; background: transparent; border: 1px solid #4A4A45;
+  border-radius: 999px; padding: 7px 16px; cursor: pointer;
+}
+.bk-chip:hover { border-color: var(--goud); }
+.bk-chip--aan { background: var(--goud); border-color: var(--goud); color: var(--ink); }
+@media (max-width: 640px) { .bk-chips { justify-content: center; } }
+
+.bk-wrap { max-width: 1228px; margin: 0 auto; padding: 8px 24px 24px; }
+.bk-wrap--tuis { padding-top: 16px; }
+.bk-ry { padding-top: clamp(32px, 4vw, 52px); }
+.bk-ry-kop { margin-bottom: 18px; }
+.bk-ry-kop--met-skakel { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; }
+.bk-ry-titel {
+  font-family: var(--font-opskrif); font-weight: 700; font-size: clamp(20px, 2vw, 24px);
+  color: #1F1F1D; margin: 0;
+}
+.bk-ry-beskrywing { font-family: var(--font-liggaam); font-size: 14px; line-height: 1.5; color: #5F5E5A; margin: 6px 0 0; }
+.bk-sien-alles { font-family: var(--font-liggaam); font-weight: 500; font-size: 14px; color: var(--teal); text-decoration: none; white-space: nowrap; }
+.bk-sien-alles:hover { text-decoration: underline; }
+
+/* Ses kaarte op 'n ry op 'n rekenaar, sodat elke ry ewe groot kaarte het. */
+.bk-rooster { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 26px 18px; }
+.bk-rooster--vier { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 26px; }
+@media (max-width: 1024px) { .bk-rooster { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (max-width: 720px) {
+  .bk-rooster, .bk-rooster--vier { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 14px; }
+}
+
+.bk { min-width: 0; }
+.bk-vlak {
+  position: relative; display: flex; align-items: center; justify-content: center;
+  aspect-ratio: 3 / 4; background: var(--room); border-radius: 8px; padding: 12px;
+  text-decoration: none; transition: transform 0.15s ease;
+}
+.bk-vlak:hover { transform: translateY(-2px); }
+.bk-omslag {
+  height: 100%; max-width: 100%; object-fit: contain; border-radius: 3px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.14);
+}
+.bk-omslag--leeg { width: 70%; background: #E2DCCF; }
+.bk-etiket, .bk-voorbestel {
+  position: absolute; top: 10px; left: 10px;
+  font-family: var(--font-liggaam); font-weight: 600; font-size: 11px; letter-spacing: 0.04em;
+  padding: 3px 9px; border-radius: 999px; background: var(--ink); color: var(--wit);
+}
+.bk-etiket--amber { background: var(--goud); color: var(--ink); }
+.bk-etiket--koraal { background: var(--koraal); }
+.bk-etiket--teal { background: var(--teal); }
+.bk-voorbestel { top: auto; bottom: 10px; background: var(--wit); color: var(--ink); box-shadow: 0 1px 4px rgba(0,0,0,.12); }
+
+.bk-lyn { font-family: var(--font-liggaam); font-size: 12px; color: #8A877E; margin: 12px 0 3px; }
+.bk-titel { font-family: var(--font-opskrif); font-weight: 700; font-size: 14px; line-height: 1.3; margin: 0; }
+.bk-titel a { color: #1F1F1D; text-decoration: none; }
+.bk-titel a:hover { color: var(--teal); }
+.bk-onder {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 2px 6px;
+  font-family: var(--font-liggaam); font-size: 13px; color: #1F1F1D; margin: 6px 0 0;
+}
+.bk-prys { font-weight: 500; }
+.bk-skeier { color: #B5B1A7; }
+.bk-formaat {
+  background: none; border: none; padding: 0; cursor: pointer;
+  font-family: var(--font-liggaam); font-size: 13px; color: #8A877E;
+  text-decoration: underline dotted #C9C4B8; text-underline-offset: 3px;
+}
+.bk-formaat:hover { color: var(--teal); }
+.bk-gekoop { color: var(--teal); font-weight: 600; }
+.bk-lees { color: var(--teal); font-weight: 600; text-decoration: none; margin-left: 6px; }
+.bk-taal { font-family: var(--font-liggaam); font-size: 12px; color: #8A877E; margin: 4px 0 0; font-style: italic; }
