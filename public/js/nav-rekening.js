@@ -14,31 +14,64 @@
 // Vereis identiteit.js reeds gelaai. Vereis die bestaande mini-kop-
 // merk-op (mini-kop-inner > mini-kop-regs > #nav-rekening-plek).
 
-// --- 3. Skakel na Future Sharp se aanlyn kursusse (futuresharp.co) ---
-// Voeg op elke bladsy in — soos die res van hierdie lêer, een plek om te
-// onderhou i.p.v. 9 aparte HTML-lêers. Eksterne skakel, maak in 'n nuwe
-// oortjie oop (target="_blank") sodat 'n koper nie die winkel verloor nie.
+// --- 3. Die hoofskakels (November 2026) ---
+// Boeke, Video's, Kursusse, My Leeskamer en Kontak, vir ELKE besoeker, ook
+// wie nie aangemeld is nie. Voorheen het 'n besoeker net Kursusse en Kontak
+// gesien en nooit agtergekom dat daar 'n Leeskamer is nie. Een plek om te
+// onderhou i.p.v. al die aparte HTML-lêers.
+//
+// Kursusse is 'n eksterne skakel en maak in 'n nuwe oortjie oop, sodat 'n
+// koper nie die winkel verloor nie. Die skakel van die bladsy waarop die
+// besoeker is, kry .mini-kop-skakel--aktief (koraal onderstreep).
 (function () {
   const regs = document.querySelector(".mini-kop-regs");
   if (!regs) return;
+  const tt = (sleutel, terug) => (window.t ? window.t(sleutel) : terug);
+  const pad = window.location.pathname.replace(/\/+$/, "") || "/";
+  const blad = pad.split("/").pop() || "index.html";
 
-  const kursusse_skakel = document.createElement("a");
-  kursusse_skakel.href = "https://www.futuresharp.co/courses";
-  kursusse_skakel.target = "_blank";
-  kursusse_skakel.rel = "noopener";
-  kursusse_skakel.className = "mini-kop-kursusse-skakel";
-  kursusse_skakel.title = "Besigtig gerus ook ons aanlyn kursusse";
-  kursusse_skakel.textContent = window.t ? window.t("nav_kursusse") : "Kursusse";
+  const skakels = [
+    { href: "index.html#katalogus-rooster", teks: tt("nav_boeke", "Boeke"), aktief: blad === "produk.html" },
+    { href: "/talks", teks: tt("nav_videos", "Video's"), aktief: /^\/(talks|talk|teater)/.test(pad) },
+    { href: "https://www.futuresharp.co/courses", teks: tt("nav_kursusse", "Kursusse"), ekstern: true },
+    { href: "my-boeke.html", teks: tt("my_boeke_titel", "My Leeskamer"), aktief: blad === "my-boeke.html" },
+    { href: "kontak.html", teks: tt("nav_kontak", "Kontak"), aktief: blad === "kontak.html" },
+  ];
 
-  regs.insertBefore(kursusse_skakel, regs.firstChild);
+  const groep = document.createElement("nav");
+  groep.className = "mini-kop-hoofskakels";
+  groep.setAttribute("aria-label", tt("nav_hoof", "Hoofkieslys"));
+  for (const s of skakels) {
+    const a = document.createElement("a");
+    a.href = s.href;
+    a.className = "mini-kop-kursusse-skakel" + (s.aktief ? " mini-kop-skakel--aktief" : "");
+    a.textContent = s.teks;
+    if (s.ekstern) { a.target = "_blank"; a.rel = "noopener"; }
+    if (s.aktief) a.setAttribute("aria-current", "page");
+    groep.appendChild(a);
+  }
+  regs.insertBefore(groep, regs.firstChild);
+})();
 
-  const kontak_skakel = document.createElement("a");
-  kontak_skakel.href = "kontak.html";
-  kontak_skakel.className = "mini-kop-kursusse-skakel";
-  kontak_skakel.title = "Is jy 'n skrywer? Kontak ons oor jou boek";
-  kontak_skakel.textContent = window.t ? window.t("nav_kontak") : "Kontak";
-
-  regs.insertBefore(kontak_skakel, kursusse_skakel.nextSibling);
+// --- 5. Die voet (November 2026) ---
+// Een voet vir elke winkelbladsy, hier ingevoeg om dieselfde rede as die
+// skakels hierbo. "Vir skrywers" maak die skrywersafdeling op die
+// Kontak-bladsy oop (kontak.js lees #skrywer).
+(function () {
+  if (document.querySelector(".winkel-voet")) return;
+  const tt = (sleutel, terug) => (window.t ? window.t(sleutel) : terug);
+  const voet = document.createElement("footer");
+  voet.className = "winkel-voet";
+  voet.innerHTML = `
+    <div class="winkel-voet-binne">
+      <span>${tt("voet_inisiatief_a", "'n Inisiatief van")} <b>Future Sharp</b></span>
+      <span class="winkel-voet-skakels">
+        <a href="kontak.html">${tt("nav_kontak", "Kontak")}</a>
+        <a href="kontak.html#skrywer">${tt("voet_vir_skrywers", "Vir skrywers")}</a>
+      </span>
+    </div>`;
+  const doel = () => document.body.appendChild(voet);
+  if (document.body) doel(); else document.addEventListener("DOMContentLoaded", doel);
 })();
 
 // --- 1. Mobiele hamburger-kieslys (loop ongeag aanmeld-status) ---
@@ -127,7 +160,7 @@
   });
   // Maak toe as die skerm weer wyer as mobiel gemaak word (bv. rotasie).
   window.addEventListener("resize", () => {
-    if (window.innerWidth > 640) maak_toe();
+    if (window.innerWidth > 1024) maak_toe();
   });
 
   // --- Die teller, sonder om mandjie.js aan te raak ---
@@ -379,27 +412,7 @@ async function nav_is_outeur(sessie) {
   }
 })();
 
-// --- 4. AF/EN langs die handelsnaam (September 2026) ---
-// 'n Aangemelde outeur het die meeste items in die kop, en regs het AF/EN
-// dan na 'n tweede ry gespring terwyl die ruimte langs die handelsnaam leeg
-// staan. Die wisselaar skuif dus links, reg langs "Future Sharp — Future
-// Shop". Op 'n foon verander niks: die hamburger-afdeling hierbo het reeds
-// 'n kloon in die mobiele balk gesit, en styl.css verskuil hierdie een
-// onder 640px (.mini-kop-links .taal-wisselaar).
-//
-// Loop NA afdeling 1, want die kloon word van die oorspronklike gemaak.
-// taal.js koppel die knoppies eers by DOMContentLoaded, dus werk hulle ook
-// op hul nuwe plek.
-(function () {
-  const inner = document.querySelector(".mini-kop-inner");
-  const regs = document.querySelector(".mini-kop-regs");
-  const merk = inner && inner.querySelector(".mini-kop-merk");
-  const taal = regs && regs.querySelector(".taal-wisselaar");
-  if (!inner || !merk || !taal || inner.querySelector(".mini-kop-links")) return;
-
-  const links = document.createElement("div");
-  links.className = "mini-kop-links";
-  merk.parentNode.insertBefore(links, merk);
-  links.appendChild(merk);
-  links.appendChild(taal);
-})();
+// --- 4. (Afgeskakel November 2026) ---
+// AF/EN het van September af links langs die handelsnaam gestaan. In die
+// nuwe kop is daar minder items, en die woordmerk is groter; AF/EN bly dus
+// regs in .mini-kop-regs, waar 'n besoeker dit verwag.

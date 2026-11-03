@@ -24,6 +24,20 @@ const WOORDEBOEK = {
   nav_mandjie: { af: "Mandjie", en: "Cart" },
   nav_kursusse: { af: "Kursusse", en: "Courses" },
   nav_kontak: { af: "Kontak", en: "Contact" },
+  // Nuwe kop en voet (November 2026)
+  nav_boeke: { af: "Boeke", en: "Books" },
+  nav_videos: { af: "Video's", en: "Videos" },
+  nav_hoof: { af: "Hoofkieslys", en: "Main menu" },
+  voet_inisiatief_a: { af: "'n Inisiatief van", en: "An initiative of" },
+  voet_vir_skrywers: { af: "Vir skrywers", en: "For writers" },
+  // Tuisblad: die strook vir FutureSharp Talks
+  talks_strook_oog: { af: "FutureSharp Talks", en: "FutureSharp Talks" },
+  talks_strook_titel: { af: "Een skerp idee op 'n slag.", en: "One sharp idea at a time." },
+  talks_strook_teks: {
+    af: "Kort praatjies van sowat 15 minute deur kundiges. Kyk wanneer dit jou pas, in jou eie Teater.",
+    en: "Short talks of about 15 minutes by experts. Watch whenever it suits you, in your own Theatre.",
+  },
+  talks_strook_knoppie: { af: "Kyk na die praatjies", en: "Watch the talks" },
   filter_alle: { af: "Alle", en: "All" },
   opsioneel: { af: "(opsioneel)", en: "(optional)" },
 
@@ -257,7 +271,8 @@ const WOORDEBOEK = {
   // Kop (tuisblad)
   // Tuisblad (November 2026): uitnodigend, nie verduidelikend nie.
   kop_eyebrow: { af: "Welkom by Future Shop", en: "Welcome to Future Shop" },
-  kop_titel: { af: "Bly opgeskerp vir die toekoms.", en: "Stay sharp for the future." },
+  // data-i18n-html: een woord in goud (.goud).
+  kop_titel: { af: 'Bly <span class="goud">opgeskerp</span> vir die toekoms.', en: 'Stay <span class="goud">sharp</span> for the future.' },
   kop_subtitel: { af: "Boeke, video's en kursusse vol nuwe idees.", en: "Books, videos and courses full of new ideas." },
   kop_cta: { af: "Kom kyk gerus rond", en: "Take a look around" },
   kop_cta_nota: { af: "Ons het dalk iets waarby jy kan baatvind.", en: "You may well find something that's right for you." },
@@ -3895,6 +3910,12 @@ function t_in(sleutel, taal) {
 function pas_i18n_toe() {
   document.querySelectorAll("[data-i18n]").forEach((el) => {
     el.textContent = t(el.dataset.i18n);
+  });
+  // data-i18n-html: vir die paar sleutels wat self opmaak dra (bv. een woord
+  // in goud in die tuisblad se opskrif). Net vir teks uit hierdie woordeboek,
+  // nooit vir iets wat 'n gebruiker ingetik het nie.
+  document.querySelectorAll("[data-i18n-html]").forEach((el) => {
+    el.innerHTML = t(el.dataset.i18nHtml);
   });
   document.documentElement.lang = kry_huidige_taal() === "en" ? "en" : "af";
 }

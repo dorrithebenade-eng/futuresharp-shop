@@ -62,3 +62,12 @@ function bou_leser_mailto_skakel() {
 
 document.addEventListener("DOMContentLoaded", bou_kontak_mailto_skakel);
 document.addEventListener("DOMContentLoaded", bou_leser_mailto_skakel);
+
+// "Vir skrywers" in die voet skakel na kontak.html#skrywer: vou dan die
+// skrywersafdeling dadelik oop.
+document.addEventListener("DOMContentLoaded", () => {
+  if (window.location.hash === "#skrywer") {
+    const d = document.getElementById("skrywer");
+    if (d) d.open = true;
+  }
+});

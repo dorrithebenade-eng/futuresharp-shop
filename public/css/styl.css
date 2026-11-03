@@ -4238,3 +4238,257 @@ body.vennoot-modus .paneel-dokument-skrap-knoppie {
   .bondel-ry { grid-template-columns: 1fr; }
   .bondel-kop { display: none; }
 }
+
+/* =====================================================================
+   NUWE WINKELSTYL (November 2026), fase 1: kop, tuisblad-band en voet
+   ---------------------------------------------------------------------
+   Sien "Winkelfront-Herontwerp-November-2026" in die projek. Die kop is
+   wit met die woordmerk; die tuisblad se band is ink-swart met een woord
+   in goud; koraal net vir die hoofaksie.
+
+   GESKOPEER MET :has(#nav-rekening-plek). Die paneelbord, faktuurpaneel en
+   ander personeelbladsye gebruik ook .mini-kop, maar sonder
+   #nav-rekening-plek; hulle bly dus presies soos hulle was. Geen HTML-lêer
+   hoef 'n nuwe klas te kry nie.
+
+   DIE HAMBURGER KOM NOU BY 1024px in (was 640px) vir die winkelkop. Die
+   kop het vyf hoofskakels plus mandjie, profiel en AF/EN; tussen 640 en
+   1024 het die ou kop oorgeloop en sywaarts gerol. nav-rekening.js maak die
+   paneel toe bo 1024px.
+   ===================================================================== */
+:root {
+  --ink: #1B1B19;
+  --goud: #E9C46A;
+  --room: #F3EFE7;
+  --houtskool: #2A2A28;
+  --rand-lig: #ECE7DD;
+}
+
+.mini-kop:has(#nav-rekening-plek) {
+  background: var(--wit);
+  color: var(--houtskool);
+  border-bottom: 1px solid var(--rand-lig);
+  padding: 14px 24px;
+}
+.mini-kop:has(#nav-rekening-plek) .mini-kop-inner { max-width: 1180px; gap: 24px; }
+
+/* Die woordmerk vervang die teks "Future Sharp — Future Shop". Die teks
+   bly vir skermlesers, net onsigbaar. */
+.mini-kop:has(#nav-rekening-plek) .mini-kop-merk {
+  display: block;
+  width: 220px;
+  height: 52px;
+  background: url("/images/future-shop-woordmerk-kop.png") left center / contain no-repeat;
+  position: relative;
+  flex-shrink: 0;
+}
+.mini-kop:has(#nav-rekening-plek) .mini-kop-merk > span {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap;
+}
+
+.mini-kop:has(#nav-rekening-plek) .mini-kop-regs {
+  flex-wrap: nowrap;
+  gap: 22px;
+}
+.mini-kop-hoofskakels { display: flex; align-items: center; gap: 26px; }
+.mini-kop:has(#nav-rekening-plek) .mini-kop-kursusse-skakel,
+.mini-kop:has(#nav-rekening-plek) .nav-rekening-skakel,
+.mini-kop:has(#nav-rekening-plek) .mini-kop-mandjie {
+  color: var(--houtskool);
+  font-weight: 500;
+  font-size: 14px;
+  opacity: 1;
+  white-space: nowrap;
+}
+.mini-kop:has(#nav-rekening-plek) .mini-kop-kursusse-skakel:hover,
+.mini-kop:has(#nav-rekening-plek) .nav-rekening-skakel:hover { color: var(--teal); text-decoration: none; }
+.mini-kop-skakel--aktief {
+  font-weight: 600 !important;
+  box-shadow: inset 0 -2px 0 var(--koraal);
+  padding-bottom: 4px;
+}
+
+/* Die mandjie: net die ikoon met sy teller; die woord bly vir skermlesers. */
+.mini-kop:has(#nav-rekening-plek) .mini-kop-mandjie [data-i18n="nav_mandjie"] {
+  position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0);
+}
+.mini-kop:has(#nav-rekening-plek) .mini-kop-mandjie { position: relative; gap: 4px; }
+
+/* "Meld aan" as 'n pil met 'n buitelyn. */
+.mini-kop:has(#nav-rekening-plek) .mini-kop-rekening {
+  color: var(--houtskool);
+  border: 1px solid #D9D3C7;
+  border-radius: 999px;
+  padding: 7px 16px;
+}
+.mini-kop:has(#nav-rekening-plek) .mini-kop-rekening:hover { border-color: var(--teal); color: var(--teal); }
+
+/* Aangemeld: My Leeskamer staan reeds in die hoofskakels. */
+.mini-kop:has(#nav-rekening-plek) .nav-rekening-groep > a[href="my-boeke.html"] { display: none; }
+.mini-kop:has(#nav-rekening-plek) .nav-rekening-skakel--gedemp { color: #8A877E; }
+
+/* AF/EN: stil en lig. */
+.mini-kop:has(#nav-rekening-plek) .taal-wisselaar { border-color: #D9D3C7; }
+.mini-kop:has(#nav-rekening-plek) .taal-knoppie { color: #8A877E; }
+.mini-kop:has(#nav-rekening-plek) .taal-knoppie:hover { color: var(--houtskool); }
+.mini-kop:has(#nav-rekening-plek) .taal-knoppie-aktief { background: var(--houtskool); color: var(--wit); }
+
+/* Die mobiele balk en hamburger op 'n wit kop. */
+.mini-kop:has(#nav-rekening-plek) .kop-mandjie { color: var(--houtskool); }
+.mini-kop:has(#nav-rekening-plek) .mini-kop-hamburger span { background: var(--houtskool); }
+
+@media (max-width: 1024px) {
+  .mini-kop:has(#nav-rekening-plek) .mini-kop-merk { width: 170px; height: 40px; }
+  .mini-kop:has(#nav-rekening-plek) .mini-kop-hamburger { display: flex; }
+  .mini-kop:has(#nav-rekening-plek) .mini-kop-mobiel-balk { display: flex; }
+  .mini-kop:has(#nav-rekening-plek) .kop-mandjie { display: inline-flex; }
+  .mini-kop:has(#nav-rekening-plek) .mini-kop-regs .taal-wisselaar { display: none; }
+  .mini-kop:has(#nav-rekening-plek) .mini-kop-regs {
+    position: fixed; top: 0; right: 0; bottom: 0;
+    width: 78%; max-width: 320px;
+    background: var(--wit);
+    flex-direction: column; align-items: stretch; justify-content: flex-start;
+    gap: 20px; padding: 20px 24px 32px;
+    transform: translateX(100%); transition: transform 0.25s ease;
+    z-index: 50; overflow-y: auto;
+    box-shadow: -12px 0 32px rgba(0, 0, 0, 0.12);
+  }
+  .mini-kop:has(#nav-rekening-plek) .mini-kop-regs.mini-kop-regs-oop { transform: translateX(0); }
+  .mini-kop:has(#nav-rekening-plek) .mini-kop-regs-toemaak { display: block; color: var(--houtskool); }
+  .mini-kop:has(#nav-rekening-plek) ~ .mini-kop-regs-agtergrond,
+  .mini-kop-regs-agtergrond { }
+  .mini-kop-hoofskakels { flex-direction: column; align-items: flex-start; gap: 18px; }
+  .mini-kop:has(#nav-rekening-plek) .mini-kop-kursusse-skakel,
+  .mini-kop:has(#nav-rekening-plek) .nav-rekening-skakel { font-size: 16px; }
+  .mini-kop:has(#nav-rekening-plek) .mini-kop-mandjie { display: none; }
+  .mini-kop:has(#nav-rekening-plek) .nav-rekening-groep {
+    flex-direction: column; align-items: flex-start; gap: 16px; width: 100%;
+    border-top: 1px solid var(--rand-lig); padding-top: 18px;
+  }
+  .mini-kop:has(#nav-rekening-plek) .nav-rekening-epos-mobiel { display: block; color: #8A877E; font-size: 13px; }
+  .mini-kop:has(#nav-rekening-plek) .mini-kop-rekening { align-self: flex-start; }
+}
+
+/* Die agtergrond agter die oop skyfie-paneel. In die ou kop het dit by
+   640px aangeskakel; vir die winkelkop moet dit tot by 1024px werk. */
+@media (max-width: 1024px) {
+  body:has(#nav-rekening-plek) .mini-kop-regs-agtergrond {
+    position: fixed; inset: 0; background: rgba(0, 0, 0, 0.35); z-index: 40;
+  }
+  body:has(#nav-rekening-plek) .mini-kop-regs-agtergrond:not(.mini-kop-regs-agtergrond-oop) { display: none; }
+  body:has(#nav-rekening-plek) .mini-kop-regs-agtergrond.mini-kop-regs-agtergrond-oop { display: block; }
+}
+
+/* ---------- Tuisblad: die donker band ---------- */
+.kop {
+  background: var(--ink);
+  padding: clamp(44px, 6vw, 76px) 24px clamp(48px, 6vw, 80px);
+}
+.kop-kolom { grid-template-columns: 1.1fr 1fr; max-width: 1180px; }
+.kop-eyebrow {
+  background: none;
+  color: var(--goud);
+  padding: 0;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  margin-bottom: 16px;
+}
+.kop-titel-brand {
+  color: var(--wit);
+  text-shadow: none;
+  font-size: clamp(32px, 4.6vw, 54px);
+  letter-spacing: -0.01em;
+}
+.kop-titel-brand .goud { color: var(--goud); }
+.kop-subtitel { color: #C9C5BB; font-size: clamp(16px, 1.5vw, 18px); max-width: 480px; }
+.kop-cta {
+  background: var(--koraal);
+  font-size: 15px;
+  padding: 14px 28px;
+  margin-top: 28px;
+}
+.kop-cta:hover { background: #D94C2A; }
+.kop-cta-nota { color: #A9A59B; margin-top: 12px; }
+
+/* Die waaier van drie omslae. */
+.kop-waaier {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  aspect-ratio: 440 / 330;
+  justify-self: center;
+}
+.kop-waaier-omslag {
+  position: absolute;
+  width: 47%;
+  aspect-ratio: 2 / 2.85;
+  object-fit: cover;
+  border-radius: 4px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.kop-waaier--gereed .kop-waaier-omslag { opacity: 1; }
+.kop-waaier-omslag--1 { left: 0; top: 8%; transform: rotate(-8deg); z-index: 1; }
+.kop-waaier-omslag--2 { left: 26.5%; top: 0; z-index: 3; }
+.kop-waaier-omslag--3 { right: 0; top: 8%; transform: rotate(8deg); z-index: 2; }
+
+@media (max-width: 640px) {
+  .kop-kolom { grid-template-columns: 1fr; }
+  .kop-waaier { max-width: 300px; margin: 36px auto 0; order: 2; }
+}
+
+/* ---------- Tuisblad: strook vir FutureSharp Talks ---------- */
+.talks-strook-wrap { max-width: 1100px; margin: 0 auto; padding: 0 24px 24px; }
+.talks-strook {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  background: var(--ink);
+  border-radius: 14px;
+  overflow: hidden;
+  text-decoration: none;
+}
+.talks-strook-beeld { display: block; width: 100%; height: 100%; object-fit: cover; }
+.talks-strook-teks { padding: 32px 40px; }
+.talks-strook-oog {
+  font-family: var(--font-liggaam); font-weight: 600; font-size: 12px;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--goud); margin: 0 0 10px;
+}
+.talks-strook-titel {
+  font-family: var(--font-opskrif); font-weight: 800; font-size: clamp(22px, 2.6vw, 30px);
+  line-height: 1.15; color: var(--wit); margin: 0;
+}
+.talks-strook-lei {
+  font-family: var(--font-liggaam); font-size: 15px; line-height: 1.55; color: #C9C5BB; margin: 12px 0 22px;
+}
+.talks-strook-knoppie {
+  display: inline-flex; gap: 8px; align-items: center;
+  background: var(--teal); color: var(--wit);
+  font-family: var(--font-liggaam); font-weight: 600; font-size: 15px;
+  padding: 13px 26px; border-radius: 999px;
+}
+.talks-strook:hover .talks-strook-knoppie { background: #3B8C80; }
+@media (max-width: 720px) {
+  .talks-strook { grid-template-columns: 1fr; }
+  .talks-strook-teks { padding: 24px 22px 28px; }
+}
+
+/* ---------- Voet ---------- */
+.winkel-voet { background: var(--ink); color: #A9A59B; margin-top: 56px; }
+.winkel-voet-binne {
+  max-width: 1228px; margin: 0 auto; padding: 36px 24px;
+  display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap;
+  font-family: var(--font-liggaam); font-size: 13px;
+}
+.winkel-voet b { color: #EDEAE3; font-weight: 600; }
+.winkel-voet-skakels { display: flex; gap: 22px; }
+.winkel-voet-skakels a { color: #C9C5BB; text-decoration: none; }
+.winkel-voet-skakels a:hover { color: var(--wit); }
+
+/* Op 'n kort bladsy (bv. Kontak) loop die voet se ink tot onder aan die
+   venster, in plaas van 'n leë strook onder die voet.
+   GEEN flex op die body nie: dit sou elke bladsy se gesentreerde houers
+   (max-width + margin: 0 auto) laat krimp tot hul inhoud. */
+html:has(#nav-rekening-plek) { background: var(--ink); }

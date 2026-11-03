@@ -18,8 +18,7 @@
   </script>
   <title>Future Shop — Boeke</title>
   <link rel="stylesheet" href="css/styl.css">
-  <link rel="stylesheet" href="css/fst-pil.css">
-  <link rel="icon" href="/icons/ikoon-32.png" sizes="32x32" type="image/png">
+    <link rel="icon" href="/icons/ikoon-32.png" sizes="32x32" type="image/png">
   <link rel="icon" href="/icons/ikoon-16.png" sizes="16x16" type="image/png">
   <link rel="apple-touch-icon" href="/icons/apple-touch-ikoon.png">
   <link rel="manifest" href="/manifest.json">
@@ -52,13 +51,10 @@
   </header>
   <header class="kop">
     <div class="kop-kolom">
-      <div class="kop-blokke" aria-hidden="true">
-        <img src="images/future-shop-woordmerk.png" alt="" class="kop-woordmerk">
-      </div>
       <div class="kop-inhoud">
         <p class="kop-eyebrow" data-i18n="kop_eyebrow">Welkom by Future Shop</p>
         <h1 class="kop-titel">
-          <span class="kop-titel-brand" data-i18n="kop_titel">Bly opgeskerp vir die toekoms.</span>
+          <span class="kop-titel-brand" data-i18n-html="kop_titel">Bly <span class="goud">opgeskerp</span> vir die toekoms.</span>
         </h1>
         <p class="kop-subtitel" data-i18n="kop_subtitel">Boeke, video's en kursusse vol nuwe idees.</p>
         <a href="index.html#katalogus-rooster" class="kop-cta">
@@ -67,6 +63,8 @@
         </a>
         <p class="kop-cta-nota" data-i18n="kop_cta_nota">Ons het dalk iets waarby jy kan baatvind.</p>
       </div>
+      <!-- Drie omslae in 'n waaier; tuis-waaier.js kies hulle. -->
+      <div class="kop-waaier" id="kop-waaier" aria-hidden="true"></div>
     </div>
   </header>
 
@@ -76,14 +74,27 @@
       <p class="stelsel-boodskap" data-i18n="katalogus_laai">Katalogus word gelaai …</p>
     </div>
   </main>
+
+  <section class="talks-strook-wrap">
+    <a href="/talks" class="talks-strook">
+      <img src="images/talks-strook.jpg" alt="FutureSharp Talks" class="talks-strook-beeld">
+      <div class="talks-strook-teks">
+        <p class="talks-strook-oog" data-i18n="talks_strook_oog">FutureSharp Talks</p>
+        <h2 class="talks-strook-titel" data-i18n="talks_strook_titel">Een skerp idee op 'n slag.</h2>
+        <p class="talks-strook-lei" data-i18n="talks_strook_teks">Kort praatjies van sowat 15 minute deur kundiges. Kyk wanneer dit jou pas, in jou eie Teater.</p>
+        <span class="talks-strook-knoppie"><span data-i18n="talks_strook_knoppie">Kyk na die praatjies</span> <span aria-hidden="true">→</span></span>
+      </div>
+    </a>
+  </section>
+
   <script src="js/taal.js"></script>
-  <script src="js/fst-pil.js"></script>
   <script src="js/identiteit.js"></script>
   <script src="js/mandjie.js"></script>
   <script src="js/formaat-info.js"></script>
   <script src="js/nav-rekening.js"></script>
   <script src="js/katalogus.js"></script>
   <script src="js/katalogus-sorteer.js"></script>
+  <script src="js/tuis-waaier.js"></script>
   <script>
     // Agtergrond-besoekteller — "fire and forget", nooit die bladsy se
     // werking laat wag of breek as dit misluk nie. Geen persoonlike
