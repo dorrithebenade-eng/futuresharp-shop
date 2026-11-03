@@ -42,8 +42,9 @@ function fst_talk_teken(talk, kategoriee) {
         </div>
         <h1 class="fst-profiel-titel">${fst_esc(talk.titel)}</h1>
         <p class="fst-profiel-wie">${fst_esc(talk.spreker)}</p>
-        <h2>${fst_esc(t("fst_oor_talk"))}</h2>
-        <div class="fst-teks">${beskrywing}</div>
+        ${beskrywing.replace(/<p><\/p>/g, "").trim() ? `
+          <h2>${fst_esc(t("fst_oor_talk"))}</h2>
+          <div class="fst-teks">${beskrywing}</div>` : ""}
         ${fst_sleutelwoorde(talk).length ? `
           <h2>${fst_esc(t("fst_sleutelwoorde"))}</h2>
           <div class="fst-sleutels">${fst_sleutelwoorde(talk).map((w) => `<a href="/talks?soek=${encodeURIComponent(w)}">${fst_esc(w)}</a>`).join("")}</div>` : ""}
@@ -202,9 +203,86 @@ async function fst_talk_besit(slug) {
   }
 }
 
+// 'n Gratis talk (prys R0, sonder toegangskode) speel reg hier op die
+// bladsy, vir enigiemand, ook sonder 'n profiel (November 2026).
+function fst_talk_is_gratis(talk) {
+  const v = talk.video || {};
+  return !!talk.koopbaar && !v.net_koepon && !v.prys_sent;
+}
+
+let fst_mux_laai = null;
+function fst_laai_mux_speler() {
+  if (customElements.get("mux-player")) return Promise.resolve();
+  if (!fst_mux_laai) {
+    fst_mux_laai = new Promise((klaar, fout) => {
+      const s = document.createElement("script");
+      s.src = "https://cdn.jsdelivr.net/npm/@mux/mux-player";
+      s.onload = () => customElements.whenDefined("mux-player").then(klaar);
+      s.onerror = fout;
+      document.head.appendChild(s);
+    });
+  }
+  return fst_mux_laai;
+}
+
+async function fst_talk_speel(talk, knop) {
+  const skerm = document.querySelector(".fst-omslag-groot");
+  const fout = document.getElementById("fst-koop-fout");
+  fout.hidden = true;
+  const oud = knop.textContent;
+  knop.disabled = true;
+  knop.textContent = t("fst_besig");
+  try {
+    const [resp] = await Promise.all([
+      fetch(`/.netlify/functions/kry-kyk-token?slug=${encodeURIComponent(talk.slug)}`, { headers: await identiteit_kop() }),
+      fst_laai_mux_speler(),
+    ]);
+    if (!resp.ok) throw new Error(await resp.text());
+    const data = await resp.json();
+    const speler = document.createElement("mux-player");
+    speler.setAttribute("playback-id", data.playback_id);
+    speler.setAttribute("playback-token", data.tokens.playback);
+    speler.setAttribute("thumbnail-token", data.tokens.thumbnail);
+    speler.setAttribute("storyboard-token", data.tokens.storyboard);
+    speler.setAttribute("stream-type", "on-demand");
+    speler.setAttribute("accent-color", "#F1BD43");
+    speler.setAttribute("primary-color", "#FFFFFF");
+    speler.setAttribute("metadata-video-title", talk.titel);
+    speler.setAttribute("metadata-video-id", talk.slug);
+    speler.setAttribute("title", talk.titel);
+    speler.setAttribute("autoplay", "");
+    skerm.innerHTML = "";
+    skerm.classList.add("fst-omslag-speel");
+    skerm.appendChild(speler);
+    skerm.scrollIntoView({ behavior: "smooth", block: "center" });
+    knop.hidden = true;
+  } catch (e) {
+    console.error("Kon nie die video laai nie:", e);
+    fout.textContent = t("fst_speler_fout");
+    fout.hidden = false;
+    knop.disabled = false;
+    knop.textContent = oud;
+  }
+}
+
 async function fst_talk_knoppie(talk) {
   const knop = document.getElementById("fst-koop-knop");
   if (!knop) return;
+
+  if (fst_talk_is_gratis(talk)) {
+    knop.disabled = false;
+    knop.textContent = t("fst_kyk_nou");
+    knop.onclick = () => fst_talk_speel(talk, knop);
+    const omslag = document.querySelector(".fst-omslag-groot");
+    if (omslag) {
+      omslag.classList.add("fst-omslag-klik");
+      omslag.insertAdjacentHTML("beforeend", `<span class="fst-speel-ikoon" aria-hidden="true"></span>`);
+      omslag.onclick = () => { if (!knop.hidden && !knop.disabled) fst_talk_speel(talk, knop); };
+    }
+    knop.insertAdjacentHTML("beforebegin", `<div class="fst-koop-prys">${fst_esc(t("fst_gratis"))}</div>`);
+    knop.insertAdjacentHTML("afterend", `<p class="fst-gratis-nota">${fst_esc(t("fst_gratis_nota"))}</p>`);
+    return;
+  }
 
   if (await fst_talk_besit(talk.slug)) {
     knop.disabled = false;

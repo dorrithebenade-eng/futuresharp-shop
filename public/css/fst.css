@@ -320,3 +320,12 @@
 .fst-koepon-nota a { color: var(--amber); text-decoration: underline; word-break: break-all; }
 /* hidden moet display: grid/block klop */
 .fst-koepon-ry[hidden], .fst-knop[hidden], .fst-koepon-nota[hidden] { display: none; }
+
+/* Gratis talk: speel reg op die talk-bladsy (November 2026). */
+.fst-omslag-klik { cursor: pointer; }
+.fst-speel-ikoon { position: absolute; left: 50%; top: 50%; width: 76px; height: 76px; margin: -38px 0 0 -38px; border-radius: 50%; background: rgba(255, 255, 255, 0.92); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35); transition: transform 0.2s ease; }
+.fst-speel-ikoon::after { content: ""; position: absolute; left: 31px; top: 24px; border-style: solid; border-width: 14px 0 14px 22px; border-color: transparent transparent transparent #171717; }
+.fst-omslag-klik:hover .fst-speel-ikoon { transform: scale(1.06); }
+.fst-omslag-speel { cursor: default; background: #000; }
+.fst-omslag-speel mux-player { display: block; width: 100%; height: 100%; --media-object-fit: contain; }
+.fst-gratis-nota { margin: 10px 0 0; font-size: 13px; color: var(--fst-sag); }
