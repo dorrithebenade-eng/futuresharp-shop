@@ -221,6 +221,8 @@ function wys_voortgang() {
   document.getElementById("leser-voortgang-balk").style.width = `${persentasie}%`;
   // Die skuifbalk onderaan (leser-skuif.js) volg dieselfde bladsy.
   if (typeof window.leser_skuif_werk_by === "function") window.leser_skuif_werk_by(huidige_bladsy, totale_bladsye);
+  // Inhoud en boekmerke (leser-inhoud.js) luister hierna.
+  document.dispatchEvent(new CustomEvent("leser-bladsy", { detail: { bladsy: huidige_bladsy, totaal: totale_bladsye } }));
 }
 
 async function wys_bladsy(nommer, opsies = {}) {
