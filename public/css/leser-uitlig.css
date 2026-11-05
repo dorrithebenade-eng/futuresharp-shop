@@ -1,0 +1,108 @@
+/* leser-uitlig.css — tekslaag en uitligte in die leser (November 2026).
+   Geld vir leser.html en paneel-leser.html. */
+
+/* Die uitligte lê tussen die prent en die tekslaag. multiply hou die
+   letters donker en leesbaar deur die kleur. Breuke van die bladsy, dus
+   volg hulle elke zoemvlak vanself. */
+.leser-uitlig-laag {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+}
+.leser-uitlig { position: absolute; border-radius: 2px; }
+.leser-uitlig-geel { background: rgba(242, 203, 76, 0.55); }
+.leser-uitlig-groen { background: rgba(124, 196, 107, 0.5); }
+.leser-uitlig-pienk { background: rgba(233, 138, 171, 0.5); }
+
+/* PDF.js se tekslaag: onsigbare letters presies oor die prent. */
+.leser-teks-laag {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  overflow: hidden;
+  line-height: 1;
+  -webkit-user-select: text;
+  user-select: text;
+  -webkit-touch-callout: none;
+}
+.leser-teks-laag > span {
+  color: transparent;
+  position: absolute;
+  white-space: pre;
+  cursor: text;
+  transform-origin: 0% 0%;
+}
+.leser-teks-einde {
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 100%;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  cursor: default;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.leser-teks-kies .leser-teks-einde { top: 0; }
+.leser-teks-laag ::selection { background: rgba(71, 159, 145, 0.35); }
+.leser-teks-laag ::-moz-selection { background: rgba(71, 159, 145, 0.35); }
+
+/* Die strokie bo (of onder) die keuse. */
+.leser-uitlig-strook {
+  position: absolute;
+  z-index: 35;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  background: #1B1B19;
+  border-radius: 999px;
+  box-shadow: 0 6px 18px rgba(23, 23, 23, 0.25);
+}
+.leser-uitlig-strook[hidden] { display: none; }
+
+.leser-uitlig-kleur {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid #1B1B19;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.25);
+  cursor: pointer;
+  padding: 0;
+}
+.leser-uitlig-kleur:hover { box-shadow: 0 0 0 2px #FFFFFF; }
+.leser-uitlig-kleur-aan { box-shadow: 0 0 0 2px #FFFFFF; }
+
+.leser-uitlig-skei { width: 1px; height: 20px; background: #55534E; }
+
+.leser-uitlig-aksie {
+  background: none;
+  border: 0;
+  color: #FFFFFF;
+  font-family: var(--font-liggaam);
+  font-size: 13px;
+  padding: 4px 6px;
+  cursor: pointer;
+}
+.leser-uitlig-aksie:hover { color: #E9C46A; }
+
+/* My uitligte in die Inhoud-lys. */
+.leser-inhoud-strepie {
+  width: 4px;
+  align-self: stretch;
+  border-radius: 2px;
+  flex-shrink: 0;
+  margin-right: 4px;
+}
+.leser-inhoud-aanhaling {
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--swart);
+  overflow-wrap: anywhere;
+}
+.leser-inhoud-uitlig .leser-inhoud-merk-spring { align-items: stretch; }
+.leser-inhoud-uitlig .leser-inhoud-bl { margin-top: 2px; }
+.leser-inhoud-ou { color: #854F0B; }

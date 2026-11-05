@@ -49,15 +49,20 @@
   margin-top: 6px;
 }
 
+/* Afdelingsopskrifte (5 Nov 2026): groter en donker teal, met 'n dun
+   teal-lyn onder, sodat Hoofstukke, My boekmerke en My uitligte duidelik
+   as afdelings lees en nie tussen die reëls verdwyn nie. */
 .leser-inhoud-kop {
-  margin: 0;
-  padding: 12px 14px 4px;
-  font-family: var(--font-liggaam);
-  font-size: 11px;
-  letter-spacing: 0.02em;
-  color: var(--grys-teks);
+  margin: 0 14px 4px;
+  padding: 14px 0 6px;
+  font-family: var(--font-opskrif);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: #0F6E56;
+  border-bottom: 2px solid #9FD6CB;
 }
-.leser-inhoud-kop-skei { border-top: 1px solid #E8E6E1; margin-top: 6px; }
+.leser-inhoud-kop-skei { margin-top: 10px; }
 
 .leser-inhoud-ry,
 .leser-inhoud-merk-spring {
