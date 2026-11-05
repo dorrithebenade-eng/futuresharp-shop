@@ -449,7 +449,9 @@ async function laai_leser() {
 
   const sessie = await identiteit_kry_huidige_sessie();
   if (!sessie || !sessie.access_token) {
-    window.location.href = `/aanmeld.html?terug=${encodeURIComponent(
+    // paneel-leser.html stel LESER_AANMELD_PAD: die admin meld by die
+    // paneelbord aan, nie by die winkel nie.
+    window.location.href = window.LESER_AANMELD_PAD || `/aanmeld.html?terug=${encodeURIComponent(
       `/leser.html?boek=${produk_slug}`
     )}`;
     return;

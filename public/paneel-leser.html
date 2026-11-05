@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<!-- paneel-leser.html (November 2026): dieselfde leser as leser.html, vir die
+     admin uit die paneelbord se My Leeskamer. Verskil van leser.html:
+     - gebruik die PANEEL se aanmelding (sien PANEEL_BLADSYE in identiteit.js);
+     - die terugskakel gaan na paneelbord.html#my-leeskamer;
+     - geen PWA/manifest en geen aflyn-kopie nie: die admin moet altyd die
+       nuutste PDF sien, en die plaaslike kopie is per boek, nie per rekening
+       nie, sodat dit met die winkel se kopie sou bots. -->
+<html lang="af">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Lees (admin) — Future Shop</title>
+  <link rel="stylesheet" href="css/styl.css">
+
+  <link rel="icon" href="/icons/ikoon-32.png" sizes="32x32" type="image/png">
+  <link rel="icon" href="/icons/ikoon-16.png" sizes="16x16" type="image/png"></head>
+<body class="leser-liggaam">
+  <!-- VOLSKERM-LEESMODUS. Die winkel se .mini-kop is weg van hierdie
+       bladsy af: dit was vasgeplak en het die boonste deel van die bladsy
+       bedek, en die leser moes rol om 'n bladsy klaar te lees. Nou vul
+       .leser-skerm presies die skerm: een dun kopbalk, die bladsy in die
+       middel (heel sigbaar, sien wys_bladsy in leser.js), en die
+       blaai-knoppies onderaan, altyd in sig. -->
+  <div class="leser-skerm">
+    <header class="leser-kopbalk">
+      <a href="paneelbord.html#my-leeskamer" class="leser-terug" id="leser-terug" aria-label="Terug na die paneel" title="Terug na die paneel"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></a>
+      <h1 class="leser-titel" id="leser-titel"></h1>
+      <button type="button" id="leser-leen-etiket" class="leser-leen-etiket" aria-expanded="false" aria-controls="leser-leen-paneel" hidden></button>
+      <div class="leser-zoom-groep">
+        <button type="button" id="leser-zoom-uit" class="leser-nutsknoppie" aria-label="Zoem uit">−</button>
+        <span id="leser-zoem-persentasie" class="leser-zoem-persentasie">100%</span>
+        <button type="button" id="leser-zoom-in" class="leser-nutsknoppie" aria-label="Zoem in">+</button>
+      </div>
+      <button type="button" id="leser-soek-knoppie" class="leser-nutsknoppie" aria-label="Soek in boek" aria-expanded="false" aria-controls="leser-soek-vorm">🔍</button>
+    </header>
+
+    <div id="leser-leen-paneel" class="leser-leen-paneel" hidden>
+      <p id="leser-leen-boodskap" class="leser-leen-boodskap"></p>
+      <button type="button" id="leser-opgradering-knoppie" class="my-boek-opgradering-knoppie" hidden></button>
+    </div>
+
+    <div id="leser-weergawe-kennisgewing" class="leser-weergawe-kennisgewing" role="status" hidden>
+      <p data-i18n="leser_weergawe_opgedateer">Hierdie boek is bygewerk na 'n nuwer weergawe. Jou leesplek is so na as moontlik behou.</p>
+      <button type="button" id="leser-weergawe-toemaak" class="leser-weergawe-toemaak" aria-label="Maak toe">×</button>
+    </div>
+
+    <form id="leser-soek-vorm" class="leser-soek-vorm" hidden>
+      <input type="search" id="leser-soek-invoer" class="leser-soek-invoer" placeholder="Soek in boek…">
+      <button type="submit" class="leser-nutsknoppie" aria-label="Soek">→</button>
+      <span id="leser-soek-status" class="leser-soek-status" aria-live="polite"></span>
+    </form>
+
+    <div class="leser-voortgang-wrap">
+      <div id="leser-voortgang-balk" class="leser-voortgang-balk"></div>
+    </div>
+
+    <div id="leser-status" class="stelsel-boodskap" aria-live="polite"></div>
+
+    <main id="leser-bekyker" class="leser-bekyker" hidden>
+      <div class="leser-bladsy-omhulsel">
+        <div class="leser-bladsy-posisie">
+          <canvas id="leser-canvas"></canvas>
+          <div id="leser-skakel-laag" class="leser-skakel-laag"></div>
+        </div>
+      </div>
+      <footer class="leser-onderbalk">
+        <div class="leser-nutsbalk-groep">
+          <button type="button" id="leser-vorige" class="leser-nutsknoppie leser-blaaiknoppie" aria-label="Vorige bladsy">‹</button>
+          <span class="leser-bladsy-teller">
+            <input type="number" id="leser-bladsy-invoer" class="leser-bladsy-invoer" min="1" value="1">
+            <span data-i18n="leser_van">van</span>
+            <span id="leser-totaal-bladsye">—</span>
+          </span>
+          <button type="button" id="leser-volgende" class="leser-nutsknoppie leser-blaaiknoppie" aria-label="Volgende bladsy">›</button>
+        </div>
+        <p class="leser-lisensie-nota" id="leser-lisensie-nota"></p>
+      </footer>
+    </main>
+  </div>
+
+  <script src="js/taal.js"></script>
+  <script src="js/identiteit.js"></script>
+  <script src="js/mandjie.js"></script>
+  <script src="js/sessie-verval.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.min.js"></script>
+  <script src="js/leser-aflyn.js"></script>
+  <script>
+    window.LESER_AANMELD_PAD = "/paneelbord.html";
+    window.aflyn_kry_boek = async () => null;
+    window.aflyn_stoor_boek = async () => {};
+    window.aflyn_verwyder_boek = async () => {};
+    // 'n Verlope sessie: terug na die paneelbord om weer aan te meld.
+    window.wys_sessie_verval = (houer) => {
+      if (!houer) return;
+      houer.innerHTML = 'Jou sessie het verval. <a href="/paneelbord.html">Meld weer by die paneel aan</a>.';
+    };
+  </script>
+  <script src="js/leser.js"></script>
+</body>
+</html>
