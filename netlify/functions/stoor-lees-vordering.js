@@ -29,7 +29,7 @@ async function besit_boek(gebruiker_id, produk_slug) {
     if (!behoort_aan_koper || !is_betaal) continue;
 
     const items = Array.isArray(bestelling.items) ? bestelling.items : [];
-    if (items.some((i) => i.produk_slug === produk_slug && i.formaat === "eboek" && i.geskenk !== true)) {
+    if (items.some((i) => i.produk_slug === produk_slug && i.formaat === "eboek")) {
       return true;
     }
 

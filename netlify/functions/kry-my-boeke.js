@@ -13,6 +13,7 @@
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 const { kry_store } = require("./_blob-store");
 const { LEEN_OPGRADERING_VENSTER_DAE } = require("./_leen-venster");
+const { kry_eie_toegang_boeke } = require("./_eie-toegang");
 
 exports.handler = async (event, context) => {
   if (event.httpMethod !== "GET") {
@@ -22,7 +23,9 @@ exports.handler = async (event, context) => {
     };
   }
 
-  const gebruiker = await kry_gebruiker_en_kontroleer_rol(event, context, "koper");
+  // "personeel" ook (November 2026): die admin lees elke boek sonder 'n
+  // bestelling, en haar paneelbord-rekening dra dalk nie die koper-rol nie.
+  const gebruiker = await kry_gebruiker_en_kontroleer_rol(event, context, ["koper", "personeel"]);
   if (!gebruiker) {
     return {
       statusCode: 401,
@@ -221,6 +224,51 @@ exports.handler = async (event, context) => {
               lees_op: v ? v.op : null,
             };
           })()),
+        });
+      }
+    }
+
+    // EIE TOEGANG (November 2026): die admin sien elke e-boek, 'n outeur sy
+    // eie, sonder 'n bestelling. Sien _eie-toegang.js. Het hy die boek reeds
+    // as e-boek gekoop, bly die gekoopte kaart en kom daar nie 'n tweede by
+    // nie. 'n Leen-kaart vir dieselfde boek val weg: die eie toegang verval
+    // nie, die leen wel.
+    const eie_boeke = await kry_eie_toegang_boeke(gebruiker);
+    if (eie_boeke.length) {
+      const reeds_op_rak = new Set(
+        my_boeke.filter((b) => !b.is_harde_kopie && !b.is_leen).map((b) => b.produk_slug)
+      );
+      const eie_slugs = new Set(eie_boeke.map((e) => e.produk.slug));
+      for (let i = my_boeke.length - 1; i >= 0; i--) {
+        const b = my_boeke[i];
+        if (b.is_leen && eie_slugs.has(b.produk_slug) && !reeds_op_rak.has(b.produk_slug)) my_boeke.splice(i, 1);
+      }
+      for (const { produk, rede } of eie_boeke) {
+        if (reeds_op_rak.has(produk.slug)) continue;
+        const v = await kry_lees_vordering(produk.slug);
+        my_boeke.push({
+          bestelnommer: null,
+          produk_slug: produk.slug,
+          titel: produk.titel || produk.slug,
+          outeur: produk.outeur || "",
+          omslag: produk.omslag || "",
+          // Admin en outeur lees ook voor die vrystellingsdatum: dit is
+          // juis wanneer 'n mens die finale PDF wil nagaan.
+          vrystelling_datum: (produk.formate.eboek && produk.formate.eboek.vrystelling_datum) || null,
+          beskikbaar_nou: true,
+          is_leen: false,
+          is_harde_kopie: false,
+          gestuur: false,
+          gestuur_op: null,
+          spoornommer: "",
+          verval_op: null,
+          leen_aktief: null,
+          dae_oor: null,
+          opgradering: null,
+          eie_toegang: rede, // "admin" of "outeur"
+          lees_bladsy: v ? v.bladsy : null,
+          lees_totaal: v ? v.totaal : null,
+          lees_op: v ? v.op : null,
         });
       }
     }

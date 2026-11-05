@@ -17,7 +17,7 @@ exports.handler = async (event, context) => {
     return { statusCode: 400, body: JSON.stringify({ fout: "Ontbrekende 'produk_slug'-parameter" }) };
   }
 
-  const gebruiker = await kry_gebruiker_en_kontroleer_rol(event, context, "koper");
+  const gebruiker = await kry_gebruiker_en_kontroleer_rol(event, context, ["koper", "personeel"]);
   if (!gebruiker) {
     return { statusCode: 401, body: JSON.stringify({ fout: "Meld eers aan" }) };
   }

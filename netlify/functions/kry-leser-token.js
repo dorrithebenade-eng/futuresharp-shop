@@ -12,6 +12,7 @@
 const crypto = require("crypto");
 const { kry_store } = require("./_blob-store");
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
+const { eie_toegang_vir_boek } = require("./_eie-toegang");
 
 const GELDIGHEID_MS = 15 * 60 * 1000; // 15 minute
 
@@ -66,7 +67,7 @@ exports.handler = async (event, context) => {
     return { statusCode: 400, body: JSON.stringify({ fout: "Ontbrekende 'produk_slug'-parameter" }) };
   }
 
-  const gebruiker = await kry_gebruiker_en_kontroleer_rol(event, context, "koper");
+  const gebruiker = await kry_gebruiker_en_kontroleer_rol(event, context, ["koper", "personeel"]);
   if (!gebruiker) {
     return { statusCode: 401, body: JSON.stringify({ fout: "Meld eers aan" }) };
   }
@@ -75,12 +76,18 @@ exports.handler = async (event, context) => {
   const verval_op = Date.now() + GELDIGHEID_MS;
 
   try {
+    // EIE TOEGANG word HIER bepaal, waar die volle token (met rolle) nog
+    // beskikbaar is, en saam met die leestoken gestoor. kry-eboek-inhoud.js
+    // kry net die leestoken via die iframe en ken nie die rolle nie.
+    const eie_toegang = await eie_toegang_vir_boek(gebruiker, produk_slug);
+
     const store = kry_store("leestokens");
     await store.setJSON(token, {
       gebruiker_id: gebruiker.id,
       gebruiker_epos: gebruiker.email,
       produk_slug,
       verval_op,
+      eie_toegang,
     });
 
     const [leen_status, weergawe] = await Promise.all([

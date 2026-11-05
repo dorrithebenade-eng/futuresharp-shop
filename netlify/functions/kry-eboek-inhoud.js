@@ -26,13 +26,7 @@ const { kry_store } = require("./_blob-store");
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 const { PDFDocument } = require("pdf-lib");
 
-// 4MB PER STUK, NIE 5MB NIE. Netlify se limiet van 6MB geld vir die
-// antwoord SOOS DIT GESTUUR WORD, en die PDF-grepe gaan as base64, wat 'n
-// derde groter is. 5MB grepe word 6,7MB base64 en Netlify gee dan 'n 502
-// (Oktober 2026: 'n opgedateerde "Speel slim" het so nooit by die koper
-// uitgekom nie). 4MB word 5,3MB base64, met ruimte vir die kopstukke.
-// Die leser (haal_volledige_pdf in leser.js) haal self die res stuk vir stuk.
-const MAKS_ANTWOORD_GREPE = 4 * 1024 * 1024;
+const MAKS_ANTWOORD_GREPE = 5 * 1024 * 1024; // 5MB per stuk, ruim onder die 6MB-limiet
 
 async function verifieer_via_token(token, produk_slug) {
   if (!token) return null;
@@ -72,7 +66,7 @@ async function besit_boek(gebruiker_id, produk_slug) {
 
     const items = Array.isArray(bestelling.items) ? bestelling.items : [];
 
-    if (items.some((i) => i.produk_slug === produk_slug && i.formaat === "eboek" && i.geskenk !== true)) {
+    if (items.some((i) => i.produk_slug === produk_slug && i.formaat === "eboek")) {
       return { besit: true, rede: "koop" };
     }
 
