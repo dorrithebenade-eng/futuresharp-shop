@@ -40,6 +40,7 @@
   const IKOON_MERK = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h12v17l-6-4.2-6 4.2z"/></svg>';
   const IKOON_LYS = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1.2" fill="currentColor" stroke="none"/><circle cx="4.5" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="4.5" cy="18" r="1.2" fill="currentColor" stroke="none"/></svg>';
   const IKOON_POTLOOD = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>';
+  const IKOON_BEVESTIG = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
   const IKOON_X = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
 
   // ---------------------------------------------------------------- bou
@@ -53,7 +54,7 @@
     merk.type = "button";
     merk.id = "leser-merk-knoppie";
     merk.className = "leser-nutsknoppie leser-merk-knoppie";
-    merk.innerHTML = IKOON_MERK;
+    merk.innerHTML = `${IKOON_MERK}<span class="leser-knoppie-woord leser-merk-woord">${esc(v("leser_merk", "Merk"))}</span>`;
     merk.hidden = true;
     merk.addEventListener("click", wissel_merk);
 
@@ -63,7 +64,7 @@
     inhoud.className = "leser-nutsknoppie leser-inhoud-knoppie";
     inhoud.setAttribute("aria-expanded", "false");
     inhoud.setAttribute("aria-controls", "leser-inhoud-paneel");
-    inhoud.innerHTML = `${IKOON_LYS}<span class="leser-inhoud-woord">${esc(v("leser_inhoud", "Inhoud"))}</span>`;
+    inhoud.innerHTML = `${IKOON_LYS}<span class="leser-knoppie-woord">${esc(v("leser_inhoud", "Inhoud"))}</span>`;
     inhoud.hidden = true;
     inhoud.addEventListener("click", klik_inhoud);
 
@@ -354,21 +355,28 @@
     paneel.querySelectorAll("[data-weg]").forEach((el) => el.addEventListener("click", () => verwyder(el.getAttribute("data-weg"))));
   }
 
+  // DIE NOTAVELD STAAN NIE IN DIE SPRING-KNOPPIE NIE. 'n <input> binne 'n
+  // <button> stuur sy klikke na die knoppie, en dan spring die leser na die
+  // bladsy sodra 'n mens in die veld klik om te tik. Terwyl die nota
+  // geskryf word, vervang 'n gewone redigeerreël die hele boekmerkreël.
   function wysig_nota(id) {
     const m = ink.merke.find((x) => x.id === id);
     const ry = document.querySelector(`.leser-inhoud-merk[data-id="${CSS.escape(id)}"]`);
     if (!m || !ry || id === "_nuut") return;
-    const teks = ry.querySelector(".leser-inhoud-merk-teks");
-    teks.innerHTML = `<span>${bl()} ${bladsy_van(m)}</span>`;
+
+    ry.classList.add("leser-inhoud-merk-wysig");
+    ry.innerHTML = `
+      <span class="leser-inhoud-merk-ikoon">${IKOON_MERK}</span>
+      <span class="leser-inhoud-merk-teks"><span>${bl()} ${bladsy_van(m)}</span></span>
+      <button type="button" class="leser-inhoud-klein leser-inhoud-bevestig" aria-label="${esc(v("leser_stoor_nota", "Stoor nota"))}" title="${esc(v("leser_stoor_nota", "Stoor nota"))}">${IKOON_BEVESTIG}</button>`;
     const invoer = document.createElement("input");
     invoer.type = "text";
     invoer.maxLength = 80;
     invoer.className = "leser-inhoud-nota-invoer";
     invoer.value = m.nota || "";
     invoer.placeholder = v("leser_voeg_nota_by", "+ Voeg 'n nota by").replace(/^\+\s*/, "");
-    teks.appendChild(invoer);
-    // Die invoer staan binne die spring-knoppie: 'n klik daarin mag nie spring nie.
-    invoer.addEventListener("click", (e) => e.stopPropagation());
+    ry.querySelector(".leser-inhoud-merk-teks").appendChild(invoer);
+
     let klaar = false;
     const stoor = () => {
       if (klaar) return;
@@ -380,9 +388,11 @@
     invoer.addEventListener("keydown", (e) => {
       e.stopPropagation();
       if (e.key === "Enter") { e.preventDefault(); stoor(); }
-      if (e.key === "Escape") { klaar = true; teken_paneel(); }
+      if (e.key === "Escape") { e.preventDefault(); klaar = true; teken_paneel(); }
     });
     invoer.addEventListener("blur", stoor);
+    // mousedown, nie click nie: so stoor die ✓ voordat die veld sy fokus verloor.
+    ry.querySelector(".leser-inhoud-bevestig").addEventListener("mousedown", (e) => { e.preventDefault(); stoor(); });
     invoer.focus();
   }
 
@@ -399,6 +409,8 @@
     const etiket = gemerk ? v("leser_haal_merk_weg", "Haal die boekmerk weg") : v("leser_merk_bladsy", "Merk hierdie bladsy");
     merk.setAttribute("aria-label", etiket);
     merk.title = etiket;
+    const woord = merk.querySelector(".leser-merk-woord");
+    if (woord) woord.textContent = gemerk ? v("leser_gemerk", "Gemerk") : v("leser_merk", "Merk");
 
     inhoud.hidden = !(ink.hoofstukke.length || ink.toc_bladsy || ink.merke.length);
     const inhoud_etiket = net_toc()

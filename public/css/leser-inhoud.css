@@ -3,29 +3,36 @@
 
 .leser-skerm { position: relative; }
 
+/* B (5 Nov 2026): albei knoppies gevul in teal, met 'n woord, sodat hulle
+   uitstaan bo die grys zoem-knoppies. Op 'n foon val die woorde weg. */
 .leser-merk-knoppie,
 .leser-inhoud-knoppie {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  color: var(--swart);
-}
-.leser-merk-knoppie[hidden],
-.leser-inhoud-knoppie[hidden] { display: none; }
-
-.leser-merk-aan { color: var(--teal); border-color: var(--teal); }
-.leser-merk-aan svg path { fill: currentColor; }
-
-.leser-inhoud-knoppie {
   width: auto;
-  padding: 0 10px;
-  color: #0F6E56;
-  border-color: #9FD6CB;
+  padding: 0 11px;
+  background: var(--teal);
+  border-color: var(--teal);
+  color: var(--wit);
   font-family: var(--font-liggaam);
   font-size: 13px;
+  font-weight: 500;
 }
-.leser-inhoud-woord { line-height: 1; }
+.leser-merk-knoppie:hover,
+.leser-inhoud-knoppie:hover { background: #3C887C; border-color: #3C887C; }
+.leser-merk-knoppie[hidden],
+.leser-inhoud-knoppie[hidden] { display: none; }
+.leser-knoppie-woord { line-height: 1; }
+
+/* Gemerk: donkerder teal en 'n ingekleurde boekmerk. */
+.leser-merk-aan,
+.leser-merk-aan:hover { background: #2F6B60; border-color: #2F6B60; }
+.leser-merk-aan svg path { fill: currentColor; }
+
+/* Lys oop: dieselfde donkerder teal. styl.css se [aria-expanded] maak dit lig. */
+.leser-inhoud-knoppie[aria-expanded="true"] { background: #2F6B60; border-color: #2F6B60; }
 
 .leser-inhoud-paneel {
   position: absolute;
@@ -105,6 +112,9 @@
   overflow-wrap: anywhere;
 }
 .leser-inhoud-nota-leeg { color: #9A9893; }
+.leser-inhoud-merk-wysig { padding: 8px 10px 8px 14px; gap: 8px; }
+.leser-inhoud-klein.leser-inhoud-bevestig { color: var(--wit); background: var(--teal); border-color: var(--teal); }
+.leser-inhoud-klein.leser-inhoud-bevestig:hover { color: var(--wit); background: #3C887C; }
 .leser-inhoud-nota-invoer {
   margin-top: 4px;
   width: 100%;
@@ -155,7 +165,8 @@
 /* Foon: net ikone in die kopbalk; die lys vul die breedte en die hoogte
    onder die kopbalk, en rol binne-in. */
 @media (max-width: 640px) {
-  .leser-inhoud-woord { display: none; }
+  .leser-knoppie-woord { display: none; }
+  .leser-merk-knoppie,
   .leser-inhoud-knoppie { width: 34px; padding: 0; }
   .leser-inhoud-paneel {
     left: 0;
