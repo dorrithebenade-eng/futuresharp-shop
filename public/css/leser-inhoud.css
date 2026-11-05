@@ -3,6 +3,27 @@
 
 .leser-skerm { position: relative; }
 
+/* Gereedskap in die middel van die kopbalk op 'n breë skerm (5 Nov 2026).
+   Die titel kry net die plek links van die groep en word anders afgekap. */
+.leser-gereedskap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+@media (min-width: 900px) {
+  .leser-kopbalk { position: relative; }
+  .leser-gereedskap {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    margin-left: 0;
+  }
+  .leser-titel { max-width: calc(50% - 300px); flex: 0 1 auto; }
+}
+
 /* B (5 Nov 2026): albei knoppies gevul in teal, met 'n woord, sodat hulle
    uitstaan bo die grys zoem-knoppies. Op 'n foon val die woorde weg. */
 .leser-merk-knoppie,

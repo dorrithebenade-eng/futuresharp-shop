@@ -68,8 +68,18 @@
     inhoud.hidden = true;
     inhoud.addEventListener("click", klik_inhoud);
 
-    kop.insertBefore(merk, voor);
-    kop.insertBefore(inhoud, voor);
+    // GEREEDSKAP IN EEN GROEP (5 Nov 2026): Merk, Inhoud, zoem en soek staan
+    // saam, sodat die groep op 'n breë skerm in die middel van die kopbalk
+    // kan staan (leser-inhoud.css). Die bestaande knoppies word net verskuif;
+    // hul luisteraars in leser.js bly aan hulle vas.
+    const groep = document.createElement("div");
+    groep.className = "leser-gereedskap";
+    kop.insertBefore(groep, voor);
+    groep.appendChild(merk);
+    groep.appendChild(inhoud);
+    groep.appendChild(voor);
+    const soek = document.getElementById("leser-soek-knoppie");
+    if (soek) groep.appendChild(soek);
 
     const paneel = document.createElement("div");
     paneel.id = "leser-inhoud-paneel";
