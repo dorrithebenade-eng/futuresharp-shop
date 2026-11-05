@@ -1,0 +1,34 @@
+/* leser-laai.css — draaiwieletjie terwyl 'n boek in die leser laai
+   (November 2026). wys_status(teks, true) in leser.js sit die klas aan;
+   enige ander boodskap haal dit af. Geld vir leser.html en paneel-leser.html. */
+
+.leser-status-laai {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.leser-status-laai::before {
+  content: "";
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 3px solid #E8E6E1;
+  border-top-color: var(--teal);
+  animation: leser-draai 0.9s linear infinite;
+}
+
+@keyframes leser-draai {
+  to { transform: rotate(360deg); }
+}
+
+/* Wie minder beweging verkies, kry 'n stadige pols in plaas van 'n draai. */
+@media (prefers-reduced-motion: reduce) {
+  .leser-status-laai::before {
+    animation: leser-pols 1.6s ease-in-out infinite;
+  }
+  @keyframes leser-pols {
+    50% { opacity: 0.35; }
+  }
+}

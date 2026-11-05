@@ -38,9 +38,13 @@ const MAKS_ZOEM = IS_AANRAAK ? 7 : 5;
 // en wit vertoon; die pixeldigtheid word dan net so ver verlaag dat dit pas.
 const MAKS_CANVAS_PIXELS = 16 * 1024 * 1024;
 
-function wys_status(teks) {
+// laai = true wys 'n draaiwieletjie saam met die teks (leser-laai.css). Elke
+// ander boodskap, en die leë status wanneer die boek oop is, haal dit weg.
+function wys_status(teks, laai = false) {
   const el = document.getElementById("leser-status");
-  if (el) el.textContent = teks;
+  if (!el) return;
+  el.textContent = teks;
+  el.classList.toggle("leser-status-laai", Boolean(laai && teks));
 }
 
 // Leen-status sit nou as 'n klein amber etiket in die kopbalk (bv.
@@ -466,7 +470,7 @@ async function laai_leser() {
     lisensie_nota_el.textContent = patroon.replace("%epos%", sessie.gebruiker.email);
   }
 
-  wys_status(window.t ? window.t("leser_laai_tans") : "Jou boek word gelaai...");
+  wys_status(window.t ? window.t("leser_laai_tans") : "Jou boek word gelaai...", true);
 
   kry_boek(sessie, produk_slug).then((boek) => {
     if (boek && boek.titel) {
@@ -492,6 +496,7 @@ async function laai_leser() {
       // helper die huidige adres MET sy ?boek=-parameter gebruik — die
       // koper moet ná aanmelding by dieselfde boek terugkom.
       const status_el = document.getElementById("leser-status");
+      status_el.classList.remove("leser-status-laai");
       if (window.wys_sessie_verval) {
         window.wys_sessie_verval(status_el);
       } else {
