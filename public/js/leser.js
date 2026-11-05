@@ -215,6 +215,8 @@ function wys_voortgang() {
   document.getElementById("leser-totaal-bladsye").textContent = totale_bladsye;
   const persentasie = totale_bladsye ? Math.round((huidige_bladsy / totale_bladsye) * 100) : 0;
   document.getElementById("leser-voortgang-balk").style.width = `${persentasie}%`;
+  // Die skuifbalk onderaan (leser-skuif.js) volg dieselfde bladsy.
+  if (typeof window.leser_skuif_werk_by === "function") window.leser_skuif_werk_by(huidige_bladsy, totale_bladsye);
 }
 
 async function wys_bladsy(nommer, opsies = {}) {

@@ -12,6 +12,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Lees (admin) — Future Shop</title>
   <link rel="stylesheet" href="css/styl.css">
+  <link rel="stylesheet" href="css/leser-skuif.css">
 
   <link rel="icon" href="/icons/ikoon-32.png" sizes="32x32" type="image/png">
   <link rel="icon" href="/icons/ikoon-16.png" sizes="16x16" type="image/png"></head>
@@ -65,6 +66,12 @@
         </div>
       </div>
       <footer class="leser-onderbalk">
+        <div class="leser-skuif-wrap">
+          <span id="leser-skuif-borrel" class="leser-skuif-borrel" aria-hidden="true"></span>
+          <input type="range" id="leser-skuif" class="leser-skuif" min="1" max="1" value="1" step="1" aria-label="Gaan na bladsy">
+        </div>
+        <div class="leser-skuif-ry">
+        <span id="leser-persentasie" class="leser-skuif-syfer"></span>
         <div class="leser-nutsbalk-groep">
           <button type="button" id="leser-vorige" class="leser-nutsknoppie leser-blaaiknoppie" aria-label="Vorige bladsy">‹</button>
           <span class="leser-bladsy-teller">
@@ -73,6 +80,8 @@
             <span id="leser-totaal-bladsye">—</span>
           </span>
           <button type="button" id="leser-volgende" class="leser-nutsknoppie leser-blaaiknoppie" aria-label="Volgende bladsy">›</button>
+        </div>
+        <span id="leser-bladsye-oor" class="leser-skuif-syfer leser-skuif-syfer-regs"></span>
         </div>
         <p class="leser-lisensie-nota" id="leser-lisensie-nota"></p>
       </footer>
@@ -97,5 +106,6 @@
     };
   </script>
   <script src="js/leser.js"></script>
+  <script src="js/leser-skuif.js"></script>
 </body>
 </html>

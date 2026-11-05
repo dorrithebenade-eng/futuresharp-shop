@@ -1,0 +1,66 @@
+/* leser-skuif.css — skuifbalk onderaan die leser (November 2026).
+   Geld vir leser.html en paneel-leser.html. */
+
+.leser-skuif-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 720px;
+  padding-top: 22px;
+}
+
+.leser-skuif {
+  display: block;
+  width: 100%;
+  margin: 0;
+  accent-color: var(--teal);
+  cursor: pointer;
+}
+
+.leser-skuif-borrel {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  font-family: var(--font-liggaam);
+  font-size: 12px;
+  line-height: 1.5;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: #085041;
+  color: #E1F5EE;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.leser-skuif-borrel-sigbaar { opacity: 1; }
+
+.leser-skuif-ry {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 720px;
+}
+
+.leser-skuif-syfer {
+  font-family: var(--font-liggaam);
+  font-size: 12px;
+  color: var(--grys-teks);
+  white-space: nowrap;
+}
+.leser-skuif-syfer-regs { text-align: right; }
+
+/* Smal foon: "bladsye oor" pas nie langs die knoppies nie; die persentasie bly. */
+@media (max-width: 420px) {
+  .leser-skuif-syfer-regs { visibility: hidden; }
+}
+
+/* Foon dwars: die onderbalk staan in een ry (styl.css). Die skuifbalk kry
+   die oorblywende breedte; die syfers val weg om hoogte en plek te spaar. */
+@media (orientation: landscape) and (max-height: 500px) {
+  .leser-skuif-wrap { flex: 1 1 200px; min-width: 120px; padding-top: 0; }
+  .leser-skuif-borrel { top: -24px; }
+  .leser-skuif-ry { display: flex; width: auto; }
+  .leser-skuif-syfer { display: none; }
+}
