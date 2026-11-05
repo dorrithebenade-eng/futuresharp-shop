@@ -3,7 +3,7 @@
 // BEDIENERLEER. Toegang tot 'n e-boek SONDER 'n bestelling (November 2026).
 //
 // Twee groepe lees 'n boek sonder om dit te koop:
-//   1. ADMIN: wie die "personeel"-rol in die token dra (Dorrithé). Sy sien
+//   1. ADMIN: wie die "personeel"- of "admin_leser"-rol in die token dra. Sy sien
 //      elke boek in die katalogus wat 'n e-boek-PDF het, ook een wat nog
 //      nie vrygestel of geaktiveer is nie. Dieselfde reël as kry-kyk-token.js
 //      vir die talks.
@@ -24,9 +24,13 @@ const { kry_store } = require("./_blob-store");
 const { kry_my_outeur } = require("./_my-outeur");
 const { outeur_by_produk_betrokke } = require("./_outeur-aandeel");
 
+// "admin_leser" (November 2026): 'n smal rol vir 'n WINKELrekening wat al
+// die boeke mag lees, sonder enige paneelbord-regte. Dorrithé gebruik in
+// die winkel 'n ander rekening (haar outeursrekening) as in die paneelbord.
+// Die rol word met die hand in Netlify Identity op daardie rekening gestel.
 function is_admin(gebruiker) {
   const rolle = (gebruiker && gebruiker.app_metadata && gebruiker.app_metadata.roles) || [];
-  return rolle.includes("personeel");
+  return rolle.includes("personeel") || rolle.includes("admin_leser");
 }
 
 function het_eboek_pdf(produk) {
