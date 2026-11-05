@@ -7,6 +7,7 @@
 
 const { kry_store } = require("./_blob-store");
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
+const { eie_toegang_vir_boek } = require("./_eie-toegang");
 
 async function besit_boek(gebruiker_id, produk_slug) {
   const bestellings_store = kry_store("bestellings");
@@ -29,7 +30,7 @@ async function besit_boek(gebruiker_id, produk_slug) {
     if (!behoort_aan_koper || !is_betaal) continue;
 
     const items = Array.isArray(bestelling.items) ? bestelling.items : [];
-    if (items.some((i) => i.produk_slug === produk_slug && i.formaat === "eboek")) {
+    if (items.some((i) => i.produk_slug === produk_slug && i.formaat === "eboek" && i.geskenk !== true)) {
       return true;
     }
 
@@ -52,7 +53,7 @@ exports.handler = async (event, context) => {
     return { statusCode: 405, body: JSON.stringify({ fout: "Metode nie toegelaat nie" }) };
   }
 
-  const gebruiker = await kry_gebruiker_en_kontroleer_rol(event, context, "koper");
+  const gebruiker = await kry_gebruiker_en_kontroleer_rol(event, context, ["koper", "personeel"]);
   if (!gebruiker) {
     return { statusCode: 401, body: JSON.stringify({ fout: "Meld eers aan" }) };
   }
@@ -78,7 +79,8 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    if (!(await besit_boek(gebruiker.id, produk_slug))) {
+    // Eie toegang (admin of outeur) tel ook, sodat hulle ook "Lees verder" kry.
+    if (!(await besit_boek(gebruiker.id, produk_slug)) && !(await eie_toegang_vir_boek(gebruiker, produk_slug))) {
       return { statusCode: 403, body: JSON.stringify({ fout: "Jy het nie hierdie e-boek gekoop nie" }) };
     }
 

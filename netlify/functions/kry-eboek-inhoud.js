@@ -25,8 +25,15 @@
 const { kry_store } = require("./_blob-store");
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 const { PDFDocument } = require("pdf-lib");
+const { eie_toegang_vir_boek } = require("./_eie-toegang");
 
-const MAKS_ANTWOORD_GREPE = 5 * 1024 * 1024; // 5MB per stuk, ruim onder die 6MB-limiet
+// 4MB PER STUK, NIE 5MB NIE. Netlify se limiet van 6MB geld vir die
+// antwoord SOOS DIT GESTUUR WORD, en die PDF-grepe gaan as base64, wat 'n
+// derde groter is. 5MB grepe word 6,7MB base64 en Netlify gee dan 'n 502
+// (Oktober 2026: 'n opgedateerde "Speel slim" het so nooit by die koper
+// uitgekom nie). 4MB word 5,3MB base64, met ruimte vir die kopstukke.
+// Die leser (haal_volledige_pdf in leser.js) haal self die res stuk vir stuk.
+const MAKS_ANTWOORD_GREPE = 4 * 1024 * 1024;
 
 async function verifieer_via_token(token, produk_slug) {
   if (!token) return null;
@@ -35,7 +42,7 @@ async function verifieer_via_token(token, produk_slug) {
   if (!rekord) return null;
   if (rekord.produk_slug !== produk_slug) return null;
   if (Date.now() > rekord.verval_op) return null;
-  return { id: rekord.gebruiker_id, email: rekord.gebruiker_epos };
+  return { id: rekord.gebruiker_id, email: rekord.gebruiker_epos, eie_toegang: rekord.eie_toegang || null };
 }
 
 // Gee 'n objek terug: { besit: boolean, rede: "koop" | "leen" | "leen_verval" | null }
@@ -66,7 +73,7 @@ async function besit_boek(gebruiker_id, produk_slug) {
 
     const items = Array.isArray(bestelling.items) ? bestelling.items : [];
 
-    if (items.some((i) => i.produk_slug === produk_slug && i.formaat === "eboek")) {
+    if (items.some((i) => i.produk_slug === produk_slug && i.formaat === "eboek" && i.geskenk !== true)) {
       return { besit: true, rede: "koop" };
     }
 
@@ -92,7 +99,7 @@ function weergawe_merker(eboek_sleutel) {
   return String(eboek_sleutel).replace(/\.pdf$/i, "").replace(/[^a-zA-Z0-9_-]/g, "_");
 }
 
-async function kry_of_genereer_gemerkte_kopie(produk_slug, gebruiker) {
+async function kry_of_genereer_gemerkte_kopie(produk_slug, gebruiker, eie_toegang) {
   const katalogus_store = kry_store("katalogus");
   const produk = await katalogus_store.get(produk_slug, { type: "json" });
   if (!produk || !produk.formate || !produk.formate.eboek || !produk.formate.eboek.eboek_sleutel) {
@@ -119,7 +126,12 @@ async function kry_of_genereer_gemerkte_kopie(produk_slug, gebruiker) {
   // dokument se eie metadata, wat behoue bly selfs al word die PDF
   // gekopieer/herverspei — 'n mens hoef net die lêer se "Eienskappe" oop
   // te maak om te sien aan wie dit gekoppel is.
-  pdf.setSubject(`Future Shop — gekoop deur ${koper_epos}`);
+  // By eie toegang (admin of outeur) is niks gekoop nie; die merker sê dit.
+  pdf.setSubject(
+    eie_toegang
+      ? `Future Shop — eksemplaar vir ${koper_epos} (${eie_toegang})`
+      : `Future Shop — gekoop deur ${koper_epos}`
+  );
   pdf.setKeywords([`future-shop-koper:${koper_epos}`]);
   pdf.setProducer(`Future Shop — eksemplaar gekoppel aan ${koper_epos}`);
 
@@ -165,7 +177,7 @@ exports.handler = async (event, context) => {
 
   // Aanvaar Bearer-token (regte fetch-versoeke) OF ?token= (iframe-src,
   // sien nota bo).
-  let gebruiker = await kry_gebruiker_en_kontroleer_rol(event, context, "koper");
+  let gebruiker = await kry_gebruiker_en_kontroleer_rol(event, context, ["koper", "personeel"]);
   if (!gebruiker) {
     gebruiker = await verifieer_via_token(parms.token, produk_slug);
   }
@@ -175,7 +187,14 @@ exports.handler = async (event, context) => {
 
   try {
     const besit_status = await besit_boek(gebruiker.id, produk_slug);
+    // Eie toegang (admin of outeur) net as daar geen bestelling is nie.
+    // Via die leestoken staan dit reeds op die rekord; via Bearer word dit
+    // hier bepaal.
+    let eie_toegang = null;
     if (!besit_status.besit) {
+      eie_toegang = gebruiker.eie_toegang || (await eie_toegang_vir_boek(gebruiker, produk_slug));
+    }
+    if (!besit_status.besit && !eie_toegang) {
       const boodskap =
         besit_status.rede === "leen_verval"
           ? "Jou leen-tydperk vir hierdie e-boek het verval. Koop dit, of leen dit weer, om verder te lees."
@@ -183,7 +202,7 @@ exports.handler = async (event, context) => {
       return { statusCode: 403, body: JSON.stringify({ fout: boodskap, leen_verval: besit_status.rede === "leen_verval" }) };
     }
 
-    const volledige_pdf = await kry_of_genereer_gemerkte_kopie(produk_slug, gebruiker);
+    const volledige_pdf = await kry_of_genereer_gemerkte_kopie(produk_slug, gebruiker, eie_toegang);
     if (!volledige_pdf) {
       return { statusCode: 404, body: JSON.stringify({ fout: "Hierdie e-boek is nog nie beskikbaar nie" }) };
     }
