@@ -3,7 +3,8 @@
 // sodra betaling voltooi en Paystack-betaling geverifieer is (Fase 3).
 //
 // Mandjie-item-vorm:
-// { produk_slug, titel, formaat: "eboek" | "harde_kopie", prys_sent, geskenk? }
+// { produk_slug, titel, formaat: "eboek" | "harde_kopie", prys_sent, geskenk?,
+//   opsie?, opsie_naam?, kaartjie? }   (opsie: harde-kopie-opsie, sien koop.js)
 //
 // LET WEL: die Identity-token-herleiding (na paneelbord.html) leef NIE
 // hier nie — dit moet as 'n inline skrip heel eerste in elke bladsy se
@@ -40,7 +41,8 @@ function voeg_by_mandjie(item) {
     (i) =>
       i.produk_slug === item.produk_slug &&
       i.formaat === item.formaat &&
-      !!i.geskenk === !!item.geskenk
+      !!i.geskenk === !!item.geskenk &&
+      (i.opsie || "") === (item.opsie || "")
   );
   if (bestaan_reeds) return { reeds_in_mandjie: true };
 
@@ -49,9 +51,10 @@ function voeg_by_mandjie(item) {
   return { reeds_in_mandjie: false };
 }
 
-function verwyder_uit_mandjie(produk_slug, formaat, geskenk = false) {
+// opsie: harde-kopie-opsie se sleutel (November 2026); leeg vir ander items.
+function verwyder_uit_mandjie(produk_slug, formaat, geskenk = false, opsie = "") {
   const items = kry_mandjie().filter(
-    (i) => !(i.produk_slug === produk_slug && i.formaat === formaat && !!i.geskenk === !!geskenk)
+    (i) => !(i.produk_slug === produk_slug && i.formaat === formaat && !!i.geskenk === !!geskenk && (i.opsie || "") === (opsie || ""))
   );
   stoor_mandjie(items);
 }

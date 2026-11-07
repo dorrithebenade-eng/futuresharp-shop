@@ -1,6 +1,7 @@
 // koop.js (November 2026), vir koop.html.
 //
 // ?produk=<slug>&formaat=eboek|harde_kopie
+// ?produk=<slug>&opsie=<sleutel>   (harde-kopie-opsie; formaat volg vanself)
 //
 // Haal die produk op (ook as dit ongelys is), sit die gekose formaat in die
 // mandjie en gaan na voltooi-betaling.html. Die prys hier is net vir die
@@ -23,7 +24,8 @@
 
     const params = new URLSearchParams(window.location.search);
     const slug = (params.get("produk") || "").trim();
-    const formaat = (params.get("formaat") || "eboek").trim();
+    const opsie = (params.get("opsie") || "").trim();
+    const formaat = opsie ? "harde_kopie" : (params.get("formaat") || "eboek").trim();
 
     if (!slug || !GELDIGE_FORMATE.includes(formaat)) {
       wys_fout("koop_ongeldig");
@@ -44,13 +46,26 @@
       return;
     }
 
+    // Harde-kopie-opsies (sien netlify/functions/_harde-kopie-opsies.js):
+    // het die boek opsies, moet een gekies wees.
+    const opsies = formaat === "harde_kopie" && Array.isArray(data.opsies) ? data.opsies : [];
+    const gekose = opsies.length ? opsies.find((o) => o.sleutel === opsie) : null;
+    if (opsies.length && (!gekose || gekose.beskikbaar === false)) {
+      wys_fout("koop_nie_beskikbaar");
+      return;
+    }
+
     const item = {
       produk_slug: produk.slug,
       titel: produk.titel,
       formaat,
-      prys_sent: Number(data.prys_sent) || 0,
+      prys_sent: Number(gekose ? gekose.prys_sent : data.prys_sent) || 0,
     };
-    if (formaat === "harde_kopie" && produk.kaartjie_boodskap === true) {
+    if (gekose) {
+      item.opsie = gekose.sleutel;
+      item.opsie_naam = gekose.naam;
+      if (gekose.kaartjie === true) item.kaartjie = true;
+    } else if (formaat === "harde_kopie" && produk.kaartjie_boodskap === true) {
       item.kaartjie = true;
     }
 

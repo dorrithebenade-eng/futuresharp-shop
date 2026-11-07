@@ -75,8 +75,11 @@ function outeur_by_produk_betrokke(produk, outeur_id) {
   }
 
   const formate = produk.formate || {};
-  return ["eboek", "harde_kopie", "leen"].some((naam) =>
-    ((formate[naam] && formate[naam].verdelings) || []).some((v) => {
+  // Harde-kopie-opsies dra elk hul eie verdelings (sien _harde-kopie-opsies.js).
+  const opsie_lyste = ((formate.harde_kopie && formate.harde_kopie.opsies) || []).map((o) => o.verdelings || []);
+  const lyste = ["eboek", "harde_kopie", "leen"].map((naam) => (formate[naam] && formate[naam].verdelings) || []).concat(opsie_lyste);
+  return lyste.some((lys) =>
+    lys.some((v) => {
       if (!v) return false;
       const rol_tipe = v.rol_tipe || (v.outeur_id ? "outeur" : null);
       const entiteit_id = v.entiteit_id || v.outeur_id;

@@ -54,6 +54,8 @@ const { stuur_outeur_kennisgewings } = require("./_kennisgewing-outeur");
 const { stuur_koper_bevestiging } = require("./_kennisgewing-koper");
 const { kry_aktiewe_pakkette, pas_pakkette_toe_per_groep } = require("./_reekspakkette");
 const { is_eie_item, skoon_geskenk_besonderhede, skep_geskenk_vir_bestelling } = require("./_geskenke");
+const { kry_formaat_data } = require("./_harde-kopie-opsies");
+const { kry_item_name } = require("./_fisiese-items");
 
 // Rol_tipe → watter Blobs-store die entiteit se subrekening-kode in is.
 const ROL_TIPE_STORES = {
@@ -247,7 +249,7 @@ exports.handler = async (event, context) => {
   const pakket_invoer = [];
   for (const kliënt_item of items) {
     const p = await katalogusStore.get(kliënt_item.produk_slug, { type: "json" });
-    const fd = p && p.formate && p.formate[kliënt_item.formaat];
+    const fd = kry_formaat_data(p, kliënt_item.formaat, kliënt_item.opsie);
     pakket_invoer.push({
       produk_slug: kliënt_item.produk_slug,
       formaat: kliënt_item.formaat,
@@ -298,7 +300,9 @@ exports.handler = async (event, context) => {
       }
     }
 
-    const formaat_data = produk.formate && produk.formate[kliënt_item.formaat];
+    // Harde-kopie-opsies: kry_formaat_data gee die gekose opsie se prys,
+    // verdelings en hosting (sien _harde-kopie-opsies.js).
+    const formaat_data = kry_formaat_data(produk, kliënt_item.formaat, kliënt_item.opsie);
     if (!formaat_data || !formaat_data.beskikbaar) {
       return { statusCode: 400, body: `"${produk.titel}" (${kliënt_item.formaat}) is nie meer beskikbaar nie` };
     }
@@ -343,6 +347,13 @@ exports.handler = async (event, context) => {
         : {}),
       ...(in_pakket ? { oorspronklike_prys_sent: item_prys_sent, reekspakket_id: in_pakket.pakket_id } : {}),
       ...(is_geskenk ? { geskenk: true } : {}),
+      ...(formaat_data.opsie
+        ? {
+            opsie: formaat_data.opsie.sleutel,
+            opsie_naam: formaat_data.opsie.naam,
+            pak_lys: await kry_item_name(formaat_data.opsie.items),
+          }
+        : {}),
       ...leen_ekstra,
     });
 

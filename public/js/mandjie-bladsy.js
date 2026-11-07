@@ -13,10 +13,10 @@ function bou_mandjie_ry(item) {
     <div class="mandjie-ry">
       <div class="mandjie-ry-info">
         <span class="mandjie-ry-titel">${item.titel}</span>
-        <span class="mandjie-ry-formaat">${etiket_vir_formaat(item.formaat)}${item.geskenk ? ` <span class="mandjie-geskenk-merk">🎁 ${t("geskenk_merk")}</span>` : ""}</span>
+        <span class="mandjie-ry-formaat">${item.opsie_naam || etiket_vir_formaat(item.formaat)}${item.geskenk ? ` <span class="mandjie-geskenk-merk">🎁 ${t("geskenk_merk")}</span>` : ""}</span>
       </div>
       <span class="mandjie-ry-prys">${formateer_prys_sent(item.prys_sent)}</span>
-      <button class="mandjie-verwyder" data-slug="${item.produk_slug}" data-formaat="${item.formaat}" data-geskenk="${item.geskenk ? "1" : ""}"
+      <button class="mandjie-verwyder" data-slug="${item.produk_slug}" data-formaat="${item.formaat}" data-geskenk="${item.geskenk ? "1" : ""}" data-opsie="${item.opsie || ""}"
         aria-label="${t("verwyder")} ${item.titel} (${etiket_vir_formaat(item.formaat)})">
         ${t("verwyder")}
       </button>
@@ -59,7 +59,7 @@ function wys_mandjie() {
 
   wrap.querySelectorAll(".mandjie-verwyder").forEach((knoppie) => {
     knoppie.addEventListener("click", () => {
-      verwyder_uit_mandjie(knoppie.dataset.slug, knoppie.dataset.formaat, knoppie.dataset.geskenk === "1");
+      verwyder_uit_mandjie(knoppie.dataset.slug, knoppie.dataset.formaat, knoppie.dataset.geskenk === "1", knoppie.dataset.opsie || "");
       wys_mandjie();
     });
   });

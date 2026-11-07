@@ -25,9 +25,11 @@ exports.handler = async (event) => {
     if (slug) {
       const rekord = await store.get(slug, { type: "json" });
       const produkte = rekord && rekord.aktief ? [rekord] : [];
+      // CORS: 'n boek se eie webblad (ander domein) lees hiermee sy pryse.
+      // Dit is dieselfde publieke data as die winkel self wys.
       return {
         statusCode: 200,
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
         body: JSON.stringify({ produkte }),
       };
     }

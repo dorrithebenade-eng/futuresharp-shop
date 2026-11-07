@@ -9,6 +9,7 @@
 
 const { kry_store } = require("./_blob-store");
 const { kry_webblad_velde } = require("./_produk-webblad");
+const { kry_geldige_opsies, kontroleer_opsies_minimum, laagste_opsie_prys } = require("./_harde-kopie-opsies");
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 const { kry_maks_verdeling_persentasie, beskryf_minimum } = require("./_paystack-koste.js");
 const { kontroleer_leen_prys } = require("./_leen-prys-kontrole");
@@ -152,6 +153,19 @@ exports.handler = async (event, context) => {
           vrystelling_datum: kry_geldige_datum(wysigings.formate[formaat_naam].vrystelling_datum),
         };
       }
+    }
+    // Harde-kopie-opsies: 'n wysiging sonder "opsies" behou die bestaande
+    // opsies (die veldverlies-patroon). Met opsies is die formaat se prys
+    // die laagste opsieprys.
+    if (wysigings.formate.harde_kopie) {
+      const ou_hk = (bestaande.formate && bestaande.formate.harde_kopie) || {};
+      const opsies = "opsies" in wysigings.formate.harde_kopie
+        ? kry_geldige_opsies(wysigings.formate.harde_kopie.opsies, kry_geldige_verdelings, kry_geldige_hosting)
+        : ou_hk.opsies || [];
+      nuwe_formate.harde_kopie.opsies = opsies;
+      if (opsies.length) nuwe_formate.harde_kopie.prys_sent = laagste_opsie_prys(opsies);
+      const opsies_fout = kontroleer_opsies_minimum(opsies, oorskry_hoofrekening_minimum, beskryf_minimum);
+      if (opsies_fout) return { statusCode: 400, body: opsies_fout };
     }
     // "Leen" is soortgelyk, maar het 'n tydperk_dae i.p.v. 'n
     // vrystelling_datum, en vereis dat die e-boek se PDF reeds bestaan

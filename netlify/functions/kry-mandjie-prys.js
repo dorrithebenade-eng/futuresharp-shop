@@ -12,6 +12,7 @@
 
 const { kry_store } = require("./_blob-store");
 const { kry_aktiewe_pakkette, pas_pakkette_toe_per_groep } = require("./_reekspakkette");
+const { kry_formaat_data } = require("./_harde-kopie-opsies");
 
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") return { statusCode: 405, body: "Metode nie toegelaat nie" };
@@ -31,7 +32,7 @@ exports.handler = async (event) => {
       const slug = String(it.produk_slug || "").slice(0, 80);
       const formaat = String(it.formaat || "");
       const produk = slug ? await katalogus.get(slug, { type: "json" }) : null;
-      const fd = produk && produk.formate && produk.formate[formaat];
+      const fd = kry_formaat_data(produk, formaat, it.opsie);
       items.push({
         produk_slug: slug,
         formaat,

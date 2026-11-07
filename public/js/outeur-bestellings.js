@@ -307,6 +307,27 @@ function ob_bou_kaart(bestelling, herlaai) {
       reel.appendChild(hoeveel);
     }
     kaart.appendChild(reel);
+
+    // Harde-kopie-opsie (November 2026): die opsie se naam en wat om te pak.
+    if (item.opsie_naam) {
+      const opsie = document.createElement("p");
+      opsie.style.cssText = "margin:2px 0 6px;";
+      opsie.textContent = item.opsie_naam;
+      kaart.appendChild(opsie);
+    }
+    if (Array.isArray(item.pak_lys) && item.pak_lys.length) {
+      const pak = document.createElement("div");
+      pak.className = "outeur-pak-lys";
+      pak.style.cssText = "background:#F5F4F1;border-radius:6px;padding:10px 12px;margin:0 0 10px;font-size:14px;";
+      const kop = document.createElement("strong");
+      kop.textContent = ob_vertaal("pak_in", "Pak in");
+      pak.appendChild(kop);
+      item.pak_lys.forEach((r) => {
+        pak.appendChild(document.createElement("br"));
+        pak.appendChild(document.createTextNode(r));
+      });
+      kaart.appendChild(pak);
+    }
   });
 
   kaart.appendChild(ob_bou_adres(bestelling.aflewering));

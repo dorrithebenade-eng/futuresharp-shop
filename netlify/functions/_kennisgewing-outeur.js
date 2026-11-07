@@ -19,6 +19,7 @@
 
 const { kry_store } = require("./_blob-store");
 const { stuur_epos, ontsnap } = require("./_stuur-epos");
+const { kry_formaat_data } = require("./_harde-kopie-opsies");
 
 // Die eie domein, nie process.env.URL nie — 'n wildcard-DNS-rekord op
 // futuresharp.co.za laat interne terugroepe by die verkeerde bediener
@@ -110,12 +111,17 @@ function wil_hoor_van_verkope(outeur, reël_items) {
 }
 
 function beskryf_item(reël_item) {
-  const { titel, formaat, tydperk_dae } = reël_item;
+  const { titel, formaat, tydperk_dae, opsie_naam, pak_lys } = reël_item;
   if (formaat === "leen") {
     const dae = tydperk_dae > 0 ? tydperk_dae : 30;
     return `<b>${titel}</b> is vir ${dae} dae uitgeleen.`;
   }
   if (formaat === "harde_kopie") {
+    // Harde-kopie-opsie: die naam en die pak-lys, soos by bestelling vasgelê.
+    if (opsie_naam) {
+      const lys = (pak_lys || []).map((r) => ontsnap(r)).join("<br>");
+      return `<b>${titel}</b> is as harde kopie verkoop: ${ontsnap(opsie_naam)}.${lys ? `<br><br><b>Pak in</b><br>${lys}` : ""}`;
+    }
     return `<b>${titel}</b> is as harde kopie verkoop.`;
   }
   return `<b>${titel}</b> is as e-boek verkoop.`;
@@ -255,7 +261,7 @@ async function stuur_outeur_kennisgewings(bestelling, opsies = {}) {
     const produk = await katalogus.get(item.produk_slug, { type: "json" });
     if (!produk) continue;
 
-    const formaat_data = (produk.formate && produk.formate[item.formaat]) || null;
+    const formaat_data = kry_formaat_data(produk, item.formaat, item.opsie) || null;
 
     for (const outeur_id of outeur_ids_vir_item(produk, formaat_data)) {
       const reël_item = {
@@ -263,6 +269,8 @@ async function stuur_outeur_kennisgewings(bestelling, opsies = {}) {
         formaat: item.formaat,
         prys_sent: item.prys_sent || 0,
         tydperk_dae: item.tydperk_dae,
+        opsie_naam: item.opsie_naam || "",
+        pak_lys: item.pak_lys || [],
         aandeel_sent: outeur_aandeel_sent(
           formaat_data && formaat_data.verdelings,
           outeur_id,

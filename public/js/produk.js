@@ -259,7 +259,20 @@ function wys_produk(produk, besit_info, konteks) {
     aksies.push(bou_aksie_ry(produk, "eboek", eboek, t("eboek_etiket"), besit_eboek));
   }
   if (hardeKopie && hardeKopie.beskikbaar) {
-    aksies.push(bou_aksie_ry(produk, "harde_kopie", hardeKopie, t("hardekopie_etiket"), false));
+    // Harde-kopie-opsies (November 2026): een ry per opsie, deur koop.html.
+    const hk_opsies = (hardeKopie.opsies || []).filter((o) => o.beskikbaar !== false);
+    if (hk_opsies.length) {
+      hk_opsies.forEach((o) => aksies.push(`
+        <div class="produk-formaat-ry">
+          <div class="produk-formaat-info">
+            <span class="produk-formaat-etiket">${titel_ontsnap(o.naam)}</span>
+            <span class="produk-formaat-prys">${formateer_prys_sent(o.prys_sent)}</span>
+          </div>
+          <a class="kaart-aksie produk-formaat-knoppie-skakel" href="koop.html?produk=${encodeURIComponent(produk.slug)}&amp;opsie=${encodeURIComponent(o.sleutel)}">${t("voeg_by_mandjie")}</a>
+        </div>`));
+    } else {
+      aksies.push(bou_aksie_ry(produk, "harde_kopie", hardeKopie, t("hardekopie_etiket"), false));
+    }
   }
   // Geen leen-ry as die koper reeds die e-boek self besit nie — geen rede
   // om iets te huur wat jy klaar permanent het nie.

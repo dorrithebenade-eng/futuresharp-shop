@@ -132,6 +132,8 @@ exports.handler = async (event, context) => {
       items: my_items.map((item) => ({
         titel: my_slugs.get(item.produk_slug),
         hoeveelheid: item.hoeveelheid || 1,
+        opsie_naam: item.opsie_naam || "",
+        pak_lys: Array.isArray(item.pak_lys) ? item.pak_lys : [],
       })),
       aflewering: aflewering_vir_outeur(bestelling),
       gestuur: Boolean(versending && versending.gestuur),

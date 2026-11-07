@@ -1002,6 +1002,7 @@ function reset_vorm() {
   document.getElementById("vorm-ongelys").checked = false;
   document.getElementById("vorm-eie-webblad").value = "";
   document.getElementById("vorm-kaartjie-boodskap").checked = false;
+  if (typeof hk_opsies_reset === "function") hk_opsies_reset();
   if (typeof hk_paneel_wys === "function") hk_paneel_wys(null);
   bou_reeks_voorstelle();
   document.getElementById("vorm-etiket-pasgemaak-velde").style.display = "none";
@@ -1219,6 +1220,7 @@ function open_vorm_vir_wysig(produk) {
   document.getElementById("vorm-ongelys").checked = produk.ongelys === true;
   document.getElementById("vorm-eie-webblad").value = produk.eie_webblad || "";
   document.getElementById("vorm-kaartjie-boodskap").checked = produk.kaartjie_boodskap === true;
+  if (typeof hk_opsies_vul === "function") hk_opsies_vul(produk);
   if (typeof hk_paneel_wys === "function") hk_paneel_wys(produk);
   document.getElementById("vorm-oorsig").value = produk.oorsig || "";
   document.getElementById("vorm-vol-beskrywing").value = produk.vol_beskrywing || "";
@@ -1420,6 +1422,8 @@ function bou_produk_liggaam() {
         vrystelling_datum: document.getElementById("vorm-hardekopie-vrystelling").value || null,
         verdelings: bou_verdelings_vanuit_vorm("hardekopie"),
         hosting: kry_hosting_vanuit_vorm("hardekopie"),
+        // Harde-kopie-opsies (paneel-hk-opsies.js).
+        ...(typeof hk_opsies_lees === "function" ? { opsies: hk_opsies_lees() } : {}),
       },
       leen: {
         beskikbaar: leenBeskikbaar,

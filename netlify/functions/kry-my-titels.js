@@ -24,6 +24,7 @@
 
 const { kry_store } = require("./_blob-store");
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
+const { kry_formaat_data } = require("./_harde-kopie-opsies");
 const {
   outeur_aandeel_sent,
   outeur_by_produk_betrokke,
@@ -154,7 +155,7 @@ exports.handler = async (event, context) => {
       if (item.via_geskenk) continue; // ontvangde geskenk, nie 'n tweede verkoop nie
 
       const formaat_data =
-        (inskrywing.produk.formate && inskrywing.produk.formate[item.formaat]) || null;
+        kry_formaat_data(inskrywing.produk, item.formaat, item.opsie) || null;
 
       const aandeel = outeur_aandeel_sent(
         formaat_data && formaat_data.verdelings,

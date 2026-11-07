@@ -14,6 +14,7 @@ const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 const { kry_maks_verdeling_persentasie, beskryf_minimum } = require("./_paystack-koste.js");
 const { kontroleer_leen_prys } = require("./_leen-prys-kontrole");
 const { kry_webblad_velde } = require("./_produk-webblad");
+const { kry_geldige_opsies, kontroleer_opsies_minimum, laagste_opsie_prys } = require("./_harde-kopie-opsies");
 const { kry_geldige_reeks, kry_geldige_taal, kry_geldige_eweknie, kontroleer_eweknie, sinkroniseer_eweknie } = require("./_eweknie");
 
 const GELDIGE_ROL_TIPES = ["outeur", "vennoot", "ontwerp_admin", "printing", "aflewering"];
@@ -180,6 +181,13 @@ exports.handler = async (event, context) => {
       body: "Die e-boek se verdeling(s) plus Hosting los te min oor vir Future Sharp se hoofrekening — Paystack se fooi (2,9% + R1 + BTW) moet gedek word. Verminder die persentasie/bedrae sodat " + beskryf_minimum(formate.eboek.prys_sent || 0) + " oorbly.",
     };
   }
+  // Harde-kopie-opsies (sien _harde-kopie-opsies.js). Met opsies is die
+  // formaat se eie prys die laagste opsieprys, vir "vanaf" op kaarte.
+  const hk_opsies = kry_geldige_opsies(formate.harde_kopie && formate.harde_kopie.opsies, kry_geldige_verdelings, kry_geldige_hosting);
+  const hk_opsies_fout = kontroleer_opsies_minimum(hk_opsies, oorskry_hoofrekening_minimum, beskryf_minimum);
+  if (hk_opsies_fout) return { statusCode: 400, body: hk_opsies_fout };
+  if (hk_opsies.length && formate.harde_kopie) formate.harde_kopie.prys_sent = laagste_opsie_prys(hk_opsies);
+
   const hardekopie_verdelings = kry_geldige_verdelings(formate.harde_kopie && formate.harde_kopie.verdelings);
   const hardekopie_hosting = kry_geldige_hosting(formate.harde_kopie && formate.harde_kopie.hosting);
   if (
@@ -274,8 +282,9 @@ exports.handler = async (event, context) => {
             verdelings: hardekopie_verdelings,
             hosting: hardekopie_hosting,
             vrystelling_datum: kry_geldige_datum(formate.harde_kopie.vrystelling_datum),
+            opsies: hk_opsies,
           }
-        : { beskikbaar: false },
+        : { beskikbaar: false, opsies: hk_opsies },
       leen: formate.leen && formate.leen.beskikbaar
         ? {
             beskikbaar: true,

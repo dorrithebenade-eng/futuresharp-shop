@@ -64,7 +64,7 @@ function bou_opsomming(items, totaal, pakkette) {
           .map(
             (i) => `
           <div class="vb-opsomming-ry">
-            <span>${i.titel} <span class="vb-opsomming-formaat">(${etiket_vir_formaat(i.formaat)}${i.geskenk ? `, 🎁 ${t("geskenk_merk")}` : ""})</span></span>
+            <span>${i.titel} <span class="vb-opsomming-formaat">(${i.opsie_naam || etiket_vir_formaat(i.formaat)}${i.geskenk ? `, 🎁 ${t("geskenk_merk")}` : ""})</span></span>
             <span>${formateer_prys_sent(i.prys_sent)}</span>
           </div>`
           )
@@ -303,7 +303,7 @@ async function verifieer_kodes(kodes, items, toegangs_token) {
     },
     body: JSON.stringify({
       koepon_kodes: kodes,
-      items: items.map((i) => ({ produk_slug: i.produk_slug, formaat: i.formaat, ...(i.geskenk ? { geskenk: true } : {}) })),
+      items: items.map((i) => ({ produk_slug: i.produk_slug, formaat: i.formaat, ...(i.opsie ? { opsie: i.opsie } : {}), ...(i.geskenk ? { geskenk: true } : {}) })),
     }),
   });
 

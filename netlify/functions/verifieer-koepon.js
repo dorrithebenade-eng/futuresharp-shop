@@ -19,6 +19,7 @@ const {
 } = require("./_koepon-velde");
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 const { kry_aktiewe_pakkette, pas_pakkette_toe_per_groep } = require("./_reekspakkette");
+const { kry_formaat_data } = require("./_harde-kopie-opsies");
 
 exports.handler = async (event, context) => {
   if (event.httpMethod !== "POST") {
@@ -83,7 +84,7 @@ exports.handler = async (event, context) => {
   const pakket_invoer = [];
   for (const kliënt_item of items) {
     const p = await katalogusStore.get(kliënt_item.produk_slug, { type: "json" });
-    const fd = p && p.formate && p.formate[kliënt_item.formaat];
+    const fd = kry_formaat_data(p, kliënt_item.formaat, kliënt_item.opsie);
     pakket_invoer.push({ produk_slug: kliënt_item.produk_slug, formaat: kliënt_item.formaat, prys_sent: fd && fd.beskikbaar ? fd.prys_sent : 0, geskenk: kliënt_item.geskenk === true });
   }
   const { per_item: pakket_per_item } = pas_pakkette_toe_per_groep(pakket_invoer, await kry_aktiewe_pakkette());
@@ -93,7 +94,7 @@ exports.handler = async (event, context) => {
     item_indeks++;
     const produk = await katalogusStore.get(kliënt_item.produk_slug, { type: "json" });
     if (!produk) continue;
-    const formaat_data = produk.formate && produk.formate[kliënt_item.formaat];
+    const formaat_data = kry_formaat_data(produk, kliënt_item.formaat, kliënt_item.opsie);
     if (!formaat_data || !formaat_data.beskikbaar) continue;
 
     const item_prys_sent = formaat_data.prys_sent;
