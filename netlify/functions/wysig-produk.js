@@ -8,6 +8,7 @@
 // entiteit_id nie) — die bedrag bly by die hoofrekening.
 
 const { kry_store } = require("./_blob-store");
+const { kry_webblad_velde } = require("./_produk-webblad");
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 const { kry_maks_verdeling_persentasie, beskryf_minimum } = require("./_paystack-koste.js");
 const { kontroleer_leen_prys } = require("./_leen-prys-kontrole");
@@ -228,6 +229,7 @@ exports.handler = async (event, context) => {
     // uit boeke met hierdie merkie, as daar drie of meer is.
     op_tuisblad: "op_tuisblad" in wysigings ? wysigings.op_tuisblad === true : bestaande.op_tuisblad === true,
     vra_harde_kopie: "vra_harde_kopie" in wysigings ? wysigings.vra_harde_kopie === true : bestaande.vra_harde_kopie === true,
+    ...kry_webblad_velde(wysigings, bestaande),
     bygewerk_op: new Date().toISOString(),
     bygewerk_deur: gebruiker.email,
   };

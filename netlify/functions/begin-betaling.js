@@ -103,6 +103,13 @@ exports.handler = async (event, context) => {
   }
 
   const { bestelnommer, items, aflewering, koper } = invoer;
+  // Kaartjieboodskap (November 2026): vrye teks van die koper, beperk tot
+  // 300 karakters. Word by elke vertoning ontsnap.
+  if (aflewering && typeof aflewering === "object" && "kaartjie" in aflewering) {
+    const kaartjie = String(aflewering.kaartjie || "").trim().slice(0, 300);
+    if (kaartjie) aflewering.kaartjie = kaartjie;
+    else delete aflewering.kaartjie;
+  }
 
   if (!bestelnommer || !items || !items.length || !koper || !koper.epos || !koper.selfoonnommer) {
     return { statusCode: 400, body: "Onvolledige bestelling-data" };

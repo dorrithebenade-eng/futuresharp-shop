@@ -13,6 +13,7 @@ const { kry_store } = require("./_blob-store");
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 const { kry_maks_verdeling_persentasie, beskryf_minimum } = require("./_paystack-koste.js");
 const { kontroleer_leen_prys } = require("./_leen-prys-kontrole");
+const { kry_webblad_velde } = require("./_produk-webblad");
 const { kry_geldige_reeks, kry_geldige_taal, kry_geldige_eweknie, kontroleer_eweknie, sinkroniseer_eweknie } = require("./_eweknie");
 
 const GELDIGE_ROL_TIPES = ["outeur", "vennoot", "ontwerp_admin", "printing", "aflewering"];
@@ -251,6 +252,7 @@ exports.handler = async (event, context) => {
     etiket: kry_geldige_etiket(invoer.etiket),
     op_tuisblad: invoer.op_tuisblad === true,
     vra_harde_kopie: invoer.vra_harde_kopie === true,
+    ...kry_webblad_velde(invoer, null),
     formate: {
       eboek: {
         beskikbaar: !!formate.eboek.beskikbaar,

@@ -589,6 +589,13 @@ const WOORDEBOEK = {
   stad: { af: "Stad", en: "City" },
   provinsie: { af: "Provinsie", en: "Province" },
   poskode: { af: "Poskode", en: "Postal code" },
+  kaartjie_boodskap_etiket: { af: "Boodskap vir die kaartjie", en: "Message for the card" },
+  koop_ongeldig: { af: "Hierdie skakel is nie volledig nie.", en: "This link is incomplete." },
+  koop_nie_beskikbaar: {
+    af: "Hierdie opsie is nie nou te koop nie.",
+    en: "This option is not available right now.",
+  },
+  koop_na_winkel: { af: "Gaan na Future Shop", en: "Go to Future Shop" },
   kontakbesonderhede: { af: "Kontakbesonderhede", en: "Contact details" },
   epos: { af: "E-pos", en: "Email" },
   selfoonnommer: { af: "Selfoonnommer", en: "Cellphone number" },

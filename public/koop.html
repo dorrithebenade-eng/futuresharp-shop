@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="af">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <!--
+    koop.html (November 2026): die ingang vir 'n boek met 'n eie webblad.
+    Die webblad se knoppie skakel hierheen met ?produk=<slug>&formaat=<formaat>.
+    Die bladsy sit die item in die winkel se mandjie en stuur die koper
+    reguit na voltooi-betaling.html. Daarna verloop alles soos in die winkel.
+    Die mandjie leef in localStorage op hierdie domein; daarom kan die
+    webblad dit nie self doen nie.
+  -->
+  <title>Future Shop</title>
+  <link rel="stylesheet" href="css/styl.css">
+  <link rel="icon" href="/icons/ikoon-32.png" sizes="32x32" type="image/png">
+  <link rel="icon" href="/icons/ikoon-16.png" sizes="16x16" type="image/png">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-ikoon.png">
+  <meta name="theme-color" content="#3FB6A4">
+</head>
+<body>
+  <main class="vb-wrap">
+    <p id="koop-boodskap" class="stelsel-boodskap" data-i18n="word_gelaai">Word gelaai …</p>
+  </main>
+  <script src="js/taal.js"></script>
+  <script src="js/mandjie.js"></script>
+  <script src="js/koop.js"></script>
+</body>
+</html>

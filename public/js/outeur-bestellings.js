@@ -58,6 +58,18 @@ function ob_bou_adres(aflewering) {
     blok.appendChild(skakel);
   }
 
+  if (aflewering.kaartjie) {
+    const kaartjie = document.createElement("p");
+    kaartjie.className = "outeur-adres-kaartjie";
+    kaartjie.style.cssText = "margin:8px 0 0;white-space:pre-line;";
+    const etiket = document.createElement("strong");
+    etiket.textContent = ob_vertaal("kaartjie_boodskap_etiket", "Boodskap vir die kaartjie");
+    kaartjie.appendChild(etiket);
+    kaartjie.appendChild(document.createElement("br"));
+    kaartjie.appendChild(document.createTextNode(aflewering.kaartjie));
+    blok.appendChild(kaartjie);
+  }
+
   // 'n Ou bestelling sonder ontvanger laat die outeur raai. Sê waar die
   // gaping is eerder as om 'n halwe adres te wys.
   if (!aflewering.ontvanger) {

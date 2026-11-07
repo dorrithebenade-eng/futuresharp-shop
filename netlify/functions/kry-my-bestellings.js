@@ -59,6 +59,7 @@ function aflewering_vir_outeur(bestelling) {
     provinsie: aflewering.provinsie || "",
     poskode: aflewering.poskode || "",
     selfoon: koper.selfoonnommer || "",
+    kaartjie: aflewering.kaartjie || "",
   };
 }
 

@@ -143,6 +143,10 @@ function aflewering_blok(bestelling) {
   const selfoon = bestelling.koper && bestelling.koper.selfoonnommer;
   if (selfoon) reels.push(`Selfoon ${ontsnap(selfoon)}`);
 
+  if (aflewering.kaartjie) {
+    reels.push(`<br><b>Boodskap vir die kaartjie</b><br>${ontsnap(aflewering.kaartjie).replace(/\n/g, "<br>")}`);
+  }
+
   // Ou bestellings het geen ontvanger nie. 'n Naamlose adres laat die
   // outeur raai; dit is beter om te sê waar die gaping is.
   if (!aflewering.ontvanger) {

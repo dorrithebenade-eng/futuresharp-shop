@@ -999,6 +999,21 @@
             <span><b>Wys op die tuisblad</b>: die band op die tuisblad kies drie omslae uit die boeke met hierdie merkie (en hul eweknieë), elke keer ander drie.</span>
           </label>
 
+          <fieldset class="paneel-webblad-blok" style="border:1px solid #e3ddd2;border-radius:8px;padding:12px 14px;margin:0 0 18px;">
+            <legend style="padding:0 6px;font-weight:600;">Eie webblad</legend>
+            <label class="paneel-merkblokkie-ry" style="display:flex;gap:8px;align-items:flex-start;margin:4px 0 10px;">
+              <input type="checkbox" id="vorm-ongelys" style="margin-top:3px;">
+              <span><b>Ongelys</b>: te koop deur 'n direkte skakel (koop.html of die boekbladsy), maar nie in die winkel se rye, katalogus of tuisblad nie.</span>
+            </label>
+            <label class="veld-etiket" for="vorm-eie-webblad">Webblad-adres <span class="veld-opsioneel">(opsioneel, https)</span></label>
+            <input type="url" id="vorm-eie-webblad" class="veld-invoer" placeholder="https://...">
+            <p class="paneel-hulp-teks">Met 'n adres hier stuur die boekbladsy besoekers na die webblad. Voeg <code>&amp;bly=1</code> by die boekbladsy se adres om dit self in die winkel te sien.</p>
+            <label class="paneel-merkblokkie-ry" style="display:flex;gap:8px;align-items:flex-start;margin:10px 0 0;">
+              <input type="checkbox" id="vorm-kaartjie-boodskap" style="margin-top:3px;">
+              <span><b>Kaartjieboodskap</b>: die betaalbladsy vra 'n opsionele boodskap vir die kaartjie by die harde kopie.</span>
+            </label>
+          </fieldset>
+
           <label class="veld-etiket" for="vorm-oorsig" data-i18n="vorm_oorsig_etiket">Oorsig (verskyn op die katalogus-kaart, ongeveer 100 woorde)</label>
           <textarea id="vorm-oorsig" class="veld-invoer paneel-teksarea" rows="5"></textarea>
 

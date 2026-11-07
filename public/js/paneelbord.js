@@ -203,6 +203,7 @@ function wys_produkte_lys(produkte) {
               ${wys_leen_teller ? `· ${t("leen_etiket")}: ${produk.aankope_leen || 0} (${formateer_prys_sent(produk.opbrengs_leen_sent || 0)})` : ""}
             </span>
             ${!produk.aktief ? `<span class="paneel-onaktief-etiket">${t("paneel_onaktief")}</span>` : ""}
+            ${produk.ongelys === true ? `<span class="paneel-onaktief-etiket" title="Te koop deur 'n direkte skakel, nie in die winkel se lyste nie">Ongelys</span>` : ""}
           </div>
           <div class="paneel-produk-aksies">
             <button class="terug-skakel paneel-wysig-knoppie" data-slug="${produk.slug}">${t("paneel_wysig")}</button>
@@ -998,6 +999,9 @@ function reset_vorm() {
   document.getElementById("vorm-reeks-volgorde").value = "";
   document.getElementById("vorm-op-tuisblad").checked = false;
   document.getElementById("vorm-vra-harde-kopie").checked = false;
+  document.getElementById("vorm-ongelys").checked = false;
+  document.getElementById("vorm-eie-webblad").value = "";
+  document.getElementById("vorm-kaartjie-boodskap").checked = false;
   if (typeof hk_paneel_wys === "function") hk_paneel_wys(null);
   bou_reeks_voorstelle();
   document.getElementById("vorm-etiket-pasgemaak-velde").style.display = "none";
@@ -1212,6 +1216,9 @@ function open_vorm_vir_wysig(produk) {
   document.getElementById("vorm-reeks-volgorde").value = (produk.reeks && produk.reeks.volgorde_in_reeks) || "";
   document.getElementById("vorm-op-tuisblad").checked = produk.op_tuisblad === true;
   document.getElementById("vorm-vra-harde-kopie").checked = produk.vra_harde_kopie === true;
+  document.getElementById("vorm-ongelys").checked = produk.ongelys === true;
+  document.getElementById("vorm-eie-webblad").value = produk.eie_webblad || "";
+  document.getElementById("vorm-kaartjie-boodskap").checked = produk.kaartjie_boodskap === true;
   if (typeof hk_paneel_wys === "function") hk_paneel_wys(produk);
   document.getElementById("vorm-oorsig").value = produk.oorsig || "";
   document.getElementById("vorm-vol-beskrywing").value = produk.vol_beskrywing || "";
@@ -1389,6 +1396,9 @@ function bou_produk_liggaam() {
     },
     op_tuisblad: document.getElementById("vorm-op-tuisblad").checked,
     vra_harde_kopie: document.getElementById("vorm-vra-harde-kopie").checked,
+    ongelys: document.getElementById("vorm-ongelys").checked,
+    eie_webblad: document.getElementById("vorm-eie-webblad").value.trim(),
+    kaartjie_boodskap: document.getElementById("vorm-kaartjie-boodskap").checked,
     oorsig: document.getElementById("vorm-oorsig").value.trim(),
     vol_beskrywing: document.getElementById("vorm-vol-beskrywing").value.trim(),
     omslag: document.getElementById("vorm-omslag").value.trim(),

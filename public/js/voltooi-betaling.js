@@ -92,7 +92,7 @@ function bou_opsomming(items, totaal, pakkette) {
   `;
 }
 
-function bou_aflewer_afdeling() {
+function bou_aflewer_afdeling(met_kaartjie) {
   return `
     <section class="vb-afdeling">
       <h2 class="vb-afdeling-titel">${t("aflewering_titel")}</h2>
@@ -115,6 +115,9 @@ function bou_aflewer_afdeling() {
             <input type="text" id="adres-poskode" class="veld-invoer">
           </div>
         </div>
+        ${met_kaartjie ? `
+        <label class="veld-etiket" for="adres-kaartjie">${t("kaartjie_boodskap_etiket")} <span class="veld-opsioneel">${t("opsioneel")}</span></label>
+        <textarea id="adres-kaartjie" class="veld-invoer" rows="3" maxlength="300"></textarea>` : ""}
       </div>
     </section>
   `;
@@ -176,6 +179,11 @@ function valideer_en_bou_bestelling(items, totaal, bestelnommer, bevat_harde_kop
 
     if (ontvanger && straat && stad && provinsie && poskode) {
       aflewering = { ontvanger, straat, stad, provinsie, poskode };
+      // Kaartjieboodskap (November 2026): opsioneel, net by produkte met
+      // kaartjie_boodskap aan (sien koop.js).
+      const kaartjie_veld = document.getElementById("adres-kaartjie");
+      const kaartjie = kaartjie_veld ? kaartjie_veld.value.trim().slice(0, 300) : "";
+      if (kaartjie) aflewering.kaartjie = kaartjie;
     }
   }
 
@@ -451,7 +459,7 @@ async function laai_vb() {
   wrap.innerHTML = `
     <p class="vb-bestelnommer">${t("bestelnommer_etiket")}: <strong>${bestelnommer}</strong></p>
     ${bou_opsomming(items, totaal, pakkette)}
-    ${bevatHardeKopie ? bou_aflewer_afdeling() : ""}
+    ${bevatHardeKopie ? bou_aflewer_afdeling(items.some((i) => i.kaartjie === true)) : ""}
     ${items.some((i) => i.geskenk) ? bou_geskenk_afdeling() : ""}
     ${bou_kontak_afdeling()}
     <div id="vb-foute" class="vb-foute" style="display:none;"></div>

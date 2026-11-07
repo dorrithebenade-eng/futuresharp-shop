@@ -570,7 +570,27 @@ async function laai_produk() {
     return;
   }
 
-  const produk = produkte.find((p) => p.slug === slug);
+  let produk = produkte.find((p) => p.slug === slug);
+
+  // Ongelyste produkte (sien kry-katalogus.js) is nie in die lys nie; vra
+  // hulle afsonderlik op volgens slug.
+  if (!produk && !demo_modus) {
+    try {
+      const r = await fetch(`${KATALOGUS_ENDPOINT}?slug=${encodeURIComponent(slug)}`);
+      if (r.ok) produk = ((await r.json()).produkte || [])[0];
+    } catch (_) {
+      /* val deur na "nie gevind nie" */
+    }
+  }
+
+  // 'n Boek met 'n eie webblad: die webblad is die voorkant. Met &bly=1 in
+  // die adres wys die winkel se eie bladsy steeds (vir personeel).
+  const bly = new URLSearchParams(window.location.search).get("bly") === "1";
+  if (produk && produk.eie_webblad && !bly) {
+    window.location.replace(produk.eie_webblad);
+    return;
+  }
+
   if (!produk) {
     wrap.innerHTML = `<p class="stelsel-boodskap">${t("produk_nie_gevind")} <a href="boeke.html">${t("terug_katalogus_skakel")}</a></p>`;
     return;
