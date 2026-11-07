@@ -46,6 +46,11 @@ const WOORDEBOEK = {
     en: "Every book waits in your own Reading Room, on your phone, tablet or computer.",
   },
   bk_ander_boeke: { af: "Ander boeke", en: "More books" },
+  bk_voorskou_ry: { af: "Voorskou", en: "Preview" },
+  bk_voorskou_nota: {
+    af: "Net jy sien hierdie boeke. Hulle is nog nie in die winkel op die rak nie.",
+    en: "Only you can see these books. They are not on the shelf in the shop yet.",
+  },
   bk_boek: { af: "Boek", en: "Book" },
   bk_lees_nou: { af: "Lees nou", en: "Read now" },
   bk_in_engels: { af: "In Engels", en: "In English" },

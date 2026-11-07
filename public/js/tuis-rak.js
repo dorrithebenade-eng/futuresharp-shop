@@ -28,7 +28,7 @@
       const in_taal = bk_in_taal(data.produkte);
       let html = "";
       if (afd.band && afd.band.nuut_op_rak === true) {
-        const nuutste = in_taal.slice()
+        const nuutste = in_taal.filter((p) => !p.voorskou)
           .sort((a, b) => String(b.geskep_op || "").localeCompare(String(a.geskep_op || "")))
           .slice(0, 4);
         if (nuutste.length) html += ry_html(t("bk_nuut_op_rak"), "boeke.html", nuutste, data, true);

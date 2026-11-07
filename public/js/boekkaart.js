@@ -86,6 +86,7 @@ function bk_lidmaatskap(afdelings, per_slug) {
 
 // Die ry en plek van 'n boek: eers die paneel se keuse, dan sy reeks.
 function bk_kode(p, per_slug, lidmaatskap) {
+  if (p.voorskou) return { kode: "__voorskou", volgorde: null, posisie: null };
   const reeks = bk_reeks(p, per_slug);
   const lid = lidmaatskap && lidmaatskap.get(p.slug);
   if (lid) return { kode: lid.kode, volgorde: reeks.volgorde, posisie: lid.posisie };
@@ -137,13 +138,34 @@ async function bk_kry_besit() {
   }
 }
 
+// VOORSKOU (November 2026): ongelyste boeke wat die aangemelde outeur (of
+// admin) mag sien voordat hulle op die rak is. Hulle kry 'n eie ry bo-aan
+// en die etiket "Voorskou". Sien netlify/functions/kry-voorskou-boeke.js.
+async function bk_kry_voorskou() {
+  try {
+    if (typeof identiteit_kry_huidige_sessie !== "function") return [];
+    const sessie = await identiteit_kry_huidige_sessie();
+    if (!sessie || !sessie.access_token) return [];
+    const r = await fetch("/.netlify/functions/kry-voorskou-boeke", { headers: { Authorization: `Bearer ${sessie.access_token}` } });
+    if (!r.ok) return [];
+    return ((await r.json()).produkte || []).map((p) => ({
+      ...p,
+      voorskou: true,
+      etiket: { teks_af: "Voorskou", teks_en: "Preview", kleur: "koraal" },
+    }));
+  } catch {
+    return [];
+  }
+}
+
 async function bk_laai_alles() {
-  const [kat, afd, besit] = await Promise.all([
+  const [kat, afd, besit, voorskou] = await Promise.all([
     fetch(BK_KATALOGUS).then((r) => (r.ok ? r.json() : Promise.reject(r.status))),
     fetch(BK_AFDELINGS).then((r) => (r.ok ? r.json() : { afdelings: [] })).catch(() => ({ afdelings: [] })),
     bk_kry_besit(),
+    bk_kry_voorskou(),
   ]);
-  const produkte = kat.produkte || [];
+  const produkte = (kat.produkte || []).concat(voorskou);
   return {
     produkte,
     per_slug: new Map(produkte.map((p) => [p.slug, p])),
@@ -253,6 +275,9 @@ function bk_bou_rye(produkte, konteks) {
       || (a.p.taal === taal_nou ? 0 : 1) - (b.p.taal === taal_nou ? 0 : 1)
       || String(a.p.titel).localeCompare(String(b.p.titel), "af", { numeric: true }));
     const meta = afdelings_per_kode.get(kode);
+    if (kode === "__voorskou") {
+      return { kode, naam: t("bk_voorskou_ry"), beskrywing: t("bk_voorskou_nota"), plek: -1, boeke: boeke.map((b) => b.p) };
+    }
     return {
       kode,
       naam: kode ? bk_afdeling_naam(kode, afdelings_per_kode, boeke[0].p) : t("bk_ander_boeke"),
