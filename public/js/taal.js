@@ -601,6 +601,7 @@ const WOORDEBOEK = {
     en: "This option is not available right now.",
   },
   koop_na_winkel: { af: "Gaan na Future Shop", en: "Go to Future Shop" },
+  terug_webblad: { af: "Kies nog iets op die webblad", en: "Choose something else on the book's page" },
   kontakbesonderhede: { af: "Kontakbesonderhede", en: "Contact details" },
   epos: { af: "E-pos", en: "Email" },
   selfoonnommer: { af: "Selfoonnommer", en: "Cellphone number" },

@@ -70,6 +70,12 @@
     }
 
     voeg_by_mandjie(item);
+
+    // Terug na die boek se webblad (sien terug-webblad.js): net as die
+    // produk 'n eie webblad het.
+    if (produk.eie_webblad && typeof stoor_terug_webblad === "function") {
+      stoor_terug_webblad(produk.slug, String(produk.eie_webblad).replace(/#.*$/, "") + "#formate");
+    }
     window.location.replace("voltooi-betaling.html");
   }
 
