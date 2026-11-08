@@ -249,7 +249,8 @@
       .reekspakket-formaat button.aan{background:var(--teal,#479F91);color:#fff}
       .reekspakket-prys{margin:0 0 12px;font-size:15px;color:#8A877E}
       .reekspakket-prys b{font-size:28px;color:#1B1B19}
-      .reekspakket-geskenk-skakel{display:block;margin:10px auto 0;background:none;border:0;color:var(--teal,#479F91);font-weight:700;font-size:14px;text-decoration:underline;cursor:pointer;font-family:inherit}
+      .reekspakket-geskenk-skakel{display:block;margin:10px 0 0;background:#fff;color:var(--teal,#479F91);border:1.5px solid var(--teal,#479F91);border-radius:999px;padding:8px 18px;font-weight:600;font-size:13px;cursor:pointer;font-family:inherit}
+      .reekspakket-geskenk-skakel[hidden]{display:none}
       .reekspakket-geskenk-knoppie{width:100%;margin-top:8px;background:#fff;color:var(--teal,#479F91);border:2px solid var(--teal,#479F91)}
       .reekspakket-ry{color:var(--teal,#479F91);font-weight:700}
       .reekspakket-wenke{margin:10px 0 14px;display:flex;flex-direction:column;gap:8px}

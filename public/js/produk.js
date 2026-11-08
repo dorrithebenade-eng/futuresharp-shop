@@ -353,6 +353,18 @@ function wys_produk(produk, besit_info, konteks) {
     <div id="pb-meer"></div>
   `;
 
+  // Die Leeskamer-reël gaan oor die e-boek: skuif dit in die e-boek se blok.
+  const leeskamer = wrap.querySelector(".pb-leeskamer");
+  if (leeskamer) {
+    const eboek_ry = [...wrap.querySelectorAll(".produk-formaat-ry")].find(
+      (r) => (r.querySelector(".produk-formaat-etiket") || {}).textContent === t("eboek_etiket")
+    );
+    if (eboek_ry) {
+      leeskamer.classList.add("pb-leeskamer-in-ry");
+      eboek_ry.appendChild(leeskamer);
+    }
+  }
+
   wys_meer_uit_ry(produk, ry, kt);
 
   wrap.querySelectorAll(".produk-formaat-knoppie").forEach((knoppie) => {

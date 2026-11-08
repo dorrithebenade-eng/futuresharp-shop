@@ -512,7 +512,7 @@ const WOORDEBOEK = {
   pakket_hk_knoppie: { af: "Sit die hele reeks as gedrukte boeke in my mandjie", en: "Add the whole series as printed books to my cart" },
   pakket_aanbod_tot: { af: "Vrystellingsaanbod tot", en: "Launch offer until" },
   pakket_knoppie: { af: "Sit die hele reeks in my mandjie", en: "Add the whole series to my cart" },
-  pakket_geskenk_knoppie: { af: "Gee die hele reeks as geskenk", en: "Give the whole series as a gift" },
+  pakket_geskenk_knoppie: { af: "Koop die hele reeks as geskenk", en: "Buy the whole series as a gift" },
   // GESKENKE (November 2026), sien netlify/functions/_geskenke.js
   geskenk_knoppie: { af: "Koop as geskenk", en: "Buy as a gift" },
   geskenk_bygevoeg: { af: "Bygevoeg as geskenk", en: "Added as a gift" },
@@ -1122,6 +1122,16 @@ const WOORDEBOEK = {
   paneel_eboek_oplaai_sukses: { af: "E-boek-PDF opgelaai ✓", en: "E-book PDF uploaded ✓" },
   paneel_eboek_reeds_opgelaai: { af: "PDF reeds opgelaai ✓", en: "PDF already uploaded ✓" },
   bondel_oop_knoppie: { af: "E-boeke in 'n bondel oplaai", en: "Bulk upload e-books" },
+  bondel_omslag_oop_knoppie: { af: "Omslae in 'n bondel oplaai", en: "Bulk upload covers" },
+  bondel_omslag_titel: { af: "Omslae in 'n bondel oplaai", en: "Bulk upload covers" },
+  bondel_omslag_hulp: {
+    af: "Kies al die voorblaaie gelyk (JPG of PNG). Elke lêer word volgens sy naam aan 'n boek gekoppel; gaan die lys na en stel dit reg waar nodig. Net die omslag word vervang. Die beelde word vanself kleiner gemaak vir die web.",
+    en: "Select all the front covers at once (JPG or PNG). Each file is matched to a book by its name; check the list and correct it where needed. Only the cover is replaced. The images are made smaller for the web automatically.",
+  },
+  bondel_omslag_bevestig: {
+    af: "Vervang die omslag van %aantal% boek(e)?",
+    en: "Replace the cover of %aantal% book(s)?",
+  },
   bondel_titel: { af: "E-boek-PDF's in 'n bondel oplaai", en: "Bulk upload e-book PDFs" },
   bondel_sluit: { af: "Sluit", en: "Close" },
   bondel_hulp: {
