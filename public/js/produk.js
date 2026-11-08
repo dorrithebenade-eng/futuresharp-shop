@@ -183,7 +183,7 @@ function bou_aksie_ry(produk, formaat, formaat_data, etiket, besit, leen_dae_oor
         data-voorbestelling="${voorbestelling}">
         ${knoppie_teks}
       </button>
-      ${formaat === "eboek" ? bou_geskenk_knoppie(produk, formaat_data) : ""}
+      ${formaat === "eboek" || formaat === "harde_kopie" ? bou_geskenk_knoppie(produk, formaat_data, formaat) : ""}
     </div>
   `;
 }
@@ -192,11 +192,13 @@ function bou_aksie_ry(produk, formaat, formaat_data, etiket, besit, leen_dae_oor
 // as geskenk in die mandjie; ná betaling kry die koper 'n eenmalige
 // geskenkkode (sien netlify/functions/_geskenke.js). Ook as die koper die
 // boek self reeds besit.
-function bou_geskenk_knoppie(produk, formaat_data) {
+// Harde kopie (November 2026): "Stuur as geskenk"; die koper vul by betaling
+// die ontvanger se adres en selfoonnommer in (sien voltooi-betaling.js).
+function bou_geskenk_knoppie(produk, formaat_data, formaat = "eboek") {
   return `
     <button type="button" class="kaart-aksie produk-geskenk-knoppie"
-      data-slug="${produk.slug}" data-titel="${titel_ontsnap(produk.titel)}" data-prys="${formaat_data.prys_sent}">
-      🎁 ${t("geskenk_knoppie")}
+      data-slug="${produk.slug}" data-titel="${titel_ontsnap(produk.titel)}" data-prys="${formaat_data.prys_sent}" data-formaat="${formaat}">
+      🎁 ${t(formaat === "harde_kopie" ? "geskenk_knoppie_hk" : "geskenk_knoppie")}
     </button>
   `;
 }
@@ -543,10 +545,11 @@ function koppel_geskenk_knoppies(wrap) {
   wrap.querySelectorAll(".produk-geskenk-knoppie").forEach((knoppie) => {
     knoppie.addEventListener("click", () => {
       const { slug, titel, prys } = knoppie.dataset;
+      const formaat = knoppie.dataset.formaat === "harde_kopie" ? "harde_kopie" : "eboek";
       const resultaat = voeg_by_mandjie({
         produk_slug: slug,
         titel,
-        formaat: "eboek",
+        formaat,
         prys_sent: Number(prys),
         geskenk: true,
       });
@@ -557,7 +560,7 @@ function koppel_geskenk_knoppies(wrap) {
       }
       knoppie.textContent = "✓ " + t("geskenk_bygevoeg");
       knoppie.disabled = true;
-      terugvoer.innerHTML = `${t("geskenk_bygevoeg_nota")} <a href="mandjie.html">${t("gaan_na_mandjie")}</a>`;
+      terugvoer.innerHTML = `${t(formaat === "harde_kopie" ? "geskenk_bygevoeg_nota_hk" : "geskenk_bygevoeg_nota")} <a href="mandjie.html">${t("gaan_na_mandjie")}</a>`;
     });
   });
 }

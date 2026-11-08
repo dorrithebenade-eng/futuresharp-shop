@@ -77,6 +77,8 @@ async function stuur_koper_bevestiging(bestelling) {
     lyn_items.push(
       afhaal
         ? "Afhaal in Pretoria &middot; R0,00"
+        : bestelling.aflewering && bestelling.aflewering.geskenk
+        ? `Aflewering per koerier as geskenk aan ${ontsnap(bestelling.aflewering.ontvanger || "")} &middot; ${rand(bestelling.afleweringskoste_sent || 0)}`
         : `Aflewering per koerier &middot; ${rand(bestelling.afleweringskoste_sent || 0)}`
     );
   }

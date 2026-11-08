@@ -132,27 +132,37 @@ function bou_opsomming(items, totaal, pakkette) {
   `;
 }
 
-function bou_aflewer_afdeling(met_kaartjie) {
+// HARDE KOPIE AS GESKENK (November 2026): die boek gaan per koerier reguit
+// na die ontvanger. Geen afhaal nie, en die ontvanger se selfoonnommer is
+// verplig sodat die koerier die ontvanger kan bel. Die item gaan sonder die
+// geskenk-vlag na die bediener (dit is nie 'n e-boek-geskenkkode nie); die
+// bestelling dra aflewering.geskenk.
+function is_hk_geskenk(i) { return i.geskenk === true && i.formaat === "harde_kopie"; }
+
+function bou_aflewer_afdeling(met_kaartjie, as_geskenk) {
   return `
     <section class="vb-afdeling">
-      <h2 class="vb-afdeling-titel">${t("aflewering_titel")}</h2>
-      <p class="vb-afdeling-nota">${t("aflewering_nota")}</p>
+      <h2 class="vb-afdeling-titel">${as_geskenk ? "🎁 " : ""}${t("aflewering_titel")}</h2>
+      <p class="vb-afdeling-nota">${t(as_geskenk ? "aflewering_geskenk_nota" : "aflewering_nota")}</p>
 
       <div class="aflewer-metodes" style="display:flex;flex-direction:column;gap:8px;margin:8px 0 16px;">
         <label style="display:flex;gap:10px;align-items:center;cursor:pointer;">
           <input type="radio" name="aflewer-metode" value="koerier" checked>
           <span>${t("aflewering_metode_koerier")} <span id="vb-koerier-bedrag" style="color:#666"></span></span>
         </label>
-        <label style="display:flex;gap:10px;align-items:center;cursor:pointer;">
+        ${as_geskenk ? "" : `<label style="display:flex;gap:10px;align-items:center;cursor:pointer;">
           <input type="radio" name="aflewer-metode" value="afhaal">
           <span>${t("aflewering_metode_afhaal")} <span style="color:#666">(${t("aflewering_gratis")})</span></span>
-        </label>
+        </label>`}
         <p id="vb-afhaal-nota" class="vb-afdeling-nota" style="display:none;margin:4px 0 0;">${t("aflewering_afhaal_nota")}</p>
       </div>
 
       <div id="aflewer-adres-blok" class="aflewer-blok">
         <label class="veld-etiket" for="adres-ontvanger">${t("ontvanger_naam")}</label>
         <input type="text" id="adres-ontvanger" class="veld-invoer" autocomplete="name">
+        ${as_geskenk ? `
+        <label class="veld-etiket" for="adres-selfoon">${t("ontvanger_selfoon")} <span class="veld-verplig">${t("verplig")}</span></label>
+        <input type="tel" id="adres-selfoon" class="veld-invoer" placeholder="08x xxx xxxx">` : ""}
         <label class="veld-etiket" for="adres-straat">${t("straatadres")}</label>
         <input type="text" id="adres-straat" class="veld-invoer">
         <label class="veld-etiket" for="adres-stad">${t("stad")}</label>
@@ -214,8 +224,12 @@ function valideer_en_bou_bestelling(items, totaal, bestelnommer, bevat_harde_kop
   if (!selfoon) foute.push(t("selfoon_verplig"));
 
   let aflewering = null;
+  const hk_geskenk = items.some(is_hk_geskenk);
+  if (hk_geskenk && items.some((i) => i.formaat === "harde_kopie" && !i.geskenk)) {
+    foute.push(t("geskenk_hk_gemeng"));
+  }
 
-  if (bevat_harde_kopie && gekose_metode() === "afhaal") {
+  if (bevat_harde_kopie && !hk_geskenk && gekose_metode() === "afhaal") {
     aflewering = { metode: "afhaal" };
   } else if (bevat_harde_kopie) {
     // Die ontvanger is nie noodwendig die koper nie — 'n boek word as
@@ -239,10 +253,18 @@ function valideer_en_bou_bestelling(items, totaal, bestelnommer, bevat_harde_kop
       const kaartjie = kaartjie_veld ? kaartjie_veld.value.trim().slice(0, 300) : "";
       if (kaartjie) aflewering.kaartjie = kaartjie;
     }
+    if (hk_geskenk) {
+      const ontvanger_selfoon = document.getElementById("adres-selfoon").value.trim();
+      if (!ontvanger_selfoon) foute.push(t("ontvanger_selfoon_verplig"));
+      if (aflewering) {
+        aflewering.geskenk = true;
+        aflewering.selfoon = ontvanger_selfoon;
+      }
+    }
   }
 
   let geskenk = null;
-  if (items.some((i) => i.geskenk)) {
+  if (items.some((i) => i.geskenk && !is_hk_geskenk(i))) {
     const van = document.getElementById("geskenk-van").value.trim();
     if (!van) foute.push(t("geskenk_van_verplig"));
     geskenk = {
@@ -260,7 +282,7 @@ function valideer_en_bou_bestelling(items, totaal, bestelnommer, bevat_harde_kop
     bestelnommer,
     geskep_op: new Date().toISOString(),
     koper: { epos, selfoonnommer: selfoon },
-    items,
+    items: items.map((i) => (is_hk_geskenk(i) ? { ...i, geskenk: false } : i)),
     totaal_sent: totaal,
     bevat_harde_kopie,
     aflewering,
@@ -357,7 +379,7 @@ async function verifieer_kodes(kodes, items, toegangs_token) {
     },
     body: JSON.stringify({
       koepon_kodes: kodes,
-      items: items.map((i) => ({ produk_slug: i.produk_slug, formaat: i.formaat, ...(i.opsie ? { opsie: i.opsie } : {}), ...(i.geskenk ? { geskenk: true } : {}) })),
+      items: items.map((i) => ({ produk_slug: i.produk_slug, formaat: i.formaat, ...(i.opsie ? { opsie: i.opsie } : {}), ...(i.geskenk && i.formaat !== "harde_kopie" ? { geskenk: true } : {}) })),
     }),
   });
 
@@ -514,8 +536,8 @@ async function laai_vb() {
   wrap.innerHTML = `
     <p class="vb-bestelnommer">${t("bestelnommer_etiket")}: <strong>${bestelnommer}</strong></p>
     ${bou_opsomming(items, totaal, pakkette)}
-    ${bevatHardeKopie ? bou_aflewer_afdeling(items.some((i) => i.kaartjie === true)) : ""}
-    ${items.some((i) => i.geskenk) ? bou_geskenk_afdeling() : ""}
+    ${bevatHardeKopie ? bou_aflewer_afdeling(items.some((i) => i.kaartjie === true), items.some(is_hk_geskenk)) : ""}
+    ${items.some((i) => i.geskenk && !is_hk_geskenk(i)) ? bou_geskenk_afdeling() : ""}
     ${bou_kontak_afdeling()}
     <div id="vb-foute" class="vb-foute" style="display:none;"></div>
     <button class="kaart-aksie vb-betaal-knoppie" id="gaan-na-betaling">${t("gaan_na_betaling")}</button>

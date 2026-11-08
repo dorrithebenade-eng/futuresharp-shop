@@ -114,6 +114,15 @@ exports.handler = async (event, context) => {
     if (kaartjie) aflewering.kaartjie = kaartjie;
     else delete aflewering.kaartjie;
   }
+  // Harde kopie as geskenk (November 2026): net 'n vlag en die ontvanger se
+  // selfoonnommer vir die koerier. Alles anders word weggegooi.
+  if (aflewering) {
+    if (aflewering.geskenk === true) aflewering.geskenk = true;
+    else delete aflewering.geskenk;
+    const selfoon = String(aflewering.selfoon || "").trim().slice(0, 30);
+    if (selfoon) aflewering.selfoon = selfoon;
+    else delete aflewering.selfoon;
+  }
 
   if (!bestelnommer || !items || !items.length || !koper || !koper.epos || !koper.selfoonnommer) {
     return { statusCode: 400, body: "Onvolledige bestelling-data" };
@@ -414,10 +423,15 @@ exports.handler = async (event, context) => {
   // hoofrekening. Koerier vra 'n volledige adres; afhaal in Pretoria nie.
   let afleweringskoste = 0;
   if (bevat_harde_kopie) {
-    const metode = skoon_metode(aflewering && aflewering.metode);
+    const is_geskenk = !!(aflewering && aflewering.geskenk);
+    // 'n Geskenk gaan altyd per koerier na die ontvanger.
+    const metode = is_geskenk ? "koerier" : skoon_metode(aflewering && aflewering.metode);
     if (metode === "koerier") {
       const a = aflewering || {};
-      if (!["ontvanger", "straat", "stad", "provinsie", "poskode"].every((k) => String(a[k] || "").trim())) {
+      const verplig = is_geskenk
+        ? ["ontvanger", "selfoon", "straat", "stad", "provinsie", "poskode"]
+        : ["ontvanger", "straat", "stad", "provinsie", "poskode"];
+      if (!verplig.every((k) => String(a[k] || "").trim())) {
         return { statusCode: 400, body: "Vul asseblief die volledige afleweringsadres in" };
       }
     }

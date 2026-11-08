@@ -515,6 +515,15 @@ const WOORDEBOEK = {
   pakket_geskenk_knoppie: { af: "Koop die hele reeks as geskenk", en: "Buy the whole series as a gift" },
   // GESKENKE (November 2026), sien netlify/functions/_geskenke.js
   geskenk_knoppie: { af: "Koop as geskenk", en: "Buy as a gift" },
+  geskenk_knoppie_hk: { af: "Stuur as geskenk", en: "Send as a gift" },
+  geskenk_bygevoeg_nota_hk: {
+    af: "Die boek is as geskenk in jou mandjie. By betaling vul jy die ontvanger se adres in.",
+    en: "The book is in your cart as a gift. At checkout you fill in the recipient's address.",
+  },
+  geskenk_hk_gemeng: {
+    af: "'n Bestelling gaan na een adres. Koop die gedrukte geskenk en jou eie gedrukte boeke asseblief in aparte bestellings.",
+    en: "An order goes to one address. Please buy the printed gift and your own printed books in separate orders.",
+  },
   geskenk_bygevoeg: { af: "Bygevoeg as geskenk", en: "Added as a gift" },
   geskenk_bygevoeg_nota: { af: "Die boek is as geskenk in jou mandjie.", en: "The book is in your cart as a gift." },
   geskenk_reeds_in_mandjie: { af: "Hierdie boek is reeds as geskenk in jou mandjie.", en: "This book is already in your cart as a gift." },
@@ -622,6 +631,15 @@ const WOORDEBOEK = {
     en: "Your cart contains a hard copy. Choose how you would like to receive it. The courier cost is charged once for the whole order.",
   },
   ontvanger_naam: { af: "Ontvanger se naam en van", en: "Recipient's full name" },
+  ontvanger_selfoon: { af: "Ontvanger se selfoonnommer (vir die koerier)", en: "Recipient's cellphone number (for the courier)" },
+  ontvanger_selfoon_verplig: {
+    af: "Die ontvanger se selfoonnommer is verplig, sodat die koerier die ontvanger kan bel.",
+    en: "The recipient's cellphone number is required so that the courier can call them.",
+  },
+  aflewering_geskenk_nota: {
+    af: "Hierdie boek is 'n geskenk. Ons stuur dit per koerier reguit na die ontvanger, sonder 'n prys of faktuur in die pakkie. Jou faktuur kom per e-pos na jou.",
+    en: "This book is a gift. We send it by courier straight to the recipient, without a price or invoice in the parcel. Your invoice is e-mailed to you.",
+  },
   straatadres: { af: "Straatadres", en: "Street address" },
   stad: { af: "Stad", en: "City" },
   provinsie: { af: "Provinsie", en: "Province" },

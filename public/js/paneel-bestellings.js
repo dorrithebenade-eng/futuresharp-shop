@@ -78,7 +78,11 @@ function bou_bestelling_kaart(b) {
     const kontak = `${e(b.koper && b.koper.epos)}${b.koper && b.koper.selfoonnommer ? ` · ${e(b.koper.selfoonnommer)}` : ""}`;
     drukker_html += a.metode === "afhaal"
       ? `<p class="paneel-bestelling-koepon">🏠 Afhaal in Pretoria · stuur tyd en plek aan ${kontak}</p>`
-      : `<p class="paneel-bestelling-koepon">🚚 Koerier (${formateer_prys_sent_bestelling(b.afleweringskoste_sent || 0)}) na <strong>${e(a.ontvanger)}</strong>, ${[a.straat, a.stad, a.provinsie, a.poskode].filter(Boolean).map(e).join(", ")} · ${kontak}</p>`;
+      : a.geskenk
+      ? `<p class="paneel-bestelling-koepon"><span style="background:#FAECE7;color:#712B13;border-radius:6px;padding:2px 8px;font-weight:600;">🎁 GESKENK: geen prys of faktuur in die pakkie</span></p>` +
+        `<p class="paneel-bestelling-koepon">🚚 Koerier na <strong>${e(a.ontvanger)}</strong>, ${[a.straat, a.stad, a.provinsie, a.poskode].filter(Boolean).map(e).join(", ")}${a.selfoon ? ` · ${e(a.selfoon)}` : ""}</p>` +
+        `<p class="paneel-bestelling-koepon">Gekoop deur: ${kontak}</p>`
+      : `<p class="paneel-bestelling-koepon">🚚 Koerier na <strong>${e(a.ontvanger)}</strong>, ${[a.straat, a.stad, a.provinsie, a.poskode].filter(Boolean).map(e).join(", ")} · ${kontak}</p>`;
   }
 
   return `

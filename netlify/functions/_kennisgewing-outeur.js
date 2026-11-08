@@ -141,6 +141,7 @@ function aflewering_blok(bestelling) {
   }
 
   const reels = [];
+  if (aflewering.geskenk) reels.push("<b>GESKENK: sit geen prys of faktuur in die pakkie nie.</b><br>");
   if (aflewering.ontvanger) reels.push(`<b>${ontsnap(aflewering.ontvanger)}</b>`);
   if (aflewering.straat) reels.push(ontsnap(aflewering.straat));
   if (aflewering.stad) reels.push(ontsnap(aflewering.stad));
@@ -151,7 +152,7 @@ function aflewering_blok(bestelling) {
     .join(", ");
   if (onderste) reels.push(onderste);
 
-  const selfoon = bestelling.koper && bestelling.koper.selfoonnommer;
+  const selfoon = aflewering.selfoon || (bestelling.koper && bestelling.koper.selfoonnommer);
   if (selfoon) reels.push(`Selfoon ${ontsnap(selfoon)}`);
 
   if (aflewering.kaartjie) {

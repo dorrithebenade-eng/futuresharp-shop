@@ -43,6 +43,14 @@ function ob_bou_adres(aflewering) {
     return blok;
   }
 
+  // Harde kopie as geskenk (November 2026).
+  if (aflewering.geskenk) {
+    const geskenk = document.createElement("p");
+    geskenk.style.cssText = "margin:0 0 6px;font-weight:600;color:#712B13;";
+    geskenk.textContent = ob_vertaal("outeur_geskenk", "GESKENK: sit geen prys of faktuur in die pakkie nie.");
+    blok.appendChild(geskenk);
+  }
+
   if (aflewering.ontvanger) {
     const naam = document.createElement("strong");
     naam.textContent = aflewering.ontvanger;

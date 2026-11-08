@@ -44,7 +44,7 @@
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        items: items.map((i) => ({ produk_slug: i.produk_slug, formaat: i.formaat, ...(i.opsie ? { opsie: i.opsie } : {}), ...(i.geskenk ? { geskenk: true } : {}) })),
+        items: items.map((i) => ({ produk_slug: i.produk_slug, formaat: i.formaat, ...(i.opsie ? { opsie: i.opsie } : {}), ...(i.geskenk && i.formaat !== "harde_kopie" ? { geskenk: true } : {}) })),
       }),
     });
     if (!resp.ok) return null;
