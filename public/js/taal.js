@@ -63,8 +63,8 @@ const WOORDEBOEK = {
   bk_albei_tale: { af: "Albei tale", en: "Both languages" },
   // Boekbladsy (fase 3)
   pb_leeskamer: {
-    af: "Jou boek wag dadelik in My Leeskamer. Lees aanlyn of aflyn op jou foon, tablet of rekenaar.",
-    en: "Your book waits for you right away in My Reading Room. Read online or offline on your phone, tablet or computer.",
+    af: "Die e-boek wag dadelik in My Leeskamer. Lees aanlyn of aflyn op jou foon, tablet of rekenaar.",
+    en: "The e-book waits for you right away in My Reading Room. Read online or offline on your phone, tablet or computer.",
   },
   pb_hoe_werk_dit: { af: "Hoe werk dit?", en: "How does it work?" },
   pb_meer_uit_ry: { af: "Meer uit hierdie ry", en: "More from this shelf" },
@@ -506,6 +506,7 @@ const WOORDEBOEK = {
   pakket_al: { af: "Al", en: "All" },
   pakket_eboeke: { af: "e-boeke", en: "e-books" },
   pakket_boeke_eboek: { af: "boeke as e-boek", en: "books as e-books" },
+  pakket_boeke: { af: "boeke", en: "books" },
   pakket_gewoonlik: { af: "Gewoonlik", en: "Normally" },
   pakket_gedruk: { af: "As gedrukte boeke", en: "As printed books" },
   pakket_hk_knoppie: { af: "Sit die hele reeks as gedrukte boeke in my mandjie", en: "Add the whole series as printed books to my cart" },

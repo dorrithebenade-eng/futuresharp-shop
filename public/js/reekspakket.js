@@ -127,18 +127,42 @@
       const hk = pakket.harde_kopie;
       const blok = document.createElement("div");
       blok.className = "reekspakket-blok";
+      // Een keuse (e-boek of gedruk), een prys, een knoppie. Die gewone prys
+      // is die pakket se prys sonder die vrystellingskode.
+      const pryse = {
+        eboek: { betaal, gewoon: pakket.prys_sent },
+        harde_kopie: hk ? { betaal: betaal + hk.druk_sent, gewoon: pakket.prys_sent + hk.druk_sent } : null,
+      };
+      let formaat = "eboek";
       blok.innerHTML = `
         ${tot ? `<span class="reekspakket-etiket">${esc(aanbod ? tt("pakket_aanbod_tot", "Vrystellingsaanbod tot") : tt("pakket_tot", "Tot"))} ${esc(tot)}</span>` : ""}
-        <p class="reekspakket-teks">
-          <strong>${esc(naam(pakket))} ${esc(tt("pakket_vir", "vir"))} ${formateer_rond(betaal)}</strong><br>
-          ${esc(tt("pakket_al", "Al"))} ${pakket.slugs.length} ${esc(tt("pakket_boeke_eboek", "boeke as e-boek"))}. ${esc(tt("pakket_gewoonlik", "Gewoonlik"))} <s>${formateer_rond(pakket.los_sent)}</s>
-          ${hk ? `<br>${esc(tt("pakket_gedruk", "As gedrukte boeke"))}: <strong>${formateer_rond(betaal + hk.druk_sent)}</strong>` : ""}
-        </p>
+        <p class="reekspakket-kop">${esc(naam(pakket))}</p>
+        <p class="reekspakket-sub">${esc(tt("pakket_al", "Al"))} ${pakket.slugs.length} ${esc(tt("pakket_boeke", "boeke"))}</p>
+        ${hk ? `<div class="reekspakket-formaat" role="radiogroup">
+          <button type="button" data-f="eboek" class="aan">${esc(tt("eboek_etiket", "E-boek"))}</button>
+          <button type="button" data-f="harde_kopie">${esc(tt("hardekopie_etiket", "Harde kopie"))}</button>
+        </div>` : ""}
+        <p class="reekspakket-prys"><b></b> <s></s></p>
         ${besit_reeds ? "" : `<button type="button" class="kaart-aksie reekspakket-knoppie">${esc(tt("pakket_knoppie", "Sit die hele reeks in my mandjie"))}</button>`}
-        ${hk ? `<button type="button" class="kaart-aksie reekspakket-hk-knoppie">${esc(tt("pakket_hk_knoppie", "Sit die hele reeks as gedrukte boeke in my mandjie"))}</button>` : ""}
-        <button type="button" class="kaart-aksie reekspakket-geskenk-knoppie">🎁 ${esc(tt("pakket_geskenk_knoppie", "Gee die hele reeks as geskenk"))}</button>
+        <button type="button" class="reekspakket-geskenk-skakel">🎁 ${esc(tt("pakket_geskenk_knoppie", "Gee die hele reeks as geskenk"))}</button>
       `;
       aksies.insertAdjacentElement("afterend", blok);
+
+      const wys = () => {
+        const p = pryse[formaat];
+        blok.querySelector(".reekspakket-prys b").textContent = formateer_rond(p.betaal);
+        blok.querySelector(".reekspakket-prys s").textContent = p.betaal < p.gewoon ? formateer_rond(p.gewoon) : "";
+        blok.querySelectorAll(".reekspakket-formaat button").forEach((k) => k.classList.toggle("aan", k.dataset.f === formaat));
+        // Geskenke is net e-boeke.
+        blok.querySelector(".reekspakket-geskenk-skakel").hidden = formaat !== "eboek";
+      };
+      blok.querySelectorAll(".reekspakket-formaat button").forEach((k) =>
+        k.addEventListener("click", () => {
+          formaat = k.dataset.f;
+          wys();
+        })
+      );
+      wys();
 
       const sit_in = (geskenk, formaat) => {
         for (const boek of pakket.boeke) {
@@ -163,10 +187,8 @@
         window.location.href = "mandjie.html";
       };
       const self_knoppie = blok.querySelector(".reekspakket-knoppie");
-      if (self_knoppie) self_knoppie.addEventListener("click", () => sit_in(false, "eboek"));
-      const hk_knoppie = blok.querySelector(".reekspakket-hk-knoppie");
-      if (hk_knoppie) hk_knoppie.addEventListener("click", () => sit_in(false, "harde_kopie"));
-      blok.querySelector(".reekspakket-geskenk-knoppie").addEventListener("click", () => sit_in(true, "eboek"));
+      if (self_knoppie) self_knoppie.addEventListener("click", () => sit_in(false, formaat));
+      blok.querySelector(".reekspakket-geskenk-skakel").addEventListener("click", () => sit_in(true, "eboek"));
     };
 
     teken();
@@ -220,7 +242,14 @@
       .reekspakket-teks{margin:8px 0 10px;font-size:15px;line-height:1.45}
       .reekspakket-teks s{color:#999}
       .reekspakket-knoppie{width:100%;background:var(--teal,#479F91);border-color:var(--teal,#479F91)}
-      .reekspakket-hk-knoppie{width:100%;margin-top:8px;background:#2F6F66;border-color:#2F6F66}
+      .reekspakket-kop{margin:10px 0 0;font-weight:700;font-size:17px}
+      .reekspakket-sub{margin:2px 0 10px;font-size:14px;color:#6b6b6b}
+      .reekspakket-formaat{display:flex;gap:6px;margin:0 0 10px}
+      .reekspakket-formaat button{flex:1;padding:9px 10px;border-radius:999px;border:2px solid var(--teal,#479F91);background:#fff;color:var(--teal,#479F91);font-weight:700;font-size:14px;cursor:pointer;font-family:inherit}
+      .reekspakket-formaat button.aan{background:var(--teal,#479F91);color:#fff}
+      .reekspakket-prys{margin:0 0 12px;font-size:15px;color:#8A877E}
+      .reekspakket-prys b{font-size:28px;color:#1B1B19}
+      .reekspakket-geskenk-skakel{display:block;margin:10px auto 0;background:none;border:0;color:var(--teal,#479F91);font-weight:700;font-size:14px;text-decoration:underline;cursor:pointer;font-family:inherit}
       .reekspakket-geskenk-knoppie{width:100%;margin-top:8px;background:#fff;color:var(--teal,#479F91);border:2px solid var(--teal,#479F91)}
       .reekspakket-ry{color:var(--teal,#479F91);font-weight:700}
       .reekspakket-wenke{margin:10px 0 14px;display:flex;flex-direction:column;gap:8px}

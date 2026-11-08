@@ -336,13 +336,13 @@ function wys_produk(produk, besit_info, konteks) {
         ${lyn ? `<p class="pb-lyn">${titel_ontsnap(lyn)}</p>` : ""}
         <h1 class="pb-titel">${titel_ontsnap(titel)}</h1>
         <p class="pb-outeur">${titel_ontsnap(produk.outeur || "")}</p>
+        ${webblad_html}
         <div class="koop-afdeling pb-koop">
           <div class="produk-aksies">${aksies.join("")}</div>
           <p class="produk-nota" id="produk-terugvoer" role="status"></p>
         </div>
         ${leeskamer_html}
         ${eweknie_html}
-        ${webblad_html}
         <div class="pb-oor">
           <h2 class="pb-oor-titel">${t("oor_hierdie_boek")}</h2>
           <p class="produk-beskrywing">${produk.vol_beskrywing || produk.oorsig || ""}</p>
