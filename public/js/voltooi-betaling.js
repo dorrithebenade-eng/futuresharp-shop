@@ -479,7 +479,16 @@ async function laai_vb() {
   // 'n Koepon-kode kan as URL-parameter saamkom (bv. ?koepon=ABCD1234) —
   // gebruik vir die leen-na-koop-opgradering-skakel op "My Boeke", sodat
   // die koper nie die kode self hoef in te tik nie.
-  const url_koepon_kode = new URLSearchParams(window.location.search).get("koepon");
+  // Ook uit localStorage: koop.js bewaar 'n kode van 'n boek se webblad, sodat
+  // dit ná aanmelding steeds hier is (hoogstens twee dae oud).
+  let url_koepon_kode = new URLSearchParams(window.location.search).get("koepon");
+  try {
+    const bewaar = JSON.parse(localStorage.getItem("future_shop_koepon") || "null");
+    if (!url_koepon_kode && bewaar && bewaar.kode && Date.now() - (bewaar.op || 0) < 2 * 86400000) url_koepon_kode = bewaar.kode;
+    localStorage.removeItem("future_shop_koepon");
+  } catch (_) {
+    /* geen bewaarde kode nie */
+  }
   if (url_koepon_kode) {
     const koepon_invoer = document.getElementById("vb-koepon-invoer");
     if (koepon_invoer) {

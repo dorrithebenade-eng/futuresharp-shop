@@ -51,6 +51,9 @@ async function met_los_pryse(pakkette) {
       naam_en: p.naam_en,
       slugs: p.slugs,
       prys_sent: p.prys_sent,
+      trappe: p.trappe || [],
+      tel_nie: p.tel_nie || [],
+      koepon_toegelaat: p.koepon_toegelaat === true,
       los_sent,
       van: p.van,
       tot: p.tot,
@@ -72,6 +75,23 @@ async function stoor(invoer) {
   const tot = skoon_datum(p.tot);
   if (van === undefined || tot === undefined) return antwoord(400, { fout: "Ongeldige datum" });
 
+  // Trappe: "2=240; 4=230" (getal boeke = prys per boek in rand), of 'n lys.
+  const trappe = [];
+  const ruwe_trappe = Array.isArray(p.trappe)
+    ? p.trappe.map((t) => [t.min, t.prys_rand != null ? t.prys_rand : (t.prys_per_boek_sent || 0) / 100])
+    : String(p.trappe_teks || "").split(/[;\n]+/).map((d) => d.split("=").map((x) => x.trim().replace(",", ".").replace(/^R/i, "")));
+  for (const [min_r, rand_r] of ruwe_trappe) {
+    if (min_r === undefined || min_r === "") continue;
+    const min = Math.round(Number(min_r));
+    const rand = Number(rand_r);
+    if (!Number.isInteger(min) || min < 1 || !Number.isFinite(rand) || rand <= 0) {
+      return antwoord(400, { fout: "Ongeldige trap. Skryf dit so: 2=240; 4=230" });
+    }
+    trappe.push({ min, prys_per_boek_sent: Math.round(rand * 100) });
+  }
+  trappe.sort((a, b) => a.min - b.min);
+  const tel_nie = [...new Set((Array.isArray(p.tel_nie) ? p.tel_nie : []).map((s) => teks(s, 80)).filter((s) => slugs.includes(s)))];
+
   const lys = await lees_pakkette();
   const id = skoon_id(p.id || naam_af);
   if (!id) return antwoord(400, { fout: "Ongeldige naam" });
@@ -83,6 +103,9 @@ async function stoor(invoer) {
     naam_en: teks(p.naam_en, 120) || naam_af,
     slugs,
     prys_sent: Math.round(prys_rand * 100),
+    trappe,
+    tel_nie,
+    koepon_toegelaat: p.koepon_toegelaat === true,
     van,
     tot,
     aktief: p.aktief !== false,

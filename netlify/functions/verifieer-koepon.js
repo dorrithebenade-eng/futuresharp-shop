@@ -103,7 +103,7 @@ exports.handler = async (event, context) => {
     const in_pakket = pakket_per_item[item_indeks];
     if (in_pakket) verkoop_prys_sent = in_pakket.prys_sent;
 
-    for (const koepon of in_pakket ? [] : gesorteer) {
+    for (const koepon of in_pakket && !in_pakket.koepon_toegelaat ? [] : gesorteer) {
       const kom_ooreen =
         koepon_geld_vir_boek(koepon, produk.slug) &&
         (koepon.formaat_beperking === "albei" || koepon.formaat_beperking === kliënt_item.formaat);

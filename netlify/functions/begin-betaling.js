@@ -314,8 +314,9 @@ exports.handler = async (event, context) => {
     if (in_pakket) verkoop_prys_sent = in_pakket.prys_sent;
 
     // Veldtog eerste, dan lojaliteit op die prys wat oorbly. Nie op 'n
-    // boek in 'n reekspakket nie: die pakketprys is die finale prys.
-    for (const koepon of in_pakket ? [] : gesorteerde_koepons) {
+    // boek in 'n reekspakket nie, behalwe as die pakket koepons bo-op
+    // toelaat (koepon_toegelaat, sien _reekspakkette.js).
+    for (const koepon of in_pakket && !in_pakket.koepon_toegelaat ? [] : gesorteerde_koepons) {
       if (!koepon_geld_vir_item(koepon, produk.slug, kliënt_item.formaat)) continue;
       verkoop_prys_sent = pas_koepon_toe(koepon, verkoop_prys_sent);
       item_koepon_kodes.push(koepon.kode);

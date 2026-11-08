@@ -63,6 +63,34 @@
       .join("");
   }
 
+  // WENKE (November 2026): die winkel keer niemand nie, maar wys wat 'n
+  // ekstra boek of die basisboek (bv. Grondslag) sou beteken.
+  function wenke_html(wenke) {
+    const vul = (s, w) => String(s).replace("%titel%", esc(w.titel || "")).replace("%n%", w.nodig).replace("%prys%", formateer_rond(w.prys_per_boek_sent || w.prys_sent || 0));
+    return (wenke || [])
+      .map((w) => {
+        if (w.soort === "basis") {
+          return `<div class="reekspakket-wenk">💡 ${vul(tt("wenk_basis", "%titel% vorm die basis van die reeks."), w)}
+            ${w.prys_sent ? `<button type="button" class="terug-skakel reekspakket-wenk-voeg" data-slug="${esc(w.slug)}" data-titel="${esc(w.titel)}" data-prys="${w.prys_sent}">${vul(tt("wenk_basis_knoppie", "Voeg %titel% by"), w)}</button>` : ""}</div>`;
+        }
+        const sleutel = `wenk_${w.soort}_${w.nodig === 1 ? "een" : "meer"}`;
+        return `<div class="reekspakket-wenk">💡 ${vul(tt(sleutel, ""), w)}</div>`;
+      })
+      .join("");
+  }
+
+  function koppel_wenke(wrap, na) {
+    wrap.querySelectorAll(".reekspakket-wenk-voeg").forEach((b) =>
+      b.addEventListener("click", () => {
+        if (typeof voeg_by_mandjie !== "function") return;
+        voeg_by_mandjie({ produk_slug: b.dataset.slug, titel: b.dataset.titel, formaat: "eboek", prys_sent: Number(b.dataset.prys) || 0 });
+        if (typeof na === "function") na();
+      })
+    );
+  }
+
+  window.reekspakket_wenke_html = wenke_html;
+  window.reekspakket_koppel_wenke = koppel_wenke;
   window.reekspakket_kry_mandjie_prys = kry_mandjie_prys;
   window.reekspakket_lyne_html = pakket_lyne_html;
 
@@ -148,6 +176,12 @@
           const bedrag = totaal_ry.querySelector(".mandjie-totaal-bedrag");
           if (bedrag) bedrag.textContent = formateer(prys.totaal_sent);
         }
+        if (prys && prys.wenke && prys.wenke.length && wrap.contains(totaal_ry) && !wrap.querySelector(".reekspakket-wenke")) {
+          totaal_ry.insertAdjacentHTML("afterend", `<div class="reekspakket-wenke">${wenke_html(prys.wenke)}</div>`);
+          koppel_wenke(wrap, () => {
+            if (typeof wys_mandjie === "function") wys_mandjie();
+          });
+        }
       } catch (_) {
         /* die gewone totaal bly staan */
       } finally {
@@ -171,6 +205,9 @@
       .reekspakket-knoppie{width:100%;background:var(--teal,#479F91);border-color:var(--teal,#479F91)}
       .reekspakket-geskenk-knoppie{width:100%;margin-top:8px;background:#fff;color:var(--teal,#479F91);border:2px solid var(--teal,#479F91)}
       .reekspakket-ry{color:var(--teal,#479F91);font-weight:700}
+      .reekspakket-wenke{margin:10px 0 14px;display:flex;flex-direction:column;gap:8px}
+      .reekspakket-wenk{background:#FDF6E3;border:1px solid #F0DFA8;border-radius:10px;padding:10px 14px;font-size:14px;line-height:1.45}
+      .reekspakket-wenk-voeg{margin-left:6px;font-weight:700}
     `;
     document.head.appendChild(s);
   }

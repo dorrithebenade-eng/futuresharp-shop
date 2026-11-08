@@ -55,6 +55,7 @@
             <div class="paneel-produk-inligting">
               <strong>${esc(p.naam_af)}</strong>
               <span class="paneel-produk-outeur">${p.slugs.length} boeke · ${rand(p.prys_sent)}${m.los_sent ? ` (los ${rand(m.los_sent)})` : ""} · ${vertoon_datum(p.van)} tot ${vertoon_datum(p.tot)} · ${status(p)}</span>
+              ${(p.trappe || []).length ? `<span class="paneel-produk-outeur">Trappe: ${trappe_teks(p.trappe)}${(p.tel_nie || []).length ? ` · tel nie mee nie: ${esc(p.tel_nie.join(", "))}` : ""}${p.koepon_toegelaat ? " · koepons bo-op" : ""}</span>` : (p.koepon_toegelaat ? `<span class="paneel-produk-outeur">Koepons bo-op</span>` : "")}
             </div>
             <div class="paneel-produk-aksies">
               <button class="terug-skakel rp-wysig" data-id="${esc(p.id)}">Wysig</button>
@@ -76,6 +77,11 @@
       console.error("Kon nie reekspakkette laai nie:", fout);
       lys.innerHTML = `<p class="stelsel-boodskap">Kon nie die reekspakkette laai nie.</p>`;
     }
+  }
+
+  // [{min, prys_per_boek_sent}] -> "2=240; 4=230"
+  function trappe_teks(trappe) {
+    return (trappe || []).map((t) => `${t.min}=${(t.prys_per_boek_sent / 100).toFixed(0)}`).join("; ");
   }
 
   async function stoor_rekord(pakket) {
@@ -107,8 +113,20 @@
     $("rp-van").value = p ? na_datumveld(p.van) : "";
     $("rp-tot").value = p ? na_datumveld(p.tot) : "";
     $("rp-boeke").innerHTML = boeke_keuses(p ? p.slugs : []);
+    $("rp-trappe").value = p ? trappe_teks(p.trappe) : "";
+    $("rp-koepon").checked = !!(p && p.koepon_toegelaat);
+    vul_basis(p ? p.slugs : [], p && p.tel_nie ? p.tel_nie[0] : "");
     $("rp-fout").textContent = "";
     $("rp-skrap").style.display = p ? "" : "none";
+  }
+
+  // Die basisboek (bv. Grondslag) kies jy uit die boeke in die pakket.
+  function vul_basis(slugs, gekies) {
+    const produkte = (typeof produkte_kas !== "undefined" && produkte_kas) || [];
+    const titel = (slug) => (produkte.find((x) => x.slug === slug) || {}).titel || slug;
+    $("rp-basis").innerHTML = `<option value="">Geen</option>` + (slugs || [])
+      .map((slug) => `<option value="${esc(slug)}" ${slug === gekies ? "selected" : ""}>${esc(titel(slug))}</option>`)
+      .join("");
   }
 
   async function stoor_vorm(e) {
@@ -123,6 +141,9 @@
         naam_en: $("rp-naam-en").value,
         slugs: [...$("rp-boeke").querySelectorAll("input:checked")].map((b) => b.value),
         prys_rand: Number($("rp-prys").value),
+        trappe_teks: $("rp-trappe").value,
+        tel_nie: $("rp-basis").value ? [$("rp-basis").value] : [],
+        koepon_toegelaat: $("rp-koepon").checked,
         van: van_iso($("rp-van").value),
         tot: tot_iso($("rp-tot").value),
         aktief: bestaande ? bestaande.aktief : true,
@@ -156,7 +177,7 @@
         <h3 class="paneel-afdeling-titel" style="font-size:1.1em">Reekspakkette</h3>
         <button id="rp-nuut" class="terug-skakel" type="button">+ Nuwe pakket</button>
       </div>
-      <p class="paneel-hulp-teks">Al die e-boeke van die pakket saam in die mandjie kry die pakketprys. Koepons geld nie bo-op die pakketprys nie.</p>
+      <p class="paneel-hulp-teks">Al die e-boeke van die pakket saam in die mandjie kry die pakketprys. Met trappe kry 'n deel van die reeks ook afslag: hoe meer boeke, hoe laer die prys per boek. Koepons geld net bo-op as jy dit by die pakket aanskakel.</p>
       <div id="rp-lys"><p class="stelsel-boodskap">Word gelaai …</p></div>
       <form id="rp-vorm" style="display:none">
         <label class="veld-etiket" for="rp-naam-af">Naam (Afrikaans)</label>
@@ -167,6 +188,11 @@
         <div id="rp-boeke" class="koepon-boeke-lys"></div>
         <label class="veld-etiket" for="rp-prys">Pakketprys (R)</label>
         <input id="rp-prys" class="veld-invoer" type="number" min="1" step="0.01">
+        <label class="veld-etiket" for="rp-trappe">Trappe: getal boeke = prys per boek (R)</label>
+        <input id="rp-trappe" class="veld-invoer" placeholder="Bv. 2=240; 4=230 (leeg = net die hele reeks)">
+        <label class="veld-etiket" for="rp-basis">Basisboek wat nie by die trappe meetel nie</label>
+        <select id="rp-basis" class="veld-invoer"><option value="">Geen</option></select>
+        <label class="koepon-boek-keuse" style="margin-top:8px"><input type="checkbox" id="rp-koepon"><span>Koepons (bv. SPEELSLIM) geld bo-op die pakket- en trappryse</span></label>
         <label class="veld-etiket" for="rp-van">Van</label>
         <input id="rp-van" class="veld-invoer" type="date">
         <label class="veld-etiket" for="rp-tot">Tot en met</label>
@@ -185,6 +211,10 @@
     $("rp-vorm").addEventListener("submit", stoor_vorm);
     $("rp-kanselleer").addEventListener("click", () => ($("rp-vorm").style.display = "none"));
     $("rp-skrap").addEventListener("click", skrap);
+    $("rp-boeke").addEventListener("change", () => {
+      const gekies = [...$("rp-boeke").querySelectorAll("input:checked")].map((b) => b.value);
+      vul_basis(gekies, $("rp-basis").value);
+    });
 
     const s = document.createElement("style");
     s.textContent = `.rp-afdeling{margin-bottom:20px}.rp-skeier{border:0;border-top:1px dashed #E3E0D9;margin:20px 0}`;
