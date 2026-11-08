@@ -313,9 +313,11 @@ function wys_produk(produk, besit_info, konteks) {
     let gasheer = "";
     try { gasheer = new URL(produk.webblad_skakel).host; } catch (_) { gasheer = ""; }
     webblad_html = `<a class="pb-webblad" href="${titel_ontsnap(produk.webblad_skakel)}">
-      <span>${produk.webblad_naam
+      <span class="pb-webblad-ikoon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3.6 9h16.8M3.6 15h16.8M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg></span>
+      <span class="pb-webblad-teks"><span>${produk.webblad_naam
         ? t("pb_webblad_met_naam").replace("%naam%", titel_ontsnap(produk.webblad_naam))
-        : t("pb_webblad_skakel")}</span><b>${titel_ontsnap(gasheer)} →</b></a>`;
+        : t("pb_webblad_skakel")}</span><b>${titel_ontsnap(gasheer)}</b></span>
+      <span class="pb-webblad-pyl" aria-hidden="true">→</span></a>`;
   }
 
   const leeskamer_html = eboek && eboek.beskikbaar
