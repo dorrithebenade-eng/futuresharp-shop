@@ -23,12 +23,12 @@ let BOEKE_TOTAAL_SENT = 0;
 let AFLEWERING_SENT = 0;
 let KOERIER_SENT = 0;
 
-// Dieselfde trappe as _aflewering.js: R100 vir 1 tot 10 boeke, R160 vir 11 tot 30.
+// Dieselfde trappe as _aflewering.js: R90 vir 1 tot 10 boeke, R160 vir 11 tot 30.
 function koerier_sent_vir(getal) {
   let oor = getal, som = 0;
   while (oor > 0) {
     const n = Math.min(oor, 30);
-    som += n <= 10 ? 10000 : 16000;
+    som += n <= 10 ? 9000 : 16000;
     oor -= n;
   }
   return som;

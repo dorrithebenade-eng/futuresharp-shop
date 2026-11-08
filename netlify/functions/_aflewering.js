@@ -9,14 +9,14 @@
 //    bly altyd vol en bly in Future Sharp se hoofrekening.
 //
 // 2. Aflewering. Een keer per bestelling, volgens die getal harde kopieë:
-//    koerier R100 vir 1 tot 10 boeke, R160 vir 11 tot 30, en so verder per
+//    koerier R90 vir 1 tot 10 boeke, R160 vir 11 tot 30, en so verder per
 //    30. Afhaal in Pretoria is R0; die tyd en plek gaan per e-pos.
 //    LET WEL: bestelling.versending is reeds die rekord van die versending
 //    self (gestuur, spoornommer). Die keuse en die bedrag leef daarom by
 //    aflewering.metode en afleweringskoste_sent.
 
 const KOERIER_TRAPPE = [
-  { tot: 10, sent: 10000 },
+  { tot: 10, sent: 9000 },
   { tot: 30, sent: 16000 },
 ];
 
