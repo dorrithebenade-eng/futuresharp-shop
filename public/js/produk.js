@@ -307,6 +307,17 @@ function wys_produk(produk, besit_info, konteks) {
       <a href="produk.html?produk=${encodeURIComponent(e.slug)}">${titel_ontsnap(e.titel)}</a></p>`;
   }
 
+  // Skakel na die boek of reeks se webblad (webblad_skakel, November 2026).
+  let webblad_html = "";
+  if (produk.webblad_skakel && /^https:\/\//.test(produk.webblad_skakel)) {
+    let gasheer = "";
+    try { gasheer = new URL(produk.webblad_skakel).host; } catch (_) { gasheer = ""; }
+    webblad_html = `<a class="pb-webblad" href="${titel_ontsnap(produk.webblad_skakel)}">
+      <span>${produk.webblad_naam
+        ? t("pb_webblad_met_naam").replace("%naam%", titel_ontsnap(produk.webblad_naam))
+        : t("pb_webblad_skakel")}</span><b>${titel_ontsnap(gasheer)} →</b></a>`;
+  }
+
   const leeskamer_html = eboek && eboek.beskikbaar
     ? `<p class="pb-leeskamer">${t("pb_leeskamer")}
         <button type="button" class="beskikbaar-merker pb-hoe" data-formaat="eboek">${t("pb_hoe_werk_dit")}</button></p>`
@@ -331,6 +342,7 @@ function wys_produk(produk, besit_info, konteks) {
         </div>
         ${leeskamer_html}
         ${eweknie_html}
+        ${webblad_html}
         <div class="pb-oor">
           <h2 class="pb-oor-titel">${t("oor_hierdie_boek")}</h2>
           <p class="produk-beskrywing">${produk.vol_beskrywing || produk.oorsig || ""}</p>

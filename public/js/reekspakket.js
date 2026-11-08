@@ -119,37 +119,54 @@
       // maar wel as geskenk gee.
       const besit_reeds = !!aksies.querySelector(".produk-alreeds-eie-knoppie");
 
-      const tot = datum_kort(pakket.tot);
+      // Die prys wat die koper werklik betaal: met die vrystellingskode as daar
+      // een op die hele reeks geld (pakket.aanbod, sien reekspakkette.js).
+      const aanbod = pakket.aanbod;
+      const betaal = aanbod ? aanbod.prys_sent : pakket.prys_sent;
+      const tot = datum_kort(aanbod && aanbod.tot ? aanbod.tot : pakket.tot);
+      const hk = pakket.harde_kopie;
       const blok = document.createElement("div");
       blok.className = "reekspakket-blok";
       blok.innerHTML = `
-        ${tot ? `<span class="reekspakket-etiket">${esc(tt("pakket_tot", "Tot"))} ${esc(tot)}</span>` : ""}
+        ${tot ? `<span class="reekspakket-etiket">${esc(aanbod ? tt("pakket_aanbod_tot", "Vrystellingsaanbod tot") : tt("pakket_tot", "Tot"))} ${esc(tot)}</span>` : ""}
         <p class="reekspakket-teks">
-          <strong>${esc(naam(pakket))} ${esc(tt("pakket_vir", "vir"))} ${formateer_rond(pakket.prys_sent)}</strong><br>
-          ${esc(tt("pakket_al", "Al"))} ${pakket.slugs.length} ${esc(tt("pakket_eboeke", "e-boeke"))}. <s>${formateer_rond(pakket.los_sent)}</s>
+          <strong>${esc(naam(pakket))} ${esc(tt("pakket_vir", "vir"))} ${formateer_rond(betaal)}</strong><br>
+          ${esc(tt("pakket_al", "Al"))} ${pakket.slugs.length} ${esc(tt("pakket_boeke_eboek", "boeke as e-boek"))}. ${esc(tt("pakket_gewoonlik", "Gewoonlik"))} <s>${formateer_rond(pakket.los_sent)}</s>
+          ${hk ? `<br>${esc(tt("pakket_gedruk", "As gedrukte boeke"))}: <strong>${formateer_rond(betaal + hk.druk_sent)}</strong>` : ""}
         </p>
         ${besit_reeds ? "" : `<button type="button" class="kaart-aksie reekspakket-knoppie">${esc(tt("pakket_knoppie", "Sit die hele reeks in my mandjie"))}</button>`}
+        ${hk ? `<button type="button" class="kaart-aksie reekspakket-hk-knoppie">${esc(tt("pakket_hk_knoppie", "Sit die hele reeks as gedrukte boeke in my mandjie"))}</button>` : ""}
         <button type="button" class="kaart-aksie reekspakket-geskenk-knoppie">🎁 ${esc(tt("pakket_geskenk_knoppie", "Gee die hele reeks as geskenk"))}</button>
       `;
       aksies.insertAdjacentElement("afterend", blok);
 
-      const sit_in = (geskenk) => {
+      const sit_in = (geskenk, formaat) => {
         for (const boek of pakket.boeke) {
           if (typeof voeg_by_mandjie === "function") {
             voeg_by_mandjie({
               produk_slug: boek.slug,
               titel: boek.titel,
-              formaat: "eboek",
-              prys_sent: boek.prys_sent,
+              formaat,
+              prys_sent: formaat === "harde_kopie" ? boek.hk_prys_sent || boek.prys_sent : boek.prys_sent,
               ...(geskenk ? { geskenk: true } : {}),
             });
+          }
+        }
+        // Die vrystellingskode gaan saam na die betaalbladsy (voltooi-betaling.js).
+        if (aanbod && aanbod.kode) {
+          try {
+            localStorage.setItem("future_shop_koepon", JSON.stringify({ kode: aanbod.kode, op: Date.now() }));
+          } catch (_) {
+            /* die koper kan die kode self intik */
           }
         }
         window.location.href = "mandjie.html";
       };
       const self_knoppie = blok.querySelector(".reekspakket-knoppie");
-      if (self_knoppie) self_knoppie.addEventListener("click", () => sit_in(false));
-      blok.querySelector(".reekspakket-geskenk-knoppie").addEventListener("click", () => sit_in(true));
+      if (self_knoppie) self_knoppie.addEventListener("click", () => sit_in(false, "eboek"));
+      const hk_knoppie = blok.querySelector(".reekspakket-hk-knoppie");
+      if (hk_knoppie) hk_knoppie.addEventListener("click", () => sit_in(false, "harde_kopie"));
+      blok.querySelector(".reekspakket-geskenk-knoppie").addEventListener("click", () => sit_in(true, "eboek"));
     };
 
     teken();
@@ -203,6 +220,7 @@
       .reekspakket-teks{margin:8px 0 10px;font-size:15px;line-height:1.45}
       .reekspakket-teks s{color:#999}
       .reekspakket-knoppie{width:100%;background:var(--teal,#479F91);border-color:var(--teal,#479F91)}
+      .reekspakket-hk-knoppie{width:100%;margin-top:8px;background:#2F6F66;border-color:#2F6F66}
       .reekspakket-geskenk-knoppie{width:100%;margin-top:8px;background:#fff;color:var(--teal,#479F91);border:2px solid var(--teal,#479F91)}
       .reekspakket-ry{color:var(--teal,#479F91);font-weight:700}
       .reekspakket-wenke{margin:10px 0 14px;display:flex;flex-direction:column;gap:8px}

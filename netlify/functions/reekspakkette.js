@@ -11,6 +11,45 @@
 const { kry_store } = require("./_blob-store");
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 const { lees_pakkette, skryf_pakkette, kry_aktiewe_pakkette } = require("./_reekspakkette");
+const { koepon_boeke, koepon_geld_vir_boek, koepon_soort, pas_koepon_toe } = require("./_koepon-velde");
+
+// AANBOD (November 2026): die produkbladsy wys die prys wat die koper werklik
+// betaal, met 'n openbare veldtogkode (bv. SPEELSLIM) wat op al die boeke van
+// die pakket geld. Net kodes wat enigiemand mag gebruik.
+async function openbare_veldtogkoepons() {
+  const store = kry_store("koepons");
+  const { blobs } = await store.list();
+  const uit = [];
+  for (const b of blobs) {
+    const k = await store.get(b.key, { type: "json" });
+    if (!k || !k.aktief || k.koper_id_beperking || k.vereis_besit) continue;
+    if (koepon_soort(k) !== "veldtog" || k.formaat_beperking === "video" || k.formaat_beperking === "leen") continue;
+    if (k.verval_op && new Date(k.verval_op) < new Date()) continue;
+    if ((k.gebruike_tot_dusver || 0) >= (k.maks_gebruike || 0)) continue;
+    uit.push(k);
+  }
+  // Die mees spesifieke kode eerste (bv. SPEELSLIM voor 'n kode vir alle boeke).
+  return uit.sort((a, b) => ((koepon_boeke(a) || []).length || 9999) - ((koepon_boeke(b) || []).length || 9999));
+}
+
+function versprei(bedrag_sent, n) {
+  const basis = Math.floor(bedrag_sent / n);
+  const oor = bedrag_sent - basis * n;
+  return Array.from({ length: n }, (_, i) => basis + (i < oor ? 1 : 0));
+}
+
+function beste_aanbod(pakket, koepons) {
+  if (!pakket.koepon_toegelaat) return null;
+  let beste = null;
+  for (const k of koepons) {
+    if (!pakket.slugs.every((s) => koepon_geld_vir_boek(k, s))) continue;
+    const prys = versprei(pakket.prys_sent, pakket.slugs.length).reduce((som, d) => som + pas_koepon_toe(k, d), 0);
+    if (prys < pakket.prys_sent && (!beste || prys < beste.prys_sent)) {
+      beste = { kode: k.kode, prys_sent: prys, tot: k.verval_op || null };
+    }
+  }
+  return beste;
+}
 
 const JSON_KOP = { "Content-Type": "application/json", "Cache-Control": "no-store" };
 const antwoord = (status, data) => ({ statusCode: status, headers: JSON_KOP, body: JSON.stringify(data) });
@@ -34,16 +73,29 @@ function skoon_datum(w) {
 // Die los prys van elke boek in die pakket, uit die katalogus.
 async function met_los_pryse(pakkette) {
   const katalogus = kry_store("katalogus");
+  let koepons = [];
+  try {
+    koepons = await openbare_veldtogkoepons();
+  } catch (_) {
+    koepons = [];
+  }
   const uit = [];
   for (const p of pakkette) {
     let los_sent = 0;
+    let druk_sent = 0;
+    let hk_almal = true;
     const boeke = [];
     for (const slug of p.slugs) {
       const produk = await katalogus.get(slug, { type: "json" });
       const eboek = produk && produk.formate && produk.formate.eboek;
+      const hk = produk && produk.formate && produk.formate.harde_kopie;
       const prys = eboek && eboek.beskikbaar ? eboek.prys_sent : 0;
       los_sent += prys;
-      boeke.push({ slug, titel: produk ? produk.titel : slug, prys_sent: prys });
+      const hk_ok = !!(hk && hk.beskikbaar && !(Array.isArray(hk.opsies) && hk.opsies.length));
+      if (!hk_ok) hk_almal = false;
+      const druk = hk_ok ? Math.max(0, Math.round(Number(hk.drukkoste_sent) || 0)) : 0;
+      druk_sent += druk;
+      boeke.push({ slug, titel: produk ? produk.titel : slug, prys_sent: prys, ...(hk_ok ? { hk_prys_sent: hk.prys_sent } : {}) });
     }
     uit.push({
       id: p.id,
@@ -55,6 +107,8 @@ async function met_los_pryse(pakkette) {
       tel_nie: p.tel_nie || [],
       koepon_toegelaat: p.koepon_toegelaat === true,
       los_sent,
+      aanbod: beste_aanbod(p, koepons),
+      harde_kopie: hk_almal ? { druk_sent } : null,
       van: p.van,
       tot: p.tot,
       boeke,

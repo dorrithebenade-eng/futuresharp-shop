@@ -505,6 +505,11 @@ const WOORDEBOEK = {
   pakket_vir: { af: "vir", en: "for" },
   pakket_al: { af: "Al", en: "All" },
   pakket_eboeke: { af: "e-boeke", en: "e-books" },
+  pakket_boeke_eboek: { af: "boeke as e-boek", en: "books as e-books" },
+  pakket_gewoonlik: { af: "Gewoonlik", en: "Normally" },
+  pakket_gedruk: { af: "As gedrukte boeke", en: "As printed books" },
+  pakket_hk_knoppie: { af: "Sit die hele reeks as gedrukte boeke in my mandjie", en: "Add the whole series as printed books to my cart" },
+  pakket_aanbod_tot: { af: "Vrystellingsaanbod tot", en: "Launch offer until" },
   pakket_knoppie: { af: "Sit die hele reeks in my mandjie", en: "Add the whole series to my cart" },
   pakket_geskenk_knoppie: { af: "Gee die hele reeks as geskenk", en: "Give the whole series as a gift" },
   // GESKENKE (November 2026), sien netlify/functions/_geskenke.js
@@ -591,6 +596,14 @@ const WOORDEBOEK = {
     en: "This coupon is not valid for your account",
   },
   aflewering_titel: { af: "Aflewering", en: "Delivery" },
+  pb_webblad_skakel: {
+    af: "Besoek gerus die webblad vir meer inligting.",
+    en: "Feel free to visit the website for more information.",
+  },
+  pb_webblad_met_naam: {
+    af: "Besoek gerus die %naam%-webblad vir meer inligting.",
+    en: "Feel free to visit the %naam% website for more information.",
+  },
   outeur_afhaal: {
     af: "Die koper haal self in Pretoria af. Future Sharp reël die tyd en plek.",
     en: "The buyer collects in Pretoria. Future Sharp arranges the time and place.",

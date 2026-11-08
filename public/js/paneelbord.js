@@ -1219,6 +1219,8 @@ function open_vorm_vir_wysig(produk) {
   document.getElementById("vorm-vra-harde-kopie").checked = produk.vra_harde_kopie === true;
   document.getElementById("vorm-ongelys").checked = produk.ongelys === true;
   document.getElementById("vorm-eie-webblad").value = produk.eie_webblad || "";
+  document.getElementById("vorm-webblad-skakel").value = produk.webblad_skakel || "";
+  document.getElementById("vorm-webblad-naam").value = produk.webblad_naam || "";
   document.getElementById("vorm-kaartjie-boodskap").checked = produk.kaartjie_boodskap === true;
   if (typeof hk_opsies_vul === "function") hk_opsies_vul(produk);
   if (typeof hk_paneel_wys === "function") hk_paneel_wys(produk);
@@ -1401,6 +1403,8 @@ function bou_produk_liggaam() {
     vra_harde_kopie: document.getElementById("vorm-vra-harde-kopie").checked,
     ongelys: document.getElementById("vorm-ongelys").checked,
     eie_webblad: document.getElementById("vorm-eie-webblad").value.trim(),
+    webblad_skakel: document.getElementById("vorm-webblad-skakel").value.trim(),
+    webblad_naam: document.getElementById("vorm-webblad-naam").value.trim(),
     kaartjie_boodskap: document.getElementById("vorm-kaartjie-boodskap").checked,
     oorsig: document.getElementById("vorm-oorsig").value.trim(),
     vol_beskrywing: document.getElementById("vorm-vol-beskrywing").value.trim(),
