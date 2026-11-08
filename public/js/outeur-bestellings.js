@@ -37,6 +37,12 @@ function ob_bou_adres(aflewering) {
   const blok = document.createElement("div");
   blok.className = "outeur-adres";
 
+  // Afhaal in Pretoria (November 2026): geen adres nie; Future Sharp reël dit.
+  if (aflewering.metode === "afhaal") {
+    blok.appendChild(document.createTextNode(ob_vertaal("outeur_afhaal", "Die koper haal self in Pretoria af. Future Sharp reël die tyd en plek.")));
+    return blok;
+  }
+
   if (aflewering.ontvanger) {
     const naam = document.createElement("strong");
     naam.textContent = aflewering.ontvanger;

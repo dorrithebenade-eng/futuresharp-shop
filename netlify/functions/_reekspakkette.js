@@ -66,6 +66,10 @@ function versprei(bedrag_sent, n) {
 //   per_item: [{ pakket_id, prys_sent } | null] in dieselfde volgorde
 //   toegepas: [{ id, naam_af, naam_en, slugs, oorspronklike_sent, prys_sent, afslag_sent }]
 // 'n Pakket word net toegepas as dit goedkoper is as die boeke los.
+// E-boeke en harde kopieë tel albei (November 2026). By 'n harde kopie is
+// prys_sent hier net die boek se deel, sonder die drukkoste (_aflewering.js).
+const BOEK_FORMATE = new Set(["eboek", "harde_kopie"]);
+
 function trap_vir(trappe, getal) {
   let beste = null;
   for (const t of Array.isArray(trappe) ? trappe : []) {
@@ -83,7 +87,7 @@ function pas_pakkette_toe(items, pakkette) {
     const koepon_toegelaat = pakket.koepon_toegelaat === true;
     const indekse = pakket.slugs.map((slug) =>
       items.findIndex(
-        (it, i) => it.formaat === "eboek" && it.produk_slug === slug && !reeds_gebruik.has(i)
+        (it, i) => BOEK_FORMATE.has(it.formaat) && it.produk_slug === slug && !reeds_gebruik.has(i)
       )
     );
 
@@ -149,7 +153,7 @@ function pas_pakkette_toe(items, pakkette) {
 // koper se eie items (nie geskenke nie).
 function bou_wenke(items, pakkette) {
   const wenke = [];
-  const eie = items.filter((it) => it.formaat === "eboek" && !it.geskenk);
+  const eie = items.filter((it) => BOEK_FORMATE.has(it.formaat) && !it.geskenk);
   const in_mandjie = new Set(eie.map((it) => it.produk_slug));
   for (const p of pakkette) {
     const tel_nie = new Set(p.tel_nie || []);

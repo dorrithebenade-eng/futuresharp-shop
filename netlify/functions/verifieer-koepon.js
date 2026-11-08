@@ -20,6 +20,7 @@ const {
 const { kry_gebruiker_en_kontroleer_rol } = require("./_rol-kontrole");
 const { kry_aktiewe_pakkette, pas_pakkette_toe_per_groep } = require("./_reekspakkette");
 const { kry_formaat_data } = require("./_harde-kopie-opsies");
+const { drukkoste_sent, boekdeel_sent } = require("./_aflewering");
 
 exports.handler = async (event, context) => {
   if (event.httpMethod !== "POST") {
@@ -85,7 +86,7 @@ exports.handler = async (event, context) => {
   for (const kliënt_item of items) {
     const p = await katalogusStore.get(kliënt_item.produk_slug, { type: "json" });
     const fd = kry_formaat_data(p, kliënt_item.formaat, kliënt_item.opsie);
-    pakket_invoer.push({ produk_slug: kliënt_item.produk_slug, formaat: kliënt_item.formaat, prys_sent: fd && fd.beskikbaar ? fd.prys_sent : 0, geskenk: kliënt_item.geskenk === true });
+    pakket_invoer.push({ produk_slug: kliënt_item.produk_slug, formaat: kliënt_item.formaat, prys_sent: fd && fd.beskikbaar ? boekdeel_sent(fd) : 0, geskenk: kliënt_item.geskenk === true });
   }
   const { per_item: pakket_per_item } = pas_pakkette_toe_per_groep(pakket_invoer, await kry_aktiewe_pakkette());
   let item_indeks = -1;
@@ -97,8 +98,10 @@ exports.handler = async (event, context) => {
     const formaat_data = kry_formaat_data(produk, kliënt_item.formaat, kliënt_item.opsie);
     if (!formaat_data || !formaat_data.beskikbaar) continue;
 
-    const item_prys_sent = formaat_data.prys_sent;
-    oorspronklike_totaal_sent += item_prys_sent;
+    // Harde kopie: afslag net op die boekdeel; die drukkoste bly vol.
+    const druk_sent = kliënt_item.formaat === "harde_kopie" ? drukkoste_sent(formaat_data) : 0;
+    const item_prys_sent = boekdeel_sent(formaat_data);
+    oorspronklike_totaal_sent += item_prys_sent + druk_sent;
     let verkoop_prys_sent = item_prys_sent;
     const in_pakket = pakket_per_item[item_indeks];
     if (in_pakket) verkoop_prys_sent = in_pakket.prys_sent;
@@ -115,7 +118,7 @@ exports.handler = async (event, context) => {
         verkoop_prys_sent = pas_koepon_toe(koepon, verkoop_prys_sent);
       }
     }
-    nuwe_totaal_sent += verkoop_prys_sent;
+    nuwe_totaal_sent += verkoop_prys_sent + druk_sent;
   }
 
   const pas_nêrens = koepons.find((k) => !pas_iewers.has(k.kode));

@@ -134,6 +134,11 @@ function aflewering_blok(bestelling) {
   if (!aflewering) {
     return "Geen afleweradres is by hierdie bestelling gestoor nie. Kontak Future Shop voordat jy die boek pos.";
   }
+  if (aflewering.metode === "afhaal") {
+    const selfoon = bestelling.koper && bestelling.koper.selfoonnommer;
+    return "Die koper haal self in Pretoria af. Future Sharp reël die tyd en plek per e-pos." +
+      (selfoon ? `<br>Selfoon ${ontsnap(selfoon)}` : "");
+  }
 
   const reels = [];
   if (aflewering.ontvanger) reels.push(`<b>${ontsnap(aflewering.ontvanger)}</b>`);
@@ -274,7 +279,7 @@ async function stuur_outeur_kennisgewings(bestelling, opsies = {}) {
         aandeel_sent: outeur_aandeel_sent(
           formaat_data && formaat_data.verdelings,
           outeur_id,
-          item.prys_sent || 0
+          (item.prys_sent || 0) - (item.druk_sent || 0)
         ),
       };
 

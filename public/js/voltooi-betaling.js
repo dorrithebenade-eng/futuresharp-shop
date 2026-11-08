@@ -16,6 +16,41 @@ const BESTELNOMMER_SLEUTEL = "future_shop_bestelnommer_konsep";
 // (bv. VOLGENDE50). Die bediener kontroleer die reëls; hier hou ons net lys.
 let TOEGEPASTE_KOEPON_KODES = [];
 let VERTOONDE_TOTAAL_SENT = 0;
+// HARDE KOPIEË (November 2026): die boeke se totaal (ná koepons) en die
+// afleweringskoste word apart gehou en saam gewys. Die bediener bereken
+// albei weer self (sien netlify/functions/_aflewering.js).
+let BOEKE_TOTAAL_SENT = 0;
+let AFLEWERING_SENT = 0;
+let KOERIER_SENT = 0;
+
+// Dieselfde trappe as _aflewering.js: R100 vir 1 tot 10 boeke, R160 vir 11 tot 30.
+function koerier_sent_vir(getal) {
+  let oor = getal, som = 0;
+  while (oor > 0) {
+    const n = Math.min(oor, 30);
+    som += n <= 10 ? 10000 : 16000;
+    oor -= n;
+  }
+  return som;
+}
+
+function gekose_metode() {
+  const k = document.querySelector('input[name="aflewer-metode"]:checked');
+  return k && k.value === "afhaal" ? "afhaal" : "koerier";
+}
+
+function werk_totaal_by() {
+  const ry = document.getElementById("vb-aflewering-ry");
+  if (ry) {
+    AFLEWERING_SENT = gekose_metode() === "afhaal" ? 0 : KOERIER_SENT;
+    ry.style.display = "";
+    document.getElementById("vb-aflewering-bedrag").textContent =
+      AFLEWERING_SENT ? formateer_prys_sent(AFLEWERING_SENT) : t("aflewering_gratis");
+  }
+  VERTOONDE_TOTAAL_SENT = BOEKE_TOTAAL_SENT + AFLEWERING_SENT;
+  const veld = document.getElementById("vb-totaal-bedrag");
+  if (veld) veld.textContent = formateer_prys_sent(VERTOONDE_TOTAAL_SENT);
+}
 
 // Koppel elke taal-onafhanklike foutkode (van verifieer-koepon.js) aan die
 // regte taal.js-sleutel — sodat 'n Engelse koper 'n regte Engelse
@@ -84,6 +119,11 @@ function bou_opsomming(items, totaal, pakkette) {
         <p id="vb-koepon-nota" class="vb-koepon-nota" style="display:none;"></p>
       </div>
 
+      <div class="vb-opsomming-ry" id="vb-aflewering-ry" style="display:none;">
+        <span>${t("afleweringskoste_ry")}</span>
+        <span id="vb-aflewering-bedrag"></span>
+      </div>
+
       <div class="vb-opsomming-totaal">
         <span>${t("totaal")}</span>
         <span id="vb-totaal-bedrag">${formateer_prys_sent(totaal)}</span>
@@ -97,6 +137,18 @@ function bou_aflewer_afdeling(met_kaartjie) {
     <section class="vb-afdeling">
       <h2 class="vb-afdeling-titel">${t("aflewering_titel")}</h2>
       <p class="vb-afdeling-nota">${t("aflewering_nota")}</p>
+
+      <div class="aflewer-metodes" style="display:flex;flex-direction:column;gap:8px;margin:8px 0 16px;">
+        <label style="display:flex;gap:10px;align-items:center;cursor:pointer;">
+          <input type="radio" name="aflewer-metode" value="koerier" checked>
+          <span>${t("aflewering_metode_koerier")} <span id="vb-koerier-bedrag" style="color:#666"></span></span>
+        </label>
+        <label style="display:flex;gap:10px;align-items:center;cursor:pointer;">
+          <input type="radio" name="aflewer-metode" value="afhaal">
+          <span>${t("aflewering_metode_afhaal")} <span style="color:#666">(${t("aflewering_gratis")})</span></span>
+        </label>
+        <p id="vb-afhaal-nota" class="vb-afdeling-nota" style="display:none;margin:4px 0 0;">${t("aflewering_afhaal_nota")}</p>
+      </div>
 
       <div id="aflewer-adres-blok" class="aflewer-blok">
         <label class="veld-etiket" for="adres-ontvanger">${t("ontvanger_naam")}</label>
@@ -163,7 +215,9 @@ function valideer_en_bou_bestelling(items, totaal, bestelnommer, bevat_harde_kop
 
   let aflewering = null;
 
-  if (bevat_harde_kopie) {
+  if (bevat_harde_kopie && gekose_metode() === "afhaal") {
+    aflewering = { metode: "afhaal" };
+  } else if (bevat_harde_kopie) {
     // Die ontvanger is nie noodwendig die koper nie — 'n boek word as
     // geskenk gekoop. Daarom leef die naam by die adres, nie by koper.
     const ontvanger = document.getElementById("adres-ontvanger").value.trim();
@@ -178,7 +232,7 @@ function valideer_en_bou_bestelling(items, totaal, bestelnommer, bevat_harde_kop
     }
 
     if (ontvanger && straat && stad && provinsie && poskode) {
-      aflewering = { ontvanger, straat, stad, provinsie, poskode };
+      aflewering = { metode: "koerier", ontvanger, straat, stad, provinsie, poskode };
       // Kaartjieboodskap (November 2026): opsioneel, net by produkte met
       // kaartjie_boodskap aan (sien koop.js).
       const kaartjie_veld = document.getElementById("adres-kaartjie");
@@ -340,8 +394,8 @@ function wys_toegepaste_koepons(data, items, oorspronklike_totaal, toegangs_toke
   });
 
   const totaal = data ? data.nuwe_totaal_sent : oorspronklike_totaal;
-  VERTOONDE_TOTAAL_SENT = totaal;
-  document.getElementById("vb-totaal-bedrag").textContent = formateer_prys_sent(totaal);
+  BOEKE_TOTAAL_SENT = totaal;
+  werk_totaal_by();
 
   if (!data) {
     document.getElementById("vb-koepon-nota").style.display = "none";
@@ -451,6 +505,7 @@ async function laai_vb() {
   } catch (_) {
     /* die mandjie se som bly staan */
   }
+  BOEKE_TOTAAL_SENT = totaal;
   VERTOONDE_TOTAAL_SENT = totaal;
   TOEGEPASTE_KOEPON_KODES = [];
   const bevatHardeKopie = mandjie_bevat_harde_kopie();
@@ -465,6 +520,21 @@ async function laai_vb() {
     <div id="vb-foute" class="vb-foute" style="display:none;"></div>
     <button class="kaart-aksie vb-betaal-knoppie" id="gaan-na-betaling">${t("gaan_na_betaling")}</button>
   `;
+
+  // Aflewering vir harde kopieë: koerierkoste volgens die getal boeke.
+  if (bevatHardeKopie) {
+    KOERIER_SENT = koerier_sent_vir(items.filter((i) => i.formaat === "harde_kopie").length);
+    document.getElementById("vb-koerier-bedrag").textContent = `(${formateer_prys_sent(KOERIER_SENT)})`;
+    document.querySelectorAll('input[name="aflewer-metode"]').forEach((r) =>
+      r.addEventListener("change", () => {
+        const afhaal = gekose_metode() === "afhaal";
+        document.getElementById("aflewer-adres-blok").style.display = afhaal ? "none" : "";
+        document.getElementById("vb-afhaal-nota").style.display = afhaal ? "" : "none";
+        werk_totaal_by();
+      })
+    );
+    werk_totaal_by();
+  }
 
   // Voorvul die kontak-epos met die aangemelde koper se e-pos, as gerief
   const epos_invoer = document.getElementById("kontak-epos");

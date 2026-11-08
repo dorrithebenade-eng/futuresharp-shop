@@ -60,6 +60,7 @@ function aflewering_vir_outeur(bestelling) {
     poskode: aflewering.poskode || "",
     selfoon: koper.selfoonnommer || "",
     kaartjie: aflewering.kaartjie || "",
+    metode: aflewering.metode === "afhaal" ? "afhaal" : "koerier",
   };
 }
 

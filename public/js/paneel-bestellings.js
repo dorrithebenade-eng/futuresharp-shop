@@ -72,6 +72,13 @@ function bou_bestelling_kaart(b) {
         </button>
       </div>
     `;
+    // Aflewering (November 2026): waarheen, of afhaal in Pretoria.
+    const a = b.aflewering || {};
+    const e = (x) => String(x || "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+    const kontak = `${e(b.koper && b.koper.epos)}${b.koper && b.koper.selfoonnommer ? ` · ${e(b.koper.selfoonnommer)}` : ""}`;
+    drukker_html += a.metode === "afhaal"
+      ? `<p class="paneel-bestelling-koepon">🏠 Afhaal in Pretoria · stuur tyd en plek aan ${kontak}</p>`
+      : `<p class="paneel-bestelling-koepon">🚚 Koerier (${formateer_prys_sent_bestelling(b.afleweringskoste_sent || 0)}) na <strong>${e(a.ontvanger)}</strong>, ${[a.straat, a.stad, a.provinsie, a.poskode].filter(Boolean).map(e).join(", ")} · ${kontak}</p>`;
   }
 
   return `

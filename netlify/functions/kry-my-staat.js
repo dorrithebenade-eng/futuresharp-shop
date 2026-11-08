@@ -170,7 +170,7 @@ exports.handler = async (event, context) => {
       const aandeel = outeur_aandeel_sent(
         formaat_data && formaat_data.verdelings,
         outeur_id,
-        item.prys_sent || 0
+        (item.prys_sent || 0) - (item.druk_sent || 0)
       );
 
       tel_by(inskrywing.uitset, maand, "verkope", 1);

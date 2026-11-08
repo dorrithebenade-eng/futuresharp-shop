@@ -55,6 +55,7 @@ const { stuur_koper_bevestiging } = require("./_kennisgewing-koper");
 const { kry_aktiewe_pakkette, pas_pakkette_toe_per_groep } = require("./_reekspakkette");
 const { is_eie_item, skoon_geskenk_besonderhede, skep_geskenk_vir_bestelling } = require("./_geskenke");
 const { kry_formaat_data } = require("./_harde-kopie-opsies");
+const { drukkoste_sent, boekdeel_sent, skoon_metode, afleweringskoste_sent } = require("./_aflewering");
 const { kry_item_name } = require("./_fisiese-items");
 
 // Rol_tipe → watter Blobs-store die entiteit se subrekening-kode in is.
@@ -104,7 +105,8 @@ exports.handler = async (event, context) => {
     return { statusCode: 400, body: "Ongeldige JSON" };
   }
 
-  const { bestelnommer, items, aflewering, koper } = invoer;
+  const { bestelnommer, items, koper } = invoer;
+  let aflewering = invoer.aflewering && typeof invoer.aflewering === "object" ? invoer.aflewering : null;
   // Kaartjieboodskap (November 2026): vrye teks van die koper, beperk tot
   // 300 karakters. Word by elke vertoning ontsnap.
   if (aflewering && typeof aflewering === "object" && "kaartjie" in aflewering) {
@@ -238,6 +240,7 @@ exports.handler = async (event, context) => {
   let totaal_sent = 0;
   let hosting_totaal_sent = 0;
   let bevat_harde_kopie = false;
+  let getal_harde_kopieë = 0;
   const geverifieerde_items = [];
   const verdeling_per_subrekening = {}; // { "ACCT_xxx": sent_bedrag }
   const koepon_gebruikte_items = {}; // kode -> items waarop dit toegepas is
@@ -253,7 +256,7 @@ exports.handler = async (event, context) => {
     pakket_invoer.push({
       produk_slug: kliënt_item.produk_slug,
       formaat: kliënt_item.formaat,
-      prys_sent: fd && fd.beskikbaar ? fd.prys_sent : 0,
+      prys_sent: fd && fd.beskikbaar ? boekdeel_sent(fd) : 0,
       geskenk: kliënt_item.geskenk === true,
     });
   }
@@ -307,7 +310,10 @@ exports.handler = async (event, context) => {
       return { statusCode: 400, body: `"${produk.titel}" (${kliënt_item.formaat}) is nie meer beskikbaar nie` };
     }
 
-    const item_prys_sent = formaat_data.prys_sent; // oorspronklike prys, voor enige koepon
+    // By 'n harde kopie: die boek se deel; die drukkoste kom onderaan by
+    // (sien _aflewering.js). Afslag en verdelings geld net op die boekdeel.
+    const druk_sent = kliënt_item.formaat === "harde_kopie" ? drukkoste_sent(formaat_data) : 0;
+    const item_prys_sent = boekdeel_sent(formaat_data); // oorspronklike prys, voor enige koepon
     let verkoop_prys_sent = item_prys_sent;
     const item_koepon_kodes = [];
     const in_pakket = pakket_per_item[item_indeks];
@@ -326,8 +332,11 @@ exports.handler = async (event, context) => {
       });
     }
 
-    totaal_sent += verkoop_prys_sent;
-    if (kliënt_item.formaat === "harde_kopie") bevat_harde_kopie = true;
+    totaal_sent += verkoop_prys_sent + druk_sent;
+    if (kliënt_item.formaat === "harde_kopie") {
+      bevat_harde_kopie = true;
+      getal_harde_kopieë++;
+    }
 
     // Leen-items kry 'n verval-datum — bereken NOU, server-kant, sodat 'n
     // koper dit nooit self kan verleng deur die kliënt te manipuleer nie.
@@ -342,11 +351,12 @@ exports.handler = async (event, context) => {
       produk_slug: produk.slug,
       titel: produk.titel,
       formaat: kliënt_item.formaat,
-      prys_sent: verkoop_prys_sent,
+      prys_sent: verkoop_prys_sent + druk_sent,
+      ...(druk_sent ? { druk_sent } : {}),
       ...(item_koepon_kodes.length
-        ? { oorspronklike_prys_sent: item_prys_sent, koepon_kode: item_koepon_kodes[0], koepon_kodes: item_koepon_kodes }
+        ? { oorspronklike_prys_sent: item_prys_sent + druk_sent, koepon_kode: item_koepon_kodes[0], koepon_kodes: item_koepon_kodes }
         : {}),
-      ...(in_pakket ? { oorspronklike_prys_sent: item_prys_sent, reekspakket_id: in_pakket.pakket_id } : {}),
+      ...(in_pakket ? { oorspronklike_prys_sent: item_prys_sent + druk_sent, reekspakket_id: in_pakket.pakket_id } : {}),
       ...(is_geskenk ? { geskenk: true } : {}),
       ...(formaat_data.opsie
         ? {
@@ -400,6 +410,24 @@ exports.handler = async (event, context) => {
     }
   }
 
+  // AFLEWERING (November 2026): een keer per bestelling, na Future Sharp se
+  // hoofrekening. Koerier vra 'n volledige adres; afhaal in Pretoria nie.
+  let afleweringskoste = 0;
+  if (bevat_harde_kopie) {
+    const metode = skoon_metode(aflewering && aflewering.metode);
+    if (metode === "koerier") {
+      const a = aflewering || {};
+      if (!["ontvanger", "straat", "stad", "provinsie", "poskode"].every((k) => String(a[k] || "").trim())) {
+        return { statusCode: 400, body: "Vul asseblief die volledige afleweringsadres in" };
+      }
+    }
+    aflewering = { ...(aflewering || {}), metode };
+    afleweringskoste = afleweringskoste_sent(getal_harde_kopieë, metode);
+    totaal_sent += afleweringskoste;
+  } else {
+    aflewering = null;
+  }
+
   if (totaal_sent < 0 || !geverifieerde_items.length) {
     return { statusCode: 400, body: "Bestelling se totaal is ongeldig" };
   }
@@ -435,6 +463,7 @@ exports.handler = async (event, context) => {
       hosting_totaal_sent: 0,
       bevat_harde_kopie,
       aflewering: aflewering || null,
+      afleweringskoste_sent: afleweringskoste,
       verdeling: null,
       split_code: null,
       split_fout: null,
@@ -634,6 +663,7 @@ exports.handler = async (event, context) => {
     hosting_totaal_sent,
     bevat_harde_kopie,
     aflewering: aflewering || null,
+    afleweringskoste_sent: afleweringskoste,
     verdeling: subrekening_kodes.length ? verdeling_per_subrekening : null,
     split_code,
     split_fout,

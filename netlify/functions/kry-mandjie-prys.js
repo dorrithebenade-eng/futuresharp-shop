@@ -13,6 +13,7 @@
 const { kry_store } = require("./_blob-store");
 const { kry_aktiewe_pakkette, pas_pakkette_toe_per_groep, bou_wenke } = require("./_reekspakkette");
 const { kry_formaat_data } = require("./_harde-kopie-opsies");
+const { drukkoste_sent, boekdeel_sent, afleweringskoste_sent } = require("./_aflewering");
 const { koepon_geld_vir_boek, pas_koepon_toe, sorteer_koepons, skoon_kodes } = require("./_koepon-velde");
 
 // Ook vir die boeke se eie webblaaie (bv. speelslim.futuresharp.co.za).
@@ -73,10 +74,13 @@ exports.handler = async (event) => {
       const formaat = String(it.formaat || "");
       const produk = slug ? await katalogus.get(slug, { type: "json" }) : null;
       const fd = kry_formaat_data(produk, formaat, it.opsie);
+      const ok = fd && fd.beskikbaar;
       items.push({
         produk_slug: slug,
         formaat,
-        prys_sent: fd && fd.beskikbaar ? fd.prys_sent : 0,
+        // Harde kopie: die boekdeel hier; die drukkoste kom onderaan by.
+        prys_sent: ok ? boekdeel_sent(fd) : 0,
+        druk_sent: ok && formaat === "harde_kopie" ? drukkoste_sent(fd) : 0,
         ...(it.geskenk === true ? { geskenk: true } : {}),
       });
     }
@@ -88,10 +92,11 @@ exports.handler = async (event) => {
     let totaal = 0;
     let na_koepon = 0;
     const uit = items.map((it, i) => {
-      oorspronklik += it.prys_sent;
+      const druk = it.druk_sent || 0;
+      oorspronklik += it.prys_sent + druk;
       const p = per_item[i];
       const prys = p ? p.prys_sent : it.prys_sent;
-      totaal += prys;
+      totaal += prys + druk;
       let met_koepon = prys;
       if (!p || p.koepon_toegelaat) {
         for (const k of koepons) {
@@ -100,8 +105,10 @@ exports.handler = async (event) => {
           met_koepon = pas_koepon_toe(k, met_koepon);
         }
       }
-      na_koepon += met_koepon;
-      return p ? { ...it, pakket_id: p.pakket_id, pakket_prys_sent: p.prys_sent } : it;
+      na_koepon += met_koepon + druk;
+      const { druk_sent, ...rus } = it;
+      const item = { ...rus, prys_sent: it.prys_sent + druk, ...(druk ? { druk_sent: druk } : {}) };
+      return p ? { ...item, pakket_id: p.pakket_id, pakket_prys_sent: p.prys_sent + druk } : item;
     });
 
     return {
@@ -112,6 +119,9 @@ exports.handler = async (event) => {
         pakkette: toegepas,
         wenke: await verryk_wenke(bou_wenke(items, aktiewe), katalogus),
         oorspronklike_totaal_sent: oorspronklik,
+        // Koerierkoste vir die harde kopieë (afhaal is R0); nie by totaal_sent in nie.
+        harde_kopieë: items.filter((it) => it.formaat === "harde_kopie" && it.prys_sent + (it.druk_sent || 0) > 0).length,
+        koerier_sent: afleweringskoste_sent(items.filter((it) => it.formaat === "harde_kopie").length, "koerier"),
         totaal_sent: totaal,
         ...(koepons.length ? { koepons: koepons.map((k) => k.kode), totaal_na_koepon_sent: na_koepon, koepon_afslag_sent: totaal - na_koepon } : {}),
       }),

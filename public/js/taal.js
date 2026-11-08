@@ -591,9 +591,21 @@ const WOORDEBOEK = {
     en: "This coupon is not valid for your account",
   },
   aflewering_titel: { af: "Aflewering", en: "Delivery" },
+  outeur_afhaal: {
+    af: "Die koper haal self in Pretoria af. Future Sharp reël die tyd en plek.",
+    en: "The buyer collects in Pretoria. Future Sharp arranges the time and place.",
+  },
+  aflewering_metode_koerier: { af: "Aflewering per koerier", en: "Delivery by courier" },
+  aflewering_metode_afhaal: { af: "Ek haal self af in Pretoria", en: "I will collect in Pretoria" },
+  aflewering_afhaal_nota: {
+    af: "Ons stuur die tyd en plek in Pretoria per e-pos sodra jou boeke gereed is.",
+    en: "We will e-mail you the time and place in Pretoria as soon as your books are ready.",
+  },
+  aflewering_gratis: { af: "Gratis", en: "Free" },
+  afleweringskoste_ry: { af: "Aflewering", en: "Delivery" },
   aflewering_nota: {
-    af: "Jou mandjie bevat 'n harde-kopie-item — verskaf asseblief die ontvanger se naam en afleweradres.",
-    en: "Your cart contains a hard-copy item — please provide the recipient's name and delivery address.",
+    af: "Jou mandjie bevat 'n harde kopie. Kies hoe jy dit wil ontvang. Die koerierkoste word een keer vir die hele bestelling bereken.",
+    en: "Your cart contains a hard copy. Choose how you would like to receive it. The courier cost is charged once for the whole order.",
   },
   ontvanger_naam: { af: "Ontvanger se naam en van", en: "Recipient's full name" },
   straatadres: { af: "Straatadres", en: "Street address" },

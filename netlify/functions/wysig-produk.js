@@ -163,6 +163,13 @@ exports.handler = async (event, context) => {
         ? kry_geldige_opsies(wysigings.formate.harde_kopie.opsies, kry_geldige_verdelings, kry_geldige_hosting)
         : ou_hk.opsies || [];
       nuwe_formate.harde_kopie.opsies = opsies;
+      // Drukkoste (November 2026, sien _aflewering.js): 'n wysiging sonder
+      // die veld behou die bestaande waarde (die veldverlies-patroon).
+      const druk = "drukkoste_sent" in wysigings.formate.harde_kopie
+        ? Math.max(0, Math.round(Number(wysigings.formate.harde_kopie.drukkoste_sent) || 0))
+        : Math.max(0, Math.round(Number(ou_hk.drukkoste_sent) || 0));
+      if (druk) nuwe_formate.harde_kopie.drukkoste_sent = druk;
+      else delete nuwe_formate.harde_kopie.drukkoste_sent;
       if (opsies.length) nuwe_formate.harde_kopie.prys_sent = laagste_opsie_prys(opsies);
       const opsies_fout = kontroleer_opsies_minimum(opsies, oorskry_hoofrekening_minimum, beskryf_minimum);
       if (opsies_fout) return { statusCode: 400, body: opsies_fout };

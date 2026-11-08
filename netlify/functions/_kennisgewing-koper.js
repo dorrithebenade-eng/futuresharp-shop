@@ -71,6 +71,16 @@ async function stuur_koper_bevestiging(bestelling) {
     );
   });
 
+  // Aflewering (November 2026): die koerierkoste as 'n eie reël.
+  const afhaal = bevat_harde_kopie && bestelling.aflewering && bestelling.aflewering.metode === "afhaal";
+  if (bevat_harde_kopie) {
+    lyn_items.push(
+      afhaal
+        ? "Afhaal in Pretoria &middot; R0,00"
+        : `Aflewering per koerier &middot; ${rand(bestelling.afleweringskoste_sent || 0)}`
+    );
+  }
+
   const reels = [
     "Dankie vir jou bestelling. Hier is wat jy gekoop het.",
     lyn_items.join("<br>"),
@@ -80,7 +90,13 @@ async function stuur_koper_bevestiging(bestelling) {
 
   // WAT NOU VOLG -- en net dit wat werklik van toepassing is. 'n Koper wat net
   // 'n e-boek gekoop het, hoef niks van pos te lees nie, en andersom.
-  if (bevat_lees && bevat_harde_kopie) {
+  if (afhaal) {
+    reels.push(
+      (bevat_lees ? 'Jou e-boeke wag in "My Boeke", gereed om te lees. ' : "") +
+        "Jou gedrukte boek word gedruk, en ons stuur die tyd en plek in Pretoria " +
+        "per e-pos sodra dit gereed is om af te haal."
+    );
+  } else if (bevat_lees && bevat_harde_kopie) {
     reels.push(
       'Jou e-boeke wag in "My Boeke", gereed om te lees. Die gedrukte boek word ' +
         'gepos, en ons stuur die spoornommer sodra dit weg is -- jy kan die ' +
