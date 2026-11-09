@@ -29,7 +29,7 @@ function bou_bestelling_kaart(b) {
   const items_html = (b.items || [])
     .map(
       (i) =>
-        `<li>${i.titel} <span class="paneel-bestelling-item-formaat">(${etiket_vir_formaat_bestelling(i.formaat)}${i.geskenk ? ", 🎁 geskenk" : ""}${i.via_geskenk ? ", ontvangde geskenk" : ""})</span> — ${formateer_prys_sent_bestelling(i.prys_sent)}</li>`
+        `<li>${i.titel} <span class="paneel-bestelling-item-formaat">(${etiket_vir_formaat_bestelling(i.formaat)}${i.geskenk ? ", 🎁 geskenk" : ""}${i.voorbestelling ? ", ⏳ voorbestelling" : ""}${i.via_geskenk ? ", ontvangde geskenk" : ""})</span> — ${formateer_prys_sent_bestelling(i.prys_sent)}</li>`
     )
     .join("");
 

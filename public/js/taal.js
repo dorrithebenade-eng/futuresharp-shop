@@ -62,6 +62,10 @@ const WOORDEBOEK = {
   bk_boeke_in: { af: "Boeke in:", en: "Books in:" },
   bk_albei_tale: { af: "Albei tale", en: "Both languages" },
   // Boekbladsy (fase 3)
+  pb_leeskamer_voorbestel: {
+    af: "Die e-boek verskyn op %datum% in My Leeskamer. Lees dan aanlyn of aflyn op jou foon, tablet of rekenaar.",
+    en: "The e-book appears in My Reading Room on %datum%. You can then read online or offline on your phone, tablet or computer.",
+  },
   pb_leeskamer: {
     af: "Die e-boek wag dadelik in My Leeskamer. Lees aanlyn of aflyn op jou foon, tablet of rekenaar.",
     en: "The e-book waits for you right away in My Reading Room. Read online or offline on your phone, tablet or computer.",
@@ -415,7 +419,15 @@ const WOORDEBOEK = {
   isbn_hardekopie: { af: "Harde kopie", en: "Hard copy" },
   kies_formaat: { af: "Kies jou formaat", en: "Choose your format" },
   voorbestel_nou: { af: "Voorbestel nou", en: "Pre-order now" },
-  voorbestelling_beskikbaar_vanaf: { af: "Voorbestelling — beskikbaar vanaf", en: "Pre-order — available from" },
+  voorbestelling_beskikbaar_vanaf: { af: "Voorbestelling: beskikbaar vanaf", en: "Pre-order: available from" },
+  voorbestelling_hk_sonder_datum: {
+    af: "Voorbestelling: ons laat weet jou per e-pos sodra jou boek versend word.",
+    en: "Pre-order: we will let you know by e-mail as soon as your book is shipped.",
+  },
+  leser_voorbestel: {
+    af: "Hierdie e-boek is voorbestel. Dit maak op die vrystellingsdatum hier oop.",
+    en: "This e-book is pre-ordered. It opens here on the release date.",
+  },
   reeds_in_mandjie: { af: "Reeds in jou mandjie.", en: "Already in your cart." },
   in_mandjie_teken: { af: "In mandjie ✓", en: "In cart ✓" },
   voorbestel_teken: { af: "Voorbestel ✓", en: "Pre-ordered ✓" },

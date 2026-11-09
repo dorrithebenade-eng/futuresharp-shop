@@ -174,7 +174,9 @@ function bou_aksie_ry(produk, formaat, formaat_data, etiket, besit, leen_dae_oor
           ? `<span class="produk-leen-tydperk-nota">${t("leen_verduideliking").replace("%tydperk%", formaat_data.tydperk_dae || 30)}</span>`
           : ""}
         ${voorbestelling
-          ? `<span class="produk-voorbestel-nota">${t("voorbestelling_beskikbaar_vanaf")} ${formateer_datum_af(formaat_data.vrystelling_datum)}</span>`
+          ? `<span class="produk-voorbestel-nota">${formaat_data.vrystelling_datum
+              ? `${t("voorbestelling_beskikbaar_vanaf")} ${formateer_datum_af(formaat_data.vrystelling_datum)}`
+              : t("voorbestelling_hk_sonder_datum")}</span>`
           : ""}
       </div>
       <button class="kaart-aksie produk-formaat-knoppie" id="${knoppie_id}"
@@ -322,8 +324,11 @@ function wys_produk(produk, besit_info, konteks) {
       <span class="pb-webblad-pyl" aria-hidden="true">→</span></a>`;
   }
 
+  const eboek_voorbestel = eboek && eboek.beskikbaar && is_voorbestelling(eboek);
   const leeskamer_html = eboek && eboek.beskikbaar
-    ? `<p class="pb-leeskamer">${t("pb_leeskamer")}
+    ? `<p class="pb-leeskamer">${eboek_voorbestel
+        ? t("pb_leeskamer_voorbestel").replace("%datum%", formateer_datum_af(eboek.vrystelling_datum))
+        : t("pb_leeskamer")}
         <button type="button" class="beskikbaar-merker pb-hoe" data-formaat="eboek">${t("pb_hoe_werk_dit")}</button></p>`
     : "";
 

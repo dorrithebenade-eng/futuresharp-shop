@@ -356,11 +356,24 @@ exports.handler = async (event, context) => {
       leen_ekstra.tydperk_dae = tydperk_dae;
     }
 
+    // VOORBESTELLING (November 2026): 'n e-boek met 'n vrystellingsdatum in
+    // die toekoms, of 'n harde kopie met voorbestelling aan (sonder datum).
+    // Die bevestigingspos en die paneel lees dit van die item af.
+    const vandag_sa = new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString().slice(0, 10);
+    const voorbestel_ekstra = {};
+    if (formaat_data.vrystelling_datum && String(formaat_data.vrystelling_datum).slice(0, 10) > vandag_sa) {
+      voorbestel_ekstra.voorbestelling = true;
+      voorbestel_ekstra.vrystelling_datum = String(formaat_data.vrystelling_datum).slice(0, 10);
+    } else if (kliënt_item.formaat === "harde_kopie" && formaat_data.voorbestelling === true) {
+      voorbestel_ekstra.voorbestelling = true;
+    }
+
     geverifieerde_items.push({
       produk_slug: produk.slug,
       titel: produk.titel,
       formaat: kliënt_item.formaat,
       prys_sent: verkoop_prys_sent + druk_sent,
+      ...voorbestel_ekstra,
       ...(druk_sent ? { druk_sent } : {}),
       ...(item_koepon_kodes.length
         ? { oorspronklike_prys_sent: item_prys_sent + druk_sent, koepon_kode: item_koepon_kodes[0], koepon_kodes: item_koepon_kodes }

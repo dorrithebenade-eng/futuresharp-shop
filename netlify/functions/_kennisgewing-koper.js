@@ -40,6 +40,12 @@ const FORMAAT_WOORD = {
   harde_kopie: "gedrukte boek",
 };
 
+function datum_lank(iso) {
+  const d = new Date(String(iso || "").slice(0, 10) + "T00:00:00Z");
+  if (Number.isNaN(d.getTime())) return String(iso || "");
+  return d.toLocaleDateString("af-ZA", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
+}
+
 function rand(sent) {
   return "R" + (Number(sent || 0) / 100).toFixed(2).replace(".", ",");
 }
@@ -53,9 +59,14 @@ async function stuur_koper_bevestiging(bestelling) {
 
   const bestelnommer = String(bestelling.bestelnommer || "").trim();
   const bevat_harde_kopie = items.some((i) => i && i.formaat === "harde_kopie");
+  // Voorbestelde e-boeke tel nie as "gereed om te lees" nie (November 2026).
   const bevat_lees = items.some(
-    (i) => i && i.geskenk !== true && (i.formaat === "eboek" || i.formaat === "leen")
+    (i) => i && i.geskenk !== true && (i.formaat === "eboek" || i.formaat === "leen") && i.voorbestelling !== true
   );
+  const voorbestel_eboeke = items.filter(
+    (i) => i && i.geskenk !== true && i.formaat === "eboek" && i.voorbestelling === true
+  );
+  const voorbestel_hk = items.some((i) => i && i.formaat === "harde_kopie" && i.voorbestelling === true);
   const bevat_geskenk = items.some((i) => i && i.geskenk === true);
 
   // Elke reël 'n titel met sy formaat en prys. Die prys staan hier omdat dit
@@ -67,6 +78,7 @@ async function stuur_koper_bevestiging(bestelling) {
       `<b>${ontsnap(i.titel || "")}</b>` +
       (woord ? ` &middot; ${ontsnap(woord)}` : "") +
       (i.geskenk === true ? " &middot; geskenk" : "") +
+      (i.voorbestelling === true ? " &middot; voorbestelling" : "") +
       ` &middot; ${rand(i.prys_sent)}`
     );
   });
@@ -98,19 +110,37 @@ async function stuur_koper_bevestiging(bestelling) {
         "Jou gedrukte boek word gedruk, en ons stuur die tyd en plek in Pretoria " +
         "per e-pos sodra dit gereed is om af te haal."
     );
-  } else if (bevat_lees && bevat_harde_kopie) {
+  } else if (bevat_lees && bevat_harde_kopie && !voorbestel_hk) {
     reels.push(
       'Jou e-boeke wag in "My Boeke", gereed om te lees. Die gedrukte boek word ' +
         'gepos, en ons stuur die spoornommer sodra dit weg is -- jy kan die ' +
         'status ook enige tyd in "My Boeke" volg.'
     );
-  } else if (bevat_harde_kopie) {
+  } else if (bevat_harde_kopie && !voorbestel_hk) {
     reels.push(
       'Jou boek word gepos. Ons stuur die spoornommer sodra dit weg is, en jy ' +
         'kan die status enige tyd in "My Boeke" volg.'
     );
   } else if (bevat_lees) {
     reels.push('Jou boeke wag in "My Boeke", gereed om te lees.');
+  }
+
+  // VOORBESTELLINGS (November 2026): wanneer die e-boek oopmaak, en dat die
+  // gedrukte boek se versending per e-pos aangekondig word.
+  if (voorbestel_eboeke.length) {
+    const datums = [...new Set(voorbestel_eboeke.map((i) => i.vrystelling_datum).filter(Boolean))];
+    const woord = voorbestel_eboeke.length === 1 ? "Jou voorbestelde e-boek verskyn" : "Jou voorbestelde e-boeke verskyn";
+    reels.push(
+      datums.length === 1
+        ? `${woord} op <b>${ontsnap(datum_lank(datums[0]))}</b> in My Leeskamer. Jy kan dit dan aanlyn of aflyn op jou foon, tablet of rekenaar lees.`
+        : `${woord} op hul vrystellingsdatums in My Leeskamer.`
+    );
+  }
+  if (voorbestel_hk && !afhaal) {
+    reels.push(
+      "Jou gedrukte boek is voorbestel. Ons laat weet jou per e-pos sodra dit versend word, " +
+        "saam met die spoornommer."
+    );
   }
 
   // GESKENKE: die geskenkbewys met die kode kom in 'n aparte pos (sien

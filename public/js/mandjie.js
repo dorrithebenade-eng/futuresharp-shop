@@ -85,7 +85,10 @@ function wys_mandjie_teller() {
 }
 
 function is_voorbestelling(formaat_data) {
-  if (!formaat_data || !formaat_data.vrystelling_datum) return false;
+  if (!formaat_data) return false;
+  // Harde kopie sonder datum (November 2026): voorbestelling aan, die
+  // versending word per e-pos aangekondig.
+  if (!formaat_data.vrystelling_datum) return formaat_data.voorbestelling === true;
   const vrystelling = new Date(formaat_data.vrystelling_datum);
   if (Number.isNaN(vrystelling.getTime())) return false;
   const vandag = new Date();
@@ -96,7 +99,8 @@ function is_voorbestelling(formaat_data) {
 function formateer_datum_af(datum_string) {
   const datum = new Date(datum_string);
   if (Number.isNaN(datum.getTime())) return "";
-  return datum.toLocaleDateString("af-ZA", { day: "numeric", month: "long", year: "numeric" });
+  const taal = (document.documentElement.lang || "af").toLowerCase().startsWith("en") ? "en-ZA" : "af-ZA";
+  return datum.toLocaleDateString(taal, { day: "numeric", month: "long", year: "numeric" });
 }
 
 // Identity-widget-afhanklikheid is heeltemal verwyder (sien

@@ -552,6 +552,10 @@ async function laai_leser() {
       if (!pdf_resp.ok) {
         if (pdf_resp.status === 403) {
           const fout_data = await pdf_resp.json().catch(() => null);
+          if (fout_data && fout_data.voorbestelling) {
+            wys_status(window.t ? window.t("leser_voorbestel") : "Hierdie e-boek is voorbestel. Dit maak op die vrystellingsdatum hier oop.");
+            return null;
+          }
           if (fout_data && fout_data.leen_verval) {
             wys_status(
               window.t

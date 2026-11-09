@@ -202,6 +202,18 @@ exports.handler = async (event, context) => {
       return { statusCode: 403, body: JSON.stringify({ fout: boodskap, leen_verval: besit_status.rede === "leen_verval" }) };
     }
 
+    // VOORBESTELLING (November 2026): voor die vrystellingsdatum lees net
+    // admin en outeur. 'n Koper sien die boek op sy rak, maar dit maak eers
+    // op die datum oop (tyd in Suid-Afrika).
+    if (!eie_toegang) {
+      const produk_vr = await kry_store("katalogus").get(produk_slug, { type: "json" });
+      const datum = produk_vr && produk_vr.formate && produk_vr.formate.eboek && produk_vr.formate.eboek.vrystelling_datum;
+      const vandag_sa = new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString().slice(0, 10);
+      if (datum && String(datum).slice(0, 10) > vandag_sa) {
+        return { statusCode: 403, body: JSON.stringify({ fout: "Hierdie e-boek is voorbestel en maak oop op " + String(datum).slice(0, 10) + ".", voorbestelling: true }) };
+      }
+    }
+
     const volledige_pdf = await kry_of_genereer_gemerkte_kopie(produk_slug, gebruiker, eie_toegang);
     if (!volledige_pdf) {
       return { statusCode: 404, body: JSON.stringify({ fout: "Hierdie e-boek is nog nie beskikbaar nie" }) };

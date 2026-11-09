@@ -137,14 +137,19 @@ exports.handler = async (event, context) => {
         // leen-kaart nie ook nog apart wys nie — net die "Gekoop"-kaart.
         if (is_leen && reeds_besit_as_eboek.has(boek_item.produk_slug)) continue;
 
-        const vrystelling_datum = boek_item.vrystelling_datum || null;
-        const beskikbaar_nou = !vrystelling_datum || vrystelling_datum <= vandag;
-
         // Omslag en outeur kom van die katalogus-rekord, nie van die
         // bestelling nie — bestellings stoor net wat op koop-tydstip
         // nodig was. Val gragvol terug indien die produk intussen
         // gedeaktiveer/verwyder is.
         const produk = await kry_produk(boek_item.produk_slug);
+
+        // Die katalogus se huidige vrystellingsdatum wen (dit kan skuif);
+        // die bestelling s'n is die terugval. Net vir e-boeke en leen.
+        const katalogus_datum = !is_harde_kopie && produk && produk.formate && produk.formate.eboek
+          ? produk.formate.eboek.vrystelling_datum || null
+          : null;
+        const vrystelling_datum = is_harde_kopie ? null : String(katalogus_datum || boek_item.vrystelling_datum || "").slice(0, 10) || null;
+        const beskikbaar_nou = !vrystelling_datum || vrystelling_datum <= vandag;
 
         let leen_aktief = null;
         let dae_oor = null;
