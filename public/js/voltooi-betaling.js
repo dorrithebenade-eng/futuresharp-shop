@@ -34,18 +34,24 @@ function koerier_sent_vir(getal) {
   return som;
 }
 
+// Geen verstekkeuse nie (November 2026): die koper kies self koerier of
+// afhaal. Tot hy kies, gee dit null en tel die aflewering nie by die totaal
+// nie. Later kom meer koerierdienste by as ekstra radioknoppies.
 function gekose_metode() {
   const k = document.querySelector('input[name="aflewer-metode"]:checked');
-  return k && k.value === "afhaal" ? "afhaal" : "koerier";
+  if (!k) return null;
+  return k.value === "afhaal" ? "afhaal" : "koerier";
 }
 
 function werk_totaal_by() {
   const ry = document.getElementById("vb-aflewering-ry");
   if (ry) {
-    AFLEWERING_SENT = gekose_metode() === "afhaal" ? 0 : KOERIER_SENT;
+    const metode = gekose_metode();
+    AFLEWERING_SENT = metode === "koerier" ? KOERIER_SENT : 0;
     ry.style.display = "";
-    document.getElementById("vb-aflewering-bedrag").textContent =
-      AFLEWERING_SENT ? formateer_prys_sent(AFLEWERING_SENT) : t("aflewering_gratis");
+    document.getElementById("vb-aflewering-bedrag").textContent = !metode
+      ? t("aflewering_nog_nie_gekies")
+      : AFLEWERING_SENT ? formateer_prys_sent(AFLEWERING_SENT) : t("aflewering_gratis");
   }
   VERTOONDE_TOTAAL_SENT = BOEKE_TOTAAL_SENT + AFLEWERING_SENT;
   const veld = document.getElementById("vb-totaal-bedrag");
@@ -147,7 +153,7 @@ function bou_aflewer_afdeling(met_kaartjie, as_geskenk) {
 
       <div class="aflewer-metodes" style="display:flex;flex-direction:column;gap:8px;margin:8px 0 16px;">
         <label style="display:flex;gap:10px;align-items:center;cursor:pointer;">
-          <input type="radio" name="aflewer-metode" value="koerier" checked>
+          <input type="radio" name="aflewer-metode" value="koerier"${as_geskenk ? " checked" : ""}>
           <span>${t("aflewering_metode_koerier")} <span id="vb-koerier-bedrag" style="color:#666"></span></span>
         </label>
         ${as_geskenk ? "" : `<label style="display:flex;gap:10px;align-items:center;cursor:pointer;">
@@ -157,7 +163,7 @@ function bou_aflewer_afdeling(met_kaartjie, as_geskenk) {
         <p id="vb-afhaal-nota" class="vb-afdeling-nota" style="display:none;margin:4px 0 0;">${t("aflewering_afhaal_nota")}</p>
       </div>
 
-      <div id="aflewer-adres-blok" class="aflewer-blok">
+      <div id="aflewer-adres-blok" class="aflewer-blok"${as_geskenk ? "" : ' style="display:none;"'}>
         <label class="veld-etiket" for="adres-ontvanger">${t("ontvanger_naam")}</label>
         <input type="text" id="adres-ontvanger" class="veld-invoer" autocomplete="name">
         ${as_geskenk ? `
@@ -229,7 +235,9 @@ function valideer_en_bou_bestelling(items, totaal, bestelnommer, bevat_harde_kop
     foute.push(t("geskenk_hk_gemeng"));
   }
 
-  if (bevat_harde_kopie && !hk_geskenk && gekose_metode() === "afhaal") {
+  if (bevat_harde_kopie && !hk_geskenk && !gekose_metode()) {
+    foute.push(t("aflewering_metode_verplig"));
+  } else if (bevat_harde_kopie && !hk_geskenk && gekose_metode() === "afhaal") {
     aflewering = { metode: "afhaal" };
   } else if (bevat_harde_kopie) {
     // Die ontvanger is nie noodwendig die koper nie — 'n boek word as
@@ -550,7 +558,7 @@ async function laai_vb() {
     document.querySelectorAll('input[name="aflewer-metode"]').forEach((r) =>
       r.addEventListener("change", () => {
         const afhaal = gekose_metode() === "afhaal";
-        document.getElementById("aflewer-adres-blok").style.display = afhaal ? "none" : "";
+        document.getElementById("aflewer-adres-blok").style.display = gekose_metode() === "koerier" ? "" : "none";
         document.getElementById("vb-afhaal-nota").style.display = afhaal ? "" : "none";
         werk_totaal_by();
       })

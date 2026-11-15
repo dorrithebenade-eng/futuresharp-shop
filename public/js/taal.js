@@ -637,6 +637,11 @@ const WOORDEBOEK = {
     en: "We will e-mail you the time and place in Pretoria as soon as your books are ready.",
   },
   aflewering_gratis: { af: "Gratis", en: "Free" },
+  aflewering_nog_nie_gekies: { af: "Kies hieronder", en: "Choose below" },
+  aflewering_metode_verplig: {
+    af: "Kies hoe jy jou boeke wil ontvang: per koerier of afhaal in Pretoria.",
+    en: "Choose how you would like to receive your books: by courier or collection in Pretoria.",
+  },
   afleweringskoste_ry: { af: "Aflewering", en: "Delivery" },
   aflewering_nota: {
     af: "Jou mandjie bevat 'n harde kopie. Kies hoe jy dit wil ontvang. Die koerierkoste word een keer vir die hele bestelling bereken.",
