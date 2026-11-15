@@ -147,9 +147,11 @@ exports.handler = async (event, context) => {
     return entiteit_kas[kas_sleutel];
   }
 
-  // Verhoed dat 'n reeds-betaalde bestelnommer oorskryf word
+  // Verhoed dat 'n reeds-betaalde bestelnommer oorskryf word. 'n Konsep
+  // wat ná die mandjie-herinnering verval het (sien mandjie-herinnering.js),
+  // mag weer lewe kry: die koper het teruggekom en wil nou betaal.
   const bestaande = await bestellingsStore.get(bestelnommer, { type: "json" });
-  if (bestaande && bestaande.status !== "Wag vir betaling") {
+  if (bestaande && bestaande.status !== "Wag vir betaling" && bestaande.status !== "Verval") {
     return { statusCode: 409, body: "Hierdie bestelnommer is reeds verwerk" };
   }
 
@@ -702,8 +704,16 @@ exports.handler = async (event, context) => {
       ? { bestelling_geplaas: false, geplaas_op: null, nota: "" }
       : null,
     paystack: { referensie: paystack_verwysing, poging, geverifieer: false },
+    // Die koper se taal, vir die mandjie-herinnering (November 2026).
+    taal: invoer.taal === "en" ? "en" : invoer.taal === "af" ? "af" : (bestaande && bestaande.taal) || null,
+    // 'n Herinnering wat reeds gestuur is, bly staan by 'n nuwe poging, anders
+    // kry die koper 'n tweede pos (sien mandjie-herinnering.js).
+    ...(bestaande && bestaande.herinnering ? { herinnering: bestaande.herinnering } : {}),
     status: "Wag vir betaling",
-    status_geskiedenis: [{ status: "Wag vir betaling", op: new Date().toISOString() }],
+    status_geskiedenis: [
+      ...((bestaande && bestaande.status_geskiedenis) || []),
+      { status: "Wag vir betaling", op: new Date().toISOString() },
+    ],
   };
 
   await bestellingsStore.setJSON(bestelnommer, konsep_bestelling);

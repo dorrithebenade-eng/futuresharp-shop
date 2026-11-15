@@ -53,6 +53,13 @@
 [functions."akk-herinnering"]
   schedule = "25 4 * * *"
 
+# mandjie-herinnering (15 Nov 2026): ELKE UUR, vyf minute ná die uur. Een
+# neutrale pos aan 'n koper wat 3 uur ná sy laaste betaalpoging nog nie betaal
+# het nie; geen pos tussen 21:00 en 07:00 SA-tyd nie (die funksie self reken
+# met UTC+2). Ná 48 uur kry die konsep die status "Verval". Sien die lêer.
+[functions."mandjie-herinnering"]
+  schedule = "5 * * * *"
+
 # Netlify Identity registrasie-instellings word via die Netlify-kontrolepaneel
 # gestel (nie hierdie lêer nie): "Oop registrasie" aan, standaard-rol by
 # registrasie = "koper" (via 'n Identity-triggerfunksie, sien

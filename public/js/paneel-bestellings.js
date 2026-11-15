@@ -55,6 +55,11 @@ function bou_bestelling_kaart(b) {
     ? `<p class="paneel-bestelling-koepon">🎁 Ontvangde geskenk (${b.geskenk_ontvang.kode}, gekoop in ${b.geskenk_ontvang.gekoop_in}). Geen inkomste nie.</p>`
     : "";
 
+  // MANDJIE-HERINNERING (November 2026, sien mandjie-herinnering.js).
+  const herinnering_html = b.herinnering && b.herinnering.gestuur_op
+    ? `<p class="paneel-bestelling-koepon">📧 Herinnering gestuur ${formateer_datum_vol_bestelling(b.herinnering.gestuur_op)} · skakel geldig tot ${formateer_datum_vol_bestelling(b.herinnering.verval_op)}</p>`
+    : "";
+
   const split_fout_html = b.split_fout
     ? `<p class="paneel-bestelling-waarskuwing">⚠️ Split-vangnet geaktiveer: ${b.split_fout}</p>`
     : "";
@@ -98,6 +103,7 @@ function bou_bestelling_kaart(b) {
       <ul class="paneel-bestelling-items">${items_html}</ul>
       ${koepon_html}${pakket_html}
       ${gratis_html}
+      ${herinnering_html}
       ${geskenk_html}
       ${split_fout_html}
       ${drukker_html}

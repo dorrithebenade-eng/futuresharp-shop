@@ -638,6 +638,15 @@ const WOORDEBOEK = {
   },
   aflewering_gratis: { af: "Gratis", en: "Free" },
   aflewering_nog_nie_gekies: { af: "Kies hieronder", en: "Choose below" },
+  // Mandjie-herinnering se skakel (herstel-mandjie.html, November 2026).
+  herstel_verval_titel: { af: "Kom kyk gerus weer rond", en: "Feel free to have another look" },
+  herstel_verval_teks: {
+    af: "Die skakel in jou e-pos was 48 uur lank geldig. Jou boeke is steeds in die winkel, en jy kan hulle weer kies wanneer jy gereed is.",
+    en: "The link in your e-mail was valid for 48 hours. Your books are still in the shop, and you can choose them again whenever you are ready.",
+  },
+  herstel_na_boeke: { af: "Gaan na die boeke", en: "Go to the books" },
+  herstel_betaal_titel: { af: "Jou bestelling is reeds betaal", en: "Your order has already been paid" },
+  herstel_betaal_teks: { af: "Dankie, ons het jou betaling ontvang.", en: "Thank you, we have received your payment." },
   aflewering_metode_verplig: {
     af: "Kies hoe jy jou boeke wil ontvang: per koerier of afhaal in Pretoria.",
     en: "Choose how you would like to receive your books: by courier or collection in Pretoria.",

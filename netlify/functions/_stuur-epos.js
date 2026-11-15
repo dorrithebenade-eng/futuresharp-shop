@@ -164,13 +164,24 @@ function ontsnap(teks) {
     .replace(/"/g, "&quot;");
 }
 
+// KNOPPIE IN DIE MIDDEL (November 2026). Verstek staan die knoppie onder al
+// die paragrawe. Met knoppie_na = n kom dit direk ná paragraaf n (0-gebaseer)
+// en loop die res van die paragrawe daaronder voort. Die mandjie-herinnering
+// gebruik dit: die knoppie hoort by die sin "Gaan voort wanneer jy gereed
+// is", nie onderaan ná die groete nie.
+function knoppie_indeks(knoppie, reels) {
+  const n = knoppie && Number.isInteger(knoppie.na) ? knoppie.na : null;
+  return n !== null && n >= 0 && n < reels.length - 1 ? n : null;
+}
+
 function bou_html(opskrif, reels, knoppie, m) {
-  const paragrawe = reels
-    .map((r) => `<p style="margin:0 0 15px;font-family:${FONT};font-size:15px;line-height:1.65;color:#333333;">${r}</p>`)
-    .join("");
+  const p = (r) => `<p style="margin:0 0 15px;font-family:${FONT};font-size:15px;line-height:1.65;color:#333333;">${r}</p>`;
+  const middel = knoppie && knoppie.url ? knoppie_indeks(knoppie, reels) : null;
+  const paragrawe = (middel === null ? reels : reels.slice(0, middel + 1)).map(p).join("");
+  const res = middel === null ? "" : reels.slice(middel + 1).map(p).join("");
 
   const knoppie_ry = knoppie && knoppie.url
-    ? `<tr><td style="padding:10px 32px 26px;">
+    ? `<tr><td style="padding:${middel === null ? "10px 32px 26px" : "0 32px 12px"};">
         <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
           <td style="background:${KORAAL};padding:12px 24px;">
             <a href="${ontsnap(knoppie.url)}" style="font-family:${FONT};font-size:14px;font-weight:700;color:#FFFFFF;text-decoration:none;">${ontsnap(knoppie.teks || m.knoppie_verstek)}</a>
@@ -204,6 +215,7 @@ function bou_html(opskrif, reels, knoppie, m) {
       ${paragrawe}
     </td></tr>
     ${knoppie_ry}
+    ${res ? `<tr><td style="padding:8px 32px 8px;">${res}</td></tr>` : ""}
     <tr><td style="padding:16px 32px 22px;border-top:1px solid #EFEDE9;">
       <p style="margin:0;font-family:${FONT};font-size:12px;line-height:1.6;color:#8B8781;">${m.voet}</p>
     </td></tr>
@@ -220,8 +232,13 @@ function bou_teks(opskrif, reels, knoppie, m) {
   const skoon = reels.map((r) =>
     r.replace(/<br\s*\/?>/gi, "\n").replace(/<[^>]+>/g, "")
   );
-  const skakel = knoppie && knoppie.url ? `\n\n${knoppie.teks || m.knoppie_verstek}: ${knoppie.url}` : "";
-  return `${opskrif}\n\n${skoon.join("\n\n")}${skakel}\n\n—\n${m.voet_teks}`;
+  const skakel = knoppie && knoppie.url ? `${knoppie.teks || m.knoppie_verstek}: ${knoppie.url}` : "";
+  const middel = skakel ? knoppie_indeks(knoppie, skoon) : null;
+  if (middel !== null) {
+    const lyf = [...skoon.slice(0, middel + 1), skakel, ...skoon.slice(middel + 1)];
+    return `${opskrif}\n\n${lyf.join("\n\n")}\n\n—\n${m.voet_teks}`;
+  }
+  return `${opskrif}\n\n${skoon.join("\n\n")}${skakel ? `\n\n${skakel}` : ""}\n\n—\n${m.voet_teks}`;
 }
 
 /**
@@ -232,7 +249,8 @@ function bou_teks(opskrif, reels, knoppie, m) {
  * @param {string} opsies.onderwerp  onderwerpreël
  * @param {string} opsies.opskrif    groot opskrif binne die pos
  * @param {string[]} opsies.reels    paragrawe (eenvoudige HTML toegelaat)
- * @param {object} [opsies.knoppie]  { teks, url } — opsionele aksieknoppie
+ * @param {object} [opsies.knoppie]  { teks, url, na? } — opsionele aksieknoppie;
+ *                                   na = n plaas dit ná paragraaf n
  * @param {string} [opsies.merk]     "winkel" (verstek) of "faktuur"
  * @param {string} [opsies.antwoord_aan]  Reply-To
  * @param {object[]} [opsies.aanhegsels]  [{ filename, content, contentType }]

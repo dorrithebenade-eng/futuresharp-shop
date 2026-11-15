@@ -297,6 +297,8 @@ function valideer_en_bou_bestelling(items, totaal, bestelnommer, bevat_harde_kop
     geskenk,
     koepon_kodes: koepon_kodes || [],
     koepon_kode: (koepon_kodes && koepon_kodes[0]) || null,
+    // Vir die mandjie-herinnering: die pos gaan in die koper se taal.
+    taal: typeof kry_huidige_taal === "function" ? kry_huidige_taal() : "af",
     status: "Konsep — wag vir betaling",
   };
 

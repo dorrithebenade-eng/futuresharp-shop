@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="af">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <script>
+    // MOET voor enigiets anders loop -- sien die nota in mandjie.js.
+    (function () {
+      var identiteitsTokenPatroon = /(confirmation_token|invite_token|recovery_token|email_change_token)=/;
+      if (identiteitsTokenPatroon.test(window.location.hash)) {
+        window.location.replace("bevestig.html" + window.location.hash);
+      }
+    })();
+  </script>
+  <title>Jou mandjie — Future Shop</title>
+  <link rel="stylesheet" href="css/styl.css">
+  <link rel="stylesheet" href="css/dankie-stand.css">
+  <link rel="icon" href="/icons/ikoon-32.png" sizes="32x32" type="image/png">
+  <link rel="icon" href="/icons/ikoon-16.png" sizes="16x16" type="image/png">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-ikoon.png">
+  <meta name="theme-color" content="#3FB6A4">
+</head>
+<body>
+  <header class="mini-kop">
+   <div class="mini-kop-inner">
+    <a href="index.html" class="mini-kop-merk">
+      <span class="merk-sharp">Future Sharp</span>
+      <span class="merk-skeier">—</span>
+      <span class="merk-shop">Future Shop</span>
+    </a>
+    <div class="mini-kop-regs">
+      <a href="mandjie.html" class="mini-kop-mandjie">
+        <svg class="mandjie-ikoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="9" cy="21" r="1"></circle>
+          <circle cx="20" cy="21" r="1"></circle>
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+        </svg>
+        <span data-i18n="nav_mandjie">Mandjie</span>
+        <span id="mandjie-teller" class="mandjie-teller"></span>
+      </a>
+      <span id="nav-rekening-plek" class="mini-kop-rekening-plek"></span>
+      <div class="taal-wisselaar" role="group" aria-label="Taal / Language">
+        <button type="button" class="taal-knoppie" data-taal="af">AF</button>
+        <button type="button" class="taal-knoppie" data-taal="en">EN</button>
+      </div>
+    </div>
+   </div>
+  </header>
+  <main class="dankie-wrap">
+    <!-- Die skakel in die mandjie-herinnering land hier. herstel-mandjie.js
+         vul die mandjie en stuur die koper dadelik na mandjie.html. Hierdie
+         kaart verskyn net as die skakel verval het, of as die bestelling
+         reeds betaal is. -->
+    <div class="dankie-kaart" id="herstel-kaart">
+      <h1 class="mandjie-titel" id="herstel-titel"></h1>
+      <p class="dankie-teks" id="herstel-teks"></p>
+      <div class="dankie-knoppies">
+        <a class="kaart-aksie dankie-knoppie" id="herstel-knoppie" href="boeke.html" hidden></a>
+      </div>
+    </div>
+  </main>
+  <script src="js/taal.js"></script>
+  <script src="js/identiteit.js"></script>
+  <script src="js/mandjie.js"></script>
+  <script src="js/nav-rekening.js"></script>
+  <script src="js/herstel-mandjie.js"></script>
+</body>
+</html>
