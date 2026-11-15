@@ -633,8 +633,8 @@ const WOORDEBOEK = {
   aflewering_metode_koerier: { af: "Aflewering per koerier", en: "Delivery by courier" },
   aflewering_metode_afhaal: { af: "Ek haal self af in Pretoria", en: "I will collect in Pretoria" },
   aflewering_afhaal_nota: {
-    af: "Ons stuur die tyd en plek in Pretoria per e-pos sodra jou boeke gereed is.",
-    en: "We will e-mail you the time and place in Pretoria as soon as your books are ready.",
+    af: "Inligting oor die afhaaladres word per e-pos aan jou gestuur sodra jou betaling bevestig is.",
+    en: "Information about the collection address will be e-mailed to you once your payment has been confirmed.",
   },
   aflewering_gratis: { af: "Gratis", en: "Free" },
   aflewering_nog_nie_gekies: { af: "Kies hieronder", en: "Choose below" },
