@@ -190,6 +190,41 @@ function bou_aksie_ry(produk, formaat, formaat_data, etiket, besit, leen_dae_oor
   `;
 }
 
+function bou_kombinasie_ry(produk, eboek, hardeKopie) {
+  const half = Math.round((eboek.prys_sent || 0) / 2);
+  const gewoon = (hardeKopie.prys_sent || 0) + (eboek.prys_sent || 0);
+  const saam = (hardeKopie.prys_sent || 0) + half;
+  const voorbestel = is_voorbestelling(eboek) || is_voorbestelling(hardeKopie);
+  return `
+    <div class="produk-formaat-ry produk-kombinasie">
+      <div class="produk-formaat-info">
+        <span class="produk-formaat-etiket">${t("kombinasie_etiket")}</span>
+        <span class="produk-formaat-prys">${formateer_prys_sent(saam)} <s class="produk-kombinasie-ou">${formateer_prys_sent(gewoon)}</s></span>
+        <span class="produk-voorbestel-nota">${t("kombinasie_nota")}</span>
+      </div>
+      <button type="button" class="kaart-aksie produk-kombinasie-knoppie"
+        data-slug="${produk.slug}" data-titel="${titel_ontsnap(produk.titel)}"
+        data-eboek="${eboek.prys_sent}" data-hk="${hardeKopie.prys_sent}">
+        ${voorbestel ? t("kombinasie_voorbestel") : t("kombinasie_knoppie")}
+      </button>
+    </div>
+  `;
+}
+
+function koppel_kombinasie_knoppie(wrap) {
+  wrap.querySelectorAll(".produk-kombinasie-knoppie").forEach((knoppie) => {
+    knoppie.addEventListener("click", () => {
+      const { slug, titel, eboek, hk } = knoppie.dataset;
+      voeg_by_mandjie({ produk_slug: slug, titel, formaat: "harde_kopie", prys_sent: Number(hk) });
+      voeg_by_mandjie({ produk_slug: slug, titel, formaat: "eboek", prys_sent: Number(eboek) });
+      knoppie.textContent = t("in_mandjie_teken");
+      knoppie.disabled = true;
+      const terugvoer = document.getElementById("produk-terugvoer");
+      if (terugvoer) terugvoer.textContent = t("kombinasie_bygevoeg");
+    });
+  });
+}
+
 // GESKENKE (November 2026): koop die e-boek vir iemand anders. Die boek gaan
 // as geskenk in die mandjie; ná betaling kry die koper 'n eenmalige
 // geskenkkode (sien netlify/functions/_geskenke.js). Ook as die koper die
@@ -277,6 +312,13 @@ function wys_produk(produk, besit_info, konteks) {
     } else {
       aksies.push(bou_aksie_ry(produk, "harde_kopie", hardeKopie, t("hardekopie_etiket"), false));
     }
+  }
+  // HARDE KOPIE + E-BOEK (17 November 2026): albei saam in een koop, die
+  // e-boek teen die helfte. Die bediener bereken die afslag self (sien
+  // _reekspakkette.js); hierdie ry sit net albei in die mandjie.
+  if (eboek && eboek.beskikbaar && hardeKopie && hardeKopie.beskikbaar && !besit_eboek
+      && !((hardeKopie.opsies || []).some((o) => o.beskikbaar !== false))) {
+    aksies.push(bou_kombinasie_ry(produk, eboek, hardeKopie));
   }
   // Geen leen-ry as die koper reeds die e-boek self besit nie — geen rede
   // om iets te huur wat jy klaar permanent het nie.
@@ -399,6 +441,7 @@ function wys_produk(produk, besit_info, konteks) {
   });
 
   koppel_geskenk_knoppies(wrap);
+  koppel_kombinasie_knoppie(wrap);
   koppel_harde_kopie_belang(wrap);
 }
 

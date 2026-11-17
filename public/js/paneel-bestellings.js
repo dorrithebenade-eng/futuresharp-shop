@@ -41,7 +41,7 @@ function bou_bestelling_kaart(b) {
     ? `<p class="paneel-bestelling-koepon">🎟️ Koepon toegepas: <strong>${koepon_kodes.join(" + ")}</strong></p>`
     : "";
   const pakket_html = Array.isArray(b.reekspakkette_toegepas) && b.reekspakkette_toegepas.length
-    ? `<p class="paneel-bestelling-koepon">📚 Reekspakket: <strong>${b.reekspakkette_toegepas.map((p) => `${p.naam_af} (−R${(p.afslag_sent / 100).toFixed(2)})`).join(", ")}</strong></p>`
+    ? `<p class="paneel-bestelling-koepon">📚 Afslag: <strong>${b.reekspakkette_toegepas.map((p) => `${p.soort === "kombinasie" ? "" : "Reekspakket "}${p.naam_af} (−R${(p.afslag_sent / 100).toFixed(2)})`).join(", ")}</strong></p>`
     : "";
 
   const gratis_html = b.paystack && b.paystack.gratis_via_koepon

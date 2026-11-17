@@ -348,6 +348,15 @@ const WOORDEBOEK = {
   koop_nou: { af: "Koop nou", en: "Buy now" },
   eboek_etiket: { af: "E-boek", en: "E-book" },
   hardekopie_etiket: { af: "Harde kopie", en: "Hard copy" },
+  // Harde kopie + e-boek saam (17 November 2026).
+  kombinasie_etiket: { af: "Harde kopie + e-boek", en: "Hard copy + e-book" },
+  kombinasie_nota: {
+    af: "Koop albei saam, dan kry jy die e-boek teen die helfte van die prys. Die e-boek wag in My Leeskamer en die gedrukte boek kom na jou toe.",
+    en: "Buy both together and get the e-book at half price. The e-book waits in My Reading Room and the printed book comes to you.",
+  },
+  kombinasie_knoppie: { af: "Sit albei in my mandjie", en: "Add both to my cart" },
+  kombinasie_voorbestel: { af: "Voorbestel albei", en: "Pre-order both" },
+  kombinasie_bygevoeg: { af: "Albei is in jou mandjie.", en: "Both are in your cart." },
   voorbestelling_chip: { af: "Voorbestelling", en: "Pre-order" },
   reeds_gekoop: { af: "Gekoop", en: "Purchased" },
   gaan_lees: { af: "Gaan lees →", en: "Go read →" },

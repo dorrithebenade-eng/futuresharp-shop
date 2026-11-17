@@ -78,10 +78,50 @@ function trap_vir(trappe, getal) {
   return beste;
 }
 
+// HARDE KOPIE + E-BOEK (besluit 17 November 2026, permanent, alle boeke).
+// Is dieselfde boek as harde kopie EN as e-boek in een koop, kos die e-boek
+// die helfte van sy gewone katalogusprys. Daardie e-boek:
+//   - kry geen ander afslag nie (geen koepon, geen reekspakket of trap);
+//   - tel nie mee vir 'n reekspakket nie; die harde kopie wel.
+// Die harde kopie hou al sy gewone afslag (koepon, pakket, trappe).
+const KOMBINASIE_ID = "kombinasie";
+
+function pas_kombinasie_toe(items, per_item, reeds_gebruik, toegepas) {
+  const hk_slugs = new Set(items.filter((it) => it.formaat === "harde_kopie").map((it) => it.produk_slug));
+  let oorspronklik = 0;
+  let prys = 0;
+  const slugs = [];
+  items.forEach((it, i) => {
+    if (it.formaat !== "eboek" || !hk_slugs.has(it.produk_slug)) return;
+    const gewoon = it.prys_sent || 0;
+    const half = Math.round(gewoon / 2);
+    if (!(half < gewoon)) return;
+    reeds_gebruik.add(i);
+    per_item[i] = { pakket_id: KOMBINASIE_ID, prys_sent: half, koepon_toegelaat: false };
+    oorspronklik += gewoon;
+    prys += half;
+    slugs.push(it.produk_slug);
+  });
+  if (slugs.length) {
+    toegepas.push({
+      id: KOMBINASIE_ID,
+      soort: KOMBINASIE_ID,
+      naam_af: "Harde kopie + e-boek: die e-boek teen die helfte",
+      naam_en: "Hard copy + e-book: the e-book at half price",
+      slugs,
+      oorspronklike_sent: oorspronklik,
+      prys_sent: prys,
+      afslag_sent: oorspronklik - prys,
+      volledig: false,
+    });
+  }
+}
+
 function pas_pakkette_toe(items, pakkette) {
   const per_item = items.map(() => null);
   const toegepas = [];
   const reeds_gebruik = new Set();
+  pas_kombinasie_toe(items, per_item, reeds_gebruik, toegepas);
 
   for (const pakket of pakkette) {
     const koepon_toegelaat = pakket.koepon_toegelaat === true;

@@ -56,7 +56,7 @@
       .map(
         (p) => `
       <div class="${klas} reekspakket-ry">
-        <span>${esc(tt("pakket_reel", "Reekspakket"))}: ${esc(naam(p))}${p.geskenk ? " 🎁" : ""}</span>
+        <span>${p.soort === "kombinasie" ? "" : `${esc(tt("pakket_reel", "Reekspakket"))}: `}${esc(naam(p))}${p.geskenk ? " 🎁" : ""}</span>
         <span>−${formateer(p.afslag_sent)}</span>
       </div>`
       )
