@@ -3,6 +3,7 @@
 // ?produk=<slug>&formaat=eboek|harde_kopie
 // ?produk=<slug>&opsie=<sleutel>   (harde-kopie-opsie; formaat volg vanself)
 // ?boeke=<slug>,<slug>,...&formaat=eboek&koepon=<KODE>   (November 2026)
+// ?boeke=...&formaat=albei   gedrukte boek + e-boek van elke titel (e-boek teen die helfte)
 //    'n Paar boeke gelyk, bv. uit die "Kies jou boeke"-blok op 'n boek se
 //    webblad. Die koeponkode gaan saam na die betaalbladsy (ook ná aanmelding,
 //    via localStorage "future_shop_koepon").
@@ -52,11 +53,11 @@
     return null;
   }
 
-  // 'n Paar boeke in een formaat (net e-boeke en harde kopieë sonder opsies).
-  async function koop_meer(slugs, formaat, koepon) {
+  // 'n Paar boeke in een of albei formate (net e-boeke en harde kopieë sonder opsies).
+  async function koop_meer(slugs, formate, koepon) {
     const produkte = await Promise.all(slugs.map(kry_produk));
     let bygevoeg = 0;
-    for (const produk of produkte) {
+    for (const produk of produkte) for (const formaat of formate) {
       const data = produk && produk.formate && produk.formate[formaat];
       if (!produk || !data || !data.beskikbaar) continue;
       if (formaat === "harde_kopie" && Array.isArray(data.opsies) && data.opsies.length) continue;
@@ -84,11 +85,11 @@
       .slice(0, 30);
     if (boeke.length) {
       const f = (params.get("formaat") || "eboek").trim();
-      if (!GELDIGE_FORMATE.includes(f)) {
+      if (f !== "albei" && !GELDIGE_FORMATE.includes(f)) {
         wys_fout("koop_ongeldig");
         return;
       }
-      await koop_meer([...new Set(boeke)], f, koepon);
+      await koop_meer([...new Set(boeke)], f === "albei" ? ["harde_kopie", "eboek"] : [f], koepon);
       return;
     }
     const slug = (params.get("produk") || "").trim();
