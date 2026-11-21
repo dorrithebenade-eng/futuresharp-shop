@@ -170,6 +170,12 @@ exports.handler = async (event, context) => {
         : Math.max(0, Math.round(Number(ou_hk.drukkoste_sent) || 0));
       if (druk) nuwe_formate.harde_kopie.drukkoste_sent = druk;
       else delete nuwe_formate.harde_kopie.drukkoste_sent;
+      // Eie koeriertarief (November 2026): leeg = die winkel se standaard.
+      const koerier = "koerier_sent" in wysigings.formate.harde_kopie
+        ? Math.max(0, Math.round(Number(wysigings.formate.harde_kopie.koerier_sent) || 0))
+        : Math.max(0, Math.round(Number(ou_hk.koerier_sent) || 0));
+      if (koerier) nuwe_formate.harde_kopie.koerier_sent = koerier;
+      else delete nuwe_formate.harde_kopie.koerier_sent;
       if (opsies.length) nuwe_formate.harde_kopie.prys_sent = laagste_opsie_prys(opsies);
       const opsies_fout = kontroleer_opsies_minimum(opsies, oorskry_hoofrekening_minimum, beskryf_minimum);
       if (opsies_fout) return { statusCode: 400, body: opsies_fout };

@@ -55,7 +55,7 @@ const { stuur_koper_bevestiging } = require("./_kennisgewing-koper");
 const { kry_aktiewe_pakkette, pas_pakkette_toe_per_groep } = require("./_reekspakkette");
 const { is_eie_item, skoon_geskenk_besonderhede, skep_geskenk_vir_bestelling } = require("./_geskenke");
 const { kry_formaat_data } = require("./_harde-kopie-opsies");
-const { drukkoste_sent, boekdeel_sent, skoon_metode, afleweringskoste_sent } = require("./_aflewering");
+const { drukkoste_sent, boekdeel_sent, skoon_metode, afleweringskoste_sent, koerier_tarief_sent } = require("./_aflewering");
 const { kry_item_name } = require("./_fisiese-items");
 
 // Rol_tipe → watter Blobs-store die entiteit se subrekening-kode in is.
@@ -252,6 +252,7 @@ exports.handler = async (event, context) => {
   let hosting_totaal_sent = 0;
   let bevat_harde_kopie = false;
   let getal_harde_kopieë = 0;
+  let koerier_tarief = 0; // die hoogste eie koeriertarief (sien _aflewering.js)
   const geverifieerde_items = [];
   const verdeling_per_subrekening = {}; // { "ACCT_xxx": sent_bedrag }
   const koepon_gebruikte_items = {}; // kode -> items waarop dit toegepas is
@@ -347,6 +348,7 @@ exports.handler = async (event, context) => {
     if (kliënt_item.formaat === "harde_kopie") {
       bevat_harde_kopie = true;
       getal_harde_kopieë++;
+      koerier_tarief = Math.max(koerier_tarief, koerier_tarief_sent(produk));
     }
 
     // Leen-items kry 'n verval-datum — bereken NOU, server-kant, sodat 'n
@@ -451,7 +453,7 @@ exports.handler = async (event, context) => {
       }
     }
     aflewering = { ...(aflewering || {}), metode };
-    afleweringskoste = afleweringskoste_sent(getal_harde_kopieë, metode);
+    afleweringskoste = afleweringskoste_sent(getal_harde_kopieë, metode, koerier_tarief);
     totaal_sent += afleweringskoste;
   } else {
     aflewering = null;

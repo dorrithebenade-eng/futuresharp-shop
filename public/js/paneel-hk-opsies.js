@@ -217,6 +217,11 @@
       <label class="paneel-merkblokkie-ry" style="display:flex;gap:8px;align-items:center;margin:0 0 10px;">
         <input type="checkbox" class="hko-beskikbaar" ${!o || o.beskikbaar !== false ? "checked" : ""}> <span>Beskikbaar</span>
       </label>
+      <div class="veld-ry" style="align-items:end;margin:0 0 10px;">
+        <div><label class="veld-etiket">Drukkoste (R)</label><input type="number" min="0" step="0.01" class="veld-invoer hko-druk" value="${o && o.drukkoste_sent ? (o.drukkoste_sent / 100).toFixed(2) : ""}"></div>
+        <div><button type="button" class="terug-skakel hko-vul-druk">Vul uit die items</button></div>
+      </div>
+      <p class="paneel-hulp-teks" style="margin:-4px 0 10px;">Net by eie voorraad (Dorrithé en Ignatius se boeke): die drukkoste bly by Future Sharp, en die verdeling, hosting en afslag geld net op die boek se deel. Laat leeg by ander outeurs se boeke.</p>
       <p class="veld-etiket" style="margin:6px 0 4px;">Verdeling</p>
       <div class="hko-verdelings paneel-verdelings-lys"></div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px;">
@@ -253,6 +258,10 @@
     kaart.querySelector(".hko-voeg-item-by").addEventListener("click", () => { items_wrap.appendChild(item_ry(null)); werk_som_by(kaart); });
     kaart.querySelector(".hko-voeg-verdeling-by").addEventListener("click", () => { verd_wrap.appendChild(skep_verdeling_ry_element("hko", null)); werk_som_by(kaart); });
     kaart.querySelector(".hko-vul-printing").addEventListener("click", () => vul_printing(kaart));
+    kaart.querySelector(".hko-vul-druk").addEventListener("click", () => {
+      kaart.querySelector(".hko-druk").value = (items_koste_sent(kaart) / 100).toFixed(2);
+      werk_som_by(kaart);
+    });
     kaart.querySelector(".hko-verwyder").addEventListener("click", () => kaart.remove());
     kaart.addEventListener("input", () => werk_som_by(kaart));
     kaart.addEventListener("change", () => werk_som_by(kaart));
@@ -325,6 +334,11 @@
     werk_som_by(kaart);
   }
 
+  function druk_sent(kaart) {
+    const rou = parseFloat(kaart.querySelector(".hko-druk").value);
+    return Number.isFinite(rou) && rou > 0 ? Math.round(rou * 100) : 0;
+  }
+
   function werk_som_by(kaart) {
     const prys = Math.round((parseFloat(kaart.querySelector(".hko-prys").value) || 0) * 100);
     const naam = kaart.querySelector(".hko-naam").value;
@@ -336,20 +350,25 @@
       ? `Koopskakel: <code>${esc(WINKEL)}/koop.html?produk=${esc(slug)}&amp;opsie=${esc(sleutel)}</code>`
       : "";
     if (!prys) { som.textContent = "Vul die prys in om die verdeling te sien."; return; }
+    const totaal = prys;
+    const druk = Math.min(totaal, druk_sent(kaart));
+    // Die verdeling en hosting geld op die boek se deel (sien _harde-kopie-opsies.js).
+    const boekdeel = totaal - druk;
     const reels = lees_verdelings(kaart).map((v) => {
-      const bedrag = v.tipe === "vaste_bedrag" ? Math.min(v.waarde || 0, prys) : Math.round((prys * (v.waarde || 0)) / 100);
+      const bedrag = v.tipe === "vaste_bedrag" ? Math.min(v.waarde || 0, boekdeel) : Math.round((boekdeel * (v.waarde || 0)) / 100);
       return { etiket: ROL_ETIKETTE[v.rol_tipe] || v.rol_tipe, bedrag: Number.isFinite(bedrag) ? bedrag : 0 };
     });
     const h = lees_hosting(kaart);
-    const hosting = h ? (h.tipe === "vaste_bedrag" ? Math.min(h.waarde, prys) : Math.round((prys * h.waarde) / 100)) : 0;
-    const fooi = paystack_sent(prys);
-    const hou = prys - reels.reduce((s, r) => s + r.bedrag, 0) - hosting - fooi;
+    const hosting = h ? (h.tipe === "vaste_bedrag" ? Math.min(h.waarde, boekdeel) : Math.round((boekdeel * h.waarde) / 100)) : 0;
+    const fooi = paystack_sent(totaal);
+    const hou = totaal - druk - reels.reduce((s, r) => s + r.bedrag, 0) - hosting - fooi;
     const koste = items_koste_sent(kaart);
     som.innerHTML = `
       ${reels.map((r) => `<div style="display:flex;justify-content:space-between;"><span>${esc(r.etiket)}</span><span>${rand(r.bedrag)}</span></div>`).join("")}
       ${h ? `<div style="display:flex;justify-content:space-between;"><span>Hosting</span><span>${rand(hosting)}</span></div>` : ""}
+      ${druk ? `<div style="display:flex;justify-content:space-between;"><span>Drukkoste (bly by Future Sharp)</span><span>${rand(druk)}</span></div><div style="display:flex;justify-content:space-between;color:#5B5B5B;"><span>Boek se deel</span><span>${rand(boekdeel)}</span></div>` : ""}
       <div style="display:flex;justify-content:space-between;color:#5B5B5B;"><span>Paystack-voorsiening</span><span>${rand(fooi)}</span></div>
-      <div style="display:flex;justify-content:space-between;border-top:1px solid #DCD7CD;margin-top:4px;padding-top:4px;font-weight:600;${hou < 0 ? "color:#B42318;" : ""}"><span>Future Sharp hou</span><span>${rand(hou)}</span></div>
+      <div style="display:flex;justify-content:space-between;border-top:1px solid #DCD7CD;margin-top:4px;padding-top:4px;font-weight:600;${hou < 0 ? "color:#B42318;" : ""}"><span>Future Sharp hou (ná drukkoste, voor koerier)</span><span>${rand(hou)}</span></div>
       ${koste ? `<div style="color:#5B5B5B;font-size:13px;margin-top:4px;">Drukkoste van die items: ${rand(koste)}</div>` : ""}`;
   }
 
@@ -379,6 +398,7 @@
         prys_sent: Math.round((parseFloat(kaart.querySelector(".hko-prys").value) || 0) * 100),
         beskikbaar: kaart.querySelector(".hko-beskikbaar").checked,
         kaartjie: kaart.querySelector(".hko-kaartjie").checked,
+        drukkoste_sent: druk_sent(kaart),
         items: lees_items(kaart),
         verdelings: lees_verdelings(kaart),
         hosting: lees_hosting(kaart),

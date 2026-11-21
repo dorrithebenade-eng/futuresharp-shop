@@ -1277,6 +1277,7 @@ function open_vorm_vir_wysig(produk) {
   document.getElementById("vorm-hardekopie-vrystelling").value = hardeKopie.vrystelling_datum || "";
   document.getElementById("vorm-hardekopie-voorraad").value = hardeKopie.voorraad_status || "beskikbaar";
   document.getElementById("vorm-hardekopie-druk").value = hardeKopie.drukkoste_sent ? (hardeKopie.drukkoste_sent / 100).toFixed(2) : "";
+  document.getElementById("vorm-hardekopie-koerier").value = hardeKopie.koerier_sent ? (hardeKopie.koerier_sent / 100).toFixed(2) : "";
   if (hardeKopie.verdelings && hardeKopie.verdelings.length) {
     document.getElementById("vorm-hardekopie-verdeling-aan").checked = true;
     hardeKopie.verdelings.forEach((v) => voeg_verdeling_ry_by("hardekopie", v));
@@ -1425,6 +1426,7 @@ function bou_produk_liggaam() {
         prys_sent: kry_rand_as_sent("vorm-hardekopie-prys"),
         voorraad_status: document.getElementById("vorm-hardekopie-voorraad").value,
         drukkoste_sent: kry_rand_as_sent("vorm-hardekopie-druk"),
+        koerier_sent: kry_rand_as_sent("vorm-hardekopie-koerier"),
         vrystelling_datum: document.getElementById("vorm-hardekopie-vrystelling").value || null,
         verdelings: bou_verdelings_vanuit_vorm("hardekopie"),
         hosting: kry_hosting_vanuit_vorm("hardekopie"),

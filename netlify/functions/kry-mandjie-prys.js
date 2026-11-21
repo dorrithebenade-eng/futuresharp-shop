@@ -13,7 +13,7 @@
 const { kry_store } = require("./_blob-store");
 const { kry_aktiewe_pakkette, pas_pakkette_toe_per_groep, bou_wenke } = require("./_reekspakkette");
 const { kry_formaat_data } = require("./_harde-kopie-opsies");
-const { drukkoste_sent, boekdeel_sent, afleweringskoste_sent } = require("./_aflewering");
+const { drukkoste_sent, boekdeel_sent, afleweringskoste_sent, koerier_tarief_sent } = require("./_aflewering");
 const { koepon_geld_vir_boek, pas_koepon_toe, sorteer_koepons, skoon_kodes } = require("./_koepon-velde");
 
 // Ook vir die boeke se eie webblaaie (bv. speelslim.futuresharp.co.za).
@@ -69,12 +69,14 @@ exports.handler = async (event) => {
   try {
     const katalogus = kry_store("katalogus");
     const items = [];
+    let koerier_tarief = 0; // die hoogste eie tarief van die harde kopieë
     for (const it of ruwe) {
       const slug = String(it.produk_slug || "").slice(0, 80);
       const formaat = String(it.formaat || "");
       const produk = slug ? await katalogus.get(slug, { type: "json" }) : null;
       const fd = kry_formaat_data(produk, formaat, it.opsie);
       const ok = fd && fd.beskikbaar;
+      if (ok && formaat === "harde_kopie") koerier_tarief = Math.max(koerier_tarief, koerier_tarief_sent(produk));
       items.push({
         produk_slug: slug,
         formaat,
@@ -121,7 +123,7 @@ exports.handler = async (event) => {
         oorspronklike_totaal_sent: oorspronklik,
         // Koerierkoste vir die harde kopieë (afhaal is R0); nie by totaal_sent in nie.
         harde_kopieë: items.filter((it) => it.formaat === "harde_kopie" && it.prys_sent + (it.druk_sent || 0) > 0).length,
-        koerier_sent: afleweringskoste_sent(items.filter((it) => it.formaat === "harde_kopie").length, "koerier"),
+        koerier_sent: afleweringskoste_sent(items.filter((it) => it.formaat === "harde_kopie").length, "koerier", koerier_tarief),
         totaal_sent: totaal,
         ...(koepons.length ? { koepons: koepons.map((k) => k.kode), totaal_na_koepon_sent: na_koepon, koepon_afslag_sent: totaal - na_koepon } : {}),
       }),

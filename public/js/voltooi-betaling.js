@@ -22,6 +22,7 @@ let VERTOONDE_TOTAAL_SENT = 0;
 let BOEKE_TOTAAL_SENT = 0;
 let AFLEWERING_SENT = 0;
 let KOERIER_SENT = 0;
+let KOERIER_VAN_BEDIENER = NaN;
 
 // Dieselfde trappe as _aflewering.js: R90 vir 1 tot 10 boeke, R160 vir 11 tot 30.
 function koerier_sent_vir(getal) {
@@ -533,6 +534,7 @@ async function laai_vb() {
     if (prys) {
       totaal = prys.totaal_sent;
       pakkette = prys.pakkette || [];
+      KOERIER_VAN_BEDIENER = Number(prys.koerier_sent);
     }
   } catch (_) {
     /* die mandjie se som bly staan */
@@ -555,7 +557,11 @@ async function laai_vb() {
 
   // Aflewering vir harde kopieë: koerierkoste volgens die getal boeke.
   if (bevatHardeKopie) {
-    KOERIER_SENT = koerier_sent_vir(items.filter((i) => i.formaat === "harde_kopie").length);
+    // Die bediener se bedrag (kry-mandjie-prys.js) ken elke boek se eie
+    // koeriertarief; die plaaslike trappe is net 'n terugval.
+    KOERIER_SENT = Number.isFinite(KOERIER_VAN_BEDIENER) && KOERIER_VAN_BEDIENER > 0
+      ? KOERIER_VAN_BEDIENER
+      : koerier_sent_vir(items.filter((i) => i.formaat === "harde_kopie").length);
     document.getElementById("vb-koerier-bedrag").textContent = `(${formateer_prys_sent(KOERIER_SENT)})`;
     document.querySelectorAll('input[name="aflewer-metode"]').forEach((r) =>
       r.addEventListener("change", () => {

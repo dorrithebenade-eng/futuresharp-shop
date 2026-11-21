@@ -10,8 +10,15 @@
 //     sleutel, naam, prys_sent, beskikbaar,
 //     items: [{ item_id, aantal }],
 //     kaartjie,            // vra 'n kaartjieboodskap op die betaalbladsy
+//     drukkoste_sent,      // November 2026: bly by Future Sharp (eie voorraad)
 //     verdelings, hosting, // dieselfde vorm as by 'n formaat
 //   }]
+//
+// drukkoste_sent werk soos formate.harde_kopie.drukkoste_sent by 'n boek
+// sonder opsies (sien _aflewering.js): die koper sien een prys, maar die
+// verdeling, hosting en afslag geld net op die boek se deel (prys min
+// drukkoste). Elke opsie het sy eie drukkoste, want grysskaal en kleur
+// kos nie dieselfde nie.
 //
 // 'n Opsie het dieselfde velde as 'n formaat (prys_sent, verdelings,
 // hosting), sodat kode wat met 'n formaat werk, met kry_formaat_data() 'n
@@ -53,10 +60,12 @@ function kry_geldige_opsies(opsies, geldige_verdelings, geldige_hosting) {
         aantal: Math.min(20, Math.max(1, Math.round(Number(it && it.aantal) || 1))),
       }))
       .filter((it) => it.item_id);
+    const drukkoste_sent = Math.min(prys_sent, Math.max(0, Math.round(Number(o.drukkoste_sent) || 0)));
     uit.push({
       sleutel,
       naam,
       prys_sent,
+      drukkoste_sent,
       beskikbaar: o.beskikbaar !== false,
       items,
       kaartjie: o.kaartjie === true,
@@ -71,8 +80,10 @@ function kry_geldige_opsies(opsies, geldige_verdelings, geldige_hosting) {
 // los, anders null.
 function kontroleer_opsies_minimum(opsies, oorskry, beskryf_minimum) {
   for (const o of opsies || []) {
-    if (o.beskikbaar && oorskry(o.verdelings || [], o.hosting, o.prys_sent)) {
-      return `Die harde-kopie-opsie "${o.naam}" se verdeling(s) plus Hosting los te min oor vir Future Sharp se hoofrekening. Paystack se fooi (2,9% + R1 + BTW) moet gedek word: laat ${beskryf_minimum(o.prys_sent)} oor.`;
+    // Die verdeling geld op die boek se deel (prys min drukkoste).
+    const boekdeel = Math.max(0, (o.prys_sent || 0) - (o.drukkoste_sent || 0));
+    if (o.beskikbaar && oorskry(o.verdelings || [], o.hosting, boekdeel)) {
+      return `Die harde-kopie-opsie "${o.naam}" se verdeling(s) plus Hosting los te min oor vir Future Sharp se hoofrekening. Paystack se fooi (2,9% + R1 + BTW) moet gedek word: laat ${beskryf_minimum(boekdeel)} oor.`;
     }
   }
   return null;
@@ -96,6 +107,8 @@ function kry_formaat_data(produk, formaat, opsie_sleutel) {
     ...f,
     beskikbaar: !!f.beskikbaar && o.beskikbaar !== false,
     prys_sent: o.prys_sent,
+    // Die opsie se eie drukkoste, nooit die boek s'n nie.
+    drukkoste_sent: Math.max(0, Math.round(Number(o.drukkoste_sent) || 0)),
     verdelings: o.verdelings || [],
     hosting: o.hosting || null,
     opsie: o,
