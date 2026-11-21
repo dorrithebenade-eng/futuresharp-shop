@@ -19,6 +19,16 @@
 
 const TAAL_SLEUTEL = "future_shop_taal";
 
+// ?taal=en of ?taal=af in die adres stel die taal vooraf, sodat 'n boek se
+// eie webblad (bv. die Engelse uitgawe) die koper in die regte taal na die
+// winkel stuur.
+(function () {
+  try {
+    const q = new URLSearchParams(window.location.search).get("taal");
+    if (q === "af" || q === "en") localStorage.setItem(TAAL_SLEUTEL, q);
+  } catch (e) {}
+})();
+
 const WOORDEBOEK = {
   // Nav
   nav_mandjie: { af: "Mandjie", en: "Cart" },
