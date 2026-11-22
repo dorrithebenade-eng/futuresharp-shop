@@ -21,14 +21,36 @@
 // staan op elke reel, sodat die faktuurslot (fakture_vir) die registrasie
 // herken.
 //
-// GEEN VERDELING NIE: die reels kom sonder ontvangers, en die uitreiking
-// weier tot iemand in Boekhouding dit gestel het.
+// DIE VERDELING KOM VOORAF INGEVUL (22 November 2026), soos Ignatius en
+// Dorrithé dit besluit het:
+//   - Konsultasie- en opvolgreels: die konsultant kry 70% van die VOLLE
+//     reelbedrag as 'n vaste bedrag (R700 op R1 000). Hosting 5% soos op
+//     Ignatius se eie fakture. Ignatius kry die res: wat ná die Paystack-fooi,
+//     die konsultant en hosting oorbly, ook as 'n vaste bedrag, sodat die
+//     oorskot nul is.
+//   - Vraelyste en verslag: presies soos op Ignatius se eie fakture.
+// Die konsultant se ry dra haar naam soos in die Konsultante-lys. Sy word eers
+// deur Paystack uitbetaal wanneer daar 'n begunstigde met DIESELFDE naam en 'n
+// subrekening is; tot dan word haar deel met die hand betaal.
+// Boekhouding gaan die konsep na en kan enige ry verander voor uitreiking.
 
 const { kry_gebruiker_en_rol_uitslag } = require("./_rol-kontrole");
 const { portaal_admin } = require("./_portaal");
 const { konsultant_vir_epos } = require("./_konsultante");
 const { kry_fakture_store, skep_konsep_sleutel, nuwe_faktuur, voeg_geskiedenis_by } = require("./_fakture");
 const { kry_kliente_store } = require("./_kliente");
+const { fs_bereken, fs_invoer_uit_faktuur } = require("../../public/js/faktuur-som.js");
+
+const IGNATIUS = "Ignatius Gous";
+const DORRITHE = "Dorrithé Labuschagne";
+const KONSULTANT_PCT = 70;
+const HOSTING_PCT = 5;
+// Soos op FS/01970 (November 2026). Sien die vraag aan Dorrithé in die
+// oordragnota as dit verander.
+const VRAE_VERDELING = [
+  { ontvanger: IGNATIUS, tipe: "pct", waarde: 62.5 },
+  { ontvanger: DORRITHE, tipe: "pct", waarde: 32.5 },
+];
 
 const JSON_KOP = { "Content-Type": "application/json", "Cache-Control": "no-store" };
 const antwoord = (status, data) => ({ statusCode: status, headers: JSON_KOP, body: JSON.stringify(data) });
@@ -48,19 +70,44 @@ function pryse_vir(reg, huidig) {
   return { kons: opvolg, vrae: Math.max(0, eerste - opvolg) };
 }
 
-function reel(beskrywing, rand, aantal) {
+function reel(beskrywing, rand, aantal, soort_reel) {
   const prys_pp_sent = Math.round(rand * 100);
   return {
+    _soort: soort_reel,
     soort: "verkoop",
     beskrywing: beskrywing.slice(0, 300),
     hoeveelheid: aantal,
     prys_pp_sent,
     bedrag_sent: Math.round(aantal * prys_pp_sent),
     vou_in: false,
-    hosting_pct: 0,
+    hosting_pct: HOSTING_PCT,
     kategorie_id: "",
     verdeling: [],
   };
+}
+
+// Vul elke reel se verdeling in. Ignatius se deel op die konsultasiereels is
+// "die res", en die stelsel ken net persentasies en vaste bedrae. Die som loop
+// dus eers sonder hom; wat daarna op elke reel onverdeel oorbly, is syne.
+function stel_verdeling(rekord, reels, konsultant_naam) {
+  reels.forEach((r) => {
+    if (r._soort === "vrae") {
+      r.verdeling = VRAE_VERDELING.map((v) => ({ ...v }));
+    } else {
+      // Vaste bedrae word in sent gestoor.
+      r.verdeling = [
+        { ontvanger: konsultant_naam, tipe: "vas", waarde: Math.round((r.bedrag_sent * KONSULTANT_PCT) / 100) },
+      ];
+    }
+  });
+  const proef = { ...rekord, reels };
+  const u = fs_bereken(fs_invoer_uit_faktuur(proef, () => false));
+  reels.forEach((r, ix) => {
+    if (r._soort === "vrae") return;
+    const p = u.perReel[ix];
+    const res = p ? p.basisSent - p.toegekenSent : 0;
+    if (res > 0) r.verdeling.push({ ontvanger: IGNATIUS, tipe: "vas", waarde: res });
+  });
 }
 
 exports.handler = async (event, context) => {
@@ -111,10 +158,10 @@ exports.handler = async (event, context) => {
     const agter = ": " + reg.leerder.naam + " " + reg.leerder.van + " (" + reg.no + ")";
     const reels = [];
     if (eerste) {
-      reels.push(reel(REEL[taal].kons + agter, pryse.kons, 1));
-      if (pryse.vrae > 0) reels.push(reel(REEL[taal].vrae + agter, pryse.vrae, 1));
+      reels.push(reel(REEL[taal].kons + agter, pryse.kons, 1, "kons"));
+      if (pryse.vrae > 0) reels.push(reel(REEL[taal].vrae + agter, pryse.vrae, 1, "vrae"));
     }
-    if (opvolg) reels.push(reel(REEL[taal].opvolg + agter, pryse.kons, opvolg));
+    if (opvolg) reels.push(reel(REEL[taal].opvolg + agter, pryse.kons, opvolg, "kons"));
 
     const wie = konsultant.epos;
     const rekord = nuwe_faktuur(wie);
@@ -128,6 +175,8 @@ exports.handler = async (event, context) => {
       selfoon: klient.selfoon || "",
       adres: klient.adres || "",
     };
+    stel_verdeling(rekord, reels, konsultant.naam);
+    reels.forEach((r) => delete r._soort);
     rekord.reels = reels;
     rekord.totaal_sent = reels.reduce((s, r) => s + r.bedrag_sent, 0);
     rekord.bygewerk_op = new Date().toISOString();

@@ -205,7 +205,7 @@
         h += '<p class="fsp-ff-som">' + esc(opsom()) + "</p>";
         h += '<div class="fsp-aksies"><button type="button" class="fsp-knop fsp-knop-hoof" id="fsp-ff-skep"' + (totaal().n ? "" : " disabled") + ">" + (is_konsultant() ? "Skep konsep-faktuur" : "Skep 'n faktuur") + "</button></div>";
         h += '<p class="fsp-hulp">' + (is_konsultant()
-          ? "Die konsep gaan na Dorrithé en Ignatius. Hulle gaan dit na, stel die verdeling en stuur dit aan die kliënt."
+          ? "Die konsep gaan na Dorrithé en Ignatius. Hulle gaan dit na en stuur dit aan die kliënt."
           : "Die faktuur open as konsep in Boekhouding met die kliënt gekies. Die verdeling, die uitreiking en die stuur gebeur daar.") + "</p>";
         h += '<div id="fsp-ff-uit"></div>';
       }
