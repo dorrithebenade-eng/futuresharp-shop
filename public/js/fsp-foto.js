@@ -122,6 +122,8 @@
   }
 
   async function haak_in() {
+    // Net vir Dorrithé en Ignatius; 'n konsultant kry geen foto nie.
+    if (document.body.classList.contains("fsp-is-konsultant")) return;
     const kop = $("#fsp-een .fsp-kop-ry");
     const nr = $("#fsp-een .fsp-ry-no");
     if (!kop || !nr || kop.querySelector(".fsp-foto")) return;

@@ -72,6 +72,22 @@
 
   let besig = null;
 
+  // DIE KONSULTANT (November 2026) het geen toegang tot Boekhouding nie. Haar
+  // knoppie skep die konsep op die bediener (konsultant-konsep-faktuur.js) en
+  // gee haar 'n boodskap vir julle WhatsApp-groep.
+  const is_konsultant = () => document.body.classList.contains("fsp-is-konsultant");
+
+  async function skep_konsep(no, eerste, opvolg) {
+    const r = await fetch("/.netlify/functions/konsultant-konsep-faktuur", {
+      method: "POST",
+      headers: await identiteit_kop({ "Content-Type": "application/json" }),
+      body: JSON.stringify({ no, eerste, opvolg }),
+    });
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(data.fout || "Fout " + r.status);
+    return data;
+  }
+
   async function bou(een) {
     const nr = $(".fsp-ry-no", een);
     if (!nr || $("#fsp-ff-kaart", een)) return;
@@ -187,8 +203,11 @@
         h += '<p class="fsp-waarsku">Geen bedrae gevind nie. Stel die koste in by Instellings.</p>';
       } else {
         h += '<p class="fsp-ff-som">' + esc(opsom()) + "</p>";
-        h += '<div class="fsp-aksies"><button type="button" class="fsp-knop fsp-knop-hoof" id="fsp-ff-skep"' + (totaal().n ? "" : " disabled") + ">Skep 'n faktuur</button></div>";
-        h += '<p class="fsp-hulp">Die faktuur open as konsep in Boekhouding met die kliënt gekies. Die verdeling, die uitreiking en die stuur gebeur daar.</p>';
+        h += '<div class="fsp-aksies"><button type="button" class="fsp-knop fsp-knop-hoof" id="fsp-ff-skep"' + (totaal().n ? "" : " disabled") + ">" + (is_konsultant() ? "Skep konsep-faktuur" : "Skep 'n faktuur") + "</button></div>";
+        h += '<p class="fsp-hulp">' + (is_konsultant()
+          ? "Die konsep gaan na Dorrithé en Ignatius. Hulle gaan dit na, stel die verdeling en stuur dit aan die kliënt."
+          : "Die faktuur open as konsep in Boekhouding met die kliënt gekies. Die verdeling, die uitreiking en die stuur gebeur daar.") + "</p>";
+        h += '<div id="fsp-ff-uit"></div>';
       }
       k.innerHTML = h;
     }
@@ -213,6 +232,32 @@
         S.sessies.splice(Number(el.dataset.weg), 1);
         herteken();
         stoor();
+      } else if (el.id === "fsp-ff-skep" && is_konsultant()) {
+        const t = totaal();
+        if (!t.n) return;
+        el.disabled = true;
+        el.textContent = "Besig …";
+        await stoor_belofte;
+        try {
+          const d = await skep_konsep(reg.no, S.eerste, t.opvolg);
+          const deel = [d.eerste ? "eerste konsultasie" : "", d.opvolg ? d.opvolg + " × opvolgkonsultasie" : ""].filter(Boolean).join(" en ");
+          const wa = "Konsep-faktuur gereed vir " + d.no + " (" + d.leerder + "): " + deel + ", " + rand(d.totaal_sent / 100) +
+            ". Gaan dit asseblief na en stuur dit aan " + d.rekeningpligtige + ".";
+          const uit = $("#fsp-ff-uit", k);
+          uit.innerHTML = '<div class="fsp-ff-sukses"><b>✓ Die konsep is geskep.</b>' +
+            '<p class="fsp-hulp">Laat weet Dorrithé en Ignatius op die WhatsApp-groep.</p>' +
+            '<textarea class="fsp-boodskap" readonly>' + esc(wa) + "</textarea>" +
+            '<div class="fsp-aksies"><a class="fsp-knop fsp-knop-hoof" target="_blank" rel="noopener" href="https://wa.me/?text=' + encodeURIComponent(wa) + '">Deel op WhatsApp</a>' +
+            '<button type="button" class="fsp-knop fsp-knop-lig" id="fsp-ff-kopieer">Kopieer boodskap</button></div></div>';
+          el.textContent = "Konsep geskep";
+          $("#fsp-ff-kopieer", k).addEventListener("click", async () => {
+            try { await navigator.clipboard.writeText(wa); kennis("Gekopieer"); } catch (e) { kennis("Kon nie kopieer nie"); }
+          });
+        } catch (f) {
+          kennis("Kon nie: " + f.message);
+          el.disabled = false;
+          el.textContent = "Skep konsep-faktuur";
+        }
       } else if (el.id === "fsp-ff-skep") {
         const u = skakel();
         if (!u) return;

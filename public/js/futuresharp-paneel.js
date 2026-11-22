@@ -28,6 +28,9 @@
   let HUIDIG = null;          // { registrasie, bladsye }
   let filter = "aandag";
   let soek = "";
+  // Konsultantkode -> naam (November 2026). Net vir julle; die lys wys wie
+  // die konsultant is. Leeg vir 'n konsultant self.
+  let KONSULTANTE = {};
 
   // ---------- Hulpies ----------
   function esc(s) {
@@ -147,6 +150,7 @@
       const data = await portaal({ aksie: "lys" });
       LYS = data.registrasies || [];
       REGSKAKEL = data.registrasieskakel || "";
+      KONSULTANTE = data.konsultante || {};
       // Die vraelyste en die adres kom saam met die lys: een oproep, nie twee nie.
       if (Array.isArray(data.instrumente)) {
         INSTR = data.instrumente;
@@ -201,7 +205,8 @@
         : '<div class="fsp-ry-kons leeg">Konsultasie nog nie gereël nie</div>';
       return '<div class="fsp-ry" data-stand="' + st + '" data-no="' + esc(r.no) + '" tabindex="0" role="button">' +
         '<div class="fsp-ry-no">' + esc(r.no) + "</div>" +
-        '<div><div class="fsp-ry-naam">' + (r.gesien ? "" : '<span class="fsp-nuut" title="Nog nie oopgemaak nie"></span>') + esc(r.naam + " " + r.van) + "</div>" +
+        '<div><div class="fsp-ry-naam">' + (r.gesien ? "" : '<span class="fsp-nuut" title="Nog nie oopgemaak nie"></span>') + esc(r.naam + " " + r.van) +
+          (r.konsultant && KONSULTANTE[r.konsultant] ? '<span class="fsp-konsultant-merk">' + esc(KONSULTANTE[r.konsultant]) + "</span>" : "") + "</div>" +
         '<div class="fsp-ry-sub">' + esc([r.graad, (r.ouderdom != null ? r.ouderdom + " jaar" : ""), r.taal === "en" ? "Engels" : "Afrikaans"].filter(Boolean).join(", ")) + "</div>" + kons + "</div>" +
         "<div>" + (r.toets ? '<span class="fsp-stand toets">Toets</span>' : "") + '<span class="fsp-stand ' + st + '">' + STANDE[st] + "</span></div></div>";
     }).join("");
@@ -513,7 +518,9 @@
       bt.onclick = async () => {
         bt.disabled = true;
         try {
-          await portaal({ aksie: "hernu", token: bt.dataset.hernu });
+          // Die nommer gaan saam: portaal.js kontroleer by 'n konsultant
+          // dat die bladsy by haar registrasie hoort.
+          await portaal({ aksie: "hernu", token: bt.dataset.hernu, no: reg.no });
           kennis("Nuwe skakel uitgereik");
           await herlaai_een(reg.no);
         } catch (f) {
@@ -668,7 +675,13 @@
     const epos = $("#paneel-gebruiker-epos");
     if (epos && sessie.gebruiker) epos.textContent = sessie.gebruiker.email;
 
-    if (!identiteit_het_rol(sessie.gebruiker, "boekhouding")) {
+    // DIE KONSULTANT (November 2026): die rol "konsultant" kom ook in, met net
+    // Konsultasies en net haar eie kliënte. portaal.js dwing dit af; die
+    // klas op <body> laat fsp-konsultant.js en die CSS die res verberg.
+    const is_konsultant = !identiteit_het_rol(sessie.gebruiker, "boekhouding") && identiteit_het_rol(sessie.gebruiker, "konsultant");
+    if (is_konsultant) document.body.classList.add("fsp-is-konsultant");
+
+    if (!identiteit_het_rol(sessie.gebruiker, "boekhouding") && !is_konsultant) {
       // Wys MET WATTER REKENING, want die gewone oorsaak is 'n ander rekening
       // op die toestel (byvoorbeeld 'n koperrekening in die winkel). Een tik
       // meld dit af en bring die aanmeldvorm hier terug.

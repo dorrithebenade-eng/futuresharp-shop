@@ -1,0 +1,101 @@
+/* fsp-konsultant.css — konsultante in die Future Sharp-paneel (November 2026).
+   Sien fsp-konsultant.js. Die verberging hieronder is net die skerm; die slot
+   is portaal.js. */
+
+/* --- Vir 'n konsultant: net Konsultasies --- */
+.fsp-is-konsultant #fsp-kieslys .fsp-pil:not([data-gaan="leerders"]),
+.fsp-is-konsultant #fsp-toets-blok,
+.fsp-is-konsultant #nr-wysig,
+.fsp-is-konsultant #nr-vorm,
+.fsp-is-konsultant .fsp-toets-skrap,
+.fsp-is-konsultant .fsp-foto,
+.fsp-is-konsultant #paneel-area-kieslys,
+.fsp-is-konsultant .fsp-klientskakel,
+.fsp-is-konsultant a.mini-kop-mandjie[href="paneelbord.html"] {
+  display: none !important;
+}
+
+.fsp-strook-hulp {
+  grid-column: 1 / -1;
+  margin: 4px 0 0;
+}
+
+/* --- Die merkie in die lys, vir julle --- */
+.fsp-konsultant-merk {
+  display: inline-block;
+  margin-left: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  background: #E3F5F1;
+  color: #2E7D70;
+  border-radius: 99px;
+  padding: 2px 8px;
+  vertical-align: middle;
+}
+
+/* --- Die Konsultante-kaart --- */
+.fsp-kons-ry {
+  border: 1px solid var(--fsp-lyn, #E4E2DD);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+}
+
+.fsp-kons-velde {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.fsp-kons-velde label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fsp-kons-breed {
+  grid-column: 1 / -1;
+}
+
+.fsp-kons-onder {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.fsp-kons-skakel {
+  background: #F5F4F1;
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.fsp-kons-weg {
+  margin-left: auto;
+}
+
+/* --- Die konsep-faktuur van 'n konsultant --- */
+.fsp-ff-sukses {
+  margin-top: 12px;
+  background: #E3F5F1;
+  border-radius: 10px;
+  padding: 14px;
+}
+
+.fsp-ff-sukses .fsp-boodskap {
+  width: 100%;
+  min-height: 90px;
+  margin-top: 8px;
+}
+
+@media (max-width: 620px) {
+  .fsp-kons-velde {
+    grid-template-columns: 1fr;
+  }
+  .fsp-kons-weg {
+    margin-left: 0;
+  }
+}
