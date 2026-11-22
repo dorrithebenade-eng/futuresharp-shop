@@ -60,6 +60,13 @@
 [functions."mandjie-herinnering"]
   schedule = "5 * * * *"
 
+# bestelling-laat-herinnering (22 Nov 2026): een e-pos aan personeel met die
+# harde-kopie-bestellings wat langer as 10 dae nie afgehandel is nie. Elke
+# bestelling kom net een keer in so 'n pos. 04:30 UTC is 06:30 in Suid-Afrika,
+# na gov- en akk-herinnering. Sien die lêer.
+[functions."bestelling-laat-herinnering"]
+  schedule = "30 4 * * *"
+
 # Netlify Identity registrasie-instellings word via die Netlify-kontrolepaneel
 # gestel (nie hierdie lêer nie): "Oop registrasie" aan, standaard-rol by
 # registrasie = "koper" (via 'n Identity-triggerfunksie, sien

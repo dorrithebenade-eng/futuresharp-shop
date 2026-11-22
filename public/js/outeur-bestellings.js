@@ -2,7 +2,8 @@
 //
 // Die Bestellings-afdeling: harde kopieë wat die outeur moet stuur, en dié
 // wat hy reeds gestuur het. Hy merk hulle hier as gestuur, met 'n datum en
-// 'n opsionele spoornommer, en kan dit later wysig of terugtrek.
+// 'n opsionele spoornommer, en kan dit later wysig. Weer oopmaak is net vir
+// Future Sharp, in die paneelbord.
 //
 // EIE LÊER, soos outeur-titels.js. Dit wag op die "outeur-gereed"-sein en
 // weet niks van aanmelding nie.
@@ -219,17 +220,9 @@ function ob_bou_vorm(bestelling, herlaai) {
   ry.appendChild(bevestig);
   ry.appendChild(kanselleer);
 
-  // Terugtrek verskyn slegs by iets wat reeds gemerk is.
-  if (bestelling.gestuur) {
-    const terugtrek = document.createElement("button");
-    terugtrek.type = "button";
-    terugtrek.className = "outeur-knoppie-teks outeur-terugtrek";
-    terugtrek.textContent = ob_vertaal("outeur_terugtrek", "Trek terug");
-    terugtrek.addEventListener("click", () => {
-      ob_stuur(bestelling.bestelnommer, { gestuur: false }, fout, bevestig, herlaai);
-    });
-    ry.appendChild(terugtrek);
-  }
+  // GEEN "TREK TERUG" NIE (22 Nov 2026). Net Future Sharp maak 'n gestuurde
+  // bestelling weer oop, in die paneelbord (merk-afgehandel-personeel.js).
+  // Die outeur kan steeds Wysig, bv. om 'n spoornommer reg te maak.
 
   bevestig.addEventListener("click", () => {
     ob_stuur(

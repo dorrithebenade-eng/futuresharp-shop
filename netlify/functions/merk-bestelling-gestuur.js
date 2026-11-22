@@ -1,7 +1,7 @@
 // netlify/functions/merk-bestelling-gestuur.js
 //
 // Die outeur merk 'n harde-kopie-bestelling as gestuur, met 'n datum en 'n
-// opsionele spoornommer. Hy kan dit ook wysig of terugtrek.
+// opsionele spoornommer. Hy kan dit ook wysig, maar nie terugtrek nie.
 //
 // WAAROM 'N EIE VELD EN NIE `drukker` NIE: drukker.bestelling_geplaas
 // beteken "die bestelling is by die drukverskaffer geplaas" — personeel se
@@ -100,7 +100,14 @@ exports.handler = async (event, context) => {
     return { statusCode: 400, body: "Verpligte veld: bestelnommer" };
   }
 
-  const gestuur = invoer.gestuur !== false;
+  // TERUGTREK IS NIE MEER DIE OUTEUR S'N NIE (22 Nov 2026). Net Future Sharp
+  // maak 'n gestuurde bestelling weer oop, deur merk-afgehandel-personeel.js.
+  // Die knoppie is ook uit die outeurspaneel; hierdie keer vang 'n ou bladsy
+  // in iemand se blaaier.
+  if (invoer.gestuur === false) {
+    return { statusCode: 403, body: "Net Future Sharp kan 'n gestuurde bestelling weer oopmaak" };
+  }
+  const gestuur = true;
 
   // "self" of "verskaffer". Enigiets anders word "self", want dit is die
   // eenvoudiger geval en die velde wat daarby hoort, is opsioneel.
