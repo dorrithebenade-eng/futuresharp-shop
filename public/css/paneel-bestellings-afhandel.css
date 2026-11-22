@@ -1,0 +1,128 @@
+/* paneel-bestellings-afhandel.css — oortjies, merkies en stroke vir
+   paneel-bestellings-afhandel.js (November 2026). */
+
+#bh-bo {
+  margin-bottom: 16px;
+}
+
+.bh-oortjies {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.bh-oortjie {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #E3E0D9;
+  background: var(--wit);
+  color: var(--swart);
+  border-radius: 99px;
+  padding: 7px 14px;
+  font-family: var(--font-liggaam);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.bh-oortjie .bh-tel {
+  background: var(--grys-lig);
+  border-radius: 99px;
+  padding: 1px 8px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.bh-oortjie--laat .bh-tel {
+  background: var(--koraal);
+  color: var(--wit);
+}
+
+.bh-oortjie--aktief {
+  background: var(--swart);
+  border-color: var(--swart);
+  color: var(--wit);
+}
+
+.bh-oortjie--aktief .bh-tel {
+  background: rgba(255, 255, 255, 0.18);
+  color: var(--wit);
+}
+
+.bh-waarskuwing {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  background: #FDEEE9;
+  border: 1px solid #F6C7B8;
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  font-size: 13px;
+}
+
+.bh-waarskuwing-knoppie {
+  background: var(--koraal);
+  color: var(--wit);
+  border: 0;
+  border-radius: 99px;
+  padding: 6px 14px;
+  font-family: var(--font-liggaam);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.bh-merkie {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-family: var(--font-liggaam);
+  white-space: nowrap;
+}
+
+.bh-merkie--klaar {
+  background: var(--swart);
+  color: var(--wit);
+}
+
+.bh-merkie--oop {
+  background: #FCF3DA;
+  color: #8A6400;
+}
+
+.bh-merkie--laat {
+  background: var(--koraal);
+  color: var(--wit);
+}
+
+.bh-kaart--laat {
+  border-color: #F6C7B8;
+  box-shadow: inset 4px 0 0 var(--koraal);
+}
+
+.bh-strook {
+  margin-top: 10px;
+  background: var(--grys-lig);
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-size: 13px;
+  color: var(--swart);
+}
+
+.bh-strook-sub {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--grys-teks);
+}
+
+@media (max-width: 620px) {
+  .paneel-bestelling-kop {
+    flex-wrap: wrap;
+  }
+}

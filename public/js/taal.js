@@ -30,6 +30,30 @@ const TAAL_SLEUTEL = "future_shop_taal";
 })();
 
 const WOORDEBOEK = {
+  // Paneelbord: bestellings afhandel (November 2026, paneel-bestellings-afhandel.js)
+  bh_oortjie_oop: { af: "Om af te handel", en: "To handle" },
+  bh_oortjie_laat: { af: "Laat", en: "Overdue" },
+  bh_oortjie_klaar: { af: "Afgehandel", en: "Handled" },
+  bh_oortjie_alles: { af: "Alles", en: "All" },
+  bh_waarsku_een: { af: "1 bestelling is langer as {d} dae nie afgehandel nie.", en: "1 order has not been handled for more than {d} days." },
+  bh_waarsku_meer: { af: "{n} bestellings is langer as {d} dae nie afgehandel nie.", en: "{n} orders have not been handled for more than {d} days." },
+  bh_wys_hulle: { af: "Wys hulle", en: "Show them" },
+  bh_merkie_klaar: { af: "Afgehandel", en: "Handled" },
+  bh_merkie_oop: { af: "Oop", en: "Open" },
+  bh_merkie_laat: { af: "Laat", en: "Overdue" },
+  bh_een_dag: { af: "1 dag", en: "1 day" },
+  bh_dae: { af: "dae", en: "days" },
+  bh_outo_titel: { af: "Sonder harde kopie: afgehandel by betaling", en: "No hard copy: handled on payment" },
+  bh_gestuur_op: { af: "Gestuur op", en: "Sent on" },
+  bh_self_gepos: { af: "self gepos", en: "posted by the author" },
+  bh_deur_verskaffer: { af: "deur", en: "by" },
+  bh_verskaffer: { af: "'n drukker of verspreider", en: "a printer or distributor" },
+  bh_spoornommer: { af: "Spoornommer", en: "Tracking number" },
+  bh_gemerk_deur: { af: "Gemerk deur", en: "Marked by" },
+  bh_die_outeur: { af: "die outeur", en: "the author" },
+  bh_op: { af: "op", en: "on" },
+  bh_leeg_oop: { af: "Niks om af te handel nie.", en: "Nothing to handle." },
+  bh_leeg_laat: { af: "Niks is laat nie.", en: "Nothing is overdue." },
   // Nav
   nav_mandjie: { af: "Mandjie", en: "Cart" },
   nav_kursusse: { af: "Kursusse", en: "Courses" },
