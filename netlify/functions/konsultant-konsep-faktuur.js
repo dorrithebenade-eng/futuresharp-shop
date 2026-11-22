@@ -45,11 +45,11 @@ const IGNATIUS = "Ignatius Gous";
 const DORRITHE = "Dorrithé Labuschagne";
 const KONSULTANT_PCT = 70;
 const HOSTING_PCT = 5;
-// Soos op FS/01970 (November 2026). Sien die vraag aan Dorrithé in die
-// oordragnota as dit verander.
+// Soos op FS/01961 en FS/01962, deur Dorrithé bevestig op 22 November 2026:
+// sy kry die groter deel. FS/01970 het die twee per abuis omgeruil.
 const VRAE_VERDELING = [
-  { ontvanger: IGNATIUS, tipe: "pct", waarde: 62.5 },
-  { ontvanger: DORRITHE, tipe: "pct", waarde: 32.5 },
+  { ontvanger: DORRITHE, tipe: "pct", waarde: 62.5 },
+  { ontvanger: IGNATIUS, tipe: "pct", waarde: 32.5 },
 ];
 
 const JSON_KOP = { "Content-Type": "application/json", "Cache-Control": "no-store" };
