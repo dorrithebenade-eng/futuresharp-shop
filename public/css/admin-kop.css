@@ -119,6 +119,14 @@ body.ak-kop .mini-kop .paneel-area-kieslys .paneel-area-pil-admin.aktief { backg
    drie logokleure het elk reeds een betekenis. */
 body.ak-kop .mini-kop .paneel-area-kieslys .paneel-area-pil-akkreditasies,
 body.ak-kop .mini-kop .paneel-area-kieslys .paneel-area-pil-akkreditasies.aktief { background: #fff; color: var(--ak-navy); border: 0; }
+/* LearnWorlds (22 Nov 2026): 'n wit buitelyn met 'n pyltjie. Die pil
+   verlaat die paneel (nuwe oortjie) en kry daarom geen vulkleur nie. */
+body.ak-kop .mini-kop .paneel-area-kieslys .paneel-area-pil-learnworlds {
+  background: transparent;
+  color: #fff;
+  border: 1.5px solid rgba(255, 255, 255, .75);
+}
+body.ak-kop .mini-kop .paneel-area-kieslys .paneel-area-pil-learnworlds:hover { border-color: #fff; }
 
 body.ak-kop .mini-kop .paneel-area-kieslys .paneel-area-pil.aktief { font-weight: 600; }
 body.ak-kop .mini-kop .paneel-area-kieslys .paneel-area-pil.aktief::after {

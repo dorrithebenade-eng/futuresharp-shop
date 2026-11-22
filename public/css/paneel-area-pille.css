@@ -185,3 +185,19 @@ body.paneel-area-pille-aan #paneel-boekhouding-skakel { display: none; }
    admin-kop.css; hierdie twee reels geld net buite die kop. */
 .paneel-area-pil-governance { color: #8C6410; }
 .paneel-area-pil-governance.aktief { background: var(--amber); border-color: var(--amber); color: var(--swart); }
+
+
+/* LEARNWORLDS (22 Nov 2026). Geen area van hierdie werf nie: die pil open
+   futuresharp-checkout se kursus- en koeponpaneel in 'n nuwe oortjie en is
+   dus nooit aktief nie. 'n Buitelyn in plaas van 'n vulkleur, want die drie
+   logokleure en wit dra reeds elk 'n area. Die kopweergawe staan in
+   admin-kop.css; hierdie reels geld onder 620px, op wit. */
+.paneel-area-pil-learnworlds {
+  color: #071630;
+  border-color: #071630;
+}
+.paneel-area-pil-pyl {
+  margin-left: 6px;
+  font-size: .95em;
+  line-height: 1;
+}

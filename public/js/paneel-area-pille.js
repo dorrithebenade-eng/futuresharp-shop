@@ -106,6 +106,25 @@
     return pil;
   }
 
+  const LW_ADRES = "https://futuresharp-checkout.netlify.app/admin-koepons.html";
+
+  function bou_lw_pil() {
+    const pil = document.createElement("a");
+    pil.className = "paneel-area-pil paneel-area-pil-learnworlds";
+    pil.href = LW_ADRES;
+    pil.target = "_blank";
+    // noopener: die nuwe oortjie kry geen greep op hierdie een nie.
+    pil.rel = "noopener";
+    pil.title = "Kursusse en koepons (nuwe oortjie)";
+    pil.appendChild(document.createTextNode("LearnWorlds"));
+    const pyl = document.createElement("span");
+    pyl.className = "paneel-area-pil-pyl";
+    pyl.setAttribute("aria-hidden", "true");
+    pyl.textContent = "↗";
+    pil.appendChild(pyl);
+    return pil;
+  }
+
   function bou_ry(gebruiker) {
     const bladsy = kry_bladsy();
     if (!bladsy) return false;
@@ -172,6 +191,17 @@
       ry.appendChild(
         bou_pil("Akkreditasies", bladsy.area === "akkreditasies", "akkreditasies.html", "akkreditasies")
       );
+    }
+    // LearnWorlds (22 Nov 2026): dieselfde rol as Governance. Anders as die
+    // ander pille is dit nie 'n area van hierdie werf nie: dit open die
+    // kursus- en koeponpaneel van futuresharp-checkout in 'n nuwe oortjie.
+    // Daarom is hy nooit aktief nie, en die pyltjie wys dat hy die paneel
+    // verlaat.
+    //
+    // DIE PIL IS NIE DIE SLOT NIE, en hier geld dit sterker as elders:
+    // admin-koepons.html en sy Functions het self geen aanmelding nie.
+    if (het_boekhouding) {
+      ry.appendChild(bou_lw_pil());
     }
 
     // WAAR DIE RY STAAN, HANG VAN DIE SKERM AF.
