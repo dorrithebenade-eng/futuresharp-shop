@@ -126,3 +126,139 @@
     flex-wrap: wrap;
   }
 }
+
+/* --- Stap 2 en 3: afmerk, weer oopmaak, volg op --- */
+
+.bh-outeur-reel {
+  font-size: 13px;
+  margin: -4px 0 10px;
+  color: var(--grys-teks);
+}
+
+.bh-outeur-reel strong {
+  color: var(--swart);
+}
+
+.bh-aksies {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.bh-knoppie-primer {
+  background: var(--teal);
+  color: var(--wit);
+  border: 0;
+  border-radius: 99px;
+  padding: 7px 16px;
+  font-family: var(--font-liggaam);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.bh-knoppie-primer:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.bh-knoppie-rand {
+  background: var(--wit);
+  color: var(--swart);
+  border: 1px solid var(--swart);
+  border-radius: 99px;
+  padding: 6px 14px;
+  font-family: var(--font-liggaam);
+  font-size: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.bh-knoppie-rand--koraal {
+  color: var(--koraal);
+  border-color: var(--koraal);
+  font-weight: 600;
+}
+
+.bh-knoppie-teks {
+  background: none;
+  border: 0;
+  color: var(--grys-teks);
+  font-family: var(--font-liggaam);
+  font-size: 13px;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.bh-aksie-status {
+  font-size: 12px;
+  color: var(--grys-teks);
+}
+
+.bh-strook-ry {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.bh-strook-opvolg {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--koraal);
+}
+
+.bh-vorm {
+  margin-top: 12px;
+  background: #E3F5F1;
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+
+.bh-vorm-velde {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.bh-vorm-velde label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.bh-vorm-velde .veld-invoer {
+  margin: 0;
+}
+
+.bh-vorm-breed {
+  grid-column: 1 / -1;
+}
+
+.bh-vorm-hulp {
+  font-size: 12px;
+  color: var(--grys-teks);
+  margin: 8px 0 0;
+}
+
+.bh-vorm-fout {
+  font-size: 13px;
+  color: var(--koraal);
+  font-weight: 600;
+  margin: 6px 0 0;
+}
+
+.bh-vorm-fout:empty {
+  display: none;
+}
+
+@media (max-width: 620px) {
+  .bh-vorm-velde {
+    grid-template-columns: 1fr;
+  }
+}
